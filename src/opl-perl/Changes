@@ -1,0 +1,45 @@
+
+ 20030407 Peter Banik <peter@ripe.net>
+
+ -- Added more test cases for Storable tests: freeze()/thaw() as well as store()/retrieve()
+    is being tested now.
+ 
+ 20030221 Peter Banik <peter@ripe.net>
+
+ -- Added hooks for Storable.
+
+ 20020905 Peter Banik <peter@ripe.net>
+
+ -- Library renamed to Net::Whois::RIPE::RPSL
+ -- Leak tests were failing on Solaris because of 4 bytes difference, added a tolerance value to deal with this.
+
+ 20020828 Peter Banik <peter@ripe.net>
+
+ Portability fixes:
+
+ -- Makefile.PL now searches for `ar' (on Solaris it used to live in /usr/ccs/bin)
+ -- mem() subroutine was moved out of test scripts into mem.pl
+ -- linux-specific options for `ps' changed in order to be understood by Solaris `ps' as well
+
+
+ 20020805 Peter Banik <peter@ripe.net>
+
+ Updated XS code with new routines in librpsl.
+ 
+ -- Added RPSL::get_classes()
+ -- Added RPSL::TemplateAttribute subclass
+ -- Added RPSL::get_template()
+ -- Added RPSL::Attribute::attr_get_clean_lines()
+
+ In order to get RPSL::get_template() being able to return the template as a
+ hash reference, this module will need the Tie::IxHash module, which is available
+ from CPAN:
+
+ http://search.cpan.org/author/GSAR/Tie-IxHash-1.21/
+
+
+20011203
+
+ -- original version; created by h2xs 1.20 with options
+	-x -k -a -f '-F-I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include' -p rpsl_ -M 'rpsl.*' -v 0.1 -n RPSL syntax_api.h -L./ -lrpsl -lglib
+

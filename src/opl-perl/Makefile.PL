@@ -1,0 +1,26 @@
+use ExtUtils::MakeMaker;
+
+
+# Look for external tools
+@search_path = split(/:/, $ENV{PATH});
+
+# Find GNU tools on SunOS
+if($^O =~ /sunos/) {
+    push(@search_path, '/usr/ccs/bin');
+}
+
+foreach $path (@search_path){
+  	$full_ar = "$path/ar" if -f "$path/ar";
+}
+
+
+WriteMakefile(
+    'ABSTRACT'		=> 'RPSL',
+    'AUTHOR'		=> 'Kevin Baker <kevin@ripe.net>',
+	'NAME'         => 'Net::Whois::RIPE::RPSL',
+	'VERSION_FROM' => 'RPSL.pm',
+	'PREREQ_PM'    => { Tie::IxHash => 1.21 },
+	'DEFINE'       => '',
+	'LIBS'         => ['-Llib -lrpsl -lglib -lpthread'],
+	'INC'          => '-Iinclude `glib-config --cflags`',
+);

@@ -1,0 +1,34 @@
+const GList *					T_PTROBJ
+const char *					T_PV
+const gchar *					T_PV
+const gchar * class				T_PTROBJ
+const rpsl_attr_t *				T_PTROBJ
+const rpsl_object_t *				T_PTROBJ
+const rpsl_template_t *				T_PTROBJ
+gchar *						T_PV
+gchar **					T_AV
+gint						T_IV
+gint *						T_PTROBJ
+guint						T_UV
+gboolean					T_IV
+rpsl_attr_t *					T_PTROBJ
+rpsl_object_t *					T_PTROBJ
+rpsl_error_t *					T_PTROBJ
+rpsl_template_t *				T_PTROBJ
+RPSL_object *					T_PTROBJ
+Net::Whois::RIPE::RPSL::Error *			T_RPSL_ERROR
+
+#############################################################################
+INPUT
+T_RPSL_ERROR
+	if (sv_derived_from($arg, \"Net::Whois::RIPE::RPSL::Error\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    croak(\"$var is not of type Net::Whois::RIPE::RPSL::Error\")
+#############################################################################
+OUTPUT
+T_RPSL_ERROR
+	sv_setref_pv($arg, \"Net::Whois::RIPE::RPSL::Error\", (void*)$var);
+	

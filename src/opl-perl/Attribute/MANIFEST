@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+Attribute.pm
+t/01attr.t
+t/02split.t
+t/10leak.t
+t/11leak_split.t
+t/mem.pl

@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Whois::RIPE::RPSL::attr.
+
+0.01  Wed Dec  5 15:33:07 2001
+	- original version; created by h2xs 1.20 with options
+		-OAXn Net::Whois::RIPE::RPSL::attr
+
