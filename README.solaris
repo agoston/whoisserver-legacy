@@ -72,4 +72,4 @@ o Use a RAM device for the MySQL temporary space.
 
   to the "/etc/my.cnf" file and restarting MySQL.
 
-$Date: 2004/12/27 16:38:37 $
+$Date: 2004/12/27 17:52:32 $

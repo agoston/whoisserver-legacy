@@ -1,6 +1,6 @@
 <!DOCTYPE ripe_attributes SYSTEM "attributes.dtd">
 
-<ripe_attributes version="$Revision: 1.1 $" author="$Author: can $">
+<ripe_attributes version="$Revision: 1.4 $" author="$Author: denis $">
 
   <ripe_attribute name="address" code="ad">
     <description>
@@ -243,20 +243,6 @@
     </description>
     <syntax>country-code</syntax>
   </ripe_attribute>
-
-  <ripe_attribute name="default" code="df">
-     <description>
-   Specifies default routing policies.
-     </description>
-     <syntax>default</syntax>
-  </ripe_attribute>
- 
-  <ripe_attribute name="mp-default" code="ma">
-     <description>
-   Specifies default multiprotocol routing policies.
-     </description>
-     <syntax>mp-default</syntax>
-  </ripe_attribute>
  
   <ripe_attribute name="descr" code="de">
     <description>
@@ -353,20 +339,6 @@
         </sqlquery>
       </queries>
     </keys>
-  </ripe_attribute>
-
-  <ripe_attribute name="export" code="ex">
-    <description>
-   Specifies an export policy expression.
-    </description>
-    <syntax>export</syntax>
-  </ripe_attribute>
-
-  <ripe_attribute name="mp-export" code="me">
-    <description>
-   Specifies a multiprotocol export policy expression.
-    </description>
-    <syntax>mp-export</syntax>
   </ripe_attribute>
 
   <ripe_attribute xmlname="export-comps-rt" name="export-comps" code="ec">
@@ -569,20 +541,6 @@
         </sqlquery>
       </queries>
     </keys>
-  </ripe_attribute>
-
-  <ripe_attribute name="import" code="ip">
-     <description>
-   Specifies import policy expression.
-     </description>
-     <syntax>import</syntax>
-  </ripe_attribute>
-
-  <ripe_attribute name="mp-import" code="my">
-     <description>
-   Specifies multiprotocol import policy expression.
-     </description>
-     <syntax>mp-import</syntax>
   </ripe_attribute>
 
   <ripe_attribute name="inetnum" code="in">
@@ -1041,151 +999,6 @@
     </keys>
   </ripe_attribute>
 
-
- <ripe_attribute name="mnt-routes" code="mu">
-    <description>
-   This attribute references a maintainer object which is used in
-   determining authorisation for the creation of route objects.
-   After the reference to the maintainer, an optional list of
-   prefix ranges inside of curly braces or the keyword "ANY" may
-   follow. The default, when no additional set items are
-   specified, is "ANY" or all more specifics. Please refer to
-   RFC-2622 for more information.
-    </description>
-    <syntax>mnt-routes</syntax>
-
-    <representation>
-    <sqltable name="mnt_routes">
-      <insert qtype="ud_ax_mu">
-        INSERT mnt_routes
-        SELECT %d, %ld, mntner.object_id, %d
-        FROM mntner
-        WHERE mntner.mntner='%s'
-      </insert>
-      <update qtype="ud_ax_mu">
-        UPDATE mnt_routes
-        SET thread_id=%d
-        WHERE object_id=%ld
-        AND mnt_id=%ld
-      </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
-    </sqltable>
-    </representation>
-
-    <keys searchable="inverse">
-      <foreign value="mt"/>
-
-      <queries>
-        <sqlquery keytype="wk_mntner" class="ANY">
-          SELECT i.object_id,0
-          FROM   mntner, mnt_routes i
-          WHERE  mntner.object_id = i.mnt_id
-          AND    mntner.mntner  = '%s'
-          AND    i.thread_id = 0
-        </sqlquery>
-      </queries>
-    </keys>  
-  </ripe_attribute>
-
-  <ripe_attribute xmlname="mnt-routes6" name="mnt-routes" code="mu">
-    <description>
-   This attribute references a maintainer object which is used in
-   determining authorisation for the creation of route6 objects.
-   This entry is for the mnt-routes attribute of route6 and inet6num classes.
-   After the reference to the maintainer, an optional list of
-   prefix ranges inside of curly braces or the keyword "ANY" may
-   follow. The default, when no additional set items are
-   specified, is "ANY" or all more specifics.
-    </description>
-    <syntax>mnt-routes6</syntax>
-
-    <representation>
-    <sqltable name="mnt_routes">
-      <insert qtype="ud_ax_mu">
-        INSERT mnt_routes
-        SELECT %d, %ld, mntner.object_id, %d
-        FROM mntner
-        WHERE mntner.mntner='%s'
-      </insert>
-      <update qtype="ud_ax_mu">
-        UPDATE mnt_routes
-        SET thread_id=%d
-        WHERE object_id=%ld
-        AND mnt_id=%ld
-      </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
-    </sqltable>
-    </representation>
-
-    <keys searchable="inverse">
-      <foreign value="mt"/>
-
-      <queries>
-        <sqlquery keytype="wk_mntner" class="ANY">
-          SELECT i.object_id
-          FROM   mntner, mnt_routes i
-          WHERE  mntner.object_id = i.mnt_id
-          AND    mntner.mntner  = '%s'
-          AND    i.thread_id = 0
-        </sqlquery>
-      </queries>
-    </keys>
-  </ripe_attribute>
-
-  <ripe_attribute xmlname="mnt-routes-an" name="mnt-routes" code="mu">
-    <description>
-   This attribute references a maintainer object which is used in
-   determining authorisation for the creation of route6 objects.
-   This entry is for the mnt-routes attribute of aut-num class.
-   After the reference to the maintainer, an optional list of
-   prefix ranges inside of curly braces or the keyword "ANY" may
-   follow. The default, when no additional set items are
-   specified, is "ANY" or all more specifics.
-    </description>
-    <syntax>mnt-routes-an</syntax>
-
-    <representation>
-    <sqltable name="mnt_routes">
-      <insert qtype="ud_ax_mu">
-        INSERT mnt_routes
-        SELECT %d, %ld, mntner.object_id, %d
-        FROM mntner
-        WHERE mntner.mntner='%s'
-      </insert>
-      <update qtype="ud_ax_mu">
-        UPDATE mnt_routes
-        SET thread_id=%d
-        WHERE object_id=%ld
-        AND mnt_id=%ld
-      </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
-    </sqltable>
-    </representation>
-
-    <keys searchable="inverse">
-      <foreign value="mt"/>
-
-      <queries>
-        <sqlquery keytype="wk_mntner" class="ANY">
-          SELECT i.object_id
-          FROM   mntner, mnt_routes i
-          WHERE  mntner.object_id = i.mnt_id
-          AND    mntner.mntner  = '%s'
-          AND    i.thread_id = 0
-        </sqlquery>
-      </queries>
-    </keys>
-  </ripe_attribute>
-
   <ripe_attribute name="mntner" code="mt">
     <description>
    A unique identifier of the mntner object.
@@ -1544,52 +1357,16 @@
     <syntax>telephone-number</syntax>
   </ripe_attribute>
 
-  <ripe_attribute name="referral-by" code="rb">
-    <description>
-   This attribute is required in the maintainer object.  It may
-   never be altered after the addition of the maintainer.  This
-   attribute refers to the maintainer that created this
-   maintainer.  It may be multiple if more than one signature
-   appeared on the transaction creating the object.
-    </description>
-    <syntax>object-name</syntax>
-    <representation>
-    <sqltable name="referral_by">
-      <insert qtype="ud_aux__">
-        INSERT referral_by
-        SELECT %d, %ld, mntner.object_id, %d
-        FROM mntner WHERE mntner.mntner='%s'
-      </insert>
-      <update qtype="ud_ax_mt">
-        UPDATE referral_by
-        SET thread_id=%d
-        WHERE object_id=%ld
-        AND mnt_id=%ld
-      </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
-    </sqltable>
-    </representation>
-
-    <keys searchable="inverse">
-      <foreign value="mt"/>
-      <queries>
-        <sqlquery keytype="wk_mntner" class="ANY">
-          SELECT i.object_id,0
-          FROM   mntner, referral_by i
-          WHERE  mntner.object_id = i.mnt_id
-          AND    mntner.mntner = '%s'
-          AND    i.thread_id = 0
-        </sqlquery>
-      </queries>
-    </keys>
-  </ripe_attribute>
-
   <ripe_attribute name="remarks" code="rm">
     <description>
    Contains remarks.
+    </description>
+    <syntax>free-form</syntax>
+  </ripe_attribute>
+
+  <ripe_attribute name="parent" code="pt">
+    <description>
+   Generated at query time to show the parent object.
     </description>
     <syntax>free-form</syntax>
   </ripe_attribute>
@@ -1657,48 +1434,6 @@
       </update>
     </sqltable>
     </representation>
-  </ripe_attribute>
-
-  <ripe_attribute name="rev-srv" code="rz">
-    <description>
-   Specifies a DNS nameserver for a range of IP addresses
-   represented by the inetnum object that contains this
-   attribute.
-    </description>
-    <syntax><ripe-list/>domain-name</syntax>
-
-    <representation>
-    <sqltable name="rev_srv">
-      <insert qtype="ud_lf_ot">
-        INSERT rev_srv
-        SET thread_id=%d, object_id=%ld, object_type=%d, rev_srv='%s'
-      </insert>
-      <update qtype="ud_leaf_">
-        UPDATE rev_srv
-        SET thread_id=%d
-        WHERE object_id=%ld
-        AND rev_srv='%s'
-      </update>
-    </sqltable>
-    </representation>
-
-    <keys searchable="inverse">
-
-      <queries>
-        <sqlquery keytype="wk_domain" class="in">
-          SELECT object_id,0
-          FROM   rev_srv
-          WHERE  rev_srv = '%s'
-          AND    thread_id = 0
-        </sqlquery>
-        <sqlquery keytype="wk_domain" class="i6">
-          SELECT object_id,0
-          FROM   rev_srv
-          WHERE  rev_srv = '%s'
-          AND    thread_id = 0
-        </sqlquery>
-      </queries>
-    </keys>
   </ripe_attribute>
 
   <ripe_attribute name="role" code="ro">
@@ -1802,8 +1537,8 @@
     <description>
   Specifies the type of the organisation.  The possible values are 'IANA' for
   Internet Assigned Numbers Authority, 'RIR' for Regional Internet
-  Registries, 'NIR' for National Internet Registries, 'LIR' for Local
-  Internet Registries, and 'NON-REGISTRY' for all other organisations.
+  Registries, 'NIR' for National Internet Registries and 'LIR' for Local
+  Internet Registries.
     </description>
     <syntax>org-type</syntax>
   </ripe_attribute>
@@ -2411,20 +2146,6 @@
     </keys>
   </ripe_attribute>
 
-  <ripe_attribute xmlname="member-of-an" name="member-of" code="mo">
-    <description>
-   This attribute can be used in the route, aut-num and inet-rtr
-   classes. The value of the "member-of:" attribute identifies a
-   set object that this object wants to be a member of.  This
-   claim, however, should be acknowledged by a respective
-   "mbrs-by-ref:" attribute in the referenced object.
-    </description>
-    <syntax><list/>as-set</syntax>
-
-<!-- For update rules, see member-of-ir  -->
-
-  </ripe_attribute>
-
   <ripe_attribute xmlname="member-of-rt" name="member-of" code="mo">
     <description>
    This attribute can be used in the route, aut-num and inet-rtr
@@ -2438,48 +2159,6 @@
 <!-- For update rules, see member-of-ir  -->
 
   </ripe_attribute>
-
-  <ripe_attribute name="mnt-irt" code="mi">
-    <description>
-   May appear in an inetnum or inet6num object. It points to an
-   irt object representing a Computer Security Incident Response
-   Team (CSIRT) that handles security incidents for the address
-   space specified by the inetnum or inet6num object.
-    </description>
-    <syntax><list/>irt</syntax>
-    <representation> 
-    <sqltable name="mnt_irt">
-      <insert qtype="ud_aux__">
-        INSERT mnt_irt 
-        SELECT %d, %ld, irt.object_id, %d 
-        FROM irt WHERE irt.irt='%s'
-      </insert>
-      <update qtype="ud_ax_it">
-        UPDATE mnt_irt
-        SET thread_id=%d
-        WHERE object_id=%ld
-        AND irt_id=%ld
-      </update>
-      <dummy qtype="ud_ax_it">
-        INSERT irt
-        SET thread_id=%d, object_id=%ld, irt='%s', dummy=1
-      </dummy>
-    </sqltable>
-    </representation>
-    <keys searchable="inverse">
-      <foreign value="it"/>
-
-      <queries>
-        <sqlquery keytype="wk_irt" class="ANY">
-          SELECT b.object_id,0
-          FROM   irt a, mnt_irt b
-          WHERE  a.object_id = b.irt_id
-          AND    a.irt = '%s'
-          AND    b.thread_id = 0
-        </sqlquery>
-      </queries>
-    </keys>
- </ripe_attribute>
 
   <ripe_attribute name="irt" code="it">
     <description>

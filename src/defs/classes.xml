@@ -3,7 +3,7 @@
 <!-- XXX: will want to add core template in the future, to 
           document which fields are mandatory for core (e.g. nic-hdl) -->
 
-<ripe_classes version="$Revision: 1.1 $" author="$Author: can $">
+<ripe_classes version="$Revision: 1.4 $" author="$Author: denis $">
 
   <ripe_class name="domain" main_sql_table="domain" code="dn">
     <description>
@@ -66,17 +66,15 @@
       <org         choice="optional"  number="single"   />
       <admin-c     choice="mandatory" number="multiple" />
       <tech-c      choice="mandatory" number="multiple" />
-      <rev-srv     choice="optional"  number="multiple" />
       <status-in   choice="mandatory" number="single"   />
       <remarks     choice="optional"  number="multiple" />
       <notify      choice="optional"  number="multiple" />
       <mnt-by      choice="mandatory" number="multiple" />
       <mnt-lower   choice="optional"  number="multiple" />
       <mnt-domains choice="optional"  number="multiple" />
-      <mnt-routes  choice="optional"  number="multiple" />
-      <mnt-irt     choice="optional"  number="multiple" />
       <changed     choice="mandatory" number="multiple" />
       <source      choice="mandatory" number="single"   />
+      <parent      choice="generated" number="multiple" />
       <delete      choice="optional"  number="single"   pseudo="yes"/>
       <override    choice="optional"  number="single"   pseudo="yes"/>
     </attributes>
@@ -85,19 +83,15 @@
       <table name="mntner"/>
       <table name="person_role"/>
       <table name="names"/>
-      <table name="irt"/>
       <table name="organisation"/>
     </rollback-tables>
     <affected-tables>
       <table name="admin_c"/>
       <table name="tech_c"/>
-      <table name="rev_srv"/>
       <table name="notify"/>
       <table name="mnt_by"/>
       <table name="mnt_lower"/>
       <table name="mnt_domains"/>
-      <table name="mnt_routes"/>
-      <table name="mnt_irt"/>
       <table name="org"/>
     </affected-tables>
   </ripe_class>
@@ -208,7 +202,6 @@
       <remarks      choice="optional"  number="multiple" />
       <notify       choice="optional"  number="multiple" />
       <mnt-by       choice="mandatory" number="multiple" />
-      <referral-by  choice="mandatory" number="single"   />
       <changed      choice="mandatory" number="multiple" />
       <source       choice="mandatory" number="single"   />
       <delete       choice="optional"  number="single"   pseudo="yes"/>
@@ -230,16 +223,13 @@
       <table name="notify"/>
       <table name="mnt_by"/>
       <table name="auth_override"/>
-      <table name="referral_by"/>
       <table name="org"/>
     </affected-tables>
     <delete-invquery-tables>
       <table name="mnt_by"/>
       <table name="mnt_lower"/>
-      <table name="mnt_routes"/>
       <table name="mnt_domains"/>
       <table name="mbrs_by_ref"/>
-      <table name="referral_by"/>
       <table name="mnt_ref"/>
     </delete-invquery-tables>
   </ripe_class>
@@ -348,6 +338,7 @@
       <org-name     choice="mandatory" number="single"   />
       <org-type     choice="mandatory" number="single"   />
       <descr        choice="optional"  number="multiple" />
+      <country      choice="mandatory" number="multiple" />
       <remarks      choice="optional"  number="multiple" />
       <address      choice="mandatory" number="multiple" />
       <phone        choice="optional"  number="multiple" />
@@ -493,17 +484,15 @@
       <org          choice="optional"  number="single"   />
       <admin-c      choice="mandatory" number="multiple" />
       <tech-c       choice="mandatory" number="multiple" />
-      <rev-srv      choice="optional"  number="multiple" />
       <status-i6    choice="mandatory" number="single"   />
       <remarks      choice="optional"  number="multiple" />
       <notify       choice="optional"  number="multiple" />
       <mnt-by       choice="mandatory" number="multiple" />
       <mnt-lower    choice="optional"  number="multiple" />
-      <mnt-routes6  choice="optional"  number="multiple" />
       <mnt-domains  choice="optional"  number="multiple" />
-      <mnt-irt      choice="optional"  number="multiple" />
       <changed      choice="mandatory" number="multiple" />
       <source       choice="mandatory" number="single"   />
+      <parent       choice="generated" number="multiple" />
       <delete       choice="optional"  number="single"   pseudo="yes"/>
       <override     choice="optional"  number="single"   pseudo="yes"/>
     </attributes>
@@ -512,19 +501,15 @@
       <table name="mntner"/>
       <table name="person_role"/>
       <table name="names"/>
-      <table name="irt"/>
       <table name="organisation"/>
     </rollback-tables>
     <affected-tables>
       <table name="admin_c"/>
       <table name="tech_c"/>
-      <table name="rev_srv"/>
       <table name="notify"/>
       <table name="mnt_by"/>
       <table name="mnt_lower"/>
       <table name="mnt_domains"/>
-      <table name="mnt_routes"/>
-      <table name="mnt_irt"/>
       <table name="org"/>
     </affected-tables>
   </ripe_class>
@@ -625,20 +610,12 @@
       <aut-num      choice="mandatory" number="single"   />
       <as-name      choice="mandatory" number="single"   />
       <descr        choice="mandatory" number="multiple" />
-      <member-of-an choice="optional"  number="multiple" />
-      <import       choice="optional"  number="multiple" />
-      <mp-import    choice="optional"  number="multiple" />
-      <export       choice="optional"  number="multiple" />
-      <mp-export    choice="optional"  number="multiple" />
-      <default      choice="optional"  number="multiple" />
-      <mp-default   choice="optional"  number="multiple" />
       <remarks      choice="optional"  number="multiple" />
       <org          choice="optional"  number="single"   />
       <admin-c      choice="mandatory" number="multiple" />
       <tech-c       choice="mandatory" number="multiple" />
       <notify       choice="optional"  number="multiple" />
       <mnt-lower    choice="optional"  number="multiple" />
-      <mnt-routes-an choice="optional"  number="multiple" />
       <mnt-by       choice="mandatory" number="multiple" />
       <changed      choice="mandatory" number="multiple" />
       <source       choice="mandatory" number="single"   />
@@ -655,13 +632,11 @@
       <table name="organisation"/>
     </rollback-tables>
     <affected-tables>
-      <table name="member_of"/>
       <table name="admin_c"/>
       <table name="tech_c"/>
       <table name="notify"/>
       <table name="mnt_by"/>
       <table name="mnt_lower"/>
-      <table name="mnt_routes"/>
       <table name="org"/>
     </affected-tables>
   </ripe_class>
@@ -725,7 +700,6 @@
       <remarks      choice="optional"  number="multiple" />
       <notify       choice="optional"  number="multiple" />
       <mnt-lower    choice="optional"  number="multiple" />
-      <mnt-routes   choice="optional"  number="multiple" />
       <mnt-by       choice="mandatory" number="multiple" />
       <changed      choice="mandatory" number="multiple" />
       <source       choice="mandatory" number="single"   />
@@ -744,7 +718,6 @@
       <table name="notify"/>
       <table name="mnt_by"/>
       <table name="mnt_lower"/>
-      <table name="mnt_routes"/>
       <table name="org"/>
     </affected-tables>
   </ripe_class>
@@ -772,7 +745,6 @@
       <remarks      choice="optional"  number="multiple" />
       <notify       choice="optional"  number="multiple" />
       <mnt-lower    choice="optional"  number="multiple" />
-      <mnt-routes6  choice="optional"  number="multiple" />
       <mnt-by       choice="mandatory" number="multiple" />
       <changed      choice="mandatory" number="multiple" />
       <source       choice="mandatory" number="single"   />
@@ -791,7 +763,6 @@
       <table name="notify"/>
       <table name="mnt_by"/>
       <table name="mnt_lower"/>
-      <table name="mnt_routes6"/>
       <table name="org"/>
     </affected-tables>
   </ripe_class>
@@ -922,9 +893,6 @@
       <table name="irt_nfy"/>
       <table name="org"/>
     </affected-tables>
-    <delete-invquery-tables>
-      <table name="mnt_irt"/>
-    </delete-invquery-tables>
   </ripe_class>
 
 </ripe_classes>
