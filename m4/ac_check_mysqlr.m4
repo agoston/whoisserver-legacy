@@ -10,12 +10,10 @@ dnl
 dnl   MYSQL_LIBS
 dnl   MYSQL_CFLAGS
 dnl 
-dnl @version $Id: ac_check_mysqlr.m4,v 1.1 2004/12/27 17:52:33 can Exp $
+dnl @version $Id: ac_check_mysqlr.m4,v 1.2 2005/01/05 16:56:55 can Exp $
 dnl @author Can Bican <bican@yahoo.com>
 dnl
 AC_DEFUN([AC_CHECK_MYSQLR],[
-if test x"$OPLONLY" != xyes
-then
 AC_PATH_PROG(mysqlconfig,mysql_config)
 if test [ -z "${mysqlconfig}" ]
 then
@@ -28,6 +26,5 @@ else
     AC_MSG_CHECKING([mysql includes])
     MYSQL_CFLAGS=`${mysqlconfig} --cflags`
     AC_MSG_RESULT([$MYSQL_CFLAGS])
-fi
 fi
 ])
