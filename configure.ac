@@ -127,6 +127,9 @@ RIPE_SET_RPSL_VARIANT
 dnl check rdns extensions
 RIPE_CHECK_RDNS
 
+dnl check for ctime
+AC_CHECK_CTIME_R
+
 dnl check for various functions
 AC_CHECK_FUNCS([atexit bzero dup2 floor getcwd gethostbyname gethostname \
                 gettimeofday inet_ntoa isascii localeconv localtime_r \
