@@ -3,6 +3,8 @@ dnl Check if java compiler works
 dnl
 AC_DEFUN([AC_PROG_JAVAC_WORKS],[
 AC_CACHE_CHECK([if $JAVAC works], ac_cv_prog_javac_works, [
+if test x"$OPLONLY" != xyes
+then
 JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 cat << \EOF > $JAVA_TEST
@@ -18,6 +20,7 @@ else
   cat $JAVA_TEST >&AC_FD_CC
 fi
 rm -f $JAVA_TEST $CLASS_TEST
+fi
 ])
 AC_PROVIDE([$0])dnl
 ])
