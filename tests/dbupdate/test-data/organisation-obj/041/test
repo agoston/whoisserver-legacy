@@ -1,0 +1,26 @@
+# organisation object tests
+# CASE 41: Create an org object
+#          with an AUTO-1 nic-hdl (orgID)
+#          with override
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 41: The creation will succeed
+# rir AFRINIC
+
+
+organisation:  AUTO-1
+org-name:      EXAMPLE TTTTTT
+org-type:      LIR
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+override: password

@@ -1,0 +1,25 @@
+# organisation object tests
+# CASE 38: Create an org object
+#          with an AUTO-1 nic-hdl (orgID)
+#          no override
+#
+# create organisation object 
+#
+#NOOP
+#
+# RESULT 38: The creation will be forwarded to hostmaster
+# rir AFRINIC
+
+
+organisation:  AUTO-1
+org-name:      EXAMPLE TTTTTT
+org-type:      LIR
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm

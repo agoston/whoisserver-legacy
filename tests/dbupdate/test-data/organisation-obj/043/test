@@ -1,0 +1,25 @@
+# organisation object tests
+# CASE 43: Delete an org object
+#          with override
+#
+# delete organisation object 
+#
+#SUCCESS
+#
+# RESULT 43: The deletion will succeed
+# rir AFRINIC
+
+
+organisation:  ORG-Eoof1-DB-TEST
+org-name:      EXAMPLE organisation object for tests
+org-type:      RIR
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        RIPE-NCC-HM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+delete:
+override: password
