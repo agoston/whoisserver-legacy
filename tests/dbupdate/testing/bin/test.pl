@@ -1227,6 +1227,10 @@ my $flags;
   if (getvar('DBUPDATE_FLAGS_EXT')) {
     $flags = "$flags $tempfile";
   }
+
+  if (!getvar('DBUPDATE_FLAGS_EXT') && !getvar('DBUPDATE_FLAGS')) {
+    $flags = "$flags $tempfile";
+  }
   
   $commandline = $flags;
   $commandline = getvar('DBUPDATE_TRACE')." $commandline" if (getvar ('TRACE_DBUPDATE')); #add tracing if option is set
