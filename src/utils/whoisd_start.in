@@ -28,7 +28,7 @@ MAIL=mailx
 
 #####################
 # Server binary name
-WHOISD=whois_rip
+WHOISD=whois-server
 
 ####################
 #Directory layout 
