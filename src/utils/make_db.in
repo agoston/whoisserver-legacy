@@ -79,7 +79,7 @@ ls $PROPERTIES >/dev/null 2>&1 || error_exit "cannot find config file $PROPERTIE
 # Directory layout
 
 # The root of the distribution
-TOPDIR=/home/can/release/whois
+TOPDIR=@prefix@
 
 # The LD_LIBRARY_PATH should be set
 LIBS_PATH=
@@ -93,7 +93,7 @@ export LD_LIBRARY_PATH=`echo $LIBS_PATH | sed -e 's/ /:/g'`
 
 # Directory where the object files reside
 # **** Don't forget to download the object files and CURRENTSERIAL file ****
-OBJDIR=/home/can/release/whois/var/tmp/load/${SOURCE}
+OBJDIR=@tmpdir@/load/${SOURCE}
 
 # List of object files (wildcards are allowed)
 LIST=${LIST:-$OBJDIR/sample.db.gz}
@@ -104,16 +104,16 @@ DEFCURRENTSERIAL=`cat ${OBJDIR}/${SOURCE}.CURRENTSERIAL` || \
 CURRENTSERIAL=${DEFCURRENTSERIAL:=1}
 
 # Directory where the load_all.sh script is located
-SCRIPTDIR=/home/can/release/whois/scripts
+SCRIPTDIR=@bindir@
 # Location of the loader binary
-LOADER=/home/can/release/whois/bin/loader
+LOADER=@bindir@/loader
 # Update log. Use /dev/null for huge databases.
 UPDLOG=/dev/tty
 
 #################### LOCATION OF THE UTILITIES #####################################
 
 # Location of the utility that fetches config variables
-GETVAR="/home/can/release/whois/utils/getvar -s $SOURCE -c $PROPERTIES"
+GETVAR="@bindir@/getvar -s $SOURCE -c $PROPERTIES"
 
 
 # Filter that uses to convert files to RPSL format
