@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   Reporting module.
 
@@ -82,6 +82,7 @@ void RT_syntax_ok(RT_context_t* ctx);
 
 void RT_circular_dependency(RT_context_t* ctx);
 
+void RT_clean_object(RT_context_t* ctx, char *msg);
 void RT_invalid_source(RT_context_t* ctx);
 
 void RT_unknown_country(RT_context_t* ctx, gchar* country);

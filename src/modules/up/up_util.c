@@ -411,7 +411,8 @@ char *up_get_rir(LG_context_t *lg_ctx)
             0 otherwise
 */
 
-int up_remove_parent(LG_context_t *lg_ctx, char **object_str, rpsl_object_t *object)
+int up_remove_parent(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+                        char **object_str, rpsl_object_t *object)
 {
   int retval = 0;
   char *value = NULL;
@@ -442,7 +443,7 @@ int up_remove_parent(LG_context_t *lg_ctx, char **object_str, rpsl_object_t *obj
     *object_str = rpsl_object_get_text(object, 0);
    }
 
-  LG_log(lg_ctx, LG_FUNC,"<up_remove_parent: exiting");
+  LG_log(lg_ctx, LG_FUNC,"<up_remove_parent: exiting with value [%d]", retval);
   return retval;
 }
 
@@ -453,15 +454,18 @@ int up_remove_parent(LG_context_t *lg_ctx, char **object_str, rpsl_object_t *obj
             0 otherwise
 */
 
-int up_clean_object(LG_context_t *lg_ctx, char **object_str)
+char *up_clean_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char **object_str)
 {
   int retval = 0; 
+  char *retstr = NULL;
   char *rir = NULL;
   const char *type = NULL;
   char *value = NULL;
   rpsl_object_t *object = NULL;
+  GString *mess;
 
   LG_log(lg_ctx, LG_FUNC,">up_clean_object: entered with object [\n%s]", *object_str);
+  mess = g_string_new(NULL);
 
   /* parse the object string */
   object = rpsl_object_init(*object_str);
@@ -474,13 +478,19 @@ int up_clean_object(LG_context_t *lg_ctx, char **object_str)
     
     if ( ! strcasecmp(type, "inetnum") || ! strcasecmp(type, "inet6num"))
     {
-      retval |= up_remove_parent(lg_ctx, object_str, object);
+      retval |= up_remove_parent(rt_ctx, lg_ctx, object_str, object);
+      if ( retval )
+      {
+        mess = g_string_append(mess, "\"parent:\" attribute(s) removed, these are generated at query time");
+      }
     }
   }
   
-  LG_log(lg_ctx, LG_FUNC,"<up_clean_object: exiting with retval [%d] object [\n%s]",
-                                       retval, *object_str);
-  return retval;
+  if ( mess->str ) retstr = strdup(mess->str);
+  g_string_free(mess, 1);
+  LG_log(lg_ctx, LG_FUNC,"<up_clean_object: exiting with msg [%s] object [\n%s]",
+                                       retstr ? retstr : "NULL", *object_str);
+  return retstr;
 }
 
 
@@ -1825,7 +1835,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                            GList *credentials, int handle_auto_keys)
 {
   int retval = UP_OK;
-  int cleaned_retval = 0;
+  char *retstr = NULL;
   int au_retval;
   int operation = 0;
   int parsed_ok = 0;
@@ -1863,13 +1873,18 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* remove trailing dot from domain, if any */
   is_dot_removed = ns_remove_trailing_dot(lg_ctx, &object_str);
 
-  /* clean out any unwanted data */
-  cleaned_retval = up_clean_object(lg_ctx, &object_str);
+  /* Clean out any unwanted data 
+     This must be done before parsing the object as it may
+     remove some attributes. */
+  retstr = up_clean_object(rt_ctx, lg_ctx, &object_str);
 
   /* parse the object string */
   object = rpsl_object_init(object_str);
 
   RT_set_object(rt_ctx, object);
+  
+  if ( retstr && strcmp(retstr, "") )  RT_clean_object(rt_ctx, retstr);
+  if ( retstr ) free(retstr);
 
   if ( is_dot_removed )
   {

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   Reporting module.
 
@@ -266,6 +266,20 @@ xmlNodePtr rt_process_attr(const rpsl_attr_t* attr) {
 
   return node;
 } 
+
+
+/*+
+  RT_parent_removed - Removes any parent: attributes.
+
+  RT_context_t* ctx - Context.
+  +*/
+void RT_clean_object(RT_context_t* ctx, char *msg) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"clean_object");
+  rt_add_text_node(node, "msg", (xmlChar*) msg);
+  rt_prepare_node(ctx, node);
+}
 
 
 /*+

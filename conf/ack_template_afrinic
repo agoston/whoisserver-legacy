@@ -442,6 +442,11 @@ No PGP error on object
 ***Error: The origin AS object does not exist
   </xsl:template>
 
+  <xsl:template match="clean_object">
+
+***Warning: <xsl:value-of select="msg/text()"/>
+  </xsl:template>
+
   <xsl:template match="non_existent_parent">
 
 ***Error: There is no parent object
@@ -518,6 +523,12 @@ No PGP error on object
 
 
 <!-- AU module -->
+
+  <xsl:template match="banned_operation">
+  <xsl:text>
+</xsl:text>
+***Info: <xsl:value-of select="type/text()"/><xsl:text> objects are not permitted in the AfriNic Whois Database</xsl:text>
+  </xsl:template>
 
   <xsl:template match="auth_info">
 
