@@ -74,4 +74,11 @@ install-exec-hook:
 	${INSTALL} -m 0644 ./doc/WHOIS-HELP ${DESTDIR}${docdir}
 	${INSTALL} -m 0644 ./conf/sample.db.gz  ${DESTDIR}${tmpdir}/load/SAMPLE
 	${INSTALL} -m 0644 ./conf/SAMPLE.CURRENTSERIAL  ${DESTDIR}${tmpdir}/load/SAMPLE
-	${INSTALL} -m 0644 src/SQL/*.* ${DESTDIR}${bindir}/SQL
+	${INSTALL} -m 0644 ./src/SQL/aux.index.2 ${DESTDIR}/${bindir}/SQL
+	${INSTALL} -m 0644 ./src/SQL/create.RIPADMIN.sql ${DESTDIR}/${bindir}/SQL
+	${INSTALL} -m 0644 ./src/SQL/create.tables.sql ${DESTDIR}/${bindir}/SQL
+	${INSTALL} -m 0644 ./src/SQL/leaf.index.2 ${DESTDIR}/${bindir}/SQL
+	${INSTALL} -m 0644 ./src/SQL/main.index.1 ${DESTDIR}/${bindir}/SQL
+	${INSTALL} -m 0755 ./src/SQL/create.first-stage ${DESTDIR}/${bindir}/SQL
+	${INSTALL} -m 0755 ./src/SQL/create.second-stage ${DESTDIR}/${bindir}/SQL
+	${INSTALL} -m 0755 ./src/SQL/create.third-stage ${DESTDIR}/${bindir}/SQL
