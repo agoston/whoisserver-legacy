@@ -9,11 +9,19 @@ AC_ARG_WITH(rpslvariant,
    else
      RPSL_VARIANT=RIPE
    fi
-   echo $RPSL_VARIANT > ./rpsl.variant])
+   echo $RPSL_VARIANT > $ac_abs_top_builddir/rpsl.variant])
 AC_MSG_CHECKING([setting default rpsl variant])
 AC_CONFIG_COMMANDS([variant],[
-  RPSL_VARIANT=`cat $ac_abs_top_srcdir/rpsl.variant 2>/dev/null `
+  RPSL_VARIANT=`cat $ac_abs_top_builddir/rpsl.variant 2>/dev/null `
   export RPSL_VARIANT
+  if test x$RPSL_VARIANT = x
+  then
+    RPSL_VARIANT=RIPE
+  fi
+  if test ! -f $ac_abs_top_builddir/rpsl.variant
+  then
+    echo ${RPSL_VARIANT} > $ac_abs_top_builddir/rpsl.variant
+  fi
   mkdir -p $ac_abs_top_builddir/src/defs
   for file in $ac_abs_top_srcdir/src/defs/variants/$RPSL_VARIANT/*.xml \
               $ac_abs_top_srcdir/src/defs/variants/$RPSL_VARIANT/*.h \
@@ -33,6 +41,6 @@ AC_CONFIG_COMMANDS([variant],[
     fi
   done
   ])
-variant=`cat ./rpsl.variant 2>/dev/null`
+variant=`cat $ac_abs_top_builddir/rpsl.variant 2>/dev/null`
 AC_MSG_RESULT([$variant])
 ])

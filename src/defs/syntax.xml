@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.4 2005/01/30 18:16:37 denis Exp $
+$Id: syntax.xml,v 1.1 2004/12/27 18:17:04 can Exp $
 
 -->
 
@@ -565,7 +565,7 @@ $Id: syntax.xml,v 1.4 2005/01/30 18:16:37 denis Exp $
    <attribute_syntax name="org-type">
        <front_end>
            <regex>
-           ^(IANA|RIR|NIR|LIR)$
+           ^(IANA|RIR|NIR|LIR|NON-REGISTRY)$
            </regex>
        </front_end>
        <description>
@@ -689,7 +689,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
    <attribute_syntax name="status-in">
        <front_end>
            <regex>
-           ^((SUB-ALLOCATED PA)|NOT-SET|EARLY-REGISTRATION|((ALLOCATED (PA|PI|UNSPECIFIED))|(ASSIGNED (PA|PI))))$
+           ^((SUB-ALLOCATED PA)|NOT-SET|EARLY-REGISTRATION|((ALLOCATED (PA|PI|UNSPECIFIED))|((ASSIGNED|LIR-PARTITIONED) (PA|PI))))$
            </regex>
        </front_end>
        <description>
@@ -698,6 +698,8 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
      o ALLOCATED PA
      o ALLOCATED PI
      o ALLOCATED UNSPECIFIED
+     o LIR-PARTITIONED PA
+     o LIR-PARTITIONED PI
      o SUB-ALLOCATED PA
      o ASSIGNED PA
      o ASSIGNED PI
@@ -709,15 +711,70 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
    <attribute_syntax name="status-i6">
        <front_end>
            <regex>
-               ^(ALLOCATED-BY-RIR|SUB-ALLOCATED PA|ASSIGNED PA)$
+               ^(ALLOCATED-BY-RIR|ALLOCATED-BY-LIR|ASSIGNED)$
            </regex>
        </front_end>
        <description>
      Status can have one of these values:
 
      o ALLOCATED-BY-RIR
-     o SUB-ALLOCATED PA
-     o ASSIGNED PA
+     o ALLOCATED-BY-LIR
+     o ASSIGNED
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="mnt-routes">
+       <core>
+          <regex>
+              ^[A-Z]([A-Z0-9_-]){1,80}([[:space:]]+.*)*$
+          </regex>
+       </core>   
+       <front_end>
+         <parser_name>mnt_routes</parser_name>
+       </front_end>
+         <!-- removed, we already check reserved words in mntner name
+           <reserved_regex>
+               ^(peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*|irt-.*)$
+           </reserved_regex>
+         -->
+       <description>
+     &lt;mnt-name&gt; [ { list of &lt;address-prefix-range&gt; } | ANY ]
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="mnt-routes6">
+       <core>
+          <regex>
+              ^[A-Z]([A-Z0-9_-]){1,80}([[:space:]]+.*)*$
+          </regex>
+       </core>
+       <front_end>
+         <!-- ANY allowed -->
+         <parser_name>mnt_routes6</parser_name>
+         <reserved_regex>
+               ^(peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*|irt-.*)$
+         </reserved_regex>
+       </front_end>
+       <description>
+     &lt;mnt-name&gt; [ { list of &lt;ipv6-address&gt;/&lt;prefix&gt; } | ANY ]
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="mnt-routes-an">
+       <core>
+          <regex>
+              ^[A-Z]([A-Z0-9_-]){1,80}([[:space:]]+.*)*$
+          </regex>
+       </core>
+       <front_end> 
+         <!-- ANY allowed --> 
+         <parser_name>mnt_routes_an</parser_name>
+         <reserved_regex>
+               ^(peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*|irt-.*)$
+         </reserved_regex>
+       </front_end>
+       <description> 
+     &lt;mnt-name&gt; [ { list of (&lt;ipv4-address&gt;/&lt;prefix&gt; or &lt;ipv6-address&gt;/&lt;prefix&gt;) } | ANY ]
        </description>
    </attribute_syntax>
 
@@ -885,6 +942,87 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
        </description>
    </attribute_syntax>
 
+   <attribute_syntax name="default">
+       <front_end>
+         <parser_name>default</parser_name>
+       </front_end>
+       <description>
+     to &lt;peering&gt; [action &lt;action&gt;] [networks &lt;filter&gt;]
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="mp-default">
+       <front_end>
+         <parser_name>mp_default</parser_name>
+       </front_end>
+       <description>
+     to &lt;peering&gt; [action &lt;action&gt;] [networks &lt;filter&gt;]
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="export">
+       <front_end>
+         <parser_name>export</parser_name>
+       </front_end>
+       <description>
+     [protocol &lt;protocol-1&gt;] [into &lt;protocol-1&gt;]
+     to &lt;peering-1&gt; [action &lt;action-1&gt;] 
+         .
+         .
+         .
+     to &lt;peering-N&gt; [action &lt;action-N&gt;] 
+     announce &lt;filter&gt;
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="mp-export">
+       <front_end>
+         <parser_name>mp_export</parser_name>
+       </front_end>
+       <description>
+     [protocol &lt;protocol-1&gt;] [into &lt;protocol-1&gt;]
+     afi &lt;afi-list&gt;
+     to &lt;peering-1&gt; [action &lt;action-1&gt;]
+         .
+         .
+         .
+     to &lt;peering-N&gt; [action &lt;action-N&gt;]
+     announce &lt;filter&gt;
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="import">
+       <front_end>
+         <parser_name>import</parser_name>
+       </front_end>
+       <description>
+     [protocol &lt;protocol-1&gt;] [into &lt;protocol-1&gt;]
+     from &lt;peering-1&gt; [action &lt;action-1&gt;] 
+         .
+         .
+         .
+     from &lt;peering-N&gt; [action &lt;action-N&gt;] 
+     accept &lt;filter&gt;
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="mp-import">
+       <front_end>
+         <parser_name>mp_import</parser_name>
+       </front_end>
+       <description>
+     [protocol &lt;protocol-1&gt;] [into &lt;protocol-1&gt;]
+     afi &lt;afi-list&gt;
+     from &lt;peering-1&gt; [action &lt;action-1&gt;]
+         .
+         .
+         .
+     from &lt;peering-N&gt; [action &lt;action-N&gt;]
+     accept (&lt;filter&gt;|&lt;filter&gt; except &lt;importexpression&gt;|
+             &lt;filter&gt; refine &lt;importexpression&gt;)
+       </description>
+   </attribute_syntax>
+
    <attribute_syntax name="ifaddr">
        <core>
          <parser_name>ifaddr</parser_name>
@@ -966,6 +1104,17 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
      | &lt;protocol&gt; &lt;inet-rtr-name&gt; &lt;options&gt;
      | &lt;protocol&gt; &lt;rtr-set-name&gt; &lt;options&gt;
      | &lt;protocol&gt; &lt;peering-set-name&gt; &lt;options&gt;
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="referral-by">
+      <front_end>
+           <regex>
+               ^RIPE-DBM-MNT$
+           </regex>
+       </front_end>
+       <description>
+     Only RIPE-DBM-MNT is allowed.
        </description>
    </attribute_syntax>
 

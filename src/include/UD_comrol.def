@@ -22,7 +22,7 @@ char *t_as[] = {
 
 char *t_an[] = {
   "mntner","person_role","as_set","names","mbrs_by_ref","organisation",
-  "admin_c", "tech_c", "notify", "mnt_by", "mnt_lower", "org", NULL
+  "member_of", "admin_c", "tech_c", "notify", "mnt_by", "mnt_lower", "mnt_routes", "org", NULL
 };
 
 /* domain */
@@ -42,15 +42,15 @@ char *t_ir[] = {
 /* inet6num */
 
 char *t_i6[] = {
-  "mntner","person_role","names","organisation",NULL,NULL,
-  "admin_c", "tech_c", "notify", "mnt_by", "mnt_lower", "mnt_domains", "org", NULL
+  "mntner","person_role","names","irt","organisation",NULL,
+  "admin_c", "tech_c", "rev_srv", "notify", "mnt_by", "mnt_lower", "mnt_domains", "mnt_routes", "mnt_irt", "org", NULL
 };
 
 /* inetnum */
 
 char *t_in[] = {
-  "mntner","person_role","names","organisation",NULL,NULL,
-  "admin_c", "tech_c", "notify", "mnt_by", "mnt_lower", "mnt_domains", "org", NULL
+  "mntner","person_role","names","irt","organisation",NULL,
+  "admin_c", "tech_c", "rev_srv", "notify", "mnt_by", "mnt_lower", "mnt_domains", "mnt_routes", "mnt_irt", "org", NULL
 };
 
 /* key-cert */
@@ -71,11 +71,11 @@ char *t_li[] = {
 
 char *t_mt[] = {
   "mntner","person_role","names","organisation",NULL,NULL,
-  "admin_c", "tech_c", "upd_to", "mnt_nfy", "auth", "notify", "mnt_by", "auth_override", "org", NULL
+  "admin_c", "tech_c", "upd_to", "mnt_nfy", "auth", "notify", "mnt_by", "auth_override", "referral_by", "org", NULL
 };
 
 char *t_imt[] = {
-  "mnt_by","mnt_lower","mnt_domains","mbrs_by_ref","mnt_ref",NULL
+  "mnt_by","mnt_lower","mnt_routes","mnt_domains","mbrs_by_ref","referral_by","mnt_ref",NULL
 };
 
 /* person */
@@ -100,7 +100,7 @@ char *t_ro[] = {
 
 char *t_rt[] = {
   "route_set","mntner","person_role","organisation",NULL,NULL,
-  "member_of", "notify", "mnt_by", "mnt_lower", "org", NULL
+  "member_of", "notify", "mnt_by", "mnt_lower", "mnt_routes", "org", NULL
 };
 
 /* route-set */
@@ -138,6 +138,10 @@ char *t_it[] = {
   "admin_c", "tech_c", "notify", "mnt_by", "auth", "irt_nfy", "org", NULL
 };
 
+char *t_iit[] = {
+  "mnt_irt",NULL
+};
+
 /* organisation */
 
 char *t_oa[] = {
@@ -153,7 +157,7 @@ char *t_ioa[] = {
 
 char *t_r6[] = {
   "route_set","mntner","person_role","organisation",NULL,NULL,
-  "member_of", "notify", "mnt_by", "mnt_lower", "org", NULL
+  "member_of", "notify", "mnt_by", "mnt_lower", "mnt_routes6", "org", NULL
 };
 
 

@@ -16,10 +16,19 @@ $(RIPLIBDIR)/librpsl.a: syntax_api.o class.o attribute.o syntax.o\
         mp_filter.lex.o mp_filter.tab.o \
         refer.lex.o refer.tab.o \
         inet6num.lex.o inet6num.tab.o \
+        mnt_routes.lex.o mnt_routes.tab.o \
+        mnt_routes6.lex.o mnt_routes6.tab.o \
+        mnt_routes_an.lex.o mnt_routes_an.tab.o \
         components.lex.o components.tab.o \
         components_r6.lex.o components_r6.tab.o \
         aggr_mtd.lex.o aggr_mtd.tab.o \
         aggr_bndry.lex.o aggr_bndry.tab.o \
+        default.lex.o default.tab.o \
+        mp_default.lex.o mp_default.tab.o \
+        export.lex.o export.tab.o \
+        mp_export.lex.o mp_export.tab.o \
+        import.lex.o import.tab.o \
+        mp_import.lex.o mp_import.tab.o \
         ifaddr.lex.o ifaddr.tab.o \
         interface.lex.o interface.tab.o \
         inject.lex.o inject.tab.o \
@@ -139,6 +148,42 @@ inet6num.lex.c: inet6num.l
 inet6num.tab.c inet6num.tab.h: inet6num.y
 	bison -d -pinet6num inet6num.y
 
+mnt_routes.lex.o: mnt_routes.lex.c mnt_routes.tab.h
+	$(CC) $(CFLAGS) -c mnt_routes.lex.c
+
+mnt_routes.tab.o: mnt_routes.tab.c mnt_routes.tab.h
+	$(CC) $(CFLAGS) -c mnt_routes.tab.c
+
+mnt_routes.lex.c: mnt_routes.l
+	flex -i -Pmnt_routes -omnt_routes.lex.c mnt_routes.l
+
+mnt_routes.tab.c mnt_routes.tab.h: mnt_routes.y
+	bison -d -pmnt_routes mnt_routes.y
+
+mnt_routes6.lex.o: mnt_routes6.lex.c mnt_routes6.tab.h
+	$(CC) $(CFLAGS) -c mnt_routes6.lex.c
+
+mnt_routes6.tab.o: mnt_routes6.tab.c mnt_routes6.tab.h
+	$(CC) $(CFLAGS) -c mnt_routes6.tab.c
+
+mnt_routes6.lex.c: mnt_routes6.l
+	flex -i -Pmnt_routes6 -omnt_routes6.lex.c mnt_routes6.l
+
+mnt_routes6.tab.c mnt_routes6.tab.h: mnt_routes6.y
+	bison -d -pmnt_routes6 mnt_routes6.y
+
+mnt_routes_an.lex.o: mnt_routes_an.lex.c mnt_routes_an.tab.h
+	$(CC) $(CFLAGS) -c mnt_routes_an.lex.c
+
+mnt_routes_an.tab.o: mnt_routes_an.tab.c mnt_routes_an.tab.h
+	$(CC) $(CFLAGS) -c mnt_routes_an.tab.c
+
+mnt_routes_an.lex.c: mnt_routes_an.l
+	flex -i -Pmnt_routes_an -omnt_routes_an.lex.c mnt_routes_an.l
+
+mnt_routes_an.tab.c mnt_routes_an.tab.h: mnt_routes_an.y
+	bison -d -pmnt_routes_an mnt_routes_an.y
+
 components.lex.o: components.lex.c components.tab.h
 	$(CC) $(CFLAGS) -c components.lex.c
 
@@ -186,6 +231,78 @@ aggr_bndry.lex.c: aggr_bndry.l
 
 aggr_bndry.tab.c aggr_bndry.tab.h: aggr_bndry.y
 	bison -d -paggr_bndry aggr_bndry.y
+
+default.lex.o: default.lex.c default.tab.h
+	$(CC) $(CFLAGS) -c default.lex.c
+
+default.tab.o: default.tab.c default.tab.h
+	$(CC) $(CFLAGS) -c default.tab.c
+
+default.lex.c: default.l
+	flex -i -Pdefault -odefault.lex.c default.l
+
+default.tab.c default.tab.h: default.y
+	bison -d -pdefault default.y
+
+mp_default.lex.o: mp_default.lex.c mp_default.tab.h
+	$(CC) $(CFLAGS) -c mp_default.lex.c
+
+mp_default.tab.o: mp_default.tab.c mp_default.tab.h
+	$(CC) $(CFLAGS) -c mp_default.tab.c
+
+mp_default.lex.c: mp_default.l
+	flex -i -Pmp_default -omp_default.lex.c mp_default.l
+
+mp_default.tab.c mp_default.tab.h: mp_default.y
+	bison -d -pmp_default mp_default.y
+
+export.lex.o: export.lex.c export.tab.h
+	$(CC) $(CFLAGS) -c export.lex.c
+
+export.tab.o: export.tab.c export.tab.h
+	$(CC) $(CFLAGS) -c export.tab.c
+
+export.lex.c: export.l
+	flex -i -Pexport -oexport.lex.c export.l
+
+export.tab.c export.tab.h: export.y
+	bison -d -pexport export.y
+
+mp_export.lex.o: mp_export.lex.c mp_export.tab.h
+	$(CC) $(CFLAGS) -c mp_export.lex.c
+
+mp_export.tab.o: mp_export.tab.c mp_export.tab.h
+	$(CC) $(CFLAGS) -c mp_export.tab.c
+
+mp_export.lex.c: mp_export.l
+	flex -i -Pmp_export -omp_export.lex.c mp_export.l
+
+mp_export.tab.c mp_export.tab.h: mp_export.y
+	bison -d -pmp_export mp_export.y
+
+import.lex.o: import.lex.c import.tab.h
+	$(CC) $(CFLAGS) -c import.lex.c
+
+import.tab.o: import.tab.c import.tab.h
+	$(CC) $(CFLAGS) -c import.tab.c
+
+import.lex.c: import.l
+	flex -i -Pimport -oimport.lex.c import.l
+
+import.tab.c import.tab.h: import.y
+	bison -d -pimport import.y
+
+mp_import.lex.o: mp_import.lex.c mp_import.tab.h
+	$(CC) $(CFLAGS) -c mp_import.lex.c
+
+mp_import.tab.o: mp_import.tab.c mp_import.tab.h
+	$(CC) $(CFLAGS) -c mp_import.tab.c
+
+mp_import.lex.c: mp_import.l
+	flex -i -Pmp_import -omp_import.lex.c mp_import.l
+
+mp_import.tab.c mp_import.tab.h: mp_import.y
+	bison -d -pmp_import mp_import.y
 
 ifaddr.lex.o: ifaddr.lex.c ifaddr.tab.h
 	$(CC) $(CFLAGS) -c ifaddr.lex.c

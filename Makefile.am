@@ -274,6 +274,7 @@ MOSTLYCLEANFILES = ./src/modules/rpsl/*.l \
 		   ./src/modules/rpsl/*.o \
 		   ./src/modules/rpsl/*.lex.c \
 		   ./src/modules/rpsl/*.tab.c \
+		   ./src/modules/rpsl/syntax \
 		   ./conf/sample.db.gz \
 		   ./src/defs/*.class \
 		   ./src/defs/*.xml \
