@@ -18,6 +18,7 @@ LDHISTORY = libsq.a liblg.a libut.a \
 	    $(GLIB_LIBS) $(MYSQL_LIBS)
 
 OPLLDLOADLIBS = $(GLIB_LIBS) -L../opl -lrpsl $(GLIB_LIBS)
+OPLMAKE = $(MAKE) LDDLFLAGS=" -shared $(OPLLDLOADLIBS)" LDFLAGS="$(OPLLDLOADLIBS)" LDLOADLIBS="$(OPLLDLOADLIBS)"
 
 EXTRA_DIST = include/rip.h \
              include/stubs.h \
@@ -232,12 +233,17 @@ opl: ut.o ut_string.o ip.o lg.o memwrap.o numconv.o syntax
 opl-perl: opl
 	cd opl-perl; \
 	$(PERL5) Makefile.PL; \
-	$(MAKE) LDDLFLAGS=" -shared $(OPLLDLOADLIBS)" LDFLAGS="$(OPLLDLOADLIBS)" LDLOADLIBS="$(OPLLDLOADLIBS)" ; \
+	$(OPLMAKE) ; \
 	cd ..
 
 opl-perl-install: opl-perl
 	cd opl-perl; \
-	$(MAKE) LDDLFLAGS=" -shared $(OPLLDLOADLIBS)" LDFLAGS="$(OPLLDLOADLIBS)" LDLOADLIBS="$(OPLLDLOADLIBS)" install; \
+	$(OPLMAKE) install; \
+	cd ..
+
+opl-perl-dist: opl-perl
+	cd opl-perl; \
+	$(OPLMAKE) dist; \
 	cd ..
 
 syntax:
