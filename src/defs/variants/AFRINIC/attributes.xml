@@ -1,6 +1,6 @@
 <!DOCTYPE ripe_attributes SYSTEM "attributes.dtd">
 
-<ripe_attributes version="$Revision: 1.1 $" author="$Author: can $">
+<ripe_attributes version="$Revision: 1.4 $" author="$Author: denis $">
 
   <ripe_attribute name="address" code="ad">
     <description>
@@ -1438,7 +1438,7 @@
 
   <ripe_attribute name="role" code="ro">
     <description>
-   Specifies the full name of a role entity, e.g. RIPE DBM.
+   Specifies the full name of a role entity, e.g. AFRINIC DBM.
     </description>
     <syntax>person-name</syntax>
 
@@ -1512,7 +1512,7 @@
   <ripe_attribute name="source" code="so">
     <description>
    Specifies the registry where the object is registered.  Should
-   be "RIPE" for the RIPE Database.
+   be "AFRINIC" for the AFRINIC Database.
     </description>
     <syntax>registry-name</syntax>
   </ripe_attribute>

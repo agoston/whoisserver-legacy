@@ -3,7 +3,7 @@
 <!-- XXX: will want to add core template in the future, to 
           document which fields are mandatory for core (e.g. nic-hdl) -->
 
-<ripe_classes version="$Revision: 1.1 $" author="$Author: can $">
+<ripe_classes version="$Revision: 1.4 $" author="$Author: denis $">
 
   <ripe_class name="domain" main_sql_table="domain" code="dn">
     <description>
@@ -183,12 +183,10 @@
 
   <ripe_class name="mntner" main_sql_table="mntner" code="mt">
     <description>
-      Objects in the RIPE Database may be protected using mntner
+      Objects in the AFRINIC Database may be protected using mntner
       (pronounced "maintainer") objects.  A mntner object specifies
       authentication information required to authorise creation,
       deletion or modification of the objects protected by the mntner.
-      Mntner objects are not created automatically, but are forwarded
-      to RIPE Database Administration (ripe-dbm@ripe.net).
     </description>
     <attributes>
       <mntner       choice="mandatory" number="single"   />
@@ -332,6 +330,8 @@
       an organisation such as a company, charity or university,
       that is a holder of a network resource whose data is stored 
       in the whois database.
+      Organisation objects are not created automatically, but are forwarded
+      to AfriNIC Database Administration (afrinic-dbm@rafrinic.net).
     </description>
     <attributes>
       <organisation choice="mandatory" number="single"   />
