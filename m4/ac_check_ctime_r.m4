@@ -4,7 +4,7 @@ dnl If ctime_r has three arguments, we 're probably on Solaris
 dnl so we need to add -DPOSIX_PTHREAD_SEMANTICS to have a ctime_r
 dnl with two arguments
 dnl
-dnl @version $Id: ac_check_ctime_r.m4,v 1.2 2005/02/01 16:12:03 can Exp $
+dnl @version $Id: ac_check_ctime_r.m4,v 1.3 2005/02/08 16:33:57 can Exp $
 dnl @author Can Bican <can@ripe.net>
 dnl
 AC_DEFUN([AC_CHECK_CTIME_R],[
@@ -31,9 +31,9 @@ AC_DEFUN([AC_CHECK_CTIME_R],[
         ac_lib_posix_ctime_r_2_params=no
        ])
     ], [AC_DEFINE([ACE_HAS_2_PARAM_ASCTIME_R_AND_CTIME_R])],)
-])
 
 if test x$ac_lib_posix_ctime_r_2_params = xno
 then
   AC_DEFINE_UNQUOTED([POSIX_PTHREAD_SEMANTICS],[],[required for proper ctime_r])
 fi
+])
