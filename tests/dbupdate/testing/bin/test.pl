@@ -764,6 +764,7 @@ my $list = $_[1];
         $object = $object.$1.":".$2."\n";
         $string = <$FILE>;
       }
+      $object =~ s/\n$//s;
       # object in $object;
       my $tmp = $object;
       my $name;
@@ -792,16 +793,16 @@ sub gather_objects_whois($$) {
  foreach my $object (@{$objs}) {
    my $tmp = $object;
    my $name;
-   if ($object =~ /^(route):(.*?)[\n](.*?)(origin):(.*?)[\n]/iosm) {
+   if ($object =~ /^(route):[\s]*(.*?)[\n](.*?)(origin):(.*?)[\n]/iosm) {
         $name = $1." ".$2.", ".$5;
    }
-   elsif ($object =~ /^(person):(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
+   elsif ($object =~ /^(person):[\s]*(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
      $name = $1." ".$5;
    }
-   elsif ($object =~ /^(role):(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
+   elsif ($object =~ /^(role):[\s]*(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
      $name = $1." ".$5;
    }             
-   elsif ($object =~ /^(.+?):(.+?)[\n]/iom ) { 
+   elsif ($object =~ /^(.+?):[\s]*(.+?)[\n]/iom ) { 
      $name = $1." ".$2;
    } 
    $list->{$name} = $tmp;
@@ -904,6 +905,9 @@ my $found = { };
       }
       
       # match expected objects with found ones
+      if ( exists $found->{$obj} ) {
+        $found->{$obj} =~ s/:\s*/:/g;
+      }
       if ( (!is_negative($tmp)) && (exists ($found->{$obj})) && ($expected->{$obj} eq $found->{$obj}) ) {
          #OK;
       }
