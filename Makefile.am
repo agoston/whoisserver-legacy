@@ -9,7 +9,7 @@ EXTRA_DIST = rpsl.variant \
 	     RELEASE-NOTES \
 	     UPDATE-DB-3.2.0 \
 	     WISHLIST \
-	     SAMPLE.CURRENTSERIAL \
+	     conf/SAMPLE.CURRENTSERIAL \
 	     conf/ack_template ack_text \
 	     conf/delcheck-erx-ipv4-16 \
 	     conf/delcheck-ipv4-16 \
