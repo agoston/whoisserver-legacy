@@ -384,9 +384,4 @@ AC_CONFIG_COMMANDS([permissions],[
   chmod u+x src/utils/ftp_export.sh])
 AC_CONFIG_COMMANDS([sample database],[
   gzip -9c conf/sample.db > ${ac_abs_builddir}/conf/sample.db.gz])
-AC_CONFIG_COMMANDS([results],[
-  AC_MSG_NOTICE([
-
-    RPSL Variant Set to ${RPSL_VARIANT}.
-])])
 AC_OUTPUT

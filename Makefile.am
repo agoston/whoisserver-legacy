@@ -1,7 +1,6 @@
 SUBDIRS = src
 AUTOMAKE_OPTIONS = subdir-objects
-EXTRA_DIST = rpsl.variant \
-	     README \
+EXTRA_DIST = README \
 	     README.MODULES \
 	     README.freebsd \
 	     README.linux \
@@ -284,8 +283,7 @@ MOSTLYCLEANFILES = ./src/modules/rpsl/*.l \
 		   ./src/defs/class_tab.h \
 		   ./src/defs/alltodo \
 		   ./src/include/*.def \
-		   ./src/librpsl.a \
-		   ./rpsl.variant
+		   ./src/librpsl.a
 
 install-exec-hook:
 	${mkinstalldirs} $(DESTDIR)${topdir} ${DESTDIR}${bindir} \
