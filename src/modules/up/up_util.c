@@ -47,8 +47,8 @@
 #ifdef RDNSYES
 #include "ns_util.h"
 #else
-#define ns_is_decompose(x,y,z,t) (-1)
-#define ns_remove_trailing_dot(x,y) (-1)
+#define ns_is_decompose(x,y,z,t) (0)
+#define ns_remove_trailing_dot(x,y) (0)
 #define ns_decompose_object(x,y,z,t,w) NULL
 #endif
 #include <glib.h>
