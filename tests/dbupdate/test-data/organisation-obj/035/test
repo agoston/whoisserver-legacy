@@ -1,17 +1,15 @@
 # organisation object tests
-# CASE 36: Create an org object
+# CASE 35: Create an org object
 #          inetnum object and person object
 #          Person & org will have auto nic handles,
 #          and the inetnum will refer to both.
 #          Passwords for "org:" attribute and hierarchical auth provided.
-%
-% requires initial objects to be loaded
 #
 # create organisation object, inetnum and person objects 
 #
 #SUCCESS
 #
-# RESULT 36: The creation will succeed
+# RESULT 35: The creation will succeed
 
 
 inetnum:       1.0.0.0 - 1.255.255.255

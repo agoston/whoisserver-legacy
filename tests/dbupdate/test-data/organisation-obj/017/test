@@ -1,14 +1,13 @@
 # organisation object tests
 # CASE 17: Create a person object with an "org:" attribute, 
 #          password is provided
-%
-% requires initial objects to be loaded
 #
 # create person object
 #
 #SUCCESS
 #
 # RESULT 17: The creation will succeed
+
 
 person:       test person
 org:          ORG-EOOF1-DB-TEST

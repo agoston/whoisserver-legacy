@@ -1,8 +1,6 @@
 # organisation object tests
 # CASE 1: Create an org object
 #         with an AUTO-1 nic-hdl (orgID)
-%
-% requires initial objects to be loaded
 #
 # create organisation object 
 #

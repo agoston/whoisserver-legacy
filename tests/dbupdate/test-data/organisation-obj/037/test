@@ -5,8 +5,6 @@
 #          and the inetnum will refer to person & an org object.
 #          The other org will have reference to itself, and must fail.
 #          Passwords for "org:" attribute and hierarchical auth provided.
-%
-% requires initial objects to be loaded
 #
 # create organisation object, inetnum and person objects 
 #

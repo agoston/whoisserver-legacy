@@ -1,10 +1,9 @@
 # organisation object tests
 # CASE 11: Create an org object
-#         with "org-type: IANA" with
-#         a mntner in "mnt-by:" which is in ORG_POWER_MNT config
-#         variable.
-%
-% requires initial objects to be loaded
+#          with "org-type: IANA" with
+#          a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#          variable.
+#
 % make sure that TEST-DBM-MNT is in ORG_POWER_MNT config var.
 #
 # create organisation object 

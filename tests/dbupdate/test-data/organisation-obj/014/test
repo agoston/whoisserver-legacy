@@ -1,8 +1,6 @@
 # organisation object tests
 # CASE 14: Modify a person object to add an "org:" attribute, 
 #          but the password is missing
-%
-% requires initial objects to be loaded
 #
 # modify person object
 #

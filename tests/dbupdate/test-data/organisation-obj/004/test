@@ -4,8 +4,6 @@
 #         and weird characters in "org-name:" (but still valid)
 #         only one valid char in "org-name:" to be put in orgID
 #         (the other must be made up by dbupdate)
-%
-% requires initial objects to be loaded
 #
 # create organisation object 
 #

@@ -1,9 +1,7 @@
 # organisation object tests
 # CASE 34: Create an org object
-#         with an AUTO-1 nic-hdl (orgID)
-#         and no admin-c/tech-c (they are optional)
-%
-% requires initial objects to be loaded
+#          with an AUTO-1 nic-hdl (orgID)
+#          and no admin-c/tech-c (they are optional)
 #
 # create organisation object 
 #

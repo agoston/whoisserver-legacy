@@ -2,8 +2,6 @@
 # CASE 3: Create an org object
 #         with an AUTO-1 nic-hdl (orgID)
 #         and weird characters in "org-name:" (but still valid)
-%
-% requires initial objects to be loaded
 #
 # create organisation object 
 #

@@ -4,14 +4,13 @@
 #         password for "mnt-by:" is provided
 #         password for "org:" is also provided
 #
-%
-% requires initial objects to be loaded
 #
 # create inet6num object 
 #
 #FAILURE
 #
 # RESULT 26: The creation will fail
+
 
 inet6num:     2002::0/35
 netname:      TEST-ORG

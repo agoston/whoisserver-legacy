@@ -4,14 +4,13 @@
 #         password for "mnt-by:" is provided
 #         password for "org:" is also provided
 #
-%
-% requires initial objects to be loaded
 #
 # create aut-num object 
 #
 #FAILURE
 #
 # RESULT 25: The creation will fail
+
 
 aut-num:      AS123
 as-name:      ASTEST

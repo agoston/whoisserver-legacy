@@ -1,8 +1,6 @@
 # organisation object tests
 # CASE 15: Create a person object with an "org:" attribute, 
 #          but the password is missing for it
-%
-% requires initial objects to be loaded
 #
 # create person object
 #

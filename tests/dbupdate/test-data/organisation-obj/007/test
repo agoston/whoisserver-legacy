@@ -3,8 +3,7 @@
 #         with "org-type: NIR" but without
 #         a mntner in "mnt-by:" which is in ORG_POWER_MNT config
 #         variable.  
-%
-% requires initial objects to be loaded
+#
 % make sure that NON-ORG-POWER-MNT is NOT in ORG_POWER_MNT config var.
 #
 # create organisation object 

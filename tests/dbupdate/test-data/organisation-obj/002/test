@@ -3,8 +3,6 @@
 #         with an AUTO-1 nic-hdl (orgID)
 #         Then create a person object with AUTO-2
 #         nic-hdl that refers to "org: AUTO-1"
-%
-% requires initial objects to be loaded
 #
 # create organisation object 
 #

@@ -3,8 +3,6 @@
 #         with "org:" which is mandatory for such inetnums.
 #         password for "mnt-by:" is provided
 #
-%
-% requires initial objects to be loaded
 #
 # create inet6num object 
 #

@@ -4,8 +4,6 @@
 #         password for "mnt-by:" is provided
 #         password for "org:" is also provided
 #
-%
-% requires initial objects to be loaded
 % make sure the whois config has RIPE-NCC-HM-MNT in ALLOCMNT
 #
 # create inetnum object 

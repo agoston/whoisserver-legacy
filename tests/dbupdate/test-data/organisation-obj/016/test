@@ -1,14 +1,13 @@
 # organisation object tests
 # CASE 16: Modify a person object to add an "org:" attribute, 
 #          password is provided
-%
-% requires initial objects to be loaded
 #
 # modify person object
 #
 #SUCCESS
 #
 # RESULT 16: The modification will succeed
+
 
 person:       test person
 org:          ORG-EOOF1-DB-TEST
