@@ -234,6 +234,9 @@ opl-install: opl
 	${mkinstalldirs} $(libdir)
 	${INSTALL} -m 0644 ./opl/librpsl.a ${DESTDIR}$(libdir)
 
+opl-uninstall:
+	rm -vf ${DESTDIR}$(libdir)/librpsl.a
+
 opl-perl: opl
 	cd opl-perl; \
 	$(PERL5) Makefile.PL; \
@@ -243,6 +246,11 @@ opl-perl: opl
 opl-perl-install: opl-perl opl-install
 	cd opl-perl; \
 	$(OPLMAKE) install; \
+	cd ..
+
+opl-perl-uninstall: opl-uninstall
+	cd opl-perl; \
+	$(OPLMAKE) uninstall; \
 	cd ..
 
 opl-perl-dist: opl-perl
