@@ -1449,6 +1449,46 @@ IP_pref_2_rang( ip_range_t *rangptr, ip_prefix_t *prefptr )
 
 #undef ad
 
+/* IP_OK assumes a classful range!!! */
+int
+IP_rang_2_pref( ip_range_t *rangptr, ip_prefix_t *prefptr )
+{
+  /* begin & end = mask */
+  /* count contiguous '1' bits starting from the highest digit -> prefix length */
+  /* IP address = begin */
+
+  ip_addr_t res;
+  int i = 0;
+  int k = 0;
+  unsigned len = 0;
+
+  prefptr->ip = rangptr->begin;
+
+  for (i=3; i >=0; i--)
+  {
+    res.words[i] = rangptr->begin.words[i] & rangptr->end.words[i];
+  }
+
+  for (i=3; i >=0; i--) 
+  {
+    for (k = (1 << 31) ; k >= 1; ( k >> 1) ) 
+    {
+      if ( (res.words[i] & k ) == k ) 
+      {
+        len ++;
+      } 
+      else 
+      {
+        break;
+      }
+    }
+  }
+
+  prefptr->bits = len;
+  return IP_OK;
+
+}
+
 /***************************************************************************/
 
 /*+ 

@@ -1788,7 +1788,7 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
         /* parents */
         rir = ca_get_rir;   
         rir = remove_EOLs(rir);
-        if (strcasecmp(rir, "AFRINIC") == 0 )
+        if (strcasecmp(rir, "AFRINIC") == 0 ) 
         {
            GList    *qitem;
            for( qitem = g_list_first(*datlist); qitem != NULL; qitem = g_list_next(qitem)) {
@@ -1797,46 +1797,70 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
               char *parent_list = strdup("");
               rx_datcpy_t *datcpy = qitem->data;
               ip_range_t searchrange = datcpy->leafcpy.iprange;
-              char search_str[50];
+              char search_str[IP_RANGSTR_MAX];
 
-              if (IP_rang_b2a(&searchrange, search_str, 49) == IP_OK) {
-
+              if (IP_rang_b2a(&searchrange, search_str, IP_RANGSTR_MAX) == IP_OK) 
+              {
                 err = RP_asc_search(RX_SRCH_LESS, 1, 0,
                           search_str, dbhdl,
                           Query[qi->queryindex].attribute,
                           &parents, limit);
 
+                if ( NOERR(err)) {
                 for( parent_item = g_list_first(parents); parent_item != NULL; parent_item = g_list_next(parent_item)) 
-              {              
+                {              
                   rx_datcpy_t *parentcpy = parent_item->data;
                   ip_range_t iprange = parentcpy->leafcpy.iprange;
-                  char range_str[50];
+                  char range_str[IP_RANGSTR_MAX];
 
-                  if (IP_rang_b2a(&iprange, range_str, 49) == IP_OK)
-                { 
+                  if (IP_rang_b2a(&iprange, range_str, IP_RANGSTR_MAX) == IP_OK)
+                  { 
+                    /* convert IPv6 range to prefix */
+                    if (iprange.begin.space == IP_V6) {
+                      ip_prefix_t pref;
+                      if (IP_rang_2_pref(&iprange, &pref) == IP_OK) {
+                        if (IP_pref_b2a(&pref, range_str, IP_RANGSTR_MAX) == IP_OK) {
+                          /* we convert IPv6 range to prefix. If any of conversions fail,
+                             we will get a range in "parent:" attribute, But it should never happen
+                             because inet(6)nums are always classful and radix load 
+                             ensures proper range objects.
+                          */
+                        }
+                      }
+                    }
                     parent_list = (char *) UT_realloc (parent_list, strlen(parent_list)+66); 
                     strcat (parent_list, "parent:       ");
                     strcat (parent_list, range_str);
                     strcat (parent_list, "\n");
+                  } else { 
+                    /* nothing.
+                       if range is not converted, we simply skip the parent generation.
+                    */
+                  }
                 }
-              }
-              if (g_list_length(parents) > 0) 
-              {
-                /* now create a structure and add it to the list */
-                id_parent_t *id_parent;
+                if (g_list_length(parents) > 0) 
+                {
+                  /* now create a structure and add it to the list */
+                  id_parent_t *id_parent;
 
-                id_parent = (id_parent_t *)UT_calloc(1, sizeof(id_parent_t));
-                id_parent->object_id = datcpy->leafcpy.data_key; 
-                id_parent->parent_list = parent_list;
-
-                /* add it to the return list */
-                *par_list = g_list_append(*par_list, id_parent); 
+                  id_parent = (id_parent_t *)UT_calloc(1, sizeof(id_parent_t));
+                  id_parent->object_id = datcpy->leafcpy.data_key; 
+                  id_parent->parent_list = parent_list;
+  
+                  /* add it to the return list */
+                  *par_list = g_list_append(*par_list, id_parent); 
+                } /* (g_list_length(parents) > 0) */
+              }  /* IP_rang_b2a(&searchrange, search_str, 49) == IP_OK */
+              else {
+                 /* nothing.
+                    if range is not converted, we simply skip the parent generation. 
+                 */
               }
-           }
-          }
-        } /* parents */
+           } /* for datlist */ 
+           } /* if NOERR(err) */
+        } /* (strcasecmp(rir, "AFRINIC") == 0 ) */
         UT_free(rir);
-      }
+      } /* NOERR */
       else {
         LG_log(qi_context, LG_INFO,
 		  "RP_asc_search returned %x ", err);
