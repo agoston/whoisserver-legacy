@@ -129,7 +129,7 @@ char *NH_convert(nic_handle_t *nh_ptr)
 char *NH_convert_org(nic_handle_t *nh_ptr)
 {
  char *nic_id=NULL;
- char *nic_components[4];
+ char *nic_components[8];
  char *nic_handle;
  int nc=0;
   /* Check for special cases */
