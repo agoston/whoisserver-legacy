@@ -17,7 +17,7 @@ LDRIPFULL = $(top_srcdir)/src/librip.a $(cclientlib)/c-client.a \
 LDHISTORY = libsq.a liblg.a libut.a \
 	    $(GLIB_LIBS) $(MYSQL_LIBS)
 
-OPLLDLOADLIBS = -L../opl $(GLIB_LIBS) -lrpsl
+OPLLDLOADLIBS = $(GLIB_LIBS) -L../opl -lrpsl $(GLIB_LIBS)
 
 EXTRA_DIST = include/rip.h \
              include/stubs.h \
@@ -232,12 +232,12 @@ opl: ut.o ut_string.o ip.o lg.o memwrap.o numconv.o syntax
 opl-perl: opl
 	cd opl-perl; \
 	$(PERL5) Makefile.PL; \
-	$(MAKE) LDLOADLIBS="$(OPLLDLOADLIBS)" ; \
+	$(MAKE) LDDLFLAGS=" -shared $(OPLLDLOADLIBS)" LDFLAGS="$(OPLLDLOADLIBS)" LDLOADLIBS="$(OPLLDLOADLIBS)" ; \
 	cd ..
 
 opl-perl-install: opl-perl
 	cd opl-perl; \
-	$(MAKE) LDLOADLIBS="$(OPLLDLOADLIBS)" install ; \
+	$(MAKE) LDDLFLAGS=" -shared $(OPLLDLOADLIBS)" LDFLAGS="$(OPLLDLOADLIBS)" LDLOADLIBS="$(OPLLDLOADLIBS)" install; \
 	cd ..
 
 syntax:
