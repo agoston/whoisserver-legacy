@@ -17,6 +17,8 @@ LDRIPFULL = $(top_srcdir)/src/librip.a $(cclientlib)/c-client.a \
 LDHISTORY = libsq.a liblg.a libut.a \
 	    $(GLIB_LIBS) $(MYSQL_LIBS)
 
+OPLLDLOADLIBS = -L../opl $(GLIB_LIBS) -lrpsl
+
 EXTRA_DIST = include/rip.h \
              include/stubs.h \
              include/comparisons.h \
@@ -224,8 +226,22 @@ noinst_LIBRARIES = libaa.a libac.a libau.a libca.a libco.a libcr.a \
 librip.a:
 	$(AR) cru librip.a *.o modules/rpsl/*.o
 
-opl:
+opl: ut.o ut_string.o ip.o lg.o memwrap.o numconv.o syntax
 	rm -f opl/librpsl.a ; $(AR) cru opl/librpsl.a modules/rpsl/*.o ut.o ut_string.o ip.o lg.o memwrap.o numconv.o
+
+opl-perl: opl
+	cd opl-perl; \
+	$(PERL5) Makefile.PL; \
+	$(MAKE) LDLOADLIBS="$(OPLLDLOADLIBS)" ; \
+	cd ..
+
+opl-perl-install: opl-perl
+	cd opl-perl; \
+	$(MAKE) LDLOADLIBS="$(OPLLDLOADLIBS)" install ; \
+	cd ..
+
+syntax:
+	cd defs ; make syntax ; cd ..
 
 libaa_a_SOURCES = modules/aa/aa.c
 libac_a_SOURCES = modules/ac/ac_persistence.c modules/ac/access_control.c
