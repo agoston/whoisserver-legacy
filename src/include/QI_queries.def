@@ -2,21 +2,21 @@ Query_t Query[] = {
 
   {
     R_SQL,
-    Q_INVERSE,
-    WK_NIC_HDL,
-    A_ZC,
-    C_ANY,
-    "SELECT i.object_id,0           FROM   zone_c i, person_role           WHERE  i.pe_ro_id = person_role.object_id           AND    person_role.nic_hdl  = '%s'           AND    i.thread_id = 0",
-    "SQL:ANY/zc/WK_NIC_HDL"
-    },
-  {
-    R_SQL,
     Q_LOOKUP,
     WK_ASSETNAME,
     A_AS,
     C_AS,
     "SELECT object_id,0           FROM   as_set           WHERE  as_set = '%s'           AND    thread_id = 0",
     "SQL:as/as/WK_ASSETNAME"
+    },
+  {
+    R_SQL,
+    Q_INVERSE,
+    WK_NIC_HDL,
+    A_ZC,
+    C_ANY,
+    "SELECT i.object_id,0           FROM   zone_c i, person_role           WHERE  i.pe_ro_id = person_role.object_id           AND    person_role.nic_hdl  = '%s'           AND    i.thread_id = 0",
+    "SQL:ANY/zc/WK_NIC_HDL"
     },
   {
     R_SQL,
@@ -134,15 +134,6 @@ Query_t Query[] = {
     C_ANY,
     "SELECT i.object_id,0           FROM   mntner, mnt_domains i           WHERE  mntner.object_id = i.mnt_id           AND    mntner.mntner  = '%s'           AND    i.thread_id = 0",
     "SQL:ANY/md/WK_MNTNER"
-    },
-  {
-    R_SQL,
-    Q_INVERSE,
-    WK_MNTNER,
-    A_RB,
-    C_ANY,
-    "SELECT i.object_id,0           FROM   mntner, referral_by i           WHERE  mntner.object_id = i.mnt_id           AND    mntner.mntner = '%s'           AND    i.thread_id = 0",
-    "SQL:ANY/rb/WK_MNTNER"
     },
   {
     R_SQL,
@@ -334,15 +325,6 @@ Query_t Query[] = {
     "RADIX:r6/WK_IP6PREFIX"
     },
   {
-    R_SQL,
-    Q_INVERSE,
-    WK_IRT,
-    A_MI,
-    C_ANY,
-    "SELECT b.object_id,0           FROM   irt a, mnt_irt b           WHERE  a.object_id = b.irt_id           AND    a.irt = '%s'           AND    b.thread_id = 0",
-    "SQL:ANY/mi/WK_IRT"
-    },
-  {
     R_RADIX,
     Q_LOOKUP,
     WK_IP6PREFIX,
@@ -350,33 +332,6 @@ Query_t Query[] = {
     C_I6,
     "",
     "RADIX:i6/WK_IP6PREFIX"
-    },
-  {
-    R_SQL,
-    Q_INVERSE,
-    WK_DOMAIN,
-    A_RZ,
-    C_IN,
-    "SELECT object_id,0           FROM   rev_srv           WHERE  rev_srv = '%s'           AND    thread_id = 0",
-    "SQL:in/rz/WK_DOMAIN"
-    },
-  {
-    R_SQL,
-    Q_INVERSE,
-    WK_DOMAIN,
-    A_RZ,
-    C_I6,
-    "SELECT object_id,0           FROM   rev_srv           WHERE  rev_srv = '%s'           AND    thread_id = 0",
-    "SQL:i6/rz/WK_DOMAIN"
-    },
-  {
-    R_SQL,
-    Q_INVERSE,
-    WK_MNTNER,
-    A_MU,
-    C_ANY,
-    "SELECT i.object_id,0           FROM   mntner, mnt_routes i           WHERE  mntner.object_id = i.mnt_id           AND    mntner.mntner  = '%s'           AND    i.thread_id = 0",
-    "SQL:ANY/mu/WK_MNTNER"
     },
   {
     R_SQL,

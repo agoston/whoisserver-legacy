@@ -3,23 +3,39 @@
 # figure out the appropriate flags for Java execution
 @JAVA@ 2>&1 | grep classic > /dev/null
 if [ $? -eq 0 ]; then
-  JAVA="@JAVA@ -classic"
+  JAVA="@JAVA@ -cp @abs_top_srcdir@/src/defs:@abs_top_builddir@/src/defs:. -classic"
 else
-  JAVA="@JAVA@"
+  JAVA="@JAVA@ -cp @abs_top_srcdir@/src/defs:@abs_top_builddir@/src/defs:."
 fi
 
 # put our library in the class path
-CLASSPATH=xalan/xerces.jar:.
+CLASSPATH=xalan/xerces.jar:.:@abs_top_builddir@/src/defs
 export CLASSPATH
 
 # produce a single def file
 makedef() {
   echo "Making $2 $3"
-  $JAVA Defs $1 $3 > ../include/$2
+  OPWD=`pwd`
+  cd @abs_top_srcdir@/src/defs
+  echo $JAVA Defs $1 $3 \> @abs_top_builddir@/src/include/$2
+  $JAVA Defs $1 $3 > @abs_top_builddir@/src/include/$2
   JAVA_EXIT_CODE=$?
   if [ $JAVA_EXIT_CODE -ne 0 ]; then exit $JAVA_EXIT_CODE; fi
   echo "done"
+  cd $OPWD
 } # makedefs()
+
+# copy files
+for file in @abs_top_srcdir@/src/defs/*.xml
+do
+  if test ! -f `basename $file`
+  then
+    echo "Copying $file"
+    cp -f $file .
+  else
+    echo "$file exists, not copying"
+  fi
+done
 
 # create *.def files
 makedef 14 QI_queries.def normalize

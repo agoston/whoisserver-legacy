@@ -20,12 +20,6 @@ extern void refer_reset();
 extern int referparse();
 extern void inet6num_reset();
 extern int inet6numparse();
-extern void mnt_routes_reset();
-extern int mnt_routesparse();
-extern void mnt_routes6_reset();
-extern int mnt_routes6parse();
-extern void mnt_routes_an_reset();
-extern int mnt_routes_anparse();
 extern void components_reset();
 extern int componentsparse();
 extern void components_r6_reset();
@@ -34,18 +28,6 @@ extern void aggr_mtd_reset();
 extern int aggr_mtdparse();
 extern void aggr_bndry_reset();
 extern int aggr_bndryparse();
-extern void default_reset();
-extern int defaultparse();
-extern void mp_default_reset();
-extern int mp_defaultparse();
-extern void export_reset();
-extern int exportparse();
-extern void mp_export_reset();
-extern int mp_exportparse();
-extern void import_reset();
-extern int importparse();
-extern void mp_import_reset();
-extern int mp_importparse();
 extern void ifaddr_reset();
 extern int ifaddrparse();
 extern void interface_reset();
@@ -920,7 +902,7 @@ syntax_t syntax_tab[] = {
         /* core_parser */
         NULL,
         /* front_end_regex_pattern */
-        "^(IANA|RIR|NIR|LIR|NON-REGISTRY)$",
+        "^(IANA|RIR|NIR|LIR)$",
         /* front_end_regex, set by syntax_init() */
         NULL,
         /* front_end_reserved_regex_pattern */
@@ -1088,7 +1070,7 @@ syntax_t syntax_tab[] = {
         /* core_parser */
         NULL,
         /* front_end_regex_pattern */
-        "^((SUB-ALLOCATED PA)|NOT-SET|EARLY-REGISTRATION|((ALLOCATED (PA|PI|UNSPECIFIED))|((ASSIGNED|LIR-PARTITIONED) (PA|PI))))$",
+        "^((SUB-ALLOCATED PA)|NOT-SET|EARLY-REGISTRATION|((ALLOCATED (PA|PI|UNSPECIFIED))|(ASSIGNED (PA|PI))))$",
         /* front_end_regex, set by syntax_init() */
         NULL,
         /* front_end_reserved_regex_pattern */
@@ -1116,7 +1098,7 @@ syntax_t syntax_tab[] = {
         /* core_parser */
         NULL,
         /* front_end_regex_pattern */
-        "^(ALLOCATED-BY-RIR|ALLOCATED-BY-LIR|ASSIGNED)$",
+        "^(ALLOCATED-BY-RIR|SUB-ALLOCATED PA|ASSIGNED PA)$",
         /* front_end_regex, set by syntax_init() */
         NULL,
         /* front_end_reserved_regex_pattern */
@@ -1127,90 +1109,6 @@ syntax_t syntax_tab[] = {
         NULL,
         /* front_end_parser */
         NULL 
-    },
-    {
-        /* name */
-        "mnt-routes",
-        /* core_regex_pattern */
-        "^[A-Z]([A-Z0-9_-]){1,80}([[:space:]]+.*)*$",
-        /* core_regex, set by syntax_init() */
-        NULL,
-        /* core_reserved_regex_pattern */
-        NULL,
-        /* core_reserved_regex, set by syntax_init() */
-        NULL,
-        /* core_parser_reset */
-        NULL,
-        /* core_parser */
-        NULL,
-        /* front_end_regex_pattern */
-        "^[A-Z]([A-Z0-9_-]){1,80}([[:space:]]+.*)*$",
-        /* front_end_regex, set by syntax_init() */
-        NULL,
-        /* front_end_reserved_regex_pattern */
-        NULL,
-        /* front_end_reserved_regex, set by syntax_init() */
-        NULL,
-        /* front_end_parser_reset */
-        mnt_routes_reset,
-        /* front_end_parser */
-        mnt_routesparse
-    },
-    {
-        /* name */
-        "mnt-routes6",
-        /* core_regex_pattern */
-        "^[A-Z]([A-Z0-9_-]){1,80}([[:space:]]+.*)*$",
-        /* core_regex, set by syntax_init() */
-        NULL,
-        /* core_reserved_regex_pattern */
-        NULL,
-        /* core_reserved_regex, set by syntax_init() */
-        NULL,
-        /* core_parser_reset */
-        NULL,
-        /* core_parser */
-        NULL,
-        /* front_end_regex_pattern */
-        "^[A-Z]([A-Z0-9_-]){1,80}([[:space:]]+.*)*$",
-        /* front_end_regex, set by syntax_init() */
-        NULL,
-        /* front_end_reserved_regex_pattern */
-        "^(peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*|irt-.*)$",
-        /* front_end_reserved_regex, set by syntax_init() */
-        NULL,
-        /* front_end_parser_reset */
-        mnt_routes6_reset,
-        /* front_end_parser */
-        mnt_routes6parse
-    },
-    {
-        /* name */
-        "mnt-routes-an",
-        /* core_regex_pattern */
-        "^[A-Z]([A-Z0-9_-]){1,80}([[:space:]]+.*)*$",
-        /* core_regex, set by syntax_init() */
-        NULL,
-        /* core_reserved_regex_pattern */
-        NULL,
-        /* core_reserved_regex, set by syntax_init() */
-        NULL,
-        /* core_parser_reset */
-        NULL,
-        /* core_parser */
-        NULL,
-        /* front_end_regex_pattern */
-        "^[A-Z]([A-Z0-9_-]){1,80}([[:space:]]+.*)*$",
-        /* front_end_regex, set by syntax_init() */
-        NULL,
-        /* front_end_reserved_regex_pattern */
-        "^(peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*|irt-.*)$",
-        /* front_end_reserved_regex, set by syntax_init() */
-        NULL,
-        /* front_end_parser_reset */
-        mnt_routes_an_reset,
-        /* front_end_parser */
-        mnt_routes_anparse
     },
     {
         /* name */
@@ -1550,174 +1448,6 @@ syntax_t syntax_tab[] = {
     },
     {
         /* name */
-        "default",
-        /* core_regex_pattern */
-        NULL,
-        /* core_regex, set by syntax_init() */
-        NULL,
-        /* core_reserved_regex_pattern */
-        NULL,
-        /* core_reserved_regex, set by syntax_init() */
-        NULL,
-        /* core_parser_reset */
-        NULL,
-        /* core_parser */
-        NULL,
-        /* front_end_regex_pattern */
-        NULL,
-        /* front_end_regex, set by syntax_init() */
-        NULL,
-        /* front_end_reserved_regex_pattern */
-        NULL,
-        /* front_end_reserved_regex, set by syntax_init() */
-        NULL,
-        /* front_end_parser_reset */
-        default_reset,
-        /* front_end_parser */
-        defaultparse
-    },
-    {
-        /* name */
-        "mp-default",
-        /* core_regex_pattern */
-        NULL,
-        /* core_regex, set by syntax_init() */
-        NULL,
-        /* core_reserved_regex_pattern */
-        NULL,
-        /* core_reserved_regex, set by syntax_init() */
-        NULL,
-        /* core_parser_reset */
-        NULL,
-        /* core_parser */
-        NULL,
-        /* front_end_regex_pattern */
-        NULL,
-        /* front_end_regex, set by syntax_init() */
-        NULL,
-        /* front_end_reserved_regex_pattern */
-        NULL,
-        /* front_end_reserved_regex, set by syntax_init() */
-        NULL,
-        /* front_end_parser_reset */
-        mp_default_reset,
-        /* front_end_parser */
-        mp_defaultparse
-    },
-    {
-        /* name */
-        "export",
-        /* core_regex_pattern */
-        NULL,
-        /* core_regex, set by syntax_init() */
-        NULL,
-        /* core_reserved_regex_pattern */
-        NULL,
-        /* core_reserved_regex, set by syntax_init() */
-        NULL,
-        /* core_parser_reset */
-        NULL,
-        /* core_parser */
-        NULL,
-        /* front_end_regex_pattern */
-        NULL,
-        /* front_end_regex, set by syntax_init() */
-        NULL,
-        /* front_end_reserved_regex_pattern */
-        NULL,
-        /* front_end_reserved_regex, set by syntax_init() */
-        NULL,
-        /* front_end_parser_reset */
-        export_reset,
-        /* front_end_parser */
-        exportparse
-    },
-    {
-        /* name */
-        "mp-export",
-        /* core_regex_pattern */
-        NULL,
-        /* core_regex, set by syntax_init() */
-        NULL,
-        /* core_reserved_regex_pattern */
-        NULL,
-        /* core_reserved_regex, set by syntax_init() */
-        NULL,
-        /* core_parser_reset */
-        NULL,
-        /* core_parser */
-        NULL,
-        /* front_end_regex_pattern */
-        NULL,
-        /* front_end_regex, set by syntax_init() */
-        NULL,
-        /* front_end_reserved_regex_pattern */
-        NULL,
-        /* front_end_reserved_regex, set by syntax_init() */
-        NULL,
-        /* front_end_parser_reset */
-        mp_export_reset,
-        /* front_end_parser */
-        mp_exportparse
-    },
-    {
-        /* name */
-        "import",
-        /* core_regex_pattern */
-        NULL,
-        /* core_regex, set by syntax_init() */
-        NULL,
-        /* core_reserved_regex_pattern */
-        NULL,
-        /* core_reserved_regex, set by syntax_init() */
-        NULL,
-        /* core_parser_reset */
-        NULL,
-        /* core_parser */
-        NULL,
-        /* front_end_regex_pattern */
-        NULL,
-        /* front_end_regex, set by syntax_init() */
-        NULL,
-        /* front_end_reserved_regex_pattern */
-        NULL,
-        /* front_end_reserved_regex, set by syntax_init() */
-        NULL,
-        /* front_end_parser_reset */
-        import_reset,
-        /* front_end_parser */
-        importparse
-    },
-    {
-        /* name */
-        "mp-import",
-        /* core_regex_pattern */
-        NULL,
-        /* core_regex, set by syntax_init() */
-        NULL,
-        /* core_reserved_regex_pattern */
-        NULL,
-        /* core_reserved_regex, set by syntax_init() */
-        NULL,
-        /* core_parser_reset */
-        NULL,
-        /* core_parser */
-        NULL,
-        /* front_end_regex_pattern */
-        NULL,
-        /* front_end_regex, set by syntax_init() */
-        NULL,
-        /* front_end_reserved_regex_pattern */
-        NULL,
-        /* front_end_reserved_regex, set by syntax_init() */
-        NULL,
-        /* front_end_parser_reset */
-        mp_import_reset,
-        /* front_end_parser */
-        mp_importparse
-    },
-    {
-        /* name */
         "ifaddr",
         /* core_regex_pattern */
         NULL,
@@ -1939,34 +1669,6 @@ syntax_t syntax_tab[] = {
         mp_peer_reset,
         /* front_end_parser */
         mp_peerparse
-    },
-    {
-        /* name */
-        "referral-by",
-        /* core_regex_pattern */
-        NULL,
-        /* core_regex, set by syntax_init() */
-        NULL,
-        /* core_reserved_regex_pattern */
-        NULL,
-        /* core_reserved_regex, set by syntax_init() */
-        NULL,
-        /* core_parser_reset */
-        NULL,
-        /* core_parser */
-        NULL,
-        /* front_end_regex_pattern */
-        "^RIPE-DBM-MNT$",
-        /* front_end_regex, set by syntax_init() */
-        NULL,
-        /* front_end_reserved_regex_pattern */
-        NULL,
-        /* front_end_reserved_regex, set by syntax_init() */
-        NULL,
-        /* front_end_parser_reset */
-        NULL,
-        /* front_end_parser */
-        NULL 
     }
 };
 

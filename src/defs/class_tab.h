@@ -15,7 +15,7 @@ class_t class_tab[] = {
             /* attribute: as-block (as-block) */
             {
                 /* offset */
-                89,
+                79,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -24,7 +24,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -33,7 +33,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -42,7 +42,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -60,7 +60,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -69,7 +69,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -78,7 +78,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -87,7 +87,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -105,7 +105,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -114,7 +114,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -123,7 +123,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -154,7 +154,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -163,7 +163,7 @@ class_t class_tab[] = {
             /* attribute: members (members-as) */
             {
                 /* offset */
-                41,
+                35,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -172,7 +172,7 @@ class_t class_tab[] = {
             /* attribute: mbrs-by-ref (mbrs-by-ref) */
             {
                 /* offset */
-                40,
+                34,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -181,7 +181,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -190,7 +190,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -199,7 +199,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -217,7 +217,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -226,7 +226,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -235,7 +235,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -253,7 +253,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -262,7 +262,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -271,7 +271,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -287,13 +287,13 @@ class_t class_tab[] = {
         /* id */
         2,
         /* num_attr */
-        22,
+        14,
         /* attr[] */
         {
             /* attribute: aut-num (aut-num) */
             {
                 /* offset */
-                90,
+                80,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -311,79 +311,16 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
-                /* choice */
-                ATTR_MANDATORY,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: member-of (member-of-an) */
-            {
-                /* offset */
-                98,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: import (import) */
-            {
-                /* offset */
-                33,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: mp-import (mp-import) */
-            {
-                /* offset */
-                34,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: export (export) */
-            {
-                /* offset */
-                20,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: mp-export (mp-export) */
-            {
-                /* offset */
-                21,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: default (default) */
-            {
-                /* offset */
                 14,
                 /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: mp-default (mp-default) */
-            {
-                /* offset */
-                15,
-                /* choice */
-                ATTR_OPTIONAL,
+                ATTR_MANDATORY,
                 /* number */
                 ATTR_MULTIPLE
             },
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -392,7 +329,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -410,7 +347,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -419,7 +356,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -428,16 +365,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: mnt-routes (mnt-routes-an) */
-            {
-                /* offset */
-                55,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -446,7 +374,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -464,7 +392,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -473,7 +401,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -482,7 +410,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -504,7 +432,7 @@ class_t class_tab[] = {
             /* attribute: domain (domain) */
             {
                 /* offset */
-                18,
+                16,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -513,7 +441,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -522,7 +450,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -540,7 +468,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -549,7 +477,7 @@ class_t class_tab[] = {
             /* attribute: zone-c (zone-c) */
             {
                 /* offset */
-                87,
+                77,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -558,7 +486,7 @@ class_t class_tab[] = {
             /* attribute: nserver (nserver) */
             {
                 /* offset */
-                72,
+                63,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -567,7 +495,7 @@ class_t class_tab[] = {
             /* attribute: sub-dom (sub-dom) */
             {
                 /* offset */
-                81,
+                71,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -576,7 +504,7 @@ class_t class_tab[] = {
             /* attribute: dom-net (dom-net) */
             {
                 /* offset */
-                17,
+                15,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -585,7 +513,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -594,7 +522,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -603,7 +531,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -612,7 +540,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -621,7 +549,7 @@ class_t class_tab[] = {
             /* attribute: refer (refer) */
             {
                 /* offset */
-                73,
+                64,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -639,7 +567,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -648,7 +576,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -657,7 +585,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -679,7 +607,7 @@ class_t class_tab[] = {
             /* attribute: inet-rtr (inet-rtr) */
             {
                 /* offset */
-                88,
+                78,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -688,7 +616,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -706,7 +634,7 @@ class_t class_tab[] = {
             /* attribute: local-as (local-as) */
             {
                 /* offset */
-                96,
+                86,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -715,7 +643,7 @@ class_t class_tab[] = {
             /* attribute: ifaddr (ifaddr) */
             {
                 /* offset */
-                31,
+                27,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -724,7 +652,7 @@ class_t class_tab[] = {
             /* attribute: interface (interface) */
             {
                 /* offset */
-                32,
+                28,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -733,7 +661,7 @@ class_t class_tab[] = {
             /* attribute: peer (peer) */
             {
                 /* offset */
-                63,
+                54,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -742,7 +670,7 @@ class_t class_tab[] = {
             /* attribute: mp-peer (mp-peer) */
             {
                 /* offset */
-                64,
+                55,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -751,7 +679,7 @@ class_t class_tab[] = {
             /* attribute: member-of (member-of-ir) */
             {
                 /* offset */
-                97,
+                87,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -760,7 +688,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -769,7 +697,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -787,7 +715,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -796,7 +724,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -805,7 +733,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -823,7 +751,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -832,7 +760,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -841,7 +769,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -857,13 +785,13 @@ class_t class_tab[] = {
         /* id */
         5,
         /* num_attr */
-        20,
+        18,
         /* attr[] */
         {
             /* attribute: inet6num (inet6num) */
             {
                 /* offset */
-                36,
+                30,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -872,7 +800,7 @@ class_t class_tab[] = {
             /* attribute: netname (netname) */
             {
                 /* offset */
-                57,
+                48,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -881,7 +809,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -899,7 +827,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -917,25 +845,16 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: rev-srv (rev-srv) */
-            {
-                /* offset */
-                74,
-                /* choice */
-                ATTR_OPTIONAL,
                 /* number */
                 ATTR_MULTIPLE
             },
             /* attribute: status (status-i6) */
             {
                 /* offset */
-                79,
+                69,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -944,7 +863,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -953,7 +872,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -962,7 +881,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -971,16 +890,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: mnt-routes (mnt-routes6) */
-            {
-                /* offset */
-                54,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -989,16 +899,7 @@ class_t class_tab[] = {
             /* attribute: mnt-domains (mnt-domains) */
             {
                 /* offset */
-                50,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: mnt-irt (mnt-irt) */
-            {
-                /* offset */
-                100,
+                44,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1016,16 +917,25 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
                 ATTR_SINGLE
             },
+            /* attribute: parent (parent) */
+            {
+                /* offset */
+                62,
+                /* choice */
+                ATTR_GENERATED,
+                /* number */
+                ATTR_MULTIPLE
+            },
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1034,7 +944,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1050,13 +960,13 @@ class_t class_tab[] = {
         /* id */
         6,
         /* num_attr */
-        20,
+        18,
         /* attr[] */
         {
             /* attribute: inetnum (inetnum) */
             {
                 /* offset */
-                35,
+                29,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1065,7 +975,7 @@ class_t class_tab[] = {
             /* attribute: netname (netname) */
             {
                 /* offset */
-                57,
+                48,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1074,7 +984,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1092,7 +1002,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1110,25 +1020,16 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: rev-srv (rev-srv) */
-            {
-                /* offset */
-                74,
-                /* choice */
-                ATTR_OPTIONAL,
                 /* number */
                 ATTR_MULTIPLE
             },
             /* attribute: status (status-in) */
             {
                 /* offset */
-                78,
+                68,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1137,7 +1038,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1146,7 +1047,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1155,7 +1056,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1164,7 +1065,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1173,25 +1074,7 @@ class_t class_tab[] = {
             /* attribute: mnt-domains (mnt-domains) */
             {
                 /* offset */
-                50,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: mnt-routes (mnt-routes) */
-            {
-                /* offset */
-                53,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: mnt-irt (mnt-irt) */
-            {
-                /* offset */
-                100,
+                44,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1209,16 +1092,25 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
                 ATTR_SINGLE
             },
+            /* attribute: parent (parent) */
+            {
+                /* offset */
+                62,
+                /* choice */
+                ATTR_GENERATED,
+                /* number */
+                ATTR_MULTIPLE
+            },
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1227,7 +1119,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1249,7 +1141,7 @@ class_t class_tab[] = {
             /* attribute: key-cert (key-cert) */
             {
                 /* offset */
-                39,
+                33,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1258,7 +1150,7 @@ class_t class_tab[] = {
             /* attribute: method (method) */
             {
                 /* offset */
-                46,
+                40,
                 /* choice */
                 ATTR_GENERATED,
                 /* number */
@@ -1267,7 +1159,7 @@ class_t class_tab[] = {
             /* attribute: owner (owner) */
             {
                 /* offset */
-                62,
+                53,
                 /* choice */
                 ATTR_GENERATED,
                 /* number */
@@ -1276,7 +1168,7 @@ class_t class_tab[] = {
             /* attribute: fingerpr (fingerpr) */
             {
                 /* offset */
-                28,
+                24,
                 /* choice */
                 ATTR_GENERATED,
                 /* number */
@@ -1294,7 +1186,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1303,7 +1195,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1312,7 +1204,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1330,7 +1222,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1339,7 +1231,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1357,7 +1249,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1366,7 +1258,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1375,7 +1267,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1397,7 +1289,7 @@ class_t class_tab[] = {
             /* attribute: limerick (limerick) */
             {
                 /* offset */
-                91,
+                81,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1406,7 +1298,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1415,7 +1307,7 @@ class_t class_tab[] = {
             /* attribute: text (text) */
             {
                 /* offset */
-                84,
+                74,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1424,7 +1316,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1451,7 +1343,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1460,7 +1352,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1469,7 +1361,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1487,7 +1379,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1496,7 +1388,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1505,7 +1397,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1521,13 +1413,13 @@ class_t class_tab[] = {
         /* id */
         9,
         /* num_attr */
-        16,
+        15,
         /* attr[] */
         {
             /* attribute: mntner (mntner) */
             {
                 /* offset */
-                56,
+                47,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1536,7 +1428,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1545,7 +1437,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1563,7 +1455,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1572,7 +1464,7 @@ class_t class_tab[] = {
             /* attribute: upd-to (upd-to) */
             {
                 /* offset */
-                86,
+                76,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1581,7 +1473,7 @@ class_t class_tab[] = {
             /* attribute: mnt-nfy (mnt-nfy) */
             {
                 /* offset */
-                51,
+                45,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1599,7 +1491,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1608,7 +1500,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1617,20 +1509,11 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
                 ATTR_MULTIPLE
-            },
-            /* attribute: referral-by (referral-by) */
-            {
-                /* offset */
-                70,
-                /* choice */
-                ATTR_MANDATORY,
-                /* number */
-                ATTR_SINGLE
             },
             /* attribute: changed (changed) */
             {
@@ -1644,7 +1527,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1653,7 +1536,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1662,7 +1545,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1684,7 +1567,7 @@ class_t class_tab[] = {
             /* attribute: person (person) */
             {
                 /* offset */
-                67,
+                58,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1702,7 +1585,7 @@ class_t class_tab[] = {
             /* attribute: phone (phone) */
             {
                 /* offset */
-                69,
+                60,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1711,7 +1594,7 @@ class_t class_tab[] = {
             /* attribute: fax-no (fax-no) */
             {
                 /* offset */
-                24,
+                20,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1720,7 +1603,7 @@ class_t class_tab[] = {
             /* attribute: e-mail (e-mail) */
             {
                 /* offset */
-                19,
+                17,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1729,7 +1612,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1738,7 +1621,7 @@ class_t class_tab[] = {
             /* attribute: nic-hdl (nic-hdl) */
             {
                 /* offset */
-                58,
+                49,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1747,7 +1630,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1756,7 +1639,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1765,7 +1648,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1783,7 +1666,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1792,7 +1675,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1801,7 +1684,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1823,7 +1706,7 @@ class_t class_tab[] = {
             /* attribute: role (role) */
             {
                 /* offset */
-                75,
+                65,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1841,7 +1724,7 @@ class_t class_tab[] = {
             /* attribute: phone (phone) */
             {
                 /* offset */
-                69,
+                60,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1850,7 +1733,7 @@ class_t class_tab[] = {
             /* attribute: fax-no (fax-no) */
             {
                 /* offset */
-                24,
+                20,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1859,7 +1742,7 @@ class_t class_tab[] = {
             /* attribute: e-mail (e-mail) */
             {
                 /* offset */
-                19,
+                17,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1868,7 +1751,7 @@ class_t class_tab[] = {
             /* attribute: trouble (trouble) */
             {
                 /* offset */
-                85,
+                75,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1877,7 +1760,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1895,7 +1778,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1904,7 +1787,7 @@ class_t class_tab[] = {
             /* attribute: nic-hdl (nic-hdl) */
             {
                 /* offset */
-                58,
+                49,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1913,7 +1796,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1922,7 +1805,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1931,7 +1814,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1949,7 +1832,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1958,7 +1841,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1967,7 +1850,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -1983,13 +1866,13 @@ class_t class_tab[] = {
         /* id */
         12,
         /* num_attr */
-        20,
+        19,
         /* attr[] */
         {
             /* attribute: route (route) */
             {
                 /* offset */
-                92,
+                82,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -1998,7 +1881,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2007,7 +1890,7 @@ class_t class_tab[] = {
             /* attribute: origin (origin) */
             {
                 /* offset */
-                61,
+                52,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2016,7 +1899,7 @@ class_t class_tab[] = {
             /* attribute: holes (holes-rt) */
             {
                 /* offset */
-                29,
+                25,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2025,7 +1908,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2034,7 +1917,7 @@ class_t class_tab[] = {
             /* attribute: member-of (member-of-rt) */
             {
                 /* offset */
-                99,
+                88,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2043,7 +1926,7 @@ class_t class_tab[] = {
             /* attribute: inject (inject-rt) */
             {
                 /* offset */
-                37,
+                31,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2070,7 +1953,7 @@ class_t class_tab[] = {
             /* attribute: export-comps (export-comps-rt) */
             {
                 /* offset */
-                22,
+                18,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2088,7 +1971,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2097,7 +1980,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2106,16 +1989,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: mnt-routes (mnt-routes) */
-            {
-                /* offset */
-                53,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2124,7 +1998,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2142,7 +2016,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2151,7 +2025,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2160,7 +2034,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2182,7 +2056,7 @@ class_t class_tab[] = {
             /* attribute: route-set (route-set) */
             {
                 /* offset */
-                76,
+                66,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2191,7 +2065,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2200,7 +2074,7 @@ class_t class_tab[] = {
             /* attribute: members (members-rs) */
             {
                 /* offset */
-                44,
+                38,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2209,7 +2083,7 @@ class_t class_tab[] = {
             /* attribute: mp-members (mp-members-rs) */
             {
                 /* offset */
-                45,
+                39,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2218,7 +2092,7 @@ class_t class_tab[] = {
             /* attribute: mbrs-by-ref (mbrs-by-ref) */
             {
                 /* offset */
-                40,
+                34,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2227,7 +2101,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2236,7 +2110,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2245,7 +2119,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2263,7 +2137,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2272,7 +2146,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2281,7 +2155,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2299,7 +2173,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2308,7 +2182,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2317,7 +2191,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2339,7 +2213,7 @@ class_t class_tab[] = {
             /* attribute: filter-set (filter-set) */
             {
                 /* offset */
-                27,
+                23,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2348,7 +2222,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2357,7 +2231,7 @@ class_t class_tab[] = {
             /* attribute: filter (filter) */
             {
                 /* offset */
-                25,
+                21,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2366,7 +2240,7 @@ class_t class_tab[] = {
             /* attribute: mp-filter (mp-filter) */
             {
                 /* offset */
-                26,
+                22,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2375,7 +2249,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2384,7 +2258,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2393,7 +2267,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2411,7 +2285,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2420,7 +2294,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2429,7 +2303,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2447,7 +2321,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2456,7 +2330,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2465,7 +2339,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2487,7 +2361,7 @@ class_t class_tab[] = {
             /* attribute: peering-set (peering-set) */
             {
                 /* offset */
-                94,
+                84,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2496,7 +2370,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2505,7 +2379,7 @@ class_t class_tab[] = {
             /* attribute: peering (peering) */
             {
                 /* offset */
-                65,
+                56,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2514,7 +2388,7 @@ class_t class_tab[] = {
             /* attribute: mp-peering (mp-peering) */
             {
                 /* offset */
-                66,
+                57,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2523,7 +2397,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2532,7 +2406,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2541,7 +2415,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2559,7 +2433,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2568,7 +2442,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2577,7 +2451,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2595,7 +2469,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2604,7 +2478,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2613,7 +2487,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2635,7 +2509,7 @@ class_t class_tab[] = {
             /* attribute: rtr-set (rtr-set) */
             {
                 /* offset */
-                95,
+                85,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2644,7 +2518,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2653,7 +2527,7 @@ class_t class_tab[] = {
             /* attribute: members (members-is) */
             {
                 /* offset */
-                42,
+                36,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2662,7 +2536,7 @@ class_t class_tab[] = {
             /* attribute: mp-members (mp-members-is) */
             {
                 /* offset */
-                43,
+                37,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2671,7 +2545,7 @@ class_t class_tab[] = {
             /* attribute: mbrs-by-ref (mbrs-by-ref) */
             {
                 /* offset */
-                40,
+                34,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2680,7 +2554,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2689,7 +2563,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2698,7 +2572,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2716,7 +2590,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2725,7 +2599,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2734,7 +2608,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2752,7 +2626,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2761,7 +2635,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2770,7 +2644,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2792,7 +2666,7 @@ class_t class_tab[] = {
             /* attribute: irt (irt) */
             {
                 /* offset */
-                101,
+                89,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2810,7 +2684,7 @@ class_t class_tab[] = {
             /* attribute: phone (phone) */
             {
                 /* offset */
-                69,
+                60,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2819,7 +2693,7 @@ class_t class_tab[] = {
             /* attribute: fax-no (fax-no) */
             {
                 /* offset */
-                24,
+                20,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2828,7 +2702,7 @@ class_t class_tab[] = {
             /* attribute: e-mail (e-mail) */
             {
                 /* offset */
-                19,
+                17,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2837,7 +2711,7 @@ class_t class_tab[] = {
             /* attribute: signature (signature) */
             {
                 /* offset */
-                102,
+                90,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2846,7 +2720,7 @@ class_t class_tab[] = {
             /* attribute: encryption (encryption) */
             {
                 /* offset */
-                103,
+                91,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2855,7 +2729,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2873,7 +2747,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2891,7 +2765,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2900,7 +2774,7 @@ class_t class_tab[] = {
             /* attribute: irt-nfy (irt-nfy) */
             {
                 /* offset */
-                104,
+                92,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2909,7 +2783,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2918,7 +2792,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2936,7 +2810,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2945,7 +2819,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2954,7 +2828,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -2970,13 +2844,13 @@ class_t class_tab[] = {
         /* id */
         18,
         /* num_attr */
-        20,
+        21,
         /* attr[] */
         {
             /* attribute: organisation (organisation) */
             {
                 /* offset */
-                59,
+                50,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2985,7 +2859,7 @@ class_t class_tab[] = {
             /* attribute: org-name (org-name) */
             {
                 /* offset */
-                68,
+                59,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -2994,7 +2868,7 @@ class_t class_tab[] = {
             /* attribute: org-type (org-type) */
             {
                 /* offset */
-                80,
+                70,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -3003,16 +2877,25 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_OPTIONAL,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: country (country) */
+            {
+                /* offset */
+                13,
+                /* choice */
+                ATTR_MANDATORY,
                 /* number */
                 ATTR_MULTIPLE
             },
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3030,7 +2913,7 @@ class_t class_tab[] = {
             /* attribute: phone (phone) */
             {
                 /* offset */
-                69,
+                60,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3039,7 +2922,7 @@ class_t class_tab[] = {
             /* attribute: fax-no (fax-no) */
             {
                 /* offset */
-                24,
+                20,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3048,7 +2931,7 @@ class_t class_tab[] = {
             /* attribute: e-mail (e-mail) */
             {
                 /* offset */
-                19,
+                17,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -3057,7 +2940,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3075,7 +2958,7 @@ class_t class_tab[] = {
             /* attribute: tech-c (tech-c) */
             {
                 /* offset */
-                82,
+                72,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3084,7 +2967,7 @@ class_t class_tab[] = {
             /* attribute: ref-nfy (ref-nfy) */
             {
                 /* offset */
-                52,
+                46,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3093,7 +2976,7 @@ class_t class_tab[] = {
             /* attribute: mnt-ref (mnt-ref) */
             {
                 /* offset */
-                49,
+                43,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -3102,7 +2985,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3111,7 +2994,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -3129,7 +3012,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -3138,7 +3021,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3147,7 +3030,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3163,13 +3046,13 @@ class_t class_tab[] = {
         /* id */
         19,
         /* num_attr */
-        20,
+        19,
         /* attr[] */
         {
             /* attribute: route6 (route6) */
             {
                 /* offset */
-                93,
+                83,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -3178,7 +3061,7 @@ class_t class_tab[] = {
             /* attribute: descr (descr) */
             {
                 /* offset */
-                16,
+                14,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -3187,7 +3070,7 @@ class_t class_tab[] = {
             /* attribute: origin (origin) */
             {
                 /* offset */
-                61,
+                52,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -3196,7 +3079,7 @@ class_t class_tab[] = {
             /* attribute: holes (holes-r6) */
             {
                 /* offset */
-                30,
+                26,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3205,7 +3088,7 @@ class_t class_tab[] = {
             /* attribute: org (org) */
             {
                 /* offset */
-                83,
+                73,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3214,7 +3097,7 @@ class_t class_tab[] = {
             /* attribute: member-of (member-of-rt) */
             {
                 /* offset */
-                99,
+                88,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3223,7 +3106,7 @@ class_t class_tab[] = {
             /* attribute: inject (inject-r6) */
             {
                 /* offset */
-                38,
+                32,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3250,7 +3133,7 @@ class_t class_tab[] = {
             /* attribute: export-comps (export-comps-r6) */
             {
                 /* offset */
-                23,
+                19,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3268,7 +3151,7 @@ class_t class_tab[] = {
             /* attribute: remarks (remarks) */
             {
                 /* offset */
-                71,
+                61,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3277,7 +3160,7 @@ class_t class_tab[] = {
             /* attribute: notify (notify) */
             {
                 /* offset */
-                60,
+                51,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3286,16 +3169,7 @@ class_t class_tab[] = {
             /* attribute: mnt-lower (mnt-lower) */
             {
                 /* offset */
-                48,
-                /* choice */
-                ATTR_OPTIONAL,
-                /* number */
-                ATTR_MULTIPLE
-            },
-            /* attribute: mnt-routes (mnt-routes6) */
-            {
-                /* offset */
-                54,
+                42,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3304,7 +3178,7 @@ class_t class_tab[] = {
             /* attribute: mnt-by (mnt-by) */
             {
                 /* offset */
-                47,
+                41,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -3322,7 +3196,7 @@ class_t class_tab[] = {
             /* attribute: source (source) */
             {
                 /* offset */
-                77,
+                67,
                 /* choice */
                 ATTR_MANDATORY,
                 /* number */
@@ -3331,7 +3205,7 @@ class_t class_tab[] = {
             /* attribute: delete (delete) */
             {
                 /* offset */
-                105,
+                93,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
@@ -3340,7 +3214,7 @@ class_t class_tab[] = {
             /* attribute: override (override) */
             {
                 /* offset */
-                106,
+                94,
                 /* choice */
                 ATTR_OPTIONAL,
                 /* number */
