@@ -8,7 +8,7 @@
 #
 # RESULT 1: The creation will succeed
 
-# inetnum status tests
+
 # CASE 2: We try to create inetnum object
 # with status LIR-PARTITIONED PI under LIR-PARTITIONED PA
 #
@@ -18,7 +18,7 @@
 #
 # RESULT 2: The creation will fail with Authorisation failed
 
-# inetnum status tests
+
 # CASE 3: We try to create inetnum object
 # with status LIR-PARTITIONED PA under LIR-PARTITIONED PA
 #
@@ -28,7 +28,7 @@
 #
 # RESULT 3: The creation will succeed
 
-# inetnum status tests
+
 # CASE 4: We try to create inetnum object
 # with status ASSIGNED PI under LIR-PARTITIONED PA
 #
@@ -39,7 +39,7 @@
 # ***but will succeed at the moment until checks are tightened***
 # RESULT 4: The creation will fail with Authorisation failed
 
-# inetnum status tests
+
 # CASE 5: We try to create inetnum object
 # with status ASSIGNED PA under LIR-PARTITIONED PA
 #
@@ -49,7 +49,7 @@
 #
 # RESULT 5: The creation will succeed
 
-# inetnum status tests
+
 # CASE 6: We try to create inetnum object
 # with status ASSIGNED PA under ASSIGNED PA
 #
@@ -60,7 +60,7 @@
 # ***but will succeed at the moment until checks are tightened***
 # RESULT 6: The creation will fail with Authorisation failed
 
-# inetnum status tests
+
 # CASE 7: We try to update inetnum object
 # changing status LIR-PARTITIONED PA to ASSIGNED PA status
 # with more specific objects existing
@@ -72,7 +72,7 @@
 # ***but will succeed at the moment until checks are tightened***
 # RESULT 7: The update will fail with Authorisation failed
 
-# inetnum status tests
+
 # CASE 8: We try to create inetnum object
 # with status LIR-PARTITIONED PA under ASSIGNED PA status
 #
@@ -83,7 +83,7 @@
 # ***but will succeed at the moment until checks are tightened***
 # RESULT 8: The creation will fail with Authorisation failed
 
-# inetnum status tests
+
 # CASE 9: We try to update inetnum object
 # changing status ASSIGNED PA to LIR-PARTITIONED PA
 #
@@ -93,7 +93,7 @@
 #
 # RESULT 9: The update will succeed
 
-# inetnum status tests
+
 # CASE 10: We try to create inetnum object
 # with status ASSIGNED PA under ALLOCATED PA
 #
@@ -103,7 +103,7 @@
 #
 # RESULT 10: The creation will succeed
 
-# inetnum status tests
+
 # CASE 11: We try to delete inetnum object
 # with status LIR-PARTITIONED PA from a hierarchy
 #
@@ -113,7 +113,7 @@
 #
 # RESULT 11: The deletion will succeed
 
-# inetnum status tests
+
 # CASE 12: We try to create inetnum object
 # with status LIR-PARTITIONED PA under ALLOCATED UNSPECIFIED
 #
@@ -123,17 +123,17 @@
 #
 # RESULT 12: The creation will succeed
 
-# inetnum status tests
+
 # CASE 13: We try to create inetnum object
 # with status ALLOCATED UNSPECIFIED under ALLOCATED UNSPECIFIED
 #
 # create inetnum object 
 #
-#FAILURE
+#SUCCESS
 #
-# RESULT 13: The creation will fail with Authorisation failed
+# RESULT 13: The creation will succeed
 
-# inetnum status tests
+
 # CASE 14: We try to update inetnum object
 # with status ALLOCATED UNSPECIFIED 
 # and change the mnt-by to something not in the allocmnt list
@@ -144,7 +144,7 @@
 #
 # RESULT 14: The update will succeed
 
-# inetnum status tests
+
 # CASE 15: We try to create inetnum object
 # with status SUB-ALLOCATED PA 
 # parent object has status ALLOCATED PA
@@ -157,7 +157,7 @@
 #
 # RESULT 15: The creation will succeed
 
-# inetnum status tests
+
 # CASE 16: We try to create inetnum object
 # with status SUB-ALLOCATED PA 
 # parent object has status ALLOCATED UNSPECIFIED
@@ -170,7 +170,7 @@
 #
 # RESULT 16: The creation will fail
 
-# inetnum status tests
+
 # CASE 17: We try to create inetnum object
 # with status SUB-ALLOCATED PA 
 # parent object has status ALLOCATED PI
@@ -183,7 +183,7 @@
 #
 # RESULT 17: The creation will fail
 
-# inetnum status tests
+
 # CASE 18: We try to create inetnum object
 # with status SUB-ALLOCATED PA 
 # parent object has status EARLY-REGISTRATION
@@ -196,7 +196,7 @@
 #
 # RESULT 18: The creation will fail
 
-# inetnum status tests
+
 # CASE 19: We try to create inetnum object
 # with status SUB-ALLOCATED PA 
 # parent object has status ASSIGNED PA
@@ -209,7 +209,7 @@
 #
 # RESULT 19: The creation will fail
 
-# inetnum status tests
+
 # CASE 20: We try to create inetnum object
 # with status LIR-PARTITIONED PA 
 # parent object has status SUB-ALLOCATED PA
@@ -222,7 +222,7 @@
 #
 # RESULT 20: The creation will succeed
 
-# inetnum status tests
+
 # CASE 21: We try to create inetnum object
 # with status ASSIGNED PA 
 # parent object has status SUB-ALLOCATED PA
@@ -235,7 +235,7 @@
 #
 # RESULT 21: The creation will succeed
 
-# inetnum status tests
+
 # CASE 22: We try to create inetnum object
 # with status ASSIGNED PI 
 # parent object has status SUB-ALLOCATED PA
@@ -249,7 +249,7 @@
 # RESULT 22: The creation will fail
 #            *** but succeed at the moment until the checks are tightened ***
 
-# inetnum status tests
+
 # CASE 23: We try to create inetnum object
 # with status SUB-ALLOCATED PA
 # parent object has status LIR-PARTITIONED PA
@@ -262,7 +262,7 @@
 #
 # RESULT 23: The creation will succeed
 
-# inetnum status tests
+
 # CASE 24: We try to create inetnum object
 # with status SUB-ALLOCATED PA
 # parent object has status ALLOCATED UNSPECIFIED
@@ -276,7 +276,7 @@
 #
 # RESULT 24: The creation will succeed
 
-# inetnum status tests
+
 # CASE 25: We try to create inetnum object
 # with status NOT-SET
 # parent object is ALLOCATED UNSPECIFIED
@@ -289,7 +289,7 @@
 #
 # RESULT 25: The creation will fail
 
-# inetnum status tests
+
 # CASE 26: We try to create inetnum object
 # with status NOT-SET
 # parent object is ALLOCATED UNSPECIFIED
@@ -303,7 +303,7 @@
 #
 # RESULT 26: The creation will succeed
 
-# inetnum status tests
+
 # CASE 27: We try to modify inetnum object
 # from status ASSIGNED PI to NOT-SET
 # parent object is ALLOCATED UNSPECIFIED
@@ -317,7 +317,7 @@
 #
 # RESULT 27: The modification will fail
 
-# inetnum status tests
+
 # CASE 28: We try to update inetnum object
 # from status ASSIGNED PI to NOT-SET
 # parent object is ALLOCATED UNSPECIFIED
@@ -332,7 +332,7 @@
 #
 # RESULT 28: The modification will succeed
 
-# inetnum status tests
+
 # CASE 29: We try to update inetnum object
 # from status NOT-SET to ASSIGNED PI
 # parent object is ALLOCATED UNSPECIFIED
@@ -346,7 +346,7 @@
 #
 # RESULT 29: The modification will succeed
 
-# inetnum status tests
+
 # CASE 30: We try to update inetnum object
 # from status NOT-SET to SUB-ALLOCATED PA
 # parent object is ALLOCATED UNSPECIFIED
@@ -359,4 +359,76 @@
 #FAILURE
 #
 # RESULT 30: The modification will fail
+
+
+# CASE 31: We try to create inetnum object
+#          with status ALLOCATED PA under ALLOCATED PA
+#          with hostmaster mntner
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 31: The creation will succeed
+
+
+# CASE 32: We try to create inetnum object
+#          with status ALLOCATED PA under ALLOCATED PA
+#          with hostmaster mntner
+#          no org: reference
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 32: The creation will fail
+
+
+# AfriNic tests
+
+# CASE 33: We try to create inetnum object
+#          with status ALLOCATED PI under ALLOCATED PA
+#          with hostmaster mntner
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 33: The creation will fail
+#rir AFRINIC
+
+
+# CASE 34: We try to create inetnum object
+#          with status SUB-ALLOCATED PA under ALLOCATED PA
+#          no org: reference
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 34: The creation will fail
+#rir AFRINIC
+
+
+# CASE 35: We try to create inetnum object
+#          with status SUB-ALLOCATED PA under SUB-ALLOCATED PA
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 35: The creation will fail
+#rir AFRINIC
+
+
+# CASE 36: We try to create inetnum object
+#          with status ASSIGNED PI under ASSIGNED PA
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 36: The creation will fail
+#rir AFRINIC
+
 

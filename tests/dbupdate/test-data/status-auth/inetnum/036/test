@@ -1,0 +1,27 @@
+# inetnum status tests
+# CASE 36: We try to create inetnum object
+#          with status ASSIGNED PI under ASSIGNED PA
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 36: The creation will fail
+#rir AFRINIC
+
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+org:          ORG-ET1-DB-TEST
+descr:        /24 with LIR-PARTITIONED
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PI
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: LIR
+
