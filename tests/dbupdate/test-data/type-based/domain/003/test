@@ -1,0 +1,27 @@
+
+# CASE 3: We try to delete domain object ab.ba
+%
+% requires initial objects to be loaded
+#
+# delete domain object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+domain:       ab.ba
+descr:        Splitblock
+descr:        Lucky Net, Ltd.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns1.some.net
+nserver:      ns2.some.net
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20021111
+source:       DB-TEST
+delete: reason
+override: password
+

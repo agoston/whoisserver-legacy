@@ -1,0 +1,29 @@
+# inetnum status tests
+# CASE 25: We try to create inetnum object
+# with status NOT-SET
+# parent object is ALLOCATED UNSPECIFIED
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 25: The creation will fail
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      RIPE-NET
+descr:        /17 to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       NOT-SET
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: LIR
+
+password: hostmaster
+

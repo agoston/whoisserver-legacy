@@ -1,0 +1,25 @@
+
+# CASE 2: We try to modify person object test person
+%
+% requires initial objects to be loaded
+#
+# modify person object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+person:       test person
+address:      Amsterdam
+address:      Singel
+phone:        +0123456789
+e-mail:       dbtest@ripe.net
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+
+password: auth

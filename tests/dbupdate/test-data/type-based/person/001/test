@@ -1,0 +1,24 @@
+
+# CASE 1: We try to create person object test person
+%
+% requires initial objects to be loaded
+#
+# create person object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+person:       test person
+address:      Singel
+phone:        +0123456789
+e-mail:       dbtest@ripe.net
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+
+password: auth

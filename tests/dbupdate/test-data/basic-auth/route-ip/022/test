@@ -1,0 +1,27 @@
+# basic-auth tests - route IP space
+# CASE 22: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, 
+#      and mnt-routes: EXACT-MR-MNT { 20.13.2.3/16^11-12, 20.13.2.3/16^+, 20.13.0.0/16^+},
+#      (invalid prefix ranges present )
+#         should give invalid ranges error and "no mntners" error
+#         password for child mnt-by and exact match mnt-routes
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 22: The creation will fail
+
+
+password: mb-child
+password: mr-exact
+password: test-dbm
+
+route:   20.13.0.0/16
+descr:   Route
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+

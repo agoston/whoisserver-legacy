@@ -1,0 +1,210 @@
+% basic-auth tests - route IP space
+%
+
+
+%----------------------------------------------------------------
+%        Standard Template Objects
+
+
+% admin-c, tech-c person
+
+person:       test person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP1-DB-TEST
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% referral-by maintainer
+
+mntner:       TEST-DBM-MNT
+descr:        Mntner for RIPE DBM objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+upd-to:       dbtest@ripe.net
+mnt-by:       TEST-DBM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% allocation maintainer
+
+mntner:       RIPE-NCC-HM-MNT
+descr:        RIPE-NCC Hostmaster Maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+upd-to:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
+source:       DB-TEST
+
+
+% root inetnum object
+
+inetnum:      0.0.0.0 - 255.255.255.255
+netname:      IANA-BLK
+descr:        The whole IPv4 address space
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED UNSPECIFIED
+remarks:      The country is really worldwide.
+remarks:      This address space is assigned at various other places in
+remarks:      the world and might therefore not be in the RIPE database.
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+mnt-routes:   RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% root inet6num object
+
+inet6num:     0::/0
+netname:      ROOT
+descr:        Root inet6num object
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+status:       ALLOCATED-BY-RIR
+remarks:      This network in not allocated.
+              This object is here for Database
+              consistency and to allow hierarchical
+              authorisation checks.
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+%      End of Standard Template Objects
+%----------------------------------------------------------------
+
+%  Additional objects required for this test
+
+
+% set of mntners
+
+mntner:  CHILD-MB-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  CHILD-MB-MNT
+auth:    CRYPT-PW mbOJDvQ92mEH6  # mb-child
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+mntner:  PARENT-ROUTE-MB-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  PARENT-ROUTE-MB-MNT
+auth:    CRYPT-PW mbJu5ZHnhRD3E  # mbr-parent
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+mntner:  PARENT-INETNUM-MB-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  PARENT-INETNUM-MB-MNT
+auth:    CRYPT-PW mbhkl.cipoP9.  # mbi-parent
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+mntner:  EXACT-ROUTE-MB-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  EXACT-ROUTE-MB-MNT
+auth:    CRYPT-PW mbInfZx5dRb6M  # mbr-exact
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+mntner:  EXACT-INETNUM-MB-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  EXACT-INETNUM-MB-MNT
+auth:    CRYPT-PW mb/akeGBA.tag  # mbi-exact
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+% create a parent route
+
+route:   20.0.0.0/8
+descr:   parent route object
+origin:  AS100
+mnt-by:  PARENT-ROUTE-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+% create parent inetnum
+
+inetnum: 20.0.0.0 - 20.255.255.255
+netname: PARENT-INETNUM
+descr:   parent inetnum object
+country: EU
+admin-c: TP1-DB-TEST
+tech-c:  TP1-DB-TEST
+status:  ASSIGNED PA
+mnt-by:  PARENT-INETNUM-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+% create exact match inetnum
+
+inetnum: 20.13.0.0 - 20.13.255.255
+netname: EXACT-INETNUM
+descr:   Exact match inetnum object
+country: EU
+admin-c: TP1-DB-TEST
+tech-c:  TP1-DB-TEST
+status:  ASSIGNED PA
+mnt-by:  EXACT-INETNUM-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+% create an aut-num for the parent route
+
+aut-num: AS100
+as-name: TEST-AS
+descr:   Testing Authorisation code
+admin-c: TP1-DB-TEST
+tech-c:  TP1-DB-TEST
+mnt-by:  PARENT-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+% create an aut-num for the child route
+
+aut-num: AS200
+as-name: TEST-AS
+descr:   Testing Authorisation code
+admin-c: TP1-DB-TEST
+tech-c:  TP1-DB-TEST
+mnt-by:  CHILD-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+% create an aut-num for the exact match route
+
+aut-num: AS300
+as-name: TEST-AS
+descr:   Testing Authorisation code
+admin-c: TP1-DB-TEST
+tech-c:  TP1-DB-TEST
+mnt-by:  EXACT-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+% End of loader data file

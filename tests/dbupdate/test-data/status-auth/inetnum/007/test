@@ -1,0 +1,28 @@
+# inetnum status tests
+# CASE 7: We try to update inetnum object
+# changing status LIR-PARTITIONED PA to ASSIGNED PA status
+# with more specific objects existing
+%
+% requires initial objects to be loaded
+#
+# update inetnum object 
+#
+#FAILURE
+#
+# ***but will succeed at the moment until checks are tightened***
+# RESULT 7: The update will fail with Authorisation failed
+
+
+password: LIR
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with LIR-PARTITIONED
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

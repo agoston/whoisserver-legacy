@@ -1,0 +1,31 @@
+# auto-nic tests
+# CASE 21: Create 2 role objects
+#          which contains AUTO- nic-hdls
+#          and reference each other.
+%
+% requires initial objects to be loaded
+#
+# create role object
+#
+#FAILURE
+#
+# RESULT 21: The creations will fail
+
+
+role:         Test Role
+address:      Singel
+e-mail:       dbtest@ripe.net
+admin-c:      AUTO-2
+tech-c:       TP1-DB-TEST
+nic-hdl:      AUTO-1
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+role:         Test Role2
+address:      Singel
+e-mail:       dbtest@ripe.net
+admin-c:      AUTO-1
+tech-c:       TP1-DB-TEST
+nic-hdl:      AUTO-2
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

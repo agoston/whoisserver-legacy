@@ -1,0 +1,26 @@
+# CASE 2: We try to create inetnum object 80.16.151.191 - 80.16.151.184
+# with syntactically incorrect range
+# will now fail because it is not treated as syntax error.
+# creation fails with auth failure, not syntax failure
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+
+inetnum:      80.16.151.191 - 80.16.151.184
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+status:       ALLOCATED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+
+password: hostmaster

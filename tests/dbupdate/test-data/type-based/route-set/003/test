@@ -1,0 +1,28 @@
+
+# CASE 3: We try to delete route-set object AS100:RS-CUSTOMERS
+%
+% requires initial objects to be loaded
+#
+# delete route-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+route-set:    RS-CUSTOMERS
+descr:        test announcements
+members:      47.247.0.0/16,
+               47.163.0.0/16,
+               131.147.0.0/16
+admin-c:    TP1-DB-TEST
+tech-c:     TP1-DB-TEST
+mnt-by:     TEST-MNT
+mnt-lower:    TEST-MNT
+notify:     dbtest@ripe.net
+changed: dbtest@ripe.net 20021111
+delete: reason
+source:     DB-TEST
+
+
+password: auth

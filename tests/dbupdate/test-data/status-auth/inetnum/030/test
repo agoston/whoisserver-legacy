@@ -1,0 +1,29 @@
+# inetnum status tests
+# CASE 30: We try to update inetnum object
+# from status NOT-SET to SUB-ALLOCATED PA
+# parent object is ALLOCATED UNSPECIFIED
+#
+%
+% requires initial objects to be loaded
+#
+# modify inetnum object 
+#
+#FAILURE
+#
+# RESULT 30: The modification will fail
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      RIPE-NET
+descr:        /17 to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       SUB-ALLOCATED PA
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: LIR
+
+

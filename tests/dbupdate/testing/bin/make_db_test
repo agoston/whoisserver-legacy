@@ -1,0 +1,223 @@
+#!/bin/bash
+
+# Debug info: uncomment when debugging
+DEBUG="set -x"
+$DEBUG
+
+##
+## Usage: make_db -c <config_file> -s <source> -[0|1|2] -f <file>
+##  
+## -t <topdir> of whoisd
+## -p svconfig port
+## -h whoishost
+## <config_file> is the name of the whois_rip configuration file
+## <source> is the source (SOURSE) to be loaded
+## -[0|1|2] numebwr of load passes
+## 0 - just to create an empty database; if the database already exists it will be emptied
+## 1 - one pass. This is a recommended option. May be a little slower than 2-pass loading
+##     but more reliable.
+## 2 - for loading huge databases (more than 1,000,000 objects). High requirements on 
+##     the consuistency of the flat files: duplicate objects (objects with the same primary key)
+##     will prevent loading.
+## <file> is the name of the file containing objects to be loaded (plain text)
+
+##
+## Functions
+##
+
+DATECMD="/bin/date '+%Y-%m-%d %H:%M:%S'"
+TIMECMD="/bin/date '+%H:%M:%S'"
+
+# log a message, with appropriate timestamp
+log()
+{
+ echo 
+ echo "=" `eval $TIMECMD` $*
+ echo
+}
+
+# log an error message, with appropriate timestamp
+error()
+{
+ echo "************** ERROR ***************"
+ echo "*** " `eval $TIMECMD` $*
+ echo "************************************"
+ echo
+}
+
+# exit with an error message
+error_exit()
+{
+ error $*
+ exit 1
+}
+
+USAGE="make_db -t topdir -h host -p confport -c <config_file> -s <source> -[0|1|2] -f file \n"
+
+######################
+# Parse arguments
+
+while getopts t:h:p:f:l:c:s:012 a
+do
+case $a in
+h)       WHOISHOST=$OPTARG;;
+p)       CONFPORT=$OPTARG;;
+t)       TOPDIR=$OPTARG;;
+c)       CARG=$OPTARG;;
+s)       SARG=$OPTARG;;
+l)       LOAD_FILE=$OPTARG;;
+f)	     LIST=$OPTARG;;
+0)       NPASSES=0;;
+1)       NPASSES=1;;
+2)       NPASSES=2;;
+\?)      echo $USAGE
+         exit 2;;
+esac
+done
+         
+shift `expr $OPTIND - 1`
+
+SOURCE=${SARG:?"<source> is not specified. Usage: $USAGE"}
+PROPERTIES=${CARG:?"<config_file> is not specified. Usage: $USAGE"}
+NPASSES=${NPASSES:?" number of passes is not specified. Usage: $USAGE"}
+
+# check whether the configuration file exists
+ls $PROPERTIES >/dev/null 2>&1 || error_exit "cannot find config file $PROPERTIES"
+
+##################### DIRECTORY LAYOUT #############################################
+# Directory layout
+
+# The root of the distribution
+
+MYSQLLIBDIR=/usr/local/mysql/lib/mysql
+GLIBCONFIG=/usr/local/bin/glib-config
+GLIB=`${GLIBCONFIG} --exec-prefix`/lib
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MYSQLLIBDIR:$GLIB; export LD_LIBRARY_PATH
+LD_LIBRARY_PATH=/home/dbase/src/orange/local/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH
+
+# Directory where the object files reside
+# **** Don't forget to download the object files and CURRENTSERIAL file ****
+# I don't care for now.
+
+# List of object files (wildcards are allowed)
+# LIST=$OBJDIR/sample.db.gz
+
+# The current serial
+# we have 1-step DB, so we don't care about serials for now.
+DEFCURRENTSERIAL=`cat ${OBJDIR}/${SOURCE}.CURRENTSERIAL` || \
+                ( echo; echo "*** WARNING: no CURRENTSERIAL file is found, CURRENTSERIAL=1"; echo )
+CURRENTSERIAL=${DEFCURRENTSERIAL:=1}
+
+# Directory where the load_file.sh script is located
+SCRIPTDIR=$TOPDIR/scripts; export SCRIPTDIR
+# Location of the loader binary
+LOADER=$TOPDIR/bin/loader
+# Update log. Use /dev/null for huge databases.
+UPDLOG=/dev/tty
+
+#################### LOCATION OF THE UTILITIES #####################################
+
+# Location of the utility that fetches config variables
+GETVAR="$TOPDIR/utils/getvar -s $SOURCE -c $PROPERTIES"
+
+# Filter that uses to convert files to RPSL format
+FILTER=cat
+
+# Binary to unzip object files (snapshots)
+# UNZIP1='gzip -cd'
+
+# MySQL setup is taken from the configuration file
+# from the section SOURCE <source_name>
+# where <source_name> is <source>
+
+SQLHOST=`$GETVAR -p dbhost` || error_exit "unknown source $SOURCE"
+SQLPORT=`$GETVAR -p dbport` || error_exit "unknown source $SOURCE"
+SQLUSER=`$GETVAR -p dbuser` || error_exit "unknown source $SOURCE"
+SQLPSWD=`$GETVAR -p dbpswd` || error_exit "unknown source $SOURCE"
+SQLDB=`$GETVAR -p dbname` || error_exit "unknown source $SOURCE"
+
+# MySQL commands
+# note: the "CMD" versions include appropriate starup options
+MYSQLBIN=/usr/local/mysql/bin
+MYSQL=$MYSQLBIN/mysql
+MYSQLCMD="$MYSQL -h$SQLHOST -P$SQLPORT -u$SQLUSER -p$SQLPSWD"
+MYSQLADMIN=$MYSQLBIN/mysqladmin
+MYSQLADMINCMD="$MYSQLADMIN -h$SQLHOST -P$SQLPORT -u$SQLUSER -p$SQLPSWD"
+
+#####################################################################################
+
+echo  sqlhost=$SQLHOST sqlport=$SQLPORT sqluser=$SQLUSER sqlpswd=$SQLPSWD sqldbname=$SQLDB
+echo  npasses=$NPASSES
+
+
+log "Loading database [$SQLDB] (source [$SOURCE]) started"
+
+HOST=$SQLHOST
+USER=$SQLUSER
+PASSWORD=$SQLPSWD
+DB=$SQLDB
+PORT=$SQLPORT
+
+
+######################### DATABASE CREATION AND LOADING ###############################
+
+log "Loading the database [$DB] [see list in ${UPDLOG}] "
+
+log "Flush tables"
+$MYSQLADMINCMD flush-tables
+
+export MYSQL HOST USER PASSWORD DB PORT
+export UNZIP1 FILTER LOADER
+export LIST CURRENTSERIAL SOURCE
+export PROPERTIES DEBUG
+
+#cd ${SCRIPTDIR} && sh ./load_all.sh $NPASSES  2>${UPDLOG}
+#sh $LOAD_FILE $NPASSES  2>&1 2> /dev/tty
+sh $LOAD_FILE $NPASSES  2>&1 
+
+if [ $? -ne 0 ]; then
+  error_exit "Error loading database=$DB for source=${SOURCE}, $0 exiting"
+fi
+
+REMADMINCMD="$TOPDIR/utils/remadmin.pl -h $WHOISHOST -p $CONFPORT"
+PAUSEQUERIES="$REMADMINCMD set queries pause"
+RESUMEQUERIES="$REMADMINCMD set queries resume"
+RESUMEUPDATES="$REMADMINCMD set updates resume"
+INITRX="$REMADMINCMD set initrx $SOURCE"
+
+$PAUSEQUERIES
+if [ $? -ne 0 ]; then
+   error "Error stopping queries, attempting to resume queries"
+   $RESUMEQUERIES
+    if [ $? -ne 0 ]; then
+      error "Error resuming queries"
+    fi
+    error_exit "$0 now exiting"
+fi
+
+$MYSQLADMINCMD flush-tables
+
+ERROR=0
+$INITRX
+if [ $? -ne 0 ]; then
+    error "Error reloading radix tree, $0 scheduling exit"
+    ERROR=1
+fi
+# at one point, initrx would stop updates - resume them here just in case
+$RESUMEUPDATES
+if [ $? -ne 0 ]; then
+    error "Error resuming updates, $0 scheduling exit"
+    ERROR=1
+fi
+$RESUMEQUERIES
+if [ $? -ne 0 ]; then
+    error "Error resuming queries, $0 exiting"
+    ERROR=1
+fi
+if [ $ERROR -eq 1 ]; then
+    exit 1
+fi
+
+log "Loading database [$SQLDB] (source [$SOURCE]) finished without errors"
+

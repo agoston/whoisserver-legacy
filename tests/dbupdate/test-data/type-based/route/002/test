@@ -1,0 +1,22 @@
+
+# CASE 2: We try to modify route object 20.13.0.0/16,AS200
+%
+% requires initial objects to be loaded
+#
+# modify route object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+route:   20.13.0.0/16
+descr:   Route with non-existant origin
+descr:   new descr
+origin:  AS200
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net
+source:  DB-TEST
+
+
+password: auth

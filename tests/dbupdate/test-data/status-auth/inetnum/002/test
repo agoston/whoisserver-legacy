@@ -1,0 +1,27 @@
+# inetnum status tests
+# CASE 2: We try to create inetnum object
+# with status LIR-PARTITIONED PI under LIR-PARTITIONED PA
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail with Authorisation failed
+
+
+password: LIR
+
+inetnum:      192.168.200.100 - 192.168.200.255
+netname:      RIPE-NET0
+descr:        PI PA mix
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       LIR-PARTITIONED PI
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+

@@ -1,0 +1,21 @@
+# auto-nic tests
+# CASE 22: Create a person object
+#          which contains AUTO- nic-hdl
+#          and a mnt-by with password.
+%
+#
+# create person object
+#
+#SUCCESS
+#
+# RESULT 22: The creation will succeed
+
+password: test
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      AUTO-1
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

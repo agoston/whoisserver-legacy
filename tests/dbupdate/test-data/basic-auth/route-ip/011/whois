@@ -1,0 +1,8 @@
+
+route:   20.13.0.0/16
+descr:   Route changed
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+changed: dbtest@ripe.net
+source:  DB-TEST
+

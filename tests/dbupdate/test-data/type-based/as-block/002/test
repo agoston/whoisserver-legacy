@@ -1,0 +1,27 @@
+# object tests - as-block
+# CASE 2: We try to update as-block object
+# maintained
+%
+% requires initial objects to be loaded
+#
+# update as-block object
+#
+#SUCCESS
+#
+# RESULT 2: The update will succeed.
+
+
+as-block:     AS100 - AS1000
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+password: hostmaster
+override: password

@@ -1,0 +1,24 @@
+# basic-auth tests - route IP space
+# CASE 94: We try to create 20.13.0.0/16 route object. 
+#          parent route exists with mnt-by
+#          exact match inetnum exists with mnt-by
+#          parent inetnum exists with mnt-by
+#          password for child and parent route mnt-by
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 94: The creation will succeed
+
+
+password: mb-child
+password: mbr-parent
+
+route:   20.13.0.0/16
+descr:   Route
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST

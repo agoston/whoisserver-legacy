@@ -1,0 +1,29 @@
+
+# CASE 4: We try to create aut-num object AS123
+# having deprecated "cross-mnt" and "cross-nfy" attributes
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 4: The creation will fail.
+
+
+aut-num:      AS123
+as-name:      ASTEST
+descr:        TEST TELEKOM
+import:       from AS1 accept {1.2.3.4/24}
+export:       to AS2 announce {1.2.3.4/24}
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+cross-mnt:    RIPE-NCC-HM-MNT
+cross-nfy:    TP1-DB-TEST
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+password:     hostmaster
+password:     auth

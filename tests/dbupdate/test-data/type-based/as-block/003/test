@@ -1,0 +1,28 @@
+# object tests - as-block
+# CASE 3: We try to delete as-block object
+# maintained
+%
+% requires initial objects to be loaded
+#
+# delete as-block object
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed. 
+
+
+as-block:     AS100 - AS1000
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20021111
+source:       DB-TEST
+delete:       reason
+
+password: hostmaster
+override: password

@@ -1,0 +1,24 @@
+# CASE 1: We try to create inetnum object 80.16.151.184 - 80.16.151.191
+# with syntactically incorrect netname
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail.
+
+
+inetnum:      80.16.151.184 - 80.16.151.191
+netname:      123TEST-NET-NAME-_
+descr:        TEST network
+country:      NL
+status:       ALLOCATED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+
+password: hostmaster

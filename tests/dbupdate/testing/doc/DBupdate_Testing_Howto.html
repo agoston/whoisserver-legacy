@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>DBupdate Test Suite HOWTO</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-15">
+</head>
+<body>
+<h1>DBupdate Test Suite HOWTO<br>
+</h1>
+<i><br>
+Version 2.1<br>
+created: 2002-11-29</i>
+<p align="right">
+<i>"Program testing can be used<br>
+to show the presence of errors,<br> 
+but never to show their absence!"<br></i>
+Dijkstra
+</p>
+<h2>Table of Contents</h2>
+1. <a href="#1_Configuration">Configuration</a><br>
+<blockquote>1.1 <a href="#1.1_whois_rip">whois_rip configuration for testing</a><br>
+1.2 <a href="#1.2_Testing system">Testing system configuration</a><br>
+1.3 <a href="#1.3_Other scripts">Other scripts</a><br>
+</blockquote>
+2. <a href="#2._Usage">Usage</a><br>
+<blockquote>2.1 <a href="#2.1_Script usage">Script usage</a><br>
+2.2 <a href="#2.2_Composing a filter">Composing a filter</a><br>
+<blockquote> 2.2.1 <a href="#2.2.1_Objects and filters">Objects and filters</a><br>
+             2.2.2 <a href="#2.2.2_Regular expressions and modifiers">Regular expressions and modifiers</a><br>
+             2.2.3 <a href="#2.2.3_Filters with parameters">Filters with parameters</a><br>
+             2.2.4 <a href="#2.2.4_Checking the presence of object in DB">Checking the presence of object in DB</a><br>
+</blockquote>
+2.3 <a href="#2.3_Running external program">Running external program</a><br>
+2.4 <a href="#2.4_Log files">Log files</a><br>
+2.5 <a href="#2.5_DBupdate options">DBupdate options</a><br>
+2.6 <a href="#2.6_Using testing program to test any other program">Using testing program to test any other program</a><br>
+</blockquote>
+<br>
+<h2><a name="1_Configuration"></a>1. Configuration</h2>
+<h3><a name="1.1_whois_rip"></a>1.1 whois_rip configuration for testing</h3>
+<p><b>Database description</b><p>
+
+You need to point the update source record to the database you are going to use. For this, modify this variable: 
+<pre>UPDSOURCE
+</pre>
+<br>Multiple sources are supported. However currently 'loader' program doesn't work properly if all sources are in the same database. So they need to be in separate databases, 1 source per database.<br>
+For every UPDSOURCE specified in rip.config the testing program will recreate the database and empty it before running every test. It takes quite some time. It is advised to comment out all extra sources if you're not testing them at the moment. This considerably speeds up a test.
+<p><b>E-mail addresses</b><p>
+During the test, dbupdate will be run with -r flag to redirect notifications. For more information about dbupdate flags used, check DBUPDATE_* valiables in testing configuration file, as well as corresponding section of this document. <br>Set these variables appropriately to make sure no mails are getting through during the testing:
+<pre>
+HUMAILBOX
+AUTOBOX
+DEFMAIL
+</pre>
+Check whoisd_start script in $WHOIS_ROOT/bin directory and edit e-mail addresses which are supposed to be notified if the server crashes.
+<p><b>Sources definition</b><p>
+In sources.config file, put the definition of your database(s).
+<p><b>Access control</b><p>
+To enable testing script to update the Database, you need to create an entry in your RIPADMIN database (see rip.config variable RIPADMIN) for the host where you're running the script.
+<h3><a name="1.2_Testing system"></a>1.2 Testing system configuration</h3>
+The test root can be found in tests/dbupdate/testing. The datasets for testing are at:  tests/dbupdate/test-data. These tests are suitable for new dbupdate ONLY.
+The configuration file is dataset.config, you can supply any name. The most important bits are:
+<ol> 
+<li>root dir for testing script
+<li>root dir for whois_rip
+<li>names for logfiles
+<li>path to dbupdate
+<li>path to whois client
+<li>path to make_db_test script
+<li>path to rip.config
+</ol>
+<h3><a name="1.3_Other scripts"></a>1.3 Other scripts</h3>
+The scripts especially tailored for testing system are:
+<BR>
+<ul> make_db_test
+<li> load_file.sh
+<li> extract-keycerts-from-text-dump.pl
+<li> resync-gnupg-ring-from-text.sh
+</ul>
+<br><br>
+make_db_test differs from standard make_db. It does extra actions:
+<ol>
+<li> re-creates the database
+<li> runs load_file.sh
+</ol> 
+<p>load_file.sh loads a single file with specified path.
+Please note that testing script relies on whois_rip directory layout as much as all infrastructure scripts and utilities for whois_rip. You may need to modify them in order to point in the proper places if you have non-standard setup. The scripts can be found in the test root dir under 'bin' directory.
+<h2><a name="2._Usage"></a>2. Usage</h2>
+<h3><a name="2.1_Script usage"></a>2.1 Script usage</h3>
+The command line options for test.pl are:
+<pre>
+    usage:
+    --trace_test, -t      turn on test tracing
+    --trace_dbupdate, -d  turn on dbupdate tracing 
+    --output_report, -o   print report to stdout
+    --config, -c          configuration file
+    --limit, -l N         limit of mismatches (failed tests)
+    --stderr, -e          print dbupdate stderr into stderrlog file
+    --stdout, -u          print dbupdate stdout into stdoutlog file
+    --errors, -z N        limit of program errors (misconfiguration, missing files, etc)
+    --rundir, -r          [comma-separated list of directories]
+</pre>
+<ul>
+<li>-t shows testing script configuration when starting;
+<li>-d make testing script to run dbupdate in debugging mode, prints all debugging information;
+<li>-o will duplicate all output to report file into stdout;
+<li>-c [filename] the name of the configuration file for testing script
+<li>-l N after this number of failures the testing script will exit.
+<li>-e indicates that stderr from dbupdate will be written to [stderrlog] file
+<li>-u indicates that stdout from dbupdate will be written to [stdoutlog] file
+<li>-z N after this number of program errors, the testing script will exit.
+<li>-r [dir list] run tests recursively in these dirs
+</ul>
+Before starting the test, make sure whois_rip is running, otherwise the exception will be generated. For example, the options can be:
+<p>
+./test.pl -c [confdir]/dataset.config -o -r [dirlist]
+</p>
+<p>
+Note that names in the dirlist are absolute paths. If you omit "-r" option, all the tests under $DATADIR will be run recursively.
+<h3><a name="2.2_Composing a filter"></a>2.2 Composing a filter</h3>
+<h4><a name="2.2.1_Objects and filters"></a>2.2.1 Objects and filters</h4>
+In general, filter file should contain the declaration of objects to be checked and filters to be used. Every object or filter is RPSL-like parapraph, a list of "attribute: value" pairs. This file can also contain comments ('%' or '#' at the beginning of the line). 
+<br><br>
+Objects may require several filters to be matched. If the object is specified with type and name, this instructs the program to find exact matching acknowlegement/notification etc for this object and check regular expressions only in this part of a logfile.
+<pre>
+object: type pkey
+body: filter_name
+lines: [multiple|single] - default is "multiple".
+...
+</pre>
+<br> Example:
+<pre>
+object: person TEST1-DB-TEST
+body: my_custom_filter
+lines: single
+</pre>
+<br>
+<p>Also the object can be specified without any particular name, using reserved name "all". This instructs the program to match regular expressions against the whole logfile.
+<p>
+<pre>
+object: all
+body: filter_name
+lines: [multiple|single] - default is "multiple".
+...
+</pre>
+<br> Example:
+<pre>
+object: all
+body: my_custom_filter_for_entire_file
+lines: multiple
+</pre>
+<p>
+"lines: multiple" instructs the program to check the output line by line, applying usual regular expression, where "." matches everything except from beginning and end of line. "lines: single" instructs the program to check the output as single line, applying multiline patterns with "/ms" modifier. For more information about multiline pattern matching see Perl documentation. For example, the filter using multiline matching can be the following:<br>
+<pre>
+object: person TEST1-DB-TEST
+body: my_filter
+lines: single
+
+filter: my_filter
+ack: AAAA\nBBBB\nCCCC\n
+</pre>
+This test will be successful if in acknowlegement log file there is an acknowlegement for this object, and it contains the block of text:
+<pre>
+AAAA
+BBBB
+CCCC
+</pre>
+<br>
+Filter can contain several attributes, indicating where to match the output. The syntax for filter is:
+<pre>
+filter:   [name]                      [mandatory]
+ack:      [!] [perl regexp]           [optional]
+notif:    [!] [perl regexp]           [optional]
+forw:     [!] [perl regexp]           [optional]
+upd:      [!] [perl regexp]           [optional] 
+whois:    [!] [DATE_ON | DATE_OFF]    [optional] 
+stdout:   [!] [perl regexp]           [optional]
+stderr:   [!] [perl regexp]           [optional]
+report:   [!] [perl regexp]           [optional]
+summary:  [!] [perl regexp]           [optional]
+</pre>
+<p>
+<h4><a name="2.2.2_Regular expressions and modifiers"></a>2.2.2 Regular expressions and modifiers</h4>
+The testing script will look for a string (first taken) matching every regular expression in the corresponding log file/block. If a regexp is preceeded by "!" sign separated by space, this means you want to make sure this regexp is _not_ matched. If a regexp contains only "!" it means you want to make sure that output in this particular log file for this object is empty. For example, to make sure no notifications about personal object TEST1-DB-TEST are send, use this syntax: <p>
+<pre>
+object: person TEST1-DB-TEST
+body: my_filter_no_notif
+
+filter: my_filter_no_notif
+notif: ! 
+
+</pre>
+<h4><a name="2.2.3_Filters with parameters"></a>2.2.3 Filters with parameters</h4>
+The filter can contain a list of parameters. That is, the filter name is similar to function name and arguments are substituted in the filter's regular expressions.
+<br>
+Example:
+<pre>
+object: person TEST1-DB-TEST
+body: my_filter(person,TEST1-DB-TEST)
+
+filter: my_filter
+ack: \[$0\][\s]+$1
+</pre>
+<br>
+This effectively will mean:
+<br>
+<pre>
+filter: my_filter
+ack: \[person\][\s]+TEST1-DB-TEST
+</pre>
+<br>
+When matching filter my_filter, $0 is substituted with 1st argument (i.e. "person"), and $1 is substituted with 2ndargument ("TEST1-DB-TEST"). The placeholder number can be only a digit ($0, $1, ... $9). Number of available placeholders is not matched with the number of arguments. I.e. if there are more placeholders than arguments available, those placeholders which don't have matching argument are not substituted and treated as usual text. The filter will most probably fail to be matched then. If there are less placeholders than arguments, all possible placeholders will be substituted with arguments, but no error will be reported about unused arguments.
+<p>
+<h4><a name="2.2.4_Checking the presence of object in DB"></a>2.2.4 Checking the presence of object in DB</h4>
+In order to check if the object is in the database and looks as intended, whois search can be used.<p>
+"whois" attrubute allows to check whois output for the results. For named objects, type and primary key of the object will be taken to form the query like: "-r -T [type] [primary_key]. This query is issued to the server. The object received will be matched with corresponding object in 'whois' file. 'whois' file can contain more than one object.
+If the query modifier is DATE_OFF, then dates in "changed:" attribute are filtered out and not considered during the comparison. If the query modifier is DATE_ON, objects are matched "as is". If 'whois' attribute of the filter contains '!' sign, the non-existence of the object in the database will be checked.
+<h3><a name="2.3_Running external program"></a>2.3 Running external program</h3>
+There's a possibility to run external program before running the test. In order to do this, put special formatted string into the filters_local.config file for this test:<br>
+@ /path/to/my/script [args]
+</br>
+For now, testing program attempts to run this script if such a string is specified. However, please note that exit code from the script is not checked (yet). The testing script will simply wait until the program returns, and report error if it doesn't exit before timeout has expired.
+<h3><a name="2.4_Log files"></a>2.4 Log files</h3>
+The test program analyses several types of logfiles produced by dbupdate. All they are described in dataset.config file, but dbupdate-specific log files are declared in rip.config.
+<ul>
+<li>acklog - dbupdate logging, contains acknowlegements
+<li>updlog - dbupdate logging, contains updates
+<li>notiflog - dbupdate logging, contains notifications
+<li>forwlog - dbupdate logging, contains forwarded update request which failed due to auth. failure.
+<li>stderrlog - test logging, contains stderr received from dbupdate
+<li>stdoutlog - test logging, contains stdout received from dbupdate
+<li>reportlog - test logging, contains more detailed information about test results, errors and (optionally) tracing.
+<li>summarylog - test logging, contains less detailed information about test results, in short form with statistics of failed/successful/skipped/errors.
+</ul>
+<h3><a name="2.5_DBupdate options"></a>2.5 DBupdate options</h3>
+The test program usually runs 'dbupdate' program to process 'dbupdate' and 'test' files  while running a particular test. Any command-line options for dbupdate can be specified in 'dbupdate' and 'test' file. Every option has it's variable name in the configuration file. The available options are:
+<pre>
+# dbupdate flags: -r to supress notifications sending, -T to allow mntner creation 
+# generic flags (although -f is added later to point to filename
+DBUPDATE_GEN = -r -c $RIP_CONFIG 
+# points to a filename containing input
+DBUPDATE_TEXT = -f
+# input is a mail message
+DBUPDATE_MAIL = -M
+# ** TBD ** input comes from networkupdate
+DBUPDATE_NET = -n
+# switch on dbupdate tracing
+DBUPDATE_TRACE = -t
+# input comes from syncupdates
+DBUPDATE_SYNC = -w
+</pre>
+These flags can be specified as a string in 'dbupdate' or 'test' file. For example:
+<br>
+$DBUPDATE_GEN $DBUPDATE_MAIL $DBUPDATE_TEXT
+<br>
+When the testing program runs dbupdate, it takes this string and expands variable names into actual dbupdate flags taken from configuration file. Then filename containing input is added and dbupdate is run:
+<br>
+dbupdate -r -c rip.config -M -f filename
+<br>
+If the command-line string is not found in the file containing update, the default one is taken:
+<br>
+$DBUPDATE_GEN $DBUPDATE_TEXT
+<br>
+which effectively means 
+-r -c rip.config -f
+<br>
+And then the filename is added.
+<h3><a name="2.6_Using testing program to test any other program"></a>2.6 Using testing program to test any other program </h3>
+<br>Any other program giving an output can be tested using the testing system. How to do this:
+<ul>
+<li>As testing program relies on whois_rip stuff, prepare all setup as usual or disable it in the script (be careful with logfiles).
+<li>specify the commandline in [dataset.config], as well as default flags.
+<li>you can grab stdout-stderr from your program by using "-e" and "-u" options to the testing script and compose usual filters to match them:
+<pre>
+object: all
+lines: multiple
+body: my_filter
+
+filter: my_filter
+stderr: what_i_want_to_find_in_my_stderr
+stdout: what_i_want_to_find_in_my_stdout
+</pre>
+With this setup, dbupdate logs (acklog, notiflog, updlog, fowrlog) will not be checked, but you can still use existing functionality to test your program.
+</body>
+</html>

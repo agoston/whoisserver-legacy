@@ -1,0 +1,40 @@
+# auto-nic tests
+# CASE 13: Create two person objects
+#          with AUTO-1 and AUTO-1 nic-hdls
+#          and create a role object
+#          with references to AUTO-1 nic-hdl.
+%
+% requires initial objects to be loaded
+#
+# create person and role objects
+#
+#SUCCESS
+#
+# RESULT 13: The creations will succeed and the referencing nic-hdls
+#            will take the created nic-hdl from the second AUTO-1
+
+
+role:         Test Role
+address:      Singel
+e-mail:       dbtest@ripe.net
+admin-c:      AUTO-1
+tech-c:       AUTO-1
+nic-hdl:      TR1-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      AUTO-1
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+
+person:       Test Person3
+address:      Singel
+phone:        +0123456789
+nic-hdl:      AUTO-1
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

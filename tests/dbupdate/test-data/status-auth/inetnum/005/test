@@ -1,0 +1,26 @@
+# inetnum status tests
+# CASE 5: We try to create inetnum object
+# with status ASSIGNED PA under LIR-PARTITIONED PA
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed
+
+
+password: LIR
+
+inetnum:      192.168.200.200 - 192.168.200.255
+netname:      RIPE-NET2
+descr:        ASSIGNED PA
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

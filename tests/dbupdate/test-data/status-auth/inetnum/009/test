@@ -1,0 +1,26 @@
+# inetnum status tests
+# CASE 9: We try to update inetnum object
+# changing status ASSIGNED PA to LIR-PARTITIONED PA
+%
+% requires initial objects to be loaded
+#
+# update inetnum object 
+#
+#SUCCESS
+#
+# RESULT 9: The update will succeed
+
+
+password: LIR
+
+inetnum:      192.168.200.200 - 192.168.200.255
+netname:      RIPE-NET2
+descr:        ASSIGNED PA
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       LIR-PARTITIONED PA
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

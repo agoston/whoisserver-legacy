@@ -1,0 +1,19 @@
+# auto-nic tests
+# CASE 2: Create a person object
+#         with an auto-1 nic-hdl
+%
+% requires initial objects to be loaded
+#
+# create person object 
+#
+#SUCCESS
+#
+# RESULT 2: The creation will succeed
+
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      auto-1
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

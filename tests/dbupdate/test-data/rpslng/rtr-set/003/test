@@ -1,0 +1,25 @@
+
+# CASE 3: We try to delete rtr-set object rtrs-test
+%
+% requires initial objects to be loaded
+#
+# delete rtr-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+rtr-set:      rtrs-test
+descr:        test
+members:      rtr.rpslng.net
+mp-members:   my.router.net, rtrs-bla, 1.2.3.4, 1:2:3:4:5:6:7:8
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+mnt-by:       TEST-MNT
+changed:      db-test@ripe.net 20010101
+source:       DB-TEST
+delete:       remove
+
+password: auth
+
+%

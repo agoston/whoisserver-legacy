@@ -1,0 +1,29 @@
+
+# CASE 1: We try to create role object test role
+%
+% requires initial objects to be loaded
+#
+# create role object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+role:         test role 
+address:      Somewhere
+phone:        +49 700 00006467
+fax-no:       +49 700 00006467
+e-mail:       dbtest@ripe.net
+trouble:      Please send any ABUSE to /dev/null
+trouble:      included logs with time stamp we will follow it up.
+nic-hdl:      ROLE-DB-TEST
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+
+password: auth

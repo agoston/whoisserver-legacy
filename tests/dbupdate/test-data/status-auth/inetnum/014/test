@@ -1,0 +1,31 @@
+# inetnum status tests
+# CASE 14: We try to update inetnum object
+# with status ALLOCATED UNSPECIFIED 
+# and change the mnt-by to something not in the allocmnt list
+%
+% requires initial objects to be loaded
+#
+# update inetnum object 
+#
+#SUCCESS
+#
+# RESULT 14: The update will succeed
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      RIPE-NET
+descr:        /17 to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED UNSPECIFIED
+org:          ORG-Eoof1-DB-TEST
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: LIR
+
+password: hostmaster
+
+password: test-dbm

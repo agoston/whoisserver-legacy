@@ -1,0 +1,25 @@
+# CASE 6: We try to update inetnum object 80.16.151.184 - 80.16.151.184
+# start IP == end IP
+#
+# update inetnum object 
+#
+#SUCCESS
+#
+# RESULT 6: The modification will succeed.
+
+
+inetnum:      80.16.151.184 - 80.16.151.184
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+status:       ASSIGNED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+remarks:      modified
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+
+password: hostmaster

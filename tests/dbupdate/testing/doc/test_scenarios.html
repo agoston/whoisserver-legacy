@@ -1,0 +1,438 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+                  	                                                     
+  <META http-equiv="CONTENT-TYPE"
+ content="text/html; charset=iso-8859-1">
+  <TITLE>Test Scenario Writing Standards</TITLE>
+                                                                        
+                                            
+  <META name="AUTHOR" content="Denis Walker denis@ripe.net">
+                                                                  
+  <META name="CREATED" content="20020904">
+</HEAD>
+<BODY>
+<H1><CENTER>Test Scenario Writing Standards</CENTER></H1>
+<BR>
+<H2>Introduction</H2>
+<BR>
+The purpose of testing is to check that the code is bug free and to prove that the code performs the tasks outlined in the user requirements and specifications documents.
+<BR><BR>
+The philosophy of testing for dbupdate is to follow the break down of the whole system into modules according to the initial design. For example the 'main' section, authorisation checks, input processing. These may be further sub-divided to make tests more targeted. For example the authorisation tests may be sub-divided into authorisation methods, pgp, inetnum status, etc. At the lowest level we have the test scenario which perfoms a single test on the smallest unit of code we consider necessary to test individually.
+<BR><BR>
+Many of the test scenarios will be written by the developer of a particular module, during the development phase and used for module testing in isolation of the rest of the system. For this a wrapper or test harness will be required to 'feed' the input to the module and receive the output. This document is mainly concerned with the final integration and acceptance testing. The assumption is made that the whole system is available and the tests will be run by the test system. But the standards and format for individual test scenarios should be used when writing them at the development stage to avoid having to re-format them at a later stage.
+<BR><BR>
+It is further assumed that we may wish to include the test system and data in future releases of the code. Therefore any use of 'live' data or internal email addresses should be avoided. Also auth: NONE should be avoided as it is quite likely that this will be deprecated in the not too distant future.
+<BR><BR>
+This document is only concerned with the writing of the test data for a test scenario. It does not describe how to write the filters and regular expressions used by the test program in order to verify the success or failure of the test. That is covered in the <A HREF="http://iii.ripe.net/dbase/dbupdate/TEST/DBupdate_Testing_Howto.html">test program documentation</A>.
+<BR><BR><BR>
+
+<H2>Directory Structure and File Naming Convention</H2>
+<BR>
+The top level directory for all the tests relating to dbupdate will be:
+<BR><BR>
+tests/dbupdate
+<BR><BR>
+Below this will be six further directories
+<BR><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;bin &nbsp;&nbsp; data &nbsp;&nbsp; conf &nbsp;&nbsp; dump &nbsp;&nbsp; log &nbsp;&nbsp; tmp
+<BR>
+<UL>
+  <LI>bin contains the test program</LI>
+  <LI>conf contains the top level configuration files needed by the test program</LI>
+  <LI>data contains all the test scenarios relating to dbupdate</LI>
+  <LI>dump contans the log files produced by the test program and dbupdate</LI>
+  <LI>log contains the runtime logs for the current local test running</LI>
+  <LI>tmp contains various temporary files </LI>
+</UL>
+<BR>
+This allows the full set of tests to be run by simply supplying the data directory path to the test program. All tests under this directory will then be run.
+If an EXCLUDE file exists in the data directory, the directory paths listed there will be excluded from the test run.
+<BR><BR>
+Below the data directory we will have directories for the major divisions, eg:
+<BR><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;main &nbsp;&nbsp; authorisation &nbsp;&nbsp; input_processing 
+<BR><BR>
+Below each of these we may have directories for sub-divisions of the major test division, eg in the authorisation directory:
+<BR><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;auth_methods &nbsp;&nbsp; inetnum_status &nbsp;&nbsp; pgp
+<BR><BR>
+Within the sub-division directory (or the major division if there are no sub-divisions) we have a series of directories for the test scenarios. These will be named as a sequence of numbers starting with 001 which relates to CASE 1 of this set of tests. 
+<BR><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;001 &nbsp;&nbsp; 002 &nbsp;&nbsp; 003
+<BR><BR>
+Each of these directories will contain the files necessary for one test.
+<BR><BR>
+<CENTER><IMAGE src="dir.gif"></CENTER>
+<BR><BR>
+There can be any number of nested sub-divisions of a major test division. The test scenario directories (001, 002) are always at the lowest level of a branch of the directory structure. They should never be mixed with other sub-division directories. So in the case of authorisation, if we had some general test scenarios as well as some well defined sub divisions we would NOT do something like this
+<BR><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;auth_methods &nbsp;&nbsp; inetnum_status &nbsp;&nbsp; pgp &nbsp;&nbsp; 001 &nbsp;&nbsp; 002 &nbsp;&nbsp; 003
+<BR><BR>
+It should be like this
+<BR><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;auth_methods &nbsp;&nbsp; inetnum_status &nbsp;&nbsp; pgp &nbsp;&nbsp; general
+<BR><BR>
+and the 001, 002, 003 above would be in the general directory.
+<BR><BR>
+Within a test scenario directory (001) there will be a set of files for this test. These files only exist in this lowest level of directory (001, 002). All other directories within this structure contain only other directories, and must not contain any files. These files will have the standard names loader, dbupdate, test, whois, local_filters.config
+<BR>
+<UL>
+  <LI>loader - contains the objects to be loaded directly into the database using the loader program before the test is run.
+  </LI>
+  
+  <LI>dbupdate - contains the object(s) that need to be loaded into the database using dbupdate before the test is run.
+  </LI>
+  
+  <LI>test - contains the flags for dbupdate and the object(s) to be submitted to dbupdate to perform the test.
+  </LI>
+  
+  <LI>whois - contains the objects which we expect to be in the database after the test is run. The contents should correspond with filters_local.config.
+  </LI>
+  
+  <LI>filters_local.config - contains the rules for matching the output from a test.
+  </LI>
+</UL>
+
+loader, dbupdate and whois are all optional,<BR>
+test and filters_local.config are mandatory.
+<BR><BR>
+Due to local specifics, some names in the directory tree will be ignored. Directories named "doc" and "CVS" will be ignored at any sub-directory level, as well as file with the name "README".
+<BR><BR><BR>
+
+<H2>Standardised Objects Used In Tests</H2>
+
+The more standardised the objects can be throughout all the test scenarios, the easier it will be to write and to follow the tests in the long term. How far this standardisation of objects should go I am sure will be a topic of debate. What I will describe is the standard that I adopted during the re-formatting of all the test scenarios recently.
+<BR><BR>
+Do not include optional attributes that are not required for the specific test.
+<BR><BR>
+These are quite straight forward and need little explanation so I will simply list them. This list may grow as new tests are written including attributes that are not currently used in many tests.
+<BR><BR>
+
+<TABLE cellpadding="2" cellspacing="2" border="1" width="100%">
+  <TBODY>
+
+    <TR>
+      <TH valign="Top" align="Center">Attribute</TH>
+      <TH valign="Top" align="Center">Value</TH>
+      <TH valign="Top" align="Center">Notes</TH>
+    </TR>
+
+    <TR>
+      <TD>admin-c</TD>
+      <TD>TP1-DB-TEST</TD>
+      <TD>References standard person object loaded for all tests</TD>
+    </TR>
+
+    <TR>
+      <TD>tech-c</TD>
+      <TD>TP1-DB-TEST</TD>
+      <TD>References standard person object loaded for all tests</TD>
+    </TR>
+
+    <TR>
+      <TD>zone-c</TD>
+      <TD>TP1-DB-TEST</TD>
+      <TD>References standard person object loaded for all tests</TD>
+    </TR>
+
+    <TR>
+      <TD>auth</TD>
+      <TD>CRYPT-PW</TD>
+      <TD>Simplest method of auth for use when auth is not the subject of the test<BR>Always include the plain text password as an end of line comment</TD>
+    </TR>
+
+    <TR>
+      <TD>referral-by</TD>
+      <TD>TEST-DBM-MNT</TD>
+      <TD>References standard mntner object loaded for all tests</TD>
+    </TR>
+
+    <TR>
+      <TD>source</TD>
+      <TD>DB-TEST</TD>
+      <TD>Used in all objects, except when multiple sources is tested</TD>
+    </TR>
+
+    <TR>
+      <TD></TD>
+      <TD>dbtest@ripe.net</TD>
+      <TD>Used wherever an attribute requires an email address, except when multiple email addresses are required (as with notification tests) This email address does not exist.</TD>
+    </TR>
+
+  </TBODY> 
+</TABLE>
+
+<BR><BR><BR>
+
+<H2>Standard Template Objects For loader File</H2>
+
+There are a number of objects that are commonly required for most tests. These form the basis of the loader file and can be copied as a <A href="#loader_file_template">template</A> for all new loader files.
+<BR><BR>
+Additional objects required for the specific test can then be added after these standard objects.
+<BR><BR>
+The standard objects includes the person TP1-DB-TEST that is used for admin-c type attributes in all other objects. In many cases this person is not needed and could suffice as a dummy object. But if any of the objects that reference it need to be updated through dbupdate as part of the test then it would fail if this person object does not exist. For simplicity it is better to always include this person in the load to avoid having to think later if it is needed or not. This person should only be used in admin-c type attributes and not manipulated as part of a test. If the test requires to create/modify/delete a person then include a specific test person object in the additional objects section for this purpose.
+<BR><BR>
+Two basic mntner objects are included in the template. TEST-DBM-MNT for use as the referral-by mntner in other mntner objects that you may require in the test. RIPE-NCC-HM-MNT as the allocation control mntner.
+<BR><BR>
+The template also includes the root inetnum and inet6num objects as a starting point for any test that requires to use inetnums and routes.
+<BR><BR>
+Other standard objects may be added or changes made to these objects if considered necessary at a later date. If so I would suggest we write a perl (or sed) script to ripple the changes/additions throughout all existing loader files under the test data directory. This keeps the standard 'standard'.
+<BR><BR>
+If any of the template objects need to be modified for a specific test then it is advisable to move the object from the standard template object section into the additional objects section, for this test. This is to make it clear that it is no longer the standard object from the template.
+
+<BR><BR><BR>
+
+<H2>File Comments</H2>
+There are two formats for comments that can be used in any of the data files.
+
+<UL>
+  <LI># comments &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lines starting with a # symbol will be copied into the test report file by the test program.</LI>
+  
+  <LI>% comments &nbsp;&nbsp;&nbsp;&nbsp;Lines starting with a % symbol will _not_ be copied into the test report file. The test program will simply ignore them.
+</UL>
+
+This allows for details of what the test is trying to do and the expected results of the test to be included in the report file along with the results from running the test. It also allows for the test scenario writer to include additional comments in the file about writing the test that may not be of interest when checking the results.
+<BR><BR>
+The test program will remove all lines from the files that start with a # or % or $ (see below). For tests that require a mail header it is important that this is at the start of the input file to dbupdate. The mail header MUST start at the FIRST line in the update file sent to dbupdate. So do not leave any blank lines in the 'test' file before the 'From:' line. If there is a need for spacing out lines for ease of reading, these padding lines must start with a # or %.
+<BR><BR><BR>
+
+<H2>The loader File</H2>
+
+This file contains a list of objects that are to loaded directly into the database before the test can be run. If the loader file contains any key-cert objects the public keyring will also be updated with the keys. The loader file layout is shown in Appendix A, <A href="#loader_file_template">Loader File Template</A>.
+<BR><BR>
+It starts with a title of the test group, eg '% inetnum status tests', then states which test the objects are for, eg '% load objects for Case 1 test'. Next are the standard template objects as described above. Then the additional objects required for this test (if any). It ends with a comment, '% End of loader data file'. The main reason for this coment is to ensure that there is a blank line after the last object in the file. Without a blank line the last object will not be loaded.
+
+<BR><BR><BR>
+
+<H2>The dbupdate File</H2>
+
+This file contains an optional string with dbupdate command line flags and a list of objects that are to created in the database by dbupdate before the test can be run. It starts with a title of the test group, eg '% pgp tests', then states which test the objects are for, eg '% dbupdate objects for Case 1 test'. A line starting with '$' will be considered as the dbupdate command line flags string. If it exists, these flags will be used when running dbupdate. If not, the default flags will be used. Please see the documentation for the format of this line.
+This is followed by the object(s) and credentials that need to be submitted to dbupdate. An example is shown in Appendix B, <A href="#dbupdate_file_sample">dbupdate File Sample</A>.
+
+<BR><BR><BR>
+
+<H2>The test File</H2>
+
+This file contains an optional string with dbupdate command line flags and the actual test that is being performed. An example of this can be seen in Appendix C, <A href="#test_file_sample">test File Sample</A>.
+<BR><BR>
+It starts with a title followed by a description of what the test will try to do. Additional comments can be placed anywhere in the comment block for the benefit of the test writer. Then we have the action to be performed by dbupdate followed by a simple statement of whether the action should be a SUCCESS or FAILURE. Then there is a description of the outcome of the test. If the optional string with dbupdate command line flags is to be used it should be inserted after the initial comment block on a line starting with a $. If it exists, these flags will be used when running dbupdate. If not, the default flags will be used. Please see the documentation for the format of this line. Following this we have the object(s) and credentials that need to be submitted to dbupdate to perform this test. If the test requires a mail header, this will come after the initial comment block and any optional flags string and before the test objects and credentials. Every empty string occured in test/dbupdate files will be included into dbupdate input, if it is not commented out.
+<BR><BR>
+By default, the filename for file which contains input will be added to dbupdate command line. However, this can be overriden by putting '$$' at the beginning of the string containing flags. In this case no filenames will be added. 
+<p>
+In fact, any variable described in testing configuration file can be put into flags line. It will be expanded with it's current value.
+<BR><BR>
+Examples:
+<p>
+$$ -r -c $RIP_CONFIG -ZZZ
+<BR> this line can be used to test dbupdate command-line options handling
+<p>
+$$ -r -c $RIP_CONFIG -f $TEST
+<BR> this line will be effectively expanded to variables from current configuration. $TEST will point to 'test' file for current test.
+<p> 
+$ -r -c $RIP_CONFIG $DBUPDATE_FILE
+<BR> this will effectively do "-r -c [rip_config] -f [local test or dbupdate file]
+<p>
+$DBUPDATE_GEN 
+<BR> this will effectively do the same as above.
+<BR>
+<BR>
+There is also a possibility to specify a command to run before the test. It should appear somewhere in the test file, preferrably between the test description and update in order to keep test test file clear and readable. The syntax is:
+<BR>
+@ command_line
+<BR>
+The testing program will check that script is run and the process is closed successfully. If command line contains some names of defined variables of the testing program, their values will be substituted from testing configuration file.<BR>
+This feature can be used for example to swap configuration files before running a specific test. 
+<BR><BR><BR>
+
+<H2><A name="loader_file_template"></A>Appendix A<BR>loader File Template</H2>
+
+<PRE>
+% TITLE
+% load objects for Case n tests
+%
+
+
+%----------------------------------------------------------------
+%        Standard Template Objects
+
+
+% admin-c, tech-c person
+
+person:       test person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP1-DB-TEST
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% referral-by maintainer
+
+mntner:       TEST-DBM-MNT
+descr:        Mntner for RIPE DBM objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+upd-to:       dbtest@ripe.net
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+mnt-by:       TEST-DBM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% allocation maintainer
+
+mntner:       RIPE-NCC-HM-MNT
+descr:        RIPE-NCC Hostmaster Maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+upd-to:       dbtest@ripe.net
+auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+mnt-by:       RIPE-NCC-HM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
+source:       DB-TEST
+
+
+% root inetnum object
+
+inetnum:      0.0.0.0 - 255.255.255.255
+netname:      IANA-BLK
+descr:        The whole IPv4 address space
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED UNSPECIFIED
+remarks:      The country is really worldwide.
+remarks:      This address space is assigned at various other places in
+remarks:      the world and might therefore not be in the RIPE database.
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+mnt-routes:   RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% root inet6num object
+
+inet6num:     0::/0
+netname:      ROOT
+descr:        Root inet6num object
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+status:       ALLOCATED-BY-RIR
+remarks:      This network in not allocated.
+              This object is here for Database
+              consistency and to allow hierarchical
+              authorisation checks.
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+%      End of Standard Template Objects
+%----------------------------------------------------------------
+
+%  Additional objects required for this test
+
+
+
+% End of loader data file
+
+</PRE>
+
+<BR><BR><BR>
+
+
+<H2><A name="dbupdate_file_sample"></A>Appendix B<BR>dbupdate File Sample</H2>
+
+<PRE>
+% pgp auth tests
+% dbupdate objects for Case 1 test
+%
+
+key-cert: PGPKEY-4A26C717
+certif: -----BEGIN PGP PUBLIC KEY BLOCK-----
+certif: Version: GnuPG v1.0.6 (GNU/Linux)
+certif: Comment: For info see http://www.gnupg.org
+certif: 
+certif: mQGiBD1jYZYRBACA4tLa4R7ZuMpQNZVe4QfH5A/Tb0eUeHrxGsR9nfeUr8CEtJe4
+certif: l6BX1jdSc/Yl7LevFx04BRzXDmMV6Xp89xuhV5vpLH/ISpIvF55EtCslW9sKee50
+certif: 4Pefd9+4KgGkMP6r0L+apqyyvMTDl4gPF/SEB6Xa6e/RfNXXCA7YSGZfAwCg33qu
+certif: lnsXAY8qQs/2SgfUROMNetsD/2Ff5NACMQJXfoNqrWOqTHdjrAtw+CrZEHgac1Gk
+certif: wa42NEWD9kUJdQcB8zdXcNfKTZ1gIepgoc0hdh5iVhJaMCiHyTSAmB2yhcYVUX1M
+certif: 5AJhUf7dKcQa0b1hn+JhyZGe5hAgxn8y7g7Hp1PSPRjkgpV8hI37D+genN669dW6
+certif: +tguA/4tn+S4oohPG0uy5IAx19aTLwZ4zjqZdrNzXU3fJvMZeA6nRDxmWv7Gfc72
+certif: UnENHJk/rhMXca7Ix3PQn5abDl5Jd7cliONLuFA2IQoiC0DV4ih4xaD8bWud/0zN
+certif: Bd5BmTkU6O61y09ucJMYGclvKIN5k0/HZD2SH0HcU8srsjuqgrQYVGlhZ28gMSA8
+certif: dGlhZ29AcmlwZS5uZXQ+iFcEExECABcFAj1jYZYFCwcKAwQDFQMCAxYCAQIXgAAK
+certif: CRBchF+OSibHF+lDAJ9eY0qO2eJS7c49U0VgLe4dUwq9NACg2eN9jI+0sjEV39nA
+certif: FrfeGE52rgS5AQ0EPWNhlxAEANqiQyIWuXbmNDmWHZlY9rbyzEl2ztzwdeRFC2Ls
+certif: /y7XNNSmW44oo9vCEugam8SqPIA3wxiLKq/Iiqs/7H+cpXwh2mbb3QAKLiSIF/C/
+certif: BJ+JWqLssGfqdEiSicyLKLT37zMcCWKRHtdHBxcZHqQIDzbGcpDggZNmDloMGVKJ
+certif: aQ5HAAMFBACC0GFetEfC1Fj4dDx0V8rHbSCbsWNbt8uSDugsdVFV5tH6i/JwH28W
+certif: hhNtLu04BBUD7LvK8wcN18gx2kt6YqrkhoKtOZ8ulUHa4o5JYUhtdRbb2U734SFb
+certif: 2p1iomO8WfSY7GLIUlcSCfXY1Oet7fF8eZWAx3fsmu6HjLTTgGYWAohGBBgRAgAG
+certif: BQI9Y2GXAAoJEFyEX45KJscXJtIAn2CBl6tfFAkzebXmua3Z5KLO1tXlAJ49jjYj
+certif: j12sLDENvMEjsp7AdiJi8w==
+certif: =5IS6
+certif: -----END PGP PUBLIC KEY BLOCK-----
+changed:  dbtest@ripe.net 20020101
+mnt-by:   TEST-MNT
+source:   DB-TEST
+
+password: ola
+
+
+mntner:      TEST-MNT
+descr:       test mantainer object
+admin-c:     TP1-DB-TEST
+tech-c:      TP1-DB-TEST
+upd-to:      dbtest@ripe.net
+auth:        CRYPT-PW ppnvBUPxXbrQU # ola
+auth:        PGPKEY-4A26C717
+mnt-by:      TEST-MNT
+referral-by: TEST-DBM-MNT
+changed:     dbtest@ripe.net 20020101
+source:      DB-TEST
+
+</PRE>
+
+<BR><BR><BR>
+
+
+<H2><A name="test_file_sample"></A>Appendix C<BR>test File Sample</H2>
+
+<PRE>
+
+# route authorisation tests - autnum
+# CASE 4: We try to create 20.13.0.0/16 route object.
+# Will fail because of mnt-lower
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 4: The creation will fail with Hierarchical authorisation failed
+
+route:   20.13.0.0/16
+descr:   Test route object
+origin:  AS200
+mnt-by:  TEST-MNT
+changed: test@ripe.net 20020101
+source:  DB-TEST
+
+password: auth
+
+</PRE>
+
+<BR><BR><BR>
+
+
+$Id: test_scenarios.html,v 1.2 2003/07/04 08:22:47 engin Exp $<br>
+</BODY>
+</HTML>

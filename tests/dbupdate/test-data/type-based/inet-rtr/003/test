@@ -1,0 +1,28 @@
+
+# CASE 3: We try to delete inet-rtr object kst1-core.swip.net
+%
+% requires initial objects to be loaded
+#
+# delete inet-rtr object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+inet-rtr:    kst1-core.swip.net
+descr:       test router
+local-as:    AS1257
+ifaddr:      146.188.49.14 masklen 30
+ifaddr:      195.158.247.62 masklen 30
+peer:        BGP4 146.188.49.13 asno(AS702)
+peer:        BGP4 195.158.247.61 asno(AS1755)
+admin-c:     TP1-DB-TEST
+tech-c:      TP1-DB-TEST
+mnt-by:      TEST-MNT
+notify:      dbtest@ripe.net
+changed:     dbtest@ripe.net 20021111
+source:      DB-TEST
+delete: reason
+
+password: auth

@@ -1,0 +1,28 @@
+
+# CASE 1: We try to create limerick object LIM-OUR-SQL
+%
+% requires initial objects to be loaded
+#
+# create limerick object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+limerick:     LIM-OUR-SQL
+descr:        Our SQL
+author:       TP1-DB-TEST
+text:         In the photo, you can see
+text:         Engineers coding the DB,
+text:         You will be amazed & excited,
+text:         Impressed & delighted,
+text:         When they release Version 3!
+admin-c:      TP1-DB-TEST
+mnt-by:       TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+
+password: auth

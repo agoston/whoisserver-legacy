@@ -1,0 +1,28 @@
+
+# CASE 3: We try to delete inet6num object 2001:0658:021A::/48
+%
+% requires initial objects to be loaded
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+inet6num:     2001:0658:021A::/48
+descr:        test inet6num
+netname:      TEST-INET6NUM
+country:      NL
+status:       ALLOCATED-BY-RIR
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed: dbtest@ripe.net 20021111
+delete: reason
+source:       DB-TEST
+
+
+
+password: hostmaster

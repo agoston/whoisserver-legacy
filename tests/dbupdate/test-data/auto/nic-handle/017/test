@@ -1,0 +1,21 @@
+# auto-nic tests
+# CASE 17: Create a role object
+#          with a single reference to a non-existent AUTO-1 nic-hdl.
+%
+% requires initial objects to be loaded
+#
+# create role object
+#
+#FAILURE
+#
+# RESULT 17: The role creation will fail
+
+
+role:         Test Role
+address:      Singel
+e-mail:       dbtest@ripe.net
+admin-c:      AUTO-1
+tech-c:       TP1-DB-TEST
+nic-hdl:      TR1-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

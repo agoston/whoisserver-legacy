@@ -1,0 +1,36 @@
+
+# CASE 1: We try to create peering-set object prng-lipex1
+%
+% requires initial objects to be loaded
+#
+# create peering-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+
+peering-set:      prng-lipex1
+descr:        Test peering partners
+peering:      AS20834 at 193.109.219.24
+peering:      AS12621 at 193.109.219.28
+peering:      AS9191 at 193.109.219.42
+peering:      AS6067 at 193.109.219.72
+peering:      AS21238 at 193.109.219.254
+peering:      AS5587 at 193.109.219.64
+peering:      AS6770 at 193.109.219.60
+peering:      AS12295 at 193.109.219.36
+peering:      AS20976 at 193.109.219.22
+peering:      AS20976 at 193.109.219.23
+peering:      AS21238 at 193.109.219.108
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+
+password: auth

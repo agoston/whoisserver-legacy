@@ -1,0 +1,26 @@
+# overlap tests
+# CASE 19: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# overlapping inetnums exist 80.16.151.180 - 80.16.151.192 AND 80.16.151.179 - 80.16.151.193
+# 
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 19: The creation will fail.
+
+
+inetnum:      80.16.151.191 - 80.16.151.194
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+status:       ALLOCATED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+remarks:      modified
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+
+password: hostmaster

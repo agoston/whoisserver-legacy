@@ -1,0 +1,29 @@
+# inetnum status tests
+# CASE 29: We try to update inetnum object
+# from status NOT-SET to ASSIGNED PI
+# parent object is ALLOCATED UNSPECIFIED
+#
+%
+% requires initial objects to be loaded
+#
+# modify inetnum object 
+#
+#SUCCESS
+#
+# RESULT 29: The modification will succeed
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      RIPE-NET
+descr:        /17 to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PI
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: LIR
+
+

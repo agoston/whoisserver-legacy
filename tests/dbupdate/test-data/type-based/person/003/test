@@ -1,0 +1,25 @@
+
+# CASE 3: We try to delete person object test person
+%
+% requires initial objects to be loaded
+#
+# delete person object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+person:       test person
+address:      Singel
+phone:        +0123456789
+e-mail:       dbtest@ripe.net
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed: dbtest@ripe.net 20021111
+delete: reason
+source:       DB-TEST
+
+
+
+password: auth

@@ -1,0 +1,27 @@
+# inetnum status tests
+# CASE 6: We try to create inetnum object
+# with status ASSIGNED PA under ASSIGNED PA
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# ***but will succeed at the moment until checks are tightened***
+# RESULT 6: The creation will fail with Authorisation failed
+
+
+password: LIR
+
+inetnum:      192.168.200.210 - 192.168.200.210
+netname:      RIPE-NET3
+descr:        ASSIGNED PA
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

@@ -1,0 +1,27 @@
+# CASE 7: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# having two parents of the same size
+# should fail giving "multiple overlapping parents" error
+#
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 7: The creation will fail.
+
+
+inetnum:      80.16.151.191 - 80.16.151.194
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+status:       ASSIGNED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+remarks:      modified
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+
+password: hostmaster

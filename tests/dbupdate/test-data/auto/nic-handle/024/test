@@ -1,0 +1,38 @@
+# auto-nic tests
+# CASE 24: Create an inetnum object
+#          with correct password for mnt-by of parent
+#          and mnt-by of inetnum
+#          with the admin-c: set to AUTO-1
+#          and create the person with AUTO-1 nic-hdl with 
+#          a mnt-by: and password
+%
+#
+# create inetnum and person objects
+#
+#SUCCESS
+#
+# RESULT 24: The creations will succeed
+
+password: hostmaster
+password: END-USER
+
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED
+country:      NL
+admin-c:      AUTO-1
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      AUTO-1
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

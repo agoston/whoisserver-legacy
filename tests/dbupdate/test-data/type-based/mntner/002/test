@@ -1,0 +1,31 @@
+
+# CASE 2: We try to modify mntner object TEST1-MNT
+%
+% requires initial objects to be loaded
+#
+# modify mntner object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+mntner:       TEST1-MNT
+descr:        Test1 maintainer
+descr:        Test1 maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+upd-to:       dbtest@ripe.net
+mnt-nfy:      dbtest@ripe.net
+auth:         CRYPT-PW asMa4KAw.CNBs   # test-mnt
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST1-MNT
+referral-by:  TEST-DBM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+
+password: test-mnt
+override: password

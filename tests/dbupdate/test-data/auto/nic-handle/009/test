@@ -1,0 +1,31 @@
+# auto-nic tests
+# CASE 9: Create a person object
+#         with an AUTO-1 nic-hdl
+#         and modify a role object
+#         with a single reference to the AUTO-1 nic-hdl.
+%
+% requires initial objects to be loaded
+#
+# create person and modify role objects
+#
+#SUCCESS
+#
+# RESULT 9: The creation and modification will succeed
+
+
+role:         Test Role
+address:      Singel
+e-mail:       dbtest@ripe.net
+admin-c:      AUTO-1
+tech-c:       TP1-DB-TEST
+nic-hdl:      TR1-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+
+person:       Test Person3
+address:      Singel
+phone:        +0123456789
+nic-hdl:      AUTO-1
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

@@ -1,0 +1,28 @@
+# inetnum status tests
+# CASE 23: We try to create inetnum object
+# with status SUB-ALLOCATED PA
+# parent object has status LIR-PARTITIONED PA
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 23: The creation will succeed
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      RIPE-NET
+descr:        /17 to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       SUB-ALLOCATED PA
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: LIR
+
+password: hostmaster

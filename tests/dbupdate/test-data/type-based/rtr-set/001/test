@@ -1,0 +1,25 @@
+
+# CASE 1: We try to create rtr-set object rtrs-test
+%
+% requires initial objects to be loaded
+#
+# create rtr-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+rtr-set:      rtrs-test
+descr:        TEST router set
+members:      rmws-brln-de07.nw.mediaWays.net
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+
+password: auth

@@ -1,0 +1,479 @@
+<!DOCTYPE ripe_classes SYSTEM "classes.dtd">
+
+<!-- XXX: will want to add core template in the future, to 
+          document which fields are mandatory for core (e.g. nic-hdl) -->
+
+<ripe_classes version="$Revision: 1.1 $" author="$Author: can $">
+
+  <ripe_class name="domain" code="dn">
+    <description>
+      A domain object represents a Top Level Domain (TLD) or
+      other domain registrations. It is also used for Reverse 
+      Delegations.
+    </description>
+    <attributes>
+      <domain      choice="mandatory" number="single"   />
+      <descr       choice="mandatory" number="multiple" />
+      <admin-c     choice="mandatory" number="multiple" />
+      <tech-c      choice="mandatory" number="multiple" />
+      <zone-c      choice="mandatory" number="multiple" />
+      <nserver     choice="optional"  number="multiple" />
+      <sub-dom     choice="optional"  number="multiple" />
+      <dom-net     choice="optional"  number="multiple" />
+      <remarks     choice="optional"  number="multiple" />
+      <notify      choice="optional"  number="multiple" />
+      <mnt-by      choice="optional"  number="multiple" />
+      <mnt-lower   choice="optional"  number="multiple" />
+      <refer       choice="optional"  number="single"   />
+      <changed     choice="mandatory" number="multiple" />
+      <source      choice="mandatory" number="single"   />
+      <delete      choice="optional"  number="single"   pseudo="yes"/>
+      <override    choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="3"/>
+  </ripe_class>
+
+  <ripe_class name="inetnum" code="in">
+    <description>
+      An inetnum object contains information on allocations and
+      assignments of IPv4 address space.
+    </description>
+    <attributes>
+      <inetnum     choice="mandatory" number="single"   />
+      <netname     choice="mandatory" number="single"   />
+      <descr       choice="mandatory" number="multiple" />
+      <country     choice="mandatory" number="multiple" />
+      <admin-c     choice="mandatory" number="multiple" />
+      <tech-c      choice="mandatory" number="multiple" />
+      <rev-srv     choice="optional"  number="multiple" />
+      <status-in   choice="mandatory" number="single"   />
+      <remarks     choice="optional"  number="multiple" />
+      <notify      choice="optional"  number="multiple" />
+      <mnt-by      choice="mandatory" number="multiple" />
+      <mnt-lower   choice="optional"  number="multiple" />
+      <mnt-routes  choice="optional"  number="multiple" />
+      <changed     choice="mandatory" number="multiple" />
+      <source      choice="mandatory" number="single"   />
+      <delete      choice="optional"  number="single"   pseudo="yes"/>
+      <override    choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="6"/>
+  </ripe_class>
+
+  <ripe_class name="key-cert" code="kc">
+    <description>
+      A key-cert object is a database public key certificate 
+      that is stored on the server and may be used with a mntner 
+      object for authentication when performing updates. 
+      Currently only PGP/GnuPG keys are supported.
+    </description>
+    <attributes>
+      <key-cert choice="mandatory" number="single"   />
+      <method   choice="generated" number="single"   />
+      <owner    choice="generated" number="multiple" />
+      <fingerpr choice="generated" number="single"   />
+      <certif   choice="mandatory" number="multiple" />
+      <remarks  choice="optional"  number="multiple" />
+      <notify   choice="optional"  number="multiple" />
+      <mnt-by   choice="mandatory" number="multiple" />
+      <changed  choice="mandatory" number="multiple" />
+      <source   choice="mandatory" number="single"   />
+      <delete   choice="optional"  number="single"   pseudo="yes"/>
+      <override choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="7"/>
+  </ripe_class>
+
+  <ripe_class name="filter-set" code="fs">
+    <description>
+       A filter-set object defines a set of routes that are matched by
+       its filter.  The "filter-set:" attribute defines the name of
+       the filter.  It is an RPSL name that starts with "fltr-".  The
+       "filter:" attribute defines the set's policy filter.   A policy
+       filter is a logical expression which when applied to a set of
+       routes returns a subset of these routes.
+    </description>
+    <attributes>
+      <filter-set  choice="mandatory" number="single"   />
+      <descr       choice="mandatory" number="multiple" />
+      <filter      choice="mandatory" number="single"   />
+      <remarks     choice="optional"  number="multiple" />
+      <tech-c      choice="mandatory" number="multiple" />
+      <admin-c     choice="mandatory" number="multiple" />
+      <notify      choice="optional"  number="multiple" />
+      <mnt-by      choice="mandatory" number="multiple" />
+      <changed     choice="mandatory" number="multiple" />
+      <source      choice="mandatory" number="single"   />
+      <delete   choice="optional"  number="single"   pseudo="yes"/>
+      <override choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="14"/>
+  </ripe_class>
+
+  <ripe_class name="mntner" code="mt">
+    <description>
+      Objects in the RIPE Database may be protected using mntner
+      (pronounced "maintainer") objects.  A mntner object specifies
+      authentication information required to authorise creation,
+      deletion or modification of the objects protected by the mntner.
+      Mntner objects are not created automatically, but are forwarded
+      to RIPE Database Administration (ripe-dbm@ripe.net).
+    </description>
+    <attributes>
+      <mntner       choice="mandatory" number="single"   />
+      <descr        choice="mandatory" number="multiple" />
+      <country      choice="optional"  number="single"   />
+      <admin-c      choice="mandatory" number="multiple" />
+      <tech-c       choice="optional"  number="multiple" />
+      <upd-to       choice="mandatory" number="multiple" />
+      <mnt-nfy      choice="optional"  number="multiple" />
+      <auth         choice="mandatory" number="multiple" />
+      <remarks      choice="optional"  number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <referral-by  choice="mandatory" number="single"   />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="9"/>
+  </ripe_class>
+
+  <ripe_class name="person" code="pn">
+    <description>
+       A person object contains information about technical or
+       administrative contact responsible for the object where it is
+       referenced.  Once the object is created, the value of the
+       "person:" attribute cannot be changed.
+    </description>
+    <attributes>
+      <person       choice="mandatory" number="single"   />
+      <address      choice="mandatory" number="multiple" />
+      <country      choice="optional"  number="single"   />
+      <phone        choice="mandatory" number="multiple" />
+      <fax-no       choice="optional"  number="multiple" />
+      <e-mail       choice="optional"  number="multiple" />
+      <nic-hdl      choice="mandatory" number="single"   />
+      <remarks      choice="optional"  number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="optional"  number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="10"/>
+  </ripe_class>
+
+  <ripe_class name="role" code="ro">
+    <description>
+      The role class is similar to the person class.  However, instead
+      of describing a human being, it describes a role performed by
+      one or more human beings.  Examples include help desks, network
+      monitoring centres, system administrators, etc.  A role object
+      is particularly useful since often a person performing a role
+      may change; however the role itself remains. The "nic-hdl:"
+      attributes of the person and role classes share the same name
+      space. Once the object is created, the value of the "role:"
+      attribute cannot be changed.
+    </description>
+    <attributes>
+      <role         choice="mandatory" number="single"   />
+      <address      choice="mandatory" number="multiple" />
+      <country      choice="optional"  number="single"   />
+      <phone        choice="optional"  number="multiple" />
+      <fax-no       choice="optional"  number="multiple" />
+      <e-mail       choice="mandatory" number="multiple" />
+      <trouble      choice="optional"  number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <tech-c       choice="mandatory" number="multiple" />
+      <nic-hdl      choice="mandatory" number="single"   />
+      <remarks      choice="optional"  number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="optional"  number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="11"/>
+  </ripe_class>
+
+  <ripe_class name="route-set" code="rs">
+    <description>
+      A route-set object defines a set of routes that can be
+      represented by route objects or by address prefixes. In the
+      first case, the set is populated by means of the "mbrs-by-ref:"
+      attribute, in the latter, the members of the set are explicitly
+      listed in the "members:" attribute. The "members:" attribute is
+      a list of address prefixes or other route-set names.  Note that
+      the route-set class is a set of route prefixes, not of database
+      route objects.
+    </description>
+    <attributes>
+      <route-set    choice="mandatory" number="single"   />
+      <descr        choice="mandatory" number="multiple" />
+      <members-rs   choice="optional"  number="multiple" />
+      <mbrs-by-ref  choice="optional"  number="multiple" />
+      <remarks      choice="optional"  number="multiple" />
+      <tech-c       choice="mandatory" number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="13"/>
+  </ripe_class>
+
+  <ripe_class name="as-set" code="as">
+    <description>
+      An as-set object defines a set of aut-num objects. The
+      attributes of the as-set class are shown in Figure 1.2.2.  The
+      "as-set:" attribute defines the name of the set. It is an RPSL
+      name that starts with "as-". The "members:" attribute lists the
+      members of the set.  The "members:" attribute is a list of AS
+      numbers, or other as-set names.
+    </description>
+    <attributes>
+      <as-set       choice="mandatory" number="single"   />
+      <descr        choice="mandatory" number="multiple" />
+      <members-as   choice="optional"  number="multiple" />
+      <mbrs-by-ref  choice="optional"  number="multiple" />
+      <remarks      choice="optional"  number="multiple" />
+      <tech-c       choice="mandatory" number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="1"/>
+  </ripe_class>
+
+  <ripe_class name="inet6num" code="i6">
+    <description>
+      An inet6num object contains information on allocations
+      and assignments of IPv6 address space.
+    </description>
+    <attributes>
+      <inet6num     choice="mandatory" number="single"   />
+      <netname      choice="mandatory" number="single"   />
+      <descr        choice="mandatory" number="multiple" />
+      <country      choice="mandatory" number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <tech-c       choice="mandatory" number="multiple" />
+      <rev-srv      choice="optional"  number="multiple" />
+      <status-i6    choice="mandatory" number="single"   />
+      <remarks      choice="optional"  number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <mnt-lower    choice="optional"  number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="5"/>
+  </ripe_class>
+
+  <ripe_class name="inet-rtr" code="ir">
+    <description>
+      Routers are specified using the inet-rtr class.  The "inet-rtr:"
+      attribute is a valid DNS name of the router described. Each
+      "alias:" attribute, if present, is a canonical DNS name for the
+      router.  The "local-as:" attribute specifies the AS number of
+      the AS that owns/operates this router.
+    </description>
+    <attributes>
+      <inet-rtr     choice="mandatory" number="single"   />
+      <descr        choice="mandatory" number="multiple" />
+      <alias        choice="optional"  number="multiple" />
+      <local-as     choice="mandatory" number="single"   />
+      <ifaddr       choice="mandatory" number="multiple" />
+      <peer         choice="optional"  number="multiple" />
+      <member-of-ir choice="optional"  number="multiple" />
+      <remarks      choice="optional"  number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <tech-c       choice="mandatory" number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="4"/>
+  </ripe_class>
+
+  <ripe_class name="as-block" code="ak">
+    <description>
+      An as-block object is needed to delegate a range of AS numbers 
+      to a given repository.  This object may be used for authorisation 
+      of the creation of aut-num objects within the range specified 
+      by the "as-block:" attribute.
+    </description>
+    <attributes>
+      <as-block     choice="mandatory" number="single"   />
+      <descr        choice="optional"  number="multiple" />
+      <remarks      choice="optional"  number="multiple" />
+      <country      choice="optioanl"  number="single"   />
+      <tech-c       choice="mandatory" number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-lower    choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="0"/>
+  </ripe_class>
+
+  <ripe_class name="aut-num" code="an">
+    <description>
+      An object of the aut-num class is a database representation of 
+      an Autonomous System (AS), which is a group of IP networks operated 
+      by one or more network operators that has a single and clearly 
+      defined external routing policy.
+    </description>
+    <attributes>
+      <aut-num      choice="mandatory" number="single"   />
+      <as-name      choice="mandatory" number="single"   />
+      <descr        choice="mandatory" number="multiple" />
+      <country      choice="optional"  number="single"   />
+      <member-of-an choice="optional"  number="multiple" />
+      <import       choice="optional"  number="multiple" />
+      <export       choice="optional"  number="multiple" />
+      <default      choice="optional"  number="multiple" />
+      <remarks      choice="optional"  number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <tech-c       choice="mandatory" number="multiple" />
+      <cross-mnt    choice="optional"  number="multiple" />
+      <cross-nfy    choice="optional"  number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-lower    choice="optional"  number="multiple" />
+      <mnt-routes   choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="2"/>
+  </ripe_class>
+
+  <ripe_class name="limerick" code="li">
+    <description>
+      The limerick object represents a humorous poem that has five 
+      lines and the rhyme scheme "aabba".
+    </description>
+    <attributes>
+      <limerick     choice="mandatory" number="single"   />
+      <descr        choice="optional"  number="multiple" />
+      <text         choice="mandatory" number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <author       choice="mandatory" number="multiple" />
+      <remarks      choice="optional"  number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="8"/>
+  </ripe_class>
+
+  <ripe_class name="route" code="rt">
+    <description>
+      Each interAS route (also referred to as an interdomain route) 
+      originated by an AS is specified using a route object. The "route:" 
+      attribute is the address prefix of the route and the "origin:" 
+      attribute is the AS number of the AS that originates the route 
+      into the interAS routing system. 
+    </description>
+    <attributes>
+      <route        choice="mandatory" number="single"   />
+      <descr        choice="mandatory" number="multiple" />
+      <country      choice="optional"  number="single"   />
+      <origin       choice="mandatory" number="single"   />
+      <holes        choice="optional"  number="multiple" />
+      <member-of-rt choice="optional"  number="multiple" />
+      <inject       choice="optional"  number="multiple" />
+      <aggr-mtd     choice="optional"  number="single"   />
+      <aggr-bndry   choice="optional"  number="single"   />
+      <export-comps choice="optional"  number="single"   />
+      <components   choice="optional"  number="single"   />
+      <remarks      choice="optional"  number="multiple" />
+      <cross-mnt    choice="optional"  number="multiple" />
+      <cross-nfy    choice="optional"  number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-lower    choice="optional"  number="multiple" />
+      <mnt-routes   choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="12"/>
+  </ripe_class>
+
+  <ripe_class name="peering-set" code="ps">
+    <description>
+      A peering-set object defines a set of peerings that are listed 
+      in its "peering:" attributes.  The "peering-set:" attribute 
+      defines the name of the set. 
+    </description>
+    <attributes>
+      <peering-set  choice="mandatory" number="single"   />
+      <descr        choice="mandatory" number="multiple" />
+      <peering      choice="mandatory" number="multiple" />
+      <remarks      choice="optional"  number="multiple" />
+      <tech-c       choice="mandatory" number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="15"/>
+  </ripe_class>
+
+  <ripe_class name="rtr-set" code="is">
+    <description>
+      A rtr-set object defines a set of routers. A set may be described 
+      by the "members:" attribute, which is a list of inet-rtr names, 
+      IPv4 addresses or other rtr-set names. A set may also be populated 
+      by means of the "mbrs-by-ref:" attribute, in which case it is 
+      represented by inet-rtr objects.
+    </description>
+    <attributes>
+      <rtr-set      choice="mandatory" number="single"   />
+      <descr        choice="mandatory" number="multiple" />
+      <members-is   choice="optional"  number="multiple" />
+      <mbrs-by-ref  choice="optional"  number="multiple" />
+      <remarks      choice="optional"  number="multiple" />
+      <tech-c       choice="mandatory" number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="16"/>
+  </ripe_class>
+
+</ripe_classes>
+

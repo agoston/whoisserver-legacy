@@ -1,0 +1,30 @@
+
+# CASE 2: We try to modify irt object IRT-REQUEST
+%
+% requires initial objects to be loaded
+#
+# modify irt object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+irt:                 IRT-REQUEST
+address:             Singel 258
+address:             1016 AB  Amsterdam
+address:             The Netherlands
+address:             World
+e-mail:              dbtest@ripe.net
+signature:           PGPKEY-4EA45E47
+encryption:          PGPKEY-4EA45E47
+admin-c:             TP1-DB-TEST
+tech-c:              TP1-DB-TEST
+auth:                CRYPT-PW agl7a6gyad/e6   # irt
+mnt-by:              TEST-MNT
+notify:              dbtest@ripe.net
+changed:             dbtest@ripe.net
+source:              DB-TEST
+
+
+password: auth
