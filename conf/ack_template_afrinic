@@ -732,7 +732,7 @@ No PGP error on object
 <xsl:if test="(@operation='Forward Create')>0">
 
 ***Info: <xsl:value-of select="class/@class"/>: objects cannot be created automatically
-         The object has been forwarded to the RIPE
+         The object has been forwarded to the AfriNic
          Database Administration for authorisation.
          You will receive further notification when 
          this request is processesed.
@@ -741,7 +741,7 @@ No PGP error on object
 <xsl:if test="(@operation='Forward Modify')>0">
 
 ***Info: <xsl:value-of select="class/@class"/>: objects cannot be modified automatically
-         The object has been forwarded to the RIPE
+         The object has been forwarded to the AfriNic
          Database Administration for authorisation.
          You will receive further notification when 
          this request is processesed.
@@ -750,7 +750,7 @@ No PGP error on object
 <xsl:if test="(@operation='Forward Delete')>0">
 
 ***Info: <xsl:value-of select="class/@class"/>: objects cannot be deleted automatically
-         The object has been forwarded to the RIPE
+         The object has been forwarded to the AfriNic
          Database Administration for authorisation.
          You will receive further notification when 
          this request is processesed.

@@ -45,10 +45,15 @@ Auto-Submitted: auto-generated
 
 
   <xsl:template match="notif_message">
-  Please process the object below:
+  Please process the object <xsl:value-of select="op/text()"/> below:
 
 ---
 <xsl:value-of select="message/text()"/>
+  </xsl:template>
+
+  <xsl:template match="policy_fail">
+ 
+***Info: <xsl:value-of select="reason/text()"/>
   </xsl:template>
 
 
