@@ -694,6 +694,27 @@ char *filter(const char *str) {
   return result;
 } /* filter() */
 
+/* add_parent adds a "parent:" attributes to inet(6)num object if any */
+
+char *add_parent(int id, char *str, GList *par_list)
+{
+  if (par_list != NULL) {
+    GList    *qitem;
+
+    for( qitem = g_list_first(par_list); qitem != NULL; qitem = g_list_next(qitem))
+    {
+      id_parent_t *item = qitem->data;
+      if (id == item->object_id)
+      {
+        str = (char *) UT_realloc (str, strlen(str) + strlen(item->parent_list) + 2 );
+        strcat (str, item->parent_list);
+        return str;
+      }
+    }
+  }
+  return str;
+} /* add_parent */
+
 /* write_results() */
 /*++++++++++++++++++++++++++++++++++++++
   Write the results to the client socket.
@@ -715,10 +736,12 @@ static int write_results(SQ_result_set_t *result,
 			 unsigned fast,
 			 sk_conn_st *condat,
 			 acc_st    *acc_credit,
-			 acl_st    *acl
+			 acl_st    *acl,
+       GList *par_list
 			 ) {
   SQ_row_t *row;
   char *str;
+  char *id;
   char *filtrate;
   char *fasted;
   int retrieved_objects=0;
@@ -735,7 +758,7 @@ static int write_results(SQ_result_set_t *result,
 	    && AC_credit_isdenied( acc_credit ) == 0
 	    && (row = SQ_row_next(result)) != NULL ) {
       
-      dieif (  (str = SQ_get_column_string(result, row, 0)) == NULL )
+      dieif (  (id = SQ_get_column_string(result, row, 0)) == NULL )
       dieif (  (objt = SQ_get_column_string(result, row, 3)) == NULL );
 
       /* get + add object type */
@@ -743,11 +766,8 @@ static int write_results(SQ_result_set_t *result,
 	
       /* ASP_QI_LAST_DET */
       LG_log(qi_context, LG_DEBUG, 
-	     "Retrieved serial id = %d , type = %s", atoi(str), objt);
+	     "Retrieved serial id = %d , type = %s", atoi(id), objt);
 	
-      UT_free(str);
-      UT_free(objt);
-      
       /* decrement credit for accounting purposes */
       AC_count_object( acc_credit, acl, 
 		       type == C_PN || type == C_RO || type == C_MT || type == C_OA); /* is private? */
@@ -761,7 +781,14 @@ static int write_results(SQ_result_set_t *result,
       
       if ((str = SQ_get_column_string(result, row, 2)) == NULL) { die; } 
       else {
-	
+        
+        if (type == C_IN || type == C_I6) {
+          /* add "parent:" attribute for inet(6)num */
+          str = add_parent(atoi(id), str, par_list);
+        }
+        UT_free(id);
+        UT_free(objt);
+
         /* The fast output stage */
         if (fast == 1) {
           fasted = QI_fast_output(str);
@@ -858,7 +885,8 @@ qi_write_objects(SQ_connection_t **sql_connection,
 			  unsigned int fast, 
 			  sk_conn_st *condat,
 			  acc_st    *acc_credit,
-			  acl_st    *acl
+			  acl_st    *acl,
+        GList *par_list
 			  ) 
 {
   SQ_result_set_t *result = NULL;
@@ -878,11 +906,11 @@ qi_write_objects(SQ_connection_t **sql_connection,
   
   if( condat->rtc == 0) {
     retrieved_objects = write_results(result, filtered, fast, condat, 
-				      acc_credit, acl);
+				      acc_credit, acl, par_list);
     SQ_free_result(result); 
   }
   return 0;
-} /* qi_write_objects() */
+} /* qi_write_objects */
 
 /* rx_node_has_mnt_irt() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -1086,9 +1114,11 @@ More:
 static void write_radix_immediate(GList *datlist, 
 				  sk_conn_st *condat,
 				  acc_st    *acc_credit,
-				  acl_st    *acl) 
+				  acl_st    *acl
+          ) 
 {
   GList    *qitem;
+  char print_buf[25];
   
   for( qitem = g_list_first(datlist); qitem != NULL; qitem = g_list_next(qitem)) {
     rx_datcpy_t *datcpy = qitem->data;
@@ -1575,7 +1605,19 @@ exit_qi_collect_domain:
 //  return error;
 //}/* add_ref_name */
 
+/* a helper function to clean config variables */
 
+char *remove_EOLs(char *arg)
+{
+  while ( strlen(arg) > 0 &&
+          (arg[strlen(arg) - 1] == '\n' || 
+           arg[strlen(arg) - 1] == '\r') )
+  {
+    arg[strlen(arg) - 1] = '\0';
+  }
+ 
+  return arg;
+}
 
 /* qi_collect_ids */
 /*++++++++++++++++++++++++++++++++++++++ 
@@ -1617,6 +1659,7 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
 	       Query_environ *qe,	
 	       char *id_table,
 	       GList **datlist,
+         GList **par_list,
 	       acc_st *acc_credit,
 	       acl_st *acl
 	       )
@@ -1733,6 +1776,7 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
      
 
       if( NOERR(err)) {
+        char *rir;
         LG_log(qi_context, LG_DEBUG, 
 		    "%d entries after %s (mode %d par %d reg %d) query for %s",
 		    g_list_length(*datlist),
@@ -1740,6 +1784,58 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
 		    qi->rx_srch_mode, qi->rx_par_a, 
 		    dbhdl,
 		    qi->rx_keys);
+     
+        /* parents */
+        rir = ca_get_rir;   
+        rir = remove_EOLs(rir);
+        if (strcasecmp(rir, "AFRINIC") == 0 ) {
+        {
+           GList    *qitem;
+           for( qitem = g_list_first(*datlist); qitem != NULL; qitem = g_list_next(qitem)) {
+              GList *parents=NULL;
+              GList *parent_item;
+              char *parent_list = strdup("");
+              rx_datcpy_t *datcpy = qitem->data;
+              ip_range_t searchrange = datcpy->leafcpy.iprange;
+              char search_str[50];
+
+              if (IP_rang_b2a(&searchrange, search_str, 49) == IP_OK) {
+
+                err = RP_asc_search(RX_SRCH_LESS, 1, 0,
+                          search_str, dbhdl,
+                          Query[qi->queryindex].attribute,
+                          &parents, limit);
+
+                for( parent_item = g_list_first(parents); parent_item != NULL; parent_item = g_list_next(parent_item)) 
+              {              
+                  rx_datcpy_t *parentcpy = parent_item->data;
+                  ip_range_t iprange = parentcpy->leafcpy.iprange;
+                  char range_str[50];
+
+                  if (IP_rang_b2a(&iprange, range_str, 49) == IP_OK)
+                { 
+                    parent_list = (char *) UT_realloc (parent_list, strlen(parent_list)+66); 
+                    strcat (parent_list, "parent:       ");
+                    strcat (parent_list, range_str);
+                    strcat (parent_list, "\n");
+                }
+              }
+              if (g_list_length(parents) > 0) 
+              {
+                /* now create a structure and add it to the list */
+                id_parent_t *id_parent;
+
+                id_parent = (id_parent_t *)UT_calloc(1, sizeof(id_parent_t));
+                id_parent->object_id = datcpy->leafcpy.data_key; 
+                id_parent->parent_list = parent_list;
+
+                /* add it to the return list */
+                *par_list = g_list_append(*par_list, id_parent); 
+              }
+           }
+          }
+        } /* parents */
+        UT_free(rir);
       }
       else {
         LG_log(qi_context, LG_INFO,
@@ -1951,6 +2047,7 @@ int QI_execute(ca_dbSource_t *dbhdl,
   char id_table[64];
   char sql_command[STR_XL];
   GList *datlist=NULL;
+  GList *par_list=NULL;
   SQ_connection_t *sql_connection=NULL;
   int sql_error;
 
@@ -2000,7 +2097,7 @@ int QI_execute(ca_dbSource_t *dbhdl,
   if (!sql_error) { 
       srcnam = ca_get_srcname(dbhdl);
       sql_error = qi_collect_ids(dbhdl, srcnam, &sql_connection, qis, qe, 
-                                 id_table, &datlist, acc_credit, acl);
+                                 id_table, &datlist, &par_list, acc_credit, acl);
       UT_free(srcnam);
   }
 
@@ -2044,13 +2141,13 @@ int QI_execute(ca_dbSource_t *dbhdl,
   
   /* display the immediate data from the radix tree */
   if (!sql_error && (qis->filtered == 1)) {
-    write_radix_immediate(datlist, &(qe->condat), acc_credit, acl );
+    write_radix_immediate(datlist, &(qe->condat), acc_credit, acl);
   }
 
   /* display objects from the IDs table */
   if (!sql_error) {
       sql_error = qi_write_objects( &sql_connection, id_table, qis->filtered,
-		                qis->fast, &(qe->condat), acc_credit, acl);
+		                qis->fast, &(qe->condat), acc_credit, acl, par_list);
   }
 
   /* drop the table */
@@ -2063,6 +2160,17 @@ int QI_execute(ca_dbSource_t *dbhdl,
 
   /* Now disconnect (temporary tables get dropped automatically) */
   SQ_close_connection(sql_connection);  
+
+  /* clean the list of parents */
+  if (par_list != NULL) {
+  GList *p;
+  id_parent_t *t;
+    for (p=par_list; p != NULL; p = g_list_next(p)) {
+        t = (id_parent_t *)p->data;
+        UT_free(t->parent_list);
+    }
+    g_list_free(par_list);
+  }
 
   /* return appropriate value */
   if (sql_error) {
@@ -2216,7 +2324,7 @@ Query_instructions *QI_new(const Query_command *qc, const Query_environ *qe) {
 
         if (query_str!= NULL) {
           tmp_qi.query_str = query_str;
-          qi = (Query_instruction *)UT_calloc(1, sizeof(Query_instruction));
+          qi = (Query_instruction *) UT_calloc (1, sizeof(Query_instruction));
           *qi = tmp_qi;
           qis->instruction[i_no++] = qi;
         }
@@ -2306,7 +2414,7 @@ char *QI_queries_to_string(Query_instructions *qis)
        char *descr = Query[qi->queryindex].descr;
        int oldres = strlen( resstr );
        
-       resstr = (char *)UT_realloc(resstr, oldres+strlen(descr)+2);
+       resstr = (char *) UT_realloc (resstr, oldres+strlen(descr)+2);
        strcat(resstr, descr);
        strcat(resstr, ",");
    }
@@ -2321,12 +2429,10 @@ char *QI_queries_to_string(Query_instructions *qis)
    return resstr;
 }
 
-
 void
 QI_init (LG_context_t *qi_ctx, LG_context_t *sql_ctx)
 {
   qi_context = qi_ctx;
   sql_context = sql_ctx;
 }
-
 

@@ -50,6 +50,12 @@
 #define QI_CANTDB   1
 #define QI_SQLERR   2
 
+typedef struct {
+  sql_key_t object_id;    // the key to a full-text record in SQL
+  char *    parent_list;  // formatted list of parent ranges; 
+                          // please free after use
+} id_parent_t;
+
 /*
 --- snipped from http://www.tcx.se/Manual/manual.html ---
 
