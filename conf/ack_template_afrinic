@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-<xsl:import href="ack_text"/>
+<xsl:import href="ack_text_afrinic"/>
 
 <xsl:variable name="level_none">0</xsl:variable>
 <xsl:variable name="level_debug">1</xsl:variable>
@@ -19,14 +19,14 @@
 
 <xsl:template match="RDNSuseotherrir">
 
-***Error: RIPE NCC is currently not responsible for the delegation
+***Error: AfriNic is currently not responsible for the delegation
           this address space. Please use the appropriate RIR,
           in this case, <xsl:apply-templates/>.
 </xsl:template>
 
 <xsl:template match="RDNScannotregister">
 
-***Error: RIPE NCC is currently not responsible for the delegation
+***Error: AfriNic is currently not responsible for the delegation
           of this address space.
 </xsl:template>
 
@@ -37,7 +37,7 @@
 
 <xsl:template match="RDNSnotdelegated">
 
-***Error: RIPE NCC is currently not responsible for the delegation
+***Error: AfriNic is currently not responsible for the delegation
           of this address space.
 </xsl:template>
 
@@ -60,7 +60,7 @@
 
 <xsl:template match="RDNSparenthasourns">
 
-***Info: Parent has RIPE NCC nameservers.
+***Info: Parent has AfriNic nameservers.
 </xsl:template>
 
 <xsl:template match="RDNSoverlap">
@@ -224,7 +224,7 @@ key-cert operation OK
 
 
 
-  <xsl:template match="notification_header_from">From: RIPE Database Administration  &lt;<xsl:value-of select="from/text()"/>&gt;</xsl:template>
+  <xsl:template match="notification_header_from">From: AfriNic Database Administration  &lt;<xsl:value-of select="from/text()"/>&gt;</xsl:template>
 
   <xsl:template match="notification_header_to">
 To: <xsl:value-of select="to/text()"/>
@@ -235,7 +235,7 @@ Subject: <xsl:value-of select="result/text()"/>
   </xsl:template>
 
   <xsl:template match="notification_header_subject">: <xsl:value-of select="subject/text()"/>
-Reply-To: ripe-dbm@ripe.net
+Reply-To: AfriNic-dbm@ripe.net
 <xsl:text>
 
 </xsl:text>
