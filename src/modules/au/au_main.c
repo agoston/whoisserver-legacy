@@ -10,7 +10,11 @@
 #define ca_get_auth_plugins my_ca_get_auth_plugins()
 char *my_ca_get_auth_plugins() 
 {
+#ifdef RDNSYES
   return UT_strdup("rpsl\nripe\nirt\norganisation\nrdns");
+#else
+  return UT_strdup("rpsl\nripe\nirt\norganisation");
+#endif
 }
 
 
