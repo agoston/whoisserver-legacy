@@ -1059,30 +1059,18 @@ my $objects = 0;
     $input_redirect = $1;
     $commandline =~ s/<[\s]*(.*)[\s]*$//; # delete redirector and the filename
   }
-  my @args = split ('[\s]+', $commandline);
-
-  # if there are multiline arguments (in quotes), do a concatenation
-  my $buffer;
-  my @newargs;
-  foreach (@args) {
-    if (/^"/ && !$buffer) { # start buffer mode
-      $buffer = $_;
-      next;
-    }
-    if (/^.*"$/ && $buffer ) { # end of buffer mode
-      $buffer = $buffer."\n".$_;
-      push @newargs, $buffer;
-      undef $buffer;
-      next;
-    }
-    if ($buffer) { # in buffer mode
-      $buffer = $buffer."\n".$_;
-      next;
-    }
-    push @newargs, $_;
+  
+  # split the command line into space seperated arguments
+  # but keep anything between quotes ("") as one argument
+  my @args = ();
+  while ( $commandline =~ /"/ ) {
+    $commandline =~ /(.*?)"(.*?)"\s*(.*)$/s;
+    my ($bit1, $quoted, $bit3) = ($1, $2, $3);
+    $commandline = $bit3;
+    push @args, split ('[\s]+', $bit1);
+    push @args, $quoted;
   }
-
-  @args = @newargs;
+  push @args, split ('[\s]+', $commandline);
 
   my $command = splice (@args,0,1);
   my $pid = open3(*HIS_IN, *HIS_OUT, *HIS_ERR, $command, @args);
