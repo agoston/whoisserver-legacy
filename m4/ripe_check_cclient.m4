@@ -4,16 +4,18 @@ dnl
 
 AC_DEFUN(RIPE_CHECK_CCLIENT,[
 AC_ARG_WITH(cclientinc,
-    [  --with-cclientinc=DIR      DIR=path of c-client include dir[$ac_default_prefix/build/imap/c-client]],
+    [  --with-cclientinc=DIR
+     DIR=path of c-client include dir[$ac_default_prefix/build/imap/c-client]],
         if test [ x$withval != x ] -a [ -d $withval ]; then
           cclientinc=$withval
         else
-          echo "Please specify a suitable c-client include directory: --with-cclientinc=DIR"; exit 1
+          if test x$cclientinc = x
+          then
+            echo "Please specify a suitable c-client include directory: --with-cclientinc=DIR"; exit 1
+          fi
         fi ,
-        if test x$CCLIENTINC != x
+        if test x$cclientinc = x
         then
-          ccclientinc=$CCLIENTINC
-        else
           cclientinc=$ac_default_prefix/build/imap/c-client
         fi)
 
@@ -22,12 +24,13 @@ AC_ARG_WITH(cclientlib,
         if test [ x$withval != x ] -a [ -d $withval ]; then
           cclientlib=$withval
         else
-          echo "Please specify a suitable c-client library directory: --with-cclientlib=DIR"; exit 1
+          if test x$cclientlib = x
+          then
+            echo "Please specify a suitable c-client library directory: --with-cclientlib=DIR"; exit 1
+          fi
         fi ,
-        if test x$CCLIENTLIB != x
+        if test x$cclientlib = x
         then
-          cclientlib=$CCLIENTLIB
-        else
           cclientlib=$ac_default_prefix/build/imap/c-client
         fi)
 

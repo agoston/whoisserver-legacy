@@ -1,3 +1,5 @@
+M4PATH=m4
+
 AC_INIT([Whois Server], [3.3.0],
         [RIPE Database Management <ripe-dbm@ripe.net>],
         [whoisserver])
@@ -265,6 +267,7 @@ AC_SUBST(GLIB_LIBS)
 dnl Java related checks
 AC_PROG_JAVAC
 AC_PROG_JAVA
+AM_PROG_GCJ
 
 dnl Check for mysql
 AC_CHECK_MYSQLR
@@ -296,20 +299,64 @@ dnl Create links for header files
 AC_MSG_CHECKING([Creating Links])
 AC_CONFIG_COMMANDS([links],[
   OPWD=`pwd`
-  pwd
-  cd $ac_abs_top_srcdir/src/include
-  pwd
-  ln -sf ../modules/??/*.h .
-  ln -sf ../modules/rpsl/syntax_api.h syntax_api.h
-  cd $OPWD])
+  mkdir -p $ac_abs_top_builddir/src/include
+  cd $ac_abs_top_builddir/src/include
+  chmod u+rwx $ac_abs_top_builddir/src/include
+  OIFS=$IFS
+  IFS='
+'
+  AC_MSG_NOTICE([Linking in ${PWD}])
+  for file in $ac_abs_top_srcdir/src/modules/??/*.h $ac_abs_top_srcdir/src/modules/rpsl/syntax_api.h
+  do
+    ln -sf $file . 2>/dev/null
+  done
+  mkdir -p $ac_abs_top_builddir/src/modules/rpsl
+  cd $ac_abs_top_builddir/src/modules/rpsl
+  chmod u+rwx $ac_abs_top_builddir/src/include
+  AC_MSG_NOTICE([Linking in ${PWD}])
+  for file in $ac_abs_top_srcdir/src/modules/rpsl/*.h \
+    $ac_abs_top_srcdir/src/modules/rpsl/*.c \
+    $ac_abs_top_srcdir/src/modules/rpsl/*.l  \
+    $ac_abs_top_srcdir/src/modules/rpsl/*.y  
+  do
+    ln -sf $file . 2>/dev/null
+  done
+  IFS=$OIFS
+  cd $OPWD
+  ])
 AC_MSG_RESULT([Done])
 
 dnl Output & finalization
 AC_CONFIG_FILES([
   conf/rip.config.sample
   conf/rip.config.sample.q
+  conf/sources.config.sample
+  conf/sources.config.sample.q
+  conf/ack_template
+  conf/ack_text
+  conf/forw_create_template
+  conf/frwd_template
+  conf/frwd_text
+  conf/notif_template
+  conf/notif_text
+  conf/SAMPLE.CURRENTSERIAL
+  doc/AUTO-DBM-HELP
+  doc/WHOIS-HELP
   src/defs/makedefsall
   src/defs/Makefile
+  src/SQL/aux.index.2
+  src/SQL/create.RIPADMIN.sql.patch
+  src/SQL/fingerpr_x509.sql.patch
+  src/SQL/create.first-stage
+  src/SQL/create.second-stage
+  src/SQL/leaf.index.2
+  src/SQL/create.irt-tables.sql.patch
+  src/SQL/create.tables.sql
+  src/SQL/main.index.1
+  src/SQL/create.last-history-indexes.sql.patch
+  src/SQL/create.tables.sql.patch
+  src/SQL/create.RIPADMIN.sql
+  src/SQL/create.third-stage
   Makefile
   src/Makefile
   src/utils/wrapper
@@ -331,7 +378,10 @@ AC_CONFIG_FILES([
   src/utils/whoisd.server
   src/utils/whoisd_start])
 AC_CONFIG_COMMANDS([permissions],[
+  pwd; \
   chmod u+x src/defs/makedefsall; \
   chmod u+x src/utils/remadmin.pl; \
   chmod u+x src/utils/ftp_export.sh])
+AC_CONFIG_COMMANDS([sample database],[
+  gzip -9c conf/sample.db > ${ac_abs_builddir}/conf/sample.db.gz])
 AC_OUTPUT

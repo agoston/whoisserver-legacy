@@ -12,26 +12,27 @@ AC_ARG_WITH(rpslvariant,
    echo $RPSL_VARIANT > ./rpsl.variant])
 AC_MSG_CHECKING([setting default rpsl variant])
 AC_CONFIG_COMMANDS([variant],[
-  RPSL_VARIANT=`cat ./rpsl.variant 2>/dev/null `
+  RPSL_VARIANT=`cat $ac_abs_top_srcdir/rpsl.variant 2>/dev/null `
   export RPSL_VARIANT
-  cd src/defs
-  filestolink=variants/$RPSL_VARIANT/*.xml
-  if test x$filestolink != x
-  then
-    ln -sf variants/$RPSL_VARIANT/*.xml .
-  fi
-  filestolink=variants/$RPSL_VARIANT/*.h
-  if test x$filestolink != x
-  then
-    ln -sf variants/$RPSL_VARIANT/*.h .
-  fi
-  cd ../include
-  filestolink=../defs/variants/$RPSL_VARIANT/*.def
-  if test x$filestolink != x
-  then
-    ln -sf ../defs/variants/$RPSL_VARIANT/*.def .
-  fi
-  cd ../..])
+  mkdir -p $ac_abs_top_builddir/src/defs
+  for file in $ac_abs_top_srcdir/src/defs/variants/$RPSL_VARIANT/*.xml \
+              $ac_abs_top_srcdir/src/defs/variants/$RPSL_VARIANT/*.h \
+              $ac_abs_top_srcdir/src/defs/*.dtd
+  do
+    if test -f $file
+    then
+      ln -sf $file $ac_abs_top_builddir/src/defs 2>/dev/null
+    fi
+  done
+  mkdir -p $ac_abs_top_builddir/include
+  for file in $ac_abs_top_srcdir/src/defs/variants/$RPSL_VARIANT/*.def
+  do
+    if test -f $file
+    then
+      ln -sf $file $ac_abs_top_builddir/include 2>/dev/null
+    fi
+  done
+  ])
 variant=`cat ./rpsl.variant 2>/dev/null`
 AC_MSG_RESULT([$variant])
 ])
