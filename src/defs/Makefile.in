@@ -3,7 +3,7 @@ JAVAC=@JAVAC@ -classpath $(CLASSPATH)
 CPPFLAGS=@GLIB_CFLAGS@ -I../../include -I../../defs
 CFLAGS=@GLIB_CFLAGS@ -I../../include -I../../defs
 CC=@CC@
-DISTFILES = *.java *.class *.dtd makedefsall.in alltodo Makefile.in Makefile.syntax variants/*/* class_tab.h attribute_tab.h syntax_tab.h xalan/License xalan/README xalan/xerces.jar HOWTO README
+DISTFILES = *.java *.class *.dtd makedefsall.in alltodo Makefile.in Makefile.syntax variants/*/*.* class_tab.h attribute_tab.h syntax_tab.h xalan/License xalan/README xalan/xerces.jar HOWTO README
 top_srcdir = @top_srcdir@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 

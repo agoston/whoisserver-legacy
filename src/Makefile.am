@@ -48,7 +48,7 @@ EXTRA_DIST = include/rip.h \
              utils/noperson.sed \
              utils/md5_pw.c \
              utils/README.ip6arpa \
-             modules/MODULES \
+             MODULES \
              modules/rpsl/manual.txt \
              modules/rpsl/aggr_bndry.l \
              modules/rpsl/aggr_bndry.y \
@@ -166,7 +166,6 @@ EXTRA_DIST = include/rip.h \
              modules/ns/ns_util.h \
              modules/ns/ns_xml.h \
              modules/nt/notification.h \
-             modules/nt/lu_api.txt \
              modules/pc/pc_commands.h \
              modules/pc/protocol_config.h \
              modules/pg/pg.h \

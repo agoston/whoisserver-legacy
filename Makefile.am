@@ -10,7 +10,7 @@ EXTRA_DIST = rpsl.variant \
 	     UPDATE-DB-3.2.0 \
 	     WISHLIST \
 	     conf/SAMPLE.CURRENTSERIAL \
-	     conf/ack_template ack_text \
+	     conf/ack_template conf/ack_text \
 	     conf/delcheck-erx-ipv4-16 \
 	     conf/delcheck-ipv4-16 \
 	     conf/delcheck-ipv4-24 \
@@ -33,9 +33,12 @@ EXTRA_DIST = rpsl.variant \
 	     src/SQL/create.first-stage \
 	     src/SQL/create.irt-tables.sql.patch \
 	     src/SQL/create.last-history-indexes.sql.patch \
-	     src/SQL/create.second-stage create.tables.sql \
-	     src/SQL/create.tables.sql.patch create.third-stage \
-	     src/SQL/fingerpr_x509.sql.patch leaf.index.2 \
+	     src/SQL/create.second-stage 
+	     src/SQL/create.tables.sql \
+	     src/SQL/create.tables.sql.patch 
+	     src/SQL/create.third-stage \
+	     src/SQL/fingerpr_x509.sql.patch 
+	     src/SQL/leaf.index.2 \
 	     src/SQL/main.index.1
 
 install-exec-hook:
