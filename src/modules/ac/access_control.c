@@ -36,6 +36,7 @@
       
 */
 
+#include "config.h"
 #define AC_IMPL
 #include "rip.h"
 
