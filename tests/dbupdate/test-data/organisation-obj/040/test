@@ -13,6 +13,7 @@
 organisation:  ORG-Eoof1-DB-TEST
 org-name:      EXAMPLE organisation object for tests
 org-type:      RIR
+country:       NL
 address:       Address
 e-mail:        dbtest@ripe.net
 admin-c:       TP1-DB-TEST

@@ -14,6 +14,7 @@
 organisation:  AUTO-1
 org-name:      EXAMPLE TTTTTT
 org-type:      LIR
+country:       NL
 address:       Address
 e-mail:        dbtest@ripe.net
 admin-c:       TP1-DB-TEST

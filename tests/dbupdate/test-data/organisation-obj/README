@@ -517,3 +517,16 @@
 # rir AFRINIC
 
 
+# CASE 44: Create an org object
+#          with an AUTO-1 nic-hdl (orgID)
+#          with override override
+#          no country: attribute
+#
+# create organisation object 
+#
+#FAILED
+#
+# RESULT 44: The creation will fail
+# rir AFRINIC
+
+
