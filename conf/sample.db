@@ -1,0 +1,348 @@
+mntner:      TEST-DBM-MNT
+descr:       Mntner for DB objects.
+admin-c:     
++
+ RDBM-SAMPLE
+tech-c:      
+             RDBM-SAMPLE
+upd-to:      bitbucket@ripe.net
+mnt-nfy:     bitbucket@ripe.net
+auth:        CRYPT-PW re45C38li6ADw 
+mnt-by:      TEST-DBM-MNT
+referral-by: TEST-DBM-MNT # something new
+changed:     bitbucket@ripe.net 20001208
+source:      SAMPLE
+
+
+role:        TEST DBM
+nic-hdl:     RDBM-SAMPLE # just an ID
+address:     Singel 258
+address:     NL-1016 AB Amsterdam
+address:     Kingdom of the Netherlands
+e-mail:      bitbucket@ripe.net
+trouble:     No, I'm OK, thanks.
+tech-c:      RH1-SAMPLE # technical contact
+admin-c:     RH1-SAMPLE # administrative contact
+changed:     bitbucket@ripe.net 20001208
+phone:       +31 20 535 4444
+source:      SAMPLE
+
+
+route:        191.255.0.0/16
+descr:        RPSL advanced route object #
+origin:       AS65000         
+changed:      bitbucket@ripe.net 20000101
+aggr-bndry:   AS65001 OR AS65002
+aggr-mtd:     outbound AS-ANY
+components:   {191.255.0.0/15^15-20}
+inject:       at 7.7.7.1 action next-hop = 7.7.7.2;
+              cost = 10; upon static
+mnt-by:       TEST-DBM-MNT
+member-of:    RS-MARTIANS, RS-FOO, RS-BAR,
+ RS-JAR, RS-CAR, RS-BLOB
+source:       SAMPLE
+
+
+inet6num:      
+ 0::/0
+netname:       
++
+ EARTH-IPV6
++
+descr:         The Whole IPv6
++
++
++
+country:       NL
+remarks:       Country is really worldwide
+source:        SAMPLE
+admin-c:       RDBM-SAMPLE
+tech-c:        RDBM-SAMPLE
+mnt-by:        TEST-DBM-MNT
+changed:       bitbucket@ripe.net 20001208
+
+
+inet-rtr: route-me.ripe.net
+source:        SAMPLE 
+mnt-by:        TEST-DBM-MNT 
+member-of:     RTRS-FOO
+tech-c:        RH1-SAMPLE 
+alias:   router.ripe.net
+changed:       bitbucket@ripe.net 20001207 
+admin-c:       RH1-SAMPLE
+ifaddr:        123.123.0.1 MASKLEN 24
+local-as: AS5
+descr:         Edge router-- testing
+
+
+route: 
++
+ 182.16.6.0/24
+descr: Testing
+origin: AS5
+mnt-by: TEST-DBM-MNT 
+changed: bitbucket@ripe.net 20000101
+source: SAMPLE
+
+
+peering-set: PRNG-TESTTEST
+changed:   bitbucket@ripe.net 20001208
+source:        SAMPLE
+admin-c:       RDBM-SAMPLE
+tech-c:        RDBM-SAMPLE
+mnt-by:        TEST-DBM-MNT
+descr:         Testing 
+   peering-sets
+peering: AS4 at 123.123.123.4
+
+
+route: 
++
+        182.16.5.0/24
+descr: Testing
+origin: AS5
+mnt-by: 
+ TEST-DBM-MNT # An attribute's value can be split over multiple lines, by having a space, a tab or a plus ('+') character as the first character of the continuation lines.  The character "+" for line continuation allows attribute values to contain blank lines.  More spaces may optionally be used after the continuation character to increase readability.
+changed: bitbucket@ripe.net 2000010
+source: SAMPLE
+
+
+route-set: RS-TESTTEST 
+descr: Testing
+mnt-by: TEST-DBM-MNT 
+changed: bitbucket@ripe.net 20000101
+source: SAMPLE
+tech-c: RDBM-SAMPLE
+admin-c: RDBM-SAMPLE
+members: 182.16.5.0/24
+
+
+
+filter-set: FLTR-SET 
+descr: Testing
++
+mnt-by: TEST-DBM-MNT 
+changed: bitbucket@ripe.net 20000101
+source: SAMPLE
+tech-c: RDBM-SAMPLE
+admin-c: RDBM-SAMPLE
+filter: {3.0.0.0/8, 5.0.0.0/8} 
+
+
+as-block:      AS64512 
+ - 
+ AS65534
++
+descr:         IANA reserved blocks 
+remarks:       These AS numbers should only be used for internal BGP
+               peering.  Please consult RFC 1930.
+remarks:       Martians
+remarks:       Remarks are very important 
++
++
+tech-c:        RH1-SAMPLE 
+source:        SAMPLE 
+mnt-by:        TEST-DBM-MNT 
+changed:       bitbucket@ripe.net 20001208 
+descr:         Describing is difficult
++     but useful
++     
+admin-c:       RH1-SAMPLE 
+
+
+rtr-set:     RTRS-FOO
+members:     rtr1.isp.net, rtr2.isp.net
+source:      SAMPLE
+mbrs-by-ref: ANY 
+changed: bitbucket@ripe.net 20001212
+descr: Bogus Description
+mnt-by: TEST-DBM-MNT
+admin-c: RH1-SAMPLE
+tech-c:  RH1-SAMPLE
+
+
+person:    Test 
++
+ Person
+nic-hdl:   ET1-SAMPLE # eoc
+source:    SAMPLE
+changed:   bitbucket@ripe.net 
+        20001129
+address:   Test Address
+  second line
++
++
+phone: +32 32 32
+
+inetnum:       182.16.0.0 - 182.16.255.255
+netname:       A-TEST-INETNUM             
+descr:         A slash sixteen
+country:       NL
+remarks:       Country is really worldwide
+mnt-routes:    TEST-DBM-MNT {182.16.144/23}
+admin-c:       RDBM-SAMPLE
+tech-c:        RDBM-SAMPLE
+status:        ALLOCATED PI
+notify:        bitbucket@ripe.net
+mnt-by:        TEST-DBM-MNT
+changed:       bitbucket@ripe.net 20001208
+source:        SAMPLE
+
+
+route-set: RS-MARTIANS
+source:    SAMPLE
+descr:     Networks that should not be injected into the default-free
+           route table
++
+remarks:   zero network is reserved
+members:   0.0.0.0/8 # zero network is reserved
+remarks:   allocations for private networks (RFC1918 space)
+members:   10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+remarks:   loopback network
+members:   127.0.0.0/8
+remarks:   link-local network
++
+members:   169.254.0.0/16
+remarks:   IANA test/reserved networks
+members:   191.255.0.0/16, 192.0.0.0/24, 192.0.2.0/24, 223.255.255.0/24
+remarks:   multicast networks
+members:   224.0.0.0/4
+remarks:   the rest of the "class D" networks
+members:   240.0.0.0/4
+remarks:   martian
+mbrs-by-ref: TEST-DBM-MNT
+changed:   bitbucket@ripe.net 20000101
+admin-c:   RDBM-SAMPLE
+tech-c:    RDBM-SAMPLE
+mnt-by:       TEST-DBM-MNT
+
+
+role: Test Role
+nic-hdl: TR1-SAMPLE # An RPSL object is textually represented as a list of attribute-value pairs.  Each attribute-value pair is written on a separate line.  The attribute name starts at column 0, followed by character ":" and followed by the value of the attribute.  The attribute which has the same name as the object's class should be specified first.  
+source: SAMPLE
+changed: bitbucket@ripe.net 20001130
+address: Test Address
+  second line
+phone: +32 32 32
+e-mail: bitbucket@ripe.net
+admin-c: ET1-SAMPLE
+tech-c: ET1-SAMPLE
+
+
+inetnum:       0.0.0.0 
++ - 
++
+ 255.255.255.255
+netname:       
++
+ WHOLE-IPV4
++
+descr:         The Whole IPv4
+country:       NL
+remarks:       Country is really worldwide
++
+admin-c:       RDBM-SAMPLE # admin contact
+tech-c:        RDBM-SAMPLE # tech contact
+status:        ALLOCATED PI
+notify:        bitbucket@ripe.net
+mnt-by:        TEST-DBM-MNT
+changed:       bitbucket@ripe.net 20001208
+source:        SAMPLE
+
+
+domain:       tt 
+descr:        Testing Domain 
++
+              Domain description goes here
++
+tech-c:       RDBM-SAMPLE 
+zone-c:       RH1-SAMPLE 
+source:       SAMPLE
+nserver:      ns.some.net
+sub-dom:      aa, bb, cc 
+admin-c:      RH1-SAMPLE 
+dom-net:      158.75.254.0, # dom-net attribute
++
+ 158.75.253.0, # still dom-net
+ 158.75.252.0  # An attribute's value can be split over multiple lines, by having a space, a tab or a plus ('+') character as the first character of the continuation lines.  The character "+" for line continuation allows attribute values to contain blank lines.  More spaces may optionally be used after the continuation character to increase readability.
+changed:      bitbucket@ripe.net 19990711
+
+
+key-cert:    PGPKEY-B9809F41
+source: SAMPLE
+certif:      -----BEGIN PGP PUBLIC KEY BLOCK-----
+certif:      Version: 2.6.3i
+certif:      
+certif:      mQCNAzHo97IAAAEEALapce/FRz3vKnSujpXAarAlzOc5iBXELiqzQ1mvOFll7mq1
+certif:      sRBZAr7AP7K+DJ0+zchHRMUQD/QRLxoc2kYYIfFe0ceHytXcY6Ngvozhj/8hrXwd
+certif:      cbzQ/Won/GD40Mfhx8rVjOS6TbLRvewIONyhPcfbWUSwCrDG5WPeRuG5gJ9BAAUR
+certif:      tDpKZWFuLVBoaWxpcHBlIERvbm5pbyAtIFRCUy1pbnRlcm5ldCA8dGFnQFRCUy1p
+certif:      bnRlcm5ldC5jb20+iQCVAwUQM2IdA2PeRuG5gJ9BAQF2xgQApZ4l7t/RqIxCCbcN
+certif:      wDKFMyVB+J8cVOYF98bpxDdaW6H6DcsHk8wtEXHjQ633UvGOnBinoQdWdDp1/cp+
+certif:      o0RxrSMkGvJpV8O3RWLs3sPST2XPOoPJP137dVkUKbhlUcO5/KJXEs4LEdal99E9
+certif:      NsMCwHBACGN62/hiKq10wFvdK+G0J0plYW4tUGhpbGlwcGUgRG9ubmlvIDx0YWdA
+certif:      dGFnczEuZG4ubmV0PokAlQMFEDHqIKfMFkgNVGXnMQEBf6QD/3amFOknw1yOBCCl
+certif:      FTUHCd+NKO140JAVe31f5K4WSW6RO93JDp+zCKXaFIehKQKLEZiZc7cSVLsuIZp7
+certif:      0HXzpStmH1r7oEvGW+LbD5kpunAPwpGn37ed8c3Ruff6z0Usi/0BSZT4z/34UPNN
+certif:      7SEmxcujGca91u7307ynTPL7IoYsiQB1AwUQMeogmVYAhCVdmWZJAQEKAwL/ewRi
+certif:      L5RTMSadPtq04/Nl9msX+Th3KddRF63MztpEkHR+8hZtQQGkaVLLvxK3fOuqEswt
+certif:      hBycsv4RR4l9U5amctpU35Pa8oljlNDq8Rlb7b+k5ra4fgYpMOchDJHpmegEiQB1
+certif:      AwUQMeoNX5Hnbf+TFKzhAQHLNgMAn/lDJFVFW+MSoSVN8UYc2CGsmpfNzr1J+58O
+certif:      1btqrS8vJhFKMwhQyULRvCnLnQtGbxJ4kJwg1jYwivG+u8Ky7SlRIGJPGE9F0x0v
+certif:      gOUaJ/2eK0UMtG9Igt/X3iMgj3d9
+certif:      =7qJ2
+certif:      -----END PGP PUBLIC KEY BLOCK-----
+mnt-by:      TEST-DBM-MNT 
+changed:     some@some.net 19991212
+
+
+person:      RipeDbm HotSeat
+ Of The
++
+ Week
++
++
+address:     Singel 258
+address:     NL-1016 AB  Amsterdam
+address:     Kingdom of the Netherlands
+phone:       +31 20 535 4444
+e-mail:      bitbucket@ripe.net
+nic-hdl:     RH1-SAMPLE
+changed:     bitbucket@ripe.net 20001207
+source:      SAMPLE
+
+
+as-set:        AS-GROUP        
+descr:         Testing the as-set
+               continue your description here 
+members:       AS-OTHERGROUP, AS65000, AS65001, AS65002, AS65003,
++
+               AS65004, AS65005, AS65006, AS65007
+mbrs-by-ref:   TEST-DBM-MNT # members by reference
+mnt-by:        TEST-DBM-MNT                 
+tech-c:        RH1-SAMPLE 
+changed:       bitbucket@ripe.net 20001207 
+source:        SAMPLE 
+admin-c:       RH1-SAMPLE
+
+aut-num:       AS64515
+descr:         Testing the aut-nums
+               continue your description here
++
+import:        from AS64700
+               action pref=80;
+               accept ANY AND NOT {0.0.0.0/0}
+export:        to AS64700
+               announce AS-GROUP 
+remarks:       End of policy description
++
+member-of:     AS-GROUP
+mnt-by:        TEST-DBM-MNT 
+tech-c:        RH1-SAMPLE 
+mnt-routes:    TEST-DBM-MNT 
+mnt-lower:     TEST-DBM-MNT
+changed:       bitbucket@ripe.net 20001207 
+source:        SAMPLE 
+as-name:       AS-BES-FIVE 
+admin-c:       RH1-SAMPLE
+
