@@ -10,7 +10,12 @@ AC_ARG_WITH(cclientinc,
         else
           echo "Please specify a suitable c-client include directory: --with-cclientinc=DIR"; exit 1
         fi ,
-        cclientinc=$ac_default_prefix/build/imap/c-client)
+        if test x$CCLIENTINC != x
+        then
+          ccclientinc=$CCLIENTINC
+        else
+          cclientinc=$ac_default_prefix/build/imap/c-client
+        fi)
 
 AC_ARG_WITH(cclientlib,
     [  --with-cclientlib=DIR      DIR=path of c-client library dir[$ac_default_prefix/build/imap/c-client]],
@@ -19,7 +24,12 @@ AC_ARG_WITH(cclientlib,
         else
           echo "Please specify a suitable c-client library directory: --with-cclientlib=DIR"; exit 1
         fi ,
-        cclientlib=$ac_default_prefix/build/imap/c-client)
+        if test x$CCLIENTLIB != x
+        then
+          cclientlib=$CCLIENTLIB
+        else
+          cclientlib=$ac_default_prefix/build/imap/c-client
+        fi)
 
 AC_CHECK_FILE($cclientinc/mail.h, ,
   if test x"$OPLONLY" != xyes
