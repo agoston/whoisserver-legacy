@@ -215,3 +215,111 @@
 #SUCCESS
 #
 # RESULT 20: The creation will succeed.
+
+
+# The following tests assume there is a lookup file with Sub Allocation
+# Window values. The file location is set in rip.config.
+# The assumed content is:
+
+# ORG-ABC123-DB-TEST,24,64
+
+
+# CASE 21: We try to create inetnum object 80.16.151.184 - 80.16.151.184
+# start IP == end IP
+#
+# create inetnum object with status SUB-ALLOCATED PA and no org: object
+#
+#FAILURE
+#
+# RESULT 21: The creation will fail.
+# rir AFRINIC
+
+
+# CASE 22: We try to create inetnum object 80.16.151.184 - 80.16.151.184
+# start IP == end IP
+#
+# create inetnum object with status SUB-ALLOCATED PA 
+# size is within the sub allocation window size
+#
+#SUCCESS
+#
+# RESULT 22: The creation will succeed.
+# rir AFRINIC
+
+
+# CASE 23: We try to create inetnum object 80.16.0.0 - 80.16.151.184
+#
+# create inetnum object with status SUB-ALLOCATED PA 
+# size is bigger than the sub allocation window size
+# no override password
+#
+#NOOP
+#
+# RESULT 23: The creation will be a NOOP
+#            and it is forwarded to the hostmaster.
+# rir AFRINIC
+
+
+# CASE 24: We try to create inetnum object 80.16.0.0 - 80.16.151.184
+#
+# create inetnum object with status SUB-ALLOCATED PA 
+# size is bigger than the sub allocation window size
+# with override password
+#
+#SUCCESS
+#
+# RESULT 24: The creation will be a success
+# rir AFRINIC
+
+
+# CASE 25: We try to create inetnum object 80.16.0.0 - 80.16.151.184
+#          and a person object test person2
+#
+# create inetnum object with status SUB-ALLOCATED PA 
+# size is bigger than the sub allocation window size
+# no override password
+# including a new person object
+#
+#SUCCESS
+#
+# RESULT 25: The creation of the inetnum will be a NOOP
+#            and it is forwarded to the hostmaster,
+#            and the person object will be a success.
+# rir AFRINIC
+
+
+# CASE 26: We try to create inetnum object 80.16.0.0 - 80.16.0.255
+#
+# create inetnum object with status SUB-ALLOCATED PA 
+# size is equal to the sub allocation window size
+#
+#SUCCESS
+#
+# RESULT 26: The creation will succeed.
+# rir AFRINIC
+
+
+# CASE 27: We try to create inetnum object 80.16.0.0 - 80.16.151.255
+#
+# create inetnum object with status ASSIGNED PA 
+# size is bigger than the sub allocation window size
+# no override
+#
+#SUCCESS
+#
+# RESULT 27: The creation will succeed.
+# rir AFRINIC
+
+
+# CASE 28: We try to create inetnum object 80.16.0.0 - 80.16.151.255
+#
+# create inetnum object with status ALLOCATED PA 
+# size is bigger than the sub allocation window size
+# no override
+#
+#SUCCESS
+#
+# RESULT 28: The creation will succeed.
+# rir AFRINIC
+
+

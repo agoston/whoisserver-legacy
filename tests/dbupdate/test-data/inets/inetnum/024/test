@@ -1,0 +1,28 @@
+# CASE 24: We try to create inetnum object 80.16.0.0 - 80.16.151.184
+#
+# create inetnum object with status SUB-ALLOCATED PA 
+# size is bigger than the sub allocation window size
+# with override password
+#
+#SUCCESS
+#
+# RESULT 24: The creation will be a success
+# rir AFRINIC
+
+
+inetnum:      80.16.0.0 - 80.16.151.184
+netname:      TEST-NET-NAME
+org:          ORG-ABC123-DB-TEST
+descr:        TEST network
+country:      NL
+status:       SUB-ALLOCATED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+override:     password
+
+password: hostmaster
+
