@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.4 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -33,6 +33,7 @@
   ***************************************/
 #include "rip.h"
 
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include <glib.h>

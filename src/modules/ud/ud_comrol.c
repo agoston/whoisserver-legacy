@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   rollback(), commit(), delete() - rollback, commit update transaction, delete an object
 
@@ -31,6 +31,7 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ***************************************/
 
+#include "config.h"
 #include "rip.h"
 #include "UD_comrol.def"
 #include "syntax_api.h"

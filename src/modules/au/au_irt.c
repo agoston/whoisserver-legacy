@@ -1,3 +1,4 @@
+#include "config.h"
 #include <string.h>
 #include "au_plugins.h"
 #include "au_util.h"

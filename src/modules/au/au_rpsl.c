@@ -1,5 +1,6 @@
 /* XXX: a lot of duplicated code can probably be reduced */
 
+#include "config.h"
 #include <glib.h>
 
 #undef MIN

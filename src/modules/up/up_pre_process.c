@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   UP pre process checks
 
@@ -34,6 +34,7 @@
  ***************************************/
 
 
+#include "config.h"
 #include <assert.h>
 #include "rip.h"
 

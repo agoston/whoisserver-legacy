@@ -378,7 +378,6 @@ AC_CONFIG_FILES([
   src/utils/whoisd.server
   src/utils/whoisd_start])
 AC_CONFIG_COMMANDS([permissions],[
-  pwd; \
   chmod u+x src/defs/makedefsall; \
   chmod u+x src/utils/remadmin.pl; \
   chmod u+x src/utils/ftp_export.sh])
