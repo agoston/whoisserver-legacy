@@ -709,15 +709,15 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
    <attribute_syntax name="status-i6">
        <front_end>
            <regex>
-               ^(ALLOCATED-BY-RIR|ALLOCATED-BY-LIR|ASSIGNED)$
+               ^(ALLOCATED-BY-RIR|SUB-ALLOCATED PA|ASSIGNED PA)$
            </regex>
        </front_end>
        <description>
      Status can have one of these values:
 
      o ALLOCATED-BY-RIR
-     o ALLOCATED-BY-LIR
-     o ASSIGNED
+     o SUB-ALLOCATED PA
+     o ASSIGNED PA
        </description>
    </attribute_syntax>
 

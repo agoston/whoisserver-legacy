@@ -17,13 +17,20 @@
 
 AU_ret_t ripe_inetnum_checks(au_plugin_callback_info_t *info);
 AU_ret_t ripe_inet6num_checks(au_plugin_callback_info_t *info);
+AU_ret_t afrinic_inetnum_checks(au_plugin_callback_info_t *info);
+AU_ret_t afrinic_inet6num_checks(au_plugin_callback_info_t *info);
 AU_ret_t ripe_allow(au_plugin_callback_info_t *info);
 AU_ret_t ripe_check_name_change(au_plugin_callback_info_t *info);
 
 static const au_check_by_type_t ripe_plugins[] = 
 {
+#ifdef AFRINIC
+  { "inetnum", afrinic_inetnum_checks, ripe_allow, afrinic_inetnum_checks },
+  { "inet6num", afrinic_inet6num_checks, ripe_allow, afrinic_inet6num_checks },
+#else
   { "inetnum", ripe_inetnum_checks, ripe_allow, ripe_inetnum_checks },
   { "inet6num", ripe_inet6num_checks, ripe_allow, ripe_inet6num_checks },
+#endif
   { "person", ripe_allow, ripe_allow, ripe_check_name_change },
   { "role", ripe_allow, ripe_allow, ripe_check_name_change },
   { NULL }
@@ -42,14 +49,13 @@ static char *
 get_status (rpsl_object_t *obj)
 {
   GList *status_attr;
-  char *status;
+  char *status = NULL;
 
   LG_log(au_context, LG_FUNC, ">get_status: entering");
   status_attr = rpsl_object_get_attr(obj, "status");
   if (status_attr == NULL)
   {
     LG_log(au_context, LG_DEBUG, "get_status: no status");
-    status = NULL;
   }
   else
   {
@@ -57,14 +63,8 @@ get_status (rpsl_object_t *obj)
     g_strup(status);
   }
   rpsl_attr_delete_list(status_attr);
-  if (status == NULL) 
-  {
-    LG_log(au_context, LG_FUNC, "<get_status: exiting with value [NULL]");
-  } 
-  else 
-  {
-    LG_log(au_context, LG_FUNC, "<get_status: exiting with value [\"%s\"]", status);
-  }
+
+  LG_log(au_context, LG_FUNC, "<get_status: exiting with value [\"%s\"]", status ? status : "NULL");
   return status;
 }
 
@@ -210,7 +210,7 @@ parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj, ...)
 }
 
 gboolean
-has_ripe_ncc_mntner (const rpsl_object_t *obj)
+has_rir_mntner (const rpsl_object_t *obj)
 {
   char *alloc_mntner_str;
   char **alloc_mntner_list = NULL;
@@ -219,9 +219,9 @@ has_ripe_ncc_mntner (const rpsl_object_t *obj)
   GList *mntners;
   GList *p;
 
-  gboolean ripe_mntner_found;
+  gboolean rir_mntner_found;
 
-  LG_log(au_context, LG_FUNC, ">has_ripe_ncc_mntner: entering");
+  LG_log(au_context, LG_FUNC, ">has_rir_mntner: entering");
 
   /* get the list of mnt-by mntner names */
   mntners = rpsl_object_get_attr(obj, "mnt-by");
@@ -234,26 +234,26 @@ has_ripe_ncc_mntner (const rpsl_object_t *obj)
   alloc_mntner_list = ut_g_strsplit_v1(alloc_mntner_str, ",", 0);
   
   /* compare the two lists and look for a match */
-  ripe_mntner_found = FALSE;
-  for (alloc_idx = 0; alloc_mntner_list[alloc_idx] != NULL && !ripe_mntner_found; alloc_idx++)
+  rir_mntner_found = FALSE;
+  for (alloc_idx = 0; alloc_mntner_list[alloc_idx] != NULL && !rir_mntner_found; alloc_idx++)
   {
     g_strstrip(alloc_mntner_list[alloc_idx]);
-    for (p=mntners; (p != NULL) && !ripe_mntner_found; p = g_list_next(p))
+    for (p=mntners; (p != NULL) && !rir_mntner_found; p = g_list_next(p))
     {
-      LG_log(au_context, LG_DEBUG, "has_ripe_ncc_mntner: comparing mnt-by: %s with ALLOCMNT %s",
+      LG_log(au_context, LG_DEBUG, "has_rir_mntner: comparing mnt-by: %s with ALLOCMNT %s",
         rpsl_attr_get_value(p->data), alloc_mntner_list[alloc_idx]);
       if (strcasecmp(rpsl_attr_get_value(p->data), alloc_mntner_list[alloc_idx]) == 0)
       {
-        ripe_mntner_found = TRUE;
+        rir_mntner_found = TRUE;
       }
     }
   }
   rpsl_attr_delete_list(mntners);
   g_strfreev(alloc_mntner_list);
 
-  LG_log(au_context, LG_FUNC, "<has_ripe_ncc_mntner: exiting with value [%s]",
-    ripe_mntner_found ? "TRUE" : "FALSE");
-  return ripe_mntner_found;
+  LG_log(au_context, LG_FUNC, "<has_rir_mntner: exiting with value [%s]",
+            rir_mntner_found ? "TRUE" : "FALSE");
+  return rir_mntner_found;
 }
 
 
@@ -313,7 +313,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
         (strncmp(old_status, "ALLOCATED ", 10) != 0))
     {
       LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: ALLOCATED");
-      if (has_ripe_ncc_mntner(info->obj))
+      if (has_rir_mntner(info->obj))
       {
         ret_val = AU_AUTHORISED;
       }
@@ -480,7 +480,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
         (strcmp(old_status, "ALLOCATED-BY-RIR") != 0))
     {
       LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: ALLOCATED-BY-RIR");
-      if (has_ripe_ncc_mntner(info->obj))
+      if (has_rir_mntner(info->obj))
       {
         LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: has RIPE NCC maintainer");
         parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
@@ -559,6 +559,330 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
   au_override(&ret_val, &override, info);
 
   LG_log(au_context, LG_FUNC, "<ripe_inet6num_checks: exiting with value [%s]", 
+         AU_ret2str(ret_val));
+
+  return ret_val;
+}
+
+
+AU_ret_t 
+afrinic_inetnum_checks (au_plugin_callback_info_t *info)
+{
+  rpsl_object_t *old_object;
+
+  char *old_status;
+  char *new_status;
+
+  gboolean parent_status_ok;
+
+  AU_ret_t ret_val;
+  gboolean override;
+
+  LG_log(au_context, LG_FUNC, ">afrinic_inetnum_checks: entering");
+
+  if (!LU_get_object(au_lookup, &old_object, info->obj, NULL))
+  {
+    LG_log(au_context, LG_ERROR, "afrinic_inetnum_checks: error looking up old version");
+    LG_log(au_context, LG_FUNC, "<afrinic_inetnum_checks: exiting with value [AU_ERROR]");
+    return AU_ERROR;
+  }
+  if (old_object == NULL) 
+  {
+    LG_log(au_context, LG_DEBUG, "afrinic_inetnum_checks: no old version, new");
+  }
+
+  new_status = get_status(info->obj);
+  if (new_status == NULL)
+  {
+    ret_val = AU_UNAUTHORISED_CONT;
+    LG_log(au_context, LG_ERROR, "afrinic_inetnum_checks: no \"status:\" on updated inetnum");
+
+    RT_status_check_failed(info->ctx, "missing \"status:\" attribute");
+  }
+  else
+  {
+    /* get old status */
+    /* use "" to simplify our comparisons if the old object had no status */
+    if (old_object == NULL)
+    {
+      old_status = UT_strdup("");
+    }
+    else
+    {
+      old_status = get_status(old_object);
+      if (old_status == NULL)
+      {
+        old_status = UT_strdup("");
+      }
+    }
+
+    /* changing to ALLOCATED */
+    if ((strncmp(new_status, "ALLOCATED ", 10) == 0) &&
+        (strncmp(old_status, "ALLOCATED ", 10) != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "afrinic_inetnum_checks: status changing to ALLOCATED");
+      if (has_rir_mntner(info->obj))
+      {
+        if (strcmp(new_status, "ALLOCATED PA") == 0)
+        {
+          parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+                              "ALLOCATED PA", "ALLOCATED UNSPECIFIED", NULL);
+        }
+        else if (strcmp(new_status, "ALLOCATED PI") == 0)
+        {
+          parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+                              "ALLOCATED PI", "ALLOCATED UNSPECIFIED", NULL);
+        }
+        else if (strcmp(new_status, "ALLOCATED UNSPECIFIED") == 0)
+        {
+          parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+                              "ALLOCATED UNSPECIFIED", NULL);
+        }
+
+        if (parent_status_ok)
+        {
+          ret_val = AU_AUTHORISED;
+        }
+        else
+        {
+          /* note that the RT logging is done by parent_status_is_valid() */
+          ret_val = AU_UNAUTHORISED_CONT;
+        }
+      }
+      else
+      {
+        RT_status_check_failed(info->ctx, 
+          "ALLOCATED inetnum objects require the AfriNic maintainer");
+        ret_val = AU_UNAUTHORISED_CONT;
+      }
+    }
+    /* changing to SUB-ALLOCATED PA */
+    else if ((strcmp(new_status, "SUB-ALLOCATED PA") == 0) &&
+             (strcmp(old_status, "SUB-ALLOCATED PA") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "afrinic_inetnum_checks: status changing to SUB-ALLOCATED PA");
+
+      parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
+                                     "ALLOCATED UNSPECIFIED", "ALLOCATED PA", NULL);
+
+      if (parent_status_ok)
+      {
+        ret_val = AU_AUTHORISED;
+      }
+      else
+      {
+        /* note that the RT logging is done by parent_status_is_valid() */
+        ret_val = AU_UNAUTHORISED_CONT;
+      }
+    }
+    /* changing to ASSIGNED */
+    else if ((strncmp(new_status, "ASSIGNED ", 9) == 0) &&
+             (strncmp(old_status, "ASSIGNED ", 9) != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "afrinic_inetnum_checks: status changing to ASSIGNED");
+
+      if (strcmp(new_status, "ASSIGNED PA") == 0)
+      {
+        parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+                        "ALLOCATED PA", "ALLOCATED UNSPECIFIED", "SUB-ALLOCATED PA", "ASSIGNED PA", NULL);
+      }
+      else if (strcmp(new_status, "ASSIGNED PI") == 0)
+      {
+        parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+                            "ALLOCATED PI", "ALLOCATED UNSPECIFIED", "ASSIGNED PI", NULL);
+      }
+
+      if (parent_status_ok)
+      {
+        ret_val = AU_AUTHORISED;
+      }
+      else
+      {
+        /* note that the RT logging is done by parent_status_is_valid() */
+        ret_val = AU_UNAUTHORISED_CONT;
+      }
+    }
+    /* changing to EARLY-REGISTRATION */
+    else if ((strcmp(new_status, "EARLY-REGISTRATION") == 0) &&
+             (strcmp(old_status, "EARLY-REGISTRATION") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "afrinic_inetnum_checks: status changing to EARLY-REGISTRATION");
+      ret_val = AU_UNAUTHORISED_CONT;
+
+      RT_status_check_failed(info->ctx, 
+          "only the administrator can use EARLY-REGISTRATION status");
+    }
+    /* changing to NOT-SET */
+    else if ((strcmp(new_status, "NOT-SET") == 0) &&
+             (strcmp(old_status, "NOT-SET") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "afrinic_inetnum_checks: status changing to NOT-SET");
+      ret_val = AU_UNAUTHORISED_CONT;
+
+      RT_status_check_failed(info->ctx, 
+          "only the administrator can use NOT-SET status");
+    }
+    else
+    {
+      ret_val = AU_AUTHORISED;
+      LG_log(au_context, LG_DEBUG, 
+        "afrinic_inetnum_checks: no special handling changing status \"%s\" to \"%s\"",
+        old_status, new_status);
+    }
+
+    UT_free(old_status);
+    UT_free(new_status);
+  }
+
+  /* done with original object now */
+  if (old_object != NULL)
+  {
+      rpsl_object_delete(old_object);
+  }
+
+  /* override if necessary */
+  au_override(&ret_val, &override, info);
+
+  LG_log(au_context, LG_FUNC, "<afrinic_inetnum_checks: exiting with value [%s]", 
+         AU_ret2str(ret_val));
+
+  return ret_val;
+}
+
+AU_ret_t 
+afrinic_inet6num_checks (au_plugin_callback_info_t *info)
+{
+  rpsl_object_t *old_object;
+
+  char *old_status;
+  char *new_status;
+
+  gboolean parent_status_ok;
+
+  AU_ret_t ret_val;
+  gboolean override;
+
+  LG_log(au_context, LG_FUNC, ">afrinic_inet6num_checks: entering");
+
+  if (!LU_get_object(au_lookup, &old_object, info->obj, NULL))
+  {
+    LG_log(au_context, LG_ERROR, "afrinic_inet6num_checks: error looking up old version");
+    LG_log(au_context, LG_FUNC, "<afrinic_inet6num_checks: exiting with value [AU_ERROR]");
+    return AU_ERROR;
+  }
+  if (old_object == NULL) 
+  {
+    LG_log(au_context, LG_DEBUG, "afrinic_inet6num_checks: no old version, new");
+  }
+
+  new_status = get_status(info->obj);
+  if (new_status == NULL)
+  {
+    ret_val = AU_UNAUTHORISED_CONT;
+    LG_log(au_context, LG_ERROR, "afrinic_inet6num_checks: no \"status:\" on updated inet6num");
+    RT_status_check_failed(info->ctx, "missing \"status:\" attribute");
+  }
+  else
+  {
+    /* get old status */
+    /* use "" to simplify our comparisons if the old object had no status */
+    if (old_object == NULL)
+    {
+      old_status = UT_strdup("");
+    }
+    else
+    {
+      old_status = get_status(old_object);
+      if (old_status == NULL)
+      {
+        old_status = UT_strdup("");
+      }
+    }
+
+    /* changing to ALLOCATED-BY-RIR */
+    if ((strcmp(new_status, "ALLOCATED-BY-RIR") == 0) &&
+        (strcmp(old_status, "ALLOCATED-BY-RIR") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "afrinic_inet6num_checks: changing status to ALLOCATED-BY-RIR");
+      if (has_rir_mntner(info->obj))
+      {
+        LG_log(au_context, LG_DEBUG, "afrinic_inet6num_checks: has AfriNic maintainer");
+        parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+                                                   "ALLOCATED-BY-RIR", NULL);
+        if (parent_status_ok)
+        {
+          ret_val = AU_AUTHORISED;
+        }
+        else
+        {
+          /* note that the RT logging is done by parent_status_is_valid() */
+          ret_val = AU_UNAUTHORISED_CONT;
+        }
+      }
+      else
+      {
+        RT_status_check_failed(info->ctx, 
+          "ALLOCATED-BY-RIR inet6num objects require the AfriNic maintainer");
+        ret_val = AU_UNAUTHORISED_CONT;
+      }
+    }
+    /* changing to SUB-ALLOCATED PA */
+    else if ((strcmp(new_status, "SUB-ALLOCATED PA") == 0) &&
+             (strcmp(old_status, "SUB-ALLOCATED PA") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "afrinic_inet6num_checks: changing status to SUB-ALLOCATED PA");
+      parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+                                                     "ALLOCATED-BY-RIR", NULL);
+      if (parent_status_ok)
+      {
+        ret_val = AU_AUTHORISED;
+      }
+      else
+      {
+        /* note that the RT logging is done by parent_status_is_valid() */
+        ret_val = AU_UNAUTHORISED_CONT;
+      }
+    }
+    /* changing to ASSIGNED PA */
+    else if ((strcmp(new_status, "ASSIGNED PA") == 0) &&
+             (strcmp(old_status, "ASSIGNED PA") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "afrinic_inet6num_checks: changing status to ASSIGNED PA");
+      parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+                                      "ALLOCATED-BY-RIR", "SUB-ALLOCATED PA", NULL);
+      if (parent_status_ok)
+      {
+        ret_val = AU_AUTHORISED;
+      }
+      else
+      {
+        /* note that the RT logging is done by parent_status_is_valid() */
+        ret_val = AU_UNAUTHORISED_CONT;
+      }
+    }
+    /* no change */
+    else
+    {
+      ret_val = AU_AUTHORISED;
+      LG_log(au_context, LG_DEBUG, 
+        "afrinic_inet6num_checks: no special handling changing status \"%s\" to \"%s\"",
+        old_status, new_status);
+    }
+
+    UT_free(old_status);
+    UT_free(new_status);
+  }
+
+  /* done with original object now */
+  if (old_object != NULL)
+  {
+      rpsl_object_delete(old_object);
+  }
+
+  /* override if necessary */
+  au_override(&ret_val, &override, info);
+
+  LG_log(au_context, LG_FUNC, "<afrinic_inet6num_checks: exiting with value [%s]", 
          AU_ret2str(ret_val));
 
   return ret_val;

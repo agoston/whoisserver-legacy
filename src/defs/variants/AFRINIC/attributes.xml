@@ -1364,6 +1364,13 @@
     <syntax>free-form</syntax>
   </ripe_attribute>
 
+  <ripe_attribute name="parent" code="pt">
+    <description>
+   Generated at query time to show the parent object.
+    </description>
+    <syntax>free-form</syntax>
+  </ripe_attribute>
+
   <ripe_attribute name="nserver" code="ns">
     <description>
    Specifies the nameservers of the domain.

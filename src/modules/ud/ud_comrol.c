@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.39 $
+  $Revision: 1.1 $
 
   rollback(), commit(), delete() - rollback, commit update transaction, delete an object
 
@@ -642,7 +642,7 @@ char *sql_str;
        break;
 
     case C_IT:
-    
+#ifndef AFRINIC    
         /* Check that this irt object is not referenced */
         
        for (i=0; t_iit[i] != NULL; i++) { 
@@ -663,6 +663,7 @@ char *sql_str;
          tr->succeeded=0; tr->error |= ERROR_U_DBS;
         }
        }   
+#endif
        break;
         
     case C_RS:

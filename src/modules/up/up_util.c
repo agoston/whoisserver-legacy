@@ -385,6 +385,103 @@ int UP_strstr_in_attr_list(LG_context_t *lg_ctx, GList *list, const char *substr
   return 0; 
 }
 
+/* Get the rir value from the config 
+   Receives LG context
+            pointer to rir string
+   Returns  none
+*/
+
+char *up_get_rir(LG_context_t *lg_ctx)
+{
+  char *rir = NULL;
+  
+  rir = ca_get_rir;
+  assert(rir != NULL); /* should never fail */
+  rir = UP_remove_EOLs(rir);
+  LG_log(lg_ctx, LG_DEBUG,"up_get_rir: rir [%s]", rir);
+  
+  return rir;
+}
+
+/* Remove generated parent attribute(s) 
+   Receives LG context
+            pointer to object string
+            parsed object
+   Returns  1 if any changes made
+            0 otherwise
+*/
+
+int up_remove_parent(LG_context_t *lg_ctx, char **object_str, rpsl_object_t *object)
+{
+  int retval = 0;
+  char *value = NULL;
+  int pos;
+  GList *parent_list = NULL;
+
+  LG_log(lg_ctx, LG_FUNC,">up_remove_parent: entered");
+
+  /* find parent attributes */
+  parent_list = rpsl_object_get_attr(object, "parent");
+  if ( parent_list != NULL ) retval = 1;
+  while ( parent_list != NULL )
+  {
+    /* remove first parent on the list */
+	value = rpsl_attr_get_clean_value((rpsl_attr_t *)(parent_list->data));
+	pos = rpsl_attr_get_ofs((rpsl_attr_t *)(parent_list->data));
+	rpsl_object_remove_attr(object, pos, NULL);
+    LG_log(lg_ctx, LG_DEBUG,"up_remove_parent: removed parent: [%s]", value);
+	free(value);
+    /* must regenerate parent list now as positions have changed after
+       deleting an attribute */
+    parent_list = rpsl_object_get_attr(object, "parent");
+  }
+  
+  if ( retval )
+  {
+    /* regenerate object text string */
+    *object_str = rpsl_object_get_text(object, 0);
+   }
+
+  LG_log(lg_ctx, LG_FUNC,"<up_remove_parent: exiting");
+  return retval;
+}
+
+/* Cleans out any unwanted data 
+   Receives LG context
+            pointer to object string
+   Returns  1 if any changes made
+            0 otherwise
+*/
+
+int up_clean_object(LG_context_t *lg_ctx, char **object_str)
+{
+  int retval = 0; 
+  char *rir = NULL;
+  const char *type = NULL;
+  char *value = NULL;
+  rpsl_object_t *object = NULL;
+
+  LG_log(lg_ctx, LG_FUNC,">up_clean_object: entered with object [\n%s]", *object_str);
+
+  /* parse the object string */
+  object = rpsl_object_init(*object_str);
+
+  rir = up_get_rir(lg_ctx);
+  if ( ! strcasecmp(rir, "AFRINIC") )
+  {
+    /* AfriNic cleanups */
+    type = rpsl_object_get_class(object);
+    
+    if ( ! strcasecmp(type, "inetnum") || ! strcasecmp(type, "inet6num"))
+    {
+      retval |= up_remove_parent(lg_ctx, object_str, object);
+    }
+  }
+  
+  LG_log(lg_ctx, LG_FUNC,"<up_clean_object: exiting with retval [%d] object [\n%s]",
+                                       retval, *object_str);
+  return retval;
+}
 
 
 /* Gets the source data for each source from the list of config data for multiple sources.
@@ -1728,6 +1825,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                            GList *credentials, int handle_auto_keys)
 {
   int retval = UP_OK;
+  int cleaned_retval = 0;
   int au_retval;
   int operation = 0;
   int parsed_ok = 0;
@@ -1763,7 +1861,10 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   LU_init(lg_ctx);
 
   /* remove trailing dot from domain, if any */
-  is_dot_removed = ns_remove_trailing_dot(lg_ctx,&object_str);
+  is_dot_removed = ns_remove_trailing_dot(lg_ctx, &object_str);
+
+  /* clean out any unwanted data */
+  cleaned_retval = up_clean_object(lg_ctx, &object_str);
 
   /* parse the object string */
   object = rpsl_object_init(object_str);

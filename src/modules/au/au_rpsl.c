@@ -65,7 +65,7 @@ static const au_check_by_type_t rpsl_plugins[] =
   { "route", banned_create, banned_delete, banned_modify },
   /* RPSLng rule */
   { "route6", banned_create, banned_delete, banned_modify },
-#elif
+#else
   { "route", route_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
   /* RPSLng rule */
   { "route6", route6_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },

@@ -74,6 +74,7 @@
       <mnt-domains choice="optional"  number="multiple" />
       <changed     choice="mandatory" number="multiple" />
       <source      choice="mandatory" number="single"   />
+      <parent      choice="generated" number="multiple" />
       <delete      choice="optional"  number="single"   pseudo="yes"/>
       <override    choice="optional"  number="single"   pseudo="yes"/>
     </attributes>
@@ -337,6 +338,7 @@
       <org-name     choice="mandatory" number="single"   />
       <org-type     choice="mandatory" number="single"   />
       <descr        choice="optional"  number="multiple" />
+      <country      choice="mandatory" number="multiple" />
       <remarks      choice="optional"  number="multiple" />
       <address      choice="mandatory" number="multiple" />
       <phone        choice="optional"  number="multiple" />
@@ -490,6 +492,7 @@
       <mnt-domains  choice="optional"  number="multiple" />
       <changed      choice="mandatory" number="multiple" />
       <source       choice="mandatory" number="single"   />
+      <parent       choice="generated" number="multiple" />
       <delete       choice="optional"  number="single"   pseudo="yes"/>
       <override     choice="optional"  number="single"   pseudo="yes"/>
     </attributes>
