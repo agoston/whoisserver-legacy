@@ -271,6 +271,9 @@ EXTRA_DIST = rpsl.variant \
 MOSTLYCLEANFILES = ./src/modules/rpsl/*.l \
 		   ./src/modules/rpsl/*.y \
 		   ./src/modules/rpsl/*.h \
+		   ./src/modules/rpsl/*.o \
+		   ./src/modules/rpsl/*.lex.c \
+		   ./src/modules/rpsl/*.tab.c \
 		   ./conf/sample.db.gz \
 		   ./src/defs/*.class \
 		   ./src/defs/*.xml \
@@ -280,7 +283,8 @@ MOSTLYCLEANFILES = ./src/modules/rpsl/*.l \
 		   ./src/defs/class_tab.h \
 		   ./src/defs/alltodo \
 		   ./src/include/*.def \
-		   ./src/librpsl.a
+		   ./src/librpsl.a \
+		   ./rpsl.variant
 
 install-exec-hook:
 	${mkinstalldirs} $(DESTDIR)${topdir} ${DESTDIR}${bindir} \
