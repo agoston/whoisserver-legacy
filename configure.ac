@@ -1,5 +1,6 @@
 M4PATH=m4
 
+AC_PREREQ(2.59)
 AC_INIT([Whois Server], [3.3.0],
         [RIPE Database Management <ripe-dbm@ripe.net>],
         [whoisserver])
@@ -308,7 +309,10 @@ AC_CONFIG_COMMANDS([links],[
   AC_MSG_NOTICE([Linking in ${PWD}])
   for file in $ac_abs_top_srcdir/src/modules/??/*.h $ac_abs_top_srcdir/src/modules/rpsl/syntax_api.h
   do
-    ln -sf $file . 2>/dev/null
+    if ! test $file -ef `basename $file`
+    then
+      ln -sf $file . 2>/dev/null
+    fi
   done
   mkdir -p $ac_abs_top_builddir/src/modules/rpsl
   cd $ac_abs_top_builddir/src/modules/rpsl
@@ -319,7 +323,10 @@ AC_CONFIG_COMMANDS([links],[
     $ac_abs_top_srcdir/src/modules/rpsl/*.l  \
     $ac_abs_top_srcdir/src/modules/rpsl/*.y  
   do
-    ln -sf $file . 2>/dev/null
+    if ! test $file -ef `basename $file`
+    then
+      ln -sf $file . 2>/dev/null
+    fi
   done
   IFS=$OIFS
   cd $OPWD

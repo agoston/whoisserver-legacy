@@ -287,6 +287,7 @@ MOSTLYCLEANFILES = ./src/modules/rpsl/*.l \
 
 install-exec-hook:
 	${mkinstalldirs} $(DESTDIR)${topdir} ${DESTDIR}${bindir} \
+	  $(DESTDIR)${bindir}/history \
 	  $(DESTDIR)${confdir} \
 	  $(DESTDIR)${docdir} \
 	  $(DESTDIR)${bindir}/SQL \
