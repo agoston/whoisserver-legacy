@@ -1,5 +1,5 @@
 SUBDIRS = src
-AUTOMAKE_OPTIONS = subdir-objects foreign
+AUTOMAKE_OPTIONS = subdir-objects
 EXTRA_DIST = rpsl.variant \
 	     README \
 	     README.MODULES \
@@ -173,17 +173,17 @@ EXTRA_DIST = rpsl.variant \
              src/modules/rpsl/refer.y \
              src/modules/rpsl/v6_filter.l \
              src/modules/rpsl/v6_filter.y \
-             src/modules/rpsl/attribute.c \
              src/modules/rpsl/attribute.h \
+             src/modules/rpsl/attribute.c \
              src/modules/rpsl/class.c \
-             src/modules/rpsl/class.h \
-             src/modules/rpsl/manual.txt \
              src/modules/rpsl/rpsl_test.c \
              src/modules/rpsl/syntax.c \
-             src/modules/rpsl/syntax.h \
              src/modules/rpsl/syntax_api.c \
-             src/modules/rpsl/syntax_api.h \
              src/modules/rpsl/test_syntax.c \
+             src/modules/rpsl/class.h \
+             src/modules/rpsl/manual.txt \
+             src/modules/rpsl/syntax.h \
+             src/modules/rpsl/syntax_api.h \
              src/modules/aa/aa.h \
              src/modules/ac/access_control.h \
              src/modules/au/au.h \
@@ -268,7 +268,9 @@ EXTRA_DIST = rpsl.variant \
              src/history/dbsupport.h \
              src/history/miniconf.h
 
-MOSTLYCLEANFILES = ./src/modules/rpsl/* \
+MOSTLYCLEANFILES = ./src/modules/rpsl/*.l \
+		   ./src/modules/rpsl/*.y \
+		   ./src/modules/rpsl/*.h \
 		   ./conf/sample.db.gz \
 		   ./src/defs/*.class \
 		   ./src/defs/*.xml \
