@@ -792,18 +792,19 @@ sub gather_objects_whois($$) {
  foreach my $object (@{$objs}) {
    my $tmp = $object;
    my $name;
-   if ($object =~ /^(route):[\s]*(.*?)[\n](.*?)(origin):(.*?)[\n]/iosm) {
+   if ($object =~ /^(route):[\s]*(.*?)[\n](.*?)(origin):[\s]*(.*?)[\n]/iosm) {
         $name = $1." ".$2.", ".$5;
    }
-   elsif ($object =~ /^(person):[\s]*(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
+   elsif ($object =~ /^(person):[\s]*(.*?)[\n](.*?)(nic-hdl):[\s]*(.*?)[\n]/iosm) {
      $name = $1." ".$5;
    }
-   elsif ($object =~ /^(role):[\s]*(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
+   elsif ($object =~ /^(role):[\s]*(.*?)[\n](.*?)(nic-hdl):[\s]*(.*?)[\n]/iosm) {
      $name = $1." ".$5;
    }             
    elsif ($object =~ /^(.+?):[\s]*(.+?)[\n]/iom ) { 
      $name = $1." ".$2;
    } 
+#print STDERR "\nname  [$name]\n\n";
    $list->{$name} = $tmp;
  }
  return(1);
@@ -909,6 +910,8 @@ my $found = { };
       }
       my $expected_tmp = $expected->{$obj};
       $expected_tmp =~ s/\n$//s;
+#print STDERR "\nfound\n\n[$found->{$obj}]\n\n";
+#print STDERR "\nfexpected\n\n[$expected_tmp]\n\n";
       if ( (!is_negative($tmp)) && (exists ($found->{$obj})) && ($expected_tmp eq $found->{$obj}) ) {
          #OK;
       }
