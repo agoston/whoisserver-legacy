@@ -764,7 +764,6 @@ my $list = $_[1];
         $object = $object.$1.":".$2."\n";
         $string = <$FILE>;
       }
-      $object =~ s/\n$//s;
       # object in $object;
       my $tmp = $object;
       my $name;
@@ -908,7 +907,9 @@ my $found = { };
       if ( exists $found->{$obj} ) {
         $found->{$obj} =~ s/:\s*/:/g;
       }
-      if ( (!is_negative($tmp)) && (exists ($found->{$obj})) && ($expected->{$obj} eq $found->{$obj}) ) {
+      my $expected_tmp = $expected->{$obj};
+      $expected_tmp =~ s/\n$//s;
+      if ( (!is_negative($tmp)) && (exists ($found->{$obj})) && ($expected_tmp eq $found->{$obj}) ) {
          #OK;
       }
       elsif ( is_negative($tmp) && !exists $found->{$obj}) {
@@ -1219,7 +1220,7 @@ my $flags;
   if (getvar('DBUPDATE_FLAGS_EXT')) {
     $flags = "$flags $tempfile";
   }
-
+ 
   if (!getvar('DBUPDATE_FLAGS_EXT') && !getvar('DBUPDATE_FLAGS')) {
     $flags = "$flags $tempfile";
   }
@@ -1625,8 +1626,14 @@ my $source = $_[3];
    }
    elsif (/^[\s]*$/o) {
      #print TEMP $_;
-     print TEMP $object,"\n\n" if (defined $source && ($object =~ /^source:[\s]*$source[\s]+/im)); 
-     $object = "";
+     if (defined $source && ($object =~ /^source:[\s]*$source[\s]+/im)) {
+       print TEMP $object,"\n\n" ;
+       $object = "";
+     }
+     else {
+       # just copy the blank line
+       print TEMP "\n";
+     }
    }
    else { # non-empty line
      if (defined $source) { #the source is set, collect the object
