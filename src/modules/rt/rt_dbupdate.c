@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   Reporting module.
 
@@ -1724,6 +1724,18 @@ void RT_auth(RT_context_t* ctx, gchar* key, gchar* type, gchar* attr_checked,
       rt_generate_list_map(child, "list", auth_fail, (rt_map_function)rt_object_class);
     }
   }
+
+  rt_prepare_node(ctx, node);
+}
+
+
+/* auth check */
+void RT_banned_operation(RT_context_t* ctx, gchar* type) {
+  xmlNodePtr node;
+  xmlNodePtr child;
+
+  node = xmlNewNode(NULL, (xmlChar*)"banned_operation");
+  rt_add_text_node(node, "type", type);
 
   rt_prepare_node(ctx, node);
 }

@@ -24,7 +24,14 @@ AU_ret_t generic_rpsl_create(au_plugin_callback_info_t *info);
 AU_ret_t generic_rpsl_delete(au_plugin_callback_info_t *info);
 AU_ret_t generic_rpsl_modify(au_plugin_callback_info_t *info);
 
+AU_ret_t banned_create(au_plugin_callback_info_t *info);
+AU_ret_t banned_delete(au_plugin_callback_info_t *info);
+AU_ret_t banned_modify(au_plugin_callback_info_t *info);
+
 AU_ret_t restricted_rpsl_create(au_plugin_callback_info_t *info);
+AU_ret_t restricted_rpsl_delete(au_plugin_callback_info_t *info);
+AU_ret_t restricted_rpsl_modify(au_plugin_callback_info_t *info);
+
 AU_ret_t mntner_rpsl_create(au_plugin_callback_info_t *info);
 AU_ret_t set_rpsl_create(au_plugin_callback_info_t *info);
 AU_ret_t aut_num_rpsl_create(au_plugin_callback_info_t *info);
@@ -36,6 +43,9 @@ static const au_check_by_type_t rpsl_plugins[] =
 {
   /* 3.1.2 restricted classes */
   { "as-block", restricted_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
+#ifdef AFRINIC
+  { "organisation", restricted_rpsl_create, restricted_rpsl_delete, restricted_rpsl_modify },
+#endif
   /* mntner */
   { "mntner", mntner_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
   /* 3.1.3 hierarchical name classes */
@@ -51,9 +61,19 @@ static const au_check_by_type_t rpsl_plugins[] =
   { "inetnum", hierarchical_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
   { "inet6num", hierarchical_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
   /* 3.1.7 route */
+#ifdef AFRINIC
+  { "route", banned_create, banned_delete, banned_modify },
+  /* RPSLng rule */
+  { "route6", banned_create, banned_delete, banned_modify },
+#elif
   { "route", route_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
   /* RPSLng rule */
   { "route6", route6_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
+#endif
+#ifdef AFRINIC
+  /* irt */
+  { "irt", banned_create, banned_delete, banned_modify },
+#endif
   /* 3.1.1 simple rules */
   { "*", generic_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
   { NULL }
@@ -74,7 +94,73 @@ static char *CHECK_MNT_ROUTES_THEN_MNT_LOWER_THEN_MNT_BY[] = { "mnt-routes",
                                                                NULL };
 
 AU_ret_t
-restricted_rpsl_create (au_plugin_callback_info_t *info)
+banned_operation (au_plugin_callback_info_t *info)
+{
+  AU_ret_t ret_val;
+  gboolean override;
+  char *type = NULL;
+
+  LG_log(au_context, LG_FUNC, ">banned_operation: entering");
+
+  au_override(&ret_val, &override, info);
+  ret_val = AU_UNAUTHORISED_CONT;
+
+  type = strdup( rpsl_object_get_class(info->obj) );
+  RT_banned_operation(info->ctx, type);
+  UT_free(type);
+
+  /* report result */
+  RT_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);
+
+  LG_log(au_context, LG_FUNC, "<banned_operation: exiting with value [%s]",
+         AU_ret2str(ret_val));
+  return ret_val;
+}
+
+AU_ret_t
+banned_create (au_plugin_callback_info_t *info)
+{
+  AU_ret_t ret_val;
+
+  LG_log(au_context, LG_FUNC, ">banned_create: entering");
+
+  ret_val = banned_operation(info);
+  
+  LG_log(au_context, LG_FUNC, "<banned_create: exiting with value [%s]",
+         AU_ret2str(ret_val));
+  return ret_val;
+}
+
+AU_ret_t
+banned_delete (au_plugin_callback_info_t *info)
+{
+  AU_ret_t ret_val;
+
+  LG_log(au_context, LG_FUNC, ">banned_delete: entering");
+
+  ret_val = banned_operation(info);
+
+  LG_log(au_context, LG_FUNC, "<banned_delete: exiting with value [%s]",
+         AU_ret2str(ret_val));
+  return ret_val;
+}
+
+AU_ret_t
+banned_modify (au_plugin_callback_info_t *info)
+{
+  AU_ret_t ret_val;
+
+  LG_log(au_context, LG_FUNC, ">banned_modify: entering");
+
+  ret_val = banned_operation(info);
+
+  LG_log(au_context, LG_FUNC, "<banned_modify: exiting with value [%s]",
+         AU_ret2str(ret_val));
+  return ret_val;
+}
+
+AU_ret_t
+restricted_rpsl_operation (au_plugin_callback_info_t *info)
 {
   AU_ret_t ret_val;
   gboolean override;
@@ -82,19 +168,23 @@ restricted_rpsl_create (au_plugin_callback_info_t *info)
   char *key = NULL;
   char *mnt_type = NULL;
 
-  LG_log(au_context, LG_FUNC, ">restricted_rpsl_create: entering");
+  LG_log(au_context, LG_FUNC, ">restricted_rpsl_operation: entering");
 
   /* only override works*/
   ret_val = AU_FWD;
   au_override(&ret_val, &override, info);
 
   if ( db_test_mode )
+  {
+    LG_log(au_context, LG_DEBUG, "restricted_rpsl_operation: test mode - authorised");
     ret_val = AU_AUTHORISED;
+  }
 
   type = strdup( rpsl_object_get_class(info->obj) );
   key = strdup( rpsl_object_get_key_value(info->obj) );
   if ( override == TRUE )
   {
+    LG_log(au_context, LG_DEBUG, "restricted_rpsl_operation: override - forward");
     mnt_type = g_malloc0(strlen("override") + 1);
     strcat(mnt_type, "override");
     RT_auth(info->ctx, key, type, mnt_type, NULL, NULL, "");
@@ -112,7 +202,49 @@ restricted_rpsl_create (au_plugin_callback_info_t *info)
   /* report result */
   RT_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);
 
+  LG_log(au_context, LG_FUNC, "<restricted_rpsl_operation: exiting with value [%s]",
+         AU_ret2str(ret_val));
+  return ret_val;
+}
+
+AU_ret_t
+restricted_rpsl_create (au_plugin_callback_info_t *info)
+{
+  AU_ret_t ret_val;
+
+  LG_log(au_context, LG_FUNC, ">restricted_rpsl_create: entering");
+
+  ret_val = restricted_rpsl_operation(info);
+  
   LG_log(au_context, LG_FUNC, "<restricted_rpsl_create: exiting with value [%s]",
+         AU_ret2str(ret_val));
+  return ret_val;
+}
+
+AU_ret_t
+restricted_rpsl_delete (au_plugin_callback_info_t *info)
+{
+  AU_ret_t ret_val;
+
+  LG_log(au_context, LG_FUNC, ">restricted_rpsl_delete: entering");
+
+  ret_val = restricted_rpsl_operation(info);
+
+  LG_log(au_context, LG_FUNC, "<restricted_rpsl_delete: exiting with value [%s]",
+         AU_ret2str(ret_val));
+  return ret_val;
+}
+
+AU_ret_t
+restricted_rpsl_modify (au_plugin_callback_info_t *info)
+{
+  AU_ret_t ret_val;
+
+  LG_log(au_context, LG_FUNC, ">restricted_rpsl_modify: entering");
+
+  ret_val = restricted_rpsl_operation(info);
+
+  LG_log(au_context, LG_FUNC, "<restricted_rpsl_modify: exiting with value [%s]",
          AU_ret2str(ret_val));
   return ret_val;
 }

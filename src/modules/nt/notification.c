@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   NT (Notifications) module
 
@@ -1659,15 +1659,10 @@ void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   pkey = rpsl_object_get_key_value(object);
   /* build up the subject line */
   subject = g_string_new(NULL);
-  if ( ! strcmp(type, "mntner") )
-    subject = g_string_append(subject, "Maintainer" );
-  else if ( ! strcmp(type, "irt") )
-    subject = g_string_append(subject, "IRT" );
-  else if ( ! strcmp(type, "as-block") )
-    subject = g_string_append(subject, "AS-BLOCK" );
-  else
-    subject = g_string_append(subject, "UNKNOWN" );
-  subject = g_string_append(subject, " creation request: " );
+  subject = g_string_append(subject, type );
+  subject = g_string_append(subject, " " );
+  subject = g_string_append(subject, operation );
+  subject = g_string_append(subject, " request: " );
   subject = g_string_append(subject, pkey );
 
   /* get the address to send the request to */

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   Reporting module.
 
@@ -232,6 +232,7 @@ void RT_no_frwd_create(RT_context_t *rt_ctx);
 void RT_multiple_parents(RT_context_t *ctx, GList *parents);
 
 /* auth check */
+void RT_banned_operation(RT_context_t* ctx, gchar* type);
 void RT_auth(RT_context_t* ctx, gchar* key, gchar* type, gchar* attr_checked,
         GList* auth_ok, GList* auth_fail, gchar *parent_type);
 void RT_irt_auth(RT_context_t* ctx, gchar* key, gchar* type, gchar* attr_checked,

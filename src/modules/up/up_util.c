@@ -1854,10 +1854,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   /* find source from object and set current source */
   retval = up_get_source(rt_ctx, lg_ctx, options, object, &obj_source, &source_data);
-  if ( retval != UP_OK )
-  {
-    goto up_process_object_exit;
-  }
+  if ( retval != UP_OK ) goto up_process_object_exit;
 
   /* set up current server for lookups */
   current_server = LU_whois_init(source_data.query_host, source_data.query_port, UPDATE_QUERY_TIMEOUT);

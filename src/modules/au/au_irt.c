@@ -24,9 +24,11 @@ AU_ret_t irt_allow(au_plugin_callback_info_t *info);
 
 static const au_check_by_type_t irt_plugins[] = 
 {
+#ifndef AFRINIC
   { "irt", irt_creation, irt_allow, irt_allow },
   { "inetnum", irt_network_create, irt_allow, irt_network_modify },
   { "inet6num", irt_network_create, irt_allow, irt_network_modify },
+#endif
   { NULL }
 };
 
