@@ -10,7 +10,7 @@
 
 key-cert:     X509-1
 method:       X509
-owner:        /C=NL/O=RIPE NCC/OU=Members/CN=uk.bt.test-receiver/Email=test-receiver@linux.testlab.ripe.net
+owner:        /C=NL/O=RIPE NCC/OU=Members/CN=uk.bt.test-receiver/emailAddress=test-receiver@linux.testlab.ripe.net
 fingerpr:     D5:92:29:08:F8:AB:75:5F:42:F5:A8:5F:A3:8D:08:2E
 certif:       -----BEGIN CERTIFICATE-----
 certif:       MIID/DCCA2WgAwIBAgICAIQwDQYJKoZIhvcNAQEEBQAwcTELMAkGA1UEBhMCRVUx
