@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.1 2004/12/27 18:17:04 can Exp $
+$Id: syntax.xml,v 1.1 2005/01/27 18:40:29 denis Exp $
 
 -->
 
@@ -35,25 +35,6 @@ $Id: syntax.xml,v 1.1 2004/12/27 18:17:04 can Exp $
      be an actual set name (i.e. start with "fltr-").  All the
      set name components of a hierarchical filter-name have to be
      filter-set names.
-       </description>
-   </attribute_syntax>
-
-   <attribute_syntax name="irt">
-      <core>
-          <regex>
-              ^.{1,80}$
-          </regex>
-       </core>
-       <front_end>
-          <regex>
-              ^irt-[A-Z0-9_-]*[A-Z0-9]$
-          </regex>
-       </front_end>
-       <description>
-     An irt name is made up of letters, digits, the character
-     underscore "_", and the character hyphen "-"; it must start
-     with "irt-", and the last character of a name must be a
-     letter or a digit.
        </description>
    </attribute_syntax>
 
@@ -319,7 +300,7 @@ $Id: syntax.xml,v 1.1 2004/12/27 18:17:04 can Exp $
                ^[A-Z]([A-Z0-9_-]*[A-Z0-9])?$
            </regex>
            <reserved_regex>
-               ^(any|as-any|rs-any|peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*|irt-.*)$
+               ^(any|as-any|rs-any|peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*)$
            </reserved_regex>
        </front_end>
        <description>
@@ -339,8 +320,7 @@ $Id: syntax.xml,v 1.1 2004/12/27 18:17:04 can Exp $
      reserved for route set names.  Names starting with "rtrs-"
      are reserved for router set names. Names starting with
      "fltr-" are reserved for filter set names. Names starting
-     with "prng-" are reserved for peering set names. Names
-     starting with "irt-" are reserved for irt names.
+     with "prng-" are reserved for peering set names.
        </description>
    </attribute_syntax>
 
@@ -565,7 +545,7 @@ $Id: syntax.xml,v 1.1 2004/12/27 18:17:04 can Exp $
    <attribute_syntax name="org-type">
        <front_end>
            <regex>
-           ^(IANA|RIR|NIR|LIR|NON-REGISTRY)$
+           ^(IANA|RIR|NIR|LIR)$
            </regex>
        </front_end>
        <description>
@@ -573,9 +553,8 @@ $Id: syntax.xml,v 1.1 2004/12/27 18:17:04 can Exp $
 
      o IANA
      o RIR
-     o NIR (There are no NIRs in the RIPE NCC service region.)
+     o NIR (There are no NIRs in the AFRINIC service region.)
      o LIR
-     o NON-REGISTRY
        </description>
    </attribute_syntax>
 
@@ -732,7 +711,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
        </front_end>
          <!-- removed, we already check reserved words in mntner name
            <reserved_regex>
-               ^(peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*|irt-.*)$
+               ^(peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*)$
            </reserved_regex>
          -->
        <description>
@@ -750,7 +729,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
          <!-- ANY allowed -->
          <parser_name>mnt_routes6</parser_name>
          <reserved_regex>
-               ^(peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*|irt-.*)$
+               ^(peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*)$
          </reserved_regex>
        </front_end>
        <description>
@@ -768,7 +747,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
          <!-- ANY allowed --> 
          <parser_name>mnt_routes_an</parser_name>
          <reserved_regex>
-               ^(peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*|irt-.*)$
+               ^(peeras|and|or|not|atomic|from|to|at|action|accept|announce|except|refine|networks|into|inbound|outbound|as-.*|rs-.*|rtrs-.*|fltr-.*|prng-.*)$
          </reserved_regex>
        </front_end>
        <description> 

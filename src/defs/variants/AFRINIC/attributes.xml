@@ -1,6 +1,6 @@
 <!DOCTYPE ripe_attributes SYSTEM "attributes.dtd">
 
-<ripe_attributes version="$Revision: 1.1 $" author="$Author: can $">
+<ripe_attributes version="$Revision: 1.1 $" author="$Author: denis $">
 
   <ripe_attribute name="address" code="ad">
     <description>
@@ -1802,8 +1802,8 @@
     <description>
   Specifies the type of the organisation.  The possible values are 'IANA' for
   Internet Assigned Numbers Authority, 'RIR' for Regional Internet
-  Registries, 'NIR' for National Internet Registries, 'LIR' for Local
-  Internet Registries, and 'NON-REGISTRY' for all other organisations.
+  Registries, 'NIR' for National Internet Registries and 'LIR' for Local
+  Internet Registries.
     </description>
     <syntax>org-type</syntax>
   </ripe_attribute>
@@ -2437,135 +2437,6 @@
 
 <!-- For update rules, see member-of-ir  -->
 
-  </ripe_attribute>
-
-  <ripe_attribute name="mnt-irt" code="mi">
-    <description>
-   May appear in an inetnum or inet6num object. It points to an
-   irt object representing a Computer Security Incident Response
-   Team (CSIRT) that handles security incidents for the address
-   space specified by the inetnum or inet6num object.
-    </description>
-    <syntax><list/>irt</syntax>
-    <representation> 
-    <sqltable name="mnt_irt">
-      <insert qtype="ud_aux__">
-        INSERT mnt_irt 
-        SELECT %d, %ld, irt.object_id, %d 
-        FROM irt WHERE irt.irt='%s'
-      </insert>
-      <update qtype="ud_ax_it">
-        UPDATE mnt_irt
-        SET thread_id=%d
-        WHERE object_id=%ld
-        AND irt_id=%ld
-      </update>
-      <dummy qtype="ud_ax_it">
-        INSERT irt
-        SET thread_id=%d, object_id=%ld, irt='%s', dummy=1
-      </dummy>
-    </sqltable>
-    </representation>
-    <keys searchable="inverse">
-      <foreign value="it"/>
-
-      <queries>
-        <sqlquery keytype="wk_irt" class="ANY">
-          SELECT b.object_id,0
-          FROM   irt a, mnt_irt b
-          WHERE  a.object_id = b.irt_id
-          AND    a.irt = '%s'
-          AND    b.thread_id = 0
-        </sqlquery>
-      </queries>
-    </keys>
- </ripe_attribute>
-
-  <ripe_attribute name="irt" code="it">
-    <description>
-   Specifies the name of the irt object. The name should start
-   with the prefix "IRT-", reserved for this type of object.
-    </description>
-    <syntax>irt</syntax>
-    <representation>
-    <sqltable name="irt">
-      <insert qtype="ud_main_">
-        INSERT irt
-        SET thread_id=%d, object_id=%ld, irt='%s', dummy=0
-      </insert>
-      <update qtype="ud_main_">
-        UPDATE irt
-        SET thread_id=%d
-        WHERE object_id=%ld
-      </update>
-      <select qtype="ud_main_">
-        irt='%s' AND
-      </select>
-    </sqltable>
-    </representation>
-
-    <keys searchable="lookup">
-      <primary/>
-
-      <queries>
-        <sqlquery keytype="wk_irt">
-          SELECT object_id,0
-          FROM   irt
-          WHERE  irt = '%s'
-          AND    thread_id=0
-        </sqlquery>
-      </queries>
-    </keys>
- </ripe_attribute>
-
-  <ripe_attribute name="signature" code="sg">
-    <description>
-   References a key-cert object representing a CSIRT public key
-   used by the team to sign their correspondence.
-    </description>
-    <syntax>key-cert</syntax>
-  </ripe_attribute>
-
-  <ripe_attribute name="encryption" code="en">
-    <description>
-   References a key-cert object representing a CSIRT public key
-   used to encrypt correspondence sent to the CSIRT.
-    </description>
-    <syntax>key-cert</syntax>
-  </ripe_attribute>
-
-  <ripe_attribute name="irt-nfy" code="iy">
-    <description>
-   Specifies the e-mail address to be notified when a reference
-   to the irt object is added or removed.
-    </description>
-    <syntax>e-mail</syntax>
-
-    <representation>
-    <sqltable name="irt_nfy">
-      <insert qtype="ud_leaf_">
-        INSERT irt_nfy
-        SET thread_id=%d, object_id=%ld, irt_nfy='%s'
-      </insert>
-      <update qtype="ud_leaf_">
-        UPDATE irt_nfy
-        SET thread_id=%d
-        WHERE object_id=%ld
-        AND irt_nfy='%s'
-      </update>
-    </sqltable>
-    </representation>
-
-    <keys searchable="inverse">
-      <queries>
-        <sqlquery keytype="wk_email" class="it">
-          SELECT object_id,0
-          FROM   irt_nfy
-          WHERE  irt_nfy = '%s'
-          AND    thread_id = 0
-        </sqlquery>
-      </queries>
-    </keys>
   </ripe_attribute>
 
   <!-- "delete" and "override" are not really attributes but we define 
