@@ -136,9 +136,9 @@ SQLDB=`$GETVAR -p dbname` || error_exit "unknown source $SOURCE"
 # MySQL commands
 # note: the "CMD" versions include appropriate starup options
 MYSQLBIN=/usr/local/mysql/bin/
-MYSQL=$MYSQLBIN/mysql
+MYSQL=@MYSQLCLIENT@
 MYSQLCMD="$MYSQL -h$SQLHOST -P$SQLPORT -u$SQLUSER -p$SQLPSWD"
-MYSQLADMIN=$MYSQLBIN/mysqladmin
+MYSQLADMIN=@MYSQLADMIN@
 MYSQLADMINCMD="$MYSQLADMIN -h$SQLHOST -P$SQLPORT -u$SQLUSER -p$SQLPSWD"
 
 #####################################################################################

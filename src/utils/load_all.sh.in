@@ -83,7 +83,7 @@ cd SQL; ./create.third-stage; cd ..
 if [ $TRX = 'y' ]
 then
   echo "Will now convert the DB into InnoDB type"
-  $MYSQLBIN/mysql_convert_table_format --host=$HOST --port=$PORT --user=$USER \
+  @MYSQLCONVERT@ --host=$HOST --port=$PORT --user=$USER \
    --password=$PASSWORD --verbose --type=innodb $DB
   check_error "Conversion to InnoDB failed" $?
 fi
