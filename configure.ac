@@ -17,6 +17,8 @@ AC_SUBST(RIP)
 
 AC_PREFIX_DEFAULT([/usr/local/whoisd])
 
+RIPE_OPL_ONLY
+
 AM_CONFIG_HEADER(config.h)
 AC_PROG_CC
 AC_PROG_CPP
@@ -44,7 +46,7 @@ vardir=${topdir}/var
 tmpdir=${vardir}/tmp
 lockdir=${vardir}/lock
 
-libdir=${topdir}/lib/gnudl
+libdir=${topdir}/lib
 mandir=${topdir}/man/man1
 
 logdir=${topdir}/log
@@ -268,8 +270,14 @@ AC_SUBST(MYSQL_LIBS)
 AC_SUBST(MYSQL_CFLAGS)
 
 dnl Check for proper versions of libxml and libxslt
-AM_PATH_XML2([2.4.0], [], AC_MSG_ERROR([libxml2 is required!]))
-AM_PATH_XSLT([1.0.0], [], AC_MSG_ERROR([libxslt is required!]))
+AM_PATH_XML2([2.4.0], [], if test x"$OPLONLY" != xyes
+                          then
+                            AC_MSG_ERROR([libxml2 is required!])
+                          fi)
+AM_PATH_XSLT([1.0.0], [], if test x"$OPLONLY" != xyes
+                          then
+                            AC_MSG_ERROR([libxslt is required!])
+                          fi)
 
 dnl Check for md5 headers
 AC_SEARCH_LIBS(MD5Init, md5)    # Solaris

@@ -22,12 +22,18 @@ AC_ARG_WITH(cclientlib,
         cclientlib=$ac_default_prefix/build/imap/c-client)
 
 AC_CHECK_FILE($cclientinc/mail.h, ,
+  if test x"$OPLONLY" != xyes
+  then
               echo "c-client include directory does not contain c-client.h!";
-              echo "Please specify a suitable c-client include directory: --with-cclientinc=DIR"; exit 1)
+              echo "Please specify a suitable c-client include directory: --with-cclientinc=DIR"; exit 1
+  fi)
 
 AC_CHECK_FILE($cclientlib/c-client.a, ,
+  if test x"$OPLONLY" != xyes
+  then
               echo "c-client lib directory does not contain c-client.a!";
-              echo "Please specify a suitable c-client library directory: --with-cclientlib=DIR"; exit 1)
+              echo "Please specify a suitable c-client library directory: --with-cclientlib=DIR"; exit 1
+  fi)
 
 AC_SUBST(cclientinc)
 AC_SUBST(cclientlib)

@@ -230,13 +230,17 @@ librip.a:
 opl: ut.o ut_string.o ip.o lg.o memwrap.o numconv.o syntax
 	rm -f opl/librpsl.a ; $(AR) cru opl/librpsl.a modules/rpsl/*.o ut.o ut_string.o ip.o lg.o memwrap.o numconv.o
 
+opl-install: opl
+	${mkinstalldirs} $(libdir)
+	${INSTALL} -m 0644 ./opl/librpsl.a ${DESTDIR}$(libdir)
+
 opl-perl: opl
 	cd opl-perl; \
 	$(PERL5) Makefile.PL; \
 	$(OPLMAKE) ; \
 	cd ..
 
-opl-perl-install: opl-perl
+opl-perl-install: opl-perl opl-install
 	cd opl-perl; \
 	$(OPLMAKE) install; \
 	cd ..
