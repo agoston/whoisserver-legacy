@@ -1,0 +1,519 @@
+# organisation object tests
+# CASE 1: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed
+
+
+# CASE 2: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         Then create a person object with AUTO-2
+#         nic-hdl that refers to "org: AUTO-1"
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 2: The creations will succeed
+
+
+# CASE 3: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         and weird characters in "org-name:" (but still valid)
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed
+
+
+# CASE 4: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         and weird characters in "org-name:" (but still valid)
+#         only one valid char in "org-name:" to be put in orgID
+#         (the other must be made up by dbupdate)
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed
+
+
+# CASE 5: Create an org object
+#         with "org-type: LIR" but without
+#         a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#         variable.  
+#
+% make sure that NON-ORG-POWER-MNT is NOT in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will fail
+
+
+# CASE 6: Create an org object
+#         with "org-type: IANA" but without
+#         a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#         variable.  
+#
+% make sure that NON-ORG-POWER-MNT is NOT in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail
+
+
+# CASE 7: Create an org object
+#         with "org-type: NIR" but without
+#         a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#         variable.  
+#
+% make sure that NON-ORG-POWER-MNT is NOT in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail
+
+
+# CASE 8: Create an org object
+#         with "org-type: RIR" but without
+#         a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#         variable.  
+#
+% make sure that NON-ORG-POWER-MNT is NOT in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail
+
+
+# CASE 9: Create an org object
+#         with "org-type: NON-REGISTRY" but without
+#         a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#         variable. Still should succeed. 
+#
+% make sure that NON-ORG-POWER-MNT is NOT in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed
+
+
+# CASE 10: Create an org object
+#          with "org-type: LIR" with
+#          a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#          variable.
+#
+% make sure that TEST-DBM-MNT is in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 10: The creation will succeed
+
+
+# CASE 11: Create an org object
+#          with "org-type: IANA" with
+#          a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#          variable.
+#
+% make sure that TEST-DBM-MNT is in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 11: The creation will succeed
+
+
+# CASE 12: Create an org object
+#          with "org-type: NIR" with
+#          a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#          variable.
+#
+% make sure that TEST-DBM-MNT is in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 12: The creation will succeed
+
+
+# CASE 13: Create an org object
+#          with "org-type: RIR" with
+#          a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#          variable.
+#
+% make sure that TEST-DBM-MNT is in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 13: The creation will succeed
+
+
+# CASE 14: Modify a person object to add an "org:" attribute, 
+#          but the password is missing
+#
+# modify person object
+#
+#FAILURE
+#
+# RESULT 14: The modification will fail
+
+
+# CASE 15: Create a person object with an "org:" attribute, 
+#          but the password is missing for it
+#
+# create person object
+#
+#FAILURE
+#
+# RESULT 15: The creation will fail
+
+
+# CASE 16: Modify a person object to add an "org:" attribute, 
+#          password is provided
+#
+# modify person object
+#
+#SUCCESS
+#
+# RESULT 16: The modification will succeed
+
+
+# CASE 17: Create a person object with an "org:" attribute, 
+#          password is provided
+#
+# create person object
+#
+#SUCCESS
+#
+# RESULT 17: The creation will succeed
+
+
+# CASE 18: Create an inetnum with status "ALLOCATED PA"
+#         but without "org:" which is mandatory for such inetnums.
+#         password for "mnt-by:" is provided
+#
+% make sure the whois config has RIPE-NCC-HM-MNT in ALLOCMNT
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 18: The creation will fail
+
+
+# CASE 19: Create an inetnum with status "ALLOCATED PI"
+#         but without "org:" which is mandatory for such inetnums.
+#         password for "mnt-by:" is provided
+#
+% make sure the whois config has RIPE-NCC-HM-MNT in ALLOCMNT
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 19: The creation will fail
+
+
+# CASE 20: Create an inetnum with status "ALLOCATED UNSPECIFIED"
+#         but without "org:" which is mandatory for such inetnums.
+#         password for "mnt-by:" is provided
+#
+% make sure the whois config has RIPE-NCC-HM-MNT in ALLOCMNT
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 20: The creation will fail
+
+
+# CASE 21: Create an inetnum with status "ALLOCATED PA"
+#         with an "org:" which is mandatory for such inetnums.
+#         password for "mnt-by:" is provided
+#         password for "org:" is also provided
+#
+% make sure the whois config has RIPE-NCC-HM-MNT in ALLOCMNT
+#
+# create inetnum object 
+#
+#SUCCEED
+#
+# RESULT 21: The creation will succeed
+
+
+# CASE 22: Create an inetnum with status "ALLOCATED PI"
+#         with an "org:" which is mandatory for such inetnums.
+#         password for "mnt-by:" is provided
+#         password for "org:" is also provided
+#
+% make sure the whois config has RIPE-NCC-HM-MNT in ALLOCMNT
+#
+# create inetnum object 
+#
+#SUCCEED
+#
+# RESULT 22: The creation will succeed
+
+
+# CASE 23: Create an inetnum with status "ALLOCATED UNSPECIFIED"
+#         with an "org:" which is mandatory for such inetnums.
+#         password for "mnt-by:" is provided
+#         password for "org:" is also provided
+#
+% make sure the whois config has RIPE-NCC-HM-MNT in ALLOCMNT
+#
+# create inetnum object 
+#
+#SUCCEED
+#
+# RESULT 23: The creation will succeed
+
+
+# CASE 24: Create an inetnum with two "org:" attributes,
+#         where it is single valued.
+#         password for "mnt-by:" is provided
+#         password for "org:" is also provided
+#
+% make sure the whois config has RIPE-NCC-HM-MNT in ALLOCMNT
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 24: The creation will fail
+
+
+# CASE 25: Create an aut-num with two "org:" attributes,
+#         where it is single valued.
+#         password for "mnt-by:" is provided
+#         password for "org:" is also provided
+#
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 25: The creation will fail
+
+
+# CASE 26: Create an inet6num with two "org:" attributes,
+#         where it is single valued.
+#         password for "mnt-by:" is provided
+#         password for "org:" is also provided
+#
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 26: The creation will fail
+
+
+# CASE 28: Create an inet6num with status "ALLOCATED-BY-RIR"
+#         but without "org:" which is mandatory for such inetnums.
+#         password for "mnt-by:" is provided
+#
+#
+# create inet6num object 
+#
+#
+#FAILURE
+#
+# RESULT 28: The creation will fail
+
+
+# CASE 30: Create an inet6num with status "ALLOCATED-BY-RIR"
+#         with "org:" which is mandatory for such inetnums.
+#         password for "mnt-by:" is provided
+#
+#
+# create inet6num object 
+#
+#
+#SUCCEED
+#
+# RESULT 30: The creation will succeed
+
+
+# CASE 31: Add an "org:" attribute to a person object,
+#         test notification
+#         password for "org:" is provided
+#
+#
+# modify person object 
+#
+#
+#SUCCEED
+#
+# RESULT 31: The modification will succeed
+
+
+# CASE 32: Remove an "org:" attribute to a person object,
+#          test notification
+#          password for "org:" is provided
+#
+#
+# modify person object 
+#
+#
+#SUCCEED
+#
+# RESULT 32: The modification will succeed
+
+
+# CASE 33: Modify a person object with "org:" attribute.
+#          test notification. Notif must NOT be sent in this case
+#
+#
+# modify person object 
+#
+#
+#SUCCEED
+#
+# RESULT 33: The modification will succeed
+
+
+# CASE 34: Create an org object
+#          with an AUTO-1 nic-hdl (orgID)
+#          and no admin-c/tech-c (they are optional)
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 34: The creation will succeed
+
+
+# CASE 35: Create an org object
+#          inetnum object and person object
+#          Person & org will have auto nic handles,
+#          and the inetnum will refer to both.
+#          Passwords for "org:" attribute and hierarchical auth provided.
+#
+# create organisation object, inetnum and person objects 
+#
+#SUCCESS
+#
+# RESULT 35: The creation will succeed
+
+
+# CASE 36: Create an org object
+#          inetnum object and person object
+#          Person & org will have auto nic handles,
+#          and the inetnum will refer to both.
+#          Passwords for "org:" attribute and hierarchical auth provided.
+#
+# create organisation object, inetnum and person objects 
+#
+#SUCCESS
+#
+# RESULT 36: The creation will succeed
+
+
+# CASE 37: Create two org objects
+#          inetnum object and person object
+#          Person & orgs will have auto nic handles,
+#          and the inetnum will refer to person & an org object.
+#          The other org will have reference to itself, and must fail.
+#          Passwords for "org:" attribute and hierarchical auth provided.
+#
+# create organisation object, inetnum and person objects 
+#
+#SUCCESS
+#
+# RESULT 37: Three creations will succeed, one will fail. 
+
+
+#Afrinic tests
+
+# CASE 38: Create an org object
+#          with an AUTO-1 nic-hdl (orgID)
+#          no override
+#
+# create organisation object 
+#
+#NOOP
+#
+# RESULT 38: The creation will be forwarded to hostmaster
+# rir AFRINIC
+
+
+# CASE 39: Modify an org object
+#          no override
+#
+# modify organisation object 
+#
+#NOOP
+#
+# RESULT 39: The modification will be forwarded to hostmaster
+# rir AFRINIC
+
+
+# CASE 40: Delete an org object
+#          no override
+#
+# delete organisation object 
+#
+#NOOP
+#
+# RESULT 40: The deletion will be forwarded to hostmaster
+# rir AFRINIC
+
+
+# CASE 41: Create an org object
+#          with an AUTO-1 nic-hdl (orgID)
+#          with override
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 41: The creation will succeed
+# rir AFRINIC
+
+
+# CASE 42: Modify an org object
+#          with override
+#
+# modify organisation object 
+#
+#SUCCESS
+#
+# RESULT 42: The modification will succeed
+# rir AFRINIC
+
+
+# CASE 43: Delete an org object
+#          with override
+#
+# delete organisation object 
+#
+#SUCCESS
+#
+# RESULT 43: The deletion will succeed
+# rir AFRINIC
+
+
