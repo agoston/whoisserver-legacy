@@ -161,7 +161,10 @@ typedef enum
   UP_DELETE,
   UP_NOOP_OP,
   UP_SYNTAX_ERR,
-  UP_FWD_OP
+  UP_FWD_OP_CREATE,
+  UP_FWD_OP_MODIFY,
+  UP_FWD_OP_DELETE,
+  UP_FWD_OP_POLICY
 } op_codes;
 
 /* convert the enum to a printable operation string */
@@ -170,7 +173,10 @@ typedef enum
    ((r) == UP_MODIFY)     ? "UP_MODIFY" : \
    ((r) == UP_DELETE)     ? "UP_DELETE" : \
    ((r) == UP_NOOP_OP)    ? "UP_NOOP"   : \
-   ((r) == UP_FWD_OP)     ? "UP_FWD_OP"   : \
+   ((r) == UP_FWD_OP_CREATE)     ? "UP_FWD_OP_CREATE"   : \
+   ((r) == UP_FWD_OP_MODIFY)     ? "UP_FWD_OP_MODIFY" : \
+   ((r) == UP_FWD_OP_DELETE)     ? "UP_FWD_OP_DELETE" : \
+   ((r) == UP_FWD_OP_POLICY)     ? "UP_FWD_OP_POLICY" : \
                             "UNKNOWN" )
 
 /* convert the enum to a printable ripupdate operation string */
@@ -187,14 +193,31 @@ typedef enum
     ((op) == UP_DELETE)   ? AU_DELETE : \
                             -1 )
 
+/* convert the operation to a forward operation */
+#define op2fwd_op(op) ( \
+    ((op) == UP_CREATE)   ? UP_FWD_OP_CREATE : \
+    ((op) == UP_MODIFY)   ? UP_FWD_OP_MODIFY : \
+    ((op) == UP_DELETE)   ? UP_FWD_OP_DELETE : \
+                            -1 )
+
+/* convert the operation to a printable forward operation */
+#define op2fwd_op_str(op) ( \
+    ((op) == UP_CREATE)   ? "CREATION" : \
+    ((op) == UP_MODIFY)   ? "MODIFICATION" : \
+    ((op) == UP_DELETE)   ? "DELETION" : \
+                            "UNKNOWN OPERATION" )
+
 /* convert the operation to an RT operation */
 #define op2rt_upd_op(op) ( \
-    ((op) == UP_CREATE)     ? RT_UPD_ADD : \
-    ((op) == UP_MODIFY)     ? RT_UPD_UPD : \
-    ((op) == UP_DELETE)     ? RT_UPD_DEL : \
-    ((op) == UP_NOOP_OP)    ? RT_UPD_NOOP : \
-    ((op) == UP_SYNTAX_ERR) ? RT_UPD_SYNTAX_ERR : \
-    ((op) == UP_FWD_OP)     ? RT_UPD_FWD : \
+    ((op) == UP_CREATE)            ? RT_UPD_ADD : \
+    ((op) == UP_MODIFY)            ? RT_UPD_UPD : \
+    ((op) == UP_DELETE)            ? RT_UPD_DEL : \
+    ((op) == UP_NOOP_OP)           ? RT_UPD_NOOP : \
+    ((op) == UP_SYNTAX_ERR)        ? RT_UPD_SYNTAX_ERR : \
+    ((op) == UP_FWD_OP_CREATE)     ? RT_UPD_FWD_CREATE : \
+    ((op) == UP_FWD_OP_MODIFY)     ? RT_UPD_FWD_MODIFY : \
+    ((op) == UP_FWD_OP_DELETE)     ? RT_UPD_FWD_DELETE : \
+    ((op) == UP_FWD_OP_POLICY)     ? RT_UPD_FWD_POLICY : \
                               -1 )
 
 /* structure containing data about a single command line option */

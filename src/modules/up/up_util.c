@@ -170,7 +170,7 @@ void UP_free_options(options_struct_t *options)
    Returns  string
 */
 
-char *up_remove_EOLs(char *arg)
+char *UP_remove_EOLs(char *arg)
 {
   while ( strlen(arg) > 0 &&
           (arg[strlen(arg) - 1] == '\n' || 
@@ -303,7 +303,7 @@ void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   while ( fgets(buf, 1023, infile) != NULL ) 
   {
     line = strdup(buf);
-    line = up_remove_EOLs(line);
+    line = UP_remove_EOLs(line);
     fprintf(log_file, "%s", buf);
     LG_log(lg_ctx, LG_DEBUG, "%s", line);
     free(line);
@@ -335,7 +335,7 @@ void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     while ( fgets(buf, 1023, cert_file) != NULL ) 
     {
       line = strdup(buf);
-      line = up_remove_EOLs(line);
+      line = UP_remove_EOLs(line);
       fprintf(log_file, "%s", buf);
       LG_log(lg_ctx, LG_DEBUG, "%s", line);
       free(line);
@@ -928,14 +928,18 @@ int up_external_checks(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             auto_key pointer
             object source
             int handle_auto_keys (Handle AUTO keys if handle_auto_keys==1)
+            reason pointer to policy check fail string
+            list of credentials
    Returns  UP_OK if successful
-            UP_FAIL otherwise
+            UP_FAIL, UP_FWD otherwise
 */
 
 int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                            options_struct_t *options, key_info_t *key_info,
                            rpsl_object_t *preproc_obj,int operation,
-                           char *auto_key, char *obj_source, LU_server_t *server, int handle_auto_keys)
+                           char *auto_key, char *obj_source, LU_server_t *server,
+                           int handle_auto_keys, char **reason,
+                           GList *credentials)
 {
   int retval = UP_OK;
   int key_status;
@@ -945,6 +949,7 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   char *countries[COUNTRY_LIST_SIZE];
   char **temp_vector;
   char *value;
+  char *rir = NULL;
   KM_context_t key_cert_type;
   KM_key_return_t *key_data = NULL;
   GList *overlap = NULL;
@@ -1058,20 +1063,20 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval |= UP_check_organisation(rt_ctx, lg_ctx, preproc_obj, operation);
 
     /* check for references to AUTO- keys */
-    if(handle_auto_keys){
-    if ( ! retval && UP_has_ref_to_AUTO_key(lg_ctx, preproc_obj) )
+    if (handle_auto_keys)
+    {
+      if ( retval==UP_OK && UP_has_ref_to_AUTO_key(lg_ctx, preproc_obj) )
       {
         /* replace references to auto keys with the already assigned keys */
         retval |= UP_replace_refs_to_AUTO_key(rt_ctx, lg_ctx, options, preproc_obj, 1);
       }
     }
   }
-  
+
   type = rpsl_object_get_class(preproc_obj);
-
   if ( (! strcasecmp(type, "inetnum")) && (operation == UP_CREATE)) 
-  { /* check overlapping inetnums */
-
+  { 
+    /* check overlapping inetnums */
     if ( LU_check_overlap(server, &overlap, preproc_obj, obj_source) != LU_OKAY )
     {
       /* any lookup error is considered a fatal error */
@@ -1084,7 +1089,27 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       retval |= UP_FAIL;
     }
   }
+  
+  /* MAKE THE POLICY CHECK THE LAST ONE IN THIS FUNCTION */
+  rir = ca_get_rir;
+  assert(rir != NULL); /* should never fail */
+  rir = UP_remove_EOLs(rir);
+  LG_log(lg_ctx, LG_DEBUG,"up_pre_process_object: rir [%s]", rir);
+  if ( ! strcasecmp(rir, "AFRINIC") && retval==UP_OK )
+  {
+    /* AfriNic policy checks 
+       Only do these if all other checks succeeded */
+    retval |= UP_check_policy(rt_ctx, lg_ctx, options, operation, 
+                                  preproc_obj, reason, credentials);
+    if ( retval & UP_FWD )
+    {
+      RT_policy_fail(rt_ctx, *reason);
+    }
+  }
+  
+  /***** ADD ANY NEW CHECKS BEFORE THE POLICY CHECK ABOVE ******/
  
+  LG_log(lg_ctx, LG_FUNC,"<up_pre_process_object: exiting");
   return retval;
 }
 
@@ -1229,7 +1254,7 @@ int up_get_error_num(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
 
   /* split the string into lines */
-  temp = ut_g_strsplit_v1(string , "\n", 0);
+  temp = ut_g_strsplit_v1((char *)string , "\n", 0);
   num_idx = 0;
   for (line_idx = 0; temp[line_idx] != NULL; line_idx++)
   {
@@ -1718,6 +1743,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   const char *object_class;
   char *key_value = NULL;
   char *value;
+  char *reason = NULL;
   rpsl_object_t *object = NULL;
   rpsl_object_t *old_object = NULL;
   rpsl_object_t *preproc_obj = NULL;
@@ -1744,7 +1770,8 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   RT_set_object(rt_ctx, object);
 
-  if ( is_dot_removed ) {
+  if ( is_dot_removed )
+  {
     RT_rdns_trailingdotremoved(rt_ctx);
     rpsl_object_delete(object);
     object = rpsl_object_init(object_str);
@@ -1869,10 +1896,8 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                                    old_object_str, old_object, &operation);
   if ( retval != UP_OK ) goto up_process_object_exit;
 
-  /*
-     Check if we have converted a CIDR key into range earlier.  
-     This is only allowed for a creation.
-  */
+  /* Check if we have converted a CIDR key into range earlier.  
+     This is only allowed for a creation. */
   if(inetnum_key_converted == 1 && operation != UP_CREATE)
   {
     RT_slash_not_allowed(rt_ctx);
@@ -1885,15 +1910,28 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* set up storage location for the auto code sent to the core server  */
   auto_key = (char *)calloc(AUTO_KEY_LENGTH, sizeof(char)); 
   retval = up_pre_process_object(rt_ctx, lg_ctx, options, &key_info, preproc_obj, 
-                                    operation, auto_key, obj_source, current_server, handle_auto_keys);
+                                    operation, auto_key, obj_source, current_server,
+                                    handle_auto_keys, &reason, credentials);
 
   if ( retval != UP_OK )
   {
-    LG_log(lg_ctx, LG_DEBUG,"up_process_object: pre-processing failed, checking for auth errors");
-//    goto up_process_object_exit;
+    LG_log(lg_ctx, LG_DEBUG,"up_process_object: pre-processing failed");
+    if ( retval & UP_FWD )
+    {
+      LG_log(lg_ctx, LG_FATAL,"up_process_object: policy checks failed");
+      LG_log(lg_ctx, LG_FATAL,"up_process_object: %s", reason);
+      /* send message to hostmaster */
+      NT_forw_policy_fail(rt_ctx, lg_ctx, options, op2fwd_op_str(operation),
+                             object, reason, credentials); 
+      retval = UP_FWD;
+      operation = UP_FWD_OP_POLICY;
+      goto up_process_object_exit;   /* finished processing this object */
+    }
+    /* else check auth before reporting pre processing errors */
   }
 
   /* auth checks */
+  LG_log(lg_ctx, LG_DEBUG,"up_process_object: checking for auth errors");
   AU_set_lookup(current_server);
   au_retval = AU_check_auth(preproc_obj, credentials, op2au_op(operation), 
                             rt_ctx, &mntner_used);
@@ -1903,15 +1941,17 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     LG_log(lg_ctx, LG_DEBUG,"up_process_object: check auth returned %s", AU_ret2str(au_retval));
     if ( au_retval == AU_FWD )
     {
-      /* This was a maintainer, irt or as-block creation request with no override.
+      /* This was an irt (RIPE) or as-block creation request, or an organisation
+         operation (AfriNic), with no override.
          If we are not in test mode and no pre-processing errors were found,
          forward it to <HUMAILBOX>  */
       if ( retval == UP_OK && ! options->test_mode )
       {
         LG_log(lg_ctx, LG_DEBUG,"up_process_object: send forward create message");
-        NT_forw_create_req(rt_ctx, lg_ctx, options, object, credentials);
+        NT_forw_create_req(rt_ctx, lg_ctx, options, op2fwd_op_str(operation), 
+                              object, credentials);
         retval = UP_FWD;
-        operation = UP_FWD_OP;
+        operation = op2fwd_op(operation);
       }
     }
     /* otherwise auth failed */
@@ -2137,7 +2177,7 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   {
     line = split_lines[line_idx];  /* just to make the next few lines easier to read */
     /* remove '\n's and '\r' first */
-    line = up_remove_EOLs(line);
+    line = UP_remove_EOLs(line);
     /* remove trailing white space */
     line = g_strchomp(line); 
     

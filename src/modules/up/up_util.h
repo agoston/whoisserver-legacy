@@ -63,4 +63,6 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                       options_struct_t *options, char *object_str,
                       GList *credentials, int handle_auto_keys);
 
+char *UP_remove_EOLs(char *arg);
+
 #endif

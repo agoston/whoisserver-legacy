@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.30 $
+  $Revision: 1.1 $
 
   Reporting module.
 
@@ -359,8 +359,17 @@ void RT_unset_object(RT_context_t* ctx, RT_upd_op operation, gboolean result) {
   case RT_UPD_SYNTAX_ERR:
     sprintf(op, "Syntax Error");
     break;
-  case RT_UPD_FWD:
-    sprintf(op, "Forward");
+  case RT_UPD_FWD_CREATE:
+    sprintf(op, "Forward Create");
+    break;
+  case RT_UPD_FWD_MODIFY:
+    sprintf(op, "Forward Modify");
+    break;
+  case RT_UPD_FWD_DELETE:
+    sprintf(op, "Forward Delete");
+    break;
+  case RT_UPD_FWD_POLICY:
+    sprintf(op, "Forward Policy");
     break;
   default:
     sprintf(op, "Unknown");
@@ -763,6 +772,23 @@ void RT_changed_date_syntax(RT_context_t* ctx, gchar* msg) { //
 
   node = xmlNewNode(NULL, (xmlChar*)"changed_date_syntax");
   rt_add_text_node(node, "message", msg);
+  rt_prepare_node(ctx, node);
+}
+
+/*+
+  RT_policy_fail - Reports that an object fails a policy check.
+
+  RT_context_t* ctx - Context.
+
+  char* reason - The reason why it failed.
+  +*/
+void RT_policy_fail(RT_context_t* ctx, gchar* reason) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"policy_fail");
+
+  rt_add_text_node(node, "reason", reason);
+
   rt_prepare_node(ctx, node);
 }
 
@@ -1330,10 +1356,11 @@ void RT_notif_origin(RT_context_t* ctx, gchar* origin) { //
   rt_prepare_node(ctx, node);
 }
 
-void RT_notif_add_msg(RT_context_t* ctx, gchar* message) {
+void RT_notif_add_msg(RT_context_t* ctx, gchar* message, char *op) {
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*)"notif_message");
+  rt_add_text_node(node, "op", op);
   rt_add_text_node(node, "message", message);
 
   rt_prepare_node(ctx, node);

@@ -63,6 +63,9 @@ typedef enum
   UP_NOTIF=0, 
   UP_FRWD,
   UP_FRWD_CREATE,
+  UP_FRWD_MODIFY,
+  UP_FRWD_DELETE,
+  UP_FRWD_POLICY,
   UP_ACK
 } notif_codes;
 
@@ -71,6 +74,9 @@ typedef enum
   (((r) == UP_NOTIF)         ? "UP_NOTIF" : \
    ((r) == UP_FRWD)          ? "UP_FRWD" : \
    ((r) == UP_FRWD_CREATE)   ? "UP_FRWD_CREATE" : \
+   ((r) == UP_FRWD_MODIFY)   ? "UP_FRWD_MODIFY" : \
+   ((r) == UP_FRWD_DELETE)   ? "UP_FRWD_DELETE" : \
+   ((r) == UP_FRWD_POLICY)   ? "UP_FRWD_POLICY" : \
    ((r) == UP_ACK)           ? "UP_ACK" : \
                                "UNKNOWN" )
 
@@ -79,6 +85,9 @@ typedef enum
   (((r) == UP_NOTIF)         ? "NOTIF" : \
    ((r) == UP_FRWD)          ? "FRWD" : \
    ((r) == UP_FRWD_CREATE)   ? "FRWD CREATE" : \
+   ((r) == UP_FRWD_MODIFY)   ? "FRWD MODIFY" : \
+   ((r) == UP_FRWD_DELETE)   ? "FRWD DELETE" : \
+   ((r) == UP_FRWD_POLICY)   ? "FRWD POLICY" : \
    ((r) == UP_ACK)           ? "ACK" : \
                                "UNKNOWN" )
 
@@ -102,9 +111,13 @@ void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                                   options_struct_t *options, int type);
 
 void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
-                             options_struct_t *options, rpsl_object_t *object,
-                             GList *credentials);
+                             options_struct_t *options, char *operation,
+                             rpsl_object_t *object, GList *credentials);
 
+void NT_forw_policy_fail(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+                             options_struct_t *options, char *operation,
+                             rpsl_object_t *object, char *reason, 
+                             GList *credentials);
 
 
 #endif

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.18 $
+  $Revision: 1.1 $
 
   UP pre process checks
 
@@ -37,6 +37,7 @@
 #include <assert.h>
 #include "rip.h"
 
+#include "iproutines.h"
 #include "km.h"
 #include "ca_defs.h"
 #include "dbupdate.h"
@@ -138,10 +139,12 @@ int UP_check_country_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    The inetnums and inet6nums have to have an "org:" attribute if their
    "status:" attribute is ALLOCATED-BY-RIR, ALLOCATED PI,
    ALLOCATED PA or ALLOCATED UNSPECIFIED
+   Also for AfriNic - SUB-ALLOCATED PA
+   
    Receives RT context
             LG context
             parsed object
-   Returns  UP_FAIL if an object does not have an "org:" attr while it has to have one
+   Returns  UP_FAIL if an object does not have an "org:" attr when it has to have one
             UP_OK if optionality of "org:" attribute is OK
 */
 
@@ -149,33 +152,75 @@ int UP_check_org_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              rpsl_object_t *preproc_obj)
 {
   int retval = UP_OK; 
+  char *rir = NULL;
   const char *type = NULL;
   char *status_value = NULL;
   GList *status_attrs = NULL;
   GList *org_attrs = NULL;
  
 
-  LG_log(lg_ctx, LG_FUNC,">UP_check_org_attr: entered\n");
+  LG_log(lg_ctx, LG_FUNC,">UP_check_org_attr: entered");
 
   type = rpsl_object_get_class(preproc_obj);
   org_attrs = rpsl_object_get_attr(preproc_obj, "org");
 
-  if( strncmp(type,"inetnum", strlen("inetnum")) == 0 )
+  rir = ca_get_rir;
+  assert(rir != NULL); /* should never fail */
+  rir = UP_remove_EOLs(rir);
+  LG_log(lg_ctx, LG_DEBUG,"UP_check_org_attr: rir [%s]", rir);
+
+  if ( strncmp(type,"inetnum", strlen("inetnum")) == 0 )
   {
     /* if the object is an inetnum */
     status_attrs = rpsl_object_get_attr(preproc_obj, "status");
-    if(status_attrs == NULL){/* this should have been checked in RPSL syntax checks. Just return OK */
+    if (status_attrs == NULL)
+    {
+      /* this should have been checked in RPSL syntax checks. Just return OK */
       retval = UP_OK;
     }
     else
     {
        status_value = rpsl_attr_get_clean_value(status_attrs->data);
        g_strup(status_value);
-       if(   strncmp(status_value, "ALLOCATED PI", strlen("ALLOCATED PI")) == 0 
-          || strncmp(status_value, "ALLOCATED PA", strlen("ALLOCATED PA")) == 0 
-          || strncmp(status_value, "ALLOCATED UNSPECIFIED", strlen("ALLOCATED UNSPECIFIED")) == 0)
+       if ( strncmp(status_value, "ALLOCATED PI", strlen("ALLOCATED PI")) == 0 
+            || strncmp(status_value, "ALLOCATED PA", strlen("ALLOCATED PA")) == 0 
+            || strncmp(status_value, "ALLOCATED UNSPECIFIED", strlen("ALLOCATED UNSPECIFIED")) == 0
+            || ( ! strcasecmp(rir, "AFRINIC") && strncmp(status_value, "SUB-ALLOCATED PA", strlen("SUB-ALLOCATED PA")) == 0) )
        {
+         LG_log(lg_ctx, LG_DEBUG,"UP_check_org_attr: inetnum requires org");
          if(org_attrs == NULL)
+         {
+           retval = UP_FAIL; /* this object must have an "org:" attribute! */
+           LG_log(lg_ctx, LG_DEBUG,"UP_check_org_attr: no org found");
+         }
+         else
+         {
+           retval = UP_OK;
+         }
+       }
+       else
+       {
+         retval = UP_OK;
+       }
+       free(status_value);
+    }
+  }
+  else if ( strncmp(type,"inet6num", strlen("inet6num")) == 0 )
+  {
+    /* if the object is an inet6num */
+    status_attrs = rpsl_object_get_attr(preproc_obj, "status");
+    if (status_attrs == NULL)
+    {
+      /* this should have been checked in RPSL syntax checks. Just return OK */
+      retval = UP_OK;
+    }
+    else
+    {
+       status_value = rpsl_attr_get_clean_value(status_attrs->data);
+       g_strup(status_value);
+       if ( strncmp(status_value, "ALLOCATED-BY-RIR", strlen("ALLOCATED-BY-RIR")) == 0 )
+       {
+         if (org_attrs == NULL)
          {
            retval = UP_FAIL; /* this object must have an "org:" attribute! */
          }
@@ -191,61 +236,31 @@ int UP_check_org_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
        free(status_value);
     }
   }
-  else if( strncmp(type,"inet6num", strlen("inet6num")) == 0 )
+  else
   {
-    /* if the object is an inet6num */
-    status_attrs = rpsl_object_get_attr(preproc_obj, "status");
-    if(status_attrs == NULL){/* this should have been checked in RPSL syntax checks. Just return OK */
-      retval = UP_OK;
-    }
-    else
-    {
-       status_value = rpsl_attr_get_clean_value(status_attrs->data);
-       g_strup(status_value);
-       if( strncmp(status_value, "ALLOCATED-BY-RIR", strlen("ALLOCATED-BY-RIR")) == 0 )
-       {
-         if(org_attrs == NULL)
-         {
-           retval = UP_FAIL; /* this object must have an "org:" attribute! */
-         }
-         else
-         {
-           retval = UP_OK;
-         }
-       }
-       else
-       {
-         retval = UP_OK;
-       }
-       free(status_value);
-    }
-
-
-  }else{
     /* if the object is not an inet(6)num object, just return OK */
     retval = UP_OK;
   }
 
-
-  if(retval != UP_OK)
+  if (retval != UP_OK)
   {
     RT_wrong_org_attr_optionality(rt_ctx);
   }
 
-  LG_log(lg_ctx, LG_FUNC,"<UP_check_org_attr: exiting with value [%s]\n", UP_ret2str(retval));
+  LG_log(lg_ctx, LG_FUNC,"<UP_check_org_attr: exiting with value [%s]", UP_ret2str(retval));
   return retval;
 }
 
 
-
-/* checks that if the incoming object for creation is an organisation object, it has
-   AUTO-nic handle or not.  If not, the creation must be rejected.
+/* checks that if the incoming object for creation is an organisation object, 
+   it has AUTO-nic handle or not.  If not, the creation must be rejected.
    Receives RT context
             LG context
             parsed object
             operation type
-   Returns  UP_FAIL if the object is an organisation object, and the operation is creation,
-              and the "organisation:" attribute is NOT "AUTO-".
+   Returns  UP_FAIL if the object is an organisation object, 
+                    and the operation is creation,
+                    and the "organisation:" attribute is NOT "AUTO-".
             UP_OK otherwise
 */
 
@@ -256,43 +271,45 @@ int UP_check_organisation(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   const char *type = NULL;
   char *organisation_value = NULL;
   GList *organisation_attrs = NULL;
- 
 
   LG_log(lg_ctx, LG_FUNC,">UP_check_organisation: entered\n");
 
   /* if the operation is not creation, then return OK */
-  if(operation != UP_CREATE){
+  if (operation != UP_CREATE)
+  {
     return retval;
   }
 
   type = rpsl_object_get_class(preproc_obj);
-
   if( strncmp(type,"organisation", strlen("organisation")) == 0 )
   {
     /* if the object is an organisation */
     organisation_attrs = rpsl_object_get_attr(preproc_obj, "organisation");
-    if(organisation_attrs == NULL){/* this should never happen */
+    if (organisation_attrs == NULL)
+    {
+      /* this should never happen */
       retval = UP_FAIL;
     }
     else
     {
-       organisation_value = rpsl_attr_get_clean_value(organisation_attrs->data);
-       g_strup(organisation_value);
-       if( strstr(organisation_value, "AUTO-") != organisation_value )
-       {
-         retval = UP_FAIL; /* "organisation:" attribute does not have AUTO- */
-       }
-       else
-       {
-         retval = UP_OK;
-       }
-       free(organisation_value);
+      organisation_value = rpsl_attr_get_clean_value(organisation_attrs->data);
+      g_strup(organisation_value);
+      if ( strstr(organisation_value, "AUTO-") != organisation_value )
+      {
+        retval = UP_FAIL; /* "organisation:" attribute does not have AUTO- */
+      }
+      else
+      {
+        retval = UP_OK;
+      }
+      free(organisation_value);
     }
-  }else{
+  }
+  else
+  {
     /* if the object is not an organisation object, just return OK */
     retval = UP_OK;
   }
-
 
   if(retval != UP_OK)
   {
@@ -302,8 +319,6 @@ int UP_check_organisation(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   LG_log(lg_ctx, LG_FUNC,"<UP_check_organisation: exiting with value [%s]\n", UP_ret2str(retval));
   return retval;
 }
-
-
 
 
 /* checks for a valid suffix at the end of a 'nic-hdl' attributes 
@@ -887,7 +902,7 @@ int UP_check_changed_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   GList *date_item = NULL;
   GList *changed_list;
 
-  LG_log(lg_ctx, LG_FUNC,">UP_check_changed_attr: entered\n");
+  LG_log(lg_ctx, LG_FUNC,">UP_check_changed_attr: entered");
 
   /* perform all checks to report any errors.
      all functions called return 0 (UP_OK) for success, non zero (UP_FAIL) for error
@@ -916,7 +931,7 @@ int UP_check_changed_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
   g_list_free(date_list);
 
-  LG_log(lg_ctx, LG_FUNC,"<UP_check_changed_attr: exiting with value [%s]\n", UP_ret2str(retval));
+  LG_log(lg_ctx, LG_FUNC,"<UP_check_changed_attr: exiting with value [%s]", UP_ret2str(retval));
   return retval;
 }
 
@@ -947,7 +962,7 @@ int UP_check_disallowmnt(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   GList *mntattr;
   GList *refby;
 
-  LG_log(lg_ctx, LG_FUNC,">UP_check_disallowmnt: entered\n");
+  LG_log(lg_ctx, LG_FUNC,">UP_check_disallowmnt: entered");
 
   /* get the list of DISALLOWMNT mntner names */
   disallow_mntner_str = ca_get_disallowmnt;
@@ -1005,7 +1020,7 @@ LG_log(lg_ctx, LG_DEBUG, "UP_check_disallowmnt: disallow_mntner_str %s",
     g_strfreev(disallow_mntner_list);
   }
 
-  LG_log(lg_ctx, LG_FUNC,"<UP_check_disallowmnt: exiting with value [%s]\n", UP_ret2str(retval));
+  LG_log(lg_ctx, LG_FUNC,"<UP_check_disallowmnt: exiting with value [%s]", UP_ret2str(retval));
   return retval;
 }
 
@@ -1017,7 +1032,8 @@ LG_log(lg_ctx, LG_DEBUG, "UP_check_disallowmnt: disallow_mntner_str %s",
     This test might look a bit sloppy but together with the front-end syntax 
     checks it should be enough (and all I could do to improve this is to 
     copy/paste the front-end regex here anyway).
-*/    
+*/   
+ 
 int up_is_inetnum_cidr(rpsl_object_t *object)
 {
   int retval = 0;
@@ -1025,14 +1041,14 @@ int up_is_inetnum_cidr(rpsl_object_t *object)
 
   attr_list = rpsl_object_get_attr(object, "inetnum");
 
-  if(attr_list == NULL)
+  if (attr_list == NULL)
   {
-      return retval;
+    return retval;
   }
 
-  if(strchr(rpsl_attr_get_clean_value((rpsl_attr_t *)attr_list->data), '/') != NULL)
+  if (strchr(rpsl_attr_get_clean_value((rpsl_attr_t *)attr_list->data), '/') != NULL)
   {
-      retval = 1;
+    retval = 1;
   }
   rpsl_attr_delete_list(attr_list);
   return retval;
@@ -1054,7 +1070,10 @@ int up_is_inetnum_cidr(rpsl_object_t *object)
             UP_OK if all ok
 
 */
-int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *object, int *inetnum_key_converted)
+
+int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+                               rpsl_object_t *object, 
+                               int *inetnum_key_converted)
 {
   int ip_retval = IP_OK;
   int is_converted = 0;
@@ -1067,13 +1086,13 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_o
   GList *attr_list = NULL;
   rpsl_attr_t *attr;
 
-  LG_log(lg_ctx, LG_FUNC,">up_convert_inetnum_prefix: entered\n");
+  LG_log(lg_ctx, LG_FUNC,">up_convert_inetnum_prefix: entered");
 
   attr_list = rpsl_object_get_attr(object, "inetnum");
 
-  if(attr_list == NULL)
+  if (attr_list == NULL)
   {
-    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: cannot fetch %s inetnum: attribute\n");
+    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: cannot fetch %s inetnum: attribute");
     return UP_FAIL;
   }
 
@@ -1081,17 +1100,18 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_o
    * Check if the key is in CIDR notation
    * Return without doing anything if it is.
    */
-  if(! up_is_inetnum_cidr(object))
+  if ( ! up_is_inetnum_cidr(object))
   {
+    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: not CIDR");
     rpsl_attr_delete_list(attr_list);
     return UP_OK;
   }
       
   prefix = g_strdup(rpsl_attr_get_clean_value((rpsl_attr_t *)attr_list->data));
 
-  if(prefix == NULL)
+  if (prefix == NULL)
   {
-    LG_log(lg_ctx, LG_ERROR,"up_convert_inetnum_prefix: g_strdup() returned NULL\n");
+    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: g_strdup() returned NULL");
     rpsl_attr_delete_list(attr_list);
     return UP_FAIL;
   }
@@ -1100,9 +1120,9 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_o
   ip_retval = IP_smart_range(prefix, &range, IP_EXPN, &ipk);
 
   /* handle error condition when the range could not be parsed */
-  if(ip_retval != IP_OK)
+  if (ip_retval != IP_OK)
   {
-    LG_log(lg_ctx, LG_ERROR,"up_convert_inetnum_prefix: IP_smart_range() could not parse '%s'\n", prefix);
+    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: IP_smart_range() could not parse [%s]", prefix);
     RT_inetnum_prefix_convert_failed(rt_ctx, prefix);
     rpsl_attr_delete_list(attr_list);
     g_free(prefix);
@@ -1111,9 +1131,9 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_o
  
   /* convert the binary range structure into ASCII range representation */
   ip_retval = IP_rang_b2a(&range, ascii_range, IP_RANGSTR_MAX);
-  if(ip_retval != IP_OK)
+  if (ip_retval != IP_OK)
   {
-    LG_log(lg_ctx, LG_ERROR,"up_convert_inetnum_prefix: IP_rang_b2a() failed on %s\n", prefix);
+    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: IP_rang_b2a() failed on [%s]", prefix);
     rpsl_attr_delete_list(attr_list);
     g_free(prefix);
     return UP_FAIL;
@@ -1122,9 +1142,9 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_o
   /* the key attribute we'll rewrite */
   attr = (rpsl_attr_t *)rpsl_object_get_attr_by_ofs(object, 0);
 
-  if(attr == NULL)
+  if (attr == NULL)
   {
-    LG_log(lg_ctx, LG_FUNC,"up_convert_inetnum_prefix: cannot fetch attribute at offset 0\n");
+    LG_log(lg_ctx, LG_FUNC,"<up_convert_inetnum_prefix: cannot fetch attribute at offset 0");
     g_free(prefix);
     return UP_FAIL;
   }
@@ -1133,7 +1153,7 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_o
 
   is_converted = 1;
 
-  if(inetnum_key_converted != NULL)
+  if (inetnum_key_converted != NULL)
   {
     *inetnum_key_converted = is_converted;
   }
@@ -1142,7 +1162,7 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_o
    * which I'm not sure allocates memory for the return value -- the doc doesn't say anything
    * about that. */
 
-  LG_log(lg_ctx, LG_FUNC,"<up_convert_inetnum_prefix: exiting with value [%s]\n", 
+  LG_log(lg_ctx, LG_FUNC,"<up_convert_inetnum_prefix: exiting with value [%s]", 
       UP_ret2str(UP_OK));
 
   rpsl_attr_delete_list(attr_list);
@@ -1172,13 +1192,13 @@ int UP_check_filter_set_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   int filter_count, mp_filter_count;
   const char *type = NULL;
 
-
-  LG_log(lg_ctx, LG_FUNC,">UP_check_filter_set_object: entered\n");
+  LG_log(lg_ctx, LG_FUNC,">UP_check_filter_set_object: entered");
 
   type = rpsl_object_get_class(preproc_obj);
   /* if the object is not a filter-set object, return OK */
-  if( strcasecmp(type, "filter-set") != 0){
-    LG_log(lg_ctx, LG_FUNC,"<UP_check_filter_set_object: exiting with value [%s]\n",
+  if ( strcasecmp(type, "filter-set") != 0)
+  {
+    LG_log(lg_ctx, LG_FUNC,"<UP_check_filter_set_object: exiting with value [%s]",
                             UP_ret2str(UP_OK));
     return UP_OK;
   }
@@ -1191,25 +1211,26 @@ int UP_check_filter_set_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   filter_list = rpsl_object_get_attr(preproc_obj, "filter");
   filter_count = g_list_length(filter_list);
 
-  if( (filter_count > 0) && (mp_filter_count > 0)){
+  if ( (filter_count > 0) && (mp_filter_count > 0))
+  {
     /* if we have both filter and mp-filter attributes, we have an error */
     retval = UP_FAIL;  
     LG_log(lg_ctx, LG_ERROR,"UP_check_filter_set_object: %s", 
            "a filter-set object cannot contain both mp-filter and filter attributes");
     RT_filter_set_syntax(rt_ctx);
-
-  } else {
+  }
+  else
+  {
     retval = UP_OK;
   }
 
   rpsl_attr_delete_list(filter_list);
   rpsl_attr_delete_list(mp_filter_list);
 
-  LG_log(lg_ctx, LG_FUNC,"<UP_check_filter_set_object: exiting with value [%s]\n", UP_ret2str(retval));
+  LG_log(lg_ctx, LG_FUNC,"<UP_check_filter_set_object: exiting with value [%s]",
+             UP_ret2str(retval));
   return retval;
-
 }
-
 
 
 /* checks the peering-set objects.
@@ -1233,13 +1254,13 @@ int UP_check_peering_set_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   int peering_count, mp_peering_count;
   const char *type = NULL;
 
-
-  LG_log(lg_ctx, LG_FUNC,">UP_check_peering_set_object: entered\n");
+  LG_log(lg_ctx, LG_FUNC,">UP_check_peering_set_object: entered");
 
   type = rpsl_object_get_class(preproc_obj);
   /* if the object is not a peering-set object, return OK */
-  if( strcasecmp(type, "peering-set") != 0){
-    LG_log(lg_ctx, LG_FUNC,"<UP_check_peering_set_object: exiting with value [%s]\n",
+  if ( strcasecmp(type, "peering-set") != 0)
+  {
+    LG_log(lg_ctx, LG_FUNC,"<UP_check_peering_set_object: exiting with value [%s]",
                             UP_ret2str(UP_OK));
     return UP_OK;
   }
@@ -1252,27 +1273,246 @@ int UP_check_peering_set_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   peering_list = rpsl_object_get_attr(preproc_obj, "peering");
   peering_count = g_list_length(peering_list);
 
-  if( (peering_count == 0) && (mp_peering_count == 0)){
+  if ( (peering_count == 0) && (mp_peering_count == 0))
+  {
     /* if we have both peering and mp-peering attributes, we have an error */
     retval = UP_FAIL;  
     LG_log(lg_ctx, LG_ERROR,"UP_check_peering_set_object: %s", 
            "a peering-set object must contain at least one mp-peering or peering attribute");
     RT_peering_set_syntax(rt_ctx);
 
-  } else {
+  }
+  else
+  {
     retval = UP_OK;
   }
 
   rpsl_attr_delete_list(peering_list);
   rpsl_attr_delete_list(mp_peering_list);
 
-  LG_log(lg_ctx, LG_FUNC,"<UP_check_peering_set_object: exiting with value [%s]\n", UP_ret2str(retval));
+  LG_log(lg_ctx, LG_FUNC,"<UP_check_peering_set_object: exiting with value [%s]", 
+                   UP_ret2str(retval));
   return retval;
-
 }
 
 
+/* Gets the Sub Allocation Window size from a lookup file,
+   indexed by LIR organisation name.
+   Receives RT context
+            LG context
+            options structure
+            organisation
+   Returns  saw size if successful
+            -1 otherwise
+*/
 
+int up_get_saw(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+                 options_struct_t *options, char *organisation)
+{
+  int saw;
+  int size;
+  int found;
+  char *saw_file_name = NULL;
+  char buf[256];
+  char *line = NULL;
+  char *saw_str = NULL;
+  char **list = NULL;
+  FILE *saw_fh;
+
+  LG_log(lg_ctx, LG_FUNC,">up_get_saw: entered with org reference [%s]", organisation);
+  
+  saw_file_name = ca_get_sawfile;
+  assert(saw_file_name != NULL); /* should never fail */
+  if (( saw_fh = fopen(saw_file_name, "r")) == NULL)
+  {
+    LG_log(lg_ctx, LG_FATAL, "up_get_saw: Can't open SAW lookup file [%s]", saw_file_name);
+    UP_internal_error(rt_ctx, lg_ctx, options, "Can't open SAW lookup file\n", 0);
+  }
+
+  found = 0;
+  /* find the organisation in the file */
+  while ( fgets(buf, 255, saw_fh) != NULL ) 
+  {
+    line = strdup(buf);
+    line = UP_remove_EOLs(line);
+    list = ut_g_strsplit_v1(line, ",", 0);
+    if ( list[0] == NULL )
+    {
+      /* ignore any blank lines */
+      free(line);
+      continue; 
+    }
+    if ( ! strcasecmp(organisation, list[0]) )
+    {
+      /* found it, now get the SAW */
+      found = 1;
+      if ( list[1] == NULL )
+      {
+        LG_log(lg_ctx, LG_DEBUG,"up_get_saw: organisation found, but no SAW value");
+      }
+      else
+      {
+        saw_str = strdup(list[1]);
+        LG_log(lg_ctx, LG_DEBUG,"up_get_saw: organisation found, SAW string [%s]", saw_str);
+      }
+      free(line);
+      break;
+    }
+    free(line);
+  }
+  fclose(saw_fh);
+  
+  if ( found && saw_str != NULL )
+  {
+    saw = atoi((const char *)saw_str);
+    LG_log(lg_ctx, LG_DEBUG,"up_get_saw: organisation found, SAW slash size [%d]", saw);
+    free(saw_str);
+    if ( saw > 32 )
+    {
+      LG_log(lg_ctx, LG_DEBUG,"<up_get_saw: SAW value > 32");
+      return -1;
+    }
+  }
+  /* This is the /<size> value,
+     now find the size of this */
+  size = 2<<(32-saw-1);
+
+  LG_log(lg_ctx, LG_FUNC,"<up_get_saw: exiting with saw [%d]", size);
+  return size;
+}
+
+
+/* Gets the size of a range,
+   Receives LG context
+            value - range string
+   Returns  size if successful
+            -1 otherwise
+*/
+
+int up_get_size_from_range(LG_context_t *lg_ctx, char *value)
+{
+  int retval;
+  char **list = NULL;
+  ip_range_t range;
+  ip_rangesize_t  span;
+
+  LG_log(lg_ctx, LG_FUNC,">up_get_size_from_range: entered with range [%s]", value);
+  retval = IP_rang_t2b(&range, (const char *)value, IP_PLAIN);
+  if ( retval != IP_OK )
+  {
+    /* invalid range */
+    LG_log(lg_ctx, LG_DEBUG,"<up_get_size_from_range: IP_rang_t2b returned [%d]", retval);
+    return -1;
+  }
+  LG_log(lg_ctx, LG_DEBUG,"up_get_size_from_range: range.begin [%d]", range.begin.words[0]);
+  LG_log(lg_ctx, LG_DEBUG,"up_get_size_from_range: range.begin [%d]", range.end.words[0]);
+  span = IP_rang_span(&range) +1;
+
+  LG_log(lg_ctx, LG_FUNC,"<up_get_size_from_range: exiting with size [%d]", (int)span);
+  return (int)span;
+}
+
+
+/* Check if override password was supplied.
+   Receives LG context
+            credentials list
+   Returns  UP_OK if supplied
+            UP_FAIL otherwise
+*/
+
+int up_override(LG_context_t *lg_ctx, GList *credentials)
+{
+  int retval = UP_FAIL;
+  char *override_pwd;
+  size_t len;
+
+  LG_log(lg_ctx, LG_FUNC, ">up_override: entered");
+
+  override_pwd = ca_get_overridecryptedpw;
+  /* chop off any trailing newline */
+  len = strlen(override_pwd);
+  if ( (len > 0) && (override_pwd[len-1] == '\n') )
+  {
+    override_pwd[len-1] = '\0';
+  }
+  
+  if ( CR_credential_list_check(credentials, CR_OVERRIDE, override_pwd, FALSE) )
+  {
+    /* override password was supplied */
+    retval = UP_OK;
+  }
+  
+  return retval;
+}
+
+
+/* Applies policy checks to an object.
+   Receives RT context
+            LG context
+            options structure
+            parsed object
+            operation
+            reason pointer to policy check fail string
+   Returns  UP_OK if successful
+            UP_FWD otherwise
+*/
+
+int UP_check_policy(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                     options_struct_t *options, int operation, 
+                     rpsl_object_t *preproc_obj, char **reason,
+                     GList *credentials)
+{
+  int retval = UP_OK;
+  int size;
+  int saw;
+  const char *type = NULL;
+  char *value;
+  GList *attr = NULL;
+
+  LG_log(lg_ctx, LG_FUNC,">UP_check_policy: entered");
+
+  if ( up_override(lg_ctx, credentials) == UP_OK )
+  {
+    /* approved by hostmaster */
+    LG_log(lg_ctx, LG_DEBUG,"UP_check_policy: override used");
+    retval = UP_OK;
+  }
+  else
+  {
+    /* policy checks */
+    /* Check size against the sub allocation window when creating an 
+       inetnum object with a status of SUB-ALLOCATED PA */
+    type = rpsl_object_get_class(preproc_obj);
+    assert(type != NULL); /* should never happen */
+    if ( ( ! strcasecmp(type, "inetnum")) && operation==UP_CREATE  ) 
+    {
+      attr = rpsl_object_get_attr(preproc_obj, "status"); 
+      value = rpsl_attr_get_clean_value((rpsl_attr_t *)(attr->data));
+      if ( ! strcasecmp(value, "SUB-ALLOCATED PA") )
+      {
+        LG_log(lg_ctx, LG_DEBUG,"UP_check_policy: SUB-ALLOCATED PA inetnum creation");
+        attr = rpsl_object_get_attr(preproc_obj, type); 
+        value = rpsl_attr_get_clean_value((rpsl_attr_t *)(attr->data));
+        size = up_get_size_from_range(lg_ctx, value);
+
+        attr = rpsl_object_get_attr(preproc_obj, "org"); 
+        value = rpsl_attr_get_clean_value((rpsl_attr_t *)(attr->data));
+        saw = up_get_saw(rt_ctx, lg_ctx, options, value);
+
+        if ( size > saw )
+        {
+          LG_log(lg_ctx, LG_DEBUG,"UP_check_policy: size > saw");
+          *reason = "Sub allocation size exceeds SAW";
+          retval = UP_FWD;
+        }
+      }
+    }
+  }
+  
+  LG_log(lg_ctx, LG_FUNC,"<UP_check_policy: exiting with return status [%s]",
+                            UP_ret2str(retval));
+  return retval;
+}
 
 
 /* Gets the certif attributes from a key-cert object and packs the data into
@@ -1291,7 +1531,7 @@ char *UP_get_certif_data(LG_context_t *lg_ctx, rpsl_object_t *preproc_obj)
   GList *certiflist, *item;
   GString *gkey;
 
-  LG_log(lg_ctx, LG_FUNC,">up_get_certif_data: entered\n");
+  LG_log(lg_ctx, LG_FUNC,">up_get_certif_data: entered");
 
   /* get the certif data first */
   certiflist = rpsl_object_get_attr(preproc_obj, "certif");
@@ -1338,7 +1578,7 @@ int UP_get_key_data(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   KM_status_t key_status;
   char *key = NULL;
 
-  LG_log(lg_ctx, LG_FUNC,">UP_get_key_data: entered with key cert type [%s]\n",
+  LG_log(lg_ctx, LG_FUNC,">UP_get_key_data: entered with key cert type [%s]",
                         KM_context_string((int)key_cert_type));
 
   /* get the key data and extract some info from it */
@@ -1392,7 +1632,7 @@ void up_process_attr(LG_context_t *lg_ctx, rpsl_object_t *preproc_obj,
   char *gen;
   GList *attr_list = NULL;
 
-  LG_log(lg_ctx, LG_FUNC,">up_process_attr: entered with generated %s attribute [%s]\n",
+  LG_log(lg_ctx, LG_FUNC,">up_process_attr: entered with generated %s attribute [%s]",
                                 attr_type, gen_value);
   gen = strdup(gen_value);
   g_strstrip(gen);
@@ -1442,7 +1682,7 @@ void up_process_attr(LG_context_t *lg_ctx, rpsl_object_t *preproc_obj,
   }
 
   free(gen);
-  LG_log(lg_ctx, LG_FUNC,"<up_process_attr: exiting \n");
+  LG_log(lg_ctx, LG_FUNC,"<up_process_attr: exiting");
 }
 
 
@@ -1477,7 +1717,7 @@ int UP_generate_keycert_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   KM_key_return_t *key_data = NULL;
   GList *warn_list = NULL;
 
-  LG_log(lg_ctx, LG_FUNC,">UP_generate_keycert_attrs: entered for key-cert type [%s]\n", 
+  LG_log(lg_ctx, LG_FUNC,">UP_generate_keycert_attrs: entered for key-cert type [%s]", 
                           KM_context_string((int)key_cert_type));
   
   type = rpsl_object_get_class(preproc_obj);
@@ -1502,7 +1742,9 @@ int UP_generate_keycert_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
     /* process the attribute */
     if ( (method_attr = rpsl_attr_init(attr_str, type)) )
+    {
       up_process_attr(lg_ctx, preproc_obj, "method", method_attr, method, &warn_list, 1);
+    }
     free(attr_str);
     free(method);
 
@@ -1515,7 +1757,9 @@ int UP_generate_keycert_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
     /* process the attribute */
     if ( (owner_attr = rpsl_attr_init(attr_str, type)) )
+    {
       up_process_attr(lg_ctx, preproc_obj, "owner", owner_attr, keyowner, &warn_list, 2);
+    }
     free(attr_str);
 
     /* fingerprint: attribute, generate value */
@@ -1527,7 +1771,9 @@ int UP_generate_keycert_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
     /* process the attribute */
     if ( (fingerpr_attr = rpsl_attr_init(attr_str, type)) )
+    {
       up_process_attr(lg_ctx, preproc_obj, "fingerpr", fingerpr_attr, fingerprint, &warn_list, 3);
+    }
     free(attr_str);
     
     /* report warnings, if any */
@@ -1543,6 +1789,6 @@ int UP_generate_keycert_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
   
   KM_key_return_free(key_data);
-  LG_log(lg_ctx, LG_FUNC,"<UP_generate_keycert_attrs: exiting with value [%s]\n", UP_ret2str(retval));
+  LG_log(lg_ctx, LG_FUNC,"<UP_generate_keycert_attrs: exiting with value [%s]", UP_ret2str(retval));
   return retval;
 }

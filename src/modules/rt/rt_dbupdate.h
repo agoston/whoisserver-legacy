@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.23 $
+  $Revision: 1.1 $
 
   Reporting module.
 
@@ -59,7 +59,10 @@ typedef enum {
   RT_UPD_DEL,
   RT_UPD_NOOP,
   RT_UPD_SYNTAX_ERR,
-  RT_UPD_FWD
+  RT_UPD_FWD_CREATE,
+  RT_UPD_FWD_MODIFY,
+  RT_UPD_FWD_DELETE,
+  RT_UPD_FWD_POLICY
 } RT_upd_op;
 
 gchar* RT_EP_analyse(RT_context_t* ctx, ep_input_structure_t* input);
@@ -122,6 +125,8 @@ void RT_auth_failure(RT_context_t* ctx,
 void RT_auth_ok(RT_context_t* ctx,
 		gchar* type, gchar* mntner,
 		gboolean has_override);
+
+void RT_policy_fail(RT_context_t* ctx, char* reason);
 
 
 
@@ -210,7 +215,7 @@ void RT_header_from(RT_context_t* ctx, gchar* from_address);
 void RT_header_subject(RT_context_t* ctx, gchar* subject);
 void RT_from_mail(RT_context_t* ctx, mail_hdr_t* mail_info);
 void RT_notif_origin(RT_context_t* ctx, gchar* origin);
-void RT_notif_add_msg(RT_context_t* ctx, gchar* message);
+void RT_notif_add_msg(RT_context_t* ctx, gchar* message, char *op);
 void RT_update_result(RT_context_t* ctx, gchar* result);
 
 void RT_status_check_failed(RT_context_t* ctx, gchar* reason);

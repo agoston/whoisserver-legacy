@@ -209,7 +209,8 @@ void nt_add_list_to_hash(LG_context_t *lg_ctx, options_struct_t *options,
    Returns  none
 */
 
-void nt_add_msg_to_list(LG_context_t *lg_ctx, GList *list, GHashTable *hash, char *msg)
+void nt_add_msg_to_list(LG_context_t *lg_ctx, GList *list, 
+                                GHashTable *hash, char *msg)
 {
   GList *email_item = NULL;
   RT_context_t *new_rt_ctx;
@@ -222,7 +223,7 @@ void nt_add_msg_to_list(LG_context_t *lg_ctx, GList *list, GHashTable *hash, cha
     /* get the context pointer from the email address */
     new_rt_ctx = (RT_context_t *)g_hash_table_lookup( hash, ((char *)email_item->data) );
     /* add the message */
-    RT_notif_add_msg(new_rt_ctx, msg);
+    RT_notif_add_msg(new_rt_ctx, msg, "");
     free(email_item->data);
   }
   LG_log(lg_ctx, LG_FUNC,"<nt_add_msg_to_list: exiting\n");
@@ -1624,18 +1625,19 @@ void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 
 
-/* Forwards the maintainer, as-block and irt creation requests to <HUMAILBOX>
+/* Forwards the as-block and irt creation requests to <HUMAILBOX>
    Receives RT context
             LG context
             options structure
-            source data structure
+            operation
             object to be created
+            list of credentials
    Returns  none
 */
 
 void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
-                             options_struct_t *options, rpsl_object_t *object,
-                             GList *credentials)
+                             options_struct_t *options, char *operation,
+                             rpsl_object_t *object, GList *credentials)
 {
   char *object_str = NULL;
   char *to_address = NULL;
@@ -1683,7 +1685,7 @@ void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   /* add the message to the new reporting context */
   LG_log(lg_ctx, LG_DEBUG,"NT_forw_create_req: message [\n%s]", mess->str);
-  RT_notif_add_msg(new_rt_ctx, mess->str);
+  RT_notif_add_msg(new_rt_ctx, mess->str, operation);
 
   /* get the template for the forw_create_req message */
   template = ca_get_forw_create_template;
@@ -1720,4 +1722,113 @@ void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   free(forwlog);
   free(out_mess);
   LG_log(lg_ctx, LG_FUNC,"<NT_forw_create_req exiting\n");
+}
+
+
+/* Forwards any policy check failures to <HUMAILBOX>
+   Receives RT context
+            LG context
+            options structure
+            operation
+            object
+            reason
+            list of credentials
+   Returns  none
+*/
+
+void NT_forw_policy_fail(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+                             options_struct_t *options, char *operation,
+                             rpsl_object_t *object, char *reason, 
+                             GList *credentials)
+{
+  char *object_str = NULL;
+  char *to_address = NULL;
+  char *template = NULL;
+  char *out_mess = NULL;
+  char *forwlog = NULL;
+  const char *type = NULL;
+  char *redirect_hdg = "forward create";
+  char *pkey = NULL;
+  RT_context_t *new_rt_ctx;
+  GString *mess;
+  GString *subject;
+  GString *policy_reason;
+
+  LG_log(lg_ctx, LG_FUNC,">NT_forw_policy_fail: entered\n");
+
+  /* get the text version of the object */
+  object_str = rpsl_object_get_text(object, RPSL_STD_COLUMN);
+  type = rpsl_object_get_class(object);
+  pkey = rpsl_object_get_key_value(object);
+  /* build up the subject line */
+  subject = g_string_new(NULL);
+  subject = g_string_append(subject, "Policy check fail forward message: " );
+  subject = g_string_append(subject, pkey );
+
+  /* get the address to send the request to */
+  to_address = g_strstrip(ca_get_humailbox);
+  LG_log(lg_ctx, LG_DEBUG,"NT_forw_policy_fail: To address [%s]", to_address);
+
+  /* set up new reporting context */
+  new_rt_ctx = nt_generate_new_context(lg_ctx, options, to_address, subject->str);
+//  RT_set_object(new_rt_ctx, object);
+
+  /* build up the message */
+  mess = g_string_new(NULL);
+  mess = g_string_append(mess, object_str);
+  mess = g_string_append(mess, "\n");
+/* Dirty rotten hack!!!!
+   This reason should appear magically in the template output
+   from the call to RT_policy_fail
+   BUT......the magic failed me :(
+   So I have had to append it to the end of the object text */
+  mess = g_string_append(mess, "***Info: ");
+  mess = g_string_append(mess, reason);
+  mess = g_string_append(mess, "\n");
+
+  policy_reason = g_string_new(NULL);
+  policy_reason = g_string_append(policy_reason, reason);
+
+  /* add the message to the new reporting context */
+  LG_log(lg_ctx, LG_DEBUG,"NT_forw_policy_fail: message [\n%s]", mess->str);
+  RT_notif_add_msg(new_rt_ctx, mess->str, operation);
+//   RT_policy_fail(new_rt_ctx, policy_reason->str);
+
+  /* get the template for the forw_create_req message */
+//  template = ca_get_forw_policy_template;
+  template = ca_get_forw_create_template;
+  LG_log(lg_ctx, LG_DEBUG,"NT_forw_policy_fail: using template [%s]", template);
+
+  /* pass full input and credentials to the new_rt_ctx,
+     then close input to the new reporting context */
+//  RT_unset_object(new_rt_ctx, op2rt_upd_op(UP_CREATE), 1);
+  RT_credentials(new_rt_ctx, credentials);
+  RT_full_input(new_rt_ctx, options->input_file_name);
+  RT_end(new_rt_ctx);
+
+  /* create the email to be sent from the RT template */
+  out_mess = RT_get(new_rt_ctx, RT_UPD_INFO, template);
+  LG_log(lg_ctx, LG_DEBUG,"NT_forw_policy_fail: out going message [\n%s]", out_mess);
+
+  /* send it */ 
+  nt_send_email(rt_ctx, lg_ctx, options, out_mess, to_address, redirect_hdg);
+
+  /* log it */
+  forwlog = ca_get_forwlog;
+  nt_log_message(rt_ctx, lg_ctx, options, out_mess, forwlog, UP_FRWD_POLICY);
+  
+  /* close down the new report */
+  RT_destroy(new_rt_ctx);
+
+  /* free the g-string and the content */
+  g_string_free(mess, 1);
+  g_string_free(subject, 1);
+  g_string_free(policy_reason, 1);
+  /* free the mem */ 
+  free(object_str);
+  free(to_address);
+  free(template);
+  free(forwlog);
+  free(out_mess);
+  LG_log(lg_ctx, LG_FUNC,"<NT_forw_policy_fail exiting\n");
 }
