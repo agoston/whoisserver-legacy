@@ -252,8 +252,7 @@ dnl Check for glib
 AC_CHECK_PROG(PKGCONFIG,[pkg-config],[yes])
 if test "x${PKGCONFIG}" = "xyes"
 then
-    PKG_CHECK_MODULES(GLIB,[glib-2.0],,[PKG_CHECK_MODULES(GLIB,glib)])
-    PKG_CHECK_MODULES(GLIB,[gthread-2.0],,[PKG_CHECK_MODULES(GLIB,glib)])
+    AM_PATH_GLIB_2_0(2.0.0,,AC_MSG_ERROR([glib-2.x.x not found]),gthread)
 else
     AC_MSG_ERROR([pkg-config not found])
 fi
