@@ -10,7 +10,7 @@
 # RESULT 8: The creations will NOOP and 2 seperate requests are sent to ripe-dbm
 %
 %
-$ -c $RIP_CONFIG -mr -f
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -mr -f
 %
 From: dbtest@ripe.net
 Subject: please create

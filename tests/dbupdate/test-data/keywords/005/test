@@ -13,7 +13,7 @@
 #           Invalid keyword found reported.
 %
 %
-$ -c $RIP_CONFIG -r -k fred -f
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -r -k fred -f
 
 
 person:  test person2

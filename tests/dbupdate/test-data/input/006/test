@@ -13,7 +13,7 @@
 #           ack message printed to stdout
 %
 %
-$ -c $RIP_CONFIG -rm --print -f 
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -rm --print -f 
 %
 %
 From: dbtest@ripe.net

@@ -14,7 +14,7 @@
 #            nothing on stdout
 %
 %
-$ -c $RIP_CONFIG -mr -f 
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -mr -f 
 %
 %
 From: dbtest@ripe.net

@@ -10,7 +10,7 @@
 # RESULT 9: Data written below copied to update log
 %
 %
-$$ -c $RIP_CONFIG -r < $TEST
+$DBUPDATE_FLAGS= -c $RIP_CONFIG -r < $TEST
 
 
 person:  test person2

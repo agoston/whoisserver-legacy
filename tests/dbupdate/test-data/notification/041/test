@@ -17,7 +17,7 @@
 #  todays date in an object.
 %
 %
-$ -c $RIP_CONFIG -mr -f 
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -mr -f 
 %
 %
 From: dbtest@ripe.net

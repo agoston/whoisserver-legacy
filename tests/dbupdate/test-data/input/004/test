@@ -16,4 +16,4 @@
 #           help message on stdout
 %
 %
-$$ -c $RIP_CONFIG -ro 192.0.0.0 -k help < $TEST
+$DBUPDATE_FLAGS= -c $RIP_CONFIG -ro 192.0.0.0 -k help < $TEST

@@ -12,7 +12,7 @@
 #            The notif message should have a diff output.
 %
 %
-$ -c $RIP_CONFIG -mr -f 
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -mr -f 
 %
 %
 From: dbtest@ripe.net

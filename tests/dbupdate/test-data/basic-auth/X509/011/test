@@ -13,7 +13,7 @@
 # RESULT 11: The creation will succeed
 %
 %
-$ -c $RIP_CONFIG -rm -f 
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -rm -f 
 %
 %
 From: dbtest@ripe.net

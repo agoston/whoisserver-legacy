@@ -15,5 +15,5 @@
 #           keywords - help in upd file
 %
 %
-$ -c $RIP_CONFIG -r -k help -f 
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -r -k help -f 
 

@@ -11,7 +11,7 @@
 # RESULT 9: The creation will succeed, keyword new in upd log.
 %
 %
-$ -c $RIP_CONFIG -rm -f
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -rm -f
 %
 %
 From: dbtest@ripe.net

@@ -13,7 +13,7 @@
 # RESULT 5: The modify will fail.
 %
 %
-$ -c $RIP_CONFIG -rm -f 
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -rm -f 
 %
 %
 From: dbtest@ripe.net

@@ -10,4 +10,5 @@
 # RESULT 10: internal error message in ack
 %
 %
-$$ -c $RIP_CONFIG -r -f $CURRENT_DIR
+$DBUPDATE_FLAGS= -c $RIP_CONFIG -r -f $CURRENT_DIR
+$DBUPDATE_IGNORE_EXIT_CODE=20

@@ -11,7 +11,7 @@
 # RESULT 7: The creation will NOOP and a request is sent to ripe-dbm
 %
 %
-$ -c $RIP_CONFIG -mr -f 
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -mr -f 
 From: dbtest@ripe.net
 
 -----BEGIN PGP SIGNED MESSAGE-----

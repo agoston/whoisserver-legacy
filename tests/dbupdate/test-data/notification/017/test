@@ -13,7 +13,7 @@
 #            about the unsuccessful modify and no notif message.
 %
 %
-$$ -c $RIP_CONFIG -ro 192.0.0.0 < $TEST
+$DBUPDATE_FLAGS= -c $RIP_CONFIG -ro 192.0.0.0 < $TEST
 
 
 person:  Test Person

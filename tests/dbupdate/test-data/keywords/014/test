@@ -12,7 +12,7 @@
 #            object is created
 %
 %
-$ -c $RIP_CONFIG -r -f
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -r -f
 
 
 person:  test person2

@@ -12,6 +12,6 @@
 #           keyword help in upd log.
 %
 %
-$ -c $RIP_CONFIG -r -k help -f
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -r -k help -f
 
 

@@ -13,6 +13,6 @@
 #           Number of objects found 0 reported
 %
 %
-$ -c $RIP_CONFIG -r -k fred,help,qwerty -f
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -r -k fred,help,qwerty -f
 
 

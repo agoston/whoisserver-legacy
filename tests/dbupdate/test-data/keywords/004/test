@@ -13,7 +13,7 @@
 #           Invalid combination reported.
 %
 %
-$ -c $RIP_CONFIG -r -k help,new -f
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -r -k help,new -f
 
 
 person:  test person2

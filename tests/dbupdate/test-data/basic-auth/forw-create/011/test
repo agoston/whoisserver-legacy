@@ -9,7 +9,7 @@
 # RESULT 11: The as-block creation will succeed without forwarding.
 %
 %
-$ -c $RIP_CONFIG -mr -t -f
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -mr -t -f
 %
 From: dbtest@ripe.net
 

@@ -14,7 +14,7 @@
 #            Subject: line contains FAILED:
 %
 %
-$ -c $RIP_CONFIG -m -f 
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -m -f 
 %
 %
 From: dbtest@ripe.net
