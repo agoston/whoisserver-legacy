@@ -1,0 +1,55 @@
+
+This file explains how to update the DB schema of a 3.1.0 installation
+to comply with the 3.2.0 release of RIPE Whois Software
+
+
+There are some changes in the DB schema of RIPE Whois Software between
+releases 3.1.0 and 3.2.0. They are mainly related to the optional use
+of InnoDB (to support transactions) and some changes to the Access
+Control List (to implement the idea of limiting the number of
+concurrent connections from an IP address).
+
+Please do the following to update your DB schema:
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE names DROP PRIMARY KEY' $SOURCE
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE names ADD PRIMARY KEY (name,object_id)' $SOURCE
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE auth DROP PRIMARY KEY' $SOURCE
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE auth ADD PRIMARY KEY (auth,object_id)' $SOURCE
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE mnt_nfy DROP PRIMARY KEY' $SOURCE
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE mnt_nfy ADD PRIMARY KEY (mnt_nfy,object_id)' $SOURCE
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE upd_to DROP PRIMARY KEY' $SOURCE
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE upd_to ADD PRIMARY KEY (upd_to,object_id)' $SOURCE
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE refer DROP PRIMARY KEY' $SOURCE
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE refer ADD PRIMARY KEY (object_id,host,port,type)' $SOURCE
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE rev_srv DROP PRIMARY KEY' $SOURCE
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE rev_srv ADD PRIMARY KEY (rev_srv,object_id)' $SOURCE
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE nserver DROP PRIMARY KEY' $SOURCE
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE nserver ADD PRIMARY KEY (host,object_id)' $SOURCE
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE sub_dom DROP PRIMARY KEY' $SOURCE
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE sub_dom ADD PRIMARY KEY (domain,object_id)' $SOURCE
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE e_mail DROP PRIMARY KEY' $SOURCE
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE e_mail ADD PRIMARY KEY (e_mail,object_id)' $SOURCE
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE notify DROP PRIMARY KEY' $SOURCE
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE notify ADD PRIMARY KEY (notify,object_id)' $SOURCE
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE irt_nfy DROP PRIMARY KEY' $SOURCE
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE irt_nfy ADD PRIMARY KEY (irt_nfy,object_id)' $SOURCE
+
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE acl ADD COLUMN threshold tinyint(3) unsigned Default '4' NOT NULL after trustpass' $RIPADMINDB
+$ mysql --defaults-file=<your-mysql-config> -u$SQLUSER -p$SQLPASS -e'ALTER TABLE acl ADD COLUMN maxconn tinyint(3) unsigned Default '6' NOT NULL after threshold' $RIPADMINDB
+
+
+Then, if you want to use InnoDB, convert the database type from MyISAM into InnoDB:
+
+$ mysql_convert_table_format --verbose --type=innodb --user=$SQLUSER --socket=<your-mysql-socket> --password=$SQLPASS $SOURCE
+
+

@@ -1,0 +1,18 @@
+# first updates tests
+# CASE 5: Object with a space before the colon ':'  
+#         after the class attribute in update message
+#
+# Object not recognised, so treated as garbage.
+#
+#SUCCESS
+#
+# RESULT 5: Number of objects found: 0  reported in ack summary
+#           and object reported as not looking like an object.
+
+
+person :  test person2
+address: here
+phone:
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

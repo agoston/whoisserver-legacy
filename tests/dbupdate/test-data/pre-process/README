@@ -1,0 +1,549 @@
+# pre-process object tests
+
+# CASE 1: Create an inetnum object
+#         with valid countries and changed dates
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed
+
+
+# CASE 2: Create an inetnum object
+#         with valid countries and invalid countries 
+#         and valid changed dates
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail
+
+
+# CASE 3: Create an inetnum object
+#         with valid country 
+#         and multiple changed lines with no dates
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 3: The creation will fail
+
+
+# CASE 4: Create an inetnum object
+#         with valid country 
+#         and one changed line with no date 
+#         after other changed lines with dates.
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed
+
+
+# CASE 5: Create an inetnum object
+#         with valid country 
+#         and multiple changed lines 
+#         an earlier date appears after a later date
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will fail
+
+
+# CASE 6: Create an inetnum object
+#         with valid country 
+#         and one changed line with no date 
+#         before other changed lines with dates.
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail
+
+
+# CASE 7: Create an inetnum object
+#         with valid country 
+#         and one changed line with a date in the future
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail
+
+
+# CASE 8: Create an inetnum object
+#         with valid country 
+#         and one changed line with a date in the wrong format
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail
+
+
+# CASE 9: Create an inetnum object
+#         with valid country 
+#         and one changed line with a date before 19840000
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 9: The creation will fail
+
+
+# CASE 10: Create an inetnum object
+#          with valid country 
+#          and one changed line with a date beyond 21000000
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 10: The creation will fail
+
+
+# CASE 11: Create an inetnum object
+#          with valid country 
+#          and one changed line with a date with invalid month
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 11: The creation will fail
+
+
+# CASE 12: Create an inetnum object
+#          with valid country 
+#          and one changed line with a date with invalid day
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 12: The creation will fail
+
+
+# CASE 13: Create an inetnum object
+#          with valid country 
+#          and one changed line with a date Feb 29 in non leap year
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 13: The creation will fail
+
+
+# CASE 14: Create an inetnum object
+#          with valid country 
+#          and one changed line with a date Feb 29 in a leap year
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 14: The creation will succeed
+
+
+# CASE 15: Create an inetnum object
+#          with valid country 
+#          and one changed line with a date Feb 30 in a non leap year
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 15: The creation will fail
+
+
+# CASE 16: Create an inetnum object
+#          with valid country 
+#          and one changed line with a date Feb 30 in a leap year
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 16: The creation will fail
+
+
+# CASE 17: Create four inetnum objects
+#          with valid country 
+#          and one changed line with a date of 31st
+#          in the respective months 04, 06, 09, 11
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 17: All four creations will fail
+
+
+# CASE 18: Create a person object
+#          with a nic-hdl with no suffix
+%
+% requires initial objects to be loaded
+#
+# create person object 
+#
+#SUCCESS
+#
+# RESULT 18: The creation will succeed
+
+
+# CASE 19: Create a person object
+#          with a nic-hdl with a standard suffix from the list
+#          of nic suffixes held in the config file
+%
+% requires initial objects to be loaded
+#
+# create person object 
+#
+#SUCCESS
+#
+# RESULT 19: The creation will succeed
+
+
+# CASE 20: Create a person object
+#          with a nic-hdl with a standard suffix from the list
+#          of sources held in the config file
+%
+% requires initial objects to be loaded
+#
+# create person object 
+#
+#SUCCESS
+#
+# RESULT 20: The creation will succeed
+
+
+# CASE 21: Create a person object
+#          with a nic-hdl with a standard suffix from the list
+#          of countries held in the config file
+%
+% requires initial objects to be loaded
+#
+# create person object 
+#
+#SUCCESS
+#
+# RESULT 21: The creation will succeed
+
+
+# CASE 22: Create a person object
+#          with a nic-hdl with a suffix that is not recognised
+%
+% requires initial objects to be loaded
+#
+# create person object 
+#
+#FAILURE
+#
+# RESULT 22: The creation will fail
+
+
+# CASE 23: Create a person object
+#          with an AUTO- nic-hdl 
+%
+% requires initial objects to be loaded
+#
+# create person object 
+#
+#SUCCESS
+#
+# RESULT 23: The creation will succeed
+
+
+# CASE 24: We try to create key-cert object PGPKEY-471DBBEA
+#          without any errors and no generated attributes present.
+%
+% requires initial objects to be loaded
+#
+# create key-cert object 
+#
+#SUCCESS
+#
+# RESULT 24: The creation will succeed.and the object will have some
+#            generated attributes added.
+
+
+# CASE 25: We try to create key-cert object PGPKEY-471DBBEA
+#          with errors in the certif data
+#          and no generated attributes present.
+%
+% requires initial objects to be loaded
+#
+# create key-cert object 
+#
+#FAILURE
+#
+# RESULT 25: The creation will fail.
+
+
+# CASE 26: Modify a key-cert object PGPKEY-471DBBEA
+#          with no generated attributes included
+#          The modification does not change the key data.
+%
+% requires initial objects to be loaded
+#
+# modify key-cert object 
+#
+#SUCCESS
+#
+# RESULT 26: The modification will succeed.and the generated attributes 
+#            will be re-generated un-changed.
+
+
+# CASE 27: Modify a key-cert object PGPKEY-471DBBEA
+#          with the generated attributes included and
+#          identical to those in the database and
+#          the modification does not change the key data.
+%
+% requires initial objects to be loaded
+#
+# modify key-cert object 
+#
+#SUCCESS
+#
+# RESULT 27: The modification will succeed.and the object will have
+#            the generated attributes un-changed.
+
+
+# CASE 28: Modify a key-cert object PGPKEY-471DBBEA
+#          with the generated attributes included and
+#          not identical to those in the database and
+#          the modification does not change the key data.
+%
+% requires initial objects to be loaded
+#
+# modify key-cert object 
+#
+#SUCCESS
+#
+# RESULT 28: The modification will succeed.and the object will have
+#            the generated attributes replaced by the original values. 
+#            A warning message will be included that the values supplied
+#            have been changed.
+
+
+# CASE 29: Modify a key-cert object PGPKEY-471DBBEA
+#          with the generated attributes included and
+#          not identical to those in the database and
+#          the modification _DOES_ change the key data.
+#          The supplied generated attributes match the
+#          new generated values.
+%
+% requires initial objects to be loaded
+#
+# modify key-cert object 
+#
+#SUCCESS
+#
+# RESULT 29: The modification will succeed.and the object will have
+#            the generated attributes un-changed. 
+
+
+# CASE 30: Modify a key-cert object PGPKEY-471DBBEA
+#          with the generated attributes included and
+#          not identical to those in the database and
+#          the modification _DOES_ change the key data.
+#          The supplied generated attributes do NOT
+#          match the new generated values either.
+%
+% requires initial objects to be loaded
+#
+# modify key-cert object 
+#
+#SUCCESS
+#
+# RESULT 30: The modification will succeed.and the object will have
+#            the generated attributes replaced by the new generated values. 
+#            A warning message will be included that the values supplied
+#            have been changed.
+
+
+# CASE 31: Modify a key-cert object PGPKEY-471DBBEA
+#          with the generated attributes included and
+#          identical to those in the database and
+#          no changes to the object.
+%
+% requires initial objects to be loaded
+#
+# modify key-cert object 
+#
+#SUCCESS
+#
+# RESULT 31: NOOP reported.
+
+# Test cases for the CIDR-range conversion code
+
+# CASE 32: Create an inetnum, using normal range notation
+#
+# create an inetnum using a range
+#
+#SUCCESS
+#
+# RESULT 32: create succeeded
+
+
+# CASE 33: Create an inetnum, using invalid range notation
+#
+# create inetnum with an invalid range
+#
+#FAILURE
+#
+# RESULT 33: create failed
+
+
+# CASE 34: Create an inetnum, using a valid prefix
+#
+# create an inetnum using a valid prefix
+#
+#SUCCESS
+#
+# RESULT 34: create succeeded
+
+
+# CASE 35: Create an inetnum, using a valid prefix
+#
+# create an inetnum with a valid prefix
+#
+#SUCCESS
+#
+# RESULT 35: create succeeds
+
+
+# CASE 36: Create an inetnum, using a valid prefix
+#
+# create an inetnum using a valid prefix
+#
+#SUCCESS
+#
+# RESULT 36: create fails
+
+
+# CASE 37: Create an inetnum, using an invalid prefix
+#          This tests the front-end regex defined in syntax.xml
+#
+# create inetnum with an invalid prefix
+#
+#FAILURE
+#
+# RESULT 37: create fails
+
+
+# CASE 38: Create an inetnum, using an invalid prefix
+#          This tests the front-end regex defined in syntax.xml
+#
+# create inetnum with an invalid prefix
+#
+#FAILURE
+#
+# RESULT 38: create fails
+
+
+# CASE 39: Create an inetnum, using an invalid prefix
+#          This tests the conversion function
+#
+# create inetnum with a syntactically correct but invalid prefix
+#
+#FAILURE
+#
+# RESULT 39: create fails
+
+
+
+# CASE 40: Modify an inetnum, using a valid prefix
+#
+# modify an inetnum using a valid prefix
+#
+#FAILURE
+#
+# RESULT 40: modify will fail
+
+
+# CASE 41: Create a person object with a mnt-by: referencing a
+#          disallowed mntner
+#
+# create a person object
+#
+#FAILURE
+#
+# RESULT 41: create will fail
+
+
+# CASE 42: Create a person object with a mnt-by: referencing a
+#          disallowed mntner, second on the list in rip.config
+#
+# create a person object
+#
+#FAILURE
+#
+# RESULT 42: create will fail
+
+
+# CASE 43: Create a mntner object with a name on the 
+#          disallowed mntner list
+#
+# create a mntner object
+#
+#FAILURE
+#
+# RESULT 43: create will fail
+
+
+# CASE 44: Create a mntner object with a referral-by on the 
+#          disallowed mntner list
+#
+# create a mntner object
+#
+#FAILURE
+#
+# RESULT 44: create will fail
+
+

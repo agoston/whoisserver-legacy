@@ -1,0 +1,16 @@
+# command line options tests
+# CASE 3: Valid short option with two dash
+#
+# run dbupdate with valid short option with two dash
+# ./dbupdate -c ~/db/conf/rip.config --p
+#
+# check for exit code 11 
+#
+#
+#FAILURE
+#
+# RESULT 3: invalid option --p reported
+%
+%
+?11
+$ -c $RIP_CONFIG --p -f 

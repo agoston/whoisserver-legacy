@@ -1,0 +1,30 @@
+# basic-auth tests - inetnum
+# CASE 1: Create the root inetnum object (has no less specific)
+#         without override
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail
+
+
+password: hostmaster
+
+inetnum:      0.0.0.0 - 255.255.255.255
+netname:      IANA-BLK
+descr:        The whole IPv4 address space
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PI
+remarks:      The country is really worldwide.
+remarks:      This address space is assigned at various other places in
+remarks:      the world and might therefore not be in the RIPE database.
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+mnt-routes:   RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+

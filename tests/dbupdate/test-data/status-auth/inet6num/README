@@ -1,0 +1,168 @@
+# ipv6 status tests
+# CASE 1: create an inet6num with legacy SUBTLA status
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail with syntax error
+
+# ipv6 status tests
+# CASE 2: create an inet6num with ALLOCATED-BY-LIR
+# with less specific having a legacy status
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail
+
+# ipv6 status tests
+# CASE 3: create an inet6num with ALLOCATED-BY-RIR
+# with mnt-by: _NOT_ RIPE-NCC-HM-MNT
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 3: The creation will fail with Authorisation failure
+
+# ipv6 status tests
+# CASE 4: create an inet6num with ALLOCATED-BY-RIR
+# with mnt-by: RIPE-NCC-HM-MNT
+# and less specific has invalid status
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 4: The creation will fail with Hierarchical Authorisation failure
+
+# ipv6 status tests
+# CASE 5: create an inet6num with ALLOCATED-BY-RIR
+# with mnt-by: RIPE-NCC-HM-MNT
+# and less specific has no status
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will fail with Hierarchical Authorisation failure
+
+# ipv6 status tests
+# CASE 6: delete an inet6num object with invalid status
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 6: The deletion will succeed
+
+# ipv6 status tests
+# CASE 7: create an inet6num with ALLOCATED-BY-RIR
+# with mnt-by: RIPE-NCC-HM-MNT
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 7: The creation will succeed
+
+# ipv6 status tests
+# CASE 8: create an inet6num with ALLOCATED-BY-LIR
+# with less specific having ALLOCATED-BY-RIR status
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 8: The creation will succeed
+
+# ipv6 status tests
+# CASE 9: create an inet6num with ALLOCATED-BY-LIR
+# with less specific having ALLOCATED-BY-LIR status
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed
+
+# ipv6 status tests
+# CASE 10: change an inet6num from ALLOCATED-BY-LIR to ALLOCATED-BY-RIR 
+#
+# update inet6num object 
+#
+#FAILURE
+#
+# RESULT 10: The update will fail
+
+# ipv6 status tests
+# CASE 11: create an inet6num with ASSIGNED 
+# with less specific having ALLOCATED-BY-LIR status
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 11: The creation will succeed
+
+# ipv6 status tests
+# CASE 12: create an inet6num with ASSIGNED
+# with less specific having ASSIGNED status
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 12: The creation will fail 
+
+# ipv6 status tests
+# CASE 13: create an inet6num with ALLOCATED-BY-LIR
+# with less specific having ASSIGNED status
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 13: The creation will fail with Hierarchical Authorisation failure
+
+# ipv6 status tests
+# CASE 14: change an inet6num from ALLOCATED-BY-LIR to ASSIGNED
+# with more specifics existing
+#
+# update inet6num object 
+#
+#SUCCESS
+#
+# RESULT 14: The update will succeed
+
+# ipv6 status tests
+# CASE 15: change an inet6num from ASSIGNED to ALLOCATED-BY-LIR
+#
+# update inet6num object 
+#
+#SUCCESS
+#
+# RESULT 15: The update will succeed
+
+# ipv6 status tests
+# CASE 16:change an inet6num from ALLOCATED-BY-LIR to ASSIGNED 
+# with no more specifics
+#
+# update inet6num object 
+#
+#SUCCESS
+#
+# RESULT 16: The update will succeed
+
+# ipv6 status tests
+# CASE 17: create an inet6num with ASSIGNED
+# with less specific having ALLOCATED-BY-RIR status
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 17: The creation will succeed
+

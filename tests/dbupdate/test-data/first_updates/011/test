@@ -1,0 +1,18 @@
+# first updates tests
+# CASE 11: Delete object that does not exist
+#
+# Delete object that does not exist in the database
+#
+#FAILURE
+#
+# RESULT 11: Attempting to delete object 
+#            which does not exist in the database reported
+
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test
+delete:  not required

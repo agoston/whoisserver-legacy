@@ -1,0 +1,22 @@
+#
+# Adds access table to existing RIPADMIN
+#
+CREATE TABLE access (
+  prefix          INT(10)    UNSIGNED DEFAULT '0' NOT NULL,
+  prefix_length   TINYINT(3) UNSIGNED DEFAULT '0' NOT NULL,
+  connections     INT(4)     UNSIGNED DEFAULT '0' NOT NULL,
+  addr_passes     TINYINT(3) UNSIGNED DEFAULT '0' NOT NULL,
+  denials         INT(4)     UNSIGNED DEFAULT '0' NOT NULL,
+  queries         INT(4)     UNSIGNED DEFAULT '0' NOT NULL,
+  referrals       INT(4)     UNSIGNED DEFAULT '0' NOT NULL,
+  public_objects  INT(6)     UNSIGNED DEFAULT '0' NOT NULL,
+  private_objects INT(6)     UNSIGNED DEFAULT '0' NOT NULL,
+  public_bonus    REAL                DEFAULT '0' NOT NULL,
+  private_bonus   REAL                DEFAULT '0' NOT NULL,
+  timestamp       BIGINT     UNSIGNED NOT NULL,
+
+  PRIMARY KEY     (prefix, prefix_length)
+);
+
+CREATE INDEX access_timestamp ON access(timestamp);
+

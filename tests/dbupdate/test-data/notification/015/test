@@ -1,0 +1,50 @@
+# notification tests
+# CASE 15: Creation of an object with "notify" attribute.
+#          Modify an object with "notify" attribute to change the
+#          mail address in this attribute.
+#          Deletion of an object with "notify" attribute.
+#
+# create, modify, delete objects
+#
+#SUCCESS
+#
+# RESULT 15: There should be a notif message to case015-1@ripe.net about
+#            successful creations, modify and deletion and no forward message.
+
+
+person:  Test Person10
+address: Singel 258
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP10-DB-TEST
+changed: dbtest@ripe.net 20020101
+notify:  case015-1@ripe.net
+source:  DB-TEST
+
+person:  Test Person11
+address: Singel 258
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP11-DB-TEST
+changed: dbtest@ripe.net 20020101
+notify:  case015-2@ripe.net
+source:  DB-TEST
+
+person:  Test Person12
+address: Singel 258
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP12-DB-TEST
+changed: dbtest@ripe.net 20020101
+notify:  case015-1@ripe.net
+source:  DB-TEST
+delete: test notification
+
+person:  Test Person13
+address: Singel 258
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP13-DB-TEST
+changed: dbtest@ripe.net 20020101
+notify:  case015-1@ripe.net
+source:  DB-TEST

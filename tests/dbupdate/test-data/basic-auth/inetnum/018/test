@@ -1,0 +1,30 @@
+# basic-auth tests - inetnum
+# CASE 18: Create an allocation inetnum object
+#          without any of the ALLOCMNT mntners 
+#          as a mnt-by. 
+#          Password supplied for the mnt-by and the parent mnt-lower
+#          Password supplied also for "org:"
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 18: The creation will fail
+
+
+password: LIR
+password: test-dbm
+
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED PA
+org:          ORG-Eoof1-DB-TEST
+mnt-by:       LIR-MNT
+mnt-lower:    END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

@@ -1,0 +1,29 @@
+
+# CASE 1: We try to create route6 object ::/8
+%
+% requires initial objects to be loaded
+#
+# create route6 object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+route6:       ::/8
+descr:        test
+origin:       AS123
+mnt-by:       TEST-MNT
+components:   protocol BGP4 { 0:0:0:0:1:1:1:1/10^+}
+              protocol OSPF { 0:0:0:0:1:1:1:1/12^+}
+inject:       at 1.2.3.4 action pref=100; upon HAVE-COMPONENTS { 0:0:0:0:1:1:1:1/0, 0:0:0:0:1:1:1:1/0 }
+export-comps: { 0:0:0:0:1:1:1:1/10 }
+holes:        0:0:0:0:1:1:1:1/10, 0:0:0:0:1:1:1:1/12, 0:0:0:0:1:1:1:1/13
+changed:      db-test@ripe.net 20010101
+mnt-routes:   TEST-mnt
+source:       DB-TEST
+
+password: auth
+password: hostmaster
+
+%

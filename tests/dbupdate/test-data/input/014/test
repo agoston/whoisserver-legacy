@@ -1,0 +1,42 @@
+# input tests
+# CASE 14: Input from LIR Portal 
+#          with multi line certificate command line option
+#          (simulated by specifying --cert option and 
+#           redirect input -f from a file)
+#          no keyword specified
+#
+# input from LIR Portal
+# ./dbupdate -c ~/db/conf/rip.config -r --cert "certificate" -f test
+#
+#SUCCESS
+#
+# RESULT 14: person is created
+%
+%
+$$ -c $RIP_CONFIG -r -o 193.0.41.0 --cert "-----BEGIN CERTIFICATE-----
+$$MIIDKzCCApSgAwIBAgICAIMwDQYJKoZIhvcNAQEEBQAwcTELMAkGA1UEBhMCRVUx
+$$EDAOBgNVBAgTB0hvbGxhbmQxEDAOBgNVBAoTB25jY0RFTU8xHTAbBgNVBAMTFFNv
+$$ZnR3YXJlIFBLSSBUZXN0aW5nMR8wHQYJKoZIhvcNAQkBFhBzb2Z0aWVzQHJpcGUu
+$$bmV0MB4XDTAzMDkwODEwMjk0NloXDTA0MDkwNzEwMjk0NlowfTELMAkGA1UEBhMC
+$$TkwxETAPBgNVBAoTCFJJUEUgTkNDMRAwDgYDVQQLEwdNZW1iZXJzMRgwFgYDVQQD
+$$Ew91ay5idC50ZXN0LXVzZXIxLzAtBgkqhkiG9w0BCQEWIHRlc3QtdXNlckBsaW51
+$$eC50ZXN0bGFiLnJpcGUubmV0MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALiVBDl8
+$$1Bak0gcSYA12qVuIQPtzgmnrpIYW6ct/6tYuRW8RAxxPhsYk/7ryTN8WkrMOpPGV
+$$gEgsNS7f54zjKmMCAwEAAaOCAQgwggEEMAkGA1UdEwQCMAAwEQYJYIZIAYb4QgEB
+$$BAQDAgWgMAsGA1UdDwQEAwIF4DAaBglghkgBhvhCAQ0EDRYLUklQRSBOQ0MgQ0Ew
+$$HQYDVR0OBBYEFJYOoUpqFElie+wkZ7UDv8hDKRbxMIGbBgNVHSMEgZMwgZCAFB6S
+$$1H72gVX8V1QnE9JIfTSXh+6LoXWkczBxMQswCQYDVQQGEwJFVTEQMA4GA1UECBMH
+$$SG9sbGFuZDEQMA4GA1UEChMHbmNjREVNTzEdMBsGA1UEAxMUU29mdHdhcmUgUEtJ
+$$IFRlc3RpbmcxHzAdBgkqhkiG9w0BCQEWEHNvZnRpZXNAcmlwZS5uZXSCAQAwDQYJ
+$$KoZIhvcNAQEEBQADgYEAQEigjFK5VJJvAM51lktARjsVIT4c05+vhUTKXsavrnMl
+$$/u5YyrNCrU8U1vp6Lt9HLz3ktj2PlBDCV+P7PWZPMY70hTKjdatVedHnWNp3ZF25
+$$ou8bHSdxNwo2fcAhowtPG2rSh6D7XYNq+tpYAXh28onLmJUXrmbWIOgQWfNjx2Q=
+-----END CERTIFICATE-----" -f $TEST
+
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

@@ -1,0 +1,27 @@
+# organisation object tests
+# CASE 3: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         and weird characters in "org-name:" (but still valid)
+%
+% requires initial objects to be loaded
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed
+
+
+organisation:  AUTO-1
+org-name:      [&EXAMPLE @ "*TTTTTT & , ][
+org-type:      NON-REGISTRY
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+
+password: test-dbm

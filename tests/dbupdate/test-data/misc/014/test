@@ -1,0 +1,25 @@
+# misc tests
+# CASE 14: Modify a role object
+#          with the same name
+#          no override
+#
+# modify person object 
+#
+#SUCCESS
+#
+# RESULT 014: The modification will succeed
+
+role:         Test Role
+address:      Gingel
+phone:        +01234567
+e-mail:       dbtest@ripe.net
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+changed:      dbtest@ripe.net 20031205
+nic-hdl:      RO123-DB-TEST
+mnt-by:       TEST-MNT
+source:       DB-TEST
+password:     auth
+
+
+

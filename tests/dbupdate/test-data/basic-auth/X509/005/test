@@ -1,0 +1,78 @@
+# X.509 auth tests
+#
+# CASE 5: We try to modify a person object protected by a mntner
+#         with a password and an X509 certificate.
+#         Correct signature supplied.
+#         No matching key-cert object
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#FAILURE
+#
+# RESULT 5: The modify will fail.
+%
+%
+$ -c $RIP_CONFIG -rm -f 
+%
+%
+From: dbtest@ripe.net
+MIME-Version: 1.0
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg=sha1; boundary="----C051E21F5C0F8CB4B920AA6D96D723B4"
+
+This is an S/MIME signed message
+
+------C051E21F5C0F8CB4B920AA6D96D723B4
+
+person:       test person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+changed:      dbtest@ripe.net 20040101
+source:       DB-TEST
+
+------C051E21F5C0F8CB4B920AA6D96D723B4
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+
+MIIGgQYJKoZIhvcNAQcCoIIGcjCCBm4CAQExCzAJBgUrDgMCGgUAMAsGCSqGSIb3
+DQEHAaCCA/cwggPzMIIDXKADAgECAgIAgjANBgkqhkiG9w0BAQQFADBxMQswCQYD
+VQQGEwJFVTEQMA4GA1UECBMHSG9sbGFuZDEQMA4GA1UEChMHbmNjREVNTzEdMBsG
+A1UEAxMUU29mdHdhcmUgUEtJIFRlc3RpbmcxHzAdBgkqhkiG9w0BCQEWEHNvZnRp
+ZXNAcmlwZS5uZXQwHhcNMDMwOTA4MTAyNjEyWhcNMDQwOTA3MTAyNjEyWjB9MQsw
+CQYDVQQGEwJOTDERMA8GA1UEChMIUklQRSBOQ0MxEDAOBgNVBAsTB01lbWJlcnMx
+GDAWBgNVBAMTD3VrLmJ0LnRlc3QtdXNlcjEvMC0GCSqGSIb3DQEJARYgdGVzdC11
+c2VyQGxpbnV4LnRlc3RsYWIucmlwZS5uZXQwggEiMA0GCSqGSIb3DQEBAQUAA4IB
+DwAwggEKAoIBAQCu/eyvHKXVADe5Lh3F1ltKwat8GsxGMxvzUafHSeprqL5HOIh/
+XeWzMH8RjLQ+AulAV0Yt2FRDnZiyIY5SYy2dpY0ecQmsFRzz992cDoZV18XwATDU
+9N8nq3YJ1z3ZLBoX7mQJpQPCaU6BszffchCZTTeXcjUguzfZGlDJn51/+i8c2tXN
+4tzY/n2Kxpxt+MzZLRJc9DMeO5UsfjR46BW5cD/ksBiznV5erC0qzNLEWGp6R/4E
+ARxEOteYhPh7fN+Jk6xcp7RR9oQAGAdQytiOxQInw1MyDpeJVI3BBCZcJ1RtG8rv
+M4J7aIJfXnL2E1fGFj+r8hbnhbmK3uMZer/vAgMBAAGjggEIMIIBBDAJBgNVHRME
+AjAAMBEGCWCGSAGG+EIBAQQEAwIFoDALBgNVHQ8EBAMCBeAwGgYJYIZIAYb4QgEN
+BA0WC1JJUEUgTkNDIENBMB0GA1UdDgQWBBTN1qM1pGiuQNMBbk7oelrfP2k/cDCB
+mwYDVR0jBIGTMIGQgBQektR+9oFV/FdUJxPSSH00l4fui6F1pHMwcTELMAkGA1UE
+BhMCRVUxEDAOBgNVBAgTB0hvbGxhbmQxEDAOBgNVBAoTB25jY0RFTU8xHTAbBgNV
+BAMTFFNvZnR3YXJlIFBLSSBUZXN0aW5nMR8wHQYJKoZIhvcNAQkBFhBzb2Z0aWVz
+QHJpcGUubmV0ggEAMA0GCSqGSIb3DQEBBAUAA4GBAHKDwvxFqIjPmTufmNXAz/Sg
+dJ/jwpEwF2dh03b56gSNVBvPjw22NsFOw6JRiPkBBZEcmsq0ND6h1uiDTHtSy+Fe
+OMGj9psnq8gC6mOfE/cqlJ7vfOYFSIxTya9cuJs8/XG4jYU8zvRjt+B5R6FuZPvB
+2CqztMS1jDA95SqM89NmMYICUjCCAk4CAQEwdzBxMQswCQYDVQQGEwJFVTEQMA4G
+A1UECBMHSG9sbGFuZDEQMA4GA1UEChMHbmNjREVNTzEdMBsGA1UEAxMUU29mdHdh
+cmUgUEtJIFRlc3RpbmcxHzAdBgkqhkiG9w0BCQEWEHNvZnRpZXNAcmlwZS5uZXQC
+AgCCMAkGBSsOAwIaBQCggbEwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
+hkiG9w0BCQUxDxcNMDQwMjE3MTIwMTA5WjAjBgkqhkiG9w0BCQQxFgQUACkKIAm8
+RJUXOa4w3N5HgglfpJ4wUgYJKoZIhvcNAQkPMUUwQzAKBggqhkiG9w0DBzAOBggq
+hkiG9w0DAgICAIAwDQYIKoZIhvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwIC
+ASgwDQYJKoZIhvcNAQEBBQAEggEAgBE1MtiWcQyHB7NIOS5NcgN+7oaHXkl+IvXn
+UDaDOEYPH0aYydce5mSbjg2eqFUGr1e+PprlhDRC1yJnafBqMISx1J1h2CEKewwq
+qV/ACpA/ztvigmgrcZvE7NKl1Ic3xHyR7ZEtZ9x5/pWBY/yohuLKfx8+aixkMhJQ
+48fnVKZzjI4TN0FKGak7ZOMPdFF21pVQsbUjicR87k+njryZFq4oI/gC31MOLEup
+Qty1TkgWcY5oohDLxiEjcYcjKgK78voNYoJDfrp9XeqMiB5sKCnECAFnVUeafa6E
+AtIX4p/L1Ycvtkt7ZaQ4w/PWSn1gJ8vIYW/ogLilVKvfJWL/LQ==
+
+------C051E21F5C0F8CB4B920AA6D96D723B4--
+

@@ -1,0 +1,27 @@
+# notification tests
+# CASE 28: Modify irt object with irt-nfy and notify
+#          and its mnt-by has mnt-nfy, upd-to and notify
+#          no password.
+#
+# modify irt object 
+#
+#FAILURE
+#
+# RESULT 28: There should be a forward message to case028-4@ripe.net
+#            about failed modification, and no notif message.
+
+
+irt:          IRT-TEST
+address:      Singel 258
+e-mail:       dbtest@ripe.net
+signature:    PGPKEY-4EA45E47
+encryption:   PGPKEY-4EA45E47
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW agl7a6gyad/e6   # irt
+irt-nfy:      case027-1@ripe.net
+notify:       case027-2@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+changed:      dbtest@ripe.net 20030201
+source:       DB-TEST

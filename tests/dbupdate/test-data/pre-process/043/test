@@ -1,0 +1,21 @@
+# pre-process object tests
+# CASE 43: Create a mntner object with a name on the 
+#          disallowed mntner list
+#
+# create a mntner object
+#
+#FAILURE
+#
+# RESULT 43: create will fail
+
+
+mntner:       RIPE-NCC-NONE-MNT
+descr:        Mntner for my objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+upd-to:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-NONE-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

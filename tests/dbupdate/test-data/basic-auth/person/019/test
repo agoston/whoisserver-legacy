@@ -1,0 +1,30 @@
+# basic-auth tests
+# CASE 19: Create 2 person objects with mnt-by
+#          with correct password for one mnt-by
+#          and no password for the second.
+%
+#
+# ceate person objects
+#
+#SUCCESS
+#
+# RESULT 19: One create will succeed, second will fail
+
+
+password:  test
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+person:       Test Person3
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP3-DB-TEST
+mnt-by:       TEST2-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

@@ -1,0 +1,17 @@
+# command line options tests
+# CASE 21: Valid short option + valid short options list
+#          some requiring/some not requiring mandatory arguments
+#
+# run dbupdate with valid short option + valid short options list
+# ./dbupdate -c ~/db/conf/rip.config -m -r-p-f test
+#
+#SUCCESS
+#
+# RESULT 21: Help text returned.
+%
+$ -c $RIP_CONFIG -m -r-p-f 
+%
+From: dbtest@ripe.net
+subject: help
+
+qwerty

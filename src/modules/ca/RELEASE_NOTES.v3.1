@@ -1,0 +1,30 @@
+V3.0 Beta 1 RELEASE NOTES; CA module
+------------------------------------
+
+The big differences between this release and Version 3.0 beta 1 are:
+
+(a) the dictionary of variables is now hard-coded in the file
+		ca_dictionary.h;  this file is generated from the file 
+	   dictGen.m4 using m4 macros;
+
+(b) the file ca_dictSyms.h is no longer needed; this file contains
+    #define statements which map dictionary symbols to integer values;
+    this is now done using an enum declaration in the ca_dictionary.h
+    file;
+
+(c) variables can now classified as mandatory or optional;  in this
+		release, all variables are classified as mandatory;
+
+(d) greater use of the string utility functions from GLib; this fixes a
+		problem caused by using fixed size character arrays to store the
+		string representation of some of the variables;
+
+(e) the function ca_init() now calls a new function, ca_mandVarChk(); 
+    this function checks that all mandatory variables are defined;
+    if one or more are not defined, a warning message is printed.  The 
+	   total number of undefined variables is also printed.  This function
+    returns an integer value which can be used by ca_init() to halt the
+    start-up of the server.
+
+
+

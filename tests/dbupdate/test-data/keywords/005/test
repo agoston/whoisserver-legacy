@@ -1,0 +1,24 @@
+# keywords tests
+# CASE 5: Invalid keyword fred
+#         not a mail message
+%
+#
+# run dbupdate with option -k fred
+# ./dbupdate -c ~/db/conf/rip.config -r -k fred -f test
+# create a new object
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed, keyword fred in upd log.
+#           Invalid keyword found reported.
+%
+%
+$ -c $RIP_CONFIG -r -k fred -f
+
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

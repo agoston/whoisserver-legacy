@@ -1,0 +1,25 @@
+# CASE 4: We try to delete maintainer object TEST-MNT
+# referenced by AS-TEST mbrs-by-ref:
+# deletion fails - referenced from other objects
+#
+% requires initial objects to be loaded
+%
+# delete mntner object
+#
+#FAILURE
+#
+# RESULT 4: The deletion will fail.
+
+mntner:  TEST-MNT 
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  TEST-MNT
+auth:    CRYPT-PW dbOnSHFpKZTBU  # auth
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+delete: reason
+
+password: auth
+

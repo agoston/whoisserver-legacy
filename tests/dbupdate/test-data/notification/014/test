@@ -1,0 +1,23 @@
+# notification tests
+# CASE 14: A "composite" case: Unsuccessful modify of an object
+#          with two mnt-by, each with two upd-to.
+#
+# Try to modify the person object, with no password.
+#
+#FAILURE
+#
+# RESULT 14: There should be four forw messages about the failed update, to
+#            case014-1@ripe.net, case014-2@ripe.net, case014-4@ripe.net,
+#            case014-5@ripe.net and no notif message.
+
+
+person:  Test Person
+address: Address changed!
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP10-DB-TEST
+mnt-by:  TEST1-MNT
+mnt-by:  TEST2-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+

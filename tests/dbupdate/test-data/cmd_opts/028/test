@@ -1,0 +1,15 @@
+# command line options tests
+# CASE 28: Valid config file path with no file name
+#
+# run dbupdate with a valid file path with no file name
+# ./dbupdate -c $CURRENT_DIR -f test
+#
+# check for exit code 12
+#
+#FAILURE
+#
+# RESULT 28: config file does not exist reported
+%
+%
+?12
+$ -c $CURRENT_DIR -f

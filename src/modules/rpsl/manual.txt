@@ -1,0 +1,566 @@
+Introduction
+
+The RIPE RPSL parsing API is intended to allow applications to verify
+and manipulate RPSL objects in a straightforward manner.  
+
+What it does:
+
+* Syntax checks on attributes and objects
+
+* Provides functions to access and manipulate attributes and objects
+
+What it does not do:
+
+* I/O (for loading or storing RPSL objects)
+
+* Database interaction
+
+* Non-syntax related checks (e.g. existance of objects referred to)
+
+
+
+Usage
+
+In a typical program, you need to initialize the data structures
+representing an RPSL object, check for certain errors, manipulate the
+data, and finally output the resulting object.  To do this:
+
+1. Create a string representing your RPSL object.  This should be the
+   literal text of the object, as described in the RPSL documentation.
+   This can be read from a file or database, from user input, or created
+   dynamically by the program.
+
+2. Call rpsl_object_init(), verifying the call worked.
+
+3. Call rpsl_object_errors(), and check to see if you care about any of
+   the errors returned, possibly reporting them to the user.
+
+4. Call rpsl_object_get_attr() for the attributes that you want to 
+   process.
+
+5. For each attribute you want to use, call rpsl_attr_errors(), and
+   check to see if you care about any of the errors returned, possibly
+   reporting them to the user.
+
+6. Remove unwanted attributes by rpsl_object_attr_delete().
+
+7. Add new attributes by first calling rpsl_attr_init() and then
+   rpsl_object_attr_insert() or rpsl_object_attr_append().
+
+8. When done, call rpsl_object_get_text() to retrieve an RPSL formatted
+   version of the object.
+
+
+Data Structures
+
+These are presented here primarily for enlightenment - often a quick
+glance at a data structure can clarify the intent in ways that looking
+at function descriptions never can.
+
+  /* typedefs allow for forward references within structure definitions */
+  typedef struct rpsl_object rpsl_object_t;
+  typedef struct rpsl_attr rpsl_attr_t;
+  typedef struct rpsl_error rpsl_error_t
+
+  /* strictness of checking */
+  enum {
+      RPSL_DICT_CORE,
+      RPSL_DICT_FRONT_END
+  };
+
+  /* various RPSL error levels (similar as syslog errors) */
+  enum {
+      RPSL_ERRLVL_NONE,
+      RPSL_ERRLVL_DEBUG,
+      RPSL_ERRLVL_INFO,
+      RPSL_ERRLVL_NOTICE,
+      RPSL_ERRLVL_WARN,
+      RPSL_ERRLVL_ERROR,
+      RPSL_ERRLVL_CRIT,
+      RPSL_ERRLVL_FATAL
+  };
+
+  /* error codes */
+  enum {
+      /* attribute-related errors */
+      RPSL_ERR_BADATTR,
+      RPSL_ERR_UNKNOWNATTR,
+      RPSL_ERR_EMPTYLIST,
+      RPSL_ERR_EMPTYATTR,
+      RPSL_ERR_SYNERR,
+      /* object-related errors */
+      RPSL_ERR_ONLYCOMMENTS,
+      RPSL_ERR_BADCLASS,
+      RPSL_ERR_UNKNOWNCLASS,
+      RPSL_ERR_ATTRNOTALLOWED,
+      RPSL_ERR_ATTRSINGLE,
+      RPSL_ERR_ATTRGENERATED,
+      RPSL_ERR_MISSINGATTR,
+      RPSL_ERR_MISSINGKEY,
+      /* modification-related errors */
+      RPSL_ERR_BADOFFSET,
+      RPSL_ERR_NOSUCHATTR
+  };
+
+
+  /* specific errors (per attribute, object, or function call) */
+  struct rpsl_error {
+      gint level;               /* level of the error (enum above) */
+      gint code;                /* code for the error */
+      gchar *descr;             /* description of the error */
+  };
+
+  /* information about an attribute */
+  struct rpsl_attr {
+      gchar *name;             /* name, e.g. "inetnum" or "person" */
+      gchar *value;            /* value of the object, e.g. "192.168.0.0/24" */
+      GList *errors;           /* any errors with this attribute */
+      gint num;                /* Position of attribute.  
+                                  For class name, num = 0. 
+                                  For attributes not in a class, num = -1. */
+  };
+
+  /* information about an object */
+  struct rpsl_object {
+      GList *attributes;       /* ordered attributes for this object */
+      GHashTable *attr_lookup; /* hash table used to do by-name lookups */
+      GList *errors;           /* any errors with this object */
+  };
+
+  /* information about a class */
+  struct rpsl_template {
+      gchar *name;                /* "person", "descr", ... */
+      gchar *code;                /* "pn", "de", ... */
+      gboolean is_required;       /* mandatory/optional */
+      gboolean is_generated;      /* generated/user-specified */
+      gboolean is_multivalued;    /* single/multiple */
+      gboolean is_lookup;         /* lookup key */
+      gboolean is_inverse;        /* inverse key */
+      gboolean is_primary;        /* primary key */
+      gboolean is_list;           /* RPSL list (comma-separated) */
+      gboolean is_ripe_list;      /* RIPE list (space-separated) */
+  };
+
+
+Functions
+
+The attribute functions are presented here:
+
+  rpsl_attr_t *rpsl_attr_init(const gchar *s, const gchar *class);
+
+    Allocate and initialize the rpsl_attr_t data structure from the RPSL
+    attribute in the string s.  
+    
+    The string specified by the class parameter may either be NULL, or
+    the name of the class that this attribute is for.  This is necessary
+    for attributes like "member-of", whose syntax varies depending on
+    which class it is in.  If the syntax is always the same (e.g.
+    "changed"), or is only specified for a single class (e.g.
+    "referral-by"), then either NULL or the class name to be used may be
+    passed safely.   If you specify a class name and the attribute is
+    not in that class, this is an error and NULL will be returned.  If
+    the syntax is ambiguous without a class context (e.g. "member-of")
+    and you do not specify the class, this is also an error, and NULL
+    will be returned.
+
+    On success, the address of the structure is returned, otherwise NULL
+    is returned (possible as described above).  Syntax errors may be
+    found by looking at the errors field of the rpsl_attr_t structure
+    returned.
+
+  rpsl_attr_t *rpsl_attr_copy(const rpsl_attr_t *attr);
+
+    Returns a copy of the attribute passed.  This is a "deep copy",
+    meaning that all members of the structure are in turn copied.
+
+  rpsl_attr_t *rpsl_attr_clean_copy(const rpsl_attr_t *attr);
+
+    Returns a copy of the attribute passed, with each attribute treated
+    as if it was filtered through rpsl_attr_get_clean_value().  This is
+    a "deep copy", meaning that all members of the structure are in turn
+    copied.
+
+    Errors are not copied.
+
+  void rpsl_attr_delete(rpsl_attr_t *attr);
+
+    Free any memory used by the attribute structure, and the attribute
+    itself.
+
+  void rpsl_attr_delete_list(GList *attributes);
+  
+    Free any memory used by the rpsl_attr_t in the GList by calling
+    rpsl_attr_delete(), and also frees the memory used by the GList
+    nodes.
+
+  GList **rpsl_attr_uniq_list(Glist **rpsl_attr_list);
+    
+   Deletes the duplicates from the list of rpsl attributes.
+   rpsl_attr_list is analysed and freed, then new list is created.
+   NULL if list is empty; list can be freed with rpsl_attr_delete_list.
+
+  const gchar *rpsl_attr_get_name(const rpsl_attr_t *attr);
+
+    Get the name of the attribute.  If the attribute has no name
+    (possible for badly-formatted attributes, or ones with invalid
+    names), then NULL will be returned.
+    The name will be converted to lower case.
+
+  gint rpsl_attr_get_ofs(const rpsl_attr_t *attr);
+
+    Returns the offset of this attribute within the rpsl_object_t that
+    contains it, or -1 if it is not part of an object.
+
+  const gchar *rpsl_attr_get_value(const rpsl_attr_t *attr);
+
+    Get the data from the attribute.  If no value was found, then NULL
+    will be returned.
+
+  gchar *rpsl_attr_get_clean_value(const rpsl_attr_t *attr);
+
+    Get a cleaned copy of the data from the attribute.  Any end-of-line
+    comments will be removed, continued lines joined together,
+    runs of whitespace converted to a single space, and leading and
+    trailing whitespace removed.  If no value was found, then NULL will
+    be returned.
+
+    The memory for this copy is allocated by malloc(), and must be freed
+    by the caller.
+
+  gchar *rpsl_attr_get_clean_lines(const rpsl_attr_t *attr);
+
+    Get a cleaned copy of the data from the attribute.  Any end-of-line
+    comments or line continuation characters will be removed, runs of
+    whitespace converted to a single space, and leading and trailing
+    whitespace on each line will be removed.  If no value was found,
+    then NULL will be returned.
+
+    The memory for this copy is allocated by malloc(), and must be freed
+    by the caller.
+
+  GList *rpsl_attr_get_split_list(const rpsl_attr_t *attr);
+
+    Split attribute lists into separate elements, and return a GList of
+    these.  If the attribute is not a list type, then a GList with a
+    single element is returned.  If no value is found, then NULL will be
+    returned.
+
+    This list should be freed via rpsl_attr_delete_list().
+
+  GList **rpsl_mnt_routes_clean_split (rpsl_attr_t *attr, GList **prefix_range_list, 
+                                       GList **invalid_list);
+
+   This function cleans the mnt-routes attribute value, leaves only maintainer name 
+   and separates optional prefix list to a GList. This list is set to NULL if no list 
+   is found in mnt-routes or if the list contains only "ANY".
+   If there are any invalid (unconvertible) prefix ranges, they are added to invalid_list 
+   as gchars.
+
+  void rpsl_attr_split_multiple(GList **attrs);
+  
+    Takes a list of rpsl_attr_t structures, such as is returned by
+    rpsl_object_get_attr().  Each structure is split into separate
+    elements, like in rpsl_attr_get_split_list(), and replaced with
+    a new rpsl_attr_t for each element.
+
+    The new list should be freed via rpsl_attr_delete_list().
+
+  void rpsl_attr_replace_value(rpsl_attr_t *attr, const gchar *value);
+
+    Replace the current value of the attribute with the parameter
+    passed.  An attempt to replace the value with an illegal value will 
+    succeed, and the error will be added to the error list for the
+    attribute.
+
+  const GList *rpsl_attr_errors(const rpsl_attr_t *attr);
+  
+    Get a list of rpsl_error_t entries.  This list may be empty, in 
+    which case NULL is returned.  
+    
+    The elements of this list are NOT allocated for this call, nor is
+    the GList itself, and should NOT be freed by the caller.
+
+  gint rpsl_get_attr_id(const gchar *attr_name);
+  gint rpsl_get_class_id(const gchar *class_name);
+
+    Returns a unique identifier associated with the named attribute or 
+    class.  (These also match the attributes used by the definition files
+    generated for the RIP application.)
+
+The object functions are presented here:
+
+  rpsl_object_t *rpsl_object_init(const gchar *s);
+
+    Allocate and initialize the rpsl_object_t data structure from the
+    RPSL object in the string s.  Returns the address of the data
+    structure on success, or NULL on failure (normally only possible for
+    extreme errors, e.g. out of memory).  Other errors may be found by
+    looking at the errors field of the rpsl_object_t structure returned.
+
+  rpsl_object_t *rpsl_object_copy(const rpsl_object_t *object);
+
+    Returns a copy of the object passed.  This is a "deep copy",
+    meaning that all members of the structure are in turn copied.
+
+  rpsl_object_t *rpsl_object_copy_flattened(const rpsl_object_t *object);
+
+    Returns a copy of the object passed.  This is a "deep copy",
+    meaning that all members of the structure are in turn copied.
+
+    Additionally, all attributes are split, in the same way as
+    rpsl_attr_get_split_list(), and each element added as a separate
+    attribute.  For example, an object with:
+    
+      as-set: AS-XYZ
+      members: AS123, AS456
+
+    Will be returned as:
+
+      as-set: AS-XYZ
+      members: AS123
+      members: AS456
+
+    Neither object nor attribute errors are not copied with this function.
+
+  void rpsl_object_delete(rpsl_object_t *object);
+
+    Free any memory used by the object structure.
+
+  const char *rpsl_object_get_class(const rpsl_object_t *object);
+
+    Returns the name of the class of the attribute.  If there is none
+    (only possible for an invalid class), then NULL will be returned.
+    The name will be converted to lower case.
+
+  gchar *rpsl_object_get_text(const rpsl_object_t *object, guint data_column);
+
+    Get the data from the object.  If there is none, NULL will be
+    returned.  This does not include the trailing '\n' (i.e. a blank
+    line) that separates RPSL objects.
+
+    The data_column argument is which column the non-whitespace data of
+    the object will start at.  You can use 0 for the data_column, which
+    indicates that no formatting is to be done.  You can also use the
+    value RPSL_STD_COLUMN, which is 14 (this is the indent used by the
+    RIPE database).
+
+    Column numbering starts at 0.  Because attribute names are long, it
+    does not make sense to use anything shorter than the smallest
+    attribute name in the object.  If you do, that attribute will have
+    one space after the ':'.
+
+    Attribute values that start before the data_column value will have
+    enough spaces added before the value so that they start on that
+    column.  Attribute values that start after the data_column value
+    will have enough spaces removed so that they start on that column.
+    Any lines added via line continuation will have that many spaces
+    added or removed as well.  If data_column is non-zero, then there
+    will always be at least one space after the ':'.  Non-whitespace
+    data will never be removed.
+
+    Tabstops are considered each 8 characters, meaning when a tab is
+    encountered it is considered to be enough spaces to advance the
+    character to the next column position such that (column mod 8) is 0.  
+    If whitespace is to be removed from a continued line, a tab may be
+    replaced with the appropriate number of spaces (e.g. Two tabs would
+    put the data at column 15.  If data_column is 9, the second tab
+    would be removed and replaced with 2 spaces.)
+
+    The memory for value returned is allocated by malloc(), and must be
+    freed by the caller.
+
+  gint rpsl_object_get_num_attr(const rpsl_object_t *object);
+
+    Return the number of attributes in the object.  For badly-formed
+    objects, this may be 0.
+
+  const GList *rpsl_object_get_all_attr(const rpsl_object_t *object);
+
+    Get an in-order list of all attributes from the object.  The first
+    entry will be the class of the object.
+
+    The elements of this list are NOT allocated for this call, nor is
+    the GList itself, and should NOT be freed by the caller.
+
+  GList *rpsl_object_get_attr(const rpsl_object_t *object, const gchar *name);
+
+    Get a list of all the attributes with the specified name from the
+    object.  Each element of this list is of rpsl_attr_t.  The list may
+    be empty.
+
+    This list should be freed via rpsl_attr_delete_list().
+
+  const rpsl_attr_t *rpsl_object_get_attr_by_ofs(const rpsl_object_t *object,
+                                                 gint ofs);
+
+    Return the attribute at the specified offset within the object.
+    If the offset is less than 0 or greater than or equal to the
+    number of attributes of the object, NULL is returned.
+
+  gchar *rpsl_object_get_key_value(const rpsl_object_t *object);
+
+    Returns the value of the key attribute of the object.  The value
+    is the cleaned value, similar to the value returned by
+    rpsl_attr_get_clean_value().
+
+    If the object has a key composed of multiple attributes (currently
+    only true for route objects), then the value returned is the
+    concatenation of the attributes.  For example, a route with these
+    values:
+
+      route: 192.168.1.0/24
+      origin: AS1
+      
+    Will have the value "192.168.1.0/24AS1" returned.
+
+    The memory for this value is allocated by malloc(), and must be
+    freed by the caller.  If there is an error allocating memory, then
+    NULL will be returned.
+
+
+  int rpsl_object_append_attr(rpsl_object_t *object, 
+                              rpsl_attr_t *attr,
+                              rpsl_error_t *error);
+
+    Add the specified attribute as the last attribute in the object.  On
+    success, 1 is returned.  On failure, 0 is returned, and the error
+    structure is filled with details about the reason (e.g. attribute
+    not permitted in this class).  NULL may be passed as the error
+    structure, and it will be ignored.
+
+    Unlike attributes added by rpsl_object_init(), there will be no
+    errors added to the class itself if an attribute with an error is
+    added via this function.  Also unlike rpsl_object_init(), a
+    "generated" attribute may be added without error with this function.
+
+  int rpsl_object_add_first_attr(rpsl_object_t *object,
+                           rpsl_attr_t *attr,
+                           rpsl_error_t *error);
+   A wrapper to rpsl_object_add_attr_internal, which allows to replace only
+   the first attribute of the object. 
+
+  int rpsl_object_add_attr(rpsl_object_t *object,
+                           rpsl_attr_t *attr,
+                           gint ofs,
+                           rpsl_error_t *error);
+   A wrapper to rpsl_object_add_attr_internal, which prevents the first
+   attribute (offset 0) from being replaced.
+
+  int rpsl_object_add_attr_internal(rpsl_object_t *object, 
+                           rpsl_attr_t *attr, 
+                           gint ofs,
+                           rpsl_error_t *error);
+
+    Add the specified attribute to the object before offset specified.
+    On success, 1 is returned.  On failure, 0 is returned, and the error
+    structure is filled with details about the reason (e.g. attribute
+    not permitted in this class).  NULL may be passed as the error
+    structure, and it will be ignored.
+
+    Unlike attributes added by rpsl_object_init(), there will be no
+    errors added to the class itself if an attribute with an error is
+    added via this function.  Also unlike rpsl_object_init(), a
+    "generated" attribute may be added without error with this function.
+ 
+  int rpsl_object_remove_first_attr(rpsl_object_t *object,
+                           rpsl_attr_t *attr,
+                           rpsl_error_t *error);
+   A wrapper to rpsl_object_add_attr_internal, which allows to remove only
+   the first attribute of the object.                                      
+
+  int rpsl_object_remove_attr(rpsl_object_t *object,
+                           rpsl_attr_t *attr,
+                           gint ofs,
+                           rpsl_error_t *error);
+   A wrapper to rpsl_object_add_attr_internal, which prevents the first 
+   attribute (offset 0) from being removed.
+
+  rpsl_attr_t *rpsl_object_remove_attr(rpsl_object_t *object, 
+                                       gint ofs,
+                                       rpsl_error_t *error);
+
+    Remove the attribute at the specified offset from the object.  On
+    success, a pointer to the attribute removed is returned.  On failure,
+    NULL is returned, and the error structure is filled with details about
+    the reason (e.g. removing mandatory attribute).  NULL may be passed as
+    the error structure, and it will be ignored.
+
+  rpsl_attr_t *rpsl_object_remove_attr_name(rpsl_object_t *object,
+                                            const gchar *name,
+                                            rpsl_error_t *error);
+
+    Removes the first attribute with the specified offset from the object.
+    On success, a pointer to the attribute removed is returned is
+    returned.  On failure, NULL is returned, and the error structure is
+    filled with details about the reason (e.g. no attribute with that
+    name).  NULL may be passed as the error structure, and it will be
+    ignored.
+
+  const GList *rpsl_object_errors(const rpsl_object_t *object);
+  
+    Get a list of rpsl_error_t entries.  This list may be empty.  
+    
+    The elements of this list are NOT allocated for this call, nor is
+    the GList itself, and should NOT be freed by the caller.
+
+  gboolean rpsl_attr_is_required(const rpsl_object_t *object, 
+                                 const gchar *attr);
+  gboolean rpsl_attr_is_multivalued(const rpsl_object_t *object,
+                                    const gchar *attr);
+  gboolean rpsl_attr_is_lookup(const rpsl_object_t *object,
+                               const gchar *attr);
+  gboolean rpsl_attr_is_key(const rpsl_object_t *object,
+                            const gchar *attr);
+  gboolean rpsl_attr_is_generated(const rpsl_object_t *object,
+                                  const gchar *attr);
+
+    These functions may be used to check the status of various
+    attributes within an object.
+
+  gboolean rpsl_object_is_deleted(const rpsl_object_t *object);
+
+    Returns TRUE if the object was created with the "delete"
+    pseudo-attribute set.
+
+  gboolean rpsl_attr_has_error(const rpsl_attr_t *attr, int error_level);
+  gboolean rpsl_object_has_error(const rpsl_object_t *object, int error_level);
+
+    Returns TRUE if the attribute or object has an error of the given
+    severity or worse.
+
+  gint rpsl_get_attr_id(const gchar *attr_name);
+  gint rpsl_get_class_id(const gchar *class_name);
+
+    Return a unique identifier for the named attribute or class.  (This
+    corresponds to the enumerated value used by the RIP program.)  If
+    the attribute or class name is invalid, -1 will be returned.
+
+The dictionary controls the strictness of various checks:
+
+  void rpsl_load_dictionary(int level);
+
+    Sets the dictionary strictness to the specified level, which must be
+    either RPSL_DICT_CORE or RPSL_DICT_FRONT_END.
+
+  int rpsl_read_dictionary();
+
+    Returns the current dictionary strictness, either RPSL_DICT_CORE or
+    RPSL_DICT_FRONT_END.
+
+There are some "reflection" functions, that allow applications to know
+what RPSL classes are implemented, and what they contain:
+
+  const gchar* const *rpsl_classes();
+  
+    Returns a list of pointers to NUL-terminated strings, each of
+    which is the name of an object type.  This list is unsorted.  The
+    last entry of the list will be NULL.
+
+  const rpsl_template_t* const *rpsl_template(const gchar *class);
+
+    Returns a list of pointers to rpsl_template_t structures for the
+    class named.  This list is sorted.  The last entry of the list
+    will be NULL.
+
+
+$Id: manual.txt,v 1.1 2004/12/27 16:38:46 can Exp $

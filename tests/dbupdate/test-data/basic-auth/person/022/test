@@ -1,0 +1,21 @@
+# basic-auth tests
+# CASE 22: Create a person object
+#          with a mnt-by that does not exist in the database
+#          and a valid mnt-by with no password
+%
+#
+# create person object 
+#
+#FAILURE
+#
+# RESULT 22: The creation will fail
+
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST2-MNT
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

@@ -1,0 +1,18 @@
+# keywords tests
+# CASE 6: Invalid keyword fred, with valid keyword help
+#         not a mail message
+%
+#
+# run dbupdate with option -k fred,help
+# ./dbupdate -c ~/db/conf/rip.config -r -k fred,help,qwerty -f test
+#
+#SUCCESS
+#
+# RESULT 6: The help will not be sent, keyword fred,help in upd log.
+#           Invalid keyword found reported.
+#           Number of objects found 0 reported
+%
+%
+$ -c $RIP_CONFIG -r -k fred,help,qwerty -f
+
+

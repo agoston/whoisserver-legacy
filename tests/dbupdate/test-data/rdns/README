@@ -1,0 +1,204 @@
+# rdns tests
+# CASE 1: Delete fails because of wrong password
+#
+# delete domain object
+#
+#FAILURE
+#
+# RESULT 1: deletions will fail
+
+
+# rdns tests
+# CASE 2: Delete succeeds with correct password
+#
+# delete domain object
+#
+#SUCCESS
+#
+# RESULT 2: deletion will pass
+
+
+# rdns tests
+# CASE 3: Delete succeeds with correct override password
+#
+# delete domain object
+#
+#SUCCESS
+#
+# RESULT 3: deletion will pass
+
+
+# rdns tests
+# CASE 4: Delete fails with incorrect override password
+#
+# delete domain object
+#
+#FAILURE
+#
+# RESULT 4: deletion will fail
+
+
+# rdns tests
+# CASE 5: Delete passes with correct auth from 0/0 mnt-domains
+#
+# delete domain object
+#
+#SUCCESS
+#
+# RESULT 5: deletion will pass
+
+
+# rdns tests
+# CASE 6: Modification passes with correct auth from existing object
+#
+# modify domain object
+#
+#SUCCESS
+#
+# RESULT 6: modification will pass
+
+# rdns tests
+# CASE 7: Modification passes with correct auth from new object
+#
+# modify domain object
+#
+#SUCCESS
+#
+# RESULT 7: modification will pass
+
+# rdns tests
+# CASE 8: Modification fails because it's not the related RIR
+#
+# modify domain object
+#
+#FAILURE
+#
+# RESULT 8: modification will fail
+
+# rdns tests
+# CASE 9: Modification fails because parent is not ours
+#
+# modify domain object
+#
+#FAILURE
+#
+# RESULT 9: modification will fail
+
+
+# rdns tests
+# CASE 10: Modification fails due to excess delcheck errors
+#
+# modify domain object
+#
+#FAILURE
+#
+# RESULT 10: modification will fail
+
+
+# rdns tests
+# CASE 11: Creation passes with correct auth from 0/0 mnt-domains
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 11: creation will pass
+
+
+# rdns tests
+# CASE 12: Creation passes with correct auth from parent domain
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 12: creation will pass
+
+
+# rdns tests
+# CASE 13: Creation fails with no pass aroung
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 13: creation will fail
+
+
+# rdns tests
+# CASE 14: Creation passes with override
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 14: creation will pass
+
+
+# rdns tests
+# CASE 15: Creation fails because it's not the related RIR
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 15: Creation will fail
+
+# rdns tests
+# CASE 16: Creation fails because parent is not ours
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 16: Creation will fail
+
+
+# rdns tests
+# CASE 17: Creation fails due to excess delcheck errors
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 17: create will fail
+
+
+# rdns tests
+# CASE 18: Creation passes with correct delchecker output
+#
+# create domain object
+# WARNING WARNING WARNING
+# this test may fail anytime, due to external references
+# TODO replace it with something less puny
+# WARNING WARNING WARNING
+#
+#SUCCESS
+#
+# RESULT 18: create will pass
+
+
+# rdns tests
+# CASE 19: Modification passes with correct delchecker output
+#
+# modify domain object
+# WARNING WARNING WARNING
+# this test may fail anytime, due to external references
+# TODO replace it with something less puny
+# WARNING WARNING WARNING
+#
+#SUCCESS
+#
+# RESULT 19: modification will pass
+
+
+# rdns tests
+# CASE 20: Update fails because the decomposition range is invalid
+#
+# update domain object
+#
+#FAILURE
+#
+# RESULT 20: update will fail
+
+

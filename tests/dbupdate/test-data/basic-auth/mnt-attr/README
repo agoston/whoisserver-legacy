@@ -1,0 +1,160 @@
+# mnt-attr tests
+
+
+# CASE 1: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, and mnt-routes with EXACT-MR-MNT { 20.13.0.0/16^+},
+#         EXACT-MR-MNT { ANY}
+#         EXACT-MR-MNT 
+#         aut-num contains duplicated mnt-by
+#         route itself contain duplicated mnt-by
+#         (duplication check)
+#         every mntner name should be used only once!
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed
+# mnt-attr tests
+
+
+# CASE 2: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, mnt-routes,
+#         aut-num contains single mnt-by
+#         route itself contains single mnt-by
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 2: The creation will succeed
+# mnt-attr tests
+
+
+# CASE 3: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, two different mnt-routes,
+#         aut-num contains two different mnt-by
+#         route itself contains two different mnt-by
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed
+# mnt-attr tests
+
+
+# CASE 4: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, two different mnt-routes, (two duplicates)
+#         aut-num contains two different mnt-by (two duplicates)
+#         route itself contains two different mnt-by (two duplicates)
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed
+
+# mnt-attr tests
+# CASE 5: We try to create 20.13.0.0/16 route object. 
+#         mnt-routes contains invalid prefix in mnt-routes (range not within the prefix length)
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will fail
+
+# mnt-attr tests
+# CASE 6: We try to create 20.13.0.0/16 route object. 
+#         mnt-routes contains invalid prefix range (doesn't start on the correct boundary) 
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail
+
+# mnt-attr tests
+# CASE 7: We try to create 20.13.0.0/16 route object. 
+#         mnt-routes contains invalid prefix range (no "^") 
+#         general parse error
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail
+
+# mnt-attr tests
+# CASE 8: We try to create 20.13.0.0/16 route object. 
+#         mnt-routes contains invalid prefix range (no "/") 
+#         general parse error
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail
+
+# mnt-attr tests
+# CASE 9: We try to create 20.13.0.0/16 route object. 
+#         mnt-routes contains invalid prefix range (nothing after "^") 
+#         general parse error
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 9: The creation will fail
+
+# mnt-attr tests
+# CASE 10: We try to create 20.13.0.0/16 route object. 
+#         mnt-routes contains invalid prefix range (.../16^18-17) 
+#         range end is less then end start
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 10: The creation will fail
+
+# mnt-attr tests
+# CASE 11: We try to create 20.13.0.0/16 route object. 
+#         mnt-routes contains invalid prefix length (.../48^2-3) 
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 11: The creation will fail
+
+# mnt-attr testsIP/RIP/tests/dbupdate/test-data/basic-auth/mnt-attr $ cat 011/test 
+# CASE 12: We try to create 20.13.0.0/16 route object. uth/mnt-attr $ vim README 
+#         mnt-routes contains invalid range (.../16^44) 
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 12: The creation will fail
+
+# mnt-attr testsIP/RIP/tests/dbupdate/test-data/basic-auth/mnt-attr $ cat 012/test 
+# CASE 13: We try to create 20.13.0.0/16 route object. uth/mnt-attr $ vim README 
+#         mnt-routes contains invalid range (.../16^44-57) 
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 13: The creation will fail
+

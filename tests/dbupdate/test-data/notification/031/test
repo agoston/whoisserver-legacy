@@ -1,0 +1,34 @@
+# notification tests
+# CASE 31: Create inetnum object with auth error
+#          The inetnum has mnt-irt, notify.
+#          The inetnum mnt-by has mnt-nfy, upd-to, notify.
+#          The inetnum mnt-irt has irt-nfy, notify.
+#          The parent has mnt-irt, notify.
+#          The parent mnt-by has mnt-nfy, upd-to, notify.
+#          The parent mnt-irt has irt-nfy, notify.
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 31: There should be a forward message to case031-1@ripe.net
+#            and case031-4@ripe.net 
+#            about failed creation, and no notif message.
+
+
+inetnum:      192.168.201.0 - 192.168.201.255
+netname:      RIPE-NET
+country:      NL
+descr:        /24 to contain our tests
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+notify:       case031-12@ripe.net
+mnt-by:       USER-MNT
+mnt-lower:    USER-MNT
+mnt-irt:      IRT-USER
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password: test-mnt
+password: irt

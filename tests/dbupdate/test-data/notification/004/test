@@ -1,0 +1,20 @@
+# notification tests
+# CASE 4: Deletion of an object with "notify" attribute.
+#
+# delete object
+#
+#SUCCESS
+#
+# RESULT 4: There should be a notif message to case004@ripe.net about
+#           successful deletion and no forward message.
+
+
+person:  Test Person
+address: Singel 258
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP10-DB-TEST
+changed: dbtest@ripe.net 20020101
+notify:  case004@ripe.net
+source:  DB-TEST
+delete: test notification

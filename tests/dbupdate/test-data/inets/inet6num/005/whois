@@ -1,0 +1,12 @@
+inetnum:      80.16.151.184			-					80.16.151.191
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+status:       ALLOCATED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+

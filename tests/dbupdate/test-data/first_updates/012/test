@@ -1,0 +1,18 @@
+# first updates tests
+# CASE 12: Delete object that does not match existing object
+#
+# Delete object that does not match the existing object in the database
+#
+#FAILURE
+#
+# RESULT 12: Attempting to delete object which does not match
+#            existing object in the database reported
+
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test
+delete:  not required

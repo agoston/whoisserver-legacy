@@ -1,0 +1,26 @@
+# keywords tests
+# CASE 15: valid keyword help on subject line
+#          after keywords: tag and user reference
+#
+# run dbupdate with mail subject  
+#  with keywords: tag and user reference
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 15: help output in ack log, keyword help in upd log,
+#           no objects processed
+%
+%
+$ -c $RIP_CONFIG -rm -f
+%
+%
+From: dbtest@ripe.net
+Subject: second update  keywords: help
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

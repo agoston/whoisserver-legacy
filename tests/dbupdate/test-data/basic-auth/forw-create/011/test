@@ -1,0 +1,29 @@
+# basic-auth tests - forward create
+# CASE 11: Create an as-block object with NO override
+#          test flag is set (-t)
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 11: The as-block creation will succeed without forwarding.
+%
+%
+$ -c $RIP_CONFIG -mr -t -f
+%
+From: dbtest@ripe.net
+
+
+password: hostmaster
+ 
+as-block:     AS100 - AS1000
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20040101
+source:       DB-TEST

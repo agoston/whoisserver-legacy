@@ -1,0 +1,24 @@
+# CASE 18: We try to create as-set object with 2-level hierarchical name AS123:AS123
+# should get syntax error
+#
+% requires initial objects to be loaded
+%
+# create as-set object
+#
+#FAILURE
+#
+# RESULT 18: The creation will fail.
+
+as-set:       AS123:AS123
+descr:        test as-set
+descr:        test as-set
+members:      AS1, AS2, AS3, AS4
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password:     auth
+

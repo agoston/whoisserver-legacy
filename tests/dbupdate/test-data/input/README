@@ -1,0 +1,195 @@
+# input tests
+
+# CASE 1: Invalid file specified with -f option
+%
+#
+# input from non existant file  ( -f fred )
+# ./dbupdate -c ~/db/conf/rip.config -r -f fred
+#
+#FAILURE
+#
+# RESULT 1: internal error message in ack
+
+
+# CASE 2: Valid file specified with -f option
+#         not a mail message
+#         keyword help specified
+#         --print option NOT specified
+%
+#
+# input from specified file
+# ./dbupdate -c ~/db/conf/rip.config -r -k help -f test
+#
+#SUCCESS
+#
+# RESULT 2: help message in ack
+#           ack message printed to stdout
+#           keywords - help in upd file
+
+
+# CASE 3: Input from stdin (simulated with redirected input < from a file )
+#         not a mail message
+#         keyword help specified
+%
+#
+# input from stdin
+# ./dbupdate -c ~/db/conf/rip.config -r -k help < test
+#
+#SUCCESS
+#
+# RESULT 3: help message in ack
+#           keywords - help in upd log
+#           help message on stdout
+
+
+# CASE 4: Input from syncupdates 
+#         (simulated by specifying -o option and redirect input < from a file)
+#         not a mail message
+#         keyword help specified
+#         origin (-o 192.0.0.0) specified
+%
+#
+# input from syncupdates
+# ./dbupdate -c ~/db/conf/rip.config -ro 192.0.0.0 -k help < test
+#
+#SUCCESS
+#
+# RESULT 4: help message in ack
+#           keywords - help in upd log
+#           help message on stdout
+
+
+# CASE 5: Mail message from a file 
+#         subject help specified
+#         --print option NOT specified
+%
+#
+# mail message input from specified file
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 5: help message in ack
+#           nothing on stdout
+
+
+# CASE 6: Mail message from a file 
+#         subject help specified
+#         --print option specified
+%
+#
+# mail message input from specified file
+# ./dbupdate -c ~/db/conf/rip.config -rm --print -f test
+#
+#SUCCESS
+#
+# RESULT 6: help message in ack
+#           ack message printed to stdout
+
+
+# CASE 7: Valid file specified with -f option
+#         mail message
+#         subject help specified
+#         --redirect option specified
+%
+#
+# input from specified file
+# ./dbupdate -c ~/db/conf/rip.config --redirect -m -f test
+#
+#SUCCESS
+#
+# RESULT 7: help message in ack
+#           redirected tag in ack log
+#           nothing on stdout
+
+# CASE 8: Valid file specified with -f option
+%
+#
+# input from specified file, check update log
+# ./dbupdate -c ~/db/conf/rip.config -r -f test
+#
+#SUCCESS
+#
+# RESULT 8: Data written below copied to update log
+
+
+# CASE 9: Input from stdin (simulated with redirected input < from a file )
+%
+#
+# input from stdin, check update log
+# ./dbupdate -c ~/db/conf/rip.config -r < test
+#
+#SUCCESS
+#
+# RESULT 9: Data written below copied to update log
+
+
+# CASE 10: Valid path with no file specified with -f option
+%
+#
+# input from valid path with no file  ( -f $CURRENT_DIR)
+# ./dbupdate -c ~/db/conf/rip.config -r -f $CURRENT_DIR
+#
+#FAILURE
+#
+# RESULT 10: internal error message in ack
+
+
+# CASE 11: Mail message from a file 
+#          no reply-to field
+#          --print option NOT specified
+%
+#
+# mail message input from specified file
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 11: object created
+#            nothing on stdout
+
+
+# CASE 12: Mail message from a file 
+#          full incoming mail header
+#          --print option NOT specified
+%
+#
+# mail message input from specified file
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 12: object created
+#            nothing on stdout
+
+
+
+# CASE 13: Mail message from a file 
+#          full incoming mail header
+#          --print option NOT specified
+#          syntax error
+%
+#
+# mail message input from specified file
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#FAILURE
+#
+# RESULT 13: object not created
+#            nothing on stdout
+
+
+# CASE 14: Input from LIR Portal 
+#          with multi line certificate command line option
+#          (simulated by specifying --cert option and 
+#           redirect input -f from a file)
+#          no keyword specified
+#
+# input from LIR Portal
+# ./dbupdate -c ~/db/conf/rip.config -r --cert "certificate" -f test
+#
+#SUCCESS
+#
+# RESULT 14: person is created
+
+

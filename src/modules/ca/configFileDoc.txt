@@ -1,0 +1,82 @@
+# Engin's note (2002.10.28)
+# This file is outdated. It must be reviewed.
+# Basically: When adding/deleting variables,
+# dictGen.m4 file and ca_macros.h files must be
+# modified. ca_dictionary.h file is generated from
+# dictGen.m4. The files ca_dictSyms.h and dictionary.txt mentioned in the
+# following text do not exist anymore (see RELEASE_NOTES.v3.1)
+
+
+The Configuration Module; the Configuration File
+================================================
+
+This document describes
+
+- how to add new configuration variables
+
+- how to write the configuration file
+
+
+The configuration module allows the user to define variables of (currently) 
+five basic types: CA_INT (integer), CA_DIRLIST (a directory name), CA_STRING
+(any string of text), CA_BOOLEAN (either 0 or 1), CA_SOURCETYPE (defines
+a source completely) and CA_ADMIN (defines an administration db).
+
+The variables are called using _get_ and _set_ functions, usually using
+the macros defined in the ca_macros.h file.
+
+The "Source" variable is supported by the ca_srcAttribs.h file.
+
+The "Ripadmin" variable is supported by the ca_adminAttribs.h file.
+
+
+How to add new configuration variables:
+======================================
+
+- increment the VARS variable in ca_defs.h
+
+- update your dictionary file (dictionary.txt) with a new line as
+  follows
+	  <variable name>	<variable symbol> <variable type>
+
+- update the ca_dictSyms.h file 
+	 	add the new variable symbol and number
+
+- update the ca_macros.h file
+	 	you must use the correct function to get and set your variable
+		this depends on the type of your variable (e.g. CA_INT uses the
+		ca_get_int() function)
+
+- update the configuration file
+
+	
+How to write the Configuration File
+-----------------------------------
+
+In general, the format of the Config file for most variables is:
+
+VarName       Value   Qualifier
+
+For the SOURCE variable, it is
+
+SrcName DB-details    Mode    NRTM-details    UpdatePort      Options
+
+each of these values is separated by white-space and
+
+SrcName is the name (a string) of the Source,
+
+DB-details is a comma-separated list of 
+host, port, user, password and name of the DB,
+
+Mode is an integer representing the mode of operation of the Source/DB,
+
+NRTM-details is a comma-separated list of
+host, port, log directory, delay time and protocol version
+
+UpdatePort indicates which port accepts updates of this source
+
+Options is a comma-separated list of characters describing 
+canupd (canupdate: y/n) and deflook (default look-up db: 0/1).
+
+
+

@@ -1,0 +1,16 @@
+# first updates tests
+# CASE 10: Object with unrecognised source
+#
+# Object with unrecognised source
+#
+#FAILURE
+#
+# RESULT 10: source in object not recognised  reported
+
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  fred

@@ -1,0 +1,147 @@
+<!--  _________oOo_________
+      DTD for RIPE attributes
+      ottrey@ripe.net
+      Tue Oct 12 13:22:07 CEST 1999
+      _________oOo_________
+-->
+
+<!ELEMENT ripe_attributes  (ripe_attribute+)>
+<!ATTLIST ripe_attributes
+            version   CDATA     #REQUIRED
+            author    CDATA     #IMPLIED
+>
+
+<!ENTITY % Status_t '(deprecated | valid | proposed)'>
+
+<!ELEMENT ripe_attribute   (description, syntax, representation?, keys?)>
+<!ATTLIST ripe_attribute
+            name      CDATA       #REQUIRED
+            xmlname   CDATA       #IMPLIED
+            altName   CDATA       #IMPLIED
+            code      ID          #REQUIRED
+            status    %Status_t;             "valid"
+>
+
+<!ELEMENT description   (#PCDATA)> 
+
+<!ELEMENT syntax        ((list|ripe-list)?, CDATA)> 
+
+<!ELEMENT list  EMPTY>
+
+<!ELEMENT ripe-list EMPTY>
+
+<!ENTITY % SQL_Keytype_t '(
+  wk_name      |
+  wk_nic_hdl   |
+  wk_email     |
+  wk_mntner    |
+  wk_key_cert  |
+  wk_ipaddress |
+  wk_autnum    |
+  wk_netname   |
+  wk_net6name  |
+  wk_limerick  |
+  wk_domain    |
+  wk_routesetname |
+  wk_assetname |
+  wk_asrange    |
+  wk_filterset  |
+  wk_peeringset |
+  wk_rtrset
+)'>
+
+<!ENTITY % Radix_Keytype_t '(
+  wk_iprange   |
+  wk_ipprefix  |
+  wk_ip6prefix |
+  wk_ipaddress 
+)'>
+
+<!ELEMENT keys          ((foreign? | primary)?, ( queries?))>
+<!ATTLIST keys
+            searchable  (lookup | inverse | not) #REQUIRED
+>
+
+<!ELEMENT foreign       EMPTY>
+<!ATTLIST foreign
+            value     NMTOKEN     #REQUIRED
+>
+
+<!ELEMENT primary       EMPTY>
+
+<!ENTITY % UD_Qtype_t '(
+  ud_aux__  |
+  ud_ax_pr  |
+  ud_ax_mt  |
+  ud_ax_mo  |
+  ud_ax_mr  |
+  ud_ax_mu  |
+  ud_leaf_  |
+  ud_lf_if  |
+  ud_lf_rf  |
+  ud_lf_at  |
+  ud_lf_ot  |
+  ud_lf_ay  |
+  ud_main_  |
+  ud_ma_rt  |
+  ud_ma_or  |
+  ud_ma_pr  |
+  ud_ma_u2  |
+  ud_ma_in  |
+  ud_ma_i6  |
+  ud_ma_ak  |
+  ud_null_
+)'>
+
+
+
+<!ELEMENT queries     (sqlquery*, radixquery*)>
+
+<!ELEMENT sqlquery    (#PCDATA)>
+<!ATTLIST sqlquery
+            keytype   %SQL_Keytype_t;          #REQUIRED
+            class     NMTOKEN                  #IMPLIED     
+>
+
+<!ELEMENT radixquery  EMPTY>
+<!ATTLIST radixquery
+            keytype   %Radix_Keytype_t;        #REQUIRED
+            class     NMTOKEN                  #IMPLIED
+            space     (IP_V4 | IP_V6)          #REQUIRED            
+>
+
+<!ELEMENT representation     (sqltable, radixtrees?)>
+
+
+<!ELEMENT sqltable (insert?, update?, dummy?, select?)>
+<!ATTLIST sqltable
+            name    CDATA       #REQUIRED
+>    
+
+<!ELEMENT insert        (#PCDATA)> 
+<!ATTLIST insert
+            qtype     %UD_Qtype_t;             #REQUIRED
+>
+
+<!ELEMENT update        (#PCDATA)> 
+<!ATTLIST update
+            qtype     %UD_Qtype_t;             #REQUIRED
+>
+
+<!ELEMENT dummy         (#PCDATA)> 
+<!ATTLIST dummy
+            qtype     %UD_Qtype_t;             #REQUIRED
+>
+
+<!ELEMENT select        (#PCDATA)> 
+<!ATTLIST select
+            qtype     %UD_Qtype_t;             #REQUIRED
+>
+
+<!ELEMENT radixtrees   (IP_V4?, IP_V6?)>
+<!ATTLIST radixtrees
+             family    (RX_FAM_IN | RX_FAM_RT)  #REQUIRED
+>
+
+<!ELEMENT IP_V4        (#PCDATA)> 
+<!ELEMENT IP_V6        (#PCDATA)> 

@@ -1,0 +1,330 @@
+Description of the inetnum/route radix implementation of RIP.
+____________________________________________________________
+
+Marek Bukowy, March 1999, last revision October 2000.
+
+
+I. Introduction.	
+------------
+Radix trees give very quick access to hierarchically ordered binary
+data (like IP prefixes). They facilitate more/less specific searches
+on the data.  They allow also lookups when the search term is not an
+exact key to the stored data by ability to perform less specific
+lookups from non-existent nodes. Therefore they perfectly meet the
+needs of an IP / routing registry (IP/RR).
+
+
+Spaces.
+-------
+The radix tree concept is based on nodes equivalent to IP route prefixes,
+that is, binary numbers of certain length. 
+
+There are objects of different types in the RR that can be presented in
+form of a tree. There are also two separate address spaces - IPv4 and
+IPv6. To avoid clashes, each IP/RR holds these objects in their own spaces. 
+
+
+Prefixes.
+--------
+Generally, the object types are either equivalent to single prefixes,
+like routes or contain multiple prefixes, like inetnum ranges do. The
+inetnum ranges have to be decomposed into prefixes in order to be put
+in the radix tree.  A structure is defined for holding the binary
+representation of prefixes.  So every text must be converted to a
+binary prefix before it can be used. This is done internally in the
+radix library rp by the outmost (asc) layer of functions.
+
+
+Trees.
+------
+Each space is represented by one tree. The trees are linked in a
+linked list.  Pointer to the list is a global variable. There is a
+lock associated with it, which must be checked before accessing the
+list.
+
+The tree structures defining the tree contain more than just the
+pointer to the top node of the tree. That would be unambiguous, but
+for practical reasons the structure includes also other information
+that can be useful, like the definition of the prefix the tree covers,
+registry id, number of nodes (for consistency checks), and the like.
+
+
+Nodes.
+------
+The nodes of the tree do NOT convey any information about the objects directly.
+They are just that - nodes of the tree, created where needed.
+In fact, for the current route database almost 50% of all nodes are
+empty - they are there just to link other nodes.
+
+
+Data leaves.
+-----------
+Every node can have a linked list of pointers to the actual data structures,
+'data leaves'. There is *always* one data leaf per object.
+
+ **** A dataleaf maps 1:1 to a database object. ****
+
+There will usually be just zero or one leaf at each node, with exceptions 
+for duplicate prefixes, for which more leaves can be linked from the same node.
+This can happen for:
+
+ routes - objects with the same route but different AS number 
+ inetnums - overlapping allocations
+
+Additionally, inetnums, if composed, will have the same data leaf linked from
+different nodes.
+
+The dataleaf contains references to full-text objects on disk.
+Additionally, every dataleaf has a linked area in memory for immediate
+data (-K data = primary key in text form). The inetnums also have their
+range stored, because it can not be deduced from a single prefix.
+
+II. Project details.
+-------------------
+
+SQL representation.
+------------------
+Radix trees will be used as in-memory indexes to lookups. They are being
+populated at startup of the server from the SQL representation of the
+data, containing either prefixes or ranges.
+
+SQL queries can be issued to obtain slower but equivalent results (***).
+All queries can be performed this way, so the use of trees is *NOT*
+mandatory - it merely improves performance by a few orders of magnitude.
+
+This allows for quick start without blocking the queries until the tree
+loads. This also allows for running the server on weaker hardware, where
+keeping the trees in memory is not possible but the same functionality
+using SQL may be obtained.
+
+(***) Initial implementation, however, does not support SQL searches.
+
+
+Multiple radix trees for one space. (**)
+----------------------------------------
+To speed up the access and to decrease the number of objects protected
+by a mutex lock, inetnum spaces can be divided into separate radix
+trees common for ranges with their top 8 bits equal, i.e. equal 8 bit
+prefix.  That is, there may be a radix tree for (IPv4,RIPE,193/8) and
+a separate for (IPv4,RIPE,194/8). Route spaces may contain prefixes
+shorter than /8 and therefore will not be broken up into such
+subtrees.  In future, when multiple trees are supported for one space,
+it will be possible to automatically switch to another subtree in the
+library functions during searches, and automagically create subtrees
+wherever a node must be created under this tree.  
+(** not yet implemented)
+
+
+Generality of the design.
+------------------------
+To avoid building redundant functions containing the same algorithms, a
+common base will be used for radix access for all spaces/object types.
+
+The radix library is also used for storage of per-IP access control data
+and accounting. In that case the relevant data structures replace the
+dataleaves.
+
+
+Operations.
+--------------
+
+on all radix trees:
+
+	load all radix trees			
+	(go through the list of radix trees and load each one)
+
+on a single radix tree:
+
+	create empty tree		
+	delete tree			
+	walk tree			used for searches and debugging
+
+	load tree from disk		
+	(--no save function--)
+
+on a node (or nodes, if composed inetnum)
+
+	(all operations performed in memory, then committed to disk
+	by the update thread's logic)
+
+	insert node / prefix / range
+	delete node / prefix / range
+
+	(--no modify function needed -- primary key must be the same)
+	(if key is changed, then modification is done by first deleting,
+	then creating nodes).
+
+
+Locking. 
+--------
+To guarantee high performance of the server, a node-level locking
+should be developed. However, the structure of radix tree
+(interconnected nodes) calls rather for branch-level locking if not
+tree-level, including shared and exclusive lock features. The choice
+is not obvious, though, also from the point of view of performance
+(checking many mutexes is time consuming). The current implementation
+uses shared tree-level locks (readers preferred).
+
+
+Rollbacks.
+---------
+The operations on the nodes of a radix tree do not provide room for
+storing rollback data. If an operation must be rolled back, it must 
+be done by the application.
+
+
+III. Implementation details: modules and functions.
+--------------------------------------------------
+
+The functionality described above is implemented in two modules: RX
+and RP.  RX is lower level, which does not know anything about the
+type of data payload carried by the tree and uses binary structures as
+input.  Lower level functions will operate on memory trees and nodes,
+and binary (parsed) prefixes. Those are "bin" family functions.  Those
+are also used for non-RR applications (access control, etc).
+
+RP is higher level and has all the data-dependent logic, and operates
+on concepts such as objects, registries, descriptive (unparsed) ascii
+prefixes/ranges. It will know the location of trees and pass this
+information to lower level access functions.  That are "asc" family
+functions and they are located in the rp module.
+
+
+Stack in RX.
+-----------
+Every operation on the tree (on the nodes of the tree) involves
+building a stack for a particular prefix. The stack is an array of
+pointers to nodes, collected from the top of the tree, down along the
+way defined by the bits of the given prefix as long as matching nodes
+can be found and other conditions are held.
+
+There are two sets of conditions as there are two modes for building
+the stack.  For creation, the stack stops on a non-empty node after
+the given prefix length has been exceeded. For queries, it doesn't go
+deeper than the prefix length. Another difference is that in query
+mode empty nodes are not copied on the stack. Using a creation stack
+for queries may lead to incorrect results for searches other than the
+default or exact search.
+
+For creation, the tree is searched for existence of a matching node
+(even if empty), and if one is found, the data is simply appended to
+it. Otherwise, the closest node is found, and the new one is created
+as its parent, child, or brother (which means that an additional empty
+node is created above the two).
+
+For searches, a stack is built in query mode, then:
+- in exact match mode - it is checked if an object exists with exactly this prefix.
+- exact-lessspec (default) mode - the last element off the stack is fetched
+- less-spec - all elements off the stack are fetched
+- more-spec - an exact-lessspec search is performed, 
+then the tree is walked down from a node (within a specified depth limit).
+
+Use case: tree creation.
+-----------------------
+
+The trees for a given registry must be created with a function
+RP_init_trees() and populated from SQL with RP_sql_load_reg().
+
+Use case: update. 
+----------------
+An update is initiated either by the UD module by calling the function
+RP_pack_node() with the operation code, datapack and registry code.
+The datapack must be filled in with the object's data (primary key, text, etc)
+by the RP_pack_set_* and RP_asc2pack() functions.
+
+After generating the dataleaf and locking the tree the control goes to
+RX_in_node() or RX_rt_node() dependent on the type of the
+tree. RX_in_node functionality is a superset of RX_rt_node() augmented
+by the decomposition of the inetnum range into prefixes. In any case,
+the nodes are added/deleted by rx_bin_node().
+
+rx_bin_node searches for the node in the tree and appends/deletes the
+dataleaf and creates/deletes tree nodes as required. The search is
+done with rx_build_stack() and rx_nod_search().
+
+Use case: search:
+----------------
+The search is initiated by the QI module through the RP_asc_search()
+function. It takes the ascii representation of the key, tries to
+convert it and proceeds to the actual search procedure.
+
+The following search types are supported:
+EXLESS - exact or one level less specific
+LESS - one or more level less specific
+EXACT - exact match
+MORE/RANG - more specific [RANG=prefix not shorter than m and no longer than n]
+(****) RANG is currently not used
+
+A search procedure consists of four phases: collection of dataleaves,
+preselection, processing and copying results. The tree must be locked
+during the whole procedure. Since the search term may be a single IP,
+prefix or range, an approach for most search types (except more
+specific) is taken to convert all search terms into a range and report
+objects that appear on both ends of the range (and meet the
+requirements of the search option). In practice it is done by
+collecting a list of objects from the beginning of range and
+eliminating those that do not contain the search range:
+
+	--A--      ------B-----    ---C-- 
+	  |				|
+	  --------------------D--------------------
+	  |				|
+range:	  begin			      end
+
+(A and D are collected, but only D contains the range)
+
+The more specific searches are performed on all prefixes that the search
+range can be broken into and combined.
+
+
+collection
+
+   EXLESS/LESS/EXACT
+   range lookup becomes the only lookup type. 
+   A LESS search is performed for the IP at the beginning of the range. 
+
+   MORE/RANG
+   as before, a lookup is performed for every composing prefix.
+
+   The collection with RX_bin_search() returns a list of pointers to
+   dataleaves (multiple links to the same dataleaf are possible).
+
+preselection
+
+   EXLESS/LESS/EXACT
+   route tree dataleaves are treated as ranges, i.e. the same condition
+   applies: The list of results is checked and dataleaves that do not
+   cover the end of range are excluded. 
+   EXLESS: special case - smallest span is calculated
+
+   MORE/RANG none
+
+   Preselection operates on the list obtained from collection.
+
+processing
+
+   EXACT:  special case - any mismatch must be excluded.
+   LESS/1: special case - exact  match must be excluded.
+   EXLESS: special case - smallest span is calculated and all
+                          dataleaves with a bigger span are excluded.
+ 
+   MORE/RANG lookup - exact match is excluded.
+
+   Actual processing: rp_asc_process_datlist() will make sure dataleaves
+   that do not satisfy the search constraints are excluded.
+   Duplicate pointers are 'uniqued'. The result is still a list of 
+   pointers to dataleaves.
+
+copying
+
+   All corresponding dataleaves are looked at and their copies are made 
+   so that the tree can now be unlocked. The primary key text (-K) or
+   object_id can then be used to display the result to the user.
+   The result of copying (and whole search procedure) is a list of
+   unique dataleaf copies. The order is not quite defined, but in case
+   of simple queries it is from lowest to highest addresses. However,
+   if -K is not used, the procedure to collect the object text from the
+   database will impose its own rules of ordering based on object_id 
+   and object type.
+
+Functionality for SQL-only queries may be added in future as the rs module.

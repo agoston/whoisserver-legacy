@@ -1,0 +1,24 @@
+# mnt-attr tests
+# CASE 3: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, two different mnt-routes,
+#         aut-num contains two different mnt-by
+#         route itself contains two different mnt-by
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed
+
+
+password: mb-child
+password: mr-exact
+
+route:   20.13.0.0/16
+descr:   Route
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+mnt-by:  TEST-DBM-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST

@@ -1,0 +1,11 @@
+inetnum:      123.0.0.0 - 123.255.255.255
+netname:      TEST-BLK
+descr:        Test organisation object changes
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED PI
+org:          ORG-EOOF1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

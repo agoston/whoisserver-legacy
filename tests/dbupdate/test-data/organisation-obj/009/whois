@@ -1,0 +1,11 @@
+organisation:  ORG-Eoof1-DB-TEST
+org-name:      EXAMPLE organisation object for tests
+org-type:      NON-REGISTRY
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        NON-ORG-POWER-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST

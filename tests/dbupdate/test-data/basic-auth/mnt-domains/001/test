@@ -1,0 +1,23 @@
+# mnt-domains update tests
+# CASE 1: We try to create inetnum object with mnt-domains
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+inetnum:      1.0.0.0 - 1.255.255.255
+netname:      TEST-BLK
+descr:        Test Address Space
+country:      EU # Country is really world wide
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       TEST-DBM-MNT
+mnt-domains:  TEST-DBM-MNT
+changed:      bitbucket@ripe.net 20010529
+source:       DB-TEST
+password: test-dbm

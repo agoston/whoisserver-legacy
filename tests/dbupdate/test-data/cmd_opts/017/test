@@ -1,0 +1,13 @@
+# command line options tests
+# CASE 17: Missing mandatory config option
+#
+# run dbupdate with a missing mandatory config option
+# ./dbupdate -prf test
+#
+#FAILURE
+#
+# RESULT 17: missing mandatory option -c reported
+%
+%
+?11
+$$ -prf $TEST 

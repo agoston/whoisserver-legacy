@@ -1,0 +1,91 @@
+#!/bin/sh
+#
+# WHOISD(whois_rip) SERVER STARTUP/SHUTDOWN SCRIPT
+#
+##############################
+# DIRECTORY LAYOUT
+
+BASEDIR=@prefix@
+
+##############################
+# CONFIGURATION
+# in basedir/conf
+
+CONFIG=rip.config.sample
+
+#####################
+# Site-specific parameters
+
+# E-mail address where crash notifications are sent
+NOTIFY=myaddress@mailserver.net
+# Number of crashes per day before the whois_rip stops
+CRASHES=10
+# PID file
+pid_file=$BASEDIR/bin/whois_rip.pid
+
+#####################
+# The LD_LIBRARY_PATH should be set
+LIBS_PATH=
+for lib in @GLIB_LIBS@ @MYSQL_R_LIBS@
+do
+    case "$lib" in
+	-L*) LIBS_PATH="${LIBS_PATH} `echo \"$lib\" | sed -e 's/-L//'`";;
+    esac
+done
+export LD_LIBRARY_PATH=`echo $LIBS_PATH | sed -e 's/ /:/g'`
+########################
+
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+export PATH
+
+# start | stop
+mode=$1
+
+# Safeguard (relative paths, core dumps..)
+cd $BASEDIR
+
+case "$mode" in
+  'start')
+    # Start server
+
+    if test -x bin/whoisd_start
+    then
+      bin/whoisd_start --config=${CONFIG} --pid-file=${pid_file} --basedir=${BASEDIR} --crashes=${CRASHES} --notify=${NOTIFY} --library_path=${LD_LIBRARY_PATH} &
+    else
+      echo "Can't execute $BASEDIR/bin/whoisd_start"
+    fi
+    ;;
+
+  'stop')
+    # Stop server using SIGTERM signal
+    if test -f "$pid_file"
+    then
+      whoisd_pid=`cat $pid_file`
+      echo "Killing whoisd with pid $whoisd_pid"
+      kill $whoisd_pid
+      # whoisd should remove the pid_file when it exits, so wait for it.
+
+      sleep 1
+      while [ -s $pid_file -a "$flags" != aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ]
+      do
+        [ -z "$flags" ] && echo "Wait for whoisd to exit\c" || echo ".\c"
+        flags=a$flags
+        sleep 1
+      done
+      if [ -s $pid_file ]
+         then echo " gave up waiting!"
+      elif [ -n "$flags" ]
+         then echo " done"
+      fi
+    else
+      echo "No whoisd pid file found. Looked for $pid_file."
+    fi
+    ;;
+
+  *)
+    # usage
+    echo "usage: $0 start|stop"
+    exit 1
+    ;;
+esac

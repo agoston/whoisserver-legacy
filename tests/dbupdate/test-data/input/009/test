@@ -1,0 +1,34 @@
+# input tests
+# CASE 9: Input from stdin (simulated with redirected input < from a file )
+%
+#
+# input from stdin, check update log
+# ./dbupdate -c ~/db/conf/rip.config -r < test
+#
+#SUCCESS
+#
+# RESULT 9: Data written below copied to update log
+%
+%
+$$ -c $RIP_CONFIG -r < $TEST
+
+
+person:  test person2
+address: here
+phone:   +1
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test
+
+
+qwerty qwerty
+qwerty
+qwerty qwerty qwerty
+
+
+person:  test person3
+address: here
+phone:   +1
+changed: dbtest@ripe.net
+nic-hdl: TP3-DB-TEST
+source:  db-test

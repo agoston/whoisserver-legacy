@@ -1,0 +1,21 @@
+# CASE 010: Modify a person object
+#           with the same name
+#           no override
+%
+#
+# modify person object 
+#
+#SUCCESS
+#
+# RESULT 010: The modification will succeed
+
+person:       Test Person2
+address:      Gingel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password: auth
+

@@ -1,0 +1,26 @@
+# notification tests
+# CASE 12: A "composite" case: Modify of an object with two notify,
+#          one mnt-by attribute, where mntner has two mnt-nfy
+#          and an upd-to.
+#
+# The person object is modified 
+#
+#SUCCESS
+#
+# RESULT 12: There should be notification mails to case012-2@ripe.net,
+#            case012-3@ripe.net, case012-4@ripe.net, case012-5@ripe.net
+#            and no forward message.
+
+
+person:  Test Person
+address: Address changed!
+address: Amsterdam
+phone:   +31 20 535 4444
+notify:  case012-4@ripe.net
+notify:  case012-5@ripe.net
+nic-hdl: TP10-DB-TEST
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+ 
+password: notif

@@ -1,0 +1,13 @@
+# input tests
+# CASE 10: Valid path with no file specified with -f option
+%
+#
+# input from valid path with no file  ( -f $CURRENT_DIR)
+# ./dbupdate -c ~/db/conf/rip.config -r -f $CURRENT_DIR
+#
+#FAILURE
+#
+# RESULT 10: internal error message in ack
+%
+%
+$$ -c $RIP_CONFIG -r -f $CURRENT_DIR

@@ -1,0 +1,25 @@
+# basic-auth tests - forward create
+# CASE 2: Create an mntner object
+#         with override
+%
+#
+# create mntner object 
+#
+#SUCCESS
+#
+# RESULT 2: The creation will succeed
+
+
+override: password
+
+mntner:       TEST-MNT
+descr:        Mntner
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW qw7BVMLJG6Q6M   # test
+upd-to:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+

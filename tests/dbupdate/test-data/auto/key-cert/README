@@ -1,0 +1,283 @@
+# X.509 key-cert tests
+
+# CASE 1: We try to create key-cert object with X509 certificate
+#         with AUTO-1 name
+#
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to create key-cert objects with X509 certificate
+#         with names AUTO-1 and AUTO-20
+#         object with name X509-5 already exists in the database
+#         resulting objects should be names X509-6 and X509-7
+#
+#
+#SUCCESS
+#
+# RESULT 2: The creation will succeed.
+
+
+# CASE 3: We try to create key-cert objects with X509 certificate
+#         with name AUTO-20
+#         making sure we can use it...
+#         no objects in db, so object created should be still X509-1
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+
+# CASE 4: We try to create key-cert objects with X509 certificate
+#         with names AUTO-1, AUTO-1
+#         no key-cert objects in db
+#         X509-1 and X509-2 should be created.
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed.
+
+
+# CASE 5: We try to create key-cert objects with X509 certificate
+#         with name AUTO-1 and AUTO-2
+#         and modify mntners to add "auth: AUTO-1" and "auth: AUTO-2"
+#
+#
+#SUCCESS
+#
+# RESULT 5: The creations + modifies will succeed.
+
+
+# CASE 6: We try to create key-cert object with X509 certificate
+#         with name AUTO-1
+#         a person object with nic-handle AUTO-2
+#         and update mntner to add: "admin-c: AUTO-2" and "auth: AUTO-1"
+#
+#
+#SUCCESS
+#
+# RESULT 6: The creation + creation + update will succeed.
+
+
+# CASE 7: We try to create key-cert object with X509 certificate
+#         with name AUTO-1
+#         a person object with nic-handle AUTO-2
+#         and modify mntner to add: "admin-c: AUTO-1" and "auth: AUTO-2" 
+#         (the AUTO references swapped)
+#
+#
+#FAILURE
+#
+# RESULT 7: The creation + creation succeed, modify fail
+
+
+# CASE 8: We try to create key-cert object with X509 certificate
+#         with name AUTO-0
+#         syntax error
+#
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail
+
+
+# CASE 9: We try to create key-cert object with X509 certificate
+#         with name AUTO-1
+#         and person object with AUTO-1
+#
+#
+#SUCCESS
+#
+# RESULT 9: The creations will succeed
+
+
+# CASE 10: We try to create key-cert object with X509 certificate
+#          with name AUTO-1
+#          a person object with nic-handle AUTO-1
+#          and modify mntner to add: "admin-c: AUTO-1" and "auth: AUTO-1"
+#          The order of objects is significant here. AUTO-1 is first a key-cert
+#          then overwritten as a nic-hdl. In the mntner they are both nic-hdls
+#          that are inserted. No checks are done on the validity of the auth:
+#          objects.
+#
+#
+#SUCCESS
+#
+# RESULT 10: The creation + creation success, modify success
+
+
+# CASE 11: We try to create key-cert object with X509 certificate
+#          with name AUTO-1
+#          a person object with nic-handle AUTO-1
+#          and modify mntner to add: "admin-c: AUTO-1" and "auth: AUTO-1"
+#          The order of objects is significant here. AUTO-1 is first a nic-hdl
+#          then overwritten as a key-cert. In the mntner they are both key-certs
+#          that are inserted. Checks are done on the validity of the admin-c:
+#          objects.
+#
+#
+#FAILURE
+#
+# RESULT 11: The creation + creation success, modify fail
+
+
+# CASE 12: We try to create key-cert object with X509 certificate
+#          with X509-99 name
+#
+#
+#FAILURE
+#
+# RESULT 12: The creation will fail.
+
+
+#
+# CASE 13: We try to create key-cert object with X509 certificate
+#          with AUTO-1DW name
+#
+#
+#FAILURE
+#
+# RESULT 13: The creation will fail.
+
+
+#
+# CASE 14: We try to create key-cert object with X509 certificate
+#          with AUTO2 name
+#
+#
+#FAILURE
+#
+# RESULT 14: The creation will fail.
+
+
+# CASE 15: We try to create key-cert object with X509 certificate
+#          with name AUTO-2 and references AUTO-1
+#          a person object with nic-handle AUTO-1
+#          and modify mntner to add: "auth: AUTO-2"
+#          The order of objects is significant here
+#          person, key-cert, mntner.
+#
+#
+#SUCCESS
+#
+# RESULT 15: The creation + creation success, modify success
+
+
+# CASE 16: We try to create key-cert object with X509 certificate
+#          with name AUTO-2 and references AUTO-1
+#          a person object with nic-handle AUTO-1
+#          and modify mntner to add: "auth: AUTO-2"
+#          The order of objects is significant here
+#          person, mntner, key-cert.
+#
+#
+#FAILURE
+#
+# RESULT 16: The creation + creation success, modify fails
+
+
+#
+# CASE 17: We try to create key-cert object with X509 certificate
+#          with AUTO-1 name and no generated attributes
+#
+#
+#SUCCESS
+#
+# RESULT 17: The creation will succeed.
+
+
+# CASE 18: We try to create key-cert object with X509 certificate
+#          with AUTO-1 name and invalid generated attributes.
+#          (changed first char of fp and removed email addr from owner)
+#
+#
+#SUCCESS
+#
+# RESULT 18: The creation will succeed.
+
+
+# CASE 19: We try to create key-cert object with X509 certificate
+#          with AUTO-1 name and wrong method: type.
+#
+#
+#SUCCESS
+#
+# RESULT 19: The creation will succeed.
+
+
+# CASE 20: We try to modify key-cert object with X509 certificate
+#
+#
+#SUCCESS
+#
+# RESULT 20: The modify will succeed.
+
+
+# CASE 21: We try to modify key-cert object with X509 certificate
+#          Change certificate details with correct generated attrs.
+#
+#
+#SUCCESS
+#
+# RESULT 21: The modify will succeed.
+
+
+# CASE 22: We try to modify key-cert object with X509 certificate
+#          Change certif details but leave old generated attrs.
+#
+#
+#SUCCESS
+#
+# RESULT 22: The modify will succeed.
+
+
+# CASE 23: We try to modify key-cert object with X509 certificate
+#          Change certif details with no generated attrs.
+#
+#
+#SUCCESS
+#
+# RESULT 23: The modify will succeed.
+
+
+# CASE 24: We try to modify key-cert object with X509 certificate
+#          Change the method: to PGP
+#
+#
+#SUCCESS
+#
+# RESULT 24: The modify will succeed.
+
+
+# CASE 25: We try to modify key-cert object with X509 certificate
+#          Change certificate details with correct generated attrs.
+#          Remove -----END CERTIFICATE----- line.
+#
+#
+#FAILURE
+#
+# RESULT 25: The modify will fail.
+
+
+# CASE 26: We try to modify key-cert object with X509 certificate
+#          Change certificate details with correct generated attrs.
+#          Corrupt the certificate.
+#
+#
+#FAILURE
+#
+# RESULT 26: The modify will fail.
+
+
+# CASE 27: We try to modify key-cert object with X509 certificate
+#          Change certificate details with correct generated attrs.
+#          Remove -----BEGIN CERTIFICATE----- line.
+#
+#
+#FAILURE
+#
+# RESULT 27: The modify will fail.
+
+

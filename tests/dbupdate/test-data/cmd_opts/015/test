@@ -1,0 +1,16 @@
+# command line options tests
+# CASE 15: Valid long options with no space separator
+#
+# run dbupdate with valid long options with no space separator
+# ./dbupdate -c ~/db/conf/rip.config --print--redirect -k help
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 15: invalid option --print--redirect reported
+#            no ack created
+%
+%
+?11
+$$ -c $RIP_CONFIG --print--redirect -k help

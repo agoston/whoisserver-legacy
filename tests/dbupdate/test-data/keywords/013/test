@@ -1,0 +1,27 @@
+# keywords tests
+# CASE 13: Invalid keywords with invalid combination of
+#          valid keywords new and help on subject line
+%
+#
+# run dbupdate with mail subject fred help
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 13: The help will not be sent, keywords in upd log.
+#            Invalid keywords found reported.
+#            object is created
+%
+%
+$ -c $RIP_CONFIG -rm -f
+%
+%
+From: dbtest@ripe.net
+Subject: Please send me your help information and create this new object
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

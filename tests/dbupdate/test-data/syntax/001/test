@@ -1,0 +1,22 @@
+
+# CASE 1: We try to create as-set object with more than 80 chars in the name
+#
+# create as-set object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail.
+
+
+as-set:       AS-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-TEST
+descr:        test as-set
+members:      AS1, AS2, AS3, AS4
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+password:     auth

@@ -1,0 +1,8 @@
+aut-num: AS200
+as-name: TEST-AS
+descr:   Testing Authorisation code
+admin-c: TP1-DB-TEST
+tech-c:  TP1-DB-TEST
+mnt-by:  CHILD-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST

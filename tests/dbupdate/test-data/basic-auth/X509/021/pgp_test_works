@@ -1,0 +1,62 @@
+# X.509 auth tests
+#
+# CASE 21: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate and PGP key.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          mnt-by PGP signed, then mnt-lower X.509 signed.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 21: The creation will succeed
+%
+%
+$ -c $RIP_CONFIG -rm -f 
+%
+%
+From: dbtest@ripe.net
+MIME-Version: 1.0 
+Content-Type: multipart/signed;
+    boundary="----------=_1077303018-10603-0";
+    micalg="pgp-sha1";
+    protocol="application/pgp-signature"
+
+This is a cryptographically signed message in MIME format.
+
+------------=_1077303018-10603-0
+Content-Type: text/plain; name="msg.txt"
+Content-Disposition: inline; filename="msg.txt"
+Content-Transfer-Encoding: 7bit
+Content-Length: 300
+
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: auth2
+
+
+------------=_1077303018-10603-0
+Content-Type: application/pgp-signature
+Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (GNU/Linux)
+
+iD8DBQFANlbpEjIw2laU2dARAqKOAJwOqpmz0nalj4Vw87xrZ7RJmfRQ9wCeOF5w
+fijn7XbuW9tfiKEIvkfSgi8=
+=H1gQ
+-----END PGP SIGNATURE-----
+
+------------=_1077303018-10603-0--

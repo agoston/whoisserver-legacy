@@ -1,0 +1,17 @@
+# first updates tests
+# CASE 18: Object with a space at the start of any line  
+#          after the class attribute in update message
+#
+# syntax error.
+#
+#FAILURE
+#
+# RESULT 18: Syntax errors in object reported.
+
+
+person:  test person2
+ address: here
+phone:   +1
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

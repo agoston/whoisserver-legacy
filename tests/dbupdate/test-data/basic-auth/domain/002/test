@@ -1,0 +1,25 @@
+# domain authorisation tests
+# CASE 2: We try to create domain object mydomain.net
+#         no parent
+#         no override
+#
+# create domain object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+domain:       mydomain.net
+descr:        my test domain
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns1.some.net
+nserver:      ns2.some.net
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password: auth
+

@@ -1,0 +1,25 @@
+
+# CASE 8: We try to delete mntner object TEST-MNT
+# which is not referenced
+%
+% requires initial objects to be loaded
+#
+# delete mntner object 
+#
+#SUCCESS
+#
+# RESULT 8: The deletion will succeed.
+
+mntner:  TEST-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  TEST-MNT
+auth:    CRYPT-PW dbOnSHFpKZTBU  # auth
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+delete:  no reason
+
+password:     auth
+

@@ -1,0 +1,517 @@
+# object tests - as-block
+# CASE 1: We try to create as-block object
+# maintained
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed
+
+
+# object tests - as-block
+# CASE 2: We try to update as-block object
+# maintained
+#
+# update as-block object
+#
+#SUCCESS
+#
+# RESULT 2: The update will succeed.
+
+
+# object tests - as-block
+# CASE 3: We try to delete as-block object
+# maintained
+#
+# delete as-block object
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed. 
+
+
+# CASE 1: We try to create as-set object AS-TEST
+#
+# create as-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify as-set object AS-TEST
+#
+# modify as-set object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete as-set object AS-TEST
+#
+# delete as-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create aut-num object AS123
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify aut-num object AS123
+#
+# modify aut-num object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete aut-num object AS123
+#
+# delete aut-num object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+# CASE 4: We try to create aut-num object AS123
+# having deprecated "cross-mnt" and "cross-nfy" attributes
+#
+# create aut-num object
+#
+#FAILURE
+#
+# RESULT 4: The creation will fail.
+
+# CASE 5: We try to create aut-num object AS123 with mnt-routes containing prefixes
+#
+# create aut-num object
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed. But for now it **FAILS**
+#           see bug 252 for this.
+
+# CASE 6: We try to create aut-num object AS123 with mnt-routes only {ANY}
+#
+# create aut-num object
+#
+#SUCCESS
+#
+# RESULT 6: The creation will succeed.
+
+# CASE 1: We try to create domain object ab.ba
+#
+# create domain object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify domain object ab.ba
+#
+# modify domain object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete domain object ab.ba
+#
+# delete domain object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create filter-set object fltr-customers
+#
+# create filter-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify filter-set object fltr-customers
+#
+# modify filter-set object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete filter-set object fltr-customers
+#
+# delete filter-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create inet-rtr object kst1-core.swip.net
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify inet-rtr object kst1-core.swip.net
+#
+# modify inet-rtr object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete inet-rtr object kst1-core.swip.net
+#
+# delete inet-rtr object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create inet6num object 2001:0658:021A::/48
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify inet6num object 2001:0658:021A::/48
+#
+# modify inet6num object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete inet6num object 2001:0658:021A::/48
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create inetnum object 80.16.151.184 - 80.16.151.191
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify inetnum object 80.16.151.184 - 80.16.151.191
+#
+# modify inetnum object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete inetnum object 80.16.151.184 - 80.16.151.191
+#
+# delete inetnum object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create irt object IRT-REQUEST
+#
+# create irt object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify irt object IRT-REQUEST
+#
+# modify irt object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete irt object IRT-REQUEST
+#
+# delete irt object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create key-cert object PGPKEY-471DBBEA
+#
+# create key-cert object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify key-cert object PGPKEY-471DBBEA
+#
+# modify key-cert object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete key-cert object PGPKEY-471DBBEA
+#
+# delete key-cert object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create limerick object LIM-OUR-SQL
+#
+# create limerick object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify limerick object LIM-OUR-SQL
+#
+# modify limerick object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete limerick object LIM-OUR-SQL
+#
+# delete limerick object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create mntner object TEST1-MNT
+#
+# create mntner object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify mntner object TEST1-MNT
+#
+# modify mntner object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete mntner object TEST1-MNT
+#
+# delete mntner object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create peering-set object prng-lipex1
+#
+# create peering-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify peering-set object prng-lipex1
+#
+# modify peering-set object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete peering-set object prng-lipex1
+#
+# delete peering-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create person object test person
+#
+# create person object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify person object test person
+#
+# modify person object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete person object test person
+#
+# delete person object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create role object test role
+#
+# create role object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify role object test role
+#
+# modify role object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete role object test role
+#
+# delete role object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create route-set object AS100:RS-CUSTOMERS
+#
+# create route-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify route-set object AS100:RS-CUSTOMERS
+#
+# modify route-set object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete route-set object AS100:RS-CUSTOMERS
+#
+# delete route-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create route object 20.13.0.0/16,AS200
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify route object 20.13.0.0/16,AS200
+#
+# modify route object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete route object 20.13.0.0/16,AS200
+#
+# delete route object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create rtr-set object rtrs-test
+#
+# create rtr-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify rtr-set object rtrs-test
+#
+# modify rtr-set object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete rtr-set object rtrs-test
+#
+# delete rtr-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+

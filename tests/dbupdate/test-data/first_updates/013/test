@@ -1,0 +1,36 @@
+# first updates tests
+# CASE 13: Delete key-cert object that does not match existing object
+#
+# Delete key-cert object that does not match the existing 
+# key-cert object in the database (generated attributes missing)
+#
+#FAILURE
+#
+# RESULT 13: The object will not be deleted as 
+#            generated attributes must now be included on deletions.
+
+
+key-cert:     PGPKEY-D8F37DA3
+certif:       -----BEGIN PGP PUBLIC KEY BLOCK-----
+certif:       Version: GnuPG v1.0.7 (GNU/Linux)
+certif:
+certif:       mQGiBD6BsrgRBACJW9zbjuY1fuIAOWGGWRpEzaCfdY/ixvwJ8WpQ0LhhGtdjFmCb
+certif:       S2FAQuwTWcbHPlt+1dYi1aZcPzU8P54CI3yOl3aO7MToe7YkjY9ANzy9WvxRQcSr
+certif:       n/jM50ugKcHTK6ounkpj7mAcUvoeL4WQjLmdAojgQNCWCYlcVXg5i9pRhwCgmYTI
+certif:       vZzJclgpMpORIpuOxiKh2h0D/0o9FYAoYBB11FKnRsOAC399ZdmN4gYel5CFJNoV
+certif:       1pasVdCznqkjxODe/3VyAFSX1RPrVd0kuTxb4qmnMYr0nekznNMg5TYpRg4Uulbz
+certif:       oMoso3mrnrJ7U6doWE143YzGSEzyaD5lzTZ3uacWU9DjzaDAsmhCeLqklfocPfOb
+certif:       F4eZA/wI6F+kcGhRjwmfzh4iDiB54dlLIxHS4/vPgqmVDfXmqYx7o2Eks9S145+z
+certif:       yzks35AtDk7k6JYEB4xGeMZKvf9/V2E6lzo3a8OKqXcI9rHAeHtSdb+cBxCCd6zf
+certif:       cO0eWQvkeHP1yucFDOiDOEpBJjuWcpawVJrG+Gq6m19sEswWxLQkVGVzdCBQZXJz
+certif:       b24gKFRlc3QpIDxkYnRlc3RAcmlwZS5uZXQ+iFkEExECABkFAj6BsrgECwcDAgMV
+certif:       AgMDFgIBAh4BAheAAAoJEJrYZFrY832jW+4AnRXEk4fOtix8ynErwsh68yrss16H
+certif:       AJsEYkdtXwMM69Nd+JWsiEk+48ns3w==
+certif:       =3+2Y
+certif:       -----END PGP PUBLIC KEY BLOCK-----
+changed:      dbtest@ripe.net 20020101
+mnt-by:       TEST-MNT
+source:       DB-TEST
+delete:  not required
+
+password: test-dbm

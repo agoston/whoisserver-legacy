@@ -1,0 +1,34 @@
+# notification tests
+# CASE 36: Create inetnum object
+#          The inetnum has notify.
+#          The inetnum mnt-by has mnt-nfy, upd-to, notify.
+#          There are 4 overlapping parent objects
+#          The parents each have notify.
+#          Each parents mnt-by has mnt-nfy, upd-to, notify.
+#          Password supplied for one of the parents' mnt-lower
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 36: There should be a forward message to case036-1@ripe.net,
+#            case036-4@ripe.net, case036-7@ripe.net,
+#            case036-10@ripe.net, case036-13@ripe.net
+#            about failed creation, and no notif message.
+
+
+inetnum:      62.191.0.0 - 62.191.255.255
+netname:      RIPE-NET1
+descr:        /24 to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+notify:       case036-20@ripe.net
+mnt-by:       USER-MNT
+mnt-lower:    USER-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password: user-mnt
+password: test-mnt

@@ -1,0 +1,65 @@
+# organisation object tests
+# CASE 37: Create two org objects
+#          inetnum object and person object
+#          Person & orgs will have auto nic handles,
+#          and the inetnum will refer to person & an org object.
+#          The other org will have reference to itself, and must fail.
+#          Passwords for "org:" attribute and hierarchical auth provided.
+%
+% requires initial objects to be loaded
+#
+# create organisation object, inetnum and person objects 
+#
+#SUCCESS
+#
+# RESULT 37: Three creations will succeed, one will fail. 
+
+
+inetnum:       1.0.0.0 - 1.255.255.255
+netname:       TEST
+descr:         TEST
+country:       NL
+org:           AUTO-1
+admin-c:       AUTO-2
+tech-c:        AUTO-2
+status:        ASSIGNED PA
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+
+
+organisation:  AUTO-1
+org-name:      EXAMPLE TTTTTT
+org-type:      NON-REGISTRY
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       AUTO-2
+tech-c:        AUTO-2
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+
+organisation:  AUTO-3
+org-name:      EXAMPLE TTTTTT
+org-type:      NON-REGISTRY
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       AUTO-2
+tech-c:        AUTO-2
+org:           AUTO-3
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+
+
+person:      Test Person
+address:     Test Adress
+phone:       +1234
+nic-hdl:     AUTO-2
+changed:     dbtest@ripe.net 20030102
+source:      DB-TEST
+
+password: test-dbm
+password: hostmaster

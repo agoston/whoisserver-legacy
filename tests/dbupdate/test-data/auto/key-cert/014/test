@@ -1,0 +1,47 @@
+# X.509 key-cert tests
+#
+# CASE 14: We try to create key-cert object with X509 certificate
+#          with AUTO2 name
+#
+#
+#FAILURE
+#
+# RESULT 14: The creation will fail.
+
+
+key-cert:     AUTO2
+method:       X509
+owner:        /C=NL/O=RIPE NCC/OU=Members/CN=uk.bt.test-receiver/Email=test-receiver@linux.testlab.ripe.net
+fingerpr:     D5:92:29:08:F8:AB:75:5F:42:F5:A8:5F:A3:8D:08:2E
+certif:       -----BEGIN CERTIFICATE-----
+certif:       MIID/DCCA2WgAwIBAgICAIQwDQYJKoZIhvcNAQEEBQAwcTELMAkGA1UEBhMCRVUx
+certif:       EDAOBgNVBAgTB0hvbGxhbmQxEDAOBgNVBAoTB25jY0RFTU8xHTAbBgNVBAMTFFNv
+certif:       ZnR3YXJlIFBLSSBUZXN0aW5nMR8wHQYJKoZIhvcNAQkBFhBzb2Z0aWVzQHJpcGUu
+certif:       bmV0MB4XDTAzMDkwODE1NTMyOFoXDTA0MDkwNzE1NTMyOFowgYUxCzAJBgNVBAYT
+certif:       Ak5MMREwDwYDVQQKEwhSSVBFIE5DQzEQMA4GA1UECxMHTWVtYmVyczEcMBoGA1UE
+certif:       AxMTdWsuYnQudGVzdC1yZWNlaXZlcjEzMDEGCSqGSIb3DQEJARYkdGVzdC1yZWNl
+certif:       aXZlckBsaW51eC50ZXN0bGFiLnJpcGUubmV0MIIBIjANBgkqhkiG9w0BAQEFAAOC
+certif:       AQ8AMIIBCgKCAQEAwYAvr71Mkw68CoMKmrHs8rHbMlLotPVqx5RuJ4d+IomL0i2i
+certif:       F7NVBkg1VLuAER1wl1X2pK746ptevTzwWi/QmgFZajTqLjCfW1sou2TXEA5s80t3
+certif:       JXRNk9xF6VXnggxCiqeWyfdC9Q7yOnlNdkJgzmQ/OuE9EVkKaY2kcnMU4NVyvbmD
+certif:       DtgdgSEuvRlgyeDi2gTh79QAfTnzH2d2SFGt1lZT48PuwCXl485pxyu+gVmykEMr
+certif:       EAgG6H/Dpl7t/jyV9w/HRAFaSV8mzpaLg6rxM03ThOPl6R61RJzEqTi0zX4OHkxV
+certif:       q7m1aniNJIvWefU1Yfvdv3zzTcmxWmA3yhOt6wIDAQABo4IBCDCCAQQwCQYDVR0T
+certif:       BAIwADARBglghkgBhvhCAQEEBAMCBaAwCwYDVR0PBAQDAgXgMBoGCWCGSAGG+EIB
+certif:       DQQNFgtSSVBFIE5DQyBDQTAdBgNVHQ4EFgQU/EdNYQO8tjU3p1uJLsYn4f0bmmAw
+certif:       gZsGA1UdIwSBkzCBkIAUHpLUfvaBVfxXVCcT0kh9NJeH7ouhdaRzMHExCzAJBgNV
+certif:       BAYTAkVVMRAwDgYDVQQIEwdIb2xsYW5kMRAwDgYDVQQKEwduY2NERU1PMR0wGwYD
+certif:       VQQDExRTb2Z0d2FyZSBQS0kgVGVzdGluZzEfMB0GCSqGSIb3DQEJARYQc29mdGll
+certif:       c0ByaXBlLm5ldIIBADANBgkqhkiG9w0BAQQFAAOBgQCEve6deqF0nvHKFJ0QfEJS
+certif:       UkRTCF7YCx7Jb2tKIHfMgbrUs3x9bmpShpBkJwjEsNYp0Vvk7hfhiFgKM4AGyYd3
+certif:       hZNmF5c/d0gauqvL+egb+3V+Zg+sJTzHMVKQLF1ybWgJjU75Pi+mO7BG0zsQ13pT
+certif:       YxuZCR2W15nwt7zLiHtmfw==
+certif:       -----END CERTIFICATE-----
+remarks:      Sample Key Certificate
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20040101
+source:       DB-TEST
+
+password: auth
+

@@ -1,0 +1,25 @@
+# domain authorisation tests
+# CASE 9: We try to modify ccTLD domain object ch
+#        mnt-by TEST-MNT pass
+#        no parent 
+#
+# modify domain object 
+#
+#SUCCESS
+#
+# RESULT 9: The modification will succeed.
+
+domain:       ch
+descr:        Switzerland
+refer:        CLIENTADDRESS whois.nic.ch
+admin-c:      TP1-DB-TEST
+tech-c:       TP10-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns1.some.net
+nserver:      ns2.some.net
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+password: auth

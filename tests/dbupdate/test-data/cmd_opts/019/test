@@ -1,0 +1,15 @@
+# command line options tests
+# CASE 19: Invalid combination of options
+#
+# run dbupdate with an invalid combination of options
+# ./dbupdate -c ~/db/conf/rip.config.new -mk new -f test
+#
+# check for exit code 11
+#
+#FAILURE
+#
+# RESULT 19: invalid combination of options -m and -k reported
+%
+%
+?11
+$ -c $RIP_CONFIG -mk new -f 

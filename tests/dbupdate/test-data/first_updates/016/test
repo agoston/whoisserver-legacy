@@ -1,0 +1,17 @@
+# first updates tests
+# CASE 16: Object with corrupt class attribute
+#
+# Object not recognised, so treated as garbage.
+#
+#SUCCESS
+#
+# RESULT 16: Number of objects found: 0  reported in ack summary
+#            and object reported as not looking like an object.
+
+
+rson:  test person2
+address: here
+phone:   +1
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

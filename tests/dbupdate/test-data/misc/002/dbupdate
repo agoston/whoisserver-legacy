@@ -1,0 +1,15 @@
+% misc tests
+
+aut-num:      AS123
+as-name:      TESTAS
+descr:        TEST TELEKOM
+import:       from AS1 accept {1.2.3.4/24}
+export:       to AS2 announce {1.2.3.4/24}
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+member-of:    AS123:AS-TEST    
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+override: password

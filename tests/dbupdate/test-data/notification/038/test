@@ -1,0 +1,28 @@
+# notification tests
+# CASE 38: Create aut-num object AS123
+#          maintained by RIPE-NCC-HM-MNT
+#          with a parent maintained by TEST-MNT
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 38: There should be a notif message to case037-2@ripe.net,
+#            case037-5@ripe.net, case037-8@ripe.net
+#            about successful creation, and no forward message.
+
+
+aut-num:      AS123
+as-name:      ASTEST
+descr:        TEST TELEKOM
+import:       from AS1 accept {1.2.3.4/24}
+export:       to AS2 announce {1.2.3.4/24}
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       case038-8@ripe.net
+mnt-by:       USER-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password:     user-mnt
+password:     test-mnt

@@ -1,0 +1,25 @@
+# CASE 2: We try to create inet6num object 2001:0658:021A::/481
+# with syntactically incorrect range
+# will now fail because it is not treated as syntax error.
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+
+inet6num:     2001:0658:021A::/481
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+status:       ALLOCATED-BY-LIR
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+
+password: hostmaster

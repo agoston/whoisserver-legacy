@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+
+<xsl:import href="notif_text"/>
+
+<xsl:variable name="level_none">0</xsl:variable>
+<xsl:variable name="level_debug">1</xsl:variable>
+<xsl:variable name="level_info">2</xsl:variable>
+<xsl:variable name="level_notice">3</xsl:variable>
+<xsl:variable name="level_warn">4</xsl:variable>
+<xsl:variable name="level_error">5</xsl:variable>
+<xsl:variable name="level_critical">6</xsl:variable>
+<xsl:variable name="level_fatal">7</xsl:variable>
+
+
+<!--
+  <xsl:template match="notification_header">To: <xsl:value-of select="to/text()"/>
+From: RIPE Database Notifications &lt;<xsl:value-of select="from/text()"/>&gt;
+Subject: Notification of RIPE Database changes
+Reply-To: ripe-dbm@ripe.net
+Precedence: bulk
+  </xsl:template>
+  -->
+  <xsl:template match="notification_header_to">To: <xsl:value-of select="to/text()"/>
+  </xsl:template>
+  <xsl:template match="notification_header_from">
+From: RIPE Database Notifications &lt;unread@ripe.net&gt;</xsl:template>
+  <xsl:template match="notification_header_subject">
+Subject: Notification of RIPE Database changes
+Reply-To: ripe-dbm@ripe.net
+Precedence: bulk
+Auto-Submitted: auto-generated
+  </xsl:template>
+
+  <xsl:template match="mail_origin_of_request">
+The update causing these changes had the following mail headers:
+
+> From:     <xsl:value-of select="from/text()"/>
+> Subject:  <xsl:value-of select="subject/text()"/>
+> Date:     <xsl:value-of select="date/text()"/>
+> Reply-To: <xsl:value-of select="reply_to/text()"/>
+> MsgId:    <xsl:value-of select="msgid/text()"/>
+<xsl:text>
+
+</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="ip_origin_of_request">
+The update causing these changes had the following IP address:
+
+ - From-Host: <xsl:value-of select="ip/text()"/>
+ - Date/Time: <xsl:value-of select="../process_time/p_time/text()"/>
+  </xsl:template>
+
+  <xsl:template match="notif_message">
+
+<xsl:value-of select="message/text()"/>
+  </xsl:template>
+
+<!-- lists -->
+  <xsl:template match="list">
+<xsl:value-of select="text()"/><xsl:if test="not(position()=last())">, </xsl:if></xsl:template>
+
+<!-- root node -->
+  <xsl:template match="/">
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="report">
+     <xsl:apply-templates select="notification_header_to" />
+     <xsl:apply-templates select="notification_header_from" />
+     <xsl:apply-templates select="notification_header_subject" />
+<xsl:call-template name="intro"/><xsl:text>
+
+</xsl:text>
+
+     <xsl:apply-templates select="mail_origin_of_request" />
+     <xsl:apply-templates select="ip_origin_of_request" />
+
+<xsl:call-template name="contact"/><xsl:text>
+
+</xsl:text>
+
+
+<xsl:apply-templates select="notif_message" />
+  </xsl:template>
+
+<!-- level stuff
+  <xsl:template match="level">
+    <xsl:element name="level"><xsl:attribute name="level"><xsl:value-of select="@level"/></xsl:attribute><xsl:apply-templates/></xsl:element>
+  </xsl:template>
+-->
+
+
+<!-- composite/summary -->
+  <xsl:template match="composite">
+      **********************
+      <xsl:apply-templates/>
+      **********************
+  </xsl:template>
+
+  <xsl:template match="summary">
+      <xsl:apply-templates/>
+      ----------------------
+  </xsl:template>
+</xsl:stylesheet>

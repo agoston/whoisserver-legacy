@@ -1,0 +1,26 @@
+# input tests
+# CASE 11: Mail message from a file 
+#          no reply-to field
+#          --print option NOT specified
+%
+#
+# mail message input from specified file
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 11: object created
+#            nothing on stdout
+%
+%
+$ -c $RIP_CONFIG -mr -f 
+%
+%
+From: dbtest@ripe.net
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

@@ -1,0 +1,14 @@
+# command line options tests
+# CASE 31: Invalid combination of options
+#
+# run dbupdate with an invalid combination of options
+# mixing short and long form for the invalid pair.
+# ./dbupdate -c ~/db/conf/rip.config.new -m --x509 $CURRENT_DIR/cert.pem -f test
+#
+#FAILURE
+#
+# RESULT 31: invalid combination of options -m and -x reported
+#
+# exit code should be 11
+?11
+$ -c $RIP_CONFIG -m --x509 $CURRENT_DIR/cert.pem -f 

@@ -1,0 +1,20 @@
+# rdns tests
+# CASE 9: Modification fails because parent is not ours
+#
+# modify domain object
+#
+#FAILURE
+#
+# RESULT 9: modification will fail
+
+domain:       0.0.193.in-addr.arpa
+descr:        Test2
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns-pri.ripe.net
+nserver:      ns-sec.ripe.net
+mnt-lower:    TEST-DBM-MNT
+changed:      dbtest@ripe.net 20040329
+source:       DB-TEST
+

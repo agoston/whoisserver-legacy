@@ -1,0 +1,26 @@
+# keywords tests
+# CASE 17: Invalid combination of help and diff keywords in subject line
+%
+#
+# run dbupdate with mail subject 
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+# create a new object
+#
+#SUCCESS
+#
+# RESULT 17: The creation will succeed, keywords help,diff in upd log.
+#            Invalid combination reported.
+%
+%
+$ -c $RIP_CONFIG -rm -f
+%
+%
+From: dbtest@ripe.net
+Subject: help diff
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

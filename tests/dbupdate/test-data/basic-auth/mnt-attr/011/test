@@ -1,0 +1,22 @@
+# mnt-attr tests
+# CASE 11: We try to create 20.13.0.0/16 route object. 
+#         mnt-routes contains invalid prefix length (.../48^2-3) 
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 11: The creation will fail
+
+
+password: mb-child
+password: mr-exact
+
+route:   20.13.0.0/16
+descr:   Route
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+mnt-routes:  CHILD-MR-MNT { 20.13.0.0/48^2-3}
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST

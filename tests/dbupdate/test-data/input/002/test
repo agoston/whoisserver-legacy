@@ -1,0 +1,19 @@
+# input tests
+# CASE 2: Valid file specified with -f option
+#         not a mail message
+#         keyword help specified
+#         --print option NOT specified
+%
+#
+# input from specified file
+# ./dbupdate -c ~/db/conf/rip.config -r -k help -f test
+#
+#SUCCESS
+#
+# RESULT 2: help message in ack
+#           ack message printed to stdout
+#           keywords - help in upd file
+%
+%
+$ -c $RIP_CONFIG -r -k help -f 
+

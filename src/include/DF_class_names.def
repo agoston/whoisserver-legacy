@@ -1,0 +1,23 @@
+char * const Class_names[] = {
+  "as-block",
+  "as-set",
+  "aut-num",
+  "domain",
+  "inet-rtr",
+  "inet6num",
+  "inetnum",
+  "key-cert",
+  "limerick",
+  "mntner",
+  "person",
+  "role",
+  "route",
+  "route-set",
+  "filter-set",
+  "peering-set",
+  "rtr-set",
+  "irt",
+  "organisation",
+  "route6",
+  NULL
+}; /* Class_names */

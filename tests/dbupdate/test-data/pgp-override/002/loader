@@ -1,0 +1,76 @@
+person:       test person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP1-DB-TEST
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+mntner:       TEST-DBM-MNT
+descr:        Mntner for RIPE DBM objects
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+upd-to:       dbtest@ripe.net
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+mnt-by:       TEST-DBM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+key-cert:     PGPKEY-0DAD2612
+certif:       -----BEGIN PGP PUBLIC KEY BLOCK-----
+certif:       Version: GnuPG v1.2.2 (GNU/Linux)
+certif:       
+certif:       mQGiBD9dynQRBACkeFI0afmdo3rYa400bepQgFsM6h2dJritabNDXTay7XKxLo9j
+certif:       0kh2Ix1fRmutI3nIyqn4XW+FfFIOckjKOGLzVK8clitQ0v7/DVSnQNVUlRGw/GN4
+certif:       Jbyu97dOcU/irtW8KcpvgFDhpDSg7BysxgZnZduS1HUdJfjYu9D5IVEc+wCgxQb0
+certif:       fUp0JCF6XrzwBIT/m7UirwUEAIhunYfdMDrPluEiQ0QOIRh19uEkaXfQ7D+bmDix
+certif:       61U38UMvBCo8ws8freFxTITyji+4rIkhymwCDbvZDBHK2V0M/19ceIjmq2GNWbS5
+certif:       gzlVg3oMyHnp0P2GIaqoerbj6WdaVQFJhwkzZ6rLou2O01427L2CK+9xrJhdg7Gf
+certif:       svh0A/4sdLuh5inUihszz2ha2VpPM6AET1QvibqhXiLRvhlZ73yCz+wL9YdXQ1fr
+certif:       Q96fRMWfVTOXpnNE0Q3iXBXGyrKZUQnqAwJdrclrJWfdyEny4J3imiqOqgSNfno5
+certif:       N9+wcRILTZFL6evbE3Hgb8lGomAPfTQQq1uIC4heazUGOzJDSrQLeHh4eHggPHhA
+certif:       eD6IWwQTEQIAGwUCP13KdAYLCQgHAwIDFQIDAxYCAQIeAQIXgAAKCRCxHo/aDa0m
+certif:       ErTTAJ42C3XORlY7nX3NcEbXiWBMvuFySwCeL6cv2nsxp+oEIQvEh3WE9rpsoeS5
+certif:       AQ0EP13KdxAEAJcclIt8wxiJgV0luU8d7lsfiJoWbKkdPZaZIXhrvCR8FAkfeXbO
+certif:       6seHVFrDckIFivTWpMgd3kNlIdrAdk2RMux/54y+xNKzHk/3EWQLQlDT4jzP7v+u
+certif:       6h/sE2xo4pW78SZb+HpBTAdqE4GcubuLLdQ4VCeeksbccEzDM3FYWw3/AAMFA/9k
+certif:       6f/wmYYlV9sLychTNS0gtjdGnlU/a7wihM3akpMGGdBiO5SERCi7WR2cfjTVbPH2
+certif:       8Jfut42DlfZCUrsKyYpDkvpMbGJm4aNVoNPXDknuvoDx23BI3tX7lMMJHFV4jyus
+certif:       VsmcsoiCsCudQcgSWc8nq3in3d7ePlBawQkHHjfwY4hGBBgRAgAGBQI/Xcp3AAoJ
+certif:       ELEej9oNrSYS/9EAn3Cw/AZg0zEkz5Z9Y/119E9QAoi3AKCixWj5QgshtOA6cJz1
+certif:       sxhUIRKTIQ==
+certif:       =HGaM
+certif:       -----END PGP PUBLIC KEY BLOCK-----
+mnt-by:       TEST-DBM-MNT
+changed:      bit-bucket@ripe.net
+source:       DB-TEST
+
+key-cert:     PGPKEY-7972955B
+certif:       -----BEGIN PGP PUBLIC KEY BLOCK-----
+certif:       Version: GnuPG v1.2.2 (GNU/Linux)
+certif:       
+certif:       mQGiBD9dyocRBACAsxrnfnKURpz7TCMGJlAcJSgvAa2bg1ZUdUEWGcINveOBhkxJ
+certif:       2SdUthuMY/makRXfxg3FJIYHxpzZUURgTlZpumC4ayDIF3SmYpEWYUNKTHGwrj0D
+certif:       VZd86UH+nAEBw4wYJU8g+16+zoI3sKGb+msMgWRkRap0WVyBh9lg2u/qXwCgnaDy
+certif:       Uq/E1bJr7QFKcp9JMEGPNhMD/jgHhmQfVppbMfJ5dIvfw1r63zbgoX3ls5C3o3R/
+certif:       AlcexggqC5zQefTisgMkM8RKcIjunN8fvuzBGV7DC27KxTMRsIQSE15NkmTI0/OR
+certif:       gU8oDv8jHvuB2317K4D/H8KKArgdFZiB0BqrAh17VFlTfPeavB/SaHDNUJXVBC3o
+certif:       Hu5mA/472E6MZYNySBcz/j/rTKdMxmGjyYYaD/bhHR+JWOssTlbibD0ut7I8QDD2
+certif:       sPYJ58HOi9jadkakX6I2st8mq+8PzPI65qZO5B83dMNPAY49AFUVgGawWj7sXNo4
+certif:       hN8ykz6vFtN5YPkpUFc/r14/H3YPkLV6VF5A8ubNQhDLXuvDUbQLeHh4eHggPHhA
+certif:       eD6IWwQTEQIAGwUCP13KhwYLCQgHAwIDFQIDAxYCAQIeAQIXgAAKCRCd7ILTeXKV
+certif:       W1iwAJ9Z8OJsrhmkbYp0+3V4XLK7zxz9jwCgjCT1DL4y+AoXSwraBRPwrc1q9/K5
+certif:       AQ0EP13KiRAEAOrLeJoL6UKMZUxn7N400r5HQ/t+NGI7rmKfYPKLg66U8BXuxn3X
+certif:       /mbnjUTTH+2VXhsb1ybKC3Df4J3sM7pWZXKQidEEy+UqM2lCJZ+QILujDiAmHl4U
+certif:       y6+q730j3rYEANSgM9sBW23nZbMb1HRrLNeliW+21eY7eCeD5pazilo/AAMFBACC
+certif:       rP88/nEdNOHu7vrKVSzBCDZen6301eCFf+xtxhf/+eSwR73ysZVeeRpk3IICRB9/
+certif:       zps0mXWhTd9v0qoGBoC2DEMcx63vg3ZI/APftR32zWmBWdq2oRyTcs4pwUfTfMW1
+certif:       03UXJh/GxW1Bv1H/z6mY+OAeOWrephmgn3Y+5TgPrIhGBBgRAgAGBQI/XcqJAAoJ
+certif:       EJ3sgtN5cpVbtY4An0NIV0mA/oI+XP0T+1SWuFBrX9imAJ9Tbk18lTpZ7yTDPIFv
+certif:       3yv1GK4IHA==
+certif:       =LVZr
+certif:       -----END PGP PUBLIC KEY BLOCK-----
+mnt-by:       TEST-DBM-MNT
+changed:      bit-bucket@ripe.net
+source:       DB-TEST
+

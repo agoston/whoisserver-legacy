@@ -1,0 +1,27 @@
+# notification tests
+# CASE 23: Delete inetnum object with mnt-irt
+#          no password for irt
+#
+# delete inetnum object 
+#
+#SUCCESS
+#
+# RESULT 23: There should be a notif message to case023-1@ripe.net
+#            about successful deletion, and no forward message.
+
+
+inetnum:      192.168.201.0 - 192.168.201.255
+netname:      RIPE-NET
+descr:        /24 to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+mnt-irt:      IRT-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+delete:       not required
+
+password: test-mnt

@@ -1,0 +1,22 @@
+# notification tests
+# CASE 8: Creation of a maintained object, where mntner has
+#         both a mnt-nfy attribute and an upd-to attibutes.
+#
+# create a person with mnt-by
+#
+#SUCCESS
+#
+# RESULT 8: There should be a notif message to case008-2@ripe.net
+#           about the successful creation and no forward message.
+
+
+person:  Test Person II
+address: Singel 258
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP20-DB-TEST
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+password: notif

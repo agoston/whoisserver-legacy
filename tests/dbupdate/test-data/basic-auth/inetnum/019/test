@@ -1,0 +1,31 @@
+# basic-auth tests - inetnum
+# CASE 19: Create an allocation inetnum object
+#          with less specific mnt-lower having the same 
+#          password as the allocation mnt-by
+#          password supplied for mntner and "org:"
+#          Use the second mntner in the ALLOCMNT list
+%
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 19: The creation will succeed
+
+
+password: hostmaster
+password: test-dbm
+
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED PA
+org:          ORG-Eoof1-DB-TEST
+mnt-by:       RIPE-NCC-SECOND-HM-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

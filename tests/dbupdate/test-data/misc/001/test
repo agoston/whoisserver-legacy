@@ -1,0 +1,19 @@
+# misc tests
+# CASE 1: submit a corrupted object class
+#
+# submit object 
+#
+#SUCCESS
+#
+# RESULT 1: No objects will be recognised or processed
+
+
+
+ertif:       efS71fqrHeon3UmZucEeHWq33sn6ZTsjYS0/tcAveIbaWHZfektufYhGBBgRAgAG
+certif:       BQI+Qj3OAAoJEL8f90FHHbvqhWgAnju4Q8Mz6M8zMcwUNqe80HcV6Wg1AKCA4El2
+certif:       Pxy7ewaH1vCBSsdwd6nwxQ==
+certif:       =Nphm
+certif:       -----END PGP PUBLIC KEY BLOCK-----
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

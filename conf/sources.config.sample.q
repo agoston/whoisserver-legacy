@@ -1,0 +1,125 @@
+# Copyright (c) 2000                                RIPE NCC
+#
+# All Rights Reserved
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for any purpose and without fee is hereby granted,
+# provided that the above copyright notice appear in all copies and that
+# both that copyright notice and this permission notice appear in
+# supporting documentation, and that the name of the author not be
+# used in advertising or publicity pertaining to distribution of the
+# software without specific, written prior permission.
+#
+# THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+# ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
+# AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+# DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+# AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+# Example sources.config
+
+# Any line that begins with a '#' is ignored.
+# Blank lines are also ignored.
+# Comments can only be at the beginning of a line.  Currently, they
+# cannot be inside a definition.
+
+# A definition begins with uppercase text.  Currently, there are
+# three types of definition object: DATABASE, NRTM (near-real-time 
+# mirror) and SOURCE.  Each object is identified by a name which comes
+# immediately after the object type and is on the same line.  This
+# name is also in uppercase text.
+#
+# Definitions end with /<object type> at the beginning of a line.
+
+# Currently, all variables are mandatory.  E.g., in the definition
+# of a SOURCE, "nrtm" must be present.  Thus, a dummy definition of
+# an NRTM may be necessary.
+#
+
+
+# This is the definition of a MySQL database,
+# with all relevant data.
+#
+# Customise:
+# sqlhost - the hostname of MySQL server
+# 3306    - mysqld port
+# trx_support - does the database support transactions? (values can be 'y' or 'n')
+# dbuser  - MySQL user name (use make_mysql_user)
+# dbpsw   - MySQL user password
+DATABASE     SAMPLEDB
+host:        sqlhost
+port:        3306
+trx_support: n
+user:        dbuser
+password:    dbpsw
+/DATABASE
+
+# You can have more than one definition of a database:
+# Remove comments if you plan to use it
+#
+#DATABASE YOURDB
+#host:    yourBox	
+#port:    3306
+#user:    you
+#password: yourPswd
+#/DATABASE
+
+
+# This is the definition of a near-real-time mirror client:
+#
+# host: the machine on which the server runs.
+# port: the port number on which the mirror-server listens.
+# delay: the delay (in seconds) between requests to the server for updates.
+# protocolVersion: the version number of the NRTM protocol (typically 1).
+#
+NRTM    SPIEGEL
+host:   mirror.server.net
+port:   4444
+delay:  60
+protocolVersion: 1
+/NRTM
+
+# The definition of sources must always be after the definitions
+# of databases and mirrors.  However, databases and mirrors can
+# be defined in any order.  A source can use any predefined database
+# or mirror.
+#
+
+# Definition of source "TEST"
+# 
+# database: It uses the "MYDB" database (defined above).
+# opMode: Operation Mode. Its most frequently-used values are:
+#	0 static snapshot (no updates possible) 
+#	2 update server (processes requests from DBupdate)
+#	4 NRTM client.
+# 16 no nic-handle repository (loading foreign databases)
+# 20 NRTM without nic-handle repository( mirrored foreign databases)
+# updPort: the update port, i.e. the port on which the RIP server listens for
+# 	updates to this source via dbupdate.
+# canupd: can this database be updated? (y/n)
+# deflook: is this the default look-up source? (y/n)
+# nrtm: the name of the near-real-time mirror used by this database (see above).
+#
+SOURCE    SAMPLE
+database: SAMPLEDB
+opMode:   0
+updPort:  43004
+canupd:   y
+deflook:  y
+nrtm:     SPIEGEL
+/SOURCE
+
+# Definition of source "PRODUCTION"
+# 
+# It uses the "YOURDB" database (defined above).
+# Remove comments if you plan to use it
+#
+#SOURCE     PRODUCTION
+#database:  YOURDB
+#opMode:    2
+#updPort:   123456
+#canupd:    y
+#deflook:   y
+#nrtm:      SPIEGEL
+#/SOURCE

@@ -1,0 +1,26 @@
+# CASE 3
+#
+# unsuccessful, without override: reason and right pgp signature
+#
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+mntner:       TEST-DBM-MNT
+descr:        Mntner for RIPE DBM objects.........
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+upd-to:       dbtest@ripe.net
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+mnt-by:       TEST-DBM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (GNU/Linux)
+
+iD8DBQE/XdyhsR6P2g2tJhIRAnLkAJ9RVgbneaG4SpSUODqxzfXqal4XSgCePRnQ
+OLCbgVx1gVFdumMNw0aBneE=
+=U2Vn
+-----END PGP SIGNATURE-----

@@ -1,0 +1,14 @@
+# first updates tests
+# CASE 2: Garbage only in update message
+#
+# No object, but some garbage, in the update message
+#
+#SUCCESS
+#
+# RESULT 2: Number of objects found: 0  reported in ack summary
+#           and garbage reported as not looking like an object.
+
+
+qwerty qwerty
+qwerty
+qwerty qwerty qwerty

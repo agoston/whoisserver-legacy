@@ -1,0 +1,128 @@
+0001 25/07/2000 TODO Implement 'test' mode (where mntners can be created without 
+                     override password). 
+0002 25/07/2000 TODO Interpret "Subject:" line of the update message. Only possible 
+                     strings are NEW, HOWTO and HELP.
+0003 26/07/2000 TODO Implement the deletion of syntactically incorrect objects.
+0004 26/07/2000 TODO BUG: When deleting objects, "identicalness check" doesn't work
+                     properly.
+0005 26/07/2000 TODO In get_mntners function we must handle multiple mntner names in a
+                     single mnt-by attribute. Currently we assume single mntner name.
+0006 27/07/2000 TODO "country" attribute can take more than one countries. Fix. (currently
+                     in can take only one).
+0007 27/07/2000 TODO There is something wrong in 'get_attr_list' function. Apparently it 
+                     doesn't look at the very last attribute of the object.
+0007 27/07/2000 DONE This was apparently a bug in Object::scan method of RAToolSet. If there
+                     is no '\n' at the end of object, the last attribute is not put in the
+                     attribute linked list. This is fixed by adding a redundant '\n' at the 
+                     end of object in 'get_attr_list' function.
+0008 31/07/2000 TODO Incorporate OVERRIDECRYPTEDPASSWD and HUMAN_MAILBOX configuration 
+                     variables.
+0009 31/07/2000 TODO Incorporate ACKLOGFILE configuration variable too.
+0008 01/08/2000 DONE
+0009 01/08/2000 DONE
+0001 01/08/2000 DONE (only from command line -T option, from config file doesn't work??)
+                       A problem in CA module, possibly
+0010 03/08/2000 TODO Implement a simple upd log.
+0011 03/08/2000 TODO When an non-existent mntner is used in mnt-by attribute, "Auth failed" is 
+                       returned, instead of "referential intefrity failure" or similar. Fix.
+0012 03/08/2000 TODO Fix a bug: The problem is that when (attr->len) == 0, AK_add_to_ack
+                       fails, and coredumps. 
+0012 03/08/2000 DONE Now we check attr->len first.
+0013 04/08/2000 TODO Bug. When AUTO NIC hdls are used, the initials supplied by the user
+                       are not granted, the initials from the name of role/person object
+                       is used always. Fix.
+0014 04/08/2000 TODO Bug. AUTO nic hdls must be handled in a case-insensitive manner,
+                       that is, aUTo-4 must be handled (as equal to auto-4 and AUTO-4).
+0014 04/08/2000 DONE 
+0015 07/08/2000 TODO Incorporate country configurable variable.
+0015 07/08/2000 DONE
+0013 09/08/2000 DONE
+0004 09/08/2000 DONE There were bugs in identical & delete_delete_attrib functions.
+0016 09/08/2000 TODO Fix problems with NOOPs when updating. 
+0017 21/08/2000 TODO Design a new upd log.
+0018 28/08/2000 TODO Fix the bug which causes a core dump when parsing inetnums.
+0019 28/08/2000 TODO Incorporate SOURCE variable.
+0018 29/08/2000 DONE Fixed. After an "uinitialized mem write" has been solved, 
+                       the problem has gone away.
+0019 01/09/2000 DONE We have overloaded SOURCE variable. Probably we need to 
+                       invent another config variable for this.
+0020 05/09/2000 TODO Delete "override" line from objects when putting them
+                       to the db.
+0020 05/09/2000 DONE This is done in send_object_db function.
+0021 07/09/2000 TODO Implement the handling of MULTIPART/SIGNED MIME type.
+0022 09/10/2000 TODO Incorporate the EP module.
+0021 13/10/2000 DONE Automatically, by the implementation of EP module.
+0022 13/10/2000 DONE
+0023 13/10/2000 TODO Implement "override integrity"
+0024 02/11/2000 TODO Put a limit on the number of _unique_ passwords in a single message
+                     (so that a user can't issue every possible passwords in a
+                     single message).
+0025 05/12/2000 TODO Put the $CC conversion into ack and notif config variables too.
+0026 18/12/2000 TODO Investigate auth-override attribute.
+0027 18/12/2000 TODO Investigate referral-by attribute.
+0028 05/01/2001 TODO The syntax checks of 'mntner', 'mnt-lower' and 'mnt-by' fields
+                      must be changed: There must be another "special" syntax type for
+                      them, like "mntner". So, it must be defined as "attr:  mntner    
+                      syntax(special,mntner) ..." in schema_rpsl.cc. The check in 
+                      version 2 is: sub ismntnername {
+                                     return scalar ($_[0]!~ /^NEW\-MNT|AUTO\-1$/ ); }
+0029 05/01/2001 TODO The syntax check of 'limerick' attribute must be changed. It can
+                      start only with 'LIM-'. However, it is not a good idea to reserve
+                      this prefix to limericks, so we can define a "special" type, like
+                      'limerick' and define "attr:  limerick syntax(special, limerick) ..."
+                      in schema_rpsl.cc. 
+0030 11/01/2001 TODO Check the mnt-routes attrib: What happens when we have prefix(es) in
+                      mnt-routes attrib.
+0031 14/01/2001 TODO Check 'mnt-lower' attrib in aut-num class.
+0032 14/01/2001 TODO Check 'auth-override' and 'referral-by' attribs in mntner class.
+0033 15/01/2001 TODO Check if we allow hierarchical as-block objects with 'mnt-lower'
+                      attribute (we must, according to rfc2725, page 21)
+0034 15/01/2001 TODO A more careful check of dates in 'changed' attrib. Can be done in
+                      bison parser. Also need to check dates in auth-override attribs of
+                      mntners. We may need another attrib type in bison parser for this.
+                      We can use Glib's date related functions here.
+0035 15/01/2001 TODO Check: Do we send unauthorised maintainer creation requests to
+                      HUMAILBOX? Also goes for as-blocks?
+0036 15/01/2001 TODO The lines that start with "#" got removed from the object when
+                      creating/updating? If so, why? Are these valid object at all?
+0037 19/01/2001 TODO When sending acks to multiply signed message, the ack is a bit
+                      weird: it puts the "== BEGIN PGP..." and "== END PGP ..." strings
+                      to wrong places: in the case of a doubly singed single object, an
+                      ack like this comes back:
+                      ==== BEGIN PGP SIGNED PART (keyID(s): 00D69859) ====
+                      ==== END PGP SIGNED PART ====
+
+                      ==== BEGIN PGP SIGNED PART (keyID(s): 00D69859, 00D69859) ====
+
+                      Update OK: [person] EG29-RIPE
+                      ==== END PGP SIGNED PART ====
+
+                      where it should be:
+     
+                      ==== BEGIN PGP SIGNED PART (keyID(s): 00D69859) ====
+                      ==== BEGIN PGP SIGNED PART (keyID(s): 00D69859, 00D69859) ====
+
+                      Update OK: [person] EG29-RIPE
+                      ==== END PGP SIGNED PART ====
+                      ==== END PGP SIGNED PART ====
+0025 13/02/2001 DONE This was a bug. (When there is no Cc: in incoming mail, we
+                      just didn't touch $CCs in config variables).
+0038 22/02/2001 TODO Implement -S switch to dbupdate (which would print the acknowledgement
+                      message to stdout, intead of sending an e-mail. This is used by
+                      inaddr robot, via ssh.
+0039 22/02/2001 TODO  George Michaelson's bug report: in 'identical' func, the white spaces
+                       at the end of strings must have been removed.
+0039 22/02/2001 DONE
+0040 22/02/2001 TODO  Fix: There is a problem in replace_AUTO_NIC_hdl func: It returns a
+                        object without a '\n' at the end, which confuses RAToolSet's
+                        parser. So, add a '\n' to the end of the resulting object.
+0040 23/02/2001 DONE
+0041 23/02/2001 TODO  Fix: We don't properly report unresolved (invalid) references to
+                        AUTO NIC hdls in acknowledgements.
+0041 23/02/2001 DONE
+0042 26/02/2001 TODO  The AUTO nic handles must be replaced with the assigned NIC handles
+                        in the notification messages.
+0043 04/04/2001 TODO  If a less specific domain object could not be found, we print
+                        "auth failed" instead of "hierarchical auth failed" message.
+0044 04/05/2001 TODO  Fix bug: If AUTODBMHELP file does not exist, then dbupdate core dumps
+                        when "Subject: help" is given! Fix!

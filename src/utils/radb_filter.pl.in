@@ -1,0 +1,185 @@
+#!@PERL@ -w
+
+#
+# radb_filter.pl
+#
+# The RADB database has person objects without nic-hdl attributes.  
+# This is not valid RPSL, as defined by RFC2622, and is not allowed by
+# the Whois server.  We can not simply delete these objects from the
+# input stream, because serials need to match if we mirror the RADB
+# database.  Therefore, we replace these person objects with a 
+# dummy person object. Also, we replace routes with "withdraw" attribute
+# with a dummy route-set object. Thirdly, we delete rs-in and rs-out 
+# attributes of inet-rtr objects as we don't have them in our object
+# dictionary. Fourth, we truncate the attribute values that are of type
+# nic-handle and longer than 30 chars.
+#
+# Note the input could be performed cleaner with "" as the record 
+# separator, but this makes it hard to use on a TTY.  Likewise output
+# buffering would speed up processing, but also makes life difficult
+# from programs that end abnormally.
+#
+# $Id: radb_filter.pl,v 1.1 2002/11/28 16:00:51 engin Exp $
+#
+
+# standard Perl includes
+use strict;
+use English;
+use POSIX;
+
+# dummy person object to use for bogus references
+my $bogus_person = <<'bogus';
+person:   Place-holder Object
+address:  No Address           # not a real address
+phone:    +1 22 333            # not a real phone number
+nic-hdl:  PLACEHOLDER1-RADB    # not a real RADB NIC-HDL
+remarks:  This is a place-holder object used to replace person objects 
+          in the RADB database with no NIC-HDL attribute.  It is created
+	  automatically, and not present in the RADB dataase, because 
+	  NIC-HDL is a required attribute in RPSL.
+source:   RADB
+bogus
+
+
+# dummy route-set object to use for withdrawn routes
+my $bogus_rsset = <<'rsbogus';
+route-set: RS-WITHDRAWN-ROUTES-RADB
+descr:     routes with withdrawn attribute
+tech-c:    PLACEHOLDER1-RADB
+admin-c:   PLACEHOLDER1-RADB
+source:    RADB
+rsbogus
+
+
+# flush output 
+local $OUTPUT_AUTOFLUSH = 1;
+
+# loop over input one RPSL object at a time
+local $INPUT_RECORD_SEPARATOR="\n\n";
+until (eof(STDIN)) {
+
+    # get the next object on input stream
+    my $object = <STDIN>;
+    last unless (defined $object);
+
+    # strip off leading white space, if any
+    $object =~ s/^\s+//;
+
+    # some classful inetnum objects exist - fix them as best we can
+    if ($object =~ /^inetnum:\s*(\d+(?:\.\d+){3})\s*\n/) {
+        # get start IP
+        my $start_ip = $1;
+printf STDERR "fixing $start_ip\n";
+	my @o = split(/\./, $start_ip);
+
+        # class A
+	if ($o[0] <= 127) {
+	    for (my $n=3; ($n>=1) && ($o[$n] == 0); $n--) {
+	        $o[$n] = 255;
+	    }
+	} 
+	# class B
+	elsif ($o[0] <= 191) {
+	    for (my $n=3; ($n>=2) && ($o[$n] == 0); $n--) {
+	        $o[$n] = 255;
+	    }
+        # class C
+	} elsif ($o[0] <= 223) {
+	    if ($o[3] == 0) {
+	        $o[3] = 255;
+	    }
+	}
+
+        # generate end IP
+	my $end_ip = join('.', @o);
+
+	# replace single IP with range
+        $object =~ s/^(inetnum:\s*\d+(?:\.\d+){3})/$1 - $end_ip/;
+    }
+
+    # some route objects contain obsolete withdrawn: attribute - replace with
+    # bogus route-set
+    if ($object =~ /(\n)withdrawn:/i) {
+            my $changed = strftime('changed:  ripe-dbm@ripe.net %Y%m%d',
+	        localtime(time()));
+	    $object = "${bogus_rsset}${changed}\n\n";
+    }
+
+    # substitute dummy for some person objects
+    if ($object =~ /^person:/i) {
+
+        # check for NIC-HDL attribute, and substitute dummy person if none
+	unless ($object =~ /\nnic-hdl:/) {
+	    my $changed = strftime('changed:  ripe-dbm@ripe.net %Y%m%d',
+	        localtime(time()));
+	    $object = "${bogus_person}${changed}\n\n";
+	}
+
+    }
+
+    # output the object an attribute at a time, fixing case of 
+    # the attribute name if necessary
+    # Also, take care of rs-in & rs-out attribs of inet-rtr
+    # objects. We must delete them from the object
+    my @lines = split(/(\n)(?![ \t+])/, $object);
+    foreach my $line (@lines) {
+
+        $line =~ s/\n+$//;
+        if($line eq ''){ next; } # skip if it was just \n's
+        if ($line =~ /^([a-z0-9_\-]+):(.*)$/is) {
+
+            my $attr_name = $1;
+            my $attr_value = $2;
+            if(($object =~ /^inet-rtr:/i) && ($line =~ /^rs-(in|out):/i )){
+
+              # do not print this attribute out
+
+            }elsif($attr_name =~ /^(admin-c|tech-c|zone-c|nic-hdl|author|cross-nfy)$/i){
+
+             # Some nic-handles in the stream cause problems. They are
+             # the ones whose numeric part starts with one or more 0s (zeros).
+             # Remove those zeros.
+             if($attr_value =~ /^(\s*[A-Z]{2,8})([0-9]{0,6})((?:-[A-Z](?:[A-Z0-9_-]{0,17}[A-Z0-9]))?\s*)$/i){
+               my $start = $1;
+               my $numeric = $2;
+               my $end = $3;
+               # remove zeros from the numeric part
+               $numeric =~ s/^0+//;
+               $attr_value = $start.$numeric.$end;
+             }
+
+             # if this is an attrib of type nic-hdl, check its length 
+             if(length($attr_value) > 30){
+
+               # if it's longer than 30, then truncate it
+               #$attr_value = substr($attr_value, 0, 30);
+               $attr_value =~ s/^\s+//; 
+               $attr_value =~ s/\s+$//; 
+               # truncate to 30 characters
+               $attr_value =~ s/^(.{0,30}).*/$1/;
+
+               chomp $attr_value; # in case we have a "\n" at the end
+               if($attr_value =~ /^\s*$/){ # if it became empty, skip it
+                 next;
+               }else{
+
+                 print lc($attr_name),':            ' , $attr_value, "\n";
+
+               }
+             }else{ # if it's shorter than 30 chars, print it out
+
+               print lc($attr_name), ':', $attr_value, "\n";
+
+             }
+
+            }else{
+              print lc($attr_name), ':', $attr_value, "\n";
+            }
+        } else {
+            print $line,"\n";
+	}
+
+    }
+   print "\n"; # print an blank line after the object
+}
+

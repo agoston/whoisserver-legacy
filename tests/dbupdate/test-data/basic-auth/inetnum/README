@@ -1,0 +1,269 @@
+# basic-auth tests - inetnum
+
+# CASE 1: Create the root inetnum object (has no less specific)
+#         without override
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail
+
+
+# CASE 2: Create the root inetnum object (has no less specific)
+#         with override
+%
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 2: The creation will succeed
+
+
+# CASE 3: Create an allocation inetnum object
+#         with less specific mnt-lower having the same 
+#         password as the allocation mnt-by
+#         password supplied
+%
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed
+
+
+# CASE 4: Create an assignment inetnum object
+#         with less specific allocation having no mnt-lower
+#         and correct password for mnt-by of parent
+#         and mnt-by of object
+%
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed
+
+
+# CASE 5: Create an assignment inetnum object
+#         with less specific allocation having no mnt-lower
+#         and correct password for mnt-by of object only
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will fail
+
+
+# CASE 6: Create an assignment inetnum object
+#         with less specific allocation with mnt-lower
+#         and correct password for mnt-lower of parent
+#         and mnt-by of object
+%
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 6: The creation will succeed
+
+
+# CASE 7: Create an assignment inetnum object
+#         with less specific allocation with mnt-lower
+#         and missing password for mnt-lower of parent
+#         and correct password for mnt-by of object
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail
+
+
+# CASE 8: Create an assignment inetnum object
+#         with less specific allocation with mnt-lower
+#         and missing password for mnt-lower of parent
+#         and correct password for mnt-by of parent
+#         and correct password for mnt-by of object
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail
+
+
+# CASE 9: Create an assignment inetnum object
+#         with less specific allocation with mnt-lower
+#         and no passwords
+#         and override
+%
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed
+
+
+# CASE 10: Create an assignment inetnum object
+#          with less specific allocation with mnt-lower
+#          and no passwords
+#          and override with wrong password
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 10: The creation will fail
+
+
+# CASE 11: Create an assignment inetnum object
+#          with less specific allocation with mnt-lower
+#          and correct password for mnt-lower of parent
+#          and missing password for mnt-by of object
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 11: The creation will fail
+
+
+# CASE 12: Create an LIR-PARTITIONED inetnum object with mnt-lower
+#          with less specific allocation with mnt-lower
+#          and correct password for mnt-lower of parent
+#          and correct password for mnt-lower of object
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 12: The creation will fail
+
+
+# CASE 13: Create an assignment inetnum object
+#          with less specific allocation with mnt-lower and mnt-routes
+#          and correct password for mnt-routes of parent
+#          and mnt-by of object
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 13: The creation will fail
+
+
+# CASE 14: Create an assignment inetnum object
+#          with less specific allocation with mnt-routes and no mnt-lower
+#          and correct password for mnt-routes of parent
+#          and mnt-by of object
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 14: The creation will fail
+
+
+# basic-auth tests - inetnum
+# CASE 15: Modify an assignment inetnum object
+#          with less specific allocation with mnt-lower
+#          and correct password for mnt-by of object
+%
+#
+# modify inetnum object 
+#
+#SUCCESS
+#
+# RESULT 15: The modify will succeed
+
+
+# CASE 16: Delete an assignment inetnum object
+#          with less specific allocation with mnt-lower
+#          and correct password for mnt-by of object
+%
+#
+# delete inetnum object 
+#
+#SUCCESS
+#
+# RESULT 16: The delete  will succeed
+
+
+# CASE 17: Create an assignment inetnum object
+#          with 4 overlapping parent objects
+#          with less specific allocations with mnt-lower
+#          and correct password for mnt-lower of 2 parents
+#          and mnt-by of object, invalid password for the 
+#          other 2 parents
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 17: The creation will fail
+
+
+# CASE 18: Create an allocation inetnum object
+#          without any of the ALLOCMNT mntners 
+#          as a mnt-by. 
+#          Password supplied for the mnt-by and the parent mnt-lower
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 18: The creation will fail
+
+
+# CASE 19: Create an allocation inetnum object
+#          with less specific mnt-lower having the same 
+#          password as the allocation mnt-by
+#          password supplied
+#          Use the second mntner in the ALLOCMNT list
+%
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 19: The creation will succeed
+
+
+# basic-auth tests - inetnum
+# CASE 20: Create an assignment inetnum object
+#          with less specific allocation with no mnt-lower
+#          and correct password for mnt-by of object only
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 20: The creation will fail
+
+# basic-auth tests - inetnum
+# CASE 21: Create an assignment inetnum object
+#          with less specific allocation with mnt-lower
+#          and correct password for mnt-by of object only
+%
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 21: The creation will fail
+

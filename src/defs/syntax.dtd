@@ -1,0 +1,19 @@
+<!ELEMENT rpsl_syntax (attribute_syntax)+>
+
+<!ELEMENT attribute_syntax (core?, front_end?, description)>
+<!ATTLIST attribute_syntax
+          name   CDATA     #REQUIRED
+>
+
+<!ELEMENT core (regex?, reserved_regex?)>
+
+<!ELEMENT front_end (regex?, reserved_regex?, parser_name?)>
+
+<!ELEMENT description (#PCDATA)>
+
+<!ELEMENT regex (#PCDATA)>
+
+<!ELEMENT reserved_regex (#PCDATA)>
+
+<!ELEMENT parser_name (#PCDATA)>
+

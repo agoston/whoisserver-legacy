@@ -1,0 +1,28 @@
+# organisation object tests
+# CASE 18: Create an inetnum with status "ALLOCATED PA"
+#         but without "org:" which is mandatory for such inetnums.
+#         password for "mnt-by:" is provided
+#
+%
+% requires initial objects to be loaded
+% make sure the whois config has RIPE-NCC-HM-MNT in ALLOCMNT
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 18: The creation will fail
+
+
+inetnum:      123.0.0.0 - 123.255.255.255
+netname:      TEST-BLK
+descr:        Test organisation object changes
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED PA
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: hostmaster

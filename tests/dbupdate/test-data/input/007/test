@@ -1,0 +1,24 @@
+# input tests
+# CASE 7: Valid file specified with -f option
+#         mail message
+#         subject help specified
+#         --redirect option specified
+%
+#
+# input from specified file
+# ./dbupdate -c ~/db/conf/rip.config --redirect -m -f test
+#
+#SUCCESS
+#
+# RESULT 7: help message in ack
+#           redirected tag in ack log
+#           nothing on stdout
+%
+%
+$ -c $RIP_CONFIG --redirect -m -f 
+%
+%
+From: dbtest@ripe.net
+Subject: help
+
+qwerty

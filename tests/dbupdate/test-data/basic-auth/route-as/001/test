@@ -1,0 +1,19 @@
+# route authorisation tests - autnum
+# CASE 1: We try to create 20.13.0.0/16 route object 
+#         parent exists, origin does not exist.
+#         no passwords
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail
+
+
+route:   20.13.0.0/16
+descr:   Route with non-existant origin
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST

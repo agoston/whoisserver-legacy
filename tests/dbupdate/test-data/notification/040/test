@@ -1,0 +1,31 @@
+# notification tests
+# CASE 40: Modify an object with "notify" attribute to change the
+#          mail address in this attribute.
+#          Include the keyword DIFF
+#
+# Modify person
+#
+#SUCCESS
+#
+# RESULT 40: There should be a notif message to case040-1@ripe.net
+#            about successful modify, and no forward message.
+#            The notif message should have a diff output.
+%
+%
+$ -c $RIP_CONFIG -mr -f 
+%
+%
+From: dbtest@ripe.net
+Subject: diff
+
+
+person:  Test Person
+address: Singel 258
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP10-DB-TEST
+changed: dbtest@ripe.net 20020101
+changed: dbtest@ripe.net 20040101
+notify:  case040-2@ripe.net
+source:  DB-TEST
+

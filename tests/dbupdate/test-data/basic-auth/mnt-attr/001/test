@@ -1,0 +1,28 @@
+# mnt-attr tests
+# CASE 1: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, and mnt-routes with EXACT-MR-MNT { 20.13.0.0/16^+},
+#         EXACT-MR-MNT { ANY}
+#         EXACT-MR-MNT 
+#         aut-num contains duplicated mnt-by
+#         route itself contain duplicated mnt-by
+#         (duplication check)
+#         every mntner name should be used only once!
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed
+
+
+password: mb-child
+password: mr-exact
+
+route:   20.13.0.0/16
+descr:   Route
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+mnt-by:  CHILD-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST

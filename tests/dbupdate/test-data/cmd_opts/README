@@ -1,0 +1,394 @@
+# command line options tests
+
+
+# CASE 1: Invalid short option
+#
+# run dbupdate with invalid short option
+# ./dbupdate -c ~/db/conf/rip.config -@
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 1: invalid option -@ reported
+
+
+
+# CASE 2: Invalid long option
+#
+# run dbupdate with invalid long option
+# ./dbupdate -c ~/db/conf/rip.config --at
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 2: invalid option --at reported
+
+
+
+# CASE 3: Valid short option with two dash
+#
+# run dbupdate with valid short option with two dash
+# ./dbupdate -c ~/db/conf/rip.config --p
+#
+# check for exit code 11 
+#
+#
+#FAILURE
+#
+# RESULT 3: invalid option --p reported
+
+
+
+# CASE 4: Valid long option with only a single dash
+#
+# run dbupdate with valid long option with only a single dash
+# ./dbupdate -c ~/db/conf/rip.config -print
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 4: invalid option -i reported
+#           (p and r are valid short options)
+
+
+
+# CASE 5: Valid options with no dash
+#
+# run dbupdate with valid options with no dash
+# ./dbupdate -c ~/db/conf/rip.config r-p file test
+#
+# check for exit code 11 
+#
+#
+#FAILURE
+#
+# RESULT 5: invalid option r-p reported
+#           invalid option file reported
+
+
+
+# CASE 6: Valid short option with missing mandatory argument
+#         at end of commend line
+#
+# run dbupdate with valid short option with missing mandatory argument
+# ./dbupdate -c ~/db/conf/rip.config -f
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 6: missing argument for option -f reported
+
+
+
+# CASE 7: Valid short option with missing mandatory argument
+#         in option list
+#
+# run dbupdate with valid short option with missing mandatory argument
+# ./dbupdate -c ~/db/conf/rip.config -fp
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 7: missing argument for option -f reported
+
+
+
+# CASE 8: Valid short option with missing mandatory argument
+#         followed by another option
+#
+# run dbupdate with valid short option with missing mandatory argument
+# ./dbupdate -c ~/db/conf/rip.config -f -p
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 8: missing argument for option -f reported
+
+
+
+# CASE 9: Valid long option with missing mandatory argument
+#         at end of commend line
+#
+# run dbupdate with valid long option with missing mandatory argument
+# ./dbupdate -c ~/db/conf/rip.config --file
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 9: missing argument for option --file reported
+
+
+
+# CASE 10: Valid long option with missing mandatory argument
+#          followed by another option
+#
+# run dbupdate with valid long option with missing mandatory argument
+# ./dbupdate -c ~/db/conf/rip.config --file -p
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 10: missing argument for option --file reported
+
+
+
+# CASE 11: Short option form with no option
+#          at end of command line
+#
+# run dbupdate with short option form with no option
+# ./dbupdate -c ~/db/conf/rip.config -mf test -
+#
+#SUCCESS
+#
+# RESULT 11: invalid option - reported
+#            but help request is still processed
+
+
+
+# CASE 12: Short option form with no option
+#          followed by another option
+#
+# run dbupdate with short option form with no option
+# ./dbupdate -c ~/db/conf/rip.config - -mf test
+#
+#SUCCESS
+#
+# RESULT 12: invalid option - reported
+#            but help request still processed
+
+
+
+# CASE 13: Long option form with no option
+#          at end of commend line
+#
+# run dbupdate with long option form with no option
+# ./dbupdate -c ~/db/conf/rip.config -mf test --
+#
+#SUCCESS
+#
+# RESULT 13: invalid option -- reported
+#            but help request still processed
+
+
+
+# CASE 14: Long option form with no option
+#          followed by another option
+#
+# run dbupdate with Long option form with no option
+# ./dbupdate -c ~/db/conf/rip.config -- -mf test
+#
+#SUCCESS
+#
+# RESULT 14: invalid option -- reported
+#            but help request still processed
+
+
+
+# CASE 15: Valid long options with no space separator
+#
+# run dbupdate with valid long options with no space separator
+# ./dbupdate -c ~/db/conf/rip.config --print--redirect -k help
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 15: invalid option --print--redirect reported
+#            no ack created
+
+
+
+# CASE 16: Valid long options with no space separator
+#
+# run dbupdate with valid long options with no space separator
+# ./dbupdate -c ~/db/conf/rip.config -rp--mail -k help
+#
+#FAILURE
+#
+# RESULT 16: invalid option -rp--mail reported
+#            no ack created
+
+
+
+# CASE 17: Missing mandatory config option
+#
+# run dbupdate with a missing mandatory config option
+# ./dbupdate -prf test
+#
+#FAILURE
+#
+# RESULT 17: missing mandatory option -c reported
+
+
+
+# CASE 18: Config file specified does not exist
+#
+# run dbupdate with a non existant config file
+# ./dbupdate -c ~/db/conf/fred -f test
+#
+#FAILURE
+#
+# RESULT 18: config file fred does not exist reported
+
+
+
+# CASE 19: Invalid combination of options
+#
+# run dbupdate with an invalid combination of options
+# ./dbupdate -c ~/db/conf/rip.config.new -mk new -f test
+#
+# check for exit code 11
+#
+#FAILURE
+#
+# RESULT 19: invalid combination of options -m and -k reported
+
+
+
+# CASE 20: Valid short option + valid short options list
+#          some requiring/some not requiring mandatory arguments
+#
+# run dbupdate with valid short option + valid short options list
+# ./dbupdate -c ~/db/conf/rip.config -m -rpf test
+#
+#SUCCESS
+#
+# RESULT 20: Help text returned.
+
+
+
+# CASE 21: Valid short option + valid short options list
+#          some requiring/some not requiring mandatory arguments
+#
+# run dbupdate with valid short option + valid short options list
+# ./dbupdate -c ~/db/conf/rip.config -m -r-p-f test
+#
+#SUCCESS
+#
+# RESULT 21: Help text returned.
+
+
+
+# CASE 22: Valid long options
+#          some requiring/some not requiring mandatory arguments
+#
+# run dbupdate with valid long options
+# ./dbupdate --config ~/db/conf/rip.config --mail --redirect --print --file test
+#
+#SUCCESS
+#
+# RESULT 22: Help text returned.
+
+
+
+# CASE 23: Valid mixed short/long options
+#          some requiring/some not requiring mandatory arguments
+#
+# run dbupdate with valid mixed short/long options
+# ./dbupdate -c ~/db/conf/rip.config --mail -rp --file test
+#
+#SUCCESS
+#
+# RESULT 23: Help text returned.
+
+
+
+# CASE 24: Valid short option with optional argument
+#
+# run dbupdate with valid short option with optional argument
+# ./dbupdate -c ~/db/conf/rip.config -mrpd 64 -f test
+#
+#SUCCESS
+#
+# RESULT 24: Help text returned.
+
+
+
+# CASE 25: Valid short option without optional argument
+#
+# run dbupdate with valid short option without optional argument
+# ./dbupdate -c ~/db/conf/rip.config -mrdp -f test
+#
+#SUCCESS
+#
+# RESULT 25: Help text returned.
+
+
+
+# CASE 26: Valid long option with optional argument
+#
+# run dbupdate with valid long option with optional argument
+# ./dbupdate -c ~/db/conf/rip.config -mrp --debug 64 -f test
+#
+#SUCCESS
+#
+# RESULT 26: Help text returned.
+
+
+
+# CASE 27: Valid long option without optional argument
+#
+# run dbupdate with valid long option without optional argument
+# ./dbupdate -c ~/db/conf/rip.config -mrp --debug -f test
+#
+#SUCCESS
+#
+# RESULT 27: Help text returned.
+
+
+
+# CASE 28: Valid config file path with no file name
+#
+# run dbupdate with a valid file path with no file name
+# ./dbupdate -c $CURRENT_DIR -f test
+#
+# check for exit code 12
+#
+#FAILURE
+#
+# RESULT 28: config file does not exist reported
+
+
+# CASE 29: X.509 file specified does not exist
+#
+# run dbupdate with a non existant config file
+# ./dbupdate -c ~/db/conf/rip.config -x ~/db/conf/fred -f test
+#
+#FAILURE
+#
+# RESULT 29: X.509 certificate file does not exist reported
+#
+# exit code should be 20
+
+
+# CASE 30: Valid X.509 file path with no file name
+#
+# run dbupdate with a valid file path with no file name
+# ./dbupdate -c ~/db/conf/rip.config -x $CURRENT_DIR -f test
+#
+#FAILURE
+#
+# RESULT 30: X.509 certificate file does not exist reported
+#
+# exit code should be 20
+
+
+# CASE 31: Invalid combination of options
+#
+# run dbupdate with an invalid combination of options
+# mixing short and long form for the invalid pair.
+# ./dbupdate -c ~/db/conf/rip.config.new -m --x509 $CURRENT_DIR/cert.pem -f test
+#
+#FAILURE
+#
+# RESULT 31: invalid combination of options -m and -x reported
+#
+# exit code should be 11

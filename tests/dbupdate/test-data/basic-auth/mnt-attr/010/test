@@ -1,0 +1,23 @@
+# mnt-attr tests
+# CASE 10: We try to create 20.13.0.0/16 route object. 
+#         mnt-routes contains invalid prefix range (.../16^18-17) 
+#         range end is less then end start
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 10: The creation will fail
+
+
+password: mb-child
+password: mr-exact
+
+route:   20.13.0.0/16
+descr:   Route
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+mnt-routes:  CHILD-MR-MNT { 20.13.0.0/16^18-17}
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST

@@ -1,0 +1,22 @@
+# first updates tests
+# CASE 15: Create a new object that already exists
+#
+# Create a new object with the enforced new keyword that already 
+# exists in the database
+#
+#FAILURE
+#
+# RESULT 15: Enforced new keyword specified, but the object
+#            already exists in the database reported
+%
+$ -c $RIP_CONFIG -mr -f
+%
+From: db-test@ripe.net
+Subject: new
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

@@ -1,0 +1,21 @@
+# basic-auth tests
+# CASE 15: Create a person object
+#          with a mnt-by and the crypted password
+%
+#
+# create person object 
+#
+#FAILURE
+#
+# RESULT 15: The creation will fail
+
+
+password:  qw7BVMLJG6Q6M
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

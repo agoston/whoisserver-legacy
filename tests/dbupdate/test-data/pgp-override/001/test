@@ -1,0 +1,27 @@
+# CASE 1
+#
+# successful, with override: reason and right pgp signature
+#
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+mntner:       TEST-DBM-MNT
+descr:        Mntner for RIPE DBM objects.........
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+upd-to:       dbtest@ripe.net
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+mnt-by:       TEST-DBM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+override:     pgp somereason
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (GNU/Linux)
+
+iD8DBQE/XcuKsR6P2g2tJhIRAsPRAJ4onZ0f8geuOejI7vBZcNQ7Mx6PWQCeMclN
+w9bxQY7vBu0I/hXyDsf7yPE=
+=kHbd
+-----END PGP SIGNATURE-----

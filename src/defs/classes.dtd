@@ -1,0 +1,264 @@
+<!--  _________oOo_________
+      DTD for RIPE classes
+      ottrey@ripe.net
+      Tue Oct 12 13:22:07 CEST 1999
+      _________oOo_________
+-->
+
+<!ELEMENT ripe_classes  (ripe_class+)>
+<!ATTLIST ripe_classes
+            version   CDATA     #REQUIRED
+            author    CDATA     #IMPLIED
+>
+
+<!ELEMENT ripe_class    (description, attributes, dbase_code)>
+<!ATTLIST ripe_class 
+            name      CDATA     #REQUIRED
+            code      ID        #REQUIRED
+            main_sql_table CDATA #REQUIRED
+            status    (deprecated | valid | proposed) "valid"
+>
+
+<!-- TODO add rollback-tables/affected-tables etc elements -->
+
+<!ELEMENT description   (#PCDATA)> 
+
+<!ENTITY % CommonAttributes '
+  ch  |
+  so  
+'>
+
+<!ENTITY % ClassSpecificAttributes '
+  ac? |
+  aa? |
+  ad? |
+  ae? |
+  ag? |
+  ab? |
+  ah? |
+  ai? |
+  ak? |
+  al? |
+  am? |
+  an? |
+  ao? |
+  as? |
+  at? |
+  au? |
+  av? |
+  ay? |
+  az? |
+  bi? |
+  ce? |
+  cl? |
+  cm? |
+  cn? |
+  co? |
+  ct? |
+  cy? |
+  da? |
+  de? |
+  df? |
+  dc? |
+  di? |
+  dm? |
+  dn? |
+  do? |
+  dp? |
+  dt? |
+  ec? |
+  en? |
+  em? |
+  ex? |
+  fi? |
+  fp? |
+  fs? |
+  fx? |
+  gd? |
+  ho? |
+  i6? |
+  if? |
+  ij? |
+  in? |
+  io? |
+  ip? |
+  ir? |
+  is? |
+  it? |
+  kc? |
+  la? |
+  li? |
+  mh? |
+  mb? |
+  ml? |
+  mo? |
+  mr? |
+  ms? |
+  mt? |
+  mu? |
+  mn? |
+  mu? |
+  na? |
+  nh? |
+  ns? |
+  ny? |
+  or? |
+  ow? |
+  pe? |
+  pg? |
+  ph? |
+  pl? |
+  pn? |
+  ps? |
+  rb? |
+  rf? |
+  rm? |
+  ro? |
+  rp? |
+  rs? |
+  rt? |
+  rz? |
+  sd? |
+  so? |
+  st? |
+  tb? |
+  td? |
+  tc? |
+  tx? |
+  wd? |
+  zc?
+' >
+
+<!ELEMENT attributes (%ClassSpecificAttributes; | %CommonAttributes;)*>
+
+<!ENTITY % Code 'code NMTOKEN #FIXED'>
+
+<!ENTITY % Choices '(optional | generated | mandatory)'>
+<!ENTITY % Numbers '(single | multiple)'>
+
+<!ENTITY % Settings '
+  choice   %Choices; #REQUIRED
+  number   %Numbers; #REQUIRED
+'>
+
+<!ENTITY % FixedGen '
+  choice   %Choices; #FIXED    "generated"
+  number   %Numbers; #REQUIRED
+'>
+
+<!ENTITY % FixedManMul '
+  choice   %Choices; #FIXED    "mandatory"
+  number   %Numbers; #FIXED    "multiple"
+'>
+
+<!ENTITY % FixedManSin '
+  choice   %Choices; #FIXED    "mandatory"
+  number   %Numbers; #FIXED    "single"
+'>
+
+<!-- class specific attributes -->
+<!ELEMENT ac EMPTY><!ATTLIST ac %Code; "ac" %Settings;>
+<!ELEMENT aa EMPTY><!ATTLIST aa %Code; "aa" %Settings;>
+<!ELEMENT ad EMPTY><!ATTLIST ad %Code; "ad" %Settings;>
+<!ELEMENT ae EMPTY><!ATTLIST ae %Code; "ae" %Settings;>
+<!ELEMENT ag EMPTY><!ATTLIST ag %Code; "ag" %Settings;>
+<!ELEMENT ab EMPTY><!ATTLIST ab %Code; "ab" %Settings;>
+<!ELEMENT ah EMPTY><!ATTLIST ah %Code; "ah" %Settings;>
+<!ELEMENT ai EMPTY><!ATTLIST ai %Code; "ai" %Settings;>
+<!ELEMENT ak EMPTY><!ATTLIST ak %Code; "ak" %Settings;>
+<!ELEMENT al EMPTY><!ATTLIST al %Code; "al" %Settings;>
+<!ELEMENT am EMPTY><!ATTLIST am %Code; "am" %Settings;>
+<!ELEMENT an EMPTY><!ATTLIST an %Code; "an" %Settings;>
+<!ELEMENT ao EMPTY><!ATTLIST ao %Code; "ao" %Settings;>
+<!ELEMENT as EMPTY><!ATTLIST as %Code; "as" %Settings;>
+<!ELEMENT at EMPTY><!ATTLIST at %Code; "at" %Settings;>
+<!ELEMENT au EMPTY><!ATTLIST au %Code; "au" %Settings;>
+<!ELEMENT av EMPTY><!ATTLIST av %Code; "av" %Settings;>
+<!ELEMENT ay EMPTY><!ATTLIST ay %Code; "ay" %Settings;>
+<!ELEMENT az EMPTY><!ATTLIST az %Code; "az" %Settings;>
+<!ELEMENT bi EMPTY><!ATTLIST bi %Code; "bi" %Settings;>
+<!ELEMENT ce EMPTY><!ATTLIST ce %Code; "ce" %Settings;>
+<!ELEMENT cl EMPTY><!ATTLIST cl %Code; "cl" %Settings;>
+<!ELEMENT cm EMPTY><!ATTLIST cm %Code; "cm" %Settings;>
+<!ELEMENT cn EMPTY><!ATTLIST cn %Code; "cn" %Settings;>
+<!ELEMENT co EMPTY><!ATTLIST co %Code; "co" %Settings;>
+<!ELEMENT ct EMPTY><!ATTLIST ct %Code; "ct" %Settings;>
+<!ELEMENT cy EMPTY><!ATTLIST cy %Code; "cy" %Settings;>
+<!ELEMENT da EMPTY><!ATTLIST da %Code; "da" %Settings;>
+<!ELEMENT de EMPTY><!ATTLIST de %Code; "de" %Settings;>
+<!ELEMENT df EMPTY><!ATTLIST df %Code; "df" %Settings;>
+<!ELEMENT dc EMPTY><!ATTLIST dc %Code; "dc" %Settings;>
+<!ELEMENT di EMPTY><!ATTLIST di %Code; "di" %Settings;>
+<!ELEMENT dm EMPTY><!ATTLIST dm %Code; "dm" %Settings;>
+<!ELEMENT dn EMPTY><!ATTLIST dn %Code; "dn" %Settings;>
+<!ELEMENT do EMPTY><!ATTLIST do %Code; "do" %Settings;>
+<!ELEMENT dp EMPTY><!ATTLIST dp %Code; "dp" %Settings;>
+<!ELEMENT dt EMPTY><!ATTLIST dt %Code; "dt" %Settings;>
+<!ELEMENT ec EMPTY><!ATTLIST ec %Code; "ec" %Settings;>
+<!ELEMENT en EMPTY><!ATTLIST en %Code; "en" %Settings;>
+<!ELEMENT em EMPTY><!ATTLIST em %Code; "em" %Settings;>
+<!ELEMENT ex EMPTY><!ATTLIST ex %Code; "ex" %Settings;>
+<!ELEMENT fi EMPTY><!ATTLIST fi %Code; "fi" %Settings;>
+<!ELEMENT fp EMPTY><!ATTLIST fp %Code; "fp" %FixedGen;>
+<!ELEMENT fs EMPTY><!ATTLIST fs %Code; "fs" %Settings;>
+<!ELEMENT fx EMPTY><!ATTLIST fx %Code; "fx" %Settings;>
+<!ELEMENT gd EMPTY><!ATTLIST gd %Code; "gd" %Settings;>
+<!ELEMENT ho EMPTY><!ATTLIST ho %Code; "ho" %Settings;>
+<!ELEMENT i6 EMPTY><!ATTLIST i6 %Code; "i6" %Settings;>
+<!ELEMENT if EMPTY><!ATTLIST if %Code; "if" %Settings;>
+<!ELEMENT ij EMPTY><!ATTLIST ij %Code; "ij" %Settings;>
+<!ELEMENT it EMPTY><!ATTLIST it %Code; "it" %Settings;>
+<!ELEMENT in EMPTY><!ATTLIST in %Code; "in" %Settings;>
+<!ELEMENT io EMPTY><!ATTLIST io %Code; "io" %Settings;>
+<!ELEMENT ip EMPTY><!ATTLIST ip %Code; "ip" %Settings;>
+<!ELEMENT ir EMPTY><!ATTLIST ir %Code; "ir" %Settings;>
+<!ELEMENT is EMPTY><!ATTLIST is %Code; "is" %Settings;>
+<!ELEMENT kc EMPTY><!ATTLIST kc %Code; "kc" %Settings;>
+<!ELEMENT la EMPTY><!ATTLIST la %Code; "la" %Settings;>
+<!ELEMENT li EMPTY><!ATTLIST li %Code; "li" %Settings;>
+<!ELEMENT mh EMPTY><!ATTLIST mh %Code; "mh" %FixedGen;>
+<!ELEMENT mb EMPTY><!ATTLIST mb %Code; "mb" %Settings;>
+<!ELEMENT ml EMPTY><!ATTLIST ml %Code; "ml" %Settings;>
+<!ELEMENT mo EMPTY><!ATTLIST mo %Code; "mo" %Settings;>
+<!ELEMENT mr EMPTY><!ATTLIST mr %Code; "mr" %Settings;>
+<!ELEMENT ms EMPTY><!ATTLIST ms %Code; "ms" %Settings;>
+<!ELEMENT mt EMPTY><!ATTLIST mt %Code; "mt" %Settings;>
+<!ELEMENT mu EMPTY><!ATTLIST mu %Code; "mu" %Settings;>
+<!ELEMENT mn EMPTY><!ATTLIST mn %Code; "mn" %Settings;>
+<!ELEMENT na EMPTY><!ATTLIST na %Code; "na" %Settings;>
+<!ELEMENT nh EMPTY><!ATTLIST nh %Code; "nh" %Settings;>
+<!ELEMENT ns EMPTY><!ATTLIST ns %Code; "ns" %Settings;>
+<!ELEMENT ny EMPTY><!ATTLIST ny %Code; "ny" %Settings;>
+<!ELEMENT or EMPTY><!ATTLIST or %Code; "or" %Settings;>
+<!ELEMENT ow EMPTY><!ATTLIST ow %Code; "ow" %FixedGen;>
+<!ELEMENT pe EMPTY><!ATTLIST pe %Code; "pe" %Settings;>
+<!ELEMENT pg EMPTY><!ATTLIST pg %Code; "pg" %Settings;>
+<!ELEMENT ph EMPTY><!ATTLIST ph %Code; "ph" %Settings;>
+<!ELEMENT pl EMPTY><!ATTLIST pl %Code; "pl" %Settings;>
+<!ELEMENT pn EMPTY><!ATTLIST pn %Code; "pn" %Settings;>
+<!ELEMENT ps EMPTY><!ATTLIST ps %Code; "ps" %Settings;>
+<!ELEMENT rb EMPTY><!ATTLIST rb %Code; "rb" %Settings;>
+<!ELEMENT rf EMPTY><!ATTLIST rf %Code; "rf" %Settings;>
+<!ELEMENT rm EMPTY><!ATTLIST rm %Code; "rm" %Settings;>
+<!ELEMENT ro EMPTY><!ATTLIST ro %Code; "ro" %Settings;>
+<!ELEMENT rp EMPTY><!ATTLIST rp %Code; "rp" %Settings;>
+<!ELEMENT rs EMPTY><!ATTLIST rs %Code; "rs" %Settings;>
+<!ELEMENT rt EMPTY><!ATTLIST rt %Code; "rt" %Settings;>
+<!ELEMENT rz EMPTY><!ATTLIST rz %Code; "rz" %Settings;>
+<!ELEMENT sd EMPTY><!ATTLIST sd %Code; "sd" %Settings;>
+<!ELEMENT st EMPTY><!ATTLIST st %Code; "st" %Settings;>
+<!ELEMENT tb EMPTY><!ATTLIST tb %Code; "tb" %Settings;>
+<!ELEMENT td EMPTY><!ATTLIST td %Code; "td" %Settings;>
+<!ELEMENT tc EMPTY><!ATTLIST tc %Code; "tc" %Settings;>
+<!ELEMENT tx EMPTY><!ATTLIST tx %Code; "tx" %Settings;>
+<!ELEMENT wd EMPTY><!ATTLIST wd %Code; "wd" %Settings;>
+<!ELEMENT zc EMPTY><!ATTLIST zc %Code; "zc" %Settings;>
+
+<!-- common attributes -->
+<!ELEMENT ch EMPTY><!ATTLIST ch %Code; "ch" %FixedManMul;>
+<!ELEMENT so EMPTY><!ATTLIST so %Code; "so" %FixedManSin;>
+
+<!ELEMENT dbase_code   EMPTY>
+<!ATTLIST dbase_code
+            value   NMTOKEN   #REQUIRED
+>

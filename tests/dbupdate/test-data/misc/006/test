@@ -1,0 +1,35 @@
+# misc tests - oddities that have caused problems in the past
+# CASE 6: Create two inetnum objects, the first one having an & in the 
+#         descr: attribute.
+#
+# create inetnum objects
+#
+#SUCCESS
+#
+# RESULT 6: The creations will succeed
+
+
+inetnum: 193.149.57.16 - 193.149.57.23
+netname: some_name
+descr:   This & That
+country: NL
+admin-c: TP1-DB-TEST
+tech-c:  TP1-DB-TEST
+mnt-by:  TEST-MNT
+status:  ASSIGNED PA
+changed: dbtest@ripe.net 20030101
+source:  DB-TEST
+
+inetnum: 193.149.60.0 - 193.149.60.31
+netname: some_name
+descr:   another inetnum
+country: NL
+admin-c: TP1-DB-TEST
+tech-c:  TP1-DB-TEST
+mnt-by:  TEST-MNT
+status:  ASSIGNED PA
+changed: dbtest@ripe.net 20030101
+source:  DB-TEST
+
+
+password: test

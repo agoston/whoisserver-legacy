@@ -1,0 +1,13 @@
+# command line options tests
+# CASE 30: Valid X.509 file path with no file name
+#
+# run dbupdate with a valid file path with no file name
+# ./dbupdate -c ~/db/conf/rip.config -x $CURRENT_DIR -f test
+#
+#FAILURE
+#
+# RESULT 30: X.509 certificate file does not exist reported
+#
+# exit code should be 20
+?20
+$ -c $RIP_CONFIG -x $CURRENT_DIR -f

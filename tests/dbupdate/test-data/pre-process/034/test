@@ -1,0 +1,27 @@
+# CASE 34: Create an inetnum, using a valid prefix
+#
+# create an inetnum using a valid prefix
+#
+#SUCCESS
+#
+# RESULT 34: create succeeded
+
+
+
+inetnum:      193.0.0.0/24
+netname:      CIDR-NET
+descr:        Testing the CIDR-range conversion
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+remarks:      Testing the CIDR-range conversion
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+mnt-routes:   RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+password:     test-dbm
+password:     hostmaster
+source:       DB-TEST
+
+

@@ -1,0 +1,465 @@
+# basic-auth tests - route IP space
+# CASE 1: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by
+#         password for child
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 1: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 2: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by
+#         password for child and exact match mnt-by
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 2: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 3: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by
+#         password for child and override
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 3: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 4: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, mnt-lower
+#         password for child and exact match mnt-lower
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 4: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 5: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, mnt-lower
+#         password for child and exact match mnt-by
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 5: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 6: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, mnt-routes
+#         password for child and exact match mnt-routes
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 6: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 7: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, mnt-routes
+#         password for child and exact match mnt-by
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 7: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 8: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, mnt-lower, mnt-routes
+#         password for child and exact match mnt-by
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 8: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 9: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, mnt-lower, mnt-routes
+#         password for child and exact match mnt-lower
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 9: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 10: We try to create 20.13.0.0/16 route object. 
+#          exact match route exists with mnt-by, mnt-lower, mnt-routes
+#          password for child and exact match mnt-routes
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 10: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 11: We try to modify 20.13.0.0/16 route object. 
+#          exact match route exists with mnt-by
+#          child route exists
+#          password for child
+#
+# modify route object 
+#
+#SUCCESS
+#
+#RESULT 11: The modify will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 12: We try to delete 20.13.0.0/16 route object. 
+#          exact match route exists with mnt-by
+#          child route exists
+#          password for child
+#
+# delete route object 
+#
+#SUCCESS
+#
+#RESULT 12: The delete will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 13: We try to create 20.13.0.0/16 route object. 
+#          parent route exists with mnt-by, mnt-lower
+#          password for child and parent mnt-lower
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 13: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 14: We try to create 20.13.0.0/16 route object. 
+#          parent route exists with mnt-by, mnt-lower
+#          password for child and parent mnt-by
+#
+# create route object 
+#
+# FAILURE
+#
+#RESULT 14: The creation will fail
+
+
+# CASE 15: We try to create 20.13.0.0/16 route object. 
+#          parent route exists with mnt-by, mnt-lower
+#          another parent route exists with mnt-by, mnt-lower
+#          password for child and parent mnt-by
+#
+# create route object 
+# *** this test will fail unless we check bath parent objects ***
+#
+# FAILURE
+#
+#RESULT 15: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 16: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, and mnt-routes EXACT-MR-MNT {20.13.0.0/16^+}
+#         password for child and exact match mnt-routes
+#         mnt-routes does contain a necessary prefix
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 16: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 17: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, and mnt-routes with EXACT-MR-MNT { ANY}
+#         password for child and exact match mnt-routes
+#         mnt-routes does contain a necessary prefix
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 17: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 18: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, and mnt-routes with EXACT-MR-MNT { 21.13.0.0/16^+}
+#         this prefix is not applicable to the route
+#         password for child and exact match mnt-routes
+#         creation rejected with "no applicable mntners" error
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 18: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 19: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, and mnt-routes with EXACT-MR-MNT { 20.13.0.0/16^-, 20.13.0.0/16^16-24, 21.13.0.0/16^+}
+#         mnt-routes should be used
+#         password for child and exact match mnt-routes
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 19: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 20: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, and mnt-routes with EXACT-MR-MNT { 20.13.0.0/16^+}
+#         mnt-routes should be used, but no pass for mnt-routes
+#         password for child and exact match mnt-by
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 20: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 21: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, and mnt-routes with EXACT-MR-MNT { 20.13.0.0/16^+},
+#         EXACT-MR-MNT { ANY}
+#         EXACT-MR-MNT 
+#         (duplication check)
+#         mnt-routes should be used once!
+#         password for child mnt-by and exact match mnt-routes
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 21: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 22: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, 
+#      and mnt-routes: EXACT-MR-MNT { 20.13.2.3/16^11-12, 20.13.2.3/16^+, 20.13.0.0/16^+},
+#      (invalid prefix ranges present )
+#         should give invalid ranges error and "no mntners" error
+#         password for child mnt-by and exact match mnt-routes
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 22: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 23: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, 
+#      and mnt-routes: EXACT-MR-MNT { 20.13.2.3/16^11-12, 20.13.2.3/16^+, 20.13.0.0/16^+},
+#      (invalid prefix ranges present )
+#      and mnt-routes: TEST-DBM-MNT 
+#         password for child mnt-by and exact match mnt-routes
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 23: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 24: We try to create 20.13.0.0/16 route object. 
+#         exact match route exists with mnt-by, 
+#      and mnt-routes: EXACT-MR-MNT { 20.13.2.3/16^11-12, 20.13.2.3/16^+, 20.13.0.0/16^+},
+#      (invalid prefix ranges present )
+#      and mnt-routes: TEST-DBM-MNT 
+#         password for child mnt-by and exact match mnt-routes (TEST-DBM-MNT)
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 24: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 89: We try to create 20.13.0.0/16 route object. 
+#          exact match route exists with mnt-by
+#          parent route exists with mnt-by
+#          exact match inetnum exists with mnt-by
+#          parent inetnum exists with mnt-by
+#          password for exact match route mnt-by
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 89: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 90: We try to create 20.13.0.0/16 route object. 
+#          exact match route exists with mnt-by
+#          parent route exists with mnt-by
+#          exact match inetnum exists with mnt-by
+#          parent inetnum exists with mnt-by
+#          password for child and exact match route mnt-by
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 90: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 91: We try to create 20.13.0.0/16 route object. 
+#          exact match route exists with mnt-by
+#          parent route exists with mnt-by
+#          exact match inetnum exists with mnt-by
+#          parent inetnum exists with mnt-by
+#          password for child and parent route mnt-by
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 91: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 92: We try to create 20.13.0.0/16 route object. 
+#          exact match route exists with mnt-by
+#          parent route exists with mnt-by
+#          exact match inetnum exists with mnt-by
+#          parent inetnum exists with mnt-by
+#          password for child and exact match inetnum mnt-by
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 92: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 93: We try to create 20.13.0.0/16 route object. 
+#          exact match route exists with mnt-by
+#          parent route exists with mnt-by
+#          exact match inetnum exists with mnt-by
+#          parent inetnum exists with mnt-by
+#          password for child and parent inetnum mnt-by
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 93: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 94: We try to create 20.13.0.0/16 route object. 
+#          parent route exists with mnt-by
+#          exact match inetnum exists with mnt-by
+#          parent inetnum exists with mnt-by
+#          password for child and parent route mnt-by
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 94: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 95: We try to create 20.13.0.0/16 route object. 
+#          parent route exists with mnt-by
+#          exact match inetnum exists with mnt-by
+#          parent inetnum exists with mnt-by
+#          password for child and exact match inetnum mnt-by
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 95: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 96: We try to create 20.13.0.0/16 route object. 
+#          parent route exists with mnt-by
+#          exact match inetnum exists with mnt-by
+#          parent inetnum exists with mnt-by
+#          password for child and parent inetnum mnt-by
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 96: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 97: We try to create 20.13.0.0/16 route object. 
+#          exact match inetnum exists with mnt-by
+#          parent inetnum exists with mnt-by
+#          password for child and exact match inetnum mnt-by
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 97: The creation will succeed
+
+
+# basic-auth tests - route IP space
+# CASE 98: We try to create 20.13.0.0/16 route object. 
+#          exact match inetnum exists with mnt-by
+#          parent inetnum exists with mnt-by
+#          password for child and parent inetnum mnt-by
+#
+# create route object 
+#
+#FAILURE
+#
+#RESULT 98: The creation will fail
+
+
+# basic-auth tests - route IP space
+# CASE 99: We try to create 20.13.0.0/16 route object. 
+#          parent inetnum exists with mnt-by
+#          password for child and parent inetnum mnt-by
+#
+# create route object 
+#
+#SUCCESS
+#
+#RESULT 99: The creation will succeed
+
+

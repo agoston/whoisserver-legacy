@@ -1,0 +1,81 @@
+#!@PERL5@
+
+# Copyright (c) 2002                                        RIPE NCC
+#
+# All Rights Reserved
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for any purpose and without fee is hereby granted,
+# provided that the above copyright notice appear in all copies and that
+# both that copyright notice and this permission notice appear in
+# supporting documentation, and that the name of the author not be
+# used in advertising or publicity pertaining to distribution of the
+# software without specific, written prior permission.
+#
+# THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+# ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
+# AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+# DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+# AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+require Net::Telnet;
+
+use Getopt::Std;
+use English;
+
+getopts('h:p:');
+
+#print "options given: p$opt_p h$opt_h\n";
+$host=$opt_h;
+$port=$opt_p;
+$prompt='(=\d+= )?whois R.I.P. config> ';
+$command=join(" ",@ARGV);
+
+my $retval = 0;
+
+sub readtoprompt #returns text read, without prompt
+{
+   my $ses = shift;
+   my $cod;
+   my $retstr;
+
+   ($prematch, $match) = $ses->waitfor("/$prompt\$/");
+
+    if( $match =~ /=(\d+)=/  ) {
+ 	$cod = $1;
+    }
+
+    return ($prematch, $cod);
+}
+
+if( $command ) {
+    # this needs to be longer than the maximum query timeout in
+    # case the command is "set queries 0", which waits until all 
+    # queries have completed then returns
+    $ses=new Net::Telnet(Timeout => (60 * 20)); 
+ 
+    # increase the buffer length to 10 megs
+    $ses->max_buffer_length(10*1024*1024);
+
+    $ses->open(Host=>$host,Port=>$port);
+    readtoprompt($ses);
+
+    $ses->print($command);
+
+    ($ans,$retval) = readtoprompt($ses);
+
+    $ses->print("quit");
+    $ses->close();
+
+    print $ans;
+} 
+else {
+    print STDERR "command missing.\n";
+    $retval = -1;
+}
+
+
+exit($retval);
+
+

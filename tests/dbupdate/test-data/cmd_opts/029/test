@@ -1,0 +1,13 @@
+# command line options tests
+# CASE 29: X.509 file specified does not exist
+#
+# run dbupdate with a non existant config file
+# ./dbupdate -c ~/db/conf/rip.config -x ~/db/conf/fred -f test
+#
+#FAILURE
+#
+# RESULT 29: X.509 certificate file does not exist reported
+#
+# exit code should be 20
+?20
+$ -c $RIP_CONFIG -x ~/db/conf/fred -f

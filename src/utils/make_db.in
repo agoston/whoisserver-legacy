@@ -1,0 +1,181 @@
+#!@SHELL@
+
+# Debug info: uncomment when debugging
+#DEBUG="set -x"
+$DEBUG
+
+##
+## Usage: make_db -c <config_file> -s <source> -[0|1|2]
+##  
+## <config_file> is the name of the whois_rip configuration file
+## <source> is the source (SOURSE) to be loaded
+## -[0|1|2] numebwr of load passes
+## 0 - just to create an empty database; if the database already exists it will be emptied
+## 1 - one pass. This is a recommended option. May be a little slower than 2-pass loading
+##     but more reliable.
+## 2 - for loading huge databases (more than 1,000,000 objects). High requirements on 
+##     the consuistency of the flat files: duplicate objects (objects with the same primary key)
+##     will prevent loading.
+
+##
+## Functions
+##
+
+DATECMD="/bin/date '+%Y-%m-%d %H:%M:%S'"
+TIMECMD="/bin/date '+%H:%M:%S'"
+
+# log a message, with appropriate timestamp
+log()
+{
+ echo 
+ echo "=" `eval $TIMECMD` $*
+ echo
+}
+
+# log an error message, with appropriate timestamp
+error()
+{
+ echo "************** ERROR ***************"
+ echo "*** " `eval $TIMECMD` $*
+ echo "************************************"
+ echo
+}
+
+# exit with an error message
+error_exit()
+{
+ error $*
+ exit 1
+}
+
+USAGE="make_db -c <config_file> -s <source> -[0|1|2]\n"
+
+######################
+# Parse arguments
+
+while getopts c:s:012 a
+do
+case $a in
+c)       CARG=$OPTARG;;
+s)       SARG=$OPTARG;;
+0)       NPASSES=0;;
+1)       NPASSES=1;;
+2)       NPASSES=2;;
+\?)      echo $USAGE
+         exit 2;;
+esac
+done
+         
+shift `expr $OPTIND - 1`
+
+SOURCE=${SARG:?"<source> is not specified. Usage: $USAGE"}
+PROPERTIES=${CARG:?"<config_file> is not specified. Usage: $USAGE"}
+NPASSES=${NPASSES:?" number of passes is not specified. Usage: $USAGE"}
+
+# check whether the configuration file exists
+ls $PROPERTIES >/dev/null 2>&1 || error_exit "cannot find config file $PROPERTIES"
+
+##################### DIRECTORY LAYOUT #############################################
+# Directory layout
+
+# The root of the distribution
+TOPDIR=/home/can/release/whois
+
+# The LD_LIBRARY_PATH should be set
+LIBS_PATH=
+for lib in -threads -L/home/dbase/src/orange/local/lib -lgthread-2.0 -lglib-2.0   -L/usr/local/mysql/lib/mysql -lmysqlclient_r -lpthread -lthread -lz -lposix4 -lcrypt -lgen -lsocket -lnsl -lm  -lpthread -lthread
+do
+    case "$lib" in
+	-L*) LIBS_PATH="${LIBS_PATH} `echo \"$lib\" | sed -e 's/-L//'`";;
+    esac
+done
+export LD_LIBRARY_PATH=`echo $LIBS_PATH | sed -e 's/ /:/g'`
+
+# Directory where the object files reside
+# **** Don't forget to download the object files and CURRENTSERIAL file ****
+OBJDIR=/home/can/release/whois/var/tmp/load/${SOURCE}
+
+# List of object files (wildcards are allowed)
+LIST=${LIST:-$OBJDIR/sample.db.gz}
+
+# The current serial
+DEFCURRENTSERIAL=`cat ${OBJDIR}/${SOURCE}.CURRENTSERIAL` || \
+                ( echo; echo "*** WARNING: no CURRENTSERIAL file is found, CURRENTSERIAL=1"; echo )
+CURRENTSERIAL=${DEFCURRENTSERIAL:=1}
+
+# Directory where the load_all.sh script is located
+SCRIPTDIR=/home/can/release/whois/scripts
+# Location of the loader binary
+LOADER=/home/can/release/whois/bin/loader
+# Update log. Use /dev/null for huge databases.
+UPDLOG=/dev/tty
+
+#################### LOCATION OF THE UTILITIES #####################################
+
+# Location of the utility that fetches config variables
+GETVAR="/home/can/release/whois/utils/getvar -s $SOURCE -c $PROPERTIES"
+
+
+# Filter that uses to convert files to RPSL format
+FILTER=${FILTER:-cat}
+
+# Binary to unzip object files (snapshots)
+UNZIP1='gzip -cd'
+
+# MySQL setup is taken from the configuration file
+# from the section SOURCE <source_name>
+# where <source_name> is <source>
+
+SQLHOST=`$GETVAR -p dbhost` || error_exit "unknown source $SOURCE"
+SQLPORT=`$GETVAR -p dbport` || error_exit "unknown source $SOURCE"
+SQLUSER=`$GETVAR -p dbuser` || error_exit "unknown source $SOURCE"
+SQLPSWD=`$GETVAR -p dbpswd` || error_exit "unknown source $SOURCE"
+SQLTRX=`$GETVAR -p trx_support` || error_exit "unknown source $SOURCE"
+SQLDB=`$GETVAR -p dbname` || error_exit "unknown source $SOURCE"
+
+# MySQL commands
+# note: the "CMD" versions include appropriate starup options
+MYSQLBIN=/usr/local/mysql/bin/
+MYSQL=$MYSQLBIN/mysql
+MYSQLCMD="$MYSQL -h$SQLHOST -P$SQLPORT -u$SQLUSER -p$SQLPSWD"
+MYSQLADMIN=$MYSQLBIN/mysqladmin
+MYSQLADMINCMD="$MYSQLADMIN -h$SQLHOST -P$SQLPORT -u$SQLUSER -p$SQLPSWD"
+
+#####################################################################################
+
+echo  sqlhost=$SQLHOST sqlport=$SQLPORT sqluser=$SQLUSER sqlpswd=$SQLPSWD sqldbname=$SQLDB
+echo  npasses=$NPASSES
+
+
+log "Loading database [$SQLDB] (source [$SOURCE]) started"
+
+HOST=$SQLHOST
+PORT=$SQLPORT
+USER=$SQLUSER
+PASSWORD=$SQLPSWD
+TRX=$SQLTRX
+DB=$SQLDB
+
+
+######################### DATABASE CREATION AND LOADING ###############################
+
+log "Loading the database [$DB] [see list in ${UPDLOG}] "
+
+$MYSQLADMINCMD flush-tables
+
+export MYSQL MYSQLBIN HOST PORT USER PASSWORD TRX DB
+export UNZIP1 FILTER LOADER
+export LIST CURRENTSERIAL SOURCE
+export PROPERTIES DEBUG
+
+
+cd ${SCRIPTDIR} && ${SHELL} ./load_all.sh $NPASSES  2>${UPDLOG}
+
+if [ $? -ne 0 ]; then
+  error_exit "Error loading database=$DB for source=${SOURCE}, $0 exiting"
+fi
+
+$MYSQLADMINCMD flush-tables
+
+log "Loading database [$SQLDB] (source [$SOURCE]) finished without errors"
+

@@ -1,0 +1,194 @@
+Before doing any lookups, you need to create a server connection.
+The current implementation is the Whois lookup.
+
+LU_server_t *
+LU_whois_init (const gchar *hostname, int port, int timeout);
+
+Description: 
+  Initialise WHOIS server lookup.
+
+Parameters:
+  - hostname, name of the server, e.g. "whois.ripe.net"
+  - port, port to connect to, e.g. 43
+  - timeout in seconds, or 0 for "no timeout"
+
+Return value:
+  Address of newly allocated server structure.  Free with LU_cleanup().
+
+
+These are the generic functions:
+
+
+LU_ret_t
+LU_lookup (LU_server_t *server,
+           rpsl_object_t **obj, 
+           const gchar *type,
+           const gchar *key,
+           const ghcar *source);
+
+Description: 
+  Lookup an object by key.
+
+Parameters:
+  - server, connection to a lookup server
+  - obj, used to return the object found (possibly NULL if non-existant)
+  - type, object type to find
+  - key, the primary key (for routes, use "1.2.3.4/5AS6")
+  - source, source database to use
+
+Return values:
+  - LU_ERROR
+  - LU_OKAY
+
+LU_ret_t
+LU_inverse_lookup (LU_server_t *server,
+           GList **objects,
+           GList **types,
+           const gchar *key, 
+           GList **inverse_keys, 
+           const gchar *source);
+
+Description:
+  Lookup an object by inverse key.
+
+Parameters:
+  - server, connection to a lookup server
+  - objects, used to return the list of objects found (possibly NULL if non-existant)
+  - list of types to be returned (-T type1,type2,typeN) (possibly NULL if not restricted)
+  - key, the primary key
+  - list of inverse keys to be used for search (-i key1,key2,keyN) (not NULL)
+  - source, source database to use
+
+Return values:
+  - LU_ERROR
+  - LU_OKAY
+
+Behaviour:
+  Issues the inverse query using specified inverse keys and object types. 
+  The list of objects is returned. No type-checking of returned objects is made.
+
+LU_ret_t
+LU_get_object (LU_server_t *server,
+               rpsl_object_t **dbase_obj, 
+               const rpsl_object_t *obj, 
+               const gchar *source);
+
+Description:
+  Get the current version of an object from the database.
+
+Parameters:
+  - server, connection to a lookup server
+  - dbase_obj, used to return the object found (possibly NULL if non-existant)
+  - obj, object to find database version of
+  - source, source database to use - may be NULL to get from obj
+
+Return values:
+  - LU_ERROR
+  - LU_OKAY
+
+
+
+LU_ret_t 
+LU_get_parents (LU_server_t *server, GList **parents,
+                const rpsl_object_t *obj, const gchar *source);
+
+Description:
+  Get the parents of an object.
+
+Parameters:
+  - server, connection to a lookup server
+  - parents, used to return a list of parents found (possibly empty), 
+    which should be freed with LU_free_parents()
+  - obj, object to find parent of
+  - source, source database to use - may be NULL to get from obj
+
+Return values:
+  - LU_ERROR
+  - LU_OKAY
+
+Behaviour:
+
+  These types never have a parent:
+    inet-rtr 
+    irt
+    key-cert
+    limerick
+    mntner
+    person
+    role
+
+  Sets may have hierarchical names.  If the name has a colon, ':',
+  then the set or aut-num with the name prior to the colon is
+  returned, if it exists.  There is only at most one parent.  These
+  types are affected:
+    as-set
+    filter-set
+    peering-set
+    route-set
+    rtr-set
+
+  aut-num or as-block objects may have an as-block as the parent.
+  as-blocks do not overlap, so at most one will be returned.
+
+  inetnum and inet6num objects may have parents.  Due to overlapping,
+  any number of parents may be returned, all of the same type.
+
+  route objects may have parents.  The parents of a route object
+  include one aut-num, any number of route objects, and any number of
+  inetnum objects.
+
+  domain objects may have one parent.  The parent is the first object
+  in the database that is found after stripping labels off from the
+  left.
+
+LU_ret_t
+LU_check_overlap (LU_server_t *server, GList **overlap,
+                const rpsl_object_t *obj, const gchar *source);
+
+Description:
+  Check if inetnum has overlaps and return overlapping inetnums if any.
+
+Parameters:
+  - server, connection to a lookup server
+  - overlap, used to return a list of overlaps found (possibly empty),
+    which should be freed with LU_free_parents()
+  - obj, object to find overlaps for
+  - source, source database to use - may be NULL to get from obj
+
+Return values:
+  - LU_ERROR
+  - LU_OKAY
+
+Behaviour:
+   Assumes that object passed is an inetnum.
+   To find overlap, we query for the ranges encompassing start IP and end IP. 
+   If the objects returned are different, or start IP or end IP have more 
+   than 1 encompassing range, these ranges are returned as an overlap.
+   We explicitly check that ranges returned are not parents of the inetnum 
+   which has been passed to the function.
+
+void
+LU_free_parents (GList *parents);
+
+Description:
+  Frees a list of GList containing rpsl_object_t returned from 
+  LU_get_parents().
+
+Parameters:
+  - parents, GList containing rpsl_object_t returned from LU_get_parents().
+
+Return values:
+  none
+
+
+void 
+LU_cleanup (LU_server_t *server);
+
+Description:
+  Frees any resources used by a lookup server connection.
+
+Parameters:
+  - server, connection to a lookup server
+
+Return values:
+  none

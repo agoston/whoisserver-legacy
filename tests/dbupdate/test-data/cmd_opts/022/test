@@ -1,0 +1,18 @@
+# command line options tests
+# CASE 22: Valid long options
+#          some requiring/some not requiring mandatory arguments
+#
+# run dbupdate with valid long options
+# ./dbupdate --config ~/db/conf/rip.config --mail --redirect --print --file test
+#
+#SUCCESS
+#
+# RESULT 22: Help text returned.
+%
+%
+$ -c $RIP_CONFIG --mail --redirect --print --file 
+%
+From: dbtest@ripe.net
+subject: help
+
+qwerty

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+
+  <xsl:template match="class">
+    <xsl:choose>
+      <xsl:when test="@class='route'">
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="contact">
+
+For assistance or clarification please contact:
+RIPE Database Administration &lt;ripe-dbm@ripe.net&gt;
+  </xsl:template>
+
+
+  <xsl:template name="intro">
+
+Dear Maintainer,
+
+This is to notify you that some objects in which you are mentioned as
+a maintainer were requested to be changed, but *failed* the proper
+authorisation for any of the mentioned maintainers.
+Please contact the sender of this update about changes that need
+to be made to the following objects.
+  </xsl:template>
+
+  <xsl:template name="mail_from_msg">
+
+If the update failed with Authorisation failure, this may be
+as a result of the recent removal of MAIL-FROM as a valid
+method of authentication for the RIPE Data Base.
+If your update was authenticated using the MAIL-FROM scheme please
+see http://www.ripe.net/db/MD5-HOWTO.html for more information.
+If any of the mntner objects involved in authorising your
+update contain _ONLY_ auth: attributes with MAIL-FROM then
+please see &lt;http://www.ripe.net/db/mailfrom.html&gt; for assistance.
+  </xsl:template>
+
+
+
+</xsl:stylesheet>
+

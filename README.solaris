@@ -1,0 +1,75 @@
+README for the RIPE Whois Server (RIP) on Solaris
+
+The RIPE Whois Server has been tested on Solaris 8, using the default
+installation parameters.
+
+
+Required Software
+
+The following software must installed to build the server, as it is not
+default on Solaris and required (see the INSTALL file for more detailed
+descriptions of each):
+
+o gcc
+
+o GNU Make
+  If installed as "make", be sure that it is in your PATH before the
+  system "make" executable, as this will not work with the RIP
+  Makefiles.  Optionally, you can install it as "gmake", or create a
+  link from the GNU "make" executable to "gmake".
+
+o glib
+
+o University of Washington IMAP distribution
+
+o MySQL
+  Be sure to specify "--enable-thread-safe-client" when you build the
+  distribution. Also, you need to specify "--with-innodb" if you
+  intend to use InnoDB.
+
+o GNU Privacy Guard
+
+o zlib
+
+If you do not have Flex and Bison installed, you may get warning
+messages, but these will not affect operation unless you attempt to
+rebuild the source files from the Lex and Yacc definitions.
+
+You need to insure that /usr/ccs/bin is in your PATH, as this is the
+location of the "ar" executable used to build libraries.
+
+If you are using Solaris package files to install software, be aware
+that some put libraries required by GNU C++ in /usr/local/lib.  In this
+case, you must have /usr/local/lib in your LD_LIBRARY_PATH environment
+variable.
+
+
+Building
+
+The "build.sh" file has a section that works with the default Solaris
+setup, and the software mentioned above installed in /usr/local.
+Uncomment out the section titled Solaris to use this file when
+installing.
+
+
+General Notes
+
+The Solaris distribution has no known problems.  Since this is the
+server that RIPE NCC uses for its own Whois service, it is the best
+tested platform.  We use the Sparc platform. 
+
+
+Performance Tips
+
+o Use a RAM device for the MySQL temporary space.
+  Solaris has a file system call "swap" which uses memory rather than
+  secondary storage.  By default /tmp is swap.
+
+  To take advantage of this, you should change the "tmpdir" variable of
+  MySQL to this.  You can do this by adding:
+
+    tmpdir = /tmp
+
+  to the "/etc/my.cnf" file and restarting MySQL.
+
+$Date: 2004/12/27 16:38:37 $

@@ -1,0 +1,28 @@
+# ipv6 status tests
+# CASE 9: create an inet6num with ALLOCATED-BY-LIR
+# with less specific having ALLOCATED-BY-LIR status
+%
+% requires initial objects to be loaded
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed
+
+
+
+inet6num:     2001:0610:0240::/42
+netname:      RIPE-NCC-IPv6
+descr:        RIPE NCC
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+status:       ALLOCATED-BY-LIR
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: LIR
+

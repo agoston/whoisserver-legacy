@@ -1,0 +1,27 @@
+# notification tests
+# CASE 17: Unsuccessfully try to modify a maintained object
+#          where mntner has both a mnt-nfy attribute and an upd-to
+#          attribute.
+#          not a mail message
+#          origin (-o 192.0.0.0) specified
+#
+# Modify with no password
+#
+#FAILURE
+#
+# RESULT 17: There should be a forw message to case017-1@ripe.net
+#            about the unsuccessful modify and no notif message.
+%
+%
+$$ -c $RIP_CONFIG -ro 192.0.0.0 < $TEST
+
+
+person:  Test Person
+address: Address modified!
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP10-DB-TEST
+mnt-by:  TEST2-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+

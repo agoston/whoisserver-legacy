@@ -1,0 +1,76 @@
+#!@SHELL@
+
+# EDIT THIS FILE TO FIT YOUR SYSTEM, REMOVING THE FOLLOWING TWO LINES
+echo "ftp_export.sh must be edited to suit your system"
+exit 1
+
+#
+# ftp_export.sh
+#
+# description: shell wrapper that uses text_export to produce a set of
+#              text files, and then exports them to an FTP directory
+#
+# $Id: ftp_export.sh,v 1.3 2001/01/16 14:58:45 shane Exp $
+#
+
+# directory to store files to be combined and/or compressed
+#    note:  this directory needs several gigabytes of space.
+TMP_DIR=/var/tmp
+
+# name of the MySQL database holding the RIP database
+EXPORT_DBASE=RIPE
+
+# user and password to connect to MySQL as
+EXPORT_USER=your_user_here
+EXPORT_PASSWORD=your_password_here
+
+# location of the text_export binary
+EXPORT_BIN=/usr/local/whois_rip/utils/text_export
+
+# directory finished files will be copied to, using scp
+EXPORT_TARGET=x17:/spool/shane/tmp
+
+##
+## end of configuration section (you may still need to edit the following) 
+##
+
+# relocate to our scratch directory
+cd $TMP_DIR 
+if [ $? -ne 0 ]; then
+    echo "ERROR changing to target directory, FTP export aborting" >&2
+    exit 1
+fi
+
+# dump information to seperate files
+#     note: this takes about 15 minutes on our systems, but YMMV
+$EXPORT_BIN -u $EXPORT_USER -p $EXPORT_PASSWORD $EXPORT_DBASE
+if [ $? -ne 0 ]; then
+    echo "ERROR exporting SQL database, FTP export aborting" >&2
+    exit 1
+fi
+
+# get list of long files to publish
+SPLIT_LONG=db.???*
+PUBLIC_LONG=$SPLIT_LONG
+PUBLIC_LONG=`echo $PUBLIC_LONG | sed 's/db.person *//'`
+PUBLIC_LONG=`echo $PUBLIC_LONG | sed 's/db.role *//'`
+
+# get list of short(ish) files to publish
+SPLIT_SHORT=db.??
+PUBLIC_SHORT=$SPLIT_SHORT
+PUBLIC_SHORT=`echo $PUBLIC_SHORT | sed 's/db.pn *//'`
+PUBLIC_SHORT=`echo $PUBLIC_SHORT | sed 's/db.ro *//'`
+
+# combine and compress files
+cat $SPLIT_LONG | gzip -9c > db.long.gz
+cat $SPLIT_SHORT | gzip -9c > db.gz
+for DB in $SPLIT_LONG $SPLIT_SHORT; do
+    gzip -9f $DB
+done
+
+# copy files to remote host
+scp db.* $EXPORT_TARGET
+
+# clean up
+rm db.*
+

@@ -1,0 +1,22 @@
+# mnt-domains update tests
+# CASE 2: We try to delete mnt-domains attribute from an inetnum object
+%
+% requires initial objects to be loaded
+#
+# delete mnt-domains attribute
+#
+#SUCCESS
+#
+# RESULT 2: The deletion will succeed.
+
+inetnum:      1.0.0.0 - 1.255.255.255
+netname:      TEST-BLK
+descr:        Test Address Space
+country:      EU # Country is really world wide
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       TEST-DBM-MNT
+changed:      bitbucket@ripe.net 20010529
+source:       DB-TEST
+password: test-dbm

@@ -1,0 +1,111 @@
+# irt tests
+
+# CASE 1: We try to create irt object with override
+#
+# create irt object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed
+
+
+# CASE 2: Add mnt-irt to inetnum
+#         password for mnt-by of inetnum
+#         no password for irt
+#
+# add mnt-irt 
+#
+#FAILURE
+#
+# RESULT 2: The addition will fail
+
+
+# CASE 3: Add mnt-irt to inetnum
+#         password for mnt-by of inetnum
+#         password for irt
+#
+# add mnt-irt 
+#
+#SUCCESS
+#
+# RESULT 3: The addition will succeed
+
+
+# CASE 4: Add mnt-irt to inetnum
+#         password for mnt-by of inetnum
+#         irt object does not exist
+#
+# add mnt-irt 
+#
+#FAILURE
+#
+# RESULT 4: The addition will fail
+
+
+# CASE 5: Create inetnum with mnt-irt
+#         password for mnt-by of inetnum
+#         no password for irt
+#
+# Create inetnum
+#
+#FAILURE
+#
+# RESULT 5: The creation will fail
+
+
+# CASE 6: Create inetnum with mnt-irt
+#         password for mnt-by of inetnum
+#         password for irt
+#
+# Create inetnum 
+#
+#SUCCESS
+#
+# RESULT 6: The creation will succeed
+
+
+# CASE 7: Create inetnum with mnt-irt
+#         password for mnt-by of inetnum
+#         irt does not exist
+#
+# Create inetnum
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail
+
+
+# CASE 8: Delete inetnum with mnt-irt
+#         password for mnt-by of inetnum
+#         no password for irt
+#
+# add mnt-irt 
+#
+#SUCCESS
+#
+# RESULT 8: The deletion will succeed
+
+
+# CASE 9: Remove mnt-irt from inetnum
+#         password for mnt-by of inetnum
+#         no password for irt
+#
+# modify inetnum 
+#
+#SUCCESS
+#
+# RESULT 9: The modification will succeed
+
+
+# CASE 10: Add mnt-irt to inetnum
+#          no password for mnt-by of inetnum
+#          no password for irt
+#          override
+#
+# modify inetnum 
+#
+#SUCCESS
+#
+# RESULT 10: The modification will succeed
+
+

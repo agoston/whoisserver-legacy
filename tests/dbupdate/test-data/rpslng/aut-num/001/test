@@ -1,0 +1,42 @@
+
+# CASE 1: We try to create aut-num object AS123
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+aut-num:      AS123
+as-name:      ASTEST
+descr:        TEST TELEKOM
+import:       from AS1 accept {1.2.3.4/24}
+export:       to AS2 announce {1.2.3.4/24}
+mp-import:    afi ipv4.unicast from AS1 accept ANY; 
+mp-export:    afi ipv6 to AS1 announce {1.2.3.4/24};
+mp-import:    afi ipv4.multicast, ipv6, ipv4.unicast 
+              from AS1 1.2.3.4 at 1.2.3.4 
+              accept AS2 AND { 1.2.3.4/2, 11:22:33:44:55:66:77:88/35} OR as10;
+mp-import:    afi ipv4 
+              from AS1 11:22:33:44:55:66:77:88 at 11:22:33:44:55::87 
+              action community.append(100:10);
+              accept ANY;
+mp-default:   afi ipv4, ipv4.unicast, ipv6 
+              to AS1 11:22:33:44:55:66:77:88 at 11:22:33:44:55:66:77:87 
+              action pref=100; 
+              networks {1.2.3.4/24, 1::2/35}
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-routes:   RIPE-NCC-HM-MNT {1.2.3.4/25, 1::2/35}
+changed:      dbtest@ripe.net 20010101
+source:       DB-TEST
+
+password: auth
+password: hostmaster
+
+%

@@ -1,0 +1,283 @@
+# basic-auth tests - route autnum
+
+# CASE 1: We try to create 20.13.0.0/16 route object 
+#         parent exists, origin does not exist.
+#         no passwords
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail
+
+
+# CASE 2: We try to create 20.13.0.0/16 route object 
+#         parent exists, origin does not exist.
+#         passwords for parent and child
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail
+
+
+# CASE 3: We try to create 20.13.0.0/16 route object 
+#         parent, origin do not exist.
+#         password for child
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 3: The creation will fail
+
+
+# CASE 4: We try to create 20.13.0.0/16 route object 
+#         parent, origin do not exist.
+#         password for child
+#         override
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed
+
+
+# CASE 5: We try to create 20.13.0.0/16 route object 
+#         parent exists, 
+#         origin exists with mnt-by
+#         no passwords, override
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed
+
+
+# CASE 6: We try to create 20.13.0.0/16 route object 
+#         parent exists, 
+#         origin exists with mnt-by
+#         passwords for parent and child
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail
+
+
+# CASE 7: We try to create 20.13.0.0/16 route object 
+#         parent exists, 
+#         origin exists with mnt-by
+#         passwords for parent and child and origin
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 7: The creation will succeed
+
+
+# CASE 8: We try to create 20.13.0.0/16 route object 
+#         parent exists, 
+#         origin exists with mnt-by, mnt-lower
+#         passwords for parent and child
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail
+
+
+# CASE 9: We try to create 20.13.0.0/16 route object 
+#         parent exists, 
+#         origin exists with mnt-by, mnt-lower
+#         passwords for parent and child and origin mnt-by
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed
+
+
+# CASE 10: We try to create 20.13.0.0/16 route object 
+#          parent exists, 
+#          origin exists with mnt-by, mnt-lower
+#          passwords for parent and child and origin mnt-lower
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 10: The creation will fail
+
+
+# CASE 11: We try to create 20.13.0.0/16 route object 
+#          parent exists, 
+#          origin exists with mnt-by, mnt-routes
+#          passwords for parent and child
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 11: The creation will fail
+
+
+# CASE 12: We try to create 20.13.0.0/16 route object 
+#          parent exists, 
+#          origin exists with mnt-by, mnt-routes
+#          passwords for parent and child and origin mnt-by
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 12: The creation will fail
+
+
+# CASE 13: We try to create 20.13.0.0/16 route object 
+#          parent exists, 
+#          origin exists with mnt-by, mnt-routes
+#          passwords for parent and child and origin mnt-routes
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 13: The creation will succeed
+
+
+# CASE 14: We try to create 20.13.0.0/16 route object 
+#          parent exists, 
+#          origin exists with mnt-by, mnt-lower, mnt-routes
+#          passwords for parent and child
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 14: The creation will fail
+
+
+# CASE 15: We try to create 20.13.0.0/16 route object 
+#          parent exists, 
+#          origin exists with mnt-by, mnt-lower, mnt-routes
+#          passwords for parent and child and origin mnt-by
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 15: The creation will fail
+
+
+# CASE 16: We try to create 20.13.0.0/16 route object 
+#          parent exists, 
+#          origin exists with mnt-by, mnt-lower, mnt-routes
+#          passwords for parent and child and origin mnt-by, mnt-lower
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 16: The creation will fail
+
+
+# CASE 17: We try to create 20.13.0.0/16 route object 
+#          parent exists, 
+#          origin exists with mnt-by, mnt-lower, mnt-routes
+#          passwords for parent and child and origin mnt-routes
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 17: The creation will succeed
+
+
+# CASE 18: We try to modify 20.13.0.0/16 route object 
+#          parent, origin do not exist.
+#          password for child
+%
+#
+# modify route object 
+#
+#SUCCESS
+#
+# RESULT 18: The modify will succeed
+
+
+# CASE 19: We try to modify 20.13.0.0/16 route object 
+#          parent exists, origin does not exist.
+#          password for child
+%
+#
+# modify route object 
+#
+#SUCCESS
+#
+# RESULT 19: The modify will succeed
+
+
+# CASE 20: We try to modify 20.13.0.0/16 route object 
+#          parent, origin exist
+#          password for child
+%
+#
+# modify route object 
+#
+#SUCCESS
+#
+# RESULT 20: The modify will succeed
+
+
+# CASE 21: We try to delete 20.13.0.0/16 route object 
+#          parent, origin exist
+#          password for child
+%
+#
+# delete route object 
+#
+#SUCCESS
+#
+# RESULT 21: The delete will succeed
+
+
+# CASE 22: We try to create origin AS200 aut-num object 
+#          after a dummy object has been created for it
+#          which could happen if a route is created with overrride
+#          when the origin of the route does not exist.
+#          route, parent exist, origin does not exist.
+#          password for child and as-block
+%
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 22: The create will succeed
+
+

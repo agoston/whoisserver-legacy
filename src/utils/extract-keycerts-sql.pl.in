@@ -1,0 +1,234 @@
+#!@PERL@ -w
+
+# 16 04 2001 EG
+#
+# This script extracts 'certif' attributes of key-cert objects from sql database
+# to be feed into gpg (to create a public keyring). 
+
+# Usage: $0 sqlserver port username passwd dbasename
+
+# Copyright (c) 2002                                        RIPE NCC
+#
+# All Rights Reserved
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for any purpose and without fee is hereby granted,
+# provided that the above copyright notice appear in all copies and that
+# both that copyright notice and this permission notice appear in
+# supporting documentation, and that the name of the author not be
+# used in advertising or publicity pertaining to distribution of the
+# software without specific, written prior permission.
+#
+# THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+# ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
+# AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+# DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+# AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+use strict;
+
+#Perl DBI interface 
+use DBI;
+use DBD::mysql; 
+
+
+#
+# sub get_certif
+# Takes an RPSL key-cert object and extracts its
+# certificate.
+sub get_certif {
+
+  my $obj = shift @_;
+  my $certif = '';
+  $obj =~ s/^[\s\n]*//;
+
+  if($obj !~ /^key-cert:/){
+
+    return "***Error!\n";
+
+  }else{
+
+    my @lines = split("\n", $obj);
+
+    # here we implement a state machine to construct the 
+    # certificate from 'certif:' attributes. We read the object
+    # line by line
+    my($state) = 'INIT';
+    my $i;
+    foreach $i (@lines){
+      #print "State = $state\n";
+      #print "line = [$i]\n";
+      if($i =~ /^certif:/i){
+        if ($state eq 'INIT'){
+          $i =~ s/^certif://i; # delete 'certif:'
+          $i =~ s/^\s*//;      # delete white space in the beginning
+          $certif = "$certif\n$i";
+          $state = 'CERTIF';
+        }elsif($state eq 'CERTIF'){
+          $i =~ s/^certif://i; # delete 'certif:'
+          $i =~ s/^\s*//;      # delete white space in the beginning
+          $certif = "$certif\n$i";
+        }elsif($state eq 'ELSE'){
+          $i =~ s/^certif://i; # delete 'certif:'
+          $i =~ s/^\s*//;      # delete white space in the beginning
+          $certif = "$certif\n$i";
+          $state = 'CERTIF';
+        }else{
+          print STDERR "Unknown state $state!\n";
+        }
+      }elsif($i =~ /^[\s\+]/){
+        if ($state eq 'INIT'){
+          print STDERR "Cannot happen in INIT state!\n";
+        }elsif($state eq 'CERTIF'){
+          $i =~ s/^\+//;       # delete '+' in the beginning 
+          $i =~ s/^\s*//;      # delete white space in the beginning
+          $certif = "$certif\n$i";
+        }elsif($state eq 'ELSE'){
+        }else{   
+          print STDERR "Unknown state $state!\n";
+        }
+
+      }else{
+        if ($state eq 'INIT'){
+          #print STDERR "Cannot happen in INIT state!\n";
+          $state = 'ELSE'; 
+        }elsif($state eq 'CERTIF'){
+          $state = 'ELSE';
+        }elsif($state eq 'ELSE'){
+        }else{           
+          print STDERR "Unknown state $state!\n";
+        }
+
+      }
+    }
+
+  }
+  return $certif;
+}
+
+
+# Simple check of sanity for an ASCII dump of a public key
+sub check_sanity {
+
+    my $public_key = shift;
+
+      # make sure the public key has proper start and end marks
+        if (   $public_key !~ /-----BEGIN PGP PUBLIC KEY BLOCK-----/
+                || $public_key !~ /-----END PGP PUBLIC KEY BLOCK-----/){
+              return 0; # return false
+                }
+
+                  # no problem encountered, return 1
+                    return 1;
+
+}
+
+
+
+
+# sub closeDBHandle: closes DB handle 
+# input: $stHandle: execution handle, 
+#        $dbHandle: DBI handle
+#
+sub closeDBHandle {
+    my($stHandle, $dbHandle) = @_;
+  if($stHandle){
+    $stHandle->finish;
+    $dbHandle->disconnect;
+  }
+  elsif($dbHandle->disconnect){
+    $dbHandle->disconnect;
+  }
+
+}
+
+
+# Main
+
+
+if($#ARGV != 4){
+  print "Usage: $0 sqlserver port username passwd dbasename\n";
+  exit(1);
+}
+
+my($dbName) = $ARGV[4] ;
+
+my($dbHost) = $ARGV[0];
+my($port) =  $ARGV[1];
+
+my($data_source) = 'DBI:mysql:'. $dbName. ':'. $dbHost . ':' . $port; 
+
+my($defaultuser) = $ARGV[2];
+my($passwd) = $ARGV[3];
+
+
+my($certif) = '';
+my($keyid) = '';
+
+my($dbHandle,  #DBI handle
+   $stHandle #query execution handle
+   );
+
+$dbHandle =  DBI->connect($data_source , $defaultuser, $passwd);
+unless ($dbHandle) {
+    #error in connecting;
+    #try a close, even though not necessary
+    &closeDBHandle($stHandle, $dbHandle);
+    return ('DBI : '. $DBI::errstr);
+}
+
+
+# construct the querry
+my($query) = 'SELECT STRAIGHT_JOIN obj.object FROM key_cert AS keycert, 
+                                     last AS obj 
+              WHERE keycert.object_id = obj.object_id';
+
+
+# do the query
+$stHandle  = $dbHandle->prepare($query);
+my($rc) = $stHandle->execute  ;
+
+# If error return, print error string 
+unless(($rc) or ($stHandle->errstr)) {
+        
+   print STDERR 'MySQL  Query:' .  $stHandle->errstr;
+
+}else{# print the result
+ 
+  if($DBI::rows > '0' ) 
+  {
+      print("Found  $DBI::rows result(s).\n");
+      # print them out
+      my($i, @values); 
+      while ( ((@values) = $stHandle->fetchrow_array)){
+        foreach $i (@values) {
+
+           $certif = &get_certif($i); 
+           # perform a simple sanity check. If does not pass, do not print out
+           # the $certif to STDOUT
+           if(!&check_sanity($certif)){
+             print STDERR "ERROR: This object does not pass sanity check:\n";
+             print STDERR "$i\n";
+             print STDERR "Will continue to process other objects.\n";
+             next;
+           }
+
+           $i =~ /^.*(PGPKEY-.{8})/i;
+           $keyid = $1;
+           print "\nNext: $keyid\n\n$certif\n";
+
+        }
+      }
+
+  }
+  else  { 
+      print("No Match Found\n");
+  }
+
+
+}
+
+
+&closeDBHandle($stHandle, $dbHandle);

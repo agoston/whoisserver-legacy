@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+
+  <xsl:template match="class">
+    <xsl:choose>
+      <xsl:when test="@class='route'">
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="contact">
+
+For assistance or clarification please contact:
+RIPE Database Administration &lt;ripe-dbm@ripe.net&gt;
+  </xsl:template>
+
+
+  <xsl:template name="intro">
+
+Dear Colleague,
+
+This is to notify you that some object(s) in RIPE database
+which you either maintain or are listed as to-be-notified have
+been added, deleted or changed.
+  </xsl:template>
+
+
+</xsl:stylesheet>
+

@@ -1,0 +1,222 @@
+# keywords tests
+
+# CASE 1: help keyword
+#         not a mail message
+%
+#
+# run dbupdate with option -k help
+# ./dbupdate -c ~/db/conf/rip.config -r -k help -f test
+#
+#SUCCESS
+#
+# RESULT 1: help output in ack log and stdout, 
+#           keyword help in upd log.
+
+
+# CASE 2: howto keyword
+#         not a mail message
+%
+#
+# run dbupdate with option -k howto
+# ./dbupdate -c ~/db/conf/rip.config -r -k howto -f test
+#
+#SUCCESS
+#
+# RESULT 2: help output in ack log and stdout, 
+#           keyword howto in upd log.
+
+
+# CASE 3: new keyword
+#         not a mail message
+%
+#
+# run dbupdate with option -k new
+# ./dbupdate -c ~/db/conf/rip.config -r -k new -f test
+# create a new object
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed, keyword new in upd log.
+
+
+# CASE 4: Invalid combination of help and new keywords
+#         not a mail message
+%
+#
+# run dbupdate with option -k help,new
+# ./dbupdate -c ~/db/conf/rip.config -r -k help,new -f test
+# create a new object
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed, keywords help,new in upd log.
+#           Invalid combination reported.
+
+
+# CASE 5: Invalid keyword fred
+#         not a mail message
+%
+#
+# run dbupdate with option -k fred
+# ./dbupdate -c ~/db/conf/rip.config -r -k fred -f test
+# create a new object
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed, keyword fred in upd log.
+#           Invalid keyword found reported.
+
+
+# CASE 6: Invalid keyword fred, with valid keyword help
+#         not a mail message
+%
+#
+# run dbupdate with option -k fred,help
+# ./dbupdate -c ~/db/conf/rip.config -r -k fred,help,qwerty -f test
+#
+#SUCCESS
+#
+# RESULT 6: The help will not be sent, keyword fred,help in upd log.
+#           Invalid keyword found reported.
+#           Number of objects found 0 reported
+
+
+# CASE 7: subject: help
+%
+#
+# run dbupdate with mail subject help
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 7: help output in ack log, keyword help in upd log,
+#           no objects processed
+
+
+# CASE 8: subject: howto
+%
+#
+# run dbupdate with mail subject howto
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 8: help output in ack log, keyword howto in upd log,
+#           no objects processed
+
+
+# CASE 9: subject: new
+%
+#
+# run dbupdate with mail subject new
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+# create a new object
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed, keyword new in upd log.
+
+
+# CASE 10: Invalid combination of help and new keywords in subject line
+%
+#
+# run dbupdate with mail subject help new
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+# create a new object
+#
+#SUCCESS
+#
+# RESULT 10: The creation will succeed, keywords help,new in upd log.
+#            Invalid combination reported.
+
+
+# CASE 11: Invalid keyword longack on subject line
+%
+#
+# run dbupdate with mail subject longack
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+# create a new object
+#
+#SUCCESS
+#
+# RESULT 11: The creation will succeed, keyword longack in upd log.
+#            Invalid keyword found reported.
+
+
+# CASE 12: Invalid keywords with valid keyword help on subject line
+%
+#
+# run dbupdate with mail subject: Please send me your help information
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 12: The help will not be sent, keywords in upd log.
+#            Invalid keywords found reported.
+#            object is created
+
+
+# CASE 13: Invalid keywords with invalid combination of
+#          valid keywords new and help on subject line
+#
+# run dbupdate with mail subject fred help
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 13: The help will not be sent, keywords in upd log.
+#            Invalid keywords found reported.
+#            object is created
+
+
+# CASE 14: No keywords 
+#          not a mail message
+#
+# run dbupdate with mail subject fred help
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 14: keywords - none in upd log.
+#            object is created
+
+
+# CASE 15: valid keyword help on subject line
+#          after keywords: tag and user reference
+#
+# run dbupdate with mail subject  
+#  with keywords: tag and user reference
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 15: help output in ack log, keyword help in upd log,
+#           no objects processed
+
+
+# CASE 16: Invalid keywords with valid keyword help on subject line
+#          after keywords: tag and user reference
+#
+# run dbupdate with mail subject: 
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 16: The help will not be sent, keywords in upd log.
+#            Invalid keywords found reported.
+#            object is created
+
+
+# CASE 17: Invalid combination of help and diff keywords in subject line
+%
+#
+# run dbupdate with mail subject 
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+# create a new object
+#
+#SUCCESS
+#
+# RESULT 17: The creation will succeed, keywords help,diff in upd log.
+#            Invalid combination reported.
+
+

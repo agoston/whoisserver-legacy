@@ -1,0 +1,26 @@
+
+# CASE 2: We try to modify route-set object rs-test
+%
+% requires initial objects to be loaded
+#
+# modify route-set object 
+#
+#SUCCESS
+#
+# RESULT 2: The modify will succeed.
+
+route-set:    RS-TEST
+descr:        TEST
+descr:        test
+members:      1.2.3.4/24
+mp-members:   1.2.3.4/24, 1.2.3.4/24, 1:2:2:2:3:2:2:2/35, RS-TEST, 0::3/25
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+mnt-by:       TEST-MNT
+changed:      db-test@ripe.net 20010101
+source:       DB-TEST
+
+
+password: auth
+
+%

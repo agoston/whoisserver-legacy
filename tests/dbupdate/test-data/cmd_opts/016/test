@@ -1,0 +1,14 @@
+# command line options tests
+# CASE 16: Valid long options with no space separator
+#
+# run dbupdate with valid long options with no space separator
+# ./dbupdate -c ~/db/conf/rip.config -rp--mail -k help
+#
+#FAILURE
+#
+# RESULT 16: invalid option -rp--mail reported
+#            no ack created
+%
+%
+?11
+$$ -c $RIP_CONFIG -rp--mail -k help

@@ -1,0 +1,22 @@
+# notification tests
+# CASE 9: Unsuccessfully try to create a maintained object
+#         where mntner has both a mnt-nfy attribute and an upd-to
+#         attribute.
+#
+# try to create a person object without the password
+#
+#FAILURE
+#
+# RESULT 9: There should be a forw message to case009-1@ripe.net
+#           about the unsuccesful creation and no notif message.
+
+
+person:  Test Person
+address: Singel 258
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP20-DB-TEST
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+

@@ -1,0 +1,217 @@
+
+
+# CASE1: We try to create inetnum object 80.16.151.184 - 80.16.151.191
+# with syntactically incorrect netname
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail.
+
+
+# CASE2: We try to create inetnum object 80.16.151.191 - 80.16.151.184
+# with syntactically incorrect range
+# will now fail because it is not treated as syntax error.
+# creation fails with auth failure, not syntax failure
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+
+# CASE3: We try to create inetnum object 80.16.151.184 - 80.16.151.266
+# with syntactically incorrect range
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 3: The creation will fail.
+
+
+# CASE4: We try to create inetnum object 80.16.151.184 - 80.16.151.184
+# start IP == end IP
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed.
+
+
+# CASE5: We try to create inetnum object 80.16.151.184			-					80.16.151.191
+# start IP (tabs and spaces)-(tabs and spaces) end IP
+# the object in DB contains all spaces untouched
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed.
+
+
+# CASE6: We try to update inetnum object 80.16.151.184 - 80.16.151.184
+# start IP == end IP
+#
+# update inetnum object 
+#
+#SUCCESS
+#
+# RESULT 6: The modification will succeed.
+
+
+# CASE7: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# having two parents of the same size
+# should fail giving "multiple overlapping parents" error
+#
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 7: The creation will fail.
+
+
+# CASE8: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# having two overlapping parents and another overlapping inetnum
+# should report both mul.parents and overlap problem
+# 
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 8: The creation will fail.
+
+
+# CASE9: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# having two overlapping inetnums 80.16.151.190 - 80.16.151.193 AND 80.16.151.192 - 80.16.151.197
+# 
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 9: The creation will fail.
+# overlap tests
+
+
+# CASE10: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# parent exists 
+# 
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 10: The creation will succeed.
+# overlap tests
+
+
+# CASE11: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# more-specific inetnum exists (fully encompassed)
+# 
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 11: The creation will succeed.
+# overlap tests
+
+
+# CASE12: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# more-specific inetnum exists (its beginning matches the beginning of the inetnum)
+# 
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 12: The creation will succeed.
+# overlap tests
+
+
+# CASE13: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# parent inetnum exists (its beginning matches the beginning of the inetnum)
+# 
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 13: The creation will succeed.
+# overlap tests
+
+
+# CASE14: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# parent inetnum exists (its end IP matches the end IP of the inetnum)
+# 
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 14: The creation will succeed.
+# overlap tests
+
+
+# CASE15: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# more specific inetnum exists (its end IP matches the end IP of the inetnum)
+# 
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 15: The creation will succeed.
+# overlap tests
+
+
+# CASE16: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# overlapping inetnum exists 80.16.151.193 - 80.16.151.198
+# 
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 16: The creation will fail.
+# overlap tests
+
+
+# CASE17: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# overlapping inetnum exists 80.16.151.180 - 80.16.151.192
+# 
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 17: The creation will fail.
+# overlap tests
+
+
+# CASE18: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# overlapping inetnum exists 80.16.151.180 - 80.16.151.191
+# 
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 18: The creation will fail.
+# overlap tests
+
+
+# CASE19: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# overlapping inetnums exist 80.16.151.180 - 80.16.151.192 AND 80.16.151.179 - 80.16.151.193
+# 
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 19: The creation will fail.
+# overlap tests
+
+
+# CASE20: We try to create inetnum object 80.16.151.191 - 80.16.151.194
+# two more-specifics exist 80.16.151.191 - 80.16.151.192 AND 80.16.151.193 - 80.16.151.194
+# 
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 20: The creation will succeed.

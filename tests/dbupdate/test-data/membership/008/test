@@ -1,0 +1,26 @@
+# CASE 8: We try to create aut-num object AS123 with member-of: AS-TEST
+# AS-TEST exists and is protected by RIPE-NCC-HM-MNT
+# with mbrs-by-ref: ANY
+#
+% requires initial objects to be loaded
+%
+# create aut-num object
+#
+#SUCCESS
+#
+# RESULT 8: The creation will succeed.
+
+aut-num:      AS123
+as-name:      TESTAS
+descr:        TEST TELEKOM
+import:       from AS1 accept {1.2.3.4/24}
+export:       to AS2 announce {1.2.3.4/24}
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+member-of:    AS-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password:     auth

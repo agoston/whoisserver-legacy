@@ -1,0 +1,134 @@
+There are actually two specifications.  The first details the API that
+an external caller uses, i.e. dbupdate.  The second details the API
+that must be provided by plug-ins.
+
+
+External API
+
+There are two functions:
+
+gboolean AU_init ();
+
+This initialises the authorisation checking module.  It can fail if a
+user uses an incorrect configuration, and returns FALSE in this case.
+
+
+AU_ret_t AU_check_auth (const rpsl_object_t *obj, 
+                        const GList *cred, 
+                        AU_check_t type,
+                        RT_context_t *ctx, 
+                        GList **mntner_used);
+
+The parameters are:
+
+ obj          A parsed object from the rpsl module.
+ cred         A list of creditentials from the cr module.
+ type         One of AU_CREATE, AU_MODIFY, or AU_DELETE.
+ ctx          A reporting context from the rt module.
+ mntner_used  Returns a list of rpsl_object_t, each of which was used 
+              when trying to authenticate.  The memory from this list
+              must be freed, unless AU_ERROR is returned.
+
+The return value is one of:
+
+ AU_AUTHORISED         Operation is authorised
+ AU_UNAUTHORISED_CONT  Operation is unauthorised, continue if desired
+ AU_UNAUTHORISED_END   Operation is unauthorised, do not process further
+ AU_ERROR              Error occured when checking, process no more objects
+
+
+
+
+Plug-in API
+
+Each plug-in may provide four functions, initilisation, creation, 
+deletion, and modification.  If no implementation is desired, NULL may
+be used.  In the case of the check functions, the assumed
+return value is AU_AUTHORISED.
+
+gboolean init_func ();
+PG_status_t check_func(PG_transaction_t* trans, gpointer *info);
+                       
+The pointer passed will contain the following structure:
+
+typedef struct {
+  rpsl_object_t *obj;
+  GList *cred;
+  AU_check_t type;
+  RT_context_t *ctx;
+  GList *mntner_used;
+} au_plugin_callback_info_t;
+
+
+The file au_plugins.c contains a table that must be modified to
+document the available plugins:
+
+/* defined in au_plugins.h */
+typedef struct {
+  char *name;
+  gboolean (*init_func)();
+  PG_status_t check_func(PG_transaction_t* trans, gpointer *info);
+} au_plugin_t;
+
+static const AU_plugin_t au_plugins[] = {
+  { "RPSL",     au_rpsl_init, au_rpsl },
+  { "RPSS",     au_rpss_init, au_rpss },
+  { "RIPE_irt", au_irt_init,  au_irt },
+  { NULL,       NULL,         NULL }
+};
+
+The build system must also be modified to compile and link the
+appropriate source files (Makefiles, etc.).
+
+Not all of these plug-ins will necessarily be invoked.  The
+configuration file will specify which are called, and in which order,
+by the name.
+
+
+
+Plug-in By-Class Support
+
+Many plug-ins will want to operate only on a small number of classes.
+Also, plug-ins may wish to have special-cases or not.  In order to
+help this, there is support for building a table mapping each object
+type to the functions above.
+
+In the plug-in itself, the following table must be defined:
+
+/* defined in AU_plugins.h */
+typedef struct {
+  char *object_type;
+  AU_ret_t (*check_create)();
+  AU_ret_t (*check_delete)();
+  AU_ret_t (*check_modify)();
+} au_check_by_type_t;
+
+static const au_check_by_type_t rpsl_plugins[] = {
+  { "as-set", heiarchical_name_create, generic_delete, generic_modify },
+  { "route-set", heiarchical_name_create, generic_delete, generic_modify },
+     .
+     .
+     .
+  { "*", generic_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
+  { NULL, NULL, NULL, NULL }
+};
+
+Then the plug-in can invoke this function to dispatch checks to the
+appropriate routines:
+
+AU_ret_t AU_check_by_type (const au_plugin_by_type_t *type_table,
+                           const au_plugin_callback_info_t *info);
+
+So, for instance, the RPSL plug-in could define the table above, and
+the create function would be:
+
+PG_status_t au_rpsl_check(PG_transaction_t* trans, gpointer *info)
+{
+  return AU_check_by_type(rpsl_plugins, info);
+}
+
+
+
+Utilities
+
+TBD.

@@ -1,0 +1,26 @@
+# mnt-domains update tests
+# CASE 1: We try to create inetnum object with mnt-domains
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+# mnt-domains update tests
+# CASE 2: We try to delete mnt-domains attribute from an inetnum object
+#
+# delete mnt-domains attribute
+#
+#SUCCESS
+#
+# RESULT 2: The deletion will succeed.
+
+# mnt-domains update tests
+# CASE 3: We try to delete a maintainer referenced in mnt-domains
+#
+# delete maintainer in mnt-domains attribute
+#
+#FAILURE
+#
+# RESULT 3: The deletion will fail.

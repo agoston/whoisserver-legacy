@@ -1,0 +1,25 @@
+# CASE 7: We try to create as-set object with 2-level hierarchical name AS123:AS-TEST
+# parent aut-num doesn't exist
+# we try to create under it 
+#
+% requires initial objects to be loaded
+%
+# create as-set object
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail.
+
+as-set:       AS123:AS-TEST
+descr:        test as-set
+members:      AS1, AS2, AS3, AS4
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password:     auth
+
+

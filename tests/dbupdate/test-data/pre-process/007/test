@@ -1,0 +1,29 @@
+# pre-process object tests
+# CASE 7: Create an inetnum object
+#         with valid country 
+#         and one changed line with a date in the future
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail
+
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED PA status
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+mnt-lower:    END-USER-MNT
+changed:      dbtest@ripe.net 20200101
+source:       DB-TEST
+
+password: END-USER
+password: LIR
+

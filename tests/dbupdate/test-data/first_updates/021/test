@@ -1,0 +1,16 @@
+# first updates tests
+# CASE 21: odd characters in nic-hdl
+#
+# syntax error.
+#
+#FAILURE
+#
+# RESULT 21: syntax error in nic-hdl: attribute
+
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TPýŸ2-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

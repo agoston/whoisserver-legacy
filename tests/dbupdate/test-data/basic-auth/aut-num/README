@@ -1,0 +1,127 @@
+# aut-num authorisation tests
+# CASE 1: We try to create aut-num object AS123
+# maintained by RIPE-NCC-HM-MNT
+# with a parent maintained by TEST-MNT
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+# aut-num authorisation tests
+# CASE 2: We try to create aut-num object AS123
+# maintained by RIPE-NCC-HM-MNT
+# with a parent mnt-lower TEST-MNT
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 2: The creation will succeed.
+
+# aut-num authorisation tests
+# CASE 3: We try to create aut-num object AS123
+# maintained by RIPE-NCC-HM-MNT
+# with a parent mnt-lower TEST-MNT
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 3: The creation will fail.
+
+# aut-num authorisation tests
+# CASE 4: We try to create aut-num object AS123
+# maintained by RIPE-NCC-HM-MNT - password given
+# with a parent mnt-lower TEST-MNT - password not given
+# with override
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed with override.
+
+# aut-num authorisation tests
+# CASE 5: We try to create aut-num object AS123
+# maintained by RIPE-NCC-HM-MNT - password not given
+# with a parent mnt-lower TEST-MNT - password given
+# with override
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed with override.
+
+# aut-num authorisation tests
+# CASE 6: We try to create aut-num object AS123
+# maintained by RIPE-NCC-HM-MNT - password not given
+# with a parent mnt-lower TEST-MNT - password not given
+# with override
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 6: The creation will succeed with override.
+
+# aut-num authorisation tests
+# CASE 7: We try to create aut-num object AS123
+# maintained by RIPE-NCC-HM-MNT - password given
+# with a parent mnt-lower TEST-MNT - password given
+# with override
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 7: The creation will succeed with override.
+
+# aut-num authorisation tests
+# CASE 8: We try to create aut-num object AS123
+# maintained by RIPE-NCC-HM-MNT - password given
+# no parent
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail.
+
+# aut-num authorisation tests
+# CASE 9: We try to create as-block object AS1 - AS100
+# maintained by RIPE-NCC-HM-MNT - password given
+# parent AS1 - AS65535 mnt-lower TEST-MNT - password given
+# override
+#
+# create as-block object 
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed with override.
+
+# aut-num authorisation tests
+# CASE 10: We try to create aut-num object AS123
+# maintained by RIPE-NCC-HM-MNT - password given
+# no parent
+# override
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 10: The creation will fail.
+
+# CASE 11: We try to create very long aut-num and as-set objects
+# maintained by TEST-MNT - password given
+# with parent
+#
+# create aut-num and as-set objects
+#
+#SUCCESS
+#
+# RESULT 11: The creations will succeed.
+
+

@@ -1,0 +1,16 @@
+# command line options tests
+# CASE 2: Invalid long option
+#
+# run dbupdate with invalid long option
+# ./dbupdate -c ~/db/conf/rip.config --at
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 2: invalid option --at reported
+%
+%
+?11
+$ -c $RIP_CONFIG --at -f 
+

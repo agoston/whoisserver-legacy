@@ -1,0 +1,177 @@
+#!/bin/sh
+trap '' 1 2 3 15			# we shouldn't let anyone kill us
+
+parse_arguments() {
+  for arg do
+    case "$arg" in
+      --config=*) RIP_CONFIG=`echo "$arg" | sed -e "s;--config=;;"` ;;
+      --pid-file=*) pid_file=`echo "$arg" | sed -e "s;--pid-file=;;"` ;;
+      --basedir=*) RIP_BASEDIR=`echo "$arg" | sed -e "s;--basedir=;;"` ;;
+      --crashes=*) CRSH=`echo "$arg" | sed -e "s;--crashes=;;"` ;;
+      --notify=*) NOTIFY=`echo "$arg" | sed -e "s;--notify=;;"` ;;
+      --library_path=*) LIBRARY_PATH=`echo "$arg" | sed -e "s;--library_path=;;"` ;;
+      *) echo "Unrecognized option $arg" >&2; exit 1;; 
+    esac
+  done
+}
+
+
+# Parse arguments
+parse_arguments "$@"
+
+#####################
+# Defaults
+RIP_BASEDIR=@prefix@
+RIP_CONFIG=${RIP_CONFIG:=rip.config.sample}
+NOTIFY=${NOTIFY:=$USER}
+MAIL=mailx
+
+#####################
+# Server binary name
+WHOISD=whois_rip
+
+####################
+#Directory layout 
+
+BINDIR=@bindir@
+CONFDIR=@confdir@
+err_log=@bindir@/${WHOISD}.err.log
+CONFIG=${CONFDIR}/${RIP_CONFIG}
+WHOISRIP=@bindir@/$WHOISD
+
+
+# some tests of the directory layout
+if test ! -d $BINDIR 
+then
+ echo $0 ":$BINDIR does not exist";
+ exit 1;
+fi
+if test ! -d $CONFDIR
+then
+ echo $0 ":$CONFDIR does not exist";
+ exit 1;
+fi
+if test ! -x $WHOISRIP
+then
+ echo $0 ":$WHOISRIP does not exist";
+ exit 1;
+fi
+if test ! -f $CONFIG
+then
+ echo $0 ":$CONFIG does not exist";
+ exit 1;
+fi
+if test ! -f ${CONFIG}.q
+then
+ echo $0 ":${CONFIG}.q does not exist";
+ exit 1;
+fi
+
+# The LD_LIBRARY_PATH should be set
+LIBS_PATH=
+for lib in @GLIB_LIBS@ @MYSQL_R_LIBS@
+do
+    case "$lib" in
+	-L*) LIBS_PATH="${LIBS_PATH} `echo \"$lib\" | sed -e 's/-L//'`";;
+    esac
+done
+export LD_LIBRARY_PATH=`echo $LIBS_PATH | sed -e 's/ /:/g'`
+
+# Default number of crashes before loop is stopped
+CRASHES=${CRSH:=10}
+
+# default pid_file name
+if test -z "$pid_file"
+then
+  pid_file=$BINDIR/$WHOISD.pid
+fi
+
+# test nohup
+NOHUP_NICENESS="nohup"
+if test -w /
+then
+  NOHUP_NICENESS=`nohup nice 2>&1`
+ if test $? -eq 0 && test x"$NOHUP_NICENESS" != x0 && nice --1 echo foo > /dev/null 2>&1
+ then
+    NOHUP_NICENESS="nice --$NOHUP_NICENESS nohup"
+  else
+    NOHUP_NICENESS="nohup"
+  fi
+fi
+
+#
+# If there exists an old pid file, check if the daemon is already running
+# Note: The switches to 'ps' may depend on your operating system
+
+if test -f $pid_file
+then
+  PID=`cat $pid_file`
+  if /usr/bin/kill -0 $PID > /dev/null 2> /dev/null
+  then
+    if /usr/bin/ps -ef | grep $WHOISD | grep " $PID " > /dev/null
+    then    # The pid contains a whoisd process
+      echo "A $WHOISD process already exists"
+      exit 1
+    fi
+  fi
+  rm -f $pid_file
+  if test -f $pid_file
+  then
+    echo "Fatal error: Can't remove the pid file: $pid_file"
+    echo "Please remove it manually and start $0 again"
+    echo "whoisd daemon not started"
+    exit 1
+  fi
+fi
+
+echo "Starting $WHOISD daemon with configuration $CONFDIR/$RIP_CONFIG from $BINDIR"
+
+num_crashes=0
+
+echo "`date +'%y%m%d %H:%M:%S'` $WHOISD started" >> $err_log
+while true
+do
+
+  if [ $num_crashes -le $CRASHES ]
+  then
+  
+    # start the main server
+    echo "`date +'%y%m%d %H:%M:%S'`" "$WHOISRIP -p $pid_file -c ${CONFIG}" >>$err_log 
+    $NOHUP_NICENESS $WHOISRIP -p $pid_file -c ${CONFIG}  >> $err_log 2>&1
+    
+    # if pid file exists - that was a crash - restart the server in safe *.q mode
+    # otherwise - exit
+    if test ! -f $pid_file		# This is removed if normal shutdown
+    then
+      break
+    fi
+    
+    rm -f $pid_file
+    
+    if [ -f ${CONFIG}.q ]
+      then
+        CONFIG=${CONFIG}.q
+    fi
+
+    # Shane reported that in some versions of sh this causes to fail in loops. oops Test!
+    num_crashes=`expr 1 + $num_crashes`
+
+    mv core core.`date '+%y%m%d_%H%M%S' `
+    echo `date +'%y%m%d %H:%M:%S'` " whoisd crashed & restarted\n${WHOISRIP} -c ${CONFIG}\n" \
+    | ${MAIL} -s "ERROR:$WHOISRIP crashed & restarted" $NOTIFY
+    echo `date +'%y%m%d %H:%M:%S'` " whoisd crashed & restarted\n${WHOISRIP} -c ${CONFIG}\n" >>$err_log
+    sleep 1
+      
+  else
+    echo `date +'%y%m%d %H:%M:%S'` " Number of whoisd crashes exceeded $CRASHES\n${WHOISRIP} -c ${CONFIG}" \
+     | ${MAIL} -s "ERROR:URGENT: $WHOISRIP is stopped and not restarted" $NOTIFY
+    echo `date +'%y%m%d %H:%M:%S'` " whoisd crashed & restarted\n${WHOISRIP} -c ${CONFIG}\n"  >>$err_log
+
+    break
+  fi
+
+	    
+done
+
+echo "`date +'%y%m%d %H:%M:%S  $WHOISD ended'`" | tee -a $err_log
+echo "" | tee -a $err_log

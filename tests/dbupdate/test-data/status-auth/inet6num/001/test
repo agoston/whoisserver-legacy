@@ -1,0 +1,25 @@
+# ipv6 status tests
+# CASE 1: create an inet6num with legacy SUBTLA status
+%
+% requires initial objects to be loaded
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail with syntax error
+
+inet6num:     2001:0600::/25
+netname:      EU-ZZ-2001-0600
+descr:        European Regional Registry
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+status:       SUBTLA
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+password: hostmaster
+

@@ -1,0 +1,26 @@
+# domain authorisation tests
+# CASE 1: We try to create domain object mydomain.net
+# no parent
+# override
+%
+% requires initial objects to be loaded
+#
+# create domain object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+domain:       mydomain.net
+descr:        my test domain
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns1.some.net
+nserver:      ns2.some.net
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+override:     password
+

@@ -1,0 +1,26 @@
+# ipv6 status tests
+# CASE 14: change an inet6num from ALLOCATED-BY-LIR to ASSIGNED
+# with more specifics existing
+%
+% requires initial objects to be loaded
+#
+# update inet6num object 
+#
+#SUCCESS
+#
+# RESULT 14: The update will succeed
+
+inet6num:     2001:0610::/35
+netname:      RIPE-NCC-IPv6
+descr:        RIPE NCC
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+status:       ASSIGNED
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: LIR
+

@@ -1,0 +1,16 @@
+# first updates tests
+# CASE 7: Object with syntax error
+#
+# Object with syntax error
+#
+#FAILURE
+#
+# RESULT 7: Syntax error  reported
+
+
+person:  test person2
+address: here
+phone:   123
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

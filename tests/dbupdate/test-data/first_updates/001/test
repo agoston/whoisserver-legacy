@@ -1,0 +1,10 @@
+# first updates tests
+# CASE 1: Blank update message
+#
+# No content in the update message
+#
+#SUCCESS
+#
+# RESULT 1: Number of objects found: 0  reported in ack summary
+#           nothing reported as not looking like an object.
+

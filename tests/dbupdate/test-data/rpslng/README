@@ -1,0 +1,229 @@
+
+# CASE 1: We try to create aut-num object AS123
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+%
+
+# CASE 2: We try to modify aut-num object AS123
+%
+% requires initial objects to be loaded
+#
+# modify aut-num object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+# CASE 3: We try to delete aut-num object AS123
+%
+% requires initial objects to be loaded
+#
+# delete aut-num object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+# CASE 1: We try to create filter-set object fltr-test
+%
+% requires initial objects to be loaded
+#
+# create filter-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+%
+
+# CASE 2: We try to modify filter-set object fltr-test
+%
+% requires initial objects to be loaded
+#
+# modify filter-set object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+%
+
+# CASE 3: We try to delete filter-set object fltr-test
+%
+% requires initial objects to be loaded
+#
+# delete filter-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+%
+
+# CASE 1: We try to create inet-rtr object rtr.test.net
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+%
+
+# CASE 2: We try to modify inet-rtr object rtr.test.net
+%
+% requires initial objects to be loaded
+#
+# modify inet-rtr object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+%
+
+# CASE 3: We try to delete inet-rtr object rtr.test.net
+%
+% requires initial objects to be loaded
+#
+# modify inet-rtr object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+%
+
+# CASE 1: We try to create peering-set object prng-test
+%
+% requires initial objects to be loaded
+#
+# create peering-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+%
+
+# CASE 2: We try to modify peering-set object prng-test
+%
+% requires initial objects to be loaded
+#
+# modify peering-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The modification will succeed.
+%
+
+# CASE 3: We try to delete peering-set object prng-test
+%
+% requires initial objects to be loaded
+#
+# delete peering-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+%
+
+# CASE 1: We try to create route6 object ::/8
+%
+% requires initial objects to be loaded
+#
+# create route6 object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+%
+
+# CASE 2: We try to modify route6 object ::/8
+%
+% requires initial objects to be loaded
+#
+# modify route6 object 
+#
+#SUCCESS
+#
+# RESULT 2: The modify will succeed.
+%
+
+# CASE 3: We try to delete route6 object ::1:1:1:1/8
+%
+% requires initial objects to be loaded
+#
+# delete route6 object 
+#
+#SUCCESS
+#
+# RESULT 3: The delete will succeed.
+%
+
+# CASE 1: We try to create route-set object rs-test
+%
+% requires initial objects to be loaded
+#
+# create route-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+%
+
+# CASE 2: We try to modify route-set object rs-test
+%
+% requires initial objects to be loaded
+#
+# modify route-set object 
+#
+#SUCCESS
+#
+# RESULT 2: The modify will succeed.
+%
+
+# CASE 3: We try to delete route-set object rs-test
+%
+% requires initial objects to be loaded
+#
+# delete route-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The delete will succeed.
+%
+
+# CASE 1: We try to create rtr-set object rtrs-test
+%
+% requires initial objects to be loaded
+#
+# create rtr-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+%
+
+# CASE 2: We try to modify rtr-set object rtrs-test
+%
+% requires initial objects to be loaded
+#
+# modify rtr-set object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+%
+
+# CASE 3: We try to delete rtr-set object rtrs-test
+%
+% requires initial objects to be loaded
+#
+# delete rtr-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+%

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+echo `date` " creating indexes for aux tables"
+$MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB <aux.index.2
+echo `date` " creating indexes for leaf tables"
+$MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB <leaf.index.2
+echo `date` " saving CURRENTSERIAL=${CURRENTSERIAL}"
+$MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB <<EOM
+INSERT serials SET serial_id=${CURRENTSERIAL}, object_id=0
+EOM

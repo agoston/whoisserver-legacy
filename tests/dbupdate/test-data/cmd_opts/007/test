@@ -1,0 +1,16 @@
+# command line options tests
+# CASE 7: Valid short option with missing mandatory argument
+#         in option list
+#
+# run dbupdate with valid short option with missing mandatory argument
+# ./dbupdate -c ~/db/conf/rip.config -fp
+#
+# check for exit code 11 
+#
+#FAILURE
+#
+# RESULT 7: missing argument for option -f reported
+%
+%
+?11
+$$ -c $RIP_CONFIG -fp 

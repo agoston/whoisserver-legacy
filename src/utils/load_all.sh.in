@@ -1,0 +1,92 @@
+#!@SHELL@
+check_error()
+{
+	if [ $2 -ne 0 ] 
+	then
+	echo "*** ERROR: $1 [$2]. Exiting\n"
+	exit 1
+fi
+
+}
+
+loadpass()
+{
+	    
+  for object_file in ${LIST} 
+  do
+    echo `date` Loading ${object_file} 
+    test -f ${object_file}
+    check_error "${object_file} not found" $?
+    ${UNZIP1} ${object_file} | eval ${FILTER} | $LOADER -L $1 -p ${PROPERTIES} -s ${SOURCE}
+    check_error "Loader failure" $?
+  done
+}
+
+# switch on debugging (set -x)
+$DEBUG
+
+# number of passes to load the db
+# 0  means do not load data (empty_db)
+# 1 means single pass, 2 means 2-pass loading
+NPASSES=$1
+NPASSES=${NPASSES:?"Usage $0 npasses"}
+echo "*******************"`date`"******************" 
+echo "Creating tables\n" 
+echo "Creating tables\n"
+
+cd SQL; ./create.first-stage; cd ..
+
+# 2 - pass loading 
+
+if [ $NPASSES -eq 2 ]
+then 	
+  echo `date`"\n"
+  echo "Loading tables - 1 of 2 pass\n"
+
+  loadpass 1 
+  check_error "Pass I failed" $?
+fi
+
+echo `date`"\n" 
+echo "Making indexes\n"
+
+cd SQL; ./create.second-stage; cd ..
+
+
+
+if [ $NPASSES -eq 2 ]
+then
+  echo `date`"\n"
+  echo "Loading tables - 2 of 2 pass\n"
+
+  loadpass 2
+  check_error "Pass I failed" $?
+elif [ $NPASSES -eq 1 ]
+then
+  echo `date`"\n"
+  echo "Loading tables - 1 of 1 pass\n"
+
+# 0 indicates single pass loading 
+  loadpass 0
+  check_error "Pass I failed" $?
+fi
+
+
+
+echo `date`"\n" 
+echo "Making more indexes\n"
+
+cd SQL; ./create.third-stage; cd ..
+
+# if we want transaction support, then we need
+# to convert the database table type into InnoDB
+if [ $TRX = 'y' ]
+then
+  echo "Will now convert the DB into InnoDB type"
+  $MYSQLBIN/mysql_convert_table_format --host=$HOST --port=$PORT --user=$USER \
+   --password=$PASSWORD --verbose --type=innodb $DB
+  check_error "Conversion to InnoDB failed" $?
+fi
+
+echo "Finished "`date`
+

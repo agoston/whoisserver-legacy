@@ -1,0 +1,22 @@
+# input tests
+# CASE 5: Mail message from a file 
+#         subject help specified
+#         --print option NOT specified
+%
+#
+# mail message input from specified file
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 5: help message in ack
+#           nothing on stdout
+%
+%
+$ -c $RIP_CONFIG -m -f 
+%
+%
+From: dbtest@ripe.net
+Subject: help
+
+qwerty

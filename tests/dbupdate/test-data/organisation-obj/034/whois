@@ -1,0 +1,9 @@
+organisation:  ORG-ET1-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      NON-REGISTRY
+address:       Address
+e-mail:        dbtest@ripe.net
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST

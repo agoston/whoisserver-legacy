@@ -1,0 +1,124 @@
+# basic-auth tests - forward create
+
+# CASE 1: Create a mntner object
+#         with NO override
+#         as a mail message
+%
+#
+# create mntner object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed
+
+
+# CASE 2: Create a mntner object
+#         with override
+%
+#
+# create mntner object 
+#
+#SUCCESS
+#
+# RESULT 2: The creation will succeed
+
+
+# CASE 3: Create an irt object
+#         with NO override
+%
+#
+# create irt object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will NOOP and a request is sent to ripe-dbm
+
+
+# CASE 4: Create an irt object
+#         with override
+%
+#
+# create irt object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed
+
+
+# CASE 5: Create an as-block object
+#         with NO override
+%
+#
+# create as-block object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will NOOP and a request is sent to ripe-dbm
+
+
+# CASE 6: Create an as-block object
+#         with override
+%
+#
+# create as-block object 
+#
+#SUCCESS
+#
+# RESULT 6: The creation will succeed
+
+
+# CASE 7: Create an irt object
+#         with NO override
+#         and pgp signed mail message
+%
+#
+# create irt object 
+#
+#SUCCESS
+#
+# RESULT 7: The creation will NOOP and a request is sent to ripe-dbm
+
+
+# CASE 8: Create 2 as-block objects
+#         with NO override
+#         as a mail message
+#
+# create as-block objects
+#
+#SUCCESS
+#
+# RESULT 8: The creations will NOOP and 2 seperate requests are sent to ripe-dbm
+
+
+# CASE 9: Create an as-block object and a person object
+#         with NO override
+#
+# create an as-block object and a person object 
+#
+#SUCCESS
+#
+# RESULT 9: The as-block creation will NOOP and a request is sent to ripe-dbm
+#           and the person creation will succeed.
+
+
+# CASE 10: Create a mntner object and a person object
+#          with NO override
+#          person has mnt-by: with new mntner
+#
+# create mntner and person objects
+#
+#SUCCESS
+#
+# RESULT 10: Both objects will be created successfully
+
+
+# CASE 11: Create an as-block object with NO override
+#          test flag is set (-t)
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 11: The as-block creation will succeed without forwarding.
+
+

@@ -1,0 +1,18 @@
+# command line options tests
+# CASE 11: Short option form with no option
+#          at end of command line
+#
+# run dbupdate with short option form with no option
+# ./dbupdate -c ~/db/conf/rip.config -mf test -
+#
+#SUCCESS
+#
+# RESULT 11: invalid option - reported
+#            but help request is still processed
+%
+$$ -c $RIP_CONFIG -mf $TEST - 
+%
+From: dbtest@ripe.net
+Subject: help
+
+qwerty

@@ -1,0 +1,83 @@
+# X.509 auth tests
+#
+# CASE 17: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          mnt-by signed, with mnt-lower password inside signed message.
+#          Corrupt the signature
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#FAILED
+#
+# RESULT 17: The creation will fail
+%
+%
+$ -c $RIP_CONFIG -rm -f 
+%
+%
+From: dbtest@ripe.net
+MIME-Version: 1.0
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg=sha1; boundary="----3EEE7DA5FB98EEA53CE244F6A4696E6A"
+
+This is an S/MIME signed message
+
+------3EEE7DA5FB98EEA53CE244F6A4696E6A
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: auth2
+
+------3EEE7DA5FB98EEA53CE244F6A4696E6A
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+
+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
+
+------3EEE7DA5FB98EEA53CE244F6A4696E6A--
+

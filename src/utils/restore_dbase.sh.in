@@ -1,0 +1,62 @@
+#! @HSELL@
+
+##
+## restore a whois_rip database from a backup
+##
+
+# Copyright (c) 2002                                        RIPE NCC
+#
+# All Rights Reserved
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for any purpose and without fee is hereby granted,
+# provided that the above copyright notice appear in all copies and that
+# both that copyright notice and this permission notice appear in
+# supporting documentation, and that the name of the author not be
+# used in advertising or publicity pertaining to distribution of the
+# software without specific, written prior permission.
+#
+# THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+# ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
+# AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+# DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+# AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+GZIP=/usr/local/bin/gzip
+PERL=@PERL@
+
+DATABASE=RIPE
+TARFILE=${DATABASE}.tar.gz
+TMPDIR=@prefix@/tmp
+
+# If you want InnoDB tables, set this to 1
+INNODB=0
+
+MYSQLUSER=user
+MYSQLPASS=password
+MYSQLPORT=3306
+MYSQLHOST=hostname
+MYSQL="/usr/local/mysql/bin/mysql -u$MYSQLUSER -p$MYSQLPASS -h$MYSQLHOST -P$MYSQLPORT"
+MYSQLADMIN="/usr/local/mysql/bin/mysqladmin -u$MYSQLUSER -p$MYSQLPASS -h$MYSQLHOST -P$MYSQLPORT"
+MYSQLIMPORT="/usr/local/mysql/bin/mysqlimport --local -u$MYSQLUSER -p$MYSQLPASS -h$MYSQLHOST -P$MYSQLPORT"
+
+# Extract our textual dump
+$GZIP -dc $TARFILE | (cd $TMPDIR && tar xf -)
+
+#
+cd $TMPDIR
+$MYSQLADMIN create ${DATABASE}_snapshot
+if [ $INNODB -ne 0 ]
+  # modify *.sql files to generate InnoDB tables
+  then $PERL -pi.bak -e "s/^\s*\)\s*;\s*$/\) TYPE=InnoDB;/i" *.sql
+fi
+cat *.sql | $MYSQL ${DATABASE}_snapshot
+
+#$MYSQLIMPORT ${DATABASE}_snapshot *.txt
+#instead:
+
+for i in `ls *txt|cut -f 1 -d \.`; do echo LOAD DATA LOCAL INFILE \'$i.txt\' INTO TABLE $i\;; done | $MYSQL --local-infile=1 ${DATABASE}_snapshot
+
+

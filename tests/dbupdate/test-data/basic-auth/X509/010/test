@@ -1,0 +1,82 @@
+# X.509 auth tests
+#
+# CASE 10: We try to modify a person object protected by a mntner
+#          with a password and an X509 certificate.
+#          Signed with wrong (different) certificate.
+#          Both certificates have matching key-cert objects.
+#          Correct password supplied outside signed message.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 10: The modify will succeed
+#            This SHOULD work, but fails 
+#            (pgp case also fails, but we don't have a test case for it)
+%
+%
+$ -c $RIP_CONFIG -rm -f 
+%
+%
+From: dbtest@ripe.net
+MIME-Version: 1.0
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg=sha1; boundary="----DB373FDD9C8E2CC64C062DD917303FF4"
+
+This is an S/MIME signed message
+
+------DB373FDD9C8E2CC64C062DD917303FF4
+
+person:       test person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+changed:      dbtest@ripe.net 20040101
+source:       DB-TEST
+
+------DB373FDD9C8E2CC64C062DD917303FF4
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+
+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
+
+------DB373FDD9C8E2CC64C062DD917303FF4--
+
+password: auth

@@ -1,0 +1,14 @@
+# CASE 1
+#
+# successful, with override: reason and right pgp signature
+#
+
+# CASE 2
+#
+# unsuccessful, with override: reason and wrong pgp signature
+#
+
+# CASE 3
+#
+# unsuccessful, without override: reason and right pgp signature
+#

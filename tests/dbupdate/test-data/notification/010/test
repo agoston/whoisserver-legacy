@@ -1,0 +1,25 @@
+# notification tests
+# CASE 10: Deletion of a maintained object, where mntner has both 
+#          a mnt-nfy attribute and an upd-to attribute and the
+#          maintained object has a notify attribute.
+#
+# delete the TP20-DB-TEST person object 
+#
+#SUCCESS
+#
+# RESULT 10: There should be a notif message to case010-2@ripe.net
+#            and case010-3@ripe.net and no forward message.
+
+
+person:  Test Person II
+address: Singel 258
+address: Amsterdam
+phone:   +31 20 535 4444
+notify:  case010-3@ripe.net
+mnt-by:  TEST-MNT
+nic-hdl: TP20-DB-TEST
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+delete: test deletion case10
+
+password: notif

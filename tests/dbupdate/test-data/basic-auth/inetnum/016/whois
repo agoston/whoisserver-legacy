@@ -1,0 +1,10 @@
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

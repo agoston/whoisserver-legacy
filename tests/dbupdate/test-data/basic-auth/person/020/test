@@ -1,0 +1,22 @@
+# basic-auth tests
+# CASE 20: Create a person object with 2 mnt-by in same attribute
+#          with correct password for mnt-by2
+%
+#
+# create a person object s
+#
+#SUCCESS
+#
+# RESULT 20: The creation will succeed
+
+
+password:  test2
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT, test2-mnt
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+

@@ -1,0 +1,24 @@
+# first updates tests
+# CASE 29: Modify a single object
+#
+# Modify an object 
+# Mail message
+#
+#SUCCESS
+#
+# RESULT 29: The modify is successful 
+#            Subject: line contains SUCCESS:
+%
+%
+$ -c $RIP_CONFIG -m -f 
+%
+%
+From: dbtest@ripe.net
+
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net 
+nic-hdl: TP2-DB-TEST
+source:  db-test

@@ -1,0 +1,22 @@
+# notification tests
+# CASE 1: Modify an object without  "notify" attribute to add one:
+#
+# modify person object
+#
+#SUCCESS
+#
+# RESULT 1: There should not be any notification message 
+#           or any forward message.
+
+
+person:  Test Person
+address: Singel 258
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP10-DB-TEST
+changed: dbtest@ripe.net 20020101
+notify:  case001@ripe.net
+source:  DB-TEST
+
+
+

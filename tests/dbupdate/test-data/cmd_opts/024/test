@@ -1,0 +1,17 @@
+# command line options tests
+# CASE 24: Valid short option with optional argument
+#
+# run dbupdate with valid short option with optional argument
+# ./dbupdate -c ~/db/conf/rip.config -mrpd 64 -f test
+#
+#SUCCESS
+#
+# RESULT 24: Help text returned.
+%
+%
+$ -c $RIP_CONFIG -mrpd 64 -f 
+%
+From: dbtest@ripe.net
+subject: help
+
+qwerty

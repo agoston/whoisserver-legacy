@@ -1,0 +1,30 @@
+# basic-auth tests
+# CASE 27: Create a person object
+#          with 4 mnt-by and 2 correct passwords
+#          and 2 incorrect passwords
+#          and override
+%
+#
+# create person object 
+#
+#SUCCESS
+#
+# RESULT 27: The creation will succeed
+
+
+password:  test
+password:  Xtest2
+password:  test3
+password:  Xtest4
+override: password
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+mnt-by:       TEST2-MNT
+mnt-by:       TEST3-MNT
+mnt-by:       TEST4-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

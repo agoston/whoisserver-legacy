@@ -1,0 +1,23 @@
+# first updates tests
+# CASE 24: Object with syntax error, mail message
+#
+# Object with syntax error
+#
+#FAILURE
+#
+# RESULT 24: Syntax error  reported
+#            Subject: line contains FAILED:
+%
+%
+$ -c $RIP_CONFIG -m -f 
+%
+%
+From: dbtest@ripe.net
+
+
+person:  test person2
+address: here
+phone:   123
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

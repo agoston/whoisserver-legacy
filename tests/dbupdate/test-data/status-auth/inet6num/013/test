@@ -1,0 +1,25 @@
+# ipv6 status tests
+# CASE 13: create an inet6num with ALLOCATED-BY-LIR
+# with less specific having ASSIGNED status
+%
+% requires initial objects to be loaded
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 13: The creation will fail with Hierarchical Authorisation failure
+
+inet6num:     2001:0610:0260:0000::/128
+netname:      RIPE-NCC-IPv6
+descr:        RIPE NCC
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED-BY-LIR
+mnt-by:       LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: LIR
+

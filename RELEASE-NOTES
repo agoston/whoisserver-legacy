@@ -1,0 +1,948 @@
+Release Notes for RIPE Whois Server version 3.2.0
+*************************************************
+
+The most important difference between 3.1.1 and 3.2.0 is the dbupdate
+program: It was rewritten almost from scratch, to provide better
+configurability, cleaner acknowledgements and notifications and
+modularity.
+
+People upgrading from 3.1.1 need to read the file UPDATE-DB-3.2.0
+
+whois_rip (query and update core) changes:
+
+o Transaction support is added on MySQL side to remedy occasional 
+  queries that take very long time. InnoDB is used for this purpose
+  and it is optional.
+o ER module is decomissioned. LG module was created instead which has
+  a much simpler API.
+o Now the server limits the number of concurrent connections per IP.
+o Revised query parsing:
+  http://www.ripe.net/ripencc/pub-services/db/whois-query-2002.html
+o Various bug fixes:
+   - Referral queries did not pass the effective IP.
+   - Syntax check of inet6num was incorrect.
+
+dbupdate (mail processor) changes:
+
+o dbupdate has been rewritten almost from scratch.
+   ( see http://www.ripe.net/ripencc/pub-services/db/dbupdate/
+    for more information )
+o LU module was created to encapsulate whois look-ups.
+o AU and UP modules rewritten.
+o AK module is decomissioned. Its functionality is incorporated into
+    NT module. Static texts for acknowledgements, notifications
+    and forward messages are taken out of C source files and put into
+    xslt templates whose names are specified in configuration file.
+o PA module is decomissioned.
+o EP module is decomissioned.
+o MM module is decomissioned.
+o SY module is decomissioned.
+o CR module is introduced.
+o KM module is introduced.
+ (see modules/MODULES for short descriptions of modules)
+
+
+Release Notes for RIPE Whois Server RPSLng prototype 0.1
+********************************************************
+
+This is a prototype implementation of RPSLng (RPSL Next
+Generation) Internet Draft.  The implemented draft is
+draft-blunk-rpslng-01.txt.
+
+The other important difference between 3.1.1 and this RPSLng
+prototype implementation is the dbupdate program: It was rewritten 
+almost from scratch, to provide better configurability, cleaner 
+acknowledgements and notifications and modularity.
+
+Please note that only the RIPE variant will be RPSLng compliant
+(RPSL_VARIANT variable in the build.sh file).
+
+whois_rip (query and update core) changes:
+
+o Transaction support is added on MySQL side to remedy occasional 
+  queries that take very long time. InnoDB is used for this purpose
+  and it is optional.
+o ER module is decomissioned. LG module was created instead which has
+  a much simpler API.
+o Now the server limits the number of concurrent connections per IP.
+o Revised query parsing:
+  http://www.ripe.net/ripencc/pub-services/db/whois-query-2002.html
+o Various bug fixes:
+   - Referral queries did not pass the effective IP.
+   - Syntax check of inet6num was incorrect.
+
+dbupdate (mail processor) changes:
+
+o dbupdate has been rewritten almost from scratch.
+   ( see http://www.ripe.net/ripencc/pub-services/db/dbupdate/
+    for more information )
+o LU module was created to encapsulate whois look-ups.
+o AU and UP modules rewritten.
+o AK module is decomissioned. Its functionality is incorporated into
+    NT module. Static texts for acknowledgements, notifications
+    and forward messages are taken out of C source files and put into
+    xslt templates whose names are specified in configuration file.
+o PA module is decomissioned.
+o EP module is decomissioned.
+o MM module is decomissioned.
+o SY module is decomissioned.
+o CR module is introduced.
+o KM module is introduced.
+ (see modules/MODULES for short descriptions of modules)
+
+Please note that FreeBSD is not supported in this prototype release.
+
+Release Notes for RIPE Whois Server version 3.1.1
+*************************************************
+
+This release contains new features.  Please see the changes documented
+on the specific software (below) for details.
+
+
+People upgrading from 3.1.0 need to do the following:
+
+- Run the normal "build.sh" and "make". 
+- Use "make upgrade" to install *only* the new binaries and SQL 
+  statements.
+- Run the utils/ip6arpa-fix.pl script.  This fixes the data in the
+  database which was incorrect for certain ip6.int and ip6.arpa domain
+  entries.
+- Apply an SQL patch to the schema:
+    $ mysql RIPADMIN < bin/load/SQL/create.RIPADMIN.sql.patch
+- Add the AUTHMETHOD, AC_AUTO_SAVE, AC_LOAD, and AC_SAVE_INTERVAL
+  variables to your configuration files.
+
+We use:
+
+    # authentication methods supported - there is also MAIL-FROM
+    AUTHMETHOD NONE
+    AUTHMETHOD CRYPT-PW
+    AUTHMETHOD MD5-PW
+    AUTHMETHOD PGPKEY
+    
+    # whether to save client query access, and how often
+    AC_AUTO_SAVE 1
+    AC_SAVE_INTERVAL 1200
+
+    # whether to load saved client query access on start
+    AC_LOAD 1
+
+
+whois_rip (query and update core) changes:
+
+o User query tracking (access tree) is now persistent.  It is stored
+  in an SQL table so this information is not lost when the server
+  restarts.
+
+o Socket input buffered.  Running as a mirror client and domain
+  referrals are now much more efficient.
+
+o Various bug fixes.
+  - IPv6 DNS name mapping (ip6.int and ip6.arpa) was incorrect for
+    domains that did not end on a 16-bit boundary, e.g. 2001:11::/24.
+    Queries would not work properly.  This has been fixed.
+  - MySQL would crash when given a name query with more than 31 names.
+    Using a newer compiler fixed this bug, but it would still not
+    query correctly.  Fixed.
+  - If a VNRTM connection to a mirror server became unavailable (e.g.
+    hardware failure, network bounce) the client would never detect
+    this.  KEEPALIVE is now set on the connection, which fixes this
+    problem.
+
+dbupdate (mail processor) changes:
+
+o Support for MD5-PW authentication added.
+
+o The type of authentication supported by the server is now
+  configurable.  For example, if you do not wish to support MAIL-FROM,
+  you can prevent this.  The AUTHMETHOD configuration variable
+  controls which methods are supported.
+
+o Multiple "source:" definitions are supported for updates.  To do
+  this, put an UPDSOURCE line in your rip.config for each source.
+
+o IPv6 "status:" attribute has been changed from "generated" to the
+  new community-agreed values.  Additionally, the server now enforces
+  correct hierarchy for IPv6  "status:" attributes.
+
+o Various bug fixes.
+  - Support for nesting PGP and  "password:" lines now works.
+  - Hierarchical filter-set, prng-set, and rtr-set names now
+    properly supported.
+  - dbupdate passed the authorisation checks if it could detect the
+    key ID of a PGP key that signed the message, even if the signature
+    itself wasn't good.  Fixed.
+  - key-cert now works with networkupdate.
+  - Updates from STDIN are now properly logged.
+  - Various authorisation attributes, e.g. "mnt-by:", now work as
+    lists.
+  - routes with exact matches now properly check "mnt-by:".
+
+
+utility changes:
+
+o whois3 (client) now reads input line-buffered for efficiency.
+
+o text_export now only produces RPSL output by default.  If you still
+  need the "short" output, you can request it via the "-s" flag.
+
+
+Also, this release makes it easier to customise the code for different
+implementations.  There is now a defs/variants/ directory that
+contains definitions of the RIPE, APNIC, and IETF variations of RPSL.
+There is more work to be done making the code fully customisable,
+which will be completed in future releases.
+
+To use an alternate variant change the RPSL_VARIANT variable in the
+build.sh script.
+
+
+
+Release Notes for RIPE Whois Server version 3.1.0
+*************************************************
+
+This release adds several user-visible improvements:
+
+- New status type for inetnum objects: LIR-PARTITIONED.
+- New object type, irt, and associated new attributes: "irt:",
+  "mnt-irt:", "irt-nfy:", "signature:", and "encryption:".
+
+The SQL database schema has been changed to support these new attributes
+and class.  A patch for existing databases is provided in the file
+bin/load/SQL/create.irt-tables.sql.patch.  Optimised indexing has been
+added, and is provided in the file bin/load/SQL/create.tables.sql.patch.
+
+Additionally, the RPSL parsing has been totally rewritten.  The new
+mechanism makes adding new classes and attributes much easier.
+Modifying the syntax definitions of classes and attributes is also
+much easier, and may be done in many cases by edits to XML files.
+Please see the file defs/HOWTO for details on adding new classes or
+changing definitions.
+
+Some new options were added to the configuration.  If you are
+upgrading, please see the HELPHEADER, MTFWHEADER, and MTFWTXT message
+texts in the same configurations and add equivalent messages to your
+own configuration.
+
+People upgrading from 3.0.x need to do the following:
+
+- Run the normal "build.sh" and "make". 
+- Use "make upgrade" to install *only* the new binaries and SQL 
+  statements.
+- Apply the SQL patch to the schema:
+    $ mysql SAMPLEDB < bin/load/SQL/create.irt-tables.sql.patch
+    $ mysql SAMPLEDB < bin/load/SQL/create.tables.sql.patch
+  The second patch may take a while (30 minutes or so), as it reindexes
+  many tables.
+- Add the HELPHEADER, MTFWHEADER, and MTFWTXT message texts to their
+  configuration files.
+
+
+whois_rip (query and update core) changes:
+
+o RPSL object library takes care of object parsing and syntax checks.
+  Uses CORE syntax set.  As a consequence, the server has improved
+  handling of malformed objects and garbage.  Use of mirror reflector is
+  now optional in cases where the NRTM server supports RPSL, even if the
+  implementation uses extensions to RPSL, or is not 100% RFC-compliant.
+
+o Error reporting in IP module has been improved, along with improved
+  checks for meaningfulness, proper alignment for IP address related
+  attributes (inetnum, route, etc.).
+
+o IP6.ARPA domains are stored in the radix tree and available for search
+  with -d flag.
+
+o A new query flag, "-c" has been added to the query path to support
+  searches for inetnum or inet6num objects with "mnt-irt:" attributes.
+
+o Fix occasional server abnormal shutdown when client disconnects
+  unexpectedly.
+
+o "-i person" flag now works as "-i pn", both now also check for
+  "cross-nfy:" references.
+
+o Now reads defaults from /etc/my.cnf, needed for connecting to
+  non-standard MySQL configurations.
+
+dbupdate (mail processor) changes:
+
+o dbupdate has been substantially changed to use the new API parsing
+  library.
+
+o It has also been converted to plain C instead of a mix of C and C++.
+  All the old C++ files have now been obsoleted and no longer form
+  part of the release.  This includes the whole of the src/ sub
+  directory in the "up" module which contained all the old C++ parsing
+  functions.  References to src/ have been removed from the Makefiles.
+
+o Where the code has been changed to use the new API library, the
+  logic is basically the same, but the implementation has changed.  A
+  line by line review ofthe code from the 'process_file' function in
+  dbupdate.c downwards has been carried out during this change.
+  Numerous, previously un-noticed, little bugs were caught and fixed
+  in this process.  The basic structure of dbupdate is un-altered.
+
+  Checks for valid sources, countries and nic-hdl suffixes are now
+  handled by additional functions in UP_extrnl_syntax.c.  These were
+  previously handled by the old parsing routines.  *The valid nic-hdl
+  suffixes are hard coded in dbupdate.c for the moment.*
+
+o Additional code has been added to handle the LIR_PARTITIONED status
+  and irt objects.
+
+o PGP fixes: 
+  - A bug that allowed creation of key-cert objects that contain
+    multiple PGP keys has been fixed.
+  - Works with emacs PGP mail (emacs being the *only* RFC-compliant
+    MUA).
+
+o Various bug fixes:
+  - A bug was fixed where inet6num generated attributes were only
+    generated on updates and not on creation.
+  - Multiple lines are now handled correctly in any of the email
+    header fields. Also the Cc: field is shown in the comment block
+    section of an ack message.
+  - A help request no longer returns error messages in the ack
+    message. This also required a change to the HELPHEADER message
+    texts in rip.config files.
+  - Some corrections were made to the authorisation checks of route
+    creation where it deviated from the flow chart shown at:
+      http://www.ripe.net/ripencc/faq/database/route-creation-checks.html
+    There are still some minor deviations from this flowchart and this
+    will be looked at more closely for a future release.
+  - A lot more of the malloc'd memory is now freed than before.  This
+    does not really matter as dbupdate always terminates after each
+    update, but it is more correct to free the memory whilst the
+    program is running.
+  - Lots of point fixes, e.g. use of mail text as format specifier in
+    printf-style command, memory allocations too small, glist double
+    free, etc.
+
+o A whole new test suite has been developed for extensive testing of
+  dbupdate.  A series of tests have been carried out using pre-defined
+  objects with expected results and also comparison testing between
+  the new and previous releases using real data from the update
+  logs.  This testing has been done more thoroughly and systematically
+  than with any previous release of dbupdate.  This test suite and
+  pre-defined data sets need some more work on them before we can
+  include them in the release, but we will be able to include them in
+  the next release.
+
+o Some improvements may be noticed in the error reporting, but a major
+  overhaul of error reporting will be done for a future release.
+
+
+whois3 (client) fixes:
+
+o Bug where two blank lines caused client to stop output fixed.
+
+mr (mirror reflector) fixes:
+
+o Removed bug attempting to write to non-connected socket on name lookup
+  failure.
+
+
+Release Notes for RIPE Whois Server version 3.0.2
+*************************************************
+
+This release is intended both as a bug fix release, and also to offer
+much-improved ease of installation and configuration.
+
+whois_rip bug fixes:
+
+o Arbritrary sprintf() calls changed to g_string_sprintf() to prevent
+  buffer overflows.
+
+o Fixed double-close of file in NRTM code causing numerous errors
+  throughout the application.
+
+o Several queries fixed:
+  - The "-i nserver ip-address" query now works properly.
+  - The "-K as-set-name" query now works properly.
+  - The "-?" option now presents help.
+
+o Query keys are no longer truncated to 63 characters.
+
+o The nic-handles of dummy objects (objects that were created in the
+  database to resolve non existing references) were not stored in the
+  NIC handle repository (NHR). So sometimes an AUTO NIC handle request
+  failed with an error 32 (conflicting operation): whois_rip had picked
+  up the next available NIC handle, but it was used in a dummy object
+  already, thus the creation mysteriously failed. This was fixed by
+  putting the NIC handles of dummy objects into the NHR.
+
+o All compiler warnings reviewed, most fixed.
+
+o Numerous fixes for Linux and FreeBSD portability.
+
+
+dbupdate bug fixes:
+
+In general, better error reporting in acknowledgement messages:
+
+o When the update message contained no objects, we didn't print a
+  warning about this in the acknowledgement message.
+
+o When a name change of a person/role object was attempted, the error
+  generated was "Authorisation failed". The error message is now
+  clearer.
+
+o The status of update was not mentioned (SUCCEEDED or FAILED) in the
+  subject line of the acknowledgement.
+
+o Sometimes empty cross-notification messages were sent.
+
+o We now filter out the paragraphs which are obviously not objects (like
+  signatures etc.) so that the acknowledgement messages won't overflow
+  with syntax error messages.
+
+Some other fixes in dbupdate:
+
+o Multiple-line "From:" in the update mail header used to confuse
+  dbupdate.
+
+o Updating a person/role object whose NIC handle appears in some other
+  person/role object's name was sometimes not possible.
+
+o Sometimes it didn't send maintainer requests to HUMAILBOX.
+
+o An initialisation problem in MM module solved which caused core dumps
+  in rare conditions.
+
+o Numerous fixes for Linux and FreeBSD portability.
+
+
+Configuration:
+
+o The initial installation and configuration has been much simplified
+  and in other ways improved.  If you have used previous releases,
+  please review the new INSTALL guide.
+
+
+Portability:
+
+o We have tested the release on Solaris 8, Red Hat Linux 7.2, and
+  FreeBSD 4.3 RELEASE.  Please refer to the file README.solaris,
+  README.linux, and README.freebsd for platform-specific notes.
+
+
+
+Release Notes for RIP version 3.0.1
+***********************************
+
+This is primarily a bug fix release.
+
+whois_rip bug fixes:
+
+o In update mode when stopping updates dbupdate connections in the
+  backlog queue were not processed and dropped later when server was
+  stopped.
+
+o '\t' was not recognized as a valid whitespace. So some attributes
+  containing several words were not stored correctly in the back-end
+  database.
+
+o When in VNRTM mode the mirror client enters a loop requesting serials
+  without any delay between the attempts, when a requested range doesn't
+  exist or server returns an error. Thus flooding the mirror server with
+  requests.
+
+o Object templates were corrected in accordance with RIP object
+  definitions.
+  
+o Server will now timeout on socket writes, if client is unresponsive.
+
+o Lookups for netname, mntner, and limerick now corrected to allow
+  underscore.
+
+
+dbupdate bug fixes:
+
+o The forward message of a networkupdate didn't contain the IP of the
+  updating client.
+
+o When the update failed with authentication failure, the
+  acknowledgement message didn't show the object.
+
+o Classless inetnums were accepted. Not any more.
+
+o When updating key-certificate objects, generated attributes used to
+  disappear.
+
+o E-mail address from the "Reply-To" field of an update message
+  was not extracted correctly.
+
+o The parantheses were not taken as comments in e-mail addresses.
+
+o In cross-notifications, the "exact matches" and "less specifics"
+  parts listed the route itself.
+
+o A '\'', '.' or '`' character wasn't possible in person/role
+  objects.
+
+o Dates in changed attributes were not checked properly.
+
+o dbupdate core dumped when deleting some syntactically incorrect legacy
+  objects.
+
+
+Features:
+
+o A mirror server never returns the latest serial when serving mirroring
+  request. So if the latest serial causes server crash and database
+  corruption, it never propagates to the secondary servers. The latest
+  serial is not displayed with -q sources query as well.
+
+
+Tools:
+
+o A new Whois client, whois3, is now included with the release.  This
+  client offers ability to query in persistent mode, reading multiple
+  queries from standard input and sending them to the server.
+
+o The ripe2rpsl script has had support for optional country-code
+  attribute added to most classes.
+
+
+
+Release Notes for RIP version 3.0
+*********************************
+The major changes with this version are:
+
+
+- CA module
+    All configuration variables are currently mandatory.  
+
+- UP module
+    Implemented networkupdate.
+
+    Subject line parsing and processing has been implemented.
+
+    Several bug fixes.
+
+- UD 
+    Improved logging when performing crash recovery
+
+- SV 
+    SIGUSR1 is used to pause/resume updates. Normally, command interface
+    is used.
+
+    SVSIGTERM and SIGINT are both used to shutdown the server
+
+- RP/RX
+    Reloading of the radix trees for a given source is implemented
+
+
+- QI
+    Query path no longer core dumps when MySQL returns an errors.
+
+    We uncovered a couple of MySQL bugs, one of which caused MySQL to
+    incorrectly return an error.  Should this (or a different) bug occur
+    in the future, the server will continue to answer queries as best it
+    can.
+
+    Blank line removed between banner and copyright message.  For a
+    valid query, the banner and copyright appear as one comment block.
+
+    Temporary tables configured automatically.
+
+    Version of MySQL detected at compile and TEMPORARY tables now used
+    if possible.
+
+- PW
+    Ability to pause queries.  Useful for doing manipulations of the
+    MySQL database "under the hood" without taking RIP off-line.
+
+
+Release Notes for RIP version 3.0beta3
+**************************************
+There are two major changes with this version:
+
+- With MySQL 3.23 you now have the option to use TEMPORARY tables.
+  There are two advantages of this:
+
+    1. The tables are automatically deleted when a connection is closed.
+
+    2. If the TMPDIR environment variable used by the MySQL daemon is
+       set to a directory mounted in memory, then there is no disk I/O
+       for temporary tables.  This is much faster - we actually can't
+       support our query load without it!
+
+  To use this, you must do a quick source modification today.  This will
+  be changed to a configure option in the future.  To configure this,
+  edit modules/qi/query_instructions.c, and add the line:
+ 
+    #define MYSQL_3_23
+
+  To the top of the file before you build RIP.
+
+- A major memory leak on Solaris 8 has been fixed.  The
+  regcomp()/regfree() pair did not free memory.  As a workaround,
+  regcomp() is only called at startup.  This should also be faster.
+
+Other bug fixes:
+
+- CLIENTADDRESS referral now properly passes addresses
+
+- AS-SET queries with ':' now work (hopefully)
+
+- The "-m" queries now work.
+
+- You can use '-' in the source variable now.
+
+- Improvements in acknowledgement and notification message formats.
+  
+- Fixed multiple notification problems.
+  
+- Fixed memory allocation bug in dbupdate.
+  
+- Fixed bug which prevented the last attributes of the object
+    with references to auto NIC handles from appearing in the 
+    database.
+  
+- Refering to invalid auto NIC handles is reported in the
+    acknowledgement message as an error.
+
+UD:
+- Object parsing is reimplemented improvind performance and fixing
+several bugs related to line continuation and list valued attributes.
+- New mode of operation is supported when NHR is not updated. This
+allows to mirror sources with less strict syntax rules regarding
+nic-handles. This also improves performance in such cases.
+
+SK:
+- buffer management bug in SK_gets
+
+
+
+
+Release Notes for ripe-dbase version 3.0beta2
+*********************************************
+
+
+This is mainly a bugfix release. There has been however an important
+change in the installation procedure: the package has been "autoconfiscated",
+i.e. it uses the autoconf facilities. This is a step that will ease
+the work on portability, still at its early stage.
+
+Please refer to the INSTALL file for the new instructions on how
+to compile the package.
+
+
+Changes From Last Release
+-------------------------
+
+
+Installation/Maintenance/Administration:
+
+o The package has been autoconfiscated. A configure script is used
+  to set several site-dependent parameters.
+
+o The dictionary.txt file is no longer necessary; it has been hardcoded
+  inside the source of the configuration module.
+
+
+Dbupdate:
+
+o Syntax checks of phone & fax attributes have been fixed.
+
+o Checks of changed attribute: the current date is added if
+  a date is missing in a 'changed' attribute. The order
+  of dates is also checked: if the dates are not in order,
+  then the update is rejected.
+
+o Object formatting: The objects are "beautified" before
+  being inserted into the database. Extra whitespace is
+  added after the type name of the attribute.
+
+o in dbupdate, another switch, '-S', has been implemented. 
+  When this switch is used, the notifications and acknowledgements
+  are sent to a predefined address (DEFMAIL configuration
+  variable).  This is for testing and debugging purposes.
+
+o The MAIL-FROM authentication scheme now accepts
+  regular expressions.
+
+
+Queries:
+
+o Several little bugfixes here and there (referral, radix tree,...)
+
+
+
+Known Bugs and Limitations
+**************************
+
+
+Installation/Maintenance/Administration:
+
+o You cannot use "-" characters in paths for the definitions
+  of logfiles.
+
+o Several side-utilities still need to be implemented.
+
+o Portability: there hasn't been much work yet on the
+  portability issue. This package is known to
+  work on Solaris 2.6,7 and 8, on SPARC and Intel
+  architectures.
+
+
+Dbupdate:
+
+o The subject line is not parsed.
+
+o The "networkupdate" utility is to be implemented.
+
+o The modified objects appear doubled in notifications.
+
+
+Queries:
+
+o The "CLIENTADDRESS" referral does not pass addresses as it should.
+
+
+
+
+
+Old Release Notes
+=================
+
+Release Notes for ripe-dbase version 3.0beta1
+*********************************************
+
+
+Introduction
+------------
+
+We are going v3.
+
+The package has been renamed, from RIP to ripe-dbase v3.0 .
+The reason is that all the core functionalities of the server
+are now in place; what is needed now is bugfixes and work
+on the infrastructure. But most of the work is done.
+
+This is the beta of the server which will eventually be put
+into production for the RIPE Database and replace the old 
+software ripe-dbase v2.3.2 .
+
+
+Changes From Last Release
+-------------------------
+
+
+Installation:
+
+o "make install" now available.
+
+
+Queries:
+
+o -F mode now uses a "+ " string in line continuation.
+o -d option extends radix-style searches to reverse domains,
+  including IPv6 and not-fully-parsable domains.
+  Takes IP/prefix/range as argument.
+
+
+Updates:
+
+o Cross-notifications have been implemented.
+o Improved acknowledgements:
+  a header summary of the update message is included.
+o Implemented crash recovery in both dbupdate and the update server.
+  In case of server crash, a full recovery is done, including
+  committing/rollbacking the crashed transaction, sending outstanding
+  acknowledgements, and bringing the database into consistent state.
+o New mode of operation (opMode) for managing a static source with no
+  possible updates.
+
+
+Maintenance/Administration:
+
+o Added admin commands to stop query in progress, unblock an automatically
+  denied user, edit the logging filters, pause/resume updates,
+  switch to whois mode.
+o Almost all parameters and texts are now configurable through the
+  configuration file.
+o There is now a separate configuration file for sources, with a
+  clearer syntax.
+o Introduced flexible logging system, configured via the config file.
+  The various parts of the software send logs via this system.
+
+
+Infrastructure:
+
+o Introduced hs_cleanup, a utility to archive and clean up the SQL
+  database of old serials and history entries.
+o Introduced text_export, a utility to export a database in flat
+  files that can then be used to load the database on another server.
+
+
+
+Release Notes for RIP version 0.5.0beta1
+****************************************
+
+
+Changes From Last Release
+-------------------------
+
+
+Queries:
+
+o -k quits session only if called with no arguments
+  (required by RtConfig)
+o -R referral fix: the local object containing "refer:"
+  attribute is returned only when -R is specified
+o -i upd-to and -i mnt-nfy have been implemented
+
+
+Updates:
+
+o The PGPKEY authentication scheme is now supported.
+  PGP messages are handled by the software.
+o There are no more hardcoded values in dbupdate.h .
+o The "Reply-To:" fields of incoming messages (if they
+  exist) are used to send the acknowledgements.
+
+Plus numerous bugfixes.
+
+
+
+Release Notes for RIP version 0.4.2beta1
+****************************************
+
+
+Changes From Last Release
+-------------------------
+
+
+o This is mainly a bugfix release. Several
+  bugs have been fixed, including memory leaks.
+
+
+Release Notes for RIP version 0.4.1beta1
+****************************************
+
+
+Changes From Last Release
+-------------------------
+
+
+o This is mainly a bugfix release.
+o A basic whois client, whoisRIP.c, has been added
+  to ease the task of querying a RIP database which
+  supports new flags in respect to the allowed flags
+  of a "classic" RIPE whois client.
+
+
+
+Release Notes for RIP version 0.4.0beta1
+****************************************
+
+
+Changes From Last Release
+-------------------------
+
+
+Queries:
+
+o query cancellation: closing the socket aborts the search to save
+  resources. Note for -k: all data entered before the server finishes
+  answering the previous query will be discarded
+o query read timeout: the server closes after no data has been received
+  for a specified period of time
+o -i member-of displays only members validated by the mbrs-by-ref
+  attribute
+o -q sources displays the available sources
+o thread accounting: the currently active threads can be displayed in the
+  admin interface with "show threads"
+o input filtering: disallowed characters are dropped from the query
+o closing session on error: -k mode connection is closed on error
+
+
+RIP server:
+
+o Multiple repository support by a single server. 
+  That means that one can e.g. NRT-mirror RIPE and RADB 
+  and update TEST database running only one [super]server. 
+  Operational parameters are defined in configuration file.
+o Improved support of RPSL syntax (line continuation, 
+  End-Of-Line comments, etc.).
+o The server can mirror _only_ RPSL stream now. If someone wants to
+  NRT-mirror a RIPE181 database, he needs to run a "mirror reflector"
+  and use it as a NRTM server. This tiny program (bin/mr) connects to
+  a specified NRTM server and accepts requests from RPSL NRTM client. 
+  After receiving a request it converts the data stream on fly using
+  a specified convertor.
+o While mirroring failed transactions are stored for re-distribution
+  anyway. This should improve NRTM server reliability and allow
+  re-distribution of data from other repositories not fully compliant with
+  current implementation (e.g. different level of ref.integrity, different
+  NRTM protocol).
+o Different handling of deletion of a set. Now this operation is not
+  blocked even if the set is referenced from other objects by member-of
+  attribute. In order not to violate DB integrity, the set is actually not
+  deleted but converted into a dummy object, not visible outside.
+
+
+Updates:
+
+o More informative acknowledgement messages.
+o MIME support added.
+o Notifications (except cross-notifications) are in place.
+o The "test" mode is implemented. In this mode, users can create mntner 
+  objects without overriding. 
+o Most of the configuration variables implemented.
+
+
+Configuration:
+
+o The configuration module is now in place. It is not fully integrated
+  in the modules yet, so in this release the configuration is mixed:
+  some variables must still be set in the PROPERTIES file, and a small
+  number is still to be modified in the header files.
+
+
+
+
+Release Notes for RIP version 0.3.1beta1
+****************************************
+
+
+Changes From Last Release
+-------------------------
+
+o There have been big changes in the Makefile structure.
+  The hardcoded variables have been much reduced, and
+  currently there is only one site-dependent Makefile
+  where to change variables and paths for the user.
+  Only the update module still needs some changes 
+  in a particular header file in order to work in
+  your environment. The up module unly affects dbupdate.
+  This makes the package easier to compile and run.
+o A number of bugfixes.
+o Backend work.
+o as-block queries are now supported.
+
+
+
+
+Release Notes for RIP version 0.3.0beta2
+****************************************
+
+
+Changes From Last Release
+-------------------------
+
+o All the queries for the "old" object types
+  are now supported. IPv6 queries have been implemented.
+o in-addr.arpa queries are now supported.
+o Full support of -K, -t and -v queries.
+o The Access Control System is fully functional.
+o The expansion of person objects referenced by name
+  is working.
+o The update functionality has been integrated.
+o Lots of bugfixes and backend improvements.
+
+
+

@@ -1,0 +1,210 @@
+# inetnum erx status tests
+# CASE 1: We try to create inetnum object
+# with status EARLY-REGISTRATION under ALLOCATED UNSPECIFIED
+# with override
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed
+
+# inetnum erx status tests
+# CASE 2: We try to create inetnum object
+# with status EARLY-REGISTRATION under EARLY-REGISTRATION 
+# with override
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 2: The creation will succeed
+
+# inetnum erx status tests
+# CASE 3: We try to create inetnum object
+# with status EARLY-REGISTRATION under ALLOCATED UNSPECIFIED
+# with NO override
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 3: The creation will fail
+# with Authorisation failed
+
+# inetnum erx status tests
+# CASE 4: We try to create inetnum object
+# with status EARLY-REGISTRATION under EARLY-REGISTRATION 
+# with NO override
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 4: The creation will fail
+# with Authorisation failed
+
+# inetnum erx status tests
+# CASE 5: We try to create inetnum object
+# with status EARLY-REGISTRATION under ALLOCATED PA 
+# with override
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will fail
+# with Hierarchical Authorisation failed
+
+# inetnum erx status tests
+# CASE 6: We try to create inetnum object
+# with status EARLY-REGISTRATION under LIR-PARTITIONED PA 
+# with override
+%
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 6: The creation will succeed
+
+# inetnum erx status tests
+# CASE 7: We try to create inetnum object
+# with status EARLY-REGISTRATION under ASSIGNED PI 
+# with override
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 7: The creation will succeed
+
+# inetnum erx status tests
+# CASE 8: We try to create inetnum object
+# with status LIR-PARTITIONED PA under EARLY-REGISTRATION 
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail
+
+# inetnum erx status tests
+# CASE 9: We try to create inetnum object
+# with status ASSIGNED PI under EARLY-REGISTRATION 
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed
+
+# inetnum erx status tests
+# CASE 10: We try to modify an inetnum object twice
+# First modification is to add the RIPE-NCC-HM-MNT using override
+# Second modification is to change the
+# status from EARLY-REGISTRATION to ALLOCATED PA 
+#
+# modify inetnum object twice
+#
+#SUCCESS/SUCCESS
+#
+# RESULT 10: Both modifications will succeed
+
+# inetnum erx status tests
+# CASE 11: We try to modify an inetnum object
+# Add the RIPE-NCC-HM-MNT 
+# and change the
+# status from EARLY-REGISTRATION to ALLOCATED PA 
+# no override and no HM password
+#
+# modify inetnum object
+#
+#SUCCESS
+#
+# RESULT 11: modification will succeed
+
+# with Authorisation failed
+# inetnum erx status tests
+# CASE 12: We try to modify an inetnum object
+# Change the status from EARLY-REGISTRATION to ASSIGNED PA 
+# no override and no HM password
+#
+# modify inetnum object
+#
+#SUCCESS
+#
+# RESULT 12: modification will succeed
+
+# inetnum erx status tests
+# CASE 13: We try to modify an inetnum object
+# Change the status from EARLY-REGISTRATION to LIR-PARTITIONED PI 
+# no override and no HM password
+#
+# modify inetnum object
+#
+#SUCCESS
+#
+# RESULT 13: modification will succeed
+
+# inetnum erx status tests
+# CASE 14: We try to modify an inetnum object
+# Change the status from EARLY-REGISTRATION to ASSIGNED PI
+# The less specific inetnum also has status EARLY-REGISTRATION 
+# no override and no HM password
+#
+# modify inetnum object
+#
+#SUCCESS
+#
+# RESULT 14: modification will succeed
+
+# inetnum erx status tests
+# CASE 15: We try to modify an inetnum object
+# Change the status from EARLY-REGISTRATION to ASSIGNED PA
+# The less specific inetnum also has status ALLOCATED PA 
+# no override and no HM password
+#
+# modify inetnum object
+#
+#SUCCESS
+#
+# RESULT 15: modification will succeed
+
+# inetnum erx status tests
+# CASE 16: We try to modify an inetnum object
+# Change the status from ASSIGNED PA to EARLY-REGISTRATION
+# The less specific inetnum also has status EARLY-REGISTRATION 
+# no override and no HM password
+#
+# modify inetnum object
+#
+#FAILURE
+#
+# RESULT 16: modification will fail
+# with Authorisation failed
+
+# inetnum erx status tests
+# CASE 17: We try to modify an inetnum object
+# Change the status from ALLOCATED PA to EARLY-REGISTRATION
+# with HM password but no override 
+#
+# modify inetnum object
+#
+#FAILURE
+#
+# RESULT 17: modification will fail
+# with Authorisation failed
+
+# inetnum erx status tests
+# CASE 18: We try to modify an inetnum object
+# Change the status from ASSIGNED PA to EARLY-REGISTRATION
+# with HM password but no override 
+#
+# modify inetnum object
+#
+#FAILURE
+#
+# RESULT 18: modification will fail
+# with Authorisation failed
+

@@ -1,0 +1,23 @@
+# keywords tests
+# CASE 3: new keyword
+#         not a mail message
+%
+#
+# run dbupdate with option -k new
+# ./dbupdate -c ~/db/conf/rip.config -r -k new -f test
+# create a new object
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed, keyword new in upd log.
+%
+%
+$ -c $RIP_CONFIG -r -k new -f
+
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

@@ -1,0 +1,21 @@
+# X.509 auth tests
+#
+# CASE 2: We try to modify a person object protected by a mntner
+#         with a password and an X509 certificate.
+#         No creds supplied.
+#
+#
+#FAILURE
+#
+# RESULT 2: The modify will fail.
+
+
+person:       test person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+changed:      dbtest@ripe.net 20040101
+source:       DB-TEST
+

@@ -1,0 +1,17 @@
+# command line options tests
+# CASE 26: Valid long option with optional argument
+#
+# run dbupdate with valid long option with optional argument
+# ./dbupdate -c ~/db/conf/rip.config -mrp --debug 64 -f test
+#
+#SUCCESS
+#
+# RESULT 26: Help text returned.
+%
+%
+$ -c $RIP_CONFIG -mrp --debug 64 -f 
+%
+From: dbtest@ripe.net
+subject: help
+
+qwerty

@@ -1,0 +1,29 @@
+# basic-auth tests - inetnum
+# CASE 17: Create an assignment inetnum object
+#          with 4 overlapping parent objects
+#          with less specific allocations with mnt-lower
+#          and correct password for mnt-lower of 2 parents
+#          and mnt-by of object, invalid password for the 
+#          other 2 parents
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 17: The creation will fail
+
+
+password: LIR
+password: END-USER
+
+
+inetnum:      62.191.0.0 - 62.191.255.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

@@ -1,0 +1,25 @@
+# keywords tests
+# CASE 7: subject: help
+%
+#
+# run dbupdate with mail subject help
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 7: help output in ack log, keyword help in upd log,
+#           no objects processed
+%
+%
+$ -c $RIP_CONFIG -rm -f
+%
+%
+From: dbtest@ripe.net
+Subject: help
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

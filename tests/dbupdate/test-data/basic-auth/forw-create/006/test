@@ -1,0 +1,27 @@
+# basic-auth tests - forward create
+# CASE 6: Create an as-block object
+#         with override
+%
+#
+# create as-block object 
+#
+#SUCCESS
+#
+# RESULT 6: The creation will succeed
+
+
+override: password
+
+as-block:     AS100 - AS1000
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+

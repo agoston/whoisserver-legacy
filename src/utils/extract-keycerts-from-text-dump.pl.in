@@ -1,0 +1,168 @@
+#!@PERL@ -w
+
+# Copyright (c) 2000                          RIPE NCC
+#
+# 
+# All Rights Reserved
+# 
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for any purpose and without fee is hereby granted,
+# provided that the above copyright notice appear in all copies and that
+# both that copyright notice and this permission notice appear in
+# supporting documentation, and that the name of the author not be
+# used in advertising or publicity pertaining to distribution of the
+# software without specific, written prior permission.
+# 
+# THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+# ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
+# AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+# DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+# AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+# $Id: extract-keycerts-from-text-dump.pl,v 1.4 2003/07/04 14:11:10 engin Exp $
+# 24 04 2002 EG
+#
+# This script extracts 'certif' attributes of key-cert objects from a text dump
+# to be feed into gpg (to create a public keyring). 
+
+# Usage: $0 filename 
+
+use strict;
+
+
+#
+# sub get_certif
+# Takes an RPSL key-cert object and extracts its
+# certificate.
+sub get_certif {
+
+  my $obj = shift @_;
+  my $certif = '';
+  $obj =~ s/^[\s\n]*//;
+  if($obj !~ /^key-cert:/){
+
+    return "***Error!\n";
+
+  }else{
+
+    my @lines = split("\n", $obj);
+
+    # here we implement a state machine to construct the 
+    # certificate from 'certif:' attributes. We read the object
+    # line by line
+    my($state) = 'INIT';
+    my $i;
+    foreach $i (@lines){
+      #print "State = $state\n";
+      #print "line = [$i]\n";
+      if($i =~ /^certif:/i){
+        if ($state eq 'INIT'){
+          $i =~ s/^certif://i; # delete 'certif:'
+          $i =~ s/^\s*//;      # delete white space in the beginning
+          $certif = "$certif\n$i";
+          $state = 'CERTIF';
+        }elsif($state eq 'CERTIF'){
+          $i =~ s/^certif://i; # delete 'certif:'
+          $i =~ s/^\s*//;      # delete white space in the beginning
+          $certif = "$certif\n$i";
+        }elsif($state eq 'ELSE'){
+          $i =~ s/^certif://i; # delete 'certif:'
+          $i =~ s/^\s*//;      # delete white space in the beginning
+          $certif = "$certif\n$i";
+          $state = 'CERTIF';
+        }else{
+          print STDERR "Unknown state $state!\n";
+        }
+      }elsif($i =~ /^[\s\+]/){
+        if ($state eq 'INIT'){
+          print STDERR "Cannot happen in INIT state!\n";
+        }elsif($state eq 'CERTIF'){
+          $i =~ s/^\+//;       # delete '+' in the beginning 
+          $i =~ s/^\s*//;      # delete white space in the beginning
+          $certif = "$certif\n$i";
+        }elsif($state eq 'ELSE'){
+        }else{   
+          print STDERR "Unknown state $state!\n";
+        }
+
+      }else{
+        if ($state eq 'INIT'){
+          #print STDERR "Cannot happen in INIT state!\n";
+          $state = 'ELSE'; 
+        }elsif($state eq 'CERTIF'){
+          $state = 'ELSE';
+        }elsif($state eq 'ELSE'){
+        }else{           
+          print STDERR "Unknown state $state!\n";
+        }
+
+      }
+    }
+
+  }
+  return $certif;
+}
+
+
+# Simple check of sanity for an ASCII dump of a public key
+sub check_sanity {
+
+  my $public_key = shift;
+
+  # make sure the public key has proper start and end marks
+  if (   $public_key !~ /-----BEGIN PGP PUBLIC KEY BLOCK-----/
+      || $public_key !~ /-----END PGP PUBLIC KEY BLOCK-----/){
+    return 0; # return false
+  }
+
+  # no problem encountered, return 1
+  return 1;
+
+}
+
+
+
+# Main
+
+
+if($#ARGV != 0){
+  print STDERR "Usage: $0 filename\n";
+  exit(1);
+}
+
+
+my($textdump) = $ARGV[0];
+
+my($certif) = '';
+my($keyid) = '';
+
+open(OBJECTS, $textdump) || die "Could not open $textdump to read: $!";
+$/ = ''; # paragraph mode
+ 
+  while(my $object = <OBJECTS>) 
+  {
+      if($object !~ /^key-cert:/){
+        next; # skip if not a key-cert object
+      }
+      # print them out
+      $certif = &get_certif($object); 
+
+      # perform a simple sanity check. If does not pass, do not print out
+      # the $certif to STDOUT
+      if(!&check_sanity($certif)){
+        print STDERR "ERROR: This object does not pass sanity check:\n";
+        print STDERR "$object\n";
+        print STDERR "Will continue to process other objects.\n";
+        next;
+      }
+      $object =~ /^.*(PGPKEY-.{8})/i;
+      $keyid = $1;
+      print "\nNext: $keyid\n\n$certif\n";
+
+
+  }
+
+close(OBJECTS);
+
+

@@ -1,0 +1,31 @@
+FINE-TUNING MYSQL
+-----------------
+
+* Whois software allows arbitrarily large BLOBs to be created. There are
+  some entries that exceed the default packet size of Mysql. Default
+  settings will also cause the server to crash while mirroring RIPE
+  database. Inserting the following to [mysqld] section of my.cnf will
+  solve the problem:
+
+  set-variable = max_allowed_packet=10M
+
+  which assumes that the largest object is ~10M.
+
+* Whois software maintains a persistent connection to Mysql server. If the
+  whois server stands idle for a long time, connection is dropped by Mysql.
+  There are also certain cases where mysql just decides to drop the
+  connection due to large number of errors. Inserting the following lines
+  will solve problems about whois to mysql connections:
+
+  set-variable = wait_timeout=31536000
+  set-variable = max_connect_errors=999999999
+  set-variable = max_connections=1000
+  set-variable = back_log=200
+  set-variable = connect_timeout=20
+  set-variable = net_read_timeout=60
+  set-variable = net_retry_count=20
+  set-variable = net_write_timeout=120
+  set-variable = key_buffer_size=64M
+  set-variable = table_cache=256
+  set-variable = sort_buffer=4M
+  set-variable = record_buffer=1M

@@ -1,0 +1,22 @@
+# pre-process object tests
+# CASE 20: Create a person object
+#          with a nic-hdl with a standard suffix from the list
+#          of sources held in the config file
+%
+% requires initial objects to be loaded
+#
+# create person object 
+#
+#SUCCESS
+#
+# RESULT 20: The creation will succeed
+
+
+person:       test person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+

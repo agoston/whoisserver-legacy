@@ -1,0 +1,36 @@
+# notification tests
+# CASE 30: Create inetnum object
+#          The inetnum has mnt-irt, notify.
+#          The inetnum mnt-by has mnt-nfy, upd-to, notify.
+#          The inetnum mnt-irt has irt-nfy, notify.
+#          The parent has mnt-irt, notify.
+#          The parent mnt-by has mnt-nfy, upd-to, notify.
+#          The parent mnt-irt has irt-nfy, notify.
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 30: There should be a notif message to case030-12@ripe.net,
+#            case030-5@ripe.net, case030-10@ripe.net,
+#            case030-2@ripe.net
+#            about successful creation, and no forward message.
+
+
+inetnum:      192.168.201.0 - 192.168.201.255
+netname:      RIPE-NET
+country:      NL
+descr:        /24 to contain our tests
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+notify:       case030-12@ripe.net
+mnt-by:       USER-MNT
+mnt-lower:    USER-MNT
+mnt-irt:      IRT-USER
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password: user-mnt
+password: test-mnt
+password: irt

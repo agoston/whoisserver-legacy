@@ -1,0 +1,25 @@
+DROP TABLE IF EXISTS fingerpr;
+DROP TABLE IF EXISTS x509;
+
+#
+# Table structure for table 'fingerpr'
+#
+
+CREATE TABLE fingerpr (
+  thread_id int(11) NOT NULL default '0',
+  object_id int(10) unsigned NOT NULL default '0',
+  fingerpr varchar(80) NOT NULL default '',
+  PRIMARY KEY  (fingerpr,object_id)
+);
+
+#
+# Table structure for table 'x509'
+#
+
+CREATE TABLE x509 (
+  thread_id int(11) NOT NULL default '0',
+  keycert_id int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (keycert_id)
+);
+
+

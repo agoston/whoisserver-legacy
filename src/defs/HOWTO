@@ -1,0 +1,339 @@
+Adding an RPSL Class
+--------------------
+
+To add a class to the RPSL definitions, you must first edit
+defs/classes.xml.  A class definition looks like this:
+
+  <ripe_class name="inetnum" main_sql_table="inetnum" code="in">
+    <description>
+      An inetnum object contains information on allocations and
+      assignments of IPv4 address space.
+    </description>
+    <attributes>
+      <inetnum     choice="mandatory" number="single"   />
+      <netname     choice="mandatory" number="single"   />
+      <descr       choice="mandatory" number="multiple" />
+      <country     choice="mandatory" number="multiple" />
+      <admin-c     choice="mandatory" number="multiple" />
+      <tech-c      choice="mandatory" number="multiple" />
+      <rev-srv     choice="optional"  number="multiple" />
+      <status-in   choice="mandatory" number="single"   />
+      <remarks     choice="optional"  number="multiple" />
+      <notify      choice="optional"  number="multiple" />
+      <mnt-by      choice="mandatory" number="multiple" />
+      <mnt-lower   choice="optional"  number="multiple" />
+      <mnt-routes  choice="optional"  number="multiple" />
+      <mnt-irt     choice="optional"  number="multiple" />
+      <changed     choice="mandatory" number="multiple" />
+      <source      choice="mandatory" number="single"   />
+      <delete      choice="optional"  number="single"   pseudo="yes"/>
+      <override    choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+
+    <dbase_code value="6"/>
+
+    <rollback-tables>
+      <table name="mntner"/>
+         .
+         .
+    </rollback-tables>
+    <affected-tables>
+      <table name="admin_c"/>
+         .
+         .
+    </affected-tables>
+    <delete-invquery-tables>
+      <table name="mnt_by"/>
+         .
+         .
+    </delete-invquery-tables>
+
+  </ripe_class>
+
+In the <ripe_class>, name is the RPSL name, the code is the two
+character abbreviation used when you use -F on a query. main_sql_table
+is the main SQL table that corresponds to this class. The
+<description> has been taken from the RIPE Database Reference Manual,
+and is presented to the user when they make a "-v class" query.
+
+The <attributes> section defines the attributes of the class, in order.
+Each attribute consists of the attribute XML name, choice, and number.
+The XML name is the same as the attribute name in *most* cases, but not
+all.  In cases where attribute names are ambiguous, you should define a
+different name for this.  The recommended nomenclature is to append the
+class code to the end, e.g. "members-as" or "members-rs", but you can
+use any name you wish (see below for details).  Choice may be
+"mandatory", "optional", or "generated".  Number may be "single" or
+"multiple".  There is also the optional "pseudo" tag.  This is used
+for things that may be treated as attributes but do not show up in
+"-v" or "-t", commands for dbupdate in this case.
+
+<dbase_code> is a unique numeric identifier.  New classes
+should pick the next available number.  The number here is used to
+insure persistence in the database when this file is modified.
+
+<rollback-tables>, <affected-tables> and the <delete-invquery-tables> 
+tags specify a set of SQL tables which are affected by a particular database
+operation.  All three categories are being processed by the Java code
+generator facility to generate modules/ud/ud_comrol.h.
+
+All of these tags must be populated by zero or more <table> tags, such as: 
+  <table name="mnt_by" />.
+
+  rollback-tables:  
+    Defines the list of SQL tables affected by a rollback operation.
+    This is needed for commit or rollback of the transaction (v3 software
+    doesn't rely on transaction support from the underlying RDBMS).
+
+  affected-tables:
+    Tables that may be affected by the object itself. Basically it is a list 
+    of all possible attributes of the object of the type that are stored 
+    in the db. 
+
+  delete-invquery-tables:
+    Tables that may be affected when a dummy object is created to resolve 
+    references. For example, if one creates a inetnum object that has no 
+    corresponding admin-c, tech-c, mnt-by, etc., dummy records will be 
+    created in person_role table and mntner table. We need to clean up them.
+  
+ 
+Adding an RPSL Attribute
+------------------------
+
+Once the class has been added, the attributes must be added.  The
+attribute definitions reside in defs/attributes.xml.  An attribute
+definition looks like this:
+
+  <ripe_attribute name="as-set" code="as">
+    <description>
+       Defines the name of the set.
+    </description>
+    <syntax>as-set</syntax>
+         .
+         .
+         .
+  </ripe_attribute>
+
+Many of these will already be defined, e.g. "source", "changed", and so
+on, and should not be redefined (all warranties are void if you do so).
+
+There is a lot of definition in the "..." section above, but if all goes
+according to plan you can simply copy this data from another attribute
+definition.  (Author's warning: I actually have *no idea* how most of
+this works, so change at your own risk!)
+
+The <description> tag should be changed to match the Database Reference
+Manual.  It should *not* include the parts that specify syntax; this is
+defined in the syntax attribute.
+
+In the old defs, there was a tag called <format>.  This no longer
+exists.  Delete this if present, and replace with the <syntax> tag.  The
+syntax refers to an entry defined in the syntax.xml file (described
+below), and can be any name.  You should check to see if a syntax that
+matches already exists before making up a new name (for example,
+address, remarks, and description all use "free-form" as their syntax).
+
+The <syntax> tag can also contain a tag declaring it a list or a
+RIPE-style list.  This is done by adding <list/> or <ripe-list/> before
+the syntax name.  The reason that lists are defined here rather than in
+the syntax itself is to allow the same syntax definition to be used for
+mntner and mnt-by, for instance.  (See below for example.)
+
+For attributes that are ambiguous, you will have to define a unique XML
+name, as mentioned above.  Such an attribute looks like this:
+
+  <ripe_attribute xmlname="members-as" name="members" code="ms">
+    <description>
+       Lists the members of the set.
+    </description>
+    <syntax><list/>members-as</syntax>
+  </ripe_attribute>
+
+If no xmlname is specified, the attribute name is used for that value.
+
+
+Adding a Syntax
+---------------
+
+And finally, syntaxes must be added.   The syntax definitions are in
+in defs/syntax.xml.  An syntax definition looks like this:
+
+   <attribute_syntax name="filter-set">
+       <core>
+          <regex>
+              ^.{1,80}$
+          </regex>
+       </core>
+       <front_end>
+          <regex>
+              ^fltr-[A-Z0-9_-]*[A-Z0-9]$
+          </regex>
+       </front_end>
+       <description>
+           An filter-set name is made up of letters, digits, the
+           character underscore "_", and the character hyphen
+           "-"; it must start with "fltr-", and the last
+           character of a name must be a letter or a digit.
+       </description>
+   </attribute_syntax>
+
+The <description> is of the syntax only, and has been taken from the
+RIPE Database Reference Manual.  The other two sections are <core> and
+<front_end>.  These are both identical, and have between 1 and 3
+sections: <regex>, <reserved_regex>, and <parser_name>.
+
+The <core> part is used by the whois_rip application, and the
+<front_end> part by dbupdate.
+
+The <regex> is a POSIX regular expression that is used against the
+attribute to verify the syntax.  So in the case above, the
+"filter-set" core syntax requires between 1 and 80 characters, but it
+doesn't care which ones.  The front end syntax requires that it match
+the description.
+
+Regular expressions are always case-insensitive, and before they are
+matched against, leading and trailing whitespace is removed, and all
+runs of whitespace are converted into a single space, as in: s/\s+/ /g;
+     
+The <reserved_regex> is the opposite of <regex>.  Anything that
+matches a reserved regular expression is considered to be using a
+disallowed word.
+
+The final tag, <parser_name>, is the most powerful and the most
+complicated.  It is described below.
+
+
+Lex and Yacc Parsing
+--------------------
+
+The <parser_name> tag must have two files associated with it,
+modules/rpsl/<parser_name>.l and modules/rpsl/<parser_name>.y,
+which define the Lex and Yacc rules for this attribute.
+
+The Lex file contains the usual matching, and should include the
+following in the first section (replacing <parser_name> with the name
+used in the XML files):
+
+    %{
+    /* tokens defined in the grammar */
+    #include "<parser_name>.tab.h"
+    
+    #define <parser_name>wrap yywrap
+    void syntax_error(char *fmt, ...);
+    void yy_input(char *buf, int *result, int max_size);
+    #undef YY_INPUT
+    #define YY_INPUT(buf,result,max_size) yy_input(buf,&result,max_size)
+    %}
+
+These definitions are required because we use multiple Lex and Yacc
+definitions in the same file.  The easiest solution is to copy one of
+the existing Lex files, e.g. refer.l, and use that as a starting point.
+
+Note that tokens are *not* defined here - they are defined in the Yacc
+file.
+
+The Yacc file should define the following in the first section:
+
+    %{
+    int yyerror(const char *s);
+    %}
+    
+    %token TKN_A TKN_B
+
+The second section must start with the rule that matches the entire
+syntax.  The name of the rule does not matter (unless you want to make
+it recursive, for some wacky reason).
+
+The final section should look like this:
+
+    #undef <parser_name>error
+    #undef yyerror
+    
+    int
+    <parser_name>error (const char *s)
+    {
+        yyerror(s);
+        return 0;
+    }
+
+That's it!
+
+
+Building
+--------
+
+To convert the XML to the various .def, .h, and Makefile.syntax, you
+need to be in defs/.  You should have a Java interpreter in your
+PATH.  Development so far has been done with the 1.3.1 JDK from Sun,
+at http://java.sun.com/.
+
+The defs/Makefile file starts by compiling the Java source, and
+then it produces include/*.def, and then it creates attribute_tab.h,
+class_tab.h, syntax_tab.h, and Makefile.syntax in the defs/ directory.
+
+It is still possible to get mysterious "null exception caught"
+abnormal terminations.  If this happens, you can either debug the Java
+to figure out what went wrong, or examine your recent XML changes.  
+
+I recomend making small changes for this reason!
+
+At that point, you can build the rest of RIP with the new defintions.
+
+
+Table Changes
+-------------
+
+Any new attributes that need to be searched must be added to the
+scripts in bin/load/SQL.  Please use the entries there as a model for
+new attributes.
+
+
+Update Changes
+--------------
+
+As with table changes, the easiest way to define the updates to a new
+class is to model them on an existing class.  For instance, the irt
+updates were modeled after the mntner updates.  In such a case, you
+can copy the definitions from the similar class in the XML files, and
+modify them as necessary.
+
+Also you need to do some modifications in modules/ud/ud_core.c and
+modules/ud/ud_comrol.[ch]:
+
+- ud_core.c modifications are limited to create_dummy() function.
+  This is needed if an object of the new class can be referenced (like
+  person or mntner objects).  To allow the database system
+  automatically resolve such reference when the referenced object is
+  not present in the database a dummy object is created.  Please
+  follow the logic implemented for the existing classes.
+
+- ud_comrol.h is being being derived from the XML files directly
+
+- ud_comrol.c *may* need updating as the code still contains some
+  hardcoded table names -- see 2) below.
+  
+  1) If an object of this class can be referenced a <delete-invquery-tables>
+     tag needs to be added to classes.xml, populated by the names of the
+     "auxiliary" tables (like mnt_by, admin_c, etc).
+
+  2) In case of 1) the UD_check_ref() function also needs to be modified
+     to check that the object is not referenced when performing a
+     deletion.  The easiest way to do this is to follow the logic
+     implemented for person and mntner classes.
+
+In modules/df the defs.c file needs to be modified to include the new
+class in Type2main[] and Filter_names[] arrays.
+
+
+Query Changes
+-------------
+
+The server currently compares the key submitted to Whois for query
+with the definitions in the WK (or "which keytype") module.  This
+allows the server to optimise queries, for example by not looking in
+the person table if the query is "128.0.0.1".  When a new class is
+added that has a new key, the modules/wk/which_keytypes.c and 
+modules/wk/which_keytypes.h files need to be updated to add the
+appropriate pattern and symbol.
+
+

@@ -1,0 +1,16 @@
+# first updates tests
+# CASE 20: odd characters in person name
+#
+# syntax error.
+#
+#FAILURE
+#
+# RESULT 20: syntax error in person: attribute
+
+
+person:       Test PerýŸson2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

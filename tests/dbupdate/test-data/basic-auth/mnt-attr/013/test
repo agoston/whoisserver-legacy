@@ -1,0 +1,22 @@
+# mnt-attr tests
+# CASE 13: We try to create 20.13.0.0/16 route object. 
+#         mnt-routes contains invalid range (.../16^44-57) 
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 13: The creation will fail
+
+
+password: mb-child
+password: mr-exact
+
+route:   20.13.0.0/16
+descr:   Route
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+mnt-routes:  CHILD-MR-MNT { 20.13.0.0/16^44-57}
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST

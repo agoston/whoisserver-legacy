@@ -1,0 +1,27 @@
+# CASE 38: Create an inetnum, using an invalid prefix
+#          This tests the front-end regex defined in syntax.xml
+#
+# create inetnum with an invalid prefix
+#
+#FAILURE
+#
+# RESULT 38: create fails
+
+
+inetnum:      193.0.0.0/7
+netname:      CIDR-NET
+descr:        Testing the CIDR-range conversion
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+remarks:      Testing the CIDR-range conversion
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+mnt-routes:   RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+password:     test-dbm
+password:     hostmaster
+source:       DB-TEST
+
+

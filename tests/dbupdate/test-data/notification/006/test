@@ -1,0 +1,22 @@
+# notification tests
+# CASE 6: Modify a maintained object, where mntner has an upd-to 
+#         attribute and does _not_ have a mnt-nfy attribute, to change its
+#         maintainer.
+#
+# modify mnt-by of object
+#
+#SUCCESS
+#
+# RESULT 6: There should not be any notif or forward messages.
+
+
+person:  Test Person
+address: Singel 258
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP10-DB-TEST
+mnt-by:  TEST2-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+password: notif

@@ -1,0 +1,19 @@
+% misc tests
+
+inet-rtr:    kst1-core.swip.net
+descr:       test router
+local-as:    AS1257
+ifaddr:      146.188.49.14 masklen 30
+ifaddr:      195.158.247.62 masklen 30
+peer:        BGP4 146.188.49.13 asno(AS702)
+peer:        BGP4 195.158.247.61 asno(AS1755)
+admin-c:     TP1-DB-TEST
+tech-c:      TP1-DB-TEST
+mnt-by:      TEST-MNT
+member-of:   rtrs-test
+notify:      dbtest@ripe.net
+changed:     dbtest@ripe.net 20030101
+source:      DB-TEST
+
+password: auth
+

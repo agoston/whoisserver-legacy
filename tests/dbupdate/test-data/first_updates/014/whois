@@ -1,0 +1,8 @@
+% whois output
+%
+person:       test person2
+address:      here
+phone:        +0123456789
+changed:      dbtest@ripe.net 20030101
+nic-hdl:      TP2-DB-TEST
+source:       db-test

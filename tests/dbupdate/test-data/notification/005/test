@@ -1,0 +1,23 @@
+# notification tests
+# CASE 5: Modify a maintained object, where mntner has both
+#         a mnt-nfy and an upd-to attributes, to change its 
+#         mnt-by to another mntner.
+#
+# change mnt-by of object
+#
+#SUCCESS
+#
+# RESULT 5: There should be notif message to case005-1@ripe.net
+#           about successful modify and no forward message.
+
+
+person:  Test Person
+address: Address modified!
+address: Amsterdam
+phone:   +31 20 535 4444
+nic-hdl: TP10-DB-TEST
+mnt-by:  TEST2-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+password: notif

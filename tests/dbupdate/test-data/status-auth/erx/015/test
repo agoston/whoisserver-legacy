@@ -1,0 +1,27 @@
+# inetnum erx status tests
+# CASE 15: We try to modify an inetnum object
+# Change the status from EARLY-REGISTRATION to ASSIGNED PA
+# The less specific inetnum also has status ALLOCATED PA 
+# no override and no HM password
+%
+% requires initial objects to be loaded
+#
+# modify inetnum object
+#
+#SUCCESS
+#
+# RESULT 15: modification will succeed
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 was EARLY-REGISTRATION
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+mnt-lower:    END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: END-USER

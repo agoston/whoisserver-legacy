@@ -1,0 +1,343 @@
+# basic updates tests
+
+# CASE 1: Blank update message
+#
+# No content in the update message
+#
+#SUCCESS
+#
+# RESULT 1: Number of objects found: 0  reported in ack summary
+#           nothing reported as not looking like an object.
+
+
+# CASE 2: Garbage only in update message
+#
+# No object, but some garbage, in the update message
+#
+#SUCCESS
+#
+# RESULT 2: Number of objects found: 0  reported in ack summary
+#           and garbage reported as not looking like an object.
+
+
+# CASE 3: Object with no source line in update message
+#
+# Object not recognised, so treated as garbage.
+#
+#SUCCESS
+#
+# RESULT 3: Number of objects found: 0  reported in ack summary
+#           and object reported as not looking like an object.
+
+
+# CASE 4: Object with a space at the start of each line in update message
+#
+# Object not recognised, so treated as garbage.
+#
+#SUCCESS
+#
+# RESULT 4: Number of objects found: 0  reported in ack summary
+#           and object reported as not looking like an object.
+
+
+# CASE 5: Object with a space before the colon ':'  
+#         after the class attribute in update message
+#
+# Object not recognised, so treated as garbage.
+#
+#SUCCESS
+#
+# RESULT 5: Number of objects found: 0  reported in ack summary
+#           and object reported as not looking like an object.
+
+
+# CASE 6: Object with a blank line after each line in update message
+#
+# Object not recognised, so treated as garbage.
+#
+#SUCCESS
+#
+# RESULT 6: Number of objects found: 0  reported in ack summary
+#           and each line of object reported as not looking like an object.
+
+
+# CASE 7: Object with syntax error
+#
+# Object with syntax error
+#
+#FAILURE
+#
+# RESULT 7: Syntax error  reported
+
+
+# CASE 8: Object with syntax error, plus some garbage
+#
+# Object with syntax error and some garbage
+#
+#FAILURE
+#
+# RESULT 8: Syntax error  reported
+#           and garbage reported as not looking like an object.
+
+
+# CASE 9: Object with syntax error, followed by some garbage
+#         followed by another object with syntax error.
+#
+# Two objects with syntax error and some garbage
+#
+#FAILURE
+#
+# RESULT 9: Syntax errors  reported
+#           and garbage reported as not looking like an object.
+
+
+# CASE 10: Object with unrecognised source
+#
+# Object with unrecognised source
+#
+#FAILURE
+#
+# RESULT 10: source in object not recognised  reported
+
+
+# CASE 11: Delete object that does not exist
+#
+# Delete object that does not exist in the database
+#
+#FAILURE
+#
+# RESULT 11: Attempting to delete object 
+#            which does not exist in the database reported
+
+
+# CASE 12: Delete object that does not match existing object
+#
+# Delete object that does not match the existing object in the database
+#
+#FAILURE
+#
+# RESULT 12: Attempting to delete object which does not match
+#            existing object in the database reported
+
+
+# CASE 13: Delete key-cert object that does not match existing object
+#
+# Delete key-cert object that does not match the existing 
+# key-cert object in the database (generated attributes missing)
+#
+#FAILURE
+#
+# RESULT 13: The object will not be deleted as 
+#            generated attributes must now be included on deletions.
+
+
+# CASE 14: Modify an object with no changes
+#
+# Modify an object where the update object is identical to the existing
+# object in the database
+#
+#SUCCESS (NOOP)
+#
+# RESULT 14: The object for modify is identical to the one in the database, 
+#            no operation reported
+
+
+# CASE 15: Create a new object that already exists
+#
+# Create a new object with the enforced new keyword that already 
+# exists in the database
+#
+#FAILURE
+#
+# RESULT 15: Enforced new keyword specified, but the object
+#            already exists in the database reported
+
+
+# CASE 16: Object with corrupt class attribute
+#
+# Object not recognised, so treated as garbage.
+#
+#SUCCESS
+#
+# RESULT 16: Number of objects found: 0  reported in ack summary
+#            and object reported as not looking like an object.
+
+
+# CASE 17: Object with a space before the colon ':'  
+#          after any attribute in update message,
+#          but not the class attribute.
+#
+# syntax error.
+#
+#FAILURE
+#
+# RESULT 17: Syntax errors in object reported.
+
+
+# CASE 18: Object with a space at the start of any line  
+#          after the class attribute in update message
+#
+# syntax error.
+#
+#FAILURE
+#
+# RESULT 18: Syntax errors in object reported.
+
+
+# CASE 19: Delete key-cert object that does match existing object
+#
+# Delete key-cert object that does match the existing 
+# key-cert object in the database (generated attributes included)
+#
+#SUCCESS
+#
+# RESULT 19: The object will be deleted 
+
+
+# CASE 20: odd characters in person name
+#
+# syntax error.
+#
+#FAILURE
+#
+# RESULT 20: syntax error in person: attribute
+
+
+# CASE 21: odd characters in nic-hdl
+#
+# syntax error.
+#
+#FAILURE
+#
+# RESULT 21: syntax error in nic-hdl: attribute
+
+
+# CASE 22: create a person object with odd characters in address
+#
+# create succeeds.
+#
+#SUCCESS
+#
+# RESULT 22: create succeeds
+
+
+# CASE 23: Blank update mail message
+#
+# No content in the update message
+#
+#FAILURE
+#
+# RESULT 23: Number of objects found: 0  reported in ack summary
+#            nothing reported as not looking like an object.
+#            Subject: line contains FAILED:
+#
+
+
+# CASE 24: Object with syntax error, mail message
+#
+# Object with syntax error
+#
+#FAILURE
+#
+# RESULT 24: Syntax error  reported
+#            Subject: line contains FAILED:
+
+
+# CASE 25: Modify a single object with no changes
+#
+# Modify an object where the update object is identical to the existing
+# object in the database
+# Mail message
+#
+#FAILURE
+#
+# RESULT 25: The object for modify is identical to the one in the database, 
+#            no operation reported
+#            Subject: line contains SUCCESS:
+#
+
+
+# CASE 26: Modify an object with no changes 
+#          and a second object with successful changes
+#
+# Modify an object where the update object is identical to the existing
+# object in the database and a second object with some valid difference.
+# Mail message
+#
+#FAILURE
+#
+# RESULT 26: The object for modify is identical to the one in the database, 
+#            no operation reported
+#            Subject: line contains SUCCESS:
+
+
+# CASE 27: Delete object with corrupt class attribute
+#
+# Object not recognised.
+#
+#FAILURE
+#
+# RESULT 27: not recognised as an object on later check
+
+
+# CASE 28: Delete object with null class attribute value
+#
+# Object not recognised.
+#
+#FAILURE
+#
+# RESULT 28: not recognised as an object on later check
+
+
+# CASE 29: Modify a single object
+#
+# Modify an object 
+# Mail message
+#
+#SUCCESS
+#
+# RESULT 29: The modify is successful 
+#            Subject: line contains SUCCESS:
+
+
+# CASE 30: Modify an object with errors 
+#          and a second object with successful changes
+#
+# Modify an object with a syntax error and a second object with 
+# some valid difference.
+# Mail message
+#
+#FAILURE
+#
+# RESULT 30: One object is successful and the other fails
+#            Subject: line contains FAILED:
+
+
+# CASE 31: Modify an object with no changes  
+#          and a second object with an error
+#
+# Modify an object where the update object is identical to the existing
+# object in the database and a second object with a syntax error
+# Mail message
+#
+#FAILURE
+#
+# RESULT 31: One object is a NOOP and the other fails
+#            Subject: line contains FAILED:
+
+
+# CASE 32: Modify an object successfully
+#          and a second object with no changes  
+#          and a third object with an error
+#
+# Modify an object successfully
+# and a second object where the update object is identical to the existing
+# object in the database and a third object with a syntax error
+# Mail message
+#
+#FAILURE
+#
+# RESULT 32: One object is a NOOP and the other fails
+#            Subject: line contains FAILED:
+
+

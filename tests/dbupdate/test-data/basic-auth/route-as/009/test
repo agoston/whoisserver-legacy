@@ -1,0 +1,24 @@
+# route authorisation tests - autnum
+# CASE 9: We try to create 20.13.0.0/16 route object 
+#         parent exists, 
+#         origin exists with mnt-by, mnt-lower
+#         passwords for parent and child and origin mnt-by
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed
+
+
+password: mb-parent
+password: mb-origin
+password: mb-child
+
+route:   20.13.0.0/16
+descr:   Route
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST

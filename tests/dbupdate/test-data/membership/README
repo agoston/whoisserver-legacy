@@ -1,0 +1,131 @@
+# The goal of these tests is to make sure we're doing right thing with membership authorisaion as
+# well as referential integrity checks for mbrs-by-ref attribute.
+#
+#
+# CASE 1: We try to create aut-num object AS123 with member-of: AS-TEST
+# AS-TEST exists and is protected by RIPE-NCC-HM-MNT
+# one of mnt-by of aut-num points to mbrs-by-ref maintainer
+#
+% requires initial objects to be loaded
+%
+# create aut-num object
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to create aut-num object AS123 with member-of: AS-TEST
+# AS-TEST exists and is protected by RIPE-NCC-HM-MNT
+# no mbrs-by-ref correct mntner in the object
+# fail with membership authorisation
+#
+% requires initial objects to be loaded
+%
+# create aut-num object
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+
+# CASE 3: We try to modify aut-num object AS123, member-of AS-TEST
+# and remove mnt-by: RIPE-NCC-HM-MNT
+# AS-TEST exists and is protected by RIPE-NCC-HM-MNT
+# fail with membership authorisation
+#
+% requires initial objects to be loaded
+%
+# modify aut-num object
+#
+#FAILURE
+#
+# RESULT 3: The modification will fail.
+
+
+# CASE 4: We try to delete maintainer object TEST-MNT
+# referenced by AS-TEST mbrs-by-ref:
+# deletion fails - referenced from other objects
+#
+% requires initial objects to be loaded
+%
+# delete mntner object
+#
+#FAILURE
+#
+# RESULT 4: The deletion will fail.
+
+
+# CASE 5: We try to delete as-set object AS-TEST
+# referenced by AS123 as member-of:
+#
+% requires initial objects to be loaded
+%
+# delete as-set object
+#
+#SUCCESS
+#
+# RESULT 5: The deletion will succeed.
+
+
+# CASE 6: We try to create as-set object AS-TEST
+# already referenced by AS123 as member-of:
+# THIS TEST ITSELF WILL SUCCEED DUE TO THE BUG, BUT SHOULD FAIL NORMALLY
+# will give Error 32 now
+#
+% requires initial objects to be loaded
+%
+# create as-set object
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail.
+
+
+# CASE 7: We try to create as-set object AS-TEST
+# with mbrs-by-ref: ANY
+#
+% requires initial objects to be loaded
+%
+# create as-set object
+#
+#SUCCESS
+#
+# RESULT 7: The creation will succeed.
+
+# CASE 8: We try to create aut-num object AS123 with member-of: AS-TEST
+# AS-TEST exists and is protected by RIPE-NCC-HM-MNT
+# with mbrs-by-ref: ANY
+#
+% requires initial objects to be loaded
+%
+# create aut-num object
+#
+#SUCCESS
+#
+# RESULT 8: The creation will succeed.
+
+# CASE 9: We try to create aut-num object AS123 with member-of: AS-TEST
+# AS-TEST exists and is protected by RIPE-NCC-HM-MNT
+# with NO mbrs-by-ref: attribute
+#
+% requires initial objects to be loaded
+%
+# create aut-num object
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed.
+
+# CASE 10: We try to create route object 1.0.0.0/24 with member-of: RS-TEST
+# RS-TEST exists and is protected by RIPE-NCC-HM-MNT
+# with NO mbrs-by-ref: attribute
+#
+% requires initial objects to be loaded
+%
+# create route object
+#
+#SUCCESS
+#
+# RESULT 10: The creation will succeed.
+

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo "creating main database"
+$MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD <<EOM
+CREATE DATABASE ${DB};
+USE ${DB};
+EOM
+
+$MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD ${DB} <create.tables.sql
+
+echo "creating RIPADMIN database"
+$MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD <create.RIPADMIN.sql

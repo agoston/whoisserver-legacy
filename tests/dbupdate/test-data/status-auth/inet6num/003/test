@@ -1,0 +1,27 @@
+# ipv6 status tests
+# CASE 3: create an inet6num with ALLOCATED-BY-RIR
+# with mnt-by: _NOT_ RIPE-NCC-HM-MNT
+%
+% requires initial objects to be loaded
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 3: The creation will fail with Authorisation failure
+
+inet6num:     2001:0600::/25
+netname:      EU-ZZ-2001-0600
+descr:        European Regional Registry
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+status:       ALLOCATED-BY-RIR
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+password: LIR
+password: hostmaster
+

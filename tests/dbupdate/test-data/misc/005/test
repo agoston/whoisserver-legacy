@@ -1,0 +1,83 @@
+# misc tests - oddities that have caused problems in the past
+# CASE 5: Create an assignment inetnum object six times
+#         with less specific allocation with mnt-lower
+#         and correct password for mnt-lower of parent
+#         and mnt-by of object
+%
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed
+
+
+password: LIR
+password: END-USER
+
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED 1
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED 2
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED 3
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED 4
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED 5
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED 6
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

@@ -1,0 +1,65 @@
+#!@SHELL@
+# wrapper
+#
+# 2002/08/26
+#
+# description:  This script executes the program named wrapper.real,
+#               notifies by mail if it exits with non-zero status.
+#               It also checks for a core, renames the core if it
+#               exists and mentions the path to the core in the mail.
+#               It also checks for $DBDIR/locks/STOPUPDATES, and doesn't
+#               execute wrapper.real if it finds one.
+#
+# notes:        The script doesn't check if the core actually belongs
+#               to the program executed, so the executing path should
+#               be clean as much as possible.
+#
+# installation: for dbupdate:
+#               mv dbupdate dbupdate.real
+#               ln -s wrapper dbupdate
+#
+# $Id: wrapper,v 1.1 2002/10/07 13:49:50 can Exp $
+
+DBDIR=@prefix@
+LOCKDIR=$DBDIR/locks
+STOPUPDATES=$LOCKDIR/STOPUPDATES
+
+DATE="/bin/date"
+MAIL="/bin/mailx"
+MKDIR="/bin/mkdir"
+MV="/bin/mv"
+BASENAME="/usr/bin/basename"
+
+[ $TO ] || TO="dbase-errs@ripe.net"
+
+file_name=$0
+real_file=${file_name}.real
+
+subject="$file_name execution problem"
+
+if [ -f "${STOPUPDATES}" ]
+then
+  message=`cat ${STOPUPDATES}`
+  if [ -z "${message}" ]
+  then
+    message="Updates are unavailable at the moment. Please try again later."
+  fi
+  echo $message
+  exit 1
+else
+  $real_file $*
+  err=$?
+  [ $err -eq 0 ] && exit 0
+  now=`${DATE} +"%Y%m%d%H%M%S"`
+  if [ -f core ]
+  then
+    NEWCORE="$PWD/core.`${BASENAME} ${file_name}`.$now"
+    ${MV} core ${NEWCORE}
+    body="$file_name crashed in ${HOSTNAME}.
+Check the core file in ${NEWCORE}"
+  else
+    body="$file_name exited with code $err on ${HOSTNAME}."
+  fi
+  echo "$body" | ${MAIL} -s "${subject}" ${TO}
+  exit $err
+fi

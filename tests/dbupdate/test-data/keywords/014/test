@@ -1,0 +1,23 @@
+# keywords tests
+# CASE 14: No keywords 
+#          not a mail message
+%
+#
+# run dbupdate with mail subject fred help
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#SUCCESS
+#
+# RESULT 14: keywords - none in upd log.
+#            object is created
+%
+%
+$ -c $RIP_CONFIG -r -f
+
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

@@ -1,0 +1,75 @@
+
+This file summarizes the modules that are the part of RIPE Whois Server.
+
+
+AA access authorisation module.
+
+AC access control module.
+
+AU authorisation module for object updates.
+
+CA configuration reader module.
+
+CO "constants" module.
+
+CR credentials module.
+
+DF definitions module.
+
+IP IP handling module.
+
+KM key management module.
+
+LG logging module.
+
+LU lookup module for dbupdate.
+
+MA bitMAsk module.
+
+NH NIC handle manipulation module.
+
+NS reverse dNS module.
+
+NT Notifications module (also handles acknowledgements & forwards)
+
+PC Protocol config module.
+
+PG Plug-in module.
+
+PM Near real-time mirror server module.
+
+PR "Properties" module.
+
+PW Whois protocol module.
+
+QC Query command module.
+
+QI Query instruction module.
+
+RP Wrapper for RX (radix tree) module.
+
+RPSL RPSL syntax check module.
+
+RT Reporting module.
+
+RX Radix tree module.
+
+SK Socket module.
+
+SQ SQL driver.
+
+SV Server module.
+
+TA Thread accounting module.
+
+TH MultiTHreading module.
+
+UD Update module (ripupdate server).
+
+UP Update module (dbupdate program).
+
+UT Utilities module.
+
+WH Whois query module.
+
+WK "Which keytypes" module (determines which keys to look for).

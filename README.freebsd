@@ -1,0 +1,115 @@
+README for the RIPE Whois Server (RIP) on FreeBSD
+
+The RIPE Whois Server 3.2.0 has been tested on FreeBSD 5.0 RELEASE,
+using the default installation parameters.
+
+
+
+Required Software
+
+The following software must installed to build the server, as it is not
+default on FreeBSD and required (see the INSTALL file for more detailed
+descriptions of each):
+
+o GNU Make
+  If installed as "make", be sure that it is in your PATH before the
+  system "make" executable, as this will not work with the RIP
+  Makefiles.  Optionally, you can install it as "gmake", or create a
+  link from the GNU "make" executable to "gmake".
+
+o University of Washington IMAP distribution
+
+o MySQL
+  Be sure to specify "--enable-thread-safe-client" when you build the
+  distribution. You need to specify "--with-innodb" as well if you
+  intend to use InnoDB.
+  See http://www.mysql.com/doc/en/FreeBSD.html for system-specific
+  MySQL issues.
+
+o BIND
+  We need gethostbyname_r() and getservbyname_r(), which are supplied by
+  the BIND libraries.  We have tested with BIND 8.
+
+If you do not have Flex and Bison installed, you may get warning
+messages, but these will not affect operation unless you attempt to
+rebuild the source files from the Lex and Yacc definitions.
+
+
+Building
+
+The "build.sh" file has a section that works with the default FreeBSD
+setup, and the software mentioned above installed in /usr/local.
+Uncomment out the section titled FreeBSD to use this file when
+installing.
+
+
+General Notes
+
+The FreeBSD distribution has some known issues:
+
+o The m4 processor on FreeBSD fails to complete processing some m4
+  files used to produce headers, appending garbage to the output file
+  endlessly until interrupted.  We ship header files so there is no
+  reason to run m4 unless you change the error codes.
+
+o The server is very slow compared to the Solaris and Linux
+  installation.  We think this is related to poor threading performance
+  on FreeBSD, and will be pursuing this in future.  (See below for tips
+  on improving performance.)
+
+o The MySQL server seems to single-thread certain types of query,
+  especially name queries (e.g. "whois george").  During these queries,
+  no other queries will be answered.  It is possible that using the
+  InnoDB table type will solve this issue.  If you have this problem,
+  you may wish to try this solution.
+
+o When serving too many concurrent queries, connecting to the MySQL
+  server fails occasionally, causing the server to exit abnormally.
+  This will be resolved in a future release.
+
+o When server queries too rapidly, the pthread_create() call fails
+  occasionally, causing the server to exit abnormally.  This will be
+  resolved in a future release.
+
+o We have seen the MySQL server lock, consuming all available CPU and 
+  and keeping the disks very busy.  When this occurs, the machine 
+  becomes unusable.  Using --skip-name-resolve flag when starting
+  MySQL might solve this problem (see http://www.mysql.com/doc/en/FreeBSD.html
+  for details).
+
+
+Performance Tips
+
+o Use a RAM device for the MySQL temporary space.
+  FreeBSD has a file system call "mfs" which uses memory rather than
+  secondary storage.  You can add one by editing /etc/fstab and changing
+  your swap device (the one with FSType "swap") too look like this:
+
+    /dev/something  /var/mfs rw,-s=100000,nodev,noexec 0 0
+
+  Create the mount point, and run "mount -a".  To take advantage of
+  this, you should chnage the "tmpdir" variable of MySQL to this.  You
+  can do this by adding:
+
+    tmpdir = /var/mfs
+
+  To the "/etc/my.cnf" file and restarting MySQL.
+
+o Explicitly give MySQL additional memory.
+  If you have extra memory on the system, be sure to configure MySQL to
+  use it.  On our 512 Mbyte test system, we found these values in
+  "/etc/my.cnf" allowed the MySQL server to grow to about 100 Mbyte
+  under load:
+
+    [mysqld]
+    set-variable    = key_buffer_size=64M
+    set-variable    = table_cache=256
+    set-variable    = sort_buffer=4M
+    set-variable    = record_buffer=1M
+    set-variable    = net_buffer_length=8K
+    set-variable    = myisam_sort_buffer_size=8M
+    tmpdir          = /var/mfs
+    low-priority-updates
+
+
+$Date: 2004/12/27 16:38:37 $

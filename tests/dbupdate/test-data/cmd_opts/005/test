@@ -1,0 +1,17 @@
+# command line options tests
+# CASE 5: Valid options with no dash
+#
+# run dbupdate with valid options with no dash
+# ./dbupdate -c ~/db/conf/rip.config r-p file test
+#
+# check for exit code 11 
+#
+#
+#FAILURE
+#
+# RESULT 5: invalid option r-p reported
+#           invalid option file reported
+%
+%
+?11
+$ -c $RIP_CONFIG r-p file  

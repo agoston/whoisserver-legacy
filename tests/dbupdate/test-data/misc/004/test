@@ -1,0 +1,23 @@
+# CASE 4: We try to create rtr-set object rtrs-test
+#         A dummy object was created for this object when kst1-core.swip.net was created
+#         which referenced rtr-test in the member-of: attribute.
+#
+# create rtr-set object 
+#
+#FAILURE
+#
+# RESULT 4: The creation will fail because of error 32
+
+
+rtr-set:      rtrs-test
+descr:        TEST router set
+members:      rmws-brln-de07.nw.mediaWays.net
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+
+password: auth

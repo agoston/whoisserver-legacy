@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE>Process model of the database server</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<CENTER>
+<H1>Process model of the database server</H1>
+<IMG SRC="process-model.jpg">
+</CENTER>
+
+<H2>Processes</H2>
+
+<DL>
+<DT><B>dbd (whois_rip)</B>
+	<DD><P>The "master" daemon of the database system. All access
+	to the underlying database engine goes through this process. 
+	It is implemented as a multi-threaded process,
+	and written in C. 
+	<BR>The dbd daemon:</P>
+
+	<P>
+	<UL>
+	<LI>answers to queries made with whois; 
+	<LI>receives update requests from dbupdate and the networkupdate
+		daemon with the update protocol 
+		(single-object updates);
+	<LI>does referral integrity checks for the updates;
+	<LI>keeps in-memory the primary keys of routes, inetnums,
+		in-addr.arpa domains to answer specific queries
+		very efficiently;
+	<LI>takes care of locking issues which are not handled by the
+		underlying database automatically;
+	<LI>is the only "clean" entry-point to the underlying storage
+		system;
+	<LI>answers to near-real-time mirrors on a specific port
+		(different than port 43), supplying them with
+		serials;
+	<LI>has a special "admin port", to which the administrators
+		can connect (with telnet) and change some configuration
+		parameters on-the-fly.
+	</UL>
+	</P>
+
+<DT><B>dbupdate</B>
+	<DD><P>The front-end process for incoming updates. It starts
+	from <TT>.forward</TT>: the incoming update mail messages are
+	piped to dbupdate. It can also be invoked from command-line,
+	using a file as an argument. It is written in C, and C++ for the
+	object parser. 
+	<BR>The dbupdate process:</P>
+
+	<P>
+	<UL>
+	<LI>parses the headers of incoming mail and extracts the
+		relevant bits of information (like the <I>from</I> 
+		address)
+	<LI>does MIME decoding if needed;
+	<LI>decodes PGP parts and verifies signatures if needed;
+	<LI>parses the objects, verifies the syntax and reports syntax
+		errors;
+	<LI>passes the objects to dbd with authentication information
+		with the update protocol, i.e. sending one object
+		at a time with the ADD, DEL or UPD instruction;
+	<LI>sends acknowledgements and notifications.
+	</UL>
+	</P>
+
+	<P>
+        Must pay extra attention in using the right exit codes
+        (should probably return 75 for ALL fatal errors and other
+        non-successful situations and report them to the database
+        management through some channel instead of sending ugly
+        bounces to senders).</P>
+
+
+
+<DT><B>networkupdate</B>
+	<DD><P>A dumb program which just reads an update from STDIN
+	and sends it to the networkupdate daemon. Written in Perl.</P>
+
+<DT><B>networkupdate daemon</B>
+	<DD><P>Started from inetd every time an update is sent from
+	networkupdate. It is actually the same binary as dbupdate,
+        invoked with a flag (namely, -n).
+
+
+</DL>
+<HR>
+<FONT SIZE=2 COLOR=#999999><TT>
+$Id: process-model.html,v 1.1 2004/12/27 16:38:38 can Exp $
+</FONT></TT>
+
+</BODY>
+</HTML>

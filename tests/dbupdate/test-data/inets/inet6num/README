@@ -1,0 +1,52 @@
+# CASE 1: We try to create inet6num object 2001:0658:021A::/48
+# with syntactically incorrect netname
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail.
+
+
+# CASE 2: We try to create inet6num object 2001:0658:021A::/481
+# with syntactically incorrect range
+# will now fail because it is not treated as syntax error.
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+
+# CASE 3: We try to create inet6num object 2001:0658:021A::/48 - 2001:0658:021A::/48
+# with syntactically incorrect range
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 3: The creation will fail.
+
+
+# CASE 4: We try to create inet6num object 2001:0658:021A::/128
+# start IP == end IP
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed.
+
+
+# CASE 5: We try to create inet6num object 2001:0658:021A:: / 128
+# with some spaces
+# should be rejected to syntax error
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will fail.
+
+

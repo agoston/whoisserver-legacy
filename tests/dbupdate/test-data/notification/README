@@ -1,0 +1,526 @@
+# notification tests
+
+# CASE 1: Modify an object without  "notify" attribute to add one:
+#
+# modify person object
+#
+#SUCCESS
+#
+# RESULT 1: There should not be any notification message 
+#           or any forward message.
+
+
+# CASE 2: Modify an object with "notify" attribute to change the
+#         mail address in this attribute.
+#
+# Modify person
+#
+#SUCCESS
+#
+# RESULT 2: There should be a notif message to case002-1@ripe.net
+#           about successful modify, and no forward message.
+
+
+# CASE 3: Creation of an object with "notify" attribute.
+#
+# create person object
+#
+#SUCCESS
+#
+# RESULT 3: There should be a notif message to case003@ripe.net
+#           about successful creation and no forward message.
+
+
+# CASE 4: Deletion of an object with "notify" attribute.
+#
+# delete object
+#
+#SUCCESS
+#
+# RESULT 4: There should be a notif message to case004@ripe.net about
+#           successful deletion and no forward message.
+
+
+# CASE 5: Modify a maintained object, where mntner has both
+#         a mnt-nfy and an upd-to attributes, to change its 
+#         mnt-by to another mntner.
+#
+# change mnt-by of object
+#
+#SUCCESS
+#
+# RESULT 5: There should be notif message to case005-1@ripe.net
+#           about successful modify and no forward message.
+
+
+# CASE 6: Modify a maintained object, where mntner has an upd-to 
+#         attribute and does _not_ have a mnt-nfy attribute, to change its
+#         maintainer.
+#
+# modify mnt-by of object
+#
+#SUCCESS
+#
+# RESULT 6: There should not be any notif or forward messages.
+
+
+# CASE 7: Unsuccessfully try to modify a maintained object
+#         where mntner has both a mnt-nfy attribute and an upd-to
+#         attribute.
+#
+# Modify with no password
+#
+#FAILURE
+#
+# RESULT 7: There should be a forw message to case007-1@ripe.net
+#           about the unsuccessful modify and no notif message.
+
+
+# CASE 8: Creation of a maintained object, where mntner has
+#         both a mnt-nfy attribute and an upd-to attibutes.
+#
+# create a person with mnt-by
+#
+#SUCCESS
+#
+# RESULT 8: There should be a notif message to case008-2@ripe.net
+#           about the successful creation and no forward message.
+
+
+# CASE 9: Unsuccessfully try to create a maintained object
+#         where mntner has both a mnt-nfy attribute and an upd-to
+#         attribute.
+#
+# try to create a person object without the password
+#
+#FAILURE
+#
+# RESULT 9: There should be a forw message to case009-1@ripe.net
+#           about the unsuccesful creation and no notif message.
+
+
+# CASE 10: Deletion of a maintained object, where mntner has both 
+#          a mnt-nfy attribute and an upd-to attribute and the
+#          maintained object has a notify attribute.
+#
+# delete the TP22-DB-TEST person object 
+#
+#SUCCESS
+#
+# RESULT 10: There should be a notif message to case010-2@ripe.net
+#            and case010-3@ripe.net and no forward message.
+
+
+# CASE 11: Unsuccessfully try to delete a maintained object
+#          where mntner has both a mnt-nfy attribute and an upd-to
+#          attribute and the maintained object has a notify attribute..
+#
+# unsuccessfully try to delete the TP1-RIPE person object
+# by sending an update with no password
+#
+#FAILURE
+#
+# RESULT 11: There should be a forw message to case011-1@ripe.net
+#            about the unsuccessful deletion and no notif messages.
+
+
+# CASE 12: A "composite" case: Modify of an object with two notify,
+#          one mnt-by attribute, where mntner has two mnt-nfy
+#          and an upd-to.
+#
+# The person object is modified 
+#
+#SUCCESS
+#
+# RESULT 12: There should be notification mails to case012-2@ripe.net,
+#            case012-3@ripe.net, case012-4@ripe.net, case012-5@ripe.net
+#            and no forward message.
+
+
+# CASE 13: A "composite" case: Modify of an object with two mnt-by.
+#
+# modify the person object 
+#
+#SUCCESS
+#
+# RESULT 13: There should be two notification emails to
+#            case013-2@ripe.net and case013-4@ripe.net
+#            and no forward message.
+
+
+# CASE 14: A "composite" case: Unsuccessful modify of an object
+#          with two mnt-by, each with two upd-to.
+#
+# Try to modify the person object, with no password.
+#
+#FAILURE
+#
+# RESULT 14: There should be four forw messages about the failed update, to
+#            case014-1@ripe.net, case014-2@ripe.net, case014-4@ripe.net,
+#            case014-5@ripe.net and no notif message.
+
+
+# CASE 15: Creation of an object with "notify" attribute.
+#          Modify an object with "notify" attribute to change the
+#          mail address in this attribute.
+#          Deletion of an object with "notify" attribute.
+#
+# create, modify, delete objects
+#
+#SUCCESS
+#
+# RESULT 15: There should be a notif message to case015-1@ripe.net about
+#            successful creations, modify and deletion and no forward message.
+
+
+# CASE 16: Modify a maintained object, where mntner has both
+#          a mnt-nfy and an upd-to attributes, to change its 
+#          mnt-by to another mntner.
+#          not a mail message
+#          origin (-o 192.0.0.0) specified
+#
+# change mnt-by of object
+#
+#SUCCESS
+#
+# RESULT 16: There should be notif message to case016-1@ripe.net
+#            about successful modify and no forward message.
+
+
+# CASE 17: Unsuccessfully try to modify a maintained object
+#          where mntner has both a mnt-nfy attribute and an upd-to
+#          attribute.
+#          not a mail message
+#          origin (-o 192.0.0.0) specified
+#
+# Modify with no password
+#
+#FAILURE
+#
+# RESULT 17: There should be a forw message to case017-1@ripe.net
+#            about the unsuccessful modify and no notif message.
+
+
+# CASE 18: Create inetnum object with mnt-irt
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 18: There should be a notif message to case018-1@ripe.net
+#            about successful creation, and no forward message.
+
+
+# CASE 19: Modify inetnum object to add mnt-irt
+#
+# modify inetnum object 
+#
+#SUCCESS
+#
+# RESULT 19: There should be a notif message to case019-1@ripe.net
+#            about successful modification, and no forward message.
+
+
+# CASE 20: Modify inetnum object to add mnt-irt
+#          no irt password
+#
+# modify inetnum object 
+#
+#FAILURE
+#
+# RESULT 20: There should be a forward message to dbtest@ripe.net
+#            about failed modification, and no notif message.
+
+
+# CASE 21: Modify inetnum object to remove mnt-irt
+#
+# modify inetnum object 
+#
+#SUCCESS
+#
+# RESULT 21: There should be a notif message to case021-1@ripe.net
+#            about successful modification, and no forward message.
+
+
+# CASE 22: Modify inetnum object to remove mnt-irt
+#          no TEST-MNT password
+#
+# modify inetnum object 
+#
+#FAILURE
+#
+# RESULT 22: There should be a forward message to dbtest@ripe.net
+#            about failed modification, and no notif message.
+
+
+# CASE 23: Delete inetnum object with mnt-irt
+#          no password for irt
+#
+# delete inetnum object 
+#
+#SUCCESS
+#
+# RESULT 23: There should be a notif message to case023-1@ripe.net
+#            about successful deletion, and no forward message.
+
+
+# CASE 24: Modify inetnum object but no change to mnt-irt
+#
+# modify inetnum object 
+#
+#SUCCESS
+#
+# RESULT 24: There should be no notif message and no forward message.
+
+
+# CASE 25: Modify inetnum object with 2 mnt-irt
+#          remove one mnt-irt
+#          add a new mnt-irt
+#
+# modify inetnum object 
+#
+#SUCCESS
+#
+# RESULT 25: There should be a notif message to case025-3@ripe.net
+#            and case025-5@ripe.net about successful modification, 
+#            and no forward message.
+
+
+# CASE 26: Modify inetnum object to add mnt-irt
+#          which has 2 irt-nfy and a notify
+#
+# modify inetnum object 
+#
+#SUCCESS
+#
+# RESULT 26: There should be a notif message to case026-1@ripe.net
+#            and case026-2@ripe.net, but not case026-3@ripe.net
+#            about successful modification, and no forward message.
+
+
+# CASE 27: Modify irt object with irt-nfy and notify
+#          and its mnt-by has mnt-nfy, upd-to and notify.
+#
+# modify irt object 
+#
+#SUCCESS
+#
+# RESULT 27: There should be a notif message to case027-2@ripe.net
+#            and case027-3@ripe.net about successful modification,
+#            and no forward message.
+
+
+# CASE 28: Modify irt object with irt-nfy and notify
+#          and its mnt-by has mnt-nfy, upd-to and notify
+#          no password.
+#
+# modify irt object 
+#
+#FAILURE
+#
+# RESULT 28: There should be a forward message to case028-4@ripe.net
+#            about failed modification, and no notif message.
+
+
+# CASE 29: Create inetnum object with syntax error
+#          The inetnum has mnt-irt, notify.
+#          The inetnum mnt-by has mnt-nfy, upd-to, notify.
+#          The inetnum mnt-irt has irt-nfy, notify.
+#          The parent has mnt-irt, notify.
+#          The parent mnt-by has mnt-nfy, upd-to, notify.
+#          The parent mnt-irt has irt-nfy, notify.
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 29: There should be no forward message and no notif message.
+
+
+# CASE 30: Create inetnum object
+#          The inetnum has mnt-irt, notify.
+#          The inetnum mnt-by has mnt-nfy, upd-to, notify.
+#          The inetnum mnt-irt has irt-nfy, notify.
+#          The parent has mnt-irt, notify.
+#          The parent mnt-by has mnt-nfy, upd-to, notify.
+#          The parent mnt-irt has irt-nfy, notify.
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 30: There should be a notif message to case030-12@ripe.net,
+#            case030-5@ripe.net, case030-10@ripe.net,
+#            case030-2@ripe.net
+#            about successful creation, and no forward message.
+
+
+# CASE 31: Create inetnum object with auth error
+#          The inetnum has mnt-irt, notify.
+#          The inetnum mnt-by has mnt-nfy, upd-to, notify.
+#          The inetnum mnt-irt has irt-nfy, notify.
+#          The parent has mnt-irt, notify.
+#          The parent mnt-by has mnt-nfy, upd-to, notify.
+#          The parent mnt-irt has irt-nfy, notify.
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 31: There should be a forward message to case031-1@ripe.net
+#            and case031-4@ripe.net 
+#            about failed creation, and no notif message.
+
+
+# CASE 32: Modify inetnum object
+#          The inetnum has mnt-irt, notify.
+#          The inetnum mnt-by has mnt-nfy, upd-to, notify.
+#          The inetnum mnt-irt has irt-nfy, notify.
+#          The parent has mnt-irt, notify.
+#          The parent mnt-by has mnt-nfy, upd-to, notify.
+#          The parent mnt-irt has irt-nfy, notify.
+#
+# modify inetnum object 
+#
+#SUCCESS
+#
+# RESULT 32: There should be a notif message to case032-12@ripe.net,
+#            case032-5@ripe.net
+#            about successful modification, and no forward message.
+
+
+# CASE 33: modify inetnum object with auth error
+#          The inetnum has mnt-irt, notify.
+#          The inetnum mnt-by has mnt-nfy, upd-to, notify.
+#          The inetnum mnt-irt has irt-nfy, notify.
+#          The parent has mnt-irt, notify.
+#          The parent mnt-by has mnt-nfy, upd-to, notify.
+#          The parent mnt-irt has irt-nfy, notify.
+#
+# modify inetnum object 
+#
+#FAILURE
+#
+# RESULT 33: There should be a forward message and case033-4@ripe.net 
+#            about failed modification, and no notif message.
+
+
+# CASE 34: Delete inetnum object
+#          The inetnum has mnt-irt, notify.
+#          The inetnum mnt-by has mnt-nfy, upd-to, notify.
+#          The inetnum mnt-irt has irt-nfy, notify.
+#          The parent has mnt-irt, notify.
+#          The parent mnt-by has mnt-nfy, upd-to, notify.
+#          The parent mnt-irt has irt-nfy, notify.
+#
+# delete inetnum object 
+#
+#SUCCESS
+#
+# RESULT 34: There should be a notif message to case034-10@ripe.net,
+#            case034-5@ripe.net, case034-12@ripe.net
+#            about successful deletion, and no forward message.
+
+
+# CASE 35: delete inetnum object with auth error
+#          The inetnum has mnt-irt, notify.
+#          The inetnum mnt-by has mnt-nfy, upd-to, notify.
+#          The inetnum mnt-irt has irt-nfy, notify.
+#          The parent has mnt-irt, notify.
+#          The parent mnt-by has mnt-nfy, upd-to, notify.
+#          The parent mnt-irt has irt-nfy, notify.
+#
+# delete inetnum object 
+#
+#FAILURE
+#
+# RESULT 35: There should be a forward message and case035-4@ripe.net 
+#            about failed deletion, and no notif message.
+
+
+# CASE 36: Create inetnum object
+#          The inetnum has notify.
+#          The inetnum mnt-by has mnt-nfy, upd-to, notify.
+#          There are 4 overlapping parent objects
+#          The parents each have notify.
+#          Each parents mnt-by has mnt-nfy, upd-to, notify.
+#          Password supplied for one of the parents' mnt-lower
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 36: There should be a forward message to case036-1@ripe.net,
+#            case036-4@ripe.net, case036-7@ripe.net,
+#            case036-10@ripe.net, case036-13@ripe.net
+#            about failed creation, and no notif message.
+
+
+# CASE 37: Create as-set object with 3-level hierarchical name 
+#          AS123:AS-TEST1:AS-TEST
+#          parent as-set object exists. auth for set and parent is given
+#
+# create as-set object
+#
+#SUCCESS
+#
+# RESULT 37: There should be a notif message to case037-11@ripe.net,
+#            case037-5@ripe.net, case037-16@ripe.net
+#            about successful creation, and no forward message.
+
+
+# CASE 38: Create aut-num object AS123
+#          maintained by RIPE-NCC-HM-MNT
+#          with a parent maintained by TEST-MNT
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 38: There should be a notif message to case037-2@ripe.net,
+#            case037-5@ripe.net, case037-8@ripe.net
+#            about successful creation, and no forward message.
+
+
+# CASE 39: We try to create 20.13.0.0/16 route object. 
+#          exact match route exists with mnt-by
+#          password for child and exact match mnt-by
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 39: There should be a notif message to case039-8@ripe.net,
+#            case039-5@ripe.net, case039-16@ripe.net,
+#            case039-2@ripe.net
+#            about successful creation, and no forward message.
+
+
+# CASE 40: Modify an object with "notify" attribute to change the
+#          mail address in this attribute.
+#          Include the keyword DIFF
+#
+# Modify person
+#
+#SUCCESS
+#
+# RESULT 40: There should be a notif message to case040-1@ripe.net
+#            about successful modify, and no forward message.
+#            The notif message should have a diff output.
+
+
+# CASE 41: Implied modification of an object by missing out the date on
+#          the changed line
+#          mail address in this attribute.
+#          Include the keyword DIFF
+#
+# Modify person
+#
+#SUCCESS
+#
+# RESULT 41: There should be a notif message to case041-1@ripe.net
+#            about successful modify, and no forward message.
+#            The notif message should have a diff output.
+#            with the identical object message
+
+

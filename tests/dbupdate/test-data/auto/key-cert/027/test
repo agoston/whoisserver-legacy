@@ -1,0 +1,47 @@
+# X.509 key-cert tests
+#
+# CASE 27: We try to modify key-cert object with X509 certificate
+#          Change certificate details with correct generated attrs.
+#          Remove -----BEGIN CERTIFICATE----- line.
+#
+#
+#FAILURE
+#
+# RESULT 27: The modify will fail.
+
+
+key-cert:     X509-1
+method:       X509
+owner:        /C=NL/O=RIPE NCC/OU=Members/CN=uk.bt.test-user/Email=test-user@linux.testlab.ripe.net
+fingerpr:     AC:B5:B1:36:95:F3:46:93:B1:2D:58:EB:E1:46:DA:3F
+certif:       MIID8zCCA1ygAwIBAgICAIIwDQYJKoZIhvcNAQEEBQAwcTELMAkGA1UEBhMCRVUx
+certif:       EDAOBgNVBAgTB0hvbGxhbmQxEDAOBgNVBAoTB25jY0RFTU8xHTAbBgNVBAMTFFNv
+certif:       ZnR3YXJlIFBLSSBUZXN0aW5nMR8wHQYJKoZIhvcNAQkBFhBzb2Z0aWVzQHJpcGUu
+certif:       bmV0MB4XDTAzMDkwODEwMjYxMloXDTA0MDkwNzEwMjYxMlowfTELMAkGA1UEBhMC
+certif:       TkwxETAPBgNVBAoTCFJJUEUgTkNDMRAwDgYDVQQLEwdNZW1iZXJzMRgwFgYDVQQD
+certif:       Ew91ay5idC50ZXN0LXVzZXIxLzAtBgkqhkiG9w0BCQEWIHRlc3QtdXNlckBsaW51
+certif:       eC50ZXN0bGFiLnJpcGUubmV0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+certif:       AQEArv3srxyl1QA3uS4dxdZbSsGrfBrMRjMb81Gnx0nqa6i+RziIf13lszB/EYy0
+certif:       PgLpQFdGLdhUQ52YsiGOUmMtnaWNHnEJrBUc8/fdnA6GVdfF8AEw1PTfJ6t2Cdc9
+certif:       2SwaF+5kCaUDwmlOgbM333IQmU03l3I1ILs32RpQyZ+df/ovHNrVzeLc2P59isac
+certif:       bfjM2S0SXPQzHjuVLH40eOgVuXA/5LAYs51eXqwtKszSxFhqekf+BAEcRDrXmIT4
+certif:       e3zfiZOsXKe0UfaEABgHUMrYjsUCJ8NTMg6XiVSNwQQmXCdUbRvK7zOCe2iCX15y
+certif:       9hNXxhY/q/IW54W5it7jGXq/7wIDAQABo4IBCDCCAQQwCQYDVR0TBAIwADARBglg
+certif:       hkgBhvhCAQEEBAMCBaAwCwYDVR0PBAQDAgXgMBoGCWCGSAGG+EIBDQQNFgtSSVBF
+certif:       IE5DQyBDQTAdBgNVHQ4EFgQUzdajNaRorkDTAW5O6Hpa3z9pP3AwgZsGA1UdIwSB
+certif:       kzCBkIAUHpLUfvaBVfxXVCcT0kh9NJeH7ouhdaRzMHExCzAJBgNVBAYTAkVVMRAw
+certif:       DgYDVQQIEwdIb2xsYW5kMRAwDgYDVQQKEwduY2NERU1PMR0wGwYDVQQDExRTb2Z0
+certif:       d2FyZSBQS0kgVGVzdGluZzEfMB0GCSqGSIb3DQEJARYQc29mdGllc0ByaXBlLm5l
+certif:       dIIBADANBgkqhkiG9w0BAQQFAAOBgQByg8L8RaiIz5k7n5jVwM/0oHSf48KRMBdn
+certif:       YdN2+eoEjVQbz48NtjbBTsOiUYj5AQWRHJrKtDQ+odbog0x7UsvhXjjBo/abJ6vI
+certif:       AupjnxP3KpSe73zmBUiMU8mvXLibPP1xuI2FPM70Y7fgeUehbmT7wdgqs7TEtYww
+certif:       PeUqjPPTZg==
+certif:       -----END CERTIFICATE-----
+remarks:      Sample Key Certificate
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20040101
+source:       DB-TEST
+
+password: auth
+

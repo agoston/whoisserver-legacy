@@ -1,0 +1,18 @@
+# command line options tests
+# CASE 23: Valid mixed short/long options
+#          some requiring/some not requiring mandatory arguments
+#
+# run dbupdate with valid mixed short/long options
+# ./dbupdate -c ~/db/conf/rip.config --mail -rp --file test
+#
+#SUCCESS
+#
+# RESULT 23: Help text returned.
+%
+%
+$ -c $RIP_CONFIG --mail -rp --file 
+%
+From: dbtest@ripe.net
+subject: help
+
+qwerty

@@ -1,0 +1,23 @@
+# CASE 10: We try to create route object 1.0.0.0/24 with member-of: RS-TEST
+# RS-TEST exists and is protected by RIPE-NCC-HM-MNT
+# with NO mbrs-by-ref: attribute
+#
+% requires initial objects to be loaded
+%
+# create route object
+#
+#SUCCESS
+#
+# RESULT 10: The creation will succeed.
+
+route:        1.0.0.0/24
+descr:        test
+origin:       AS123
+mnt-by:       TEST-MNT
+member-of:    RS-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password:     auth
+password:     hostmaster
+

@@ -1,0 +1,25 @@
+
+# CASE 7: We try to delete mntner object TEST-MNT
+#         with existing reference from "mnt-lower" of as-set.
+%
+% requires initial objects to be loaded
+#
+# create as-set object 
+#
+#FAILURE
+#
+# RESULT 7: The deletion will fail.
+
+mntner:  TEST-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  TEST-MNT
+auth:    CRYPT-PW dbOnSHFpKZTBU  # auth
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+delete:  no reason
+
+password:     auth
+

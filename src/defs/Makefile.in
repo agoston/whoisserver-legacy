@@ -1,0 +1,84 @@
+CLASSPATH=xalan/xerces.jar:.
+JAVAC=@JAVAC@ -classpath $(CLASSPATH)
+CPPFLAGS=@GLIB_CFLAGS@ -I../../include -I../../defs
+CFLAGS=@GLIB_CFLAGS@ -I../../include -I../../defs
+CC=@CC@
+DISTFILES = *.java *.class *.dtd makedefsall.in alltodo Makefile.in Makefile.syntax variants/*/* class_tab.h attribute_tab.h syntax_tab.h xalan/License xalan/README xalan/xerces.jar HOWTO README
+top_srcdir = @top_srcdir@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+
+distdir: $(DISTFILES)
+	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
+	mkdir $(distdir)
+	$(mkinstalldirs) $(distdir)/src/defs $(distdir)/src/utils
+	@for file in $(DISTFILES); do \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
+	  if test "$$dir" != "$$file" && test "$$dir" != "."; then \
+	    $(mkinstalldirs) "$(distdir)/$$dir"; \
+	  fi; \
+	  if test -d $$d/$$file; then \
+	    cp -pR $$d/$$file $(distdir) \
+	    || exit 1; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || cp -p $$d/$$file $(distdir)/$$file \
+	    || exit 1; \
+	  fi; \
+	done
+	for subdir in $(SUBDIRS); do \
+	  if test "$$subdir" = .; then :; else \
+	    test -d $(distdir)/$$subdir \
+	    || mkdir $(distdir)/$$subdir \
+	    || exit 1; \
+	    (cd $$subdir && \
+	      $(MAKE) $(AM_MAKEFLAGS) \
+	        top_distdir="$(top_distdir)" \
+	        distdir=../$(distdir)/$$subdir \
+	        distdir) \
+	      || exit 1; \
+	  fi; \
+	done
+	-find $(distdir) -type d ! -perm -777 -exec chmod a+rwx {} \; -o \
+	  ! -type d ! -perm -444 -links 1 -exec chmod a+r {} \; -o \
+	  ! -type d ! -perm -400 -exec chmod a+r {} \; -o \
+	  ! -type d ! -perm -444 -exec $(SHELL) $(install_sh) -c -m a+r {} {} \; \
+	|| chmod -R a+r $(distdir)
+dist: distdir
+	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
+	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
+
+
+syntax:
+	RIPINCDIR="@srcdir@/../../include/" RIPLIBDIR="@srcdir@/../../" CC="@CC@" CFLAGS="$(CFLAGS)" $(MAKE) -f @top_srcdir@/defs/Makefile.syntax -C @top_srcdir@/src/modules/rpsl && touch syntax
+
+Defs.class: Defs.java
+	$(JAVAC) Defs.java
+
+AttributeDef.class: AttributeDef.java
+	$(JAVAC) AttributeDef.java
+
+ClassDef.class: ClassDef.java
+	$(JAVAC) ClassDef.java
+
+Query.class: Query.java
+	$(JAVAC) Query.java
+
+RPSLSyntax.class: RPSLSyntax.java
+	$(JAVAC) RPSLSyntax.java
+
+AttributeSyntax.class: AttributeSyntax.java
+	$(JAVAC) AttributeSyntax.java
+
+all: alltodo syntax
+
+alltodo: Defs.class ClassDef.class AttributeDef.class Query.class RPSLSyntax.class AttributeSyntax.class attributes.xml attributes.dtd classes.xml classes.dtd syntax.xml syntax.dtd
+	./makedefsall && touch alltodo
+
+clean:
+	rm -f *.class all
+
+distclean:
+	rm -f *.class all
+
+install:

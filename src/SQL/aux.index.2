@@ -1,0 +1,41 @@
+alter table admin_c add index (object_type);
+alter table admin_c add index (object_id);
+
+alter table tech_c add index (object_type);
+alter table tech_c add index (object_id);
+
+alter table zone_c add index (object_type);
+alter table zone_c add index (object_id);
+
+alter table mnt_by add index (object_id);
+alter table mnt_by add index (object_type);
+
+alter table mnt_lower add index (object_id);
+alter table mnt_lower add index (object_type);
+
+alter table mnt_irt add index (object_id);
+alter table mnt_irt add index (object_type);
+
+alter table mnt_routes add index (object_id);
+alter table mnt_routes add index (object_type);
+
+alter table mnt_routes6 add index (object_id);
+alter table mnt_routes6 add index (object_type);
+
+alter table mbrs_by_ref add index (object_id);
+alter table mbrs_by_ref add index (object_type);
+
+alter table member_of add index (object_id);
+alter table member_of add index (object_type);
+
+alter table author add index (object_id);
+alter table author add index (object_type);
+
+alter table referral_by add index (object_id);
+alter table referral_by add index (object_type);
+
+alter table org add index (object_id);
+alter table org add index (object_type);
+
+alter table mnt_ref add index (object_id);
+alter table mnt_ref add index (object_type);

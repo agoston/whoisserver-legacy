@@ -1,0 +1,32 @@
+These files contain the classes, attributes, and syntax definitions used
+in RIP.  The XML (and associated DTD) files define the syntax and
+semantics of the RPSL, as well as containing SQL instructions to query
+and modify the database's representation of these.
+
+These files define the format that the XML files must take:
+
+syntax.dtd
+attributes.dtd
+classes.dtd
+
+These XML files actually contain definitions:
+
+syntax.xml         - Syntax rules
+attributes.xml     - Attribute definitions
+classes.xml        - Class definitions
+*.[ly]             - Lex/Yacc source used by some some syntax rules.
+
+These files are copied from the appropriate variants subdirectory by
+the build.sh script used to install the software.
+
+Java classes are used to convert the XML into *.def and *_tab.h files
+used by the RIP code.
+
+Defs.java             - The main program.
+AttributeDef.java     - Attribute definitions.
+ClassDef.java         - Class definitions.
+Query.java            - Query definitions.
+RPSLSyntax.java       - Contains a set of syntax definitions.
+AttributeSyntax.java  - Syntax definitions.
+
+If you want to author your own XML, look at the file HOWTO.

@@ -1,0 +1,66 @@
+# pre-process object tests
+# CASE 17: Create four inetnum objects
+#          with valid country 
+#          and one changed line with a date of 31st
+#          in the respective months 04, 06, 09, 11
+%
+% requires initial objects to be loaded
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 17: All four creations will fail
+
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED PA status
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20030431
+source:       DB-TEST
+
+inetnum:      192.168.201.0 - 192.168.201.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED PA status
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20030631
+source:       DB-TEST
+
+inetnum:      192.168.202.0 - 192.168.202.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED PA status
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20030931
+source:       DB-TEST
+
+inetnum:      192.168.203.0 - 192.168.203.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED PA status
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20031131
+source:       DB-TEST
+
+password: END-USER
+password: LIR
+

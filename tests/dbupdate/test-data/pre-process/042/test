@@ -1,0 +1,18 @@
+# pre-process object tests
+# CASE 42: Create a person object with a mnt-by: referencing a
+#          disallowed mntner, second on the list in rip.config
+#
+# create a person object
+#
+#FAILURE
+#
+# RESULT 42: create will fail
+
+
+person:       test person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       ripe-ncc-none-mnt
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

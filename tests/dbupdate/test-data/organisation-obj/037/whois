@@ -1,0 +1,31 @@
+
+organisation: ORG-ET1-DB-TEST
+org-name:     EXAMPLE TTTTTT
+org-type:     NON-REGISTRY
+address:      Address
+e-mail:       dbtest@ripe.net
+admin-c:      TP2-DB-TEST
+tech-c:       TP2-DB-TEST
+mnt-ref:      TEST-DBM-MNT
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net 20030102
+source:       DB-TEST
+
+inetnum:      1.0.0.0 - 1.255.255.255
+netname:      TEST
+descr:        TEST
+country:      NL
+org:          ORG-ET1-DB-TEST
+admin-c:      TP2-DB-TEST
+tech-c:       TP2-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net 20030102
+source:       DB-TEST
+
+person:       Test Person
+address:      Test Adress
+phone:        +1234
+nic-hdl:      TP2-DB-TEST
+changed:      dbtest@ripe.net 20030102
+source:       DB-TEST

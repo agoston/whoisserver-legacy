@@ -1,0 +1,27 @@
+# aut-num authorisation tests
+# CASE 8: We try to create aut-num object AS123
+# maintained by RIPE-NCC-HM-MNT - password given
+# no parent
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail.
+
+
+aut-num:      AS123
+as-name:      ASTEST
+descr:        TEST TELEKOM
+import:       from AS1 accept {1.2.3.4/24}
+export:       to AS2 announce {1.2.3.4/24}
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password:     hostmaster

@@ -1,0 +1,27 @@
+# route authorisation tests - autnum
+# CASE 22: We try to create origin AS200 aut-num object 
+#          after a dummy object has been created for it
+#          which could happen if a route is created with overrride
+#          when the origin of the route does not exist.
+#          route, parent exist, origin does not exist.
+#          password for child and as-block
+%
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 22: The create will succeed
+
+
+password: mb-child
+password: hostmaster
+
+aut-num: AS200
+as-name: TEST-AS
+descr:   Testing Authorisation code
+admin-c: TP1-DB-TEST
+tech-c:  TP1-DB-TEST
+mnt-by:  CHILD-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST

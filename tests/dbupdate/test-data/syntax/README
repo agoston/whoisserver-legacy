@@ -1,0 +1,13 @@
+# syntax tests - testing the syntax
+# These tests do not fully test the syntax of dbupdate. 
+# They are added bit at a time when problems occur.
+
+# CASE 1: We try to create as-set object with more than 80 chars in the name
+#
+# create as-set object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail.
+
+

@@ -1,0 +1,299 @@
+% X.509 auto tests
+% load objects 
+%
+
+
+%----------------------------------------------------------------
+%        Standard Template Objects
+
+
+
+% admin-c, tech-c person
+
+person:       test person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP1-DB-TEST
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% referral-by maintainer
+
+mntner:       TEST-DBM-MNT
+descr:        Mntner for RIPE DBM objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+upd-to:       dbtest@ripe.net
+mnt-by:       TEST-DBM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% allocation maintainer
+
+mntner:       RIPE-NCC-HM-MNT
+descr:        RIPE-NCC Hostmaster Maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+upd-to:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
+source:       DB-TEST
+
+
+% root inetnum object
+
+inetnum:      0.0.0.0 - 255.255.255.255
+netname:      IANA-BLK
+descr:        The whole IPv4 address space
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED UNSPECIFIED
+remarks:      The country is really worldwide.
+remarks:      This address space is assigned at various other places in
+remarks:      the world and might therefore not be in the RIPE database.
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+mnt-routes:   RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% root inet6num object
+
+inet6num:     0::/0
+netname:      ROOT
+descr:        Root inet6num object
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+status:       ALLOCATED-BY-RIR
+remarks:      This network in not allocated.
+              This object is here for Database
+              consistency and to allow hierarchical
+              authorisation checks.
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+%      End of Standard Template Objects
+%----------------------------------------------------------------
+
+%  Additional objects required for this test
+
+
+% create an encompassing as-block 
+
+as-block:     AS1 - AS65534
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+key-cert:     X509-1
+method:       X509
+owner:        /C=NL/O=RIPE NCC/OU=Members/CN=uk.bt.test-user/Email=test-user@linux.testlab.ripe.net
+fingerpr:     AC:B5:B1:36:95:F3:46:93:B1:2D:58:EB:E1:46:DA:3F
+certif:       -----BEGIN CERTIFICATE-----
+certif:       MIID8zCCA1ygAwIBAgICAIIwDQYJKoZIhvcNAQEEBQAwcTELMAkGA1UEBhMCRVUx
+certif:       EDAOBgNVBAgTB0hvbGxhbmQxEDAOBgNVBAoTB25jY0RFTU8xHTAbBgNVBAMTFFNv
+certif:       ZnR3YXJlIFBLSSBUZXN0aW5nMR8wHQYJKoZIhvcNAQkBFhBzb2Z0aWVzQHJpcGUu
+certif:       bmV0MB4XDTAzMDkwODEwMjYxMloXDTA0MDkwNzEwMjYxMlowfTELMAkGA1UEBhMC
+certif:       TkwxETAPBgNVBAoTCFJJUEUgTkNDMRAwDgYDVQQLEwdNZW1iZXJzMRgwFgYDVQQD
+certif:       Ew91ay5idC50ZXN0LXVzZXIxLzAtBgkqhkiG9w0BCQEWIHRlc3QtdXNlckBsaW51
+certif:       eC50ZXN0bGFiLnJpcGUubmV0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+certif:       AQEArv3srxyl1QA3uS4dxdZbSsGrfBrMRjMb81Gnx0nqa6i+RziIf13lszB/EYy0
+certif:       PgLpQFdGLdhUQ52YsiGOUmMtnaWNHnEJrBUc8/fdnA6GVdfF8AEw1PTfJ6t2Cdc9
+certif:       2SwaF+5kCaUDwmlOgbM333IQmU03l3I1ILs32RpQyZ+df/ovHNrVzeLc2P59isac
+certif:       bfjM2S0SXPQzHjuVLH40eOgVuXA/5LAYs51eXqwtKszSxFhqekf+BAEcRDrXmIT4
+certif:       e3zfiZOsXKe0UfaEABgHUMrYjsUCJ8NTMg6XiVSNwQQmXCdUbRvK7zOCe2iCX15y
+certif:       9hNXxhY/q/IW54W5it7jGXq/7wIDAQABo4IBCDCCAQQwCQYDVR0TBAIwADARBglg
+certif:       hkgBhvhCAQEEBAMCBaAwCwYDVR0PBAQDAgXgMBoGCWCGSAGG+EIBDQQNFgtSSVBF
+certif:       IE5DQyBDQTAdBgNVHQ4EFgQUzdajNaRorkDTAW5O6Hpa3z9pP3AwgZsGA1UdIwSB
+certif:       kzCBkIAUHpLUfvaBVfxXVCcT0kh9NJeH7ouhdaRzMHExCzAJBgNVBAYTAkVVMRAw
+certif:       DgYDVQQIEwdIb2xsYW5kMRAwDgYDVQQKEwduY2NERU1PMR0wGwYDVQQDExRTb2Z0
+certif:       d2FyZSBQS0kgVGVzdGluZzEfMB0GCSqGSIb3DQEJARYQc29mdGllc0ByaXBlLm5l
+certif:       dIIBADANBgkqhkiG9w0BAQQFAAOBgQByg8L8RaiIz5k7n5jVwM/0oHSf48KRMBdn
+certif:       YdN2+eoEjVQbz48NtjbBTsOiUYj5AQWRHJrKtDQ+odbog0x7UsvhXjjBo/abJ6vI
+certif:       AupjnxP3KpSe73zmBUiMU8mvXLibPP1xuI2FPM70Y7fgeUehbmT7wdgqs7TEtYww
+certif:       PeUqjPPTZg==
+certif:       -----END CERTIFICATE-----
+remarks:      Sample Key Certificate
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20040101
+source:       DB-TEST
+
+key-cert:     X509-2
+method:       X509
+owner:        /C=NL/O=RIPE NCC/OU=Members/CN=uk.bt.test-receiver/Email=test-receiver@linux.testlab.ripe.net
+fingerpr:     D5:92:29:08:F8:AB:75:5F:42:F5:A8:5F:A3:8D:08:2E
+certif:       -----BEGIN CERTIFICATE-----
+certif:       MIID/DCCA2WgAwIBAgICAIQwDQYJKoZIhvcNAQEEBQAwcTELMAkGA1UEBhMCRVUx
+certif:       EDAOBgNVBAgTB0hvbGxhbmQxEDAOBgNVBAoTB25jY0RFTU8xHTAbBgNVBAMTFFNv
+certif:       ZnR3YXJlIFBLSSBUZXN0aW5nMR8wHQYJKoZIhvcNAQkBFhBzb2Z0aWVzQHJpcGUu
+certif:       bmV0MB4XDTAzMDkwODE1NTMyOFoXDTA0MDkwNzE1NTMyOFowgYUxCzAJBgNVBAYT
+certif:       Ak5MMREwDwYDVQQKEwhSSVBFIE5DQzEQMA4GA1UECxMHTWVtYmVyczEcMBoGA1UE
+certif:       AxMTdWsuYnQudGVzdC1yZWNlaXZlcjEzMDEGCSqGSIb3DQEJARYkdGVzdC1yZWNl
+certif:       aXZlckBsaW51eC50ZXN0bGFiLnJpcGUubmV0MIIBIjANBgkqhkiG9w0BAQEFAAOC
+certif:       AQ8AMIIBCgKCAQEAwYAvr71Mkw68CoMKmrHs8rHbMlLotPVqx5RuJ4d+IomL0i2i
+certif:       F7NVBkg1VLuAER1wl1X2pK746ptevTzwWi/QmgFZajTqLjCfW1sou2TXEA5s80t3
+certif:       JXRNk9xF6VXnggxCiqeWyfdC9Q7yOnlNdkJgzmQ/OuE9EVkKaY2kcnMU4NVyvbmD
+certif:       DtgdgSEuvRlgyeDi2gTh79QAfTnzH2d2SFGt1lZT48PuwCXl485pxyu+gVmykEMr
+certif:       EAgG6H/Dpl7t/jyV9w/HRAFaSV8mzpaLg6rxM03ThOPl6R61RJzEqTi0zX4OHkxV
+certif:       q7m1aniNJIvWefU1Yfvdv3zzTcmxWmA3yhOt6wIDAQABo4IBCDCCAQQwCQYDVR0T
+certif:       BAIwADARBglghkgBhvhCAQEEBAMCBaAwCwYDVR0PBAQDAgXgMBoGCWCGSAGG+EIB
+certif:       DQQNFgtSSVBFIE5DQyBDQTAdBgNVHQ4EFgQU/EdNYQO8tjU3p1uJLsYn4f0bmmAw
+certif:       gZsGA1UdIwSBkzCBkIAUHpLUfvaBVfxXVCcT0kh9NJeH7ouhdaRzMHExCzAJBgNV
+certif:       BAYTAkVVMRAwDgYDVQQIEwdIb2xsYW5kMRAwDgYDVQQKEwduY2NERU1PMR0wGwYD
+certif:       VQQDExRTb2Z0d2FyZSBQS0kgVGVzdGluZzEfMB0GCSqGSIb3DQEJARYQc29mdGll
+certif:       c0ByaXBlLm5ldIIBADANBgkqhkiG9w0BAQQFAAOBgQCEve6deqF0nvHKFJ0QfEJS
+certif:       UkRTCF7YCx7Jb2tKIHfMgbrUs3x9bmpShpBkJwjEsNYp0Vvk7hfhiFgKM4AGyYd3
+certif:       hZNmF5c/d0gauqvL+egb+3V+Zg+sJTzHMVKQLF1ybWgJjU75Pi+mO7BG0zsQ13pT
+certif:       YxuZCR2W15nwt7zLiHtmfw==
+certif:       -----END CERTIFICATE-----
+remarks:      Sample Key Certificate
+notify:       dbtest@ripe.net
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net 20040101
+source:       DB-TEST
+
+
+key-cert:     PGPKEY-E868AD9B
+method:       PGP
+owner:        Test Person (testing) <dbtest@ripe.net>
+fingerpr:     E200 63F3 FC4D 4F6B 803D  2762 E20F F41C E868 AD9B
+certif:       BEGIN PGP PUBLIC KEY BLOCK-----
+certif:       Version: GnuPG v1.2.2 (SunOS)
+certif:    
+certif:       mQGiBEA2Oo8RBADlcozgQ+tNR+8Ugh3mFge73RF73AFlDOXKi6zI0kjOH9ZVOtdQ
+certif:       EFgGnqX/kl1xKAC/LOTDKPvf43r8RkfiBD1fNSKwbw01fJGujZROqwcGLCyycB8f
+certif:       /dJx0pvX8Idgf6qcO5wGcmiOM30826WIbMflP6R+V42xM3enUDxuodOuCwCgzTd/
+certif:       6h3uZ2U/gqVrM1OgjX+SGDsD/jSKzPFkosH/uBatp0uVlm3SpU5iiSYmSyXF3R50
+certif:       YgtXqtD00PiZFotrLV2PgKugI4g9nYhovfJBMPKULnkONHZLVOr3wL5/kZM8NPpb
+certif:       pssndzakPEPk6YbxD/+kKUQAtE5Idah3lX77jRkCU7f79/I2cNtX3WvTaQVQuU9v
+certif:       k1Q7A/9Bcga5STtpLKYt0Yl9d4Ey2cDSdPIZdqppKRGTrBFFMF8GDqnRJ49eUZa9
+certif:       LOgr5uOF/haaMVqIlNkvctt0tDDhZ4MZR6dAbmhhR41OKWfKHdyQ91YnjheDHVeO
+certif:       i4kTUxy3M0v+Q4yLX0yd9RgKqQNTLZP1u2HUMcMMOUxaqskqN7QnVGVzdCBQZXJz
+certif:       b24gKHRlc3RpbmcpIDxkYnRlc3RAcmlwZS5uZXQ+iFsEExECABsFAkA2Oo8GCwkI
+certif:       BwMCAxUCAwMWAgECHgECF4AACgkQ4g/0HOhorZtuAQCggptMb4NAddMUVltQUq/7
+certif:       zC8ArwgAn2Kn80ZZNCHbdcuE1Mj7/CO0REHouQINBEA2PAAQCAChCOpjCRX4d64E
+certif:       IQjmuSfOhzWk8hK6kp4a0cwnRBREzPjI5IoH/gaI4UT27W6pUJZ9TqAxbNI1Creu
+certif:       odvMF8gg6yLnTELc3Y6oxdwIPb36kERKj9B5ZWiG3d13SnCN/kfmgy77r7kl3jAq
+certif:       7ZDLyH9nJE/WQxZrBP6JNlw3PzeFJTfT4o1jQHa/ZXzDr7YF3P34JkzkbZ7ya4GT
+certif:       yN72HhXDhVIuG5yyK3OGKMrwUkY8bXqavifzQETIFjn/DW8ipHiPdslTR/MfCRj2
+certif:       S19AxezeGS6v0o+KycMe0MPsA9V52qHabc+ibZTKVQ7mNfqAJUgU+c+mUrqm1t9t
+certif:       JAjjWjFHAAMHB/sEo+m0uYcjK54LzuY2Rn6E4t//VAYUerUVymGQB6HlIkC85S7H
+certif:       3jA4FHww7tr79b56U/AhDotDDLIiDZdxiIESaYmdyg1oA3wIv4H6AD2M/bYnD+9p
+certif:       b3gw5Mx/tAwdywPdfmeTunNsVNjgIzkPncBjnMvfF1VWQhBZWgOxlLGWeP+n4KH9
+certif:       FelRLyZtcve7mwkxKE0JEkkyQDZd8mEZi9sjNLnQMxMSgcPByyRtHo8+yD4HziU9
+certif:       +hB267lBDDgj2IxTSH7cxl7Qnqgdinh+SNgCO/5gftW8EjLXDRX6m/908wSQR+2o
+certif:       yKfmACd98VfICmw1IDEarNX4Q35Ui7d/rTqoiEYEGBECAAYFAkA2PAAACgkQ4g/0
+certif:       HOhorZv5YQCgvVpq6D99xRTP3VyPvr9hcG2UmJ0An0T1LGe+uK62sFGJc1FGtRzz
+certif:       WWff
+certif:       =io2K
+certif:       -----END PGP PUBLIC KEY BLOCK-----
+remarks:      Sample PGP Key Certificate
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20040101
+source:       DB-TEST
+
+
+key-cert:     PGPKEY-5694D9D0
+method:       PGP
+owner:        Timur I. Bakeyev <timur@ripe.net>
+fingerpr:     7B28 E630 CA37 F06F F16E  03D9 1232 30DA 5694 D9D0
+certif:       -----BEGIN PGP PUBLIC KEY BLOCK-----
+certif:       Version: GnuPG v1.2.2 (GNU/Linux)
+certif:  
+certif:       mQGiBDw8OhoRBACP2/NAZ3SkApceRnCyPwqlGrSPx0RmxMFhFEKV890L75hRY3nN
+certif:       G04comYhAn4ykBZHqUz7A2utnZ8/F7ABn7CC2KAXrlvNssOSJeeLpOGQZgXj/KlG
+certif:       lZ7l3wLXWZbzAQv727E+OXbPZ84oh+/AL8vwtWecd0kW4gyinx4OY3m++wCgoIl+
+certif:       HLdX/6rqwyjNjWzHga9YghcD/12G3rLRFTYdSYLchWcj9Gh4h+4Mdjgye078ub8d
+certif:       1lCLmDFWGdSDx99UemjInH07bFUfAYURbfaWC+v1Btw8LsP52a9HpbSq6pWTTxD1
+certif:       M/GpzyrztGDPDY0VszZ8WDWjMDZ5PPDSzkLBUcOqR34P9vhXItDDW8Bq1B9gMc7G
+certif:       E84QA/9kT1+IuM/NbXFRlQnJ66sLNe1qO+ILlX/56saqwENWHZVTZeGy12b5+sHV
+certif:       hqGCibIVUSnw2FtWgBBYfEHrIYgdA/aOA/+Ch9Q4tKm9tKZcwEVgNClyrfBusMyA
+certif:       UQCYPdA8+eWgrciaOpmbo8Dkdev02y/NnL03ctrk4PPp+II8crQhVGltdXIgSS4g
+certif:       QmFrZXlldiA8dGltdXJAcmlwZS5uZXQ+iFcEExECABcFAjw8OhoFCwcKAwQDFQMC
+certif:       AxYCAQIXgAAKCRASMjDaVpTZ0IKFAJ4gDqqw1y3of2UGed7lSl0JqKuvjwCePMzW
+certif:       ScXdO3+Xrl7WJAjYkRlGBxS5Ag0EPDw6IxAIAIQ5iN6HbeGcuvJeH/rXtL2D4/h+
+certif:       QZzu0BiDSze/dKYcLay6KSCWkbrBLwCdAaiJqtC7KwSLEKu640qSBQxq3QFQCJoU
+certif:       54hq6uME+uGc/sZOAYt6N4fb7FiOObCEFHG2EeCrJGaHIvPtzJ/4HZ5ZxuIU0qTv
+certif:       UHbcfWYnfsip1vF4ae7I8c005XWOQC23jKlHeRuLwr79248Xv9mEl6ir2HqX7qJX
+certif:       1BhxQ67ffY2M4S6RhG6faO9/oXrYMX+TbMKaAb5ElbpYk26HXJpGpmXBxNOMqu9T
+certif:       kD/YFDqvYA0vO6Kiebgtj32xonY9swBUiNuYpue6k/HvWtlNTLIWBXbi+NcAAwUH
+certif:       /RlpJEl3waSkXvjyQM3LnyJYqoaJ0Kgpz10tHxcranTxsPOfJjsSl1JVXmxfgODa
+certif:       IlMziiVrlcLZHj1WGmbv6G0+lmBlXDgnlPq+aManbaxFbZCiqZ0102mqTx4G3j/n
+certif:       FVbA+al9co4Ub2mt/p+3CIxKO0nGRWXY8468NRP1zwBl9BLkVkvcLHleBmcMc6zw
+certif:       cfwE/GepfUDZhfM8hz2XQ12jMnxeqq/An0aUV5KmBUZGpti3jPvwco8TVg8ob0CD
+certif:       0PqWQzCsP7aZXRvspCoiS1H2Itnc5yoNfcCeLTp0N5YQ3XSiNj0zdN0sPkgqVHYv
+certif:       ZAIbiaTE12hKvOzc4QIJriyIRgQYEQIABgUCPDw6IwAKCRASMjDaVpTZ0J/5AJwJ
+certif:       wbHUwRoDExpjbHUttFrmY6iglgCdFuiMBVwMSEWvSDj4cK45epvKMB0=
+certif:       =3S4W
+certif:       -----END PGP PUBLIC KEY BLOCK-----
+remarks:      Sample PGP Key Certificate
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20040101
+source:       DB-TEST
+
+
+% create maintainers for successful authorisation
+
+mntner:       TEST-MNT
+descr:        Test maintainer object
+admin-c:      TP1-DB-TEST
+upd-to:       dbtest@ripe.net
+referral-by:  TEST-DBM-MNT
+mnt-by:       TEST-MNT
+auth:         CRYPT-PW dbOnSHFpKZTBU  # auth
+auth:         X509-1
+auth:         PGPKEY-5694D9D0
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+mntner:       TEST2-MNT
+descr:        Test maintainer object
+admin-c:      TP1-DB-TEST
+upd-to:       dbtest@ripe.net
+referral-by:  TEST-DBM-MNT
+mnt-by:       TEST2-MNT
+auth:         X509-2
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+% create parent inetnum
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED PA
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    TEST2-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+person:       test person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+
+% End of loader data file

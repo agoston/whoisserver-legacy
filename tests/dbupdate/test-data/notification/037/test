@@ -1,0 +1,28 @@
+# notification tests
+# CASE 37: Create as-set object with 3-level hierarchical name 
+#          AS123:AS-TEST1:AS-TEST
+#          parent as-set object exists. auth for set and parent is given
+#
+# create as-set object
+#
+#SUCCESS
+#
+# RESULT 37: There should be a notif message to case037-11@ripe.net,
+#            case037-5@ripe.net, case037-16@ripe.net
+#            about successful creation, and no forward message.
+
+
+as-set:       AS123:AS-TEST1:AS-TEST
+descr:        test as-set
+members:      AS1, AS2, AS3, AS4
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+notify:       case037-16@ripe.net
+mnt-by:       USER-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password:     user-mnt
+password:     test2-mnt
+
+

@@ -1,0 +1,22 @@
+# route authorisation tests - autnum
+# CASE 21: We try to delete 20.13.0.0/16 route object 
+#          parent, origin exist
+#          password for child
+%
+#
+# delete route object 
+#
+#SUCCESS
+#
+# RESULT 21: The delete will succeed
+
+
+password: mb-child
+
+route:   20.13.0.0/16
+descr:   Route
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+delete:  not required

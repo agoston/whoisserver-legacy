@@ -1,0 +1,16 @@
+# keywords tests
+# CASE 2: howto keyword
+#         not a mail message
+%
+#
+# run dbupdate with option -k howto
+# ./dbupdate -c ~/db/conf/rip.config -r -k howto -f test
+#
+#SUCCESS
+#
+# RESULT 2: help output in ack log and stdout, 
+#           keyword howto in upd log.
+%
+%
+$ -c $RIP_CONFIG -r -k howto  -f
+

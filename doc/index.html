@@ -1,0 +1,137 @@
+<HTML>
+
+<HEAD>
+<TITLE>RIPE Whois Database Software Version 3.0</TITLE>
+</HEAD>
+
+<BODY BGCOLOR=#ffffff>
+
+<CENTER>
+<TABLE BORDER=0 WIDTH=85%>
+<TR>
+<TD> 
+
+<CENTER>
+<H1>RIPE Whois Database Software Version 3.0</FONT></H1>
+</CENTER>
+
+
+<A NAME="#intro">
+<H3>Introduction</H3>
+
+<P>
+Welcome to Version 3.0 of the RIPE Whois Database Software. This
+version is completely different from the previous versions
+of the software, i.e. v2.3.2 and below.
+
+<P>
+For instance, Version 3.0 of the Software uses <A HREF="#rpsl">RPSL</A>.
+The old object syntax, based on 
+<A HREF="http://www.ripe.net/ripe/docs/ripe-181.html">RIPE-181</A>,
+is not supported anymore, except that you can convert RIPE-181 objects
+to store them in the database in RPSL format.
+Check out the <A HREF="http://www.ripe.net/ripencc/pub-services/db/rpsl/">
+RIPE-181 to RPSL migration page</A> that the RIPE NCC has prepared 
+to ease your transition from RIPE-181 to RPSL.
+
+<P>
+Furthermore, the whole Whois database software has been completely
+rewritten. It now stores the objects in a SQL backend instead than
+in flat files, thus making it more scalable. Many new features
+have been added, such as:
+
+<UL TYPE=CIRCLE>
+<LI>Dynamic access control and authorization
+<LI>Loading in memory the primary keys of certain types of objects
+(the so-called <EM>radix tree</EM>)
+<LI>A runtime administrative interface 
+<LI>The parsing of MIME messages for database updates
+</UL>
+
+to name just a few.
+
+<P>
+The languages used in v3.0 are C/C++ (PERL was used in v2).
+
+
+<A NAME="compiling">
+<H3>Compiling and Installing the Package</H3>
+
+<P>
+For detailed instructions about compiling and installing the RIPE
+Whois Database Software, please read the files <A HREF="../README">README</A>
+and <A HREF="../INSTALL">INSTALL</A>, provided with this distribution.
+
+
+<P>
+The software is being developed and tested in the Solaris environment.
+We managed to make it run on Solaris 2.6, 7 and 8 for SPARC, and on
+Solaris 7 for Intel. More effort will be spent on portability in the
+next few months.
+
+
+<A NAME="docs">
+<H3>Documentation</H3>
+
+<P>
+This package includes for you to read some 
+<A HREF="../design/specs/README.html">design specifications</A>;
+you can also <A HREF="global/index.html">browse</A> through our source code
+or <A HREF="cxref/index.html">view</A> the source files commented using 
+CXREF style.
+
+<P>
+In the not-so-far future, we will include more documentation as to how
+the RIPE Whois Database Software v3.0 works, and some manpages.
+
+
+<A NAME="transition">
+<H3>The transition from RIPE Database v2 to v3</H3>
+
+<P>
+At a certain point in future, the RIPE Database will switch to RPSL format,
+and abandon the RIPE-181 format. This will not happen in a sudden way,
+however. There is a transition plan, described in a "Transition" document
+that you can find linked 
+<A HREF="http://www.ripe.net/ripencc/pub-services/db/rpsl/">here</A>.
+
+<P>
+Please check the 
+<A HREF="http://www.ripe.net/ripencc/pub-services/db/rpsl/transition-v3.pdf">transition</A>
+document for the various phases and timelines of the transition.  The
+transition date for the RIPE Whois server is 23 April 2001.
+
+
+<A NAME="rpsl">
+<H3>RPSL</H3>
+
+<P>
+RPSL is an acronym for <EM>Routing Policy Specification Language</EM>. 
+Its specifications are defined
+in <A HREF="ftp://ftp.ripe.net/rfc/rfc2622.txt">RFC2622</A>. You can also
+check <A HREF="ftp://ftp.ripe.net/rfc/rfc2650.txt">RFC2650</A>,
+"Using RPSL in Practice",
+and a <A HREF="http://www.ripe.net/ripe/meetings/archive/ripe-33/presentations/rpsl-tutorial/">tutorial</A>
+on RPSL given by the RIPE NCC Database group.
+
+
+<A NAME="contribute">
+<H3>Where Can I Get Help?</H3>
+
+<P>
+If you have any comments, questions, requests; or if you find any bug in
+any way you might test this version 3.0, please let us know. You can
+either write to <A HREF="mailto:dbrip@ripe.net">dbrip@ripe.net</A>,
+which is the address for Whoisd v3.0-related issues at the RIPE NCC, or
+you can send it to the 
+<A HREF="mailto:db-beta@ripe.net">db-beta@ripe.net</A> discussion list.
+Please note that only subscribers are allowed to post on this list;
+follow the instructions in the <A HREF="../README">README</A> file for
+how to subscribe.
+
+</TD>
+</TR>
+</TABLE>
+</CENTER>
+
+</BODY>

@@ -1,0 +1,30 @@
+# aut-num authorisation tests
+# CASE 7: We try to create aut-num object AS123
+# maintained by RIPE-NCC-HM-MNT - password given
+# with a parent mnt-lower TEST-MNT - password given
+# with override
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 7: The creation will succeed with override.
+
+
+aut-num:      AS123
+as-name:      ASTEST
+descr:        TEST TELEKOM
+import:       from AS1 accept {1.2.3.4/24}
+export:       to AS2 announce {1.2.3.4/24}
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password:     hostmaster
+password:     auth
+override:     password

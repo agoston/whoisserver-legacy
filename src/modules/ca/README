@@ -1,0 +1,67 @@
+###########################################################################
+Engin's note (2002.10.28)
+This file is outdated. It must be reviewed.
+Basically: When adding/deleting variables,
+dictGen.m4 file and ca_macros.h files must be
+modified. ca_dictionary.h file is generated from
+dictGen.m4. The file ca_dictSyms.h mentioned in the
+following text does not exist anymore (see RELEASE_NOTES.v3.1)
+###########################################################################
+
+The contents of this file describe the read & write functions of the
+configuration module and explain how to use them.  Comments are welcome.
+
+There are functions to read the value of a variable and to write the
+value of a variable.  These functions take a single integer argument.
+This integer value is mapped to the variable name using #define
+statements in ca_dictSyms.h. The order of the variables is significant.
+At this time, the initial values of the variables are assigned in 
+ca_values.c; I shall do this in a better way soon.
+
+The file ca_macros.h has a series of #define statements to define 
+macros for the read and write functions.  There are four types of 
+read function and four types of write function.
+
+The four types of read function are:
+
+(a) int ca_get_int(int symbol);
+
+(b) char *ca_get_dirlist(int symbol);
+
+(c) char *ca_get_string(int symbol);
+
+(d) int ca_get_boolean(int symbol).
+
+
+The four types of write function are:
+
+(a) int ca_set_int(int symbol);
+
+(b) void ca_set_dirlist(int symbol);
+
+(c) void ca_set_string(int symbol);
+
+(d) void ca_set_boolean(int symbol).
+
+
+There is also a function to print the contents of a 
+dictionary:
+
+void ca_getDictionary(dict_t woordenboek[], int size)
+
+
+Function to print the details of a "database" (e.g. machine name, port
+number):
+
+void ca_getDatabase(ca_database_t db)
+
+
+Function to print the details of a "source" (i.e. the name of a source
+and the details of the database):
+
+void ca_getSource(ca_database_list_t src)
+
+Function to print the details of all sources available on the server:
+
+void ca_getAllSources(GSList *sources)
+

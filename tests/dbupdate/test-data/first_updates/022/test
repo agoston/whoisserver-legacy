@@ -1,0 +1,16 @@
+# first updates tests
+# CASE 22: create a person object with odd characters in address
+#
+# create succeeds.
+#
+#SUCCESS
+#
+# RESULT 22: create succeeds
+
+
+person:       Test Person2
+address:      SinýŸgel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

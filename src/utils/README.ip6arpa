@@ -1,0 +1,50 @@
+Information about the ip6arpa-fix.pl script
+
+
+Audience
+
+This is for users running the RIPE Whois Server who meet the following
+requirements:
+
+1. You are running or wish to run a version more recent than 3.1.0
+2. You were running 3.1.0 or earlier
+3. You want to convert an existing database, rather than reload
+
+If this does not describe you, then you do NOT need this script.
+
+
+Problems
+
+There was a bug in the IPv6 reverse name mapping function that would
+convert the ip6.arpa or ip6.int domain into an incorrect address in
+some cases.  This has been fixed, but we need to correct the database.
+The ip6arpa-fix.pl script does this.  
+
+There is another related bug that this fixes.  If ip6.arpa domains
+were added to the database before the 3.1.0 release, then there are
+missing table entries, which would cause a server crash if they were
+updated.  This is also fixed by this script.
+
+
+
+Requirements
+
+The script requires Perl and the MySQL Perl DBD module, available from
+CPAN.
+
+
+Invoking
+
+To run, invoke as follows:
+
+$ perl ip6arpa-fix.pl -h host -u user [-p password] database
+
+This will remove the incorrect entries and add the correct ones.  
+
+
+Contacts
+
+As always, please send any questions or problems to <dbrip@ripe.net>.
+
+
+$Id: README.ip6arpa,v 1.1 2002/07/11 12:18:02 shane Exp $

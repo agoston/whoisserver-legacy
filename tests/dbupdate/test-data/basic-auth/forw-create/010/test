@@ -1,0 +1,37 @@
+# basic-auth tests - forward create
+# CASE 10: Create a mntner object and a person object
+#          with NO override
+#          person has mnt-by: with new mntner
+#
+# create mntner and person objects
+#
+#SUCCESS
+#
+# RESULT 10: Both objects will be created successfully
+%
+$ -c $RIP_CONFIG -mr -f
+%
+From: dbtest@ripe.net
+Subject: please create
+
+
+password: test
+
+mntner:       TEST-MNT
+descr:        Mntner
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW qw7BVMLJG6Q6M   # test
+upd-to:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

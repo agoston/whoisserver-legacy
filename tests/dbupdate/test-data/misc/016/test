@@ -1,0 +1,26 @@
+# misc tests
+# CASE 16: Modify a role object
+#          with a changed name
+#          no override
+#
+# modify role object 
+#
+#FAILURE
+#
+# RESULT 16: The modification will fail
+
+
+role:         Text Rolex
+address:      Singel
+phone:        +01234567
+e-mail:       dbtest@ripe.net
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+changed:      dbtest@ripe.net 20031205
+nic-hdl:      RO123-DB-TEST
+mnt-by:       TEST-MNT
+source:       DB-TEST
+password:     auth
+
+
+

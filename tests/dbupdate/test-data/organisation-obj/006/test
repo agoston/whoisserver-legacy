@@ -1,0 +1,30 @@
+# organisation object tests
+# CASE 6: Create an org object
+#         with "org-type: IANA" but without
+#         a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#         variable.  
+%
+% requires initial objects to be loaded
+% make sure that NON-ORG-POWER-MNT is NOT in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail
+
+
+organisation:  AUTO-1
+org-name:      EXAMPLE organisation object for tests
+org-type:      IANA
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        NON-ORG-POWER-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+
+password: test-dbm
+password: non-org-power

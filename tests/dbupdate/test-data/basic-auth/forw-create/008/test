@@ -1,0 +1,42 @@
+# basic-auth tests - forward create
+# CASE 8: Create 2 as-block objects
+#         with NO override
+#         as a mail message
+#
+# create as-block objects
+#
+#SUCCESS
+#
+# RESULT 8: The creations will NOOP and 2 seperate requests are sent to ripe-dbm
+%
+%
+$ -c $RIP_CONFIG -mr -f
+%
+From: dbtest@ripe.net
+Subject: please create
+
+password: hostmaster
+
+as-block:     AS100 - AS1000
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+as-block:     AS200 - AS2000
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST

@@ -1,0 +1,27 @@
+# organisation object tests
+# CASE 33: Modify a person object with "org:" attribute.
+#         test notification. Notif must NOT be sent in this case
+#
+%
+% requires initial objects to be loaded
+#
+# modify person object 
+#
+#
+#SUCCEED
+#
+# RESULT 33: The modification will succeed
+$ -c $RIP_CONFIG -mr -f 
+%
+%
+From: dbtest@ripe.net
+
+person:       test person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+changed:      dbtest@ripe.net 20020101
+changed:      changed@ripe.net 20030101
+org:          ORG-EOOF1-DB-TEST
+source:       DB-TEST
+

@@ -1,0 +1,21 @@
+# pre-process object tests
+# CASE 44: Create a mntner object with a referral-by on the 
+#          disallowed mntner list
+#
+# create a mntner object
+#
+#FAILURE
+#
+# RESULT 44: create will fail
+
+
+mntner:       MY-MNT
+descr:        Mntner for my objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+upd-to:       dbtest@ripe.net
+mnt-by:       MY-MNT
+referral-by:  NEW-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

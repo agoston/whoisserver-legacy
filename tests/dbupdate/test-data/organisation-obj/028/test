@@ -1,0 +1,30 @@
+# organisation object tests
+# CASE 28: Create an inet6num with status "ALLOCATED-BY-RIR"
+#         but without "org:" which is mandatory for such inetnums.
+#         password for "mnt-by:" is provided
+#
+%
+% requires initial objects to be loaded
+#
+# create inet6num object 
+#
+#
+#FAILURE
+#
+# RESULT 28: The creation will fail
+
+
+inet6num:     2002::0/35
+netname:      TEST-ORG
+descr:        Test inet6num object
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+status:       ALLOCATED-BY-RIR
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+password: hostmaster

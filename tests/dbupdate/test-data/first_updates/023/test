@@ -1,0 +1,18 @@
+# first updates tests
+# CASE 23: Blank update mail message
+#
+# No content in the update message
+#
+#FAILURE
+#
+# RESULT 23: Number of objects found: 0  reported in ack summary
+#            nothing reported as not looking like an object.
+#            Subject: line contains FAILED:
+#
+%
+%
+$ -c $RIP_CONFIG -m -f 
+%
+%
+From: dbtest@ripe.net
+

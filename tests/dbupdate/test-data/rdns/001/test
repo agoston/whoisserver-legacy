@@ -1,0 +1,23 @@
+# rdns tests
+# CASE 1: Delete fails because of wrong password
+#
+# delete domain object
+#
+#FAILURE
+#
+# RESULT 1: deletions will fail
+
+domain:       193.in-addr.arpa
+descr:        Test
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns-pri.ripe.net
+nserver:      ns-sec.ripe.net
+mnt-by:       TEST-DBM-MNT
+mnt-lower:    TEST-DBM-MNT
+changed:      dbtest@ripe.net 20040329
+source:       DB-TEST
+delete: not needed
+password: wrongpassword
+

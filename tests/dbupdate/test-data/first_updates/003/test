@@ -1,0 +1,16 @@
+# first updates tests
+# CASE 3: Object with no source line in update message
+#
+# Object not recognised, so treated as garbage.
+#
+#SUCCESS
+#
+# RESULT 3: Number of objects found: 0  reported in ack summary
+#           and object reported as not looking like an object.
+
+
+person:  test person2
+address: here
+phone:
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST

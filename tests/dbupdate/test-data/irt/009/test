@@ -1,0 +1,26 @@
+# irt tests
+# CASE 9: Remove mnt-irt from inetnum
+#         password for mnt-by of inetnum
+#         no password for irt
+#
+# modify inetnum 
+#
+#SUCCESS
+#
+# RESULT 9: The modification will succeed
+
+
+password: test-mnt
+
+inetnum:      192.168.201.0 - 192.168.201.255
+netname:      RIPE-NET
+descr:        /24 to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+

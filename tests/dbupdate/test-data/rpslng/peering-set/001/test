@@ -1,0 +1,24 @@
+
+# CASE 1: We try to create peering-set object prng-test
+%
+% requires initial objects to be loaded
+#
+# create peering-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+peering-set:  prng-test
+descr:        test 
+peering:      AS1 1.1.1.1 at 2.2.2.2
+mp-peering:   AS2 1::1 at 2::2
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+mnt-by:       TEST-MNT
+changed:      db-test@ripe.net 20010101
+source:       DB-TEST
+
+password: auth
+
+%

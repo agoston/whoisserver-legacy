@@ -1,0 +1,13 @@
+# input tests
+# CASE 1: Invalid file specified with -f option
+%
+#
+# input from non existant file  ( -f fred )
+# ./dbupdate -c ~/db/conf/rip.config -r -f fred
+#
+#FAILURE
+#
+# RESULT 1: internal error message in ack
+%
+%
+$$ -c $RIP_CONFIG -r -f fred

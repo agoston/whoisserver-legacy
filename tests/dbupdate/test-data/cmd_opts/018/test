@@ -1,0 +1,13 @@
+# command line options tests
+# CASE 18: Config file specified does not exist
+#
+# run dbupdate with a non existant config file
+# ./dbupdate -c ~/db/conf/fred -f test
+#
+#FAILURE
+#
+# RESULT 18: config file fred does not exist reported
+%
+%
+?12
+$ -c ~/db/conf/fred -f

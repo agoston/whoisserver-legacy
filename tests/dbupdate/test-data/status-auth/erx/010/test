@@ -1,0 +1,43 @@
+# inetnum erx status tests
+# CASE 10: We try to modify an inetnum object twice
+# First modification is to add the RIPE-NCC-HM-MNT using override
+# Second modification is to change the
+# status from EARLY-REGISTRATION to ALLOCATED PA 
+%
+% requires initial objects to be loaded
+#
+# modify inetnum object twice
+#
+#SUCCESS/SUCCESS
+#
+# RESULT 10: Both modifications will succeed
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      RIPE-NET1
+descr:        /17 with EARLY-REGISTRATION
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       EARLY-REGISTRATION
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+override: password
+
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      RIPE-NET1
+descr:        /17 with EARLY-REGISTRATION
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED PA
+org:          ORG-Eoof1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: test-dbm
+password: hostmaster

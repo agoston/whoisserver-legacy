@@ -1,0 +1,24 @@
+DF_Load_t DF_radix_load[] = 
+{
+  { A_DN, RX_FAM_RT,
+	"SELECT domain.object_id,prefix,prefix_length,domain                 FROM inaddr_arpa,domain                 WHERE domain.object_id = inaddr_arpa.object_id                 AND   inaddr_arpa.thread_id = 0",
+	"SELECT domain.object_id, msb, lsb, prefix_length, domain                 FROM ip6int,domain                 WHERE domain.object_id = ip6int.object_id                 AND ip6int.thread_id = 0"
+  },
+  { A_IN, RX_FAM_IN,
+	"SELECT  object_id,begin_in,end_in                 FROM    inetnum                 WHERE   thread_id = 0",
+	NULL
+  },
+  { A_I6, RX_FAM_RT,
+	NULL,
+	"SELECT object_id,i6_msb,i6_lsb,prefix_length                 FROM   inet6num                 WHERE  thread_id = 0"
+  },
+  { A_RT, RX_FAM_RT,
+	"SELECT  object_id,prefix,prefix_length,origin                 FROM    route                 WHERE   thread_id = 0",
+	NULL
+  },
+  { A_R6, RX_FAM_RT,
+	NULL,
+	"SELECT  object_id,r6_msb,r6_lsb,prefix_length,origin                 FROM    route6                 WHERE   thread_id = 0"
+  },
+  { -1, -1, NULL, NULL }
+};

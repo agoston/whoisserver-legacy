@@ -1,0 +1,21 @@
+# first updates tests
+# CASE 8: Object with syntax error, plus some garbage
+#
+# Object with syntax error and some garbage
+#
+#FAILURE
+#
+# RESULT 8: Syntax error reported
+#           and garbage reported as not looking like an object.
+
+
+person:  test person2
+address: here
+phone:   123
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test
+
+qwerty qwerty
+qwerty
+qwerty qwerty qwerty

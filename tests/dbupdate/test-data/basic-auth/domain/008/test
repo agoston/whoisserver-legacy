@@ -1,0 +1,27 @@
+# domain authorisation tests
+# CASE 8: We try to create domain object 1.2.in-addr.arpa - reverse
+#        mnt-by TEST-MNT pass
+# parent mnt-lower RIPE-NCC-HM-MNT no pass
+# this test is for checking the message we're sending to the user who sends 
+# reverse domain creations to auto-dbm@ripe.net. 
+# 
+#
+# create domain object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail.
+
+domain:       1.2.in-addr.arpa  
+descr:        my test domain
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns1.some.net
+nserver:      ns2.some.net
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password:     auth

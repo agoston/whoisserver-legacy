@@ -1,0 +1,300 @@
+# X.509 auth tests
+
+
+# CASE 1: We try to modify a person object protected by a mntner
+#         with a password and an X509 certificate.
+#         Correct password supplied.
+#
+#
+#SUCCESS
+#
+# RESULT 1: The modify will succeed.
+
+
+# CASE 2: We try to modify a person object protected by a mntner
+#         with a password and an X509 certificate.
+#         No creds supplied.
+#
+#
+#FAILURE
+#
+# RESULT 2: The modify will fail.
+
+
+# CASE 3: We try to modify a person object protected by a mntner
+#         with a password and an X509 certificate.
+#         Correct signature supplied.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 3: The modify will succeed.
+
+
+# CASE 4: We try to modify a person object protected by a mntner
+#         with a password and an X509 certificate.
+#         Signed with wrong (different) certificate.
+#         Both certificates have matching key-cert objects.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#FAILURE
+#
+# RESULT 4: The modify will fail.
+
+
+# CASE 5: We try to modify a person object protected by a mntner
+#         with a password and an X509 certificate.
+#         Correct signature supplied.
+#         No matching key-cert object
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#FAILURE
+#
+# RESULT 5: The modify will fail.
+
+
+# CASE 6: We try to modify a person object protected by a mntner
+#         with a password and an X509 certificate.
+#         Correct signature supplied.
+#         Database contains 2 key-cert objects with same fingerprint
+#         but different certificates.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 6: The modify will succeed.
+
+
+# CASE 7: We try to modify a person object protected by a mntner
+#         with a password and an X509 certificate.
+#         Correct signature supplied.
+#         Change the message contents after signing.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 7: The modify will succeed.
+
+
+# CASE 8: We try to modify a person object protected by a mntner
+#         with a password and an X509 certificate.
+#         Correct signature supplied.
+#         Corrupt the signature.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#FAILURE
+#
+# RESULT 8: The modify will fail.
+
+
+# CASE 9: We try to modify a person object protected by a mntner
+#         with a password and an X509 certificate.
+#         Signed with wrong (different) certificate.
+#         Both certificates have matching key-cert objects.
+#         Correct password inside signed message.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 9: The modify will succeed.
+
+
+# CASE 10: We try to modify a person object protected by a mntner
+#          with a password and an X509 certificate.
+#          Signed with wrong (different) certificate.
+#          Both certificates have matching key-cert objects.
+#          Correct password supplied outside signed message.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 10: The modify will succeed
+#            This SHOULD work, but fails 
+#            (pgp case also fails, but we don't have a test case for it)
+
+
+# CASE 11: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          Both passwords supplied.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 11: The creation will succeed
+
+
+# CASE 12: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          no credentials supplied.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#FAILURE
+#
+# RESULT 12: The creation will fail
+
+
+ CASE 13: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          mnt-by signed, then mnt-lower signed.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 13: The creation will succeed
+
+
+# CASE 14: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          mnt-lower signed, then mnt-by signed.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 14: The creation will succeed
+
+
+# CASE 15: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          mnt-by signed, with mnt-lower password inside signed message.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 15: The creation will succeed
+
+
+# CASE 16: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          mnt-by signed, with mnt-lower password outside signed message.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 16: The creation will succeed
+#            This SHOULD work, but fails at the moment.
+
+
+# CASE 17: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          mnt-by signed, with mnt-lower password inside signed message.
+#          Corrupt the signature
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#FAILED
+#
+# RESULT 17: The creation will fail
+
+
+# CASE 18: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          mnt-by signed (corrupt), then mnt-lower signed.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#FAILED
+#
+# RESULT 18: The creation will fail
+
+
+# CASE 19: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          mnt-by signed, then mnt-lower signed (corrupt).
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 19: The creation will succeed
+
+
+# CASE 20: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          mnt-by signed (corrupt), then mnt-lower signed (corrupt).
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#FAILED
+#
+# RESULT 20: The creation will fail
+
+
+# CASE 21: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate and PGP key.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          mnt-by PGP signed, then mnt-lower X.509 signed.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 21: The creation will succeed
+
+
+# CASE 22: Input from LIR Portal 
+#          with certificate passed on the command line
+#          We try to modify a person object protected by a mntner
+#          with a password and an X509 certificate.
+#          Correct certificate supplied.
+#
+# input from LIR Portal
+# ./dbupdate -c ~/db/conf/rip.config -r --cert "certificate" -f test
+#
+#
+#SUCCESS
+#
+# RESULT 22: The modify will succeed.
+
+
+# CASE 23: Input from LIR Portal 
+#          with certificate passed on the command line
+#          We try to modify 3 person objects protected by mntners
+#          with a password and different X509 key-cert objects
+#          but each with the same certificate and fingerprint.
+#          Correct certificate supplied.
+#          Database has three key-cert objects with same fingerprint
+
+

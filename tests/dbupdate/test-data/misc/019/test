@@ -1,0 +1,22 @@
+# misc tests
+# CASE 19: Delete a person object with no nic-handle
+#
+# delete person object 
+#
+#FAILURE
+#
+# RESULT 19: syntax error reported
+
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+delete:       no reason
+
+password:     auth
+
+
+

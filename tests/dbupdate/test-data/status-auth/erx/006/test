@@ -1,0 +1,25 @@
+# inetnum erx status tests
+# CASE 6: We try to create inetnum object
+# with status EARLY-REGISTRATION under LIR-PARTITIONED PA 
+# with override
+%
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 6: The creation will succeed
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with EARLY-REGISTRATION
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       EARLY-REGISTRATION
+mnt-by:       END-USER-MNT
+mnt-lower:    END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+override: password
+

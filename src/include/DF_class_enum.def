@@ -1,0 +1,25 @@
+typedef enum _C_Type_t {
+  C_ANY = -1, 
+  C_AK,
+  C_AS,
+  C_AN,
+  C_DN,
+  C_IR,
+  C_I6,
+  C_IN,
+  C_KC,
+  C_LI,
+  C_MT,
+  C_PN,
+  C_RO,
+  C_RT,
+  C_RS,
+  C_FS,
+  C_PS,
+  C_IS,
+  C_IT,
+  C_OA,
+  C_R6,
+  C_END
+} C_Type_t;
+

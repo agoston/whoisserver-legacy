@@ -1,0 +1,30 @@
+# inetnum erx status tests
+# CASE 11: We try to modify an inetnum object
+# Add the RIPE-NCC-HM-MNT 
+# and change the
+# status from EARLY-REGISTRATION to ALLOCATED PA 
+# no override and no HM password
+%
+% requires initial objects to be loaded
+#
+# modify inetnum object
+#
+#SUCCESS
+#
+# RESULT 11: modification will succeed
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      RIPE-NET1
+descr:        /17 with EARLY-REGISTRATION
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED PA
+org:          ORG-Eoof1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    LIR-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: END-USER
+password: test-dbm

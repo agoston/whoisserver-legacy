@@ -1,0 +1,148 @@
+% X.509 key-cert tests
+% load objects 
+%
+
+
+%----------------------------------------------------------------
+%        Standard Template Objects
+
+
+
+% admin-c, tech-c person
+
+person:       test person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP1-DB-TEST
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% referral-by maintainer
+
+mntner:       TEST-DBM-MNT
+descr:        Mntner for RIPE DBM objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+upd-to:       dbtest@ripe.net
+mnt-by:       TEST-DBM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% allocation maintainer
+
+mntner:       RIPE-NCC-HM-MNT
+descr:        RIPE-NCC Hostmaster Maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+upd-to:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
+source:       DB-TEST
+
+
+% root inetnum object
+
+inetnum:      0.0.0.0 - 255.255.255.255
+netname:      IANA-BLK
+descr:        The whole IPv4 address space
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED UNSPECIFIED
+remarks:      The country is really worldwide.
+remarks:      This address space is assigned at various other places in
+remarks:      the world and might therefore not be in the RIPE database.
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+mnt-routes:   RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% root inet6num object
+
+inet6num:     0::/0
+netname:      ROOT
+descr:        Root inet6num object
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+status:       ALLOCATED-BY-RIR
+remarks:      This network in not allocated.
+              This object is here for Database
+              consistency and to allow hierarchical
+              authorisation checks.
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+%      End of Standard Template Objects
+%----------------------------------------------------------------
+
+%  Additional objects required for this test
+
+
+% create maintainer for successful authorisation
+
+mntner:  TEST-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  TEST-MNT
+auth:    CRYPT-PW dbOnSHFpKZTBU  # auth
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+% create an encompassing as-block 
+
+as-block: AS1 - AS65534
+admin-c: TP1-DB-TEST
+tech-c: TP1-DB-TEST
+mnt-by: TEST-MNT
+changed: dbtest@ripe.net 20020101
+source: DB-TEST
+
+key-cert:     X509-5
+method:       X509
+owner:        /C=NL/O=RIPE NCC/OU=Members/CN=uk.bt.test-receiver/Email=test-receiver@linux.testlab.ripe.net
+fingerpr:     D5:92:29:08:F8:AB:75:5F:42:F5:A8:5F:A3:8D:08:2E
+certif:       -----BEGIN CERTIFICATE-----
+certif:       MIID/DCCA2WgAwIBAgICAIQwDQYJKoZIhvcNAQEEBQAwcTELMAkGA1UEBhMCRVUx
+certif:       EDAOBgNVBAgTB0hvbGxhbmQxEDAOBgNVBAoTB25jY0RFTU8xHTAbBgNVBAMTFFNv
+certif:       ZnR3YXJlIFBLSSBUZXN0aW5nMR8wHQYJKoZIhvcNAQkBFhBzb2Z0aWVzQHJpcGUu
+certif:       bmV0MB4XDTAzMDkwODE1NTMyOFoXDTA0MDkwNzE1NTMyOFowgYUxCzAJBgNVBAYT
+certif:       Ak5MMREwDwYDVQQKEwhSSVBFIE5DQzEQMA4GA1UECxMHTWVtYmVyczEcMBoGA1UE
+certif:       AxMTdWsuYnQudGVzdC1yZWNlaXZlcjEzMDEGCSqGSIb3DQEJARYkdGVzdC1yZWNl
+certif:       aXZlckBsaW51eC50ZXN0bGFiLnJpcGUubmV0MIIBIjANBgkqhkiG9w0BAQEFAAOC
+certif:       AQ8AMIIBCgKCAQEAwYAvr71Mkw68CoMKmrHs8rHbMlLotPVqx5RuJ4d+IomL0i2i
+certif:       F7NVBkg1VLuAER1wl1X2pK746ptevTzwWi/QmgFZajTqLjCfW1sou2TXEA5s80t3
+certif:       JXRNk9xF6VXnggxCiqeWyfdC9Q7yOnlNdkJgzmQ/OuE9EVkKaY2kcnMU4NVyvbmD
+certif:       DtgdgSEuvRlgyeDi2gTh79QAfTnzH2d2SFGt1lZT48PuwCXl485pxyu+gVmykEMr
+certif:       EAgG6H/Dpl7t/jyV9w/HRAFaSV8mzpaLg6rxM03ThOPl6R61RJzEqTi0zX4OHkxV
+certif:       q7m1aniNJIvWefU1Yfvdv3zzTcmxWmA3yhOt6wIDAQABo4IBCDCCAQQwCQYDVR0T
+certif:       BAIwADARBglghkgBhvhCAQEEBAMCBaAwCwYDVR0PBAQDAgXgMBoGCWCGSAGG+EIB
+certif:       DQQNFgtSSVBFIE5DQyBDQTAdBgNVHQ4EFgQU/EdNYQO8tjU3p1uJLsYn4f0bmmAw
+certif:       gZsGA1UdIwSBkzCBkIAUHpLUfvaBVfxXVCcT0kh9NJeH7ouhdaRzMHExCzAJBgNV
+certif:       BAYTAkVVMRAwDgYDVQQIEwdIb2xsYW5kMRAwDgYDVQQKEwduY2NERU1PMR0wGwYD
+certif:       VQQDExRTb2Z0d2FyZSBQS0kgVGVzdGluZzEfMB0GCSqGSIb3DQEJARYQc29mdGll
+certif:       c0ByaXBlLm5ldIIBADANBgkqhkiG9w0BAQQFAAOBgQCEve6deqF0nvHKFJ0QfEJS
+certif:       UkRTCF7YCx7Jb2tKIHfMgbrUs3x9bmpShpBkJwjEsNYp0Vvk7hfhiFgKM4AGyYd3
+certif:       hZNmF5c/d0gauqvL+egb+3V+Zg+sJTzHMVKQLF1ybWgJjU75Pi+mO7BG0zsQ13pT
+certif:       YxuZCR2W15nwt7zLiHtmfw==
+certif:       -----END CERTIFICATE-----
+remarks:      Sample Key Certificate
+notify:       dbtest@ripe.net
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net 20040101
+source:       DB-TEST
+
+% end of loader data file 
+

@@ -1,0 +1,33 @@
+# first updates tests
+# CASE 31: Modify an object with no changes  
+#          and a second object with an error
+#
+# Modify an object where the update object is identical to the existing
+# object in the database and a second object with a syntax error
+# Mail message
+#
+#FAILURE
+#
+# RESULT 31: One object is a NOOP and the other fails
+#            Subject: line contains FAILED:
+%
+%
+$ -c $RIP_CONFIG -m -f 
+%
+%
+From: dbtest@ripe.net
+
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net 20030101
+nic-hdl: TP2-DB-TEST
+source:  db-test
+
+person:  test person3
+address: here
+phone:   
+changed: dbtest@ripe.net
+nic-hdl: TP3-DB-TEST
+source:  db-test

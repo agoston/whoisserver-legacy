@@ -1,0 +1,23 @@
+char * const Class_codes[] = {
+  "ak",
+  "as",
+  "an",
+  "dn",
+  "ir",
+  "i6",
+  "in",
+  "kc",
+  "li",
+  "mt",
+  "pn",
+  "ro",
+  "rt",
+  "rs",
+  "fs",
+  "ps",
+  "is",
+  "it",
+  "oa",
+  "r6",
+  NULL
+}; /* Class_codes */

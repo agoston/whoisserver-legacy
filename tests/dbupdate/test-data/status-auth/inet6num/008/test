@@ -1,0 +1,26 @@
+# ipv6 status tests
+# CASE 8: create an inet6num with ALLOCATED-BY-LIR
+# with less specific having ALLOCATED-BY-RIR status
+%
+% requires initial objects to be loaded
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 8: The creation will succeed
+
+inet6num:     2001:0610::/35
+netname:      NL-SURF
+descr:        The Netherlands
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+status:       ALLOCATED-BY-LIR
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: LIR
+

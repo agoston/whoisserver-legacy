@@ -1,0 +1,18 @@
+# first updates tests
+# CASE 17: Object with a space before the colon ':'  
+#          after any attribute in update message,
+#          but not the class attribute.
+#
+# syntax error.
+#
+#FAILURE
+#
+# RESULT 17: Syntax errors in object reported.
+
+
+person:  test person2
+address : here
+phone:   +1
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

@@ -1,0 +1,40 @@
+# basic-auth tests
+# CASE 3: Create 3 person objects
+#         with a mnt-by and correct passwords
+#         using different case for password:
+%
+#
+# create 3 person objects
+#
+#SUCCESS
+#
+# RESULT 3: The creations will succeed
+
+
+password:  test
+PASSWORD:  test2
+PaSsWoRd:  test3
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+person:       Test Person3
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP3-DB-TEST
+mnt-by:       TEST2-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+person:       Test Person4
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP4-DB-TEST
+mnt-by:       TEST3-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

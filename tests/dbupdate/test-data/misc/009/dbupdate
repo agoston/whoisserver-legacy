@@ -1,0 +1,14 @@
+
+as-set:       AS-TEST
+descr:        test as-set
+members:      AS1, AS2, AS3, AS4
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-lower:    RIPE-NCC-HM-MNT
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+password: hostmaster
+

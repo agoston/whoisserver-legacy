@@ -1,0 +1,135 @@
+% hierarchical names/auth test
+% load objects 
+%
+
+
+%----------------------------------------------------------------
+%        Standard Template Objects
+
+
+% admin-c, tech-c person
+
+person:       test person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP1-DB-TEST
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% referral-by maintainer
+
+mntner:       TEST-DBM-MNT
+descr:        Mntner for RIPE DBM objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+upd-to:       dbtest@ripe.net
+mnt-by:       TEST-DBM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% allocation maintainer
+
+mntner:       RIPE-NCC-HM-MNT
+descr:        RIPE-NCC Hostmaster Maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+upd-to:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
+source:       DB-TEST
+
+
+% root inetnum object
+
+inetnum:      0.0.0.0 - 255.255.255.255
+netname:      IANA-BLK
+descr:        The whole IPv4 address space
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED UNSPECIFIED
+remarks:      The country is really worldwide.
+remarks:      This address space is assigned at various other places in
+remarks:      the world and might therefore not be in the RIPE database.
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+mnt-routes:   RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% root inet6num object
+
+inet6num:     0::/0
+netname:      ROOT
+descr:        Root inet6num object
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+status:       ALLOCATED-BY-RIR
+remarks:      This network in not allocated.
+              This object is here for Database
+              consistency and to allow hierarchical
+              authorisation checks.
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+%      End of Standard Template Objects
+%----------------------------------------------------------------
+
+%  Additional objects required for this test
+
+
+% create maintainer for successful authorisation
+
+mntner:  TEST-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  TEST-MNT
+auth:    CRYPT-PW dbOnSHFpKZTBU  # auth
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+% create an encompassing as-block 
+
+as-block: AS1 - AS65534
+admin-c: TP1-DB-TEST
+tech-c: TP1-DB-TEST
+mnt-by: TEST-MNT
+changed: dbtest@ripe.net 20020101
+source: DB-TEST
+
+aut-num:      AS123
+as-name:      TESTAS
+descr:        TEST TELEKOM
+import:       from AS1 accept {1.2.3.4/24}
+export:       to AS2 announce {1.2.3.4/24}
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+as-set:       AS123:AS-TEST1
+descr:        test as-set1
+members:      AS1, AS2, AS3, AS4
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+
+% End of loader data file

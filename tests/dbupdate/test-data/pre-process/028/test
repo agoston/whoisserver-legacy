@@ -1,0 +1,53 @@
+# pre-process object tests
+# CASE 28: Modify a key-cert object PGPKEY-471DBBEA
+#          with the generated attributes included and
+#          not identical to those in the database and
+#          the modification does not change the key data.
+%
+% requires initial objects to be loaded
+#
+# modify key-cert object 
+#
+#SUCCESS
+#
+# RESULT 28: The modification will succeed.and the object will have
+#            the generated attributes replaced by the original values. 
+#            A warning message will be included that the values supplied
+#            have been changed.
+
+
+key-cert:    PGPKEY-471DBBEA
+method:      PGP
+owner:       Test Person2 (TP2) <dbtest@ripe.net>
+fingerpr:    74EA 5066 31F4 E014 7CD9  3363 BF1F F741 471D BBEA
+certif:     -----BEGIN PGP PUBLIC KEY BLOCK-----
+certif:     Version: GnuPG v1.0.7 (GNU/Linux)
+certif:
+certif:     mQGiBD5CPc0RBAC3V3AEnNl3IY+oQNj+hnVzYcVmsb9mZJrqhPA4nlbTubIj1+1D
+certif:     KSgXSDVl3AMycsGgSNi5Mzv/7+dbamaU7MVP+fCqmp6nbnSDQIvlzooaT2vMgMZQ
+certif:     0P960pFmIkoBwcV2mGpQ4TruGz/++RW7Hq8D3ngpWC7W8ZLP4mh8Ue3hAwCg2kTH
+certif:     81ScG1zVykqiT8pv9xtm2L0D/3AK2LHJ3YfmB3iN62+O3alrs7qtzNf0bBBLZCyh
+certif:     qdNHngYwIwJMd6td0asBWFv55LMuY5qIew+ZgPJV4j1B18PYNcO14e8/6KpcRlXa
+certif:     gf9FMjcyCqVcMSEbNdiXvQHqOBVjkZPXIfvlowkBhzfG3UJ+MC7IC7Q9ajLA4pEw
+certif:     NC4FA/0Ti/iKO0L+Lxr9LcI5/QFidB3CNNH11r2QtKicJO/OQxWA+oEdufB8wSCt
+certif:     S8VEoxlHB0MDAZq0cMwMJaivu2LGcRX8xmKgDV5ekjgjbmZlcTJDTFbUfPIW0tmg
+certif:     obRS4filVcgKBlSrdFDep1WImuFk6LDfrWPurhqCa9RGnOxHBLQiVGVzdCBQZXJz
+certif:     b24gKFRQKSA8ZGJ0ZXN0QHJpcGUubmV0PohZBBMRAgAZBQI+Qj3NBAsHAwIDFQID
+certif:     AxYCAQIeAQIXgAAKCRC/H/dBRx276rekAJ0QyxbXH9AJLuyyDvZD1xPPNBOIIACf
+certif:     Y6SKTlytwXsonB86Lnmm1yeqTrS4zQQ+Qj3OEAMA/0E2vpAnoFvwDbeY5b1l0kFg
+certif:     XMQM/LOuRteWKilRV3wUo99ieyucrveOTna3LzJjPX0Xxx0r8JGhZMZZZ3xwkGIP
+certif:     ksSzc21F/nHDOISbPLSi8Ko0t38ZgR4y6hGsFFdDAAMFAv9J7Q8Sa821rO0ee+2p
+certif:     uQJvonbDmqUWKSX/XlfsQbRnq28zzjplxMhB0WIewnR+5vA2xuDtkImOtnn0u9X6
+certif:     qx3qJ91JmbnBHh1qt97J+mU7I2EtP7XAL3iG2lh2X3pLbn2IRgQYEQIABgUCPkI9
+certif:     zgAKCRC/H/dBRx276oVoAJ47uEPDM+jPMzHMFDanvNB3FeloNQCggOBJdj8cu3sG
+certif:     h9bwgUrHcHep8MU=
+certif:     =LPNy
+certif:     -----END PGP PUBLIC KEY BLOCK-----
+mnt-by:      TEST-MNT
+changed:     dbtest@ripe.net 20030101
+changed:     dbtest@ripe.net 20030102
+source:      DB-TEST
+
+
+
+password: auth

@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+
+<xsl:variable name="level_none">0</xsl:variable>
+<xsl:variable name="level_debug">1</xsl:variable>
+<xsl:variable name="level_info">2</xsl:variable>
+<xsl:variable name="level_notice">3</xsl:variable>
+<xsl:variable name="level_warn">4</xsl:variable>
+<xsl:variable name="level_error">5</xsl:variable>
+<xsl:variable name="level_critical">6</xsl:variable>
+<xsl:variable name="level_fatal">7</xsl:variable>
+
+<!--
+  <xsl:template match="notification_header">From: <xsl:value-of select="from/text()"/>
+To: <xsl:value-of select="to/text()"/>
+Subject: <xsl:value-of select="subject/text()"/> 
+<xsl:text>
+
+</xsl:text>
+  </xsl:template>
+  -->
+  <xsl:template match="notification_header_from">From: <xsl:value-of select="from/text()"/>
+  </xsl:template>
+  <xsl:template match="notification_header_to">
+To: <xsl:value-of select="to/text()"/>
+  </xsl:template>
+  <xsl:template match="notification_header_subject">
+Subject: <xsl:value-of select="subject/text()"/>
+Precedence: bulk
+Auto-Submitted: auto-generated
+  </xsl:template>
+
+  <xsl:template match="mail_origin_of_request">
+  A maintainer object is requested by:
+
+> From:     <xsl:value-of select="from/text()"/>
+> Subject:  <xsl:value-of select="subject/text()"/>
+> Date:     <xsl:value-of select="date/text()"/>
+> Reply-To: <xsl:value-of select="reply_to/text()"/>
+> MsgId:    <xsl:value-of select="msgid/text()"/>
+<xsl:text>
+
+</xsl:text>
+  </xsl:template>
+
+
+  <xsl:template match="notif_message">
+  Please process the object below:
+
+---
+<xsl:value-of select="message/text()"/>
+  </xsl:template>
+
+
+  <xsl:template match="credentials">
+<xsl:if test="count(list)>0">
+***Info: The credentials presented were:
+
+<xsl:value-of select="text()"/>
+
+<xsl:apply-templates/>
+</xsl:if>  
+<xsl:if test="count(list)=0">
+***Info: There were no credentials presented
+
+</xsl:if>  
+  </xsl:template>
+
+
+  <xsl:template match="full_input"></xsl:template>
+
+
+
+<!-- lists -->
+  <xsl:template match="list">
+<xsl:value-of select="text()"/><xsl:if test="not(position()=last())">, </xsl:if></xsl:template>
+
+<!-- root node -->
+  <xsl:template match="/">
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="report">
+<!--      <xsl:apply-templates select="notification_header" /> -->
+      <xsl:apply-templates select="notification_header_from" />
+      <xsl:apply-templates select="notification_header_to" />
+      <xsl:apply-templates select="notification_header_subject" />
+      <xsl:apply-templates select="mail_origin_of_request" />
+      <xsl:apply-templates select="notif_message" />
+      <xsl:apply-templates select="credentials" />
+      <xsl:apply-templates select="full_input" />
+<!--          <xsl:apply-templates /> -->
+  </xsl:template>
+
+<!-- level stuff
+  <xsl:template match="level">
+    <xsl:element name="level"><xsl:attribute name="level"><xsl:value-of select="@level"/></xsl:attribute><xsl:apply-templates/></xsl:element>
+  </xsl:template>
+-->
+
+<!-- composite/summary -->
+  <xsl:template match="composite">
+      **********************
+      <xsl:apply-templates/>
+      **********************
+  </xsl:template>
+
+  <xsl:template match="summary">
+      <xsl:apply-templates/>
+      ----------------------
+  </xsl:template>
+</xsl:stylesheet>

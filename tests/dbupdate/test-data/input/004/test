@@ -1,0 +1,19 @@
+# input tests
+# CASE 4: Input from syncupdates 
+#         (simulated by specifying -o option and redirect input < from a file)
+#         not a mail message
+#         keyword help specified
+#         origin (-o 192.0.0.0) specified
+%
+#
+# input from syncupdates
+# ./dbupdate -c ~/db/conf/rip.config -ro 192.0.0.0 -k help < test
+#
+#SUCCESS
+#
+# RESULT 4: help message in ack
+#           keywords - help in upd log
+#           help message on stdout
+%
+%
+$$ -c $RIP_CONFIG -ro 192.0.0.0 -k help < $TEST

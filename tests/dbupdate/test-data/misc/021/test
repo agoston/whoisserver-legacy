@@ -1,0 +1,39 @@
+# misc tests
+# CASE 21: Try to create objects with circular AUTO- references
+#
+# create objects
+#
+#FAILURE
+#
+# RESULT 21: The circular creations will fail
+
+
+role:         TEST ROLE
+address:      Singel
+phone:        +0123456789
+e-mail:       dbtest@ripe.net
+org:          AUTO-1
+admin-c:      TP1-DB-TEST
+tech-c:       AUTO-3
+nic-hdl:      AUTO-2
+changed:      dbtest@ripe.net 20040102
+source:       DB-TEST
+
+organisation:  AUTO-1
+org-name:      EXAMPLE TTTTTT
+org-type:      NON-REGISTRY
+address:       Singel
+e-mail:        dbtest@ripe.net
+admin-c:       AUTO-2
+tech-c:        AUTO-2
+mnt-ref:       TEST-MNT
+mnt-by:        TEST-MNT
+changed:       dbtest@ripe.net 20040102
+source:        DB-TEST
+
+person:        Test Person2
+address:       Singel
+phone:         +0123456789
+nic-hdl:       AUTO-3
+changed:       dbtest@ripe.net 20040102
+source:        DB-TEST

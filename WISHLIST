@@ -1,0 +1,401 @@
+Whois R.I.P. (Re-Implementation Project)
+----------------------------------------
+
+This is a Whishlist of new things that have been suggested for Whois R.I.P.
+
+1 Database
+----------
+
+  1.1 Syntax
+  ----------
+
+    1.1.1 Person names
+    ------------------
+
+     1.1.1 ''`
+     ---------
+     Eg. allow names like : John 'Smitty' Smith
+     
+     Raised by  : marek@ripe.net [19990512]
+
+     1.1.2 Titles
+     ------------
+     Eg. allow names like : Dring Wilhelm Weber
+
+     Raised by  : ottrey@ripe.net [19990512]
+     
+     Discussion : Was previously disallowed, but why?
+
+  1.2 Structure
+  -------------
+
+    1.2.1 Updates
+    -------------
+
+      1.2.1.1 Nic-handles
+      -------------------
+      Allow reconfigurable nic-handles
+
+      Raised by : joao@ripe.net [19990503]
+
+      1.2.1.2 Person objects
+      ----------------------
+      Updating a person object 
+
+      Raised by : scher@planet.de  [19981223]
+
+      http://www.ripe.net/mail-archives/db-wg/19981001-19990101/msg00062.html
+
+      Discussion : scher@planet.de  [19981223]
+        Is it possible to change (correct) the name of a person object
+        without changing the nic handle (delete and create new) ?
+
+        Perhaps is it possible to delete the object and create
+        a new one with the old nic handle (not AUTO-1). Is it
+        possible and allowed ?
+
+    1.2.2 Additional objects
+    ------------------------
+
+      1.2.2.1 Application
+      -------------------
+      Provide an application-registry.
+        (Tagging of IP adresses / Application-Database)
+
+      Raised by  : guardian@nacamar.de [19990525]
+
+      Discussion : guardian@nacamar.de [19990525]
+        Such an application-object could look like:
+          location:    [mandatory]  [single]      [primary/look-up key]
+          app-type:    [mandatory]  [single]      [primary key]            
+          app-subtype: [mandatory]  [single]      [primary key]            
+
+          descr:       [mandatory]  [multiple] [ ]
+
+          admin-c:     [mandatory]  [multiple]   [inverse key]            
+          tech-c:      [mandatory]  [multiple]   [inverse key]            
+
+          remarks:     [optional]   [multiple]    [ ]
+
+          notify:      [optional]   [multiple]    [inverse key]
+          mnt-by:      [optional]   [multiple]    [inverse key]
+          changed:     [mandatory]  [multiple]    [ ]
+          source:      [mandatory]  [single]      [ ]
+
+        Location would be a range of IP-Addresses or maybe a hostname,
+        app-type a value/keyword like "nameserver", "dialin", "mail" etc.,
+        app-subtype a more detailed code for the application, like
+                root-nameserver, tld-nameserver, cc-nameserver, etc.
+        Details to be discussed...
+
+        Then descr, contacts etc, just the usual stuff.
+
+        Technically, this shouldn't be too hard, but
+        the main questions remain on the administrative side:
+
+        - who would use this database,
+          and for what purpose
+          (Anti-SPAM, better route-flap-dampening ...)
+        - who should insert/maintain the contents
+
+        - how to determine if the contents are 'legal',
+          e.g. come from the 'owner' of the mentioned ip-ranges/hosts
+
+        - what to do if someone protests against some contents,
+          or claims damages because of some contents
+
+      Discussion : guardian@nacamar.de [19990603]
+        Want attribute which says:
+        "SMTP connections from these IP numbers shouldn't happen"
+
+        As it is today, we pretty indiscriminantly reject email from the
+        dial-in ports of a large number of (mostly USAnian) ISPs to limit
+        the amount of SPAM.
+
+        All I wanted was to enable ISP's to cooperate on this tactic against
+        "hit and run" spammers.
+
+      Discussion : guardian@nacamar.de [19990604]
+        On Thu, 3 Jun 1999, Poul-Henning Kamp wrote:
+        > I'm sorry for my inactivity on this subject, but let me just try to
+        > get this back to basics:  The only thing I wanted was an attribute
+        > which said "SMTP connections from these IP numbers shouldn't happen"
+        > 
+        > As it is today, we pretty indiscriminantly reject email from the
+        > dial-in ports of a large number of (mostly USAnian) ISPs to limit
+        > the amount of SPAM.
+
+        ok, this was discussed at the last RIPE-Meeting,
+        and it was expressed that  such an 'overloading' 
+        of the current IP-Database with additional, 
+        basically unrelated informations was not wanted.
+
+        After all, wishes for a lot of tags for other applications
+        might possibly appear, blowing up the IP-Database...
+
+        So it was decided to do it (if at all) as a separate database,
+        that could server for any number of different needs.
+        Therefore, the issue was handed over to the database-working-group.
+
+        > All I wanted was to enable ISP's to cooperate on this tactic
+        > against "hit and run" spammers.
+
+        That raises the questions 
+        'who will/should maintain the data and the database'  and  
+        'who will tell the ISPs to use + how to use it' 
+
+
+    1.3 Internationalisation
+    ------------------------
+    Provide internationalisation of character sets used in objects.
+
+    Raised by : marek@ripe.net [19990709]
+
+      An idea came to my mind now about how to go about the internationalisation of 
+      the db. The previous ideas had those weak points:
+
+      * a us-ascii name equivalent was generated automatically, possibly wrong
+      * one had to know what it is like when querying the db
+
+      How about making the searchable attributes multiple ? 
+      A Russian Marek Bukowy would look more or less like this:
+
+      person: Marek Bukowy
+      person: Marek Bukovy
+      person: Mark Bukovy
+      person: )(!@#*(&$$)$_
+      address: 
+
+      Yeah, problem - how to write the address ? But if one of the names is flagged
+      as us-ascii equivalent, another one as the right local version, and all the 
+      other ones as aliases, then the same method of flagging could be used for the 
+      address. Like this:
+
+      person:     Marek Bukowy                # preferred English version
+      person-l:   )(!@#*(&$$)$_               # original spelling
+      person-a:   Marek Bukovy                # aliases for querying the db
+      person-a:   Mark Bukowy
+      address:   123 Dzierzhynskystr. apt 5, 234567 Moscow, Russia
+      address-l: %#(#^GDJ&^#H@* &#. 123 (*. 5, 234567 &JH#*&#), &^$#*##
+      phone:     +7 1 6391288
+      fax-no:    +7 1 9873920
+      e-mail:    bukowy@kgb.gov.ru
+      nic-hdl:   MB12383-RIPE
+      changed:   crack@gasbank.ru 20010314
+      source:    RIPE
+
+      Please note that this also makes it possible to write the address in localized
+      way which is often different from English: 
+
+      123 Dzierzhynsky street apt 5
+      vs.
+      ul. Dzierzynskiego 123/5 (or 123 m. 5) in Polish.
+
+      the ...-l and -a attributes could be optional while the preferred English
+      version would be mandatory.
+
+      As for non-us-ascii characters, they could be accepted in updates for example 
+      only in Unicode, or translated to Unicode if there is a translation map
+      for this particular charset. 
+
+      They would be displayed always in Unicode, or an attempt would be made to
+      translate to a given charset with an error if there were untranslatable 
+      characters.
+
+
+2 Database access
+-----------------
+
+  2.1 Queries
+  -----------
+
+    2.1.1 Exact matches
+    -------------------
+    Provide an exact-match query.
+
+    Raised by : hank@ibm.net.il [19981130]
+
+    Discussion: joao@ripe.net [19981130]
+      Well the purpose of the design is to give the user information about
+      the parent domain if a certain domain is missing. That's also how the
+      rest of the lookups in the RIPE DB work and is also what you do when
+      looking in the DNS for contact info for a domain and you can't find it.
+
+      May be people now see the need for an exact matching option (there is
+      already one to disable referral: -R). However if you make this the
+      default behaviour then the purpose of the referral mechanism is
+      defeated.
+
+    Discussion: mlelstv@xlink.net [19981130]
+      Since I like orthogonal designs I suggest to add an -X option to
+      return only exact matches for any kind of object.
+
+
+    2.1.2 Object history access
+    ---------------------------
+    Provide access to the object history.
+
+    Raised by : chris@ripe.net [19990705]
+
+      I noticed that the new db code will provide for recording the update
+      history for objects. 
+
+      I'm not sure how much access to this you are providing to the users. I
+      would find it useful to retrive the history of changes made to an
+      object (without involving ripe-dbm@ripe.net). It would also be useful
+      to provide a per-update comment so that the intention of the update
+      can be recorded. (in the same way as one comments new versions under
+      RCS, etc).
+
+      Note that these comments are not really part of the object and the
+      'remarks:' attribute is not really appropriate for them.
+
+
+
+  2.2 Default behaviour
+  ---------------------
+  Change the default source search behavior in the server.
+
+  Raised by : khuon@GCtr.Net [19990526]
+
+  Discussion : khuon@GCtr.Net [19990526]
+    Currently, the RIPE whois server returns a result from a single-source
+    (RIPE) search by default.  One needs to pass a -a flag in order to obtain
+    multiple-source returns.  Because of this behaviour in conjunction with the
+    necessity to allow a "defaulted" query to return inetnums, the architecture
+    of the database is limited to a single source.  For those organisations who
+    may wish to run their own registry and participate in mirroring, this poses
+    a considerable issue.
+
+    I propose that the behaviour be modified so that the default would be to
+    return a single-match first-hit from multiple-source search.  That is, a
+    query will return only one result but it will search through the source
+    search order and return the first match it finds rather than simply stopping
+    at the RIPEdb.
+
+
+  2.3 Interface
+  -------------
+
+    2.3.1 Web interface
+    -------------------
+    Provide a web-interface (for updates).
+
+    Raised by : KH220-RIPE [ripe-31]
+
+    Discussion : joao@ripe.net [ripe-31]
+      If required, a web-interface would be developed.
+
+3 Development
+-------------
+
+  3.1 Progress
+  ------------
+
+    3.1.1 Updates
+    -------------
+    If the progress of the new code would be made public?
+
+    Raised by : WW144 [ripe-32]
+
+    Discussion : joao@ripe.net [ripe-32]
+      There would be regular reports, which would be quickly followed up
+      with the new code.  He went on to say that the current aim was to
+      support the current functionality.
+
+    3.1.2 Database choice
+    ---------------------
+      JLSD1-RIPE said that the new implementation would not
+      specify which SQL engine should be used.  Thus, the new
+      implementation would have a well-defined API and users
+      could then obtain appropriate drivers.  He added that,
+      initially, MySQL would be used.
+
+    3.1.3 Implementation language
+    -----------------------------
+      AH102-RIPE asked what was the proposed implementation
+      language.  
+
+      JLSD1-RIPE replied that it would be C - for reasons
+      of maintainablility and resources.  He went on to say
+      that if the new code was to adequately support the
+      RAToolSet, then it must be capable to respond _very_
+      quickly to look-ups.  Thus, a faster response time
+      was required (e.g. to support prefix authentication,
+      as supported by the code of the Routing Registry).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+http://www.ripe.net/mail-archives/db-wg/19990101-19990401/msg00012.html
+
+DB Software Re-implementation
+-----------------------------
+
+JLSD1-RIPE gave a presentation on the re-implementation of the
+db software.  This presentation is available at:
+
+http://www.ripe.net/meetings/ripe/ripe-31/pres/reimp/index.html
+
+
+- Questions && Answers
+
+        Kevin Hayton (KH220-RIPE) asked if the new software
+        would address the security issues as done in the IRR.
+        He went on to ask if a web-interface [for updates]
+        would be provided.
+
+        JLSD1-RIPE said that the security issues would be
+        handled in the new implementation and that if required,
+        a web-interface would be developed.
+
+        JLSD1-RIPE went on to say that the new implementation
+        would have three separate modules: one each for Inetnum,
+        Domain and Routing object, but that the underlying access
+        would be the same.
+
+        WW144 asked if the progress of the new code would be made
+        public ?
+
+        JLSD1-RIPE replied that there would be regular reports, which
+        would be quickly followed up with the new code.  He went on
+        to say that the current aim was to support the current
+        functionality.
+
+        SB-RIPE asked if the new code would be written in PERL.
+        JLSD1-RIPE replied: "No".
+
+        WW144 said that he hoped that the package would be
+        self-contained.
+
+        JLSD1-RIPE said that the new implementation would not
+        specify which SQL engine should be used.  Thus, the new
+        implementation would have a well-defined API and users
+        could then obtain appropriate drivers.  He added that,
+        initially, MySQL would be used.
+
+        AH102-RIPE asked what was the proposed implementation
+        language.  
+
+        JLSD1-RIPE replied that it would be C - for reasons
+        of maintainablility and resources.  He went on to say
+        that if the new code was to adequately support the
+        RAToolSet, then it must be capable to respond _very_
+        quickly to look-ups.  Thus, a faster response time
+        was required (e.g. to support prefix authentication,
+        as supported by the code of the Routing Registry).
+
+        WW144 thanked JLSD1-RIPE for his presentation.
+
+

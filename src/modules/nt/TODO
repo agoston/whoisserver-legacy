@@ -1,0 +1,32 @@
+0001 2000/07/25 TODO  Change NT_add_notify_list to accept variable length argument list. 
+0002 2000/07/25 TODO  When sending notifications, the AUTO NIC handles must be replaced
+                         with assigned ones. Also, the "delete" and "override" attributes
+                         must NOT appear in notification messages.
+0003 2000/08/01 TODO  Implement NT logging!
+0003 2000/08/01 DONE
+0004 2000/08/01 TODO  In the NT logs, the time must be printed in the record
+                         separators (>>> blabla <<<), after the word "time:"
+0005 2000/08/01 TODO  In the notifications $FROM etc must be replaced with their
+                         real values.
+0006 2000/08/03 TODO  Fix: The forward messages contain wrong info: when an upd is
+                         requested, then it reads "deletion requested".
+0006 2000/08/03 DONE
+0007 2000/08/03 TODO  Fix: In forward messages only the new object must be printed
+                        when an upd is requested, not the old object.
+0007 2000/08/03 DONE
+0008 2000/08/08 TODO  Fix: Forward messages go to unrelated maintainers (when hierarchical
+                        authorisation fails, for example, the forward message must go to the
+                        mntner mentioned in the mnt-by attribute of related object, but not to the
+                        mntner in the mnt-by attribute.
+0009 25/08/2000 TODO  Implement NOTISIG string variable in the CA module and print
+                        that string in all the notification messages.
+0004 26/08/2000 DONE
+0010 26/01/2001 TODO  The temp notif files are named after the email address. If the
+                        e-mail contains a "/", (which is RFC822 compliant), then
+                        it must be replaced with some other char. Tis must be easy
+                        since we use a hash to map emails to file names.
+0011 19/02/2001 TODO  Multiple notification messages are sent. Fix.
+0005 20/02/2001 DONE
+0011 22/02/2001 DONE  We now 'unify' the list of e-mail to which we send e-mails.
+0012 03/04/2001 TODO  Do the notifications work with networkupdate? Check.
+0012 03/04/2001 DONE  Yes, they work.

@@ -1,0 +1,21 @@
+# rdns tests
+# CASE 8: Modification fails because it's not the related RIR
+#
+# modify domain object
+#
+#FAILURE
+#
+# RESULT 8: modification will fail
+
+domain:       1.129.in-addr.arpa
+descr:        Test2
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns-pri.ripe.net
+nserver:      ns-sec.ripe.net
+mnt-by:       RIPE-NCC-HM-DOM-MNT
+mnt-lower:    TEST-DBM-MNT
+changed:      dbtest@ripe.net 20040329
+source:       DB-TEST
+password: host3

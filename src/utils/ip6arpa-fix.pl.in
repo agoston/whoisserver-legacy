@@ -1,0 +1,162 @@
+#! @PERL@ -w
+
+# The basic problem is to take the objects from the "domain" table for
+# ip6.int and ip6.arpa and add entries to the "ip6int" table.
+# The algorithm:
+# 
+# 1. Delete everything in ip6int
+# 
+# 2. Find every ip6.int and ip6.arpa domain
+# 
+# 3. For each domain, calculate the two 64-bit values appropriate to the
+#    IPv6 address.
+# 
+#  a. Split into parts, ("tni", "6pi", "2", "0", "0", "2", "0", "6)
+#  b. Reverse domain name, "6.0.2.0.0.2.ip6.int" => "tni.6pi.2.0.0.2.0.6"
+#  c. Drop first two parts, ("2", "0", "0", "2", "0", "6)
+#  d. Use Math::BigInt to convert these parts into numbers.
+# 
+# 4. For each domain, insert the appropriate entry into ip6int.
+#
+# $Id: ip6arpa-fix.pl,v 1.3 2002/07/15 08:29:13 shane Exp $
+
+use strict;
+use English;
+use Getopt::Std;
+use Math::BigInt;
+use DBI;
+
+# run in test-mode or not
+my $TEST = 0;
+
+# display syntax and exit
+sub syntax_error
+{
+    print STDERR 
+     "$PROGRAM_NAME: call with '-h host -u user [-p password] DATABASE'\n";
+    exit(1);
+}
+
+##
+## command-line processing
+##
+
+# flag processing
+my %opts;
+getopt('h:u:p:', \%opts);
+unless (defined($opts{h}) && defined($opts{u})) {
+    syntax_error();
+}
+my $host = $opts{h};
+my $user = $opts{u};
+my $password = $opts{p};
+
+# grab database name;
+unless (@ARGV == 1) {
+    syntax_error();
+}
+my $dbase = $ARGV[0];
+
+# disable output buffering
+local $OUTPUT_AUTOFLUSH = 1;
+
+# if running in test mode, report to user
+print "*** RUNNING IN TEST MODE, NO CHANGES WILL BE WRITTEN TO DATABASE ***\n"
+    if ($TEST);
+
+
+##
+## get a password if necessary
+##
+unless (defined $password) {
+    print "Enter password: ";
+    { 
+        system("stty -echo");
+        $password = <STDIN>;
+        print "\n";
+        system("stty echo");
+    }
+    exit(0) unless defined($password);
+    chomp($password);
+}
+
+##
+## database processing
+##
+
+my $dbh = DBI->connect("DBI:mysql:$dbase;host=$host", $user, $password, 
+                       { RaiseError => 1 });
+
+# remove all old ip6int entries
+unless ($TEST) {
+    $dbh->do("DELETE FROM ip6int");
+}
+
+# get list of "ip6.(domain|int)" domains
+my $domain_qry = <<'DOMAIN_QRY';
+    SELECT object_id, domain
+    FROM domain
+    WHERE (domain.domain LIKE "%ip6.arpa") OR (domain.domain LIKE "%ip6.int")
+DOMAIN_QRY
+my $domain_sth = $dbh->prepare($domain_qry);
+
+$domain_sth->execute();
+
+my $ip6int_upd = <<'IP6INT_UPD';
+    INSERT INTO ip6int (thread_id, object_id, msb, lsb, prefix_length)
+    VALUES (0, ?, ?, ?, ?)
+IP6INT_UPD
+my $ip6int_sth = $dbh->prepare($ip6int_upd);
+
+# process each IPv6 reverse domain
+if ($TEST) {
+    print "object_id  msb                 lsb                  prefix_length domain\n";
+}
+my $num_domain_added = 0;
+while (my ($domain_object_id, $domain) = $domain_sth->fetchrow_array()) {
+    # check the domain is correctly formed
+    unless ($domain =~ /^([a-z0-9]\.)+ip6\.(arpa|int)$/i) {
+        next;
+    }
+
+    my @parts = reverse(split(/\./, $domain));
+    shift(@parts);  # drop 'arpa' or 'int'
+    shift(@parts);  # drop 'ip6'
+    # calculate our numeric values
+    my $msb = Math::BigInt->new(0);
+    for (my $i=0; $i<16; $i++) {
+        $msb *= 16;
+        $msb += ($parts[$i] ? hex($parts[$i]) : 0);
+    }
+    my $lsb = Math::BigInt->new(0);
+    for (my $i=16; $i<32; $i++) {
+        $lsb *= 16;
+        $lsb += ($parts[$i] ? hex($parts[$i]) : 0);
+    }
+    my $prefix_length = @parts * 4;
+    # report our our findings
+    my $msbstr = "$msb";
+    $msbstr =~ s/^\+//;
+    my $lsbstr = "$lsb";
+    $lsbstr =~ s/^\+//;
+    if ($TEST) {
+        # display the ranges if in test mode
+        printf "\%9d \%-20s \%-20s      \%3d      \%s\n", 
+            $domain_object_id, $msbstr, $lsbstr, $prefix_length, $domain;
+    } else {
+        # otherwise insert our new value
+        print "$domain\n";
+        $ip6int_sth->execute($domain_object_id,$msbstr,$lsbstr,$prefix_length);
+    }
+    $num_domain_added++;
+}
+
+$dbh->disconnect();
+
+# report result
+if ($TEST) { 
+    print "$num_domain_added domains would have been fixed\n";
+} else {
+    print "$num_domain_added domains fixed\n";
+}
+

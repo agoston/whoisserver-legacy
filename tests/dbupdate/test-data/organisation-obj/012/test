@@ -1,0 +1,29 @@
+# organisation object tests
+# CASE 12: Create an org object
+#         with "org-type: NIR" with
+#         a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#         variable.
+%
+% requires initial objects to be loaded
+% make sure that TEST-DBM-MNT is in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 12: The creation will succeed
+
+
+organisation:  AUTO-1
+org-name:      EXAMPLE organisation object for tests
+org-type:      NIR
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+
+password: test-dbm

@@ -1,0 +1,17 @@
+#!@SHELL@
+USAGE="Usage: make_mysql_user <dbuser> <dbpsswd>"
+HOSTNAME=`hostname`
+
+if [ $# -ne 2 ] 
+then
+ echo $USAGE
+ exit 1;
+fi 
+
+
+@MYSQL_BIN_PREFIX@/mysql -uroot -p mysql <<EOF
+INSERT user values ('localhost','$1', PASSWORD('$2'), 'Y','Y','Y','Y','Y','Y','Y','N','Y','N','N','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','','','','',0,0,0);
+INSERT user values ('$HOSTNAME','$1', PASSWORD('$2'), 'Y','Y','Y','Y','Y','Y','Y','N','Y','N','N','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','','','','',0,0,0);
+FLUSH PRIVILEGES
+EOF
+

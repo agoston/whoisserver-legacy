@@ -1,0 +1,120 @@
+# domain authorisation tests
+# CASE 1: We try to create domain object mydomain.net
+# no parent
+# override
+#
+# create domain object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+# CASE 2: We try to create domain object mydomain.net
+#         no parent
+#         no override
+#
+# create domain object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+# domain authorisation tests
+# CASE 3: We try to create domain object mydomain.net
+#        mnt-by TEST-MNT pass
+# parent mnt-by RIPE-NCC-HM-MNT pass
+#
+# create domain object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+# domain authorisation tests
+# CASE 4: We try to create domain object mydomain.net
+#        mnt-by TEST-MNT pass
+# parent mnt-lower RIPE-NCC-HM-MNT pass
+# 
+#
+# create domain object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed.
+
+# domain authorisation tests
+# CASE 5: We try to create domain object mydomain.net
+#        mnt-by    TEST-MNT no pass
+# parent mnt-lower RIPE-NCC-HM-MNT pass
+# 
+#
+# create domain object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will fail.
+
+# domain authorisation tests
+# CASE 6: We try to create domain object mydomain.net
+#        mnt-by pass TEST-MNT
+# parent mnt-lower RIPE-NCC-HM-MNT no pass
+# 
+#
+# create domain object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail.
+
+# domain authorisation tests
+# CASE 7: We try to create domain object mydomain.net
+#        mnt-by TEST-MNT no pass
+# parent mnt-lower RIPE-NCC-HM-MNT no pass
+# override
+# 
+#
+# create domain object 
+#
+#SUCCESS
+#
+# RESULT 7: The creation will succeed.
+
+# domain authorisation tests
+# CASE 8: We try to create domain object 1.2.in-addr.arpa - reverse
+#        mnt-by TEST-MNT pass
+# parent mnt-lower RIPE-NCC-HM-MNT no pass
+# this test is for checking the message we're sending to the user who sends 
+# reverse domain creations to auto-dbm@ripe.net. 
+# 
+#
+# create domain object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail.
+
+# domain authorisation tests
+# CASE 9: We try to modify ccTLD domain object ch
+#        mnt-by TEST-MNT pass
+#        no parent 
+#
+# modify domain object 
+#
+#SUCCESS
+#
+# RESULT 9: The modification will succeed.
+
+
+# domain authorisation tests
+# CASE 10: We try to create domain object mydomain.net
+#        mnt-by TEST-MNT pass
+# parent mnt-by RIPE-NCC-HM-MNT no pass
+%
+% requires initial objects to be loaded
+#
+# create domain object 
+#
+#FAILURE
+#
+# RESULT 10: The creation will fail.
+

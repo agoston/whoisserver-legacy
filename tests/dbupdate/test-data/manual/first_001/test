@@ -1,0 +1,22 @@
+# basic updates manual tests
+# CASE 1: submit update with no sources defined in configuration file
+%
+#
+# This test needs to be run manually. 
+# First edit rip.config and comment out all UPDSOURCE lines.
+# Then submit this update.
+# Remember to re-edit rip.config to un-comment UPDSOURCE lines
+#
+#FAILURE
+#
+# RESULT 1: Internal error generated.
+#           Check dbuperr file for error message:
+#            There must be at least one updateable source in the config file
+
+
+person:  test person2
+address: here
+phone:   +0123456789
+changed: dbtest@ripe.net
+nic-hdl: TP2-DB-TEST
+source:  db-test

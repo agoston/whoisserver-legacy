@@ -1,0 +1,33 @@
+# X.509 auth tests
+#
+# CASE 11: We try to create an inetnum object protected by a mntner
+#          with a password and an X509 certificate.
+#          The parent inetnum has a mnt-lower with a different mntner
+#          Both passwords supplied.
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 11: The creation will succeed
+%
+%
+$ -c $RIP_CONFIG -rm -f 
+%
+%
+From: dbtest@ripe.net
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 with ASSIGNED
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: auth
+password: auth2

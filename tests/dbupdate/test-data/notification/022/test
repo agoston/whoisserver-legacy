@@ -1,0 +1,23 @@
+# notification tests
+# CASE 22: Modify inetnum object to remove mnt-irt
+#          no TEST-MNT password
+#
+# modify inetnum object 
+#
+#FAILURE
+#
+# RESULT 22: There should be a forward message to dbtest@ripe.net
+#            about failed modification, and no notif message.
+
+
+inetnum:      192.168.201.0 - 192.168.201.255
+netname:      RIPE-NET
+descr:        /24 to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

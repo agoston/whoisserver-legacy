@@ -1,0 +1,26 @@
+# ipv6 status tests
+# CASE 12: create an inet6num with ASSIGNED
+# with less specific having ASSIGNED status
+%
+% requires initial objects to be loaded
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 12: The creation will fail 
+
+inet6num:     2001:0610:0260:0000::/128
+netname:      RIPE-NCC-IPv6
+descr:        RIPE NCC
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: END-USER
+password: LIR
+

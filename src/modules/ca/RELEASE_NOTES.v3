@@ -1,0 +1,21 @@
+V3.0 Beta RELEASE NOTES; CA module
+----------------------------------
+
+The big differences between this release and previous releases are:
+
+(a) there is now a separate configuration file for sources:
+		- the name of this file is now in the parent config file
+			- SOURCEFILE variable is the name of this file
+
+(b) there is a new syntax for the SOURCE variable
+		- a sample configuration file is provided
+
+(c) the parent configuration file must be parsed before the sources
+		  configuration file
+
+(d) there is now an initialisation function, ca_init()
+		- this calls the functions that parse the dictionary, the parent
+  	  configuration file and the source configuration file, in the
+		  correct sequence (it takes only the name of the parent
+		  configuration file as an argument).
+

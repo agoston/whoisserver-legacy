@@ -1,0 +1,18 @@
+# input tests
+# CASE 3: Input from stdin (simulated with redirected input < from a file )
+#         not a mail message
+#         keyword help specified
+%
+#
+# input from stdin
+# ./dbupdate -c ~/db/conf/rip.config -r -k help < test
+#
+#SUCCESS
+#
+# RESULT 3: help message in ack
+#           keywords - help in upd log
+#           help message on stdout
+%
+%
+$$ -c $RIP_CONFIG -r -k help < $TEST
+

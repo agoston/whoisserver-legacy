@@ -1,0 +1,28 @@
+# domain authorisation tests
+# CASE 4: We try to create domain object mydomain.net
+#        mnt-by TEST-MNT pass
+# parent mnt-lower RIPE-NCC-HM-MNT pass
+# 
+%
+% requires initial objects to be loaded
+#
+# create domain object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed.
+
+domain:       mydomain.net
+descr:        my test domain
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns1.some.net
+nserver:      ns2.some.net
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password: auth
+password: hostmaster

@@ -1,0 +1,38 @@
+# basic-auth tests - forward create
+# CASE 9: Create an as-block object and a person object
+#         with NO override
+#
+# create an as-block object and a person object 
+#
+#SUCCESS
+#
+# RESULT 9: The as-block creation will NOOP and a request is sent to ripe-dbm
+#           and the person creation will succeed.
+%
+%
+$ -c $RIP_CONFIG -mr -f
+%
+From: dbtest@ripe.net
+Subject: please create
+
+
+password: hostmaster
+
+as-block:     AS100 - AS1000
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

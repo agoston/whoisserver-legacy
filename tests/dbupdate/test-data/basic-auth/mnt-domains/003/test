@@ -1,0 +1,26 @@
+# mnt-domains update tests
+# CASE 3: We try to delete a maintainer referenced in mnt-domains
+%
+% requires initial objects to be loaded
+#
+# delete maintainer in mnt-domains attribute
+#
+#FAILURE
+#
+# RESULT 3: The deletion will fail.
+
+% related maintainer
+
+mntner:       MNTDOMAINS-DBM-MNT
+descr:        Mntner for RIPE DBM objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+upd-to:       dbtest@ripe.net
+mnt-by:       MNTDOMAINS-DBM-MNT
+referral-by:  MNTDOMAINS-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+delete: delete
+password: test-dbm
+

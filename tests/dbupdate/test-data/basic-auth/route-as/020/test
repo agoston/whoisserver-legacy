@@ -1,0 +1,21 @@
+# route authorisation tests - autnum
+# CASE 20: We try to modify 20.13.0.0/16 route object 
+#          parent, origin exist
+#          password for child
+%
+#
+# modify route object 
+#
+#SUCCESS
+#
+# RESULT 20: The modify will succeed
+
+
+password: mb-child
+
+route:   20.13.0.0/16
+descr:   Route modified
+origin:  AS200
+mnt-by:  CHILD-MB-MNT
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST

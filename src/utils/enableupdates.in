@@ -1,0 +1,82 @@
+#!@SHELL@
+#
+#ident  "@(#)lockupdates     0.1     2000/06/06 SMI"
+
+
+# Some variables
+DBDIR=@prefix@
+BATCHDIR=$DBDIR/batch
+BATCHCONF=$BATCHDIR/batch.config
+NQUEUES=`grep "^queues " $BATCHCONF | awk '{print $2}'`
+queue=1
+LOCKDIR=$DBDIR/lock
+STOPUPDATES=$LOCKDIR/STOPUPDATES
+
+
+
+case "$1" in
+'start')
+	echo "Unlocking updates..."
+
+# Unlock batch queues.
+# Messages will be received and processed.
+	if [ -d $BATCHDIR ]
+	then
+		echo "Unlocking batch queues..."
+		while [ $queue -le $NQUEUES ]
+		do
+			echo "  Queue $queue..."
+			rm -f $BATCHDIR/$queue/queue.lock
+			queue=`echo "$queue + 1" | bc`
+		done
+	else
+                echo "No batch directory!"
+	fi
+
+# Unlock general update lock
+        if [ -d $LOCKDIR ]
+        then 
+                echo "Removing STOPUPDATES..."
+                rm -f $STOPUPDATES
+        else
+                echo "Lock directory missing!"
+        fi
+        ;;
+
+'stop')
+        echo "Locking updates..."
+
+# Lock all updates
+# This is the "big lever": 
+# no updates are possible after this is done
+	if [ -d $LOCKDIR ]
+	then
+		echo "Touching STOPUPDATES..."
+		su - dbase -c "/usr/bin/touch $STOPUPDATES"
+	else
+		echo "Lock directory missing!"
+	fi
+
+# Lock batch queues. No messages will get to the batch queues
+# nor they will be processed if the lockfiles are present.
+        if [ -d $BATCHDIR ]
+        then
+		echo "Locking batch queues..."
+		while [ $queue -le $NQUEUES ]
+		do
+			echo "  Queue $queue..."
+			su - dbase -c "/usr/bin/touch $BATCHDIR/$queue/queue.lock"
+			queue=`echo "$queue + 1" | bc`
+		done
+        else
+                echo "No batch directory!"
+	fi
+
+        ;;
+
+*)
+        echo "Usage: $0 { start | stop }"
+        ;;
+
+esac
+exit 0
