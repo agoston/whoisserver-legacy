@@ -74,4 +74,4 @@ install-exec-hook:
 	${INSTALL} -m 0644 ./doc/WHOIS-HELP ${DESTDIR}${docdir}
 	${INSTALL} -m 0644 ./conf/sample.db.gz  ${DESTDIR}${tmpdir}/load/SAMPLE
 	${INSTALL} -m 0644 ./conf/SAMPLE.CURRENTSERIAL  ${DESTDIR}${tmpdir}/load/SAMPLE
-	${INSTALL} -m 0644 src/SQL/* ${DESTDIR}${bindir}/SQL
+	${INSTALL} -m 0644 src/SQL/*.* ${DESTDIR}${bindir}/SQL
