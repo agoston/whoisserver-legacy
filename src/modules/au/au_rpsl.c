@@ -13,7 +13,11 @@
 #include "au_util.h"
 #include "rt_dbupdate.h"
 #include "iproutines.h"
+#ifdef RDNSYES
 #include "ns_util.h"
+#else
+#define ns_is_rdns_suffix(x) (-1)
+#endif
 #include "memwrap.h"
 
 AU_ret_t generic_rpsl_create(au_plugin_callback_info_t *info);

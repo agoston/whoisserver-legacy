@@ -205,9 +205,15 @@ EXTRA_DIST = include/rip.h \
 
 SUBDIRS = defs
 
+if BUILDRDNS
+LIBNS = libns.a
+else
+LIBNS =
+endif
+
 noinst_LIBRARIES = libaa.a libac.a libau.a libca.a libco.a libcr.a \
                    libdf.a libep.a libip.a libkm.a liblg.a liblu.a \
-                   libma.a libnh.a libns.a libnt.a libpc.a libpg.a \
+                   libma.a libnh.a $(LIBNS) libnt.a libpc.a libpg.a \
                    libpm.a libpr.a libpw.a libqc.a libqi.a librp.a \
                    librt.a librx.a libsk.a libsq.a libsv.a libta.a \
 		   libth.a libud.a libup.a libut.a libwh.a libwk.a \

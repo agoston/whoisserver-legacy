@@ -13,7 +13,7 @@ autoheader || myFail autoheader
 
 echo "Running automake"
 #automake -a -c  || myFail automake
-automake || myFail automake
+automake -a -c || myFail automake
 
 echo "Running autoconf"
 autoconf || myFail autoconf

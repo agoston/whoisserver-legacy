@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.10 $
+  $Revision: 1.1 $
 
   UP auto nic handling
 
@@ -40,7 +40,11 @@
 
 #include "dbupdate.h"
 #include "up_auto_nic.h"
+#ifdef RDNSYES
 #include "ns_util.h"
+#else
+#define ns_remove_trailing_dot(x,y)
+#endif
 #include <glib.h>
 
 

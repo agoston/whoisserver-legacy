@@ -7,6 +7,8 @@ DISTFILES = *.java *.class *.dtd makedefsall.in alltodo Makefile.in Makefile.syn
 top_srcdir = @top_srcdir@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 
+.PHONY: syntax
+
 distdir: $(DISTFILES)
 	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
 	mkdir $(distdir)
@@ -76,9 +78,9 @@ alltodo: Defs.class ClassDef.class AttributeDef.class Query.class RPSLSyntax.cla
 	./makedefsall && touch alltodo
 
 clean:
-	rm -f *.class all
+	rm -f *.class all @top_srcdir@/src/modules/rpsl/*.o syntax alltodo
 
 distclean:
-	rm -f *.class all
+	rm -f *.class all @top_srcdir@/src/modules/rpsl/*.o syntax alltodo
 
 install:

@@ -44,7 +44,13 @@
 #include "up_auto_nic.h"
 #include "up_util.h"
 #include "ca_defs.h"
+#ifdef RDNSYES
 #include "ns_util.h"
+#else
+#define ns_is_decompose(x,y,z,t) (-1)
+#define ns_remove_trailing_dot(x,y) (-1)
+#define ns_decompose_object(x,y,z,t,w) NULL
+#endif
 #include <glib.h>
 
 /* Report an internal software error, send an ack if possoble and exit out of dbupdate

@@ -21,11 +21,15 @@ gboolean au_organisation_init();
 PG_status_t au_organisation_check (PG_transaction_t *trans, gpointer *info);
 
 /* rdns related prototypes */
+#ifdef RDNSYES
 gboolean au_rdns_init();
 PG_status_t au_rdns_check(PG_transaction_t *trans, gpointer *info);
+#endif
 
 const au_plugin_t au_plugins[] = {
+#ifdef RDNSYES
   { "rdns", au_rdns_init, au_rdns_check },
+#endif
   { "rpsl", au_rpsl_init, au_rpsl_check },
   { "ripe", au_ripe_init, au_ripe_check },
   { "irt", au_irt_init, au_irt_check },
