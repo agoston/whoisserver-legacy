@@ -37,6 +37,8 @@ use strict;
 use POSIX qw(strftime);
 use Getopt::Long;
 
+use RipeWhois;
+
 # global configuration
 our $CONFIG = { };
 
@@ -61,7 +63,8 @@ our $ERR = {'E_SINGATTR'   => "ERROR: name should be single: %s\n",
             'E_LIMIT'      => "ERROR: limit of mismatches exceeded: %d\n",
             'E_DIR'        => "ERROR: no such directory: %s\n",
             'E_UNDEF'      => "ERROR: the object is not defined: %s\n",
-            'E_NOOUTPUT'   => "ERROR: no output for the object %s found in file %s\n"
+            'E_NOOUTPUT'   => "ERROR: no output for the object %s found in file %s\n",
+            'E_WHOIS'   => "ERROR: connection to whois failed\n",
            };
 
 # Global variable to keep track if we have received or our children received
@@ -85,7 +88,7 @@ my $name = $_[0];
   if (exists $CONFIG->{$name})	{
     return($CONFIG->{$name});
   }
-  return;
+  return undef;
 }
 
 ##############################
@@ -782,6 +785,30 @@ my $list = $_[1];
  return(1);
 }
 
+sub gather_objects_whois($$) {
+ my $objs = shift;
+ my $list = shift;
+
+ foreach my $object (@{$objs}) {
+   my $tmp = $object;
+   my $name;
+   if ($object =~ /^(route):(.*?)[\n](.*?)(origin):(.*?)[\n]/iosm) {
+        $name = $1." ".$2.", ".$5;
+   }
+   elsif ($object =~ /^(person):(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
+     $name = $1." ".$5;
+   }
+   elsif ($object =~ /^(role):(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
+     $name = $1." ".$5;
+   }             
+   elsif ($object =~ /^(.+?):(.+?)[\n]/iom ) { 
+     $name = $1." ".$2;
+   } 
+   $list->{$name} = $tmp;
+ }
+ return(1);
+}
+
 ##############################
 # Function: match_whois()
 # Descr: take whois query and match output with whois_output file
@@ -842,13 +869,21 @@ my $found = { };
       $run = " -r -x -T ".$run;
 
       # run query and get objects from WHOIS
-      open (WHOIS, getvar('WHOIS')." ". getvar('WHOIS_FLAGS'). " $run 2>&1 |")
-        or error('E_FOPEN', "whois: $run", $!);
+      my $whois = new RipeWhois ( 'Host' => getvar('WHOIS_HOST'), 
+                                  'Port' => getvar('WHOIS_PORT'), 
+                                  'FormatMode' => 0 );
+      if (! $whois) {
+        error ('E_WHOIS');
+      }
+      my @objs = $whois->QueryObjects($run);
 
-      gather_objects(*WHOIS, $found);
+      #open (WHOIS, getvar('WHOIS')." ". getvar('WHOIS_FLAGS'). " $run 2>&1 |")
+      #  or error('E_FOPEN', "whois: $run", $!);
 
-      close (WHOIS)
-        or error ('E_FCLOSE', "whois: $run", $!);
+      gather_objects_whois(\@objs, $found) if (@objs);
+
+      #close (WHOIS)
+      #  or error ('E_FCLOSE', "whois: $run", $!);
 
       # change the dates
       if ($query =~ /DATE_ON/io ) {
@@ -893,7 +928,7 @@ my $found = { };
 # Remarks: (hopefully) improve configurability!!!
 sub parse_rip_config()	{
 my $configfile = getvar('RIP_CONFIG');
-my @vars = ( qw/ SVWHOIS_PORT SVCONFIG_PORT GPGCMD UPDSOURCE ACKLOG UPDLOG FORWLOG NOTIFLOG / );
+my @vars = ( qw/ SVWHOIS_PORT SVCONFIG_PORT GPGCMD UPDSOURCE RIR ACKLOG UPDLOG FORWLOG NOTIFLOG / );
 
 # format is multiline vars, like
 # VARNAME whitespaces VALUE 
@@ -943,7 +978,7 @@ my @REQUIRED =  qw/ BASEDIR CONFDIR BINDIR DATADIR LOGDIR DUMPDIR WHOISDIR TMPDI
 					FILTERS 
 					DBUPDATE DBUPDATE_GEN 
 					DBUPDATE_TEXT DBUPDATE_MAIL DBUPDATE_NET DBUPDATE_TRACE
-					WHOIS WHOIS_FLAGS WHOIS_HOST
+					WHOIS_PORT WHOIS_HOST
 					MAKE_DB MAKE_DB_FLAGS LOAD_FILE
           SYNC_RING
 					RIP_CONFIG 
@@ -1164,7 +1199,8 @@ my $flags;
   filter($updatefile, $tempfile, $update);
 
   # take out flags for dbupdate
-  $flags = pop (@{$update});
+  #$flags = pop (@{$update});
+  $flags = getvar('DBUPDATE_FLAGS') || getvar ('DBUPDATE_FLAGS_EXT');
 
   # add comments to the report
   foreach (@{$update})	{
@@ -1181,22 +1217,22 @@ my $flags;
 	$flags =~ s/\$(\w+)/defined($CONFIG->{$1})?$CONFIG->{$1}:''/mseg;
   # in case if one of reserved filenames is mentioned
   $flags =~ s/$updatefile/$tempfile/ms;
-	chomp($flags);
+  chomp($flags);
 	
-	# in temporary file there are RPSL objects OR obj + mail headers; 
-	# submit the temporary file and delete it
+  # in temporary file there are RPSL objects OR obj + mail headers; 
+  # submit the temporary file and delete it
 
-	my $commandline = "";
+  my $commandline = "";
 
-  if ($flags =~ /^\$\$/) {
-    $flags =~ s/^\$\$//;
-  } else { # otherwise add filename
+  if (getvar('DBUPDATE_FLAGS_EXT')) {
     $flags = "$flags $tempfile";
   }
   
   $commandline = $flags;
   $commandline = getvar('DBUPDATE_TRACE')." $commandline" if (getvar ('TRACE_DBUPDATE')); #add tracing if option is set
   $commandline = getvar('DBUPDATE')."    $commandline";  
+
+  #report ("[COMMAND: $commandline]\n");
 
   my $object_expected;
   if ($force == 1)	{
@@ -1351,7 +1387,7 @@ my $temporary = 0;
   foreach (@{$ret})  {
     report($_);
   }
-  
+
   # how many objects we need to load into the DB? - based on "source" line
   my $object_expected = count_objects($tmpfile);
 
@@ -1510,6 +1546,34 @@ sub trace()	{
 }
 
 ##############################
+# Function: set_test_variables($)
+# Descr: checks the 'test' file for defined variables and sets them for this test
+# Input: nothing 
+# Return: nothing
+# Output: contents of $CONFIG hash
+sub set_test_variables()   {
+
+  my $testfile = getvar('TEST');
+  my %thash;
+  open (FILE, "< $testfile")
+    or error('E_FOPEN', $testfile, $!);
+  while (<FILE>) {
+     if (/^\$([a-z0-9_]+)=(.+)$/i) {
+       my $var = uc($1);
+       my $val = $2;
+       $thash{$var} ? ($thash{$var} .= $val."\n") : ($thash{$var} = $val."\n") ;
+     } 
+  }
+  foreach my $var (keys %thash) {
+    setvar ($var, $thash{$var});
+    #report ("DEBUG: setting [$var] to [$thash{$var}]\n");
+  }
+  close (FILE);
+
+}
+
+
+##############################
 # Function: filter($)
 # Descr: filter out comments followed by empty line 
 # as well as object from foreign sources
@@ -1534,7 +1598,7 @@ my $source = $_[3];
   open (TEMP, "> $tempfile") 
     or error('E_FOPEN', $tempfile, $!);
 
-  my $flags = "";
+  #my $flags = "";
 
   my $object ="";
   while (<FILE>)  {
@@ -1547,7 +1611,8 @@ my $source = $_[3];
      next;
    }
    elsif (/^\?([-]?[0-9]+)/o)    {
-     setvar('DBUPDATE_IGNORE_EXIT_CODE',$1);
+    # setvar('DBUPDATE_IGNORE_EXIT_CODE',$1);
+    next;
    }
    elsif (/^@/o)  {
      # skip script line @
@@ -1555,16 +1620,16 @@ my $source = $_[3];
    }
    elsif (/^\$/o)  {
      # save dbupdate flags for update
-     if ($flags =~ /^$/) {
-       $flags = $_;
-     } else {
-       s/^\$\$//;
-       $flags = $flags.$_;
-     }
+   #  if ($flags =~ /^$/) {
+   #    $flags = $_;
+   #  } else {
+   #    s/^\$\$//;
+   #    $flags = $flags.$_;
+   #  }
    }
    elsif (/^[\s]*$/o) {
-     print TEMP $_;
-     print TEMP $object if (defined $source && ($object =~ /^source:[\s]*$source[\s]+/im)); 
+     #print TEMP $_;
+     print TEMP $object,"\n\n" if (defined $source && ($object =~ /^source:[\s]*$source[\s]+/im)); 
      $object = "";
    }
    else { # non-empty line
@@ -1579,12 +1644,14 @@ my $source = $_[3];
   # just in case
   print TEMP "\n";
 
+  #$flags = getvar('DBUPDATE_FLAGS') || getvar('DBUPDATE_FLAGS_EXT');
+
   close(FILE)
     or error('E_FCLOSE', $file, $!);
   close(TEMP)
     or error('E_FCLOSE', $tempfile, $!);
 
-	push @{$ret}, $flags if (defined $flags); 
+	#push @{$ret}, $flags if (defined $flags); 
 	return (1);
 }
 
@@ -1619,17 +1686,19 @@ sub run_script() {
 my $script;
 my $test = getvar('TEST');
 
-  open (TESTFILE, "< $test")
-    or error("E_FOPEN", $test, $!);
+  #open (TESTFILE, "< $test")
+  #  or error("E_FOPEN", $test, $!);
 
-  while (<TESTFILE>) {
-    if (/^@/o) {
-      $script = $_;
-      $script =~ s/^@[\s]*//;
-    }
-  }
-  close (TESTFILE)
-      or error("E_CLOSE", $test, $!);
+  #while (<TESTFILE>) {
+  #  if (/^@/o) {
+  #    $script = $_;
+  #    $script =~ s/^@[\s]*//;
+  #  }
+  #}
+  #close (TESTFILE)
+  #    or error("E_CLOSE", $test, $!);
+
+  $script = getvar('SCRIPT');
 
   return if (!$script);
 
@@ -1739,6 +1808,21 @@ my $filters = $_[0];
 my $dir = getvar('CURRENT_DIR');
 # initialize filenames
 init_paths();
+# get and set the per-test variables from the 'test' file
+
+set_test_variables();
+
+#### check if we need to run the test
+
+my $test_rir = getvar('TEST_RIR');
+my $rir = getvar('RIR');
+
+if ($test_rir && $rir) {
+  if ($test_rir !~ /\b$rir\b/i) {
+    # don't run the test
+    return "SKIPPED";
+  }
+}
 
 my $result = "FAILED";
 
@@ -1808,6 +1892,13 @@ my $result = "FAILED";
 	# 8. print report
 
 	$result = print_report($objects);
+
+        # unset the variables
+        delvar ('DBUPDATE_FLAGS') if (getvar('DBUPDATE_FLAGS'));
+        delvar ('DBUPDATE_FLAGS_EXT') if (getvar('DBUPDATE_FLAGS_EXT'));
+        delvar ('SCRIPT') if (getvar('SCRIPT'));
+        delvar ('RIR') if (getvar('RIR'));
+        delvar ('DBUPDATE_IGNORE_EXIT_CODE') if (getvar('DBUPDATE_IGNORE_EXIT_CODE'));
 
 	# 10. return result
 	return($result);
@@ -2234,6 +2325,7 @@ eval {
   my $dirs = get_test_dirs ();
   my $test_dirs = $$dirs[0];
   my $skip_dirs = $$dirs[1];
+  my @run_dirs;
 
   # run! (and gather some statistics)
 
@@ -2251,6 +2343,8 @@ eval {
   my %results;
   my $failed = 0;
   my $ok = 0;
+  my $skipped = 0;
+  $skipped = scalar (@{$skip_dirs}) if ($skip_dirs);
   my $limit = getvar('LIMIT');
 
   foreach my $dir (@{$test_dirs}) {
@@ -2280,6 +2374,12 @@ eval {
 
     $failed++ if ($res eq "FAILED");
     $ok++ if ($res eq "OK");
+    if ($res eq "SKIPPED") {
+      $skipped++;
+      push @{$skip_dirs}, $dir; 
+    } else {
+      push @run_dirs, $dir;
+    }
 
     # at this point of the loop, check if we or our children have received
     # an INT signal. If so, let's quit peacefully, by exiting the loop
@@ -2296,6 +2396,8 @@ eval {
 
   # everything goes as 1 argument: $test_dirs, $skip_dirs, \%results, $ok, $failed, $time 
   # See print_summary.
+  # replace test_dirs with run_dirs (because some tests may have been skipped)
+  $$dirs[0] = \@run_dirs;
   push @{$dirs}, (\%results, $ok, $failed);
   print_summary ($dirs);
   
