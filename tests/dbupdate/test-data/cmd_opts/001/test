@@ -6,6 +6,7 @@
 #
 # check for exit code 11 
 #
+#
 #FAILURE
 #
 # RESULT 1: invalid option -@ reported
