@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.5 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -86,6 +86,19 @@ void *qi_kill_body(void *arg)
   return NULL;
 }
 
+/* a helper function to clean config variables */
+
+char *remove_EOLs(char *arg)
+{
+  while ( strlen(arg) > 0 &&
+          (arg[strlen(arg) - 1] == '\n' ||
+           arg[strlen(arg) - 1] == '\r') )
+  {
+    arg[strlen(arg) - 1] = '\0';
+  }
+
+  return arg;
+}
 
 
 /*++++++++++++++++++++++++++++++++++++++
@@ -722,6 +735,8 @@ char *add_parent(int id, char *str, GList *par_list)
 
   SQ_result_set_t *result The result set returned from the sql query.
   unsigned filtered       if the objects should go through a filter (-K)
+  unsigned fast           fast output
+  unsigned grouped        grouped output
   sk_conn_st *condat      Connection data for the client    
 
   More:
@@ -735,6 +750,7 @@ char *add_parent(int id, char *str, GList *par_list)
 static int write_results(SQ_result_set_t *result, 
 			 unsigned filtered,
 			 unsigned fast,
+			 unsigned grouped,
 			 sk_conn_st *condat,
 			 acc_st    *acc_credit,
 			 acl_st    *acl,
@@ -747,6 +763,9 @@ static int write_results(SQ_result_set_t *result,
   char *fasted;
   int retrieved_objects=0;
   char *objt;
+  char *pkey;
+  char *rec;
+  int recursive;
   int type;
 
   /* Get all the results - one at a time */
@@ -761,6 +780,12 @@ static int write_results(SQ_result_set_t *result,
       
       dieif (  (id = SQ_get_column_string(result, row, 0)) == NULL )
       dieif (  (objt = SQ_get_column_string(result, row, 3)) == NULL );
+      if (grouped == 1) {
+        dieif (  (pkey = SQ_get_column_string(result, row, 4)) == NULL );
+        dieif (  (rec = SQ_get_column_string(result, row, 5)) == NULL );
+        recursive = atoi(rec);
+        UT_free (rec);
+      }
 
       /* get + add object type */
       type = atoi(objt);
@@ -782,8 +807,10 @@ static int write_results(SQ_result_set_t *result,
       
       if ((str = SQ_get_column_string(result, row, 2)) == NULL) { die; } 
       else {
-        
-        if (type == C_IN || type == C_I6) {
+        char *rir;
+        rir = ca_get_rir;   
+        rir = remove_EOLs(rir);
+        if ((strcasecmp(rir, "AFRINIC") == 0) && (type == C_IN || type == C_I6)) {
           /* add "parent:" attribute for inet(6)num */
           str = add_parent(atoi(id), str, par_list);
         }
@@ -799,6 +826,13 @@ static int write_results(SQ_result_set_t *result,
 	
         /* The filtering stage */
         if (filtered == 0) {
+          if ((grouped == 1) && (recursive == 0))  {
+            char banner[STR_XL];
+            sprintf (banner, GROUP_BANNER, pkey);
+            SK_cd_puts(condat, banner);
+            SK_cd_puts(condat, "\n\n");
+            UT_free(pkey);
+          }
           SK_cd_puts(condat, str);
 	  SK_cd_puts(condat, "\n");
         }
@@ -884,6 +918,7 @@ qi_write_objects(SQ_connection_t **sql_connection,
 			  char *id_table, 
 			  unsigned int filtered, 
 			  unsigned int fast, 
+                          unsigned int grouped,
 			  sk_conn_st *condat,
 			  acc_st    *acc_credit,
 			  acl_st    *acl,
@@ -894,7 +929,12 @@ qi_write_objects(SQ_connection_t **sql_connection,
   int retrieved_objects=0;
   char sql_command[STR_XL];  
 
-  sprintf(sql_command, Q_OBJECTS, id_table);
+  if (grouped == 1) {
+    sprintf(sql_command, Q_OBJECTS_GROUPED, id_table);
+  }
+  else {
+    sprintf(sql_command, Q_OBJECTS, id_table);
+  }
 
   if (sql_execute_watched(condat, sql_connection, sql_command, &result) == -1) {
       report_sql_error(condat, *sql_connection, sql_command);
@@ -906,7 +946,7 @@ qi_write_objects(SQ_connection_t **sql_connection,
   */
   
   if( condat->rtc == 0) {
-    retrieved_objects = write_results(result, filtered, fast, condat, 
+    retrieved_objects = write_results(result, filtered, fast, grouped, condat, 
 				      acc_credit, acl, par_list);
     SQ_free_result(result); 
   }
@@ -1606,20 +1646,6 @@ exit_qi_collect_domain:
 //  return error;
 //}/* add_ref_name */
 
-/* a helper function to clean config variables */
-
-char *remove_EOLs(char *arg)
-{
-  while ( strlen(arg) > 0 &&
-          (arg[strlen(arg) - 1] == '\n' || 
-           arg[strlen(arg) - 1] == '\r') )
-  {
-    arg[strlen(arg) - 1] = '\0';
-  }
- 
-  return arg;
-}
-
 /* qi_collect_ids */
 /*++++++++++++++++++++++++++++++++++++++ 
   
@@ -1944,7 +1970,7 @@ qi_fetch_references(SQ_connection_t **sql_connection,
        ( like: INSERT into ID_123 SELECT * FROM ID_123,admin_c WHERE ... )
     */
     sprintf(sql_command, 
-     "CREATE " TEMPORARY " TABLE %s ( id int PRIMARY KEY NOT NULL, recursive BOOL DEFAULT 1 ) TYPE=HEAP", 
+     "CREATE " TEMPORARY " TABLE %s ( id int NOT NULL, recursive BOOL DEFAULT 1, gid INT NOT NULL DEFAULT 0, PRIMARY KEY (id, gid)) TYPE=HEAP", 
      rec_table);
     if (SQ_execute_query(*sql_connection, sql_command, NULL) == -1) {
         report_sql_error(&qe->condat, *sql_connection, sql_command);
@@ -2007,6 +2033,7 @@ qi_fetch_references(SQ_connection_t **sql_connection,
 
     /* if we've lost connection, don't bother with this extra work */
     if (!sql_error && (qe->condat.rtc == 0)) {
+
         /* now copy things back to the main temporary table   */
         sprintf(sql_command, "INSERT IGNORE INTO %s SELECT * FROM %s", 
 	       id_table, rec_table);
@@ -2014,6 +2041,7 @@ qi_fetch_references(SQ_connection_t **sql_connection,
 	    sql_error = SQ_errno(*sql_connection);
 	    report_sql_error(&qe->condat, *sql_connection, sql_command);
 	}
+
     }
 
     /* Now drop the IDS recursive table (try to do this even if
@@ -2148,7 +2176,21 @@ int QI_execute(ca_dbSource_t *dbhdl,
       SK_watchstop(&(qe->condat));
   }
 
-
+  /* change the idtable */
+  if (!sql_error) {
+      sprintf(sql_command, Q_ALTER_TMP, id_table);
+      if (SQ_execute_query(sql_connection, sql_command, NULL) == -1 ) {
+          sql_error = SQ_errno(sql_connection);
+          report_sql_error(&qe->condat, sql_connection, sql_command);
+      }
+      if (!sql_error) {
+         sprintf(sql_command, Q_UPD_TMP, id_table);
+         if (SQ_execute_query(sql_connection, sql_command, NULL) == -1 ) {
+             sql_error = SQ_errno(sql_connection);
+             report_sql_error(&qe->condat, sql_connection, sql_command);
+         }
+      }
+  }
 
   /* fetch recursive objects (ac,tc,zc,ah,org) */
   if (!sql_error && qis->recursive && (qe->condat.rtc == 0)) {
@@ -2172,7 +2214,7 @@ int QI_execute(ca_dbSource_t *dbhdl,
   /* display objects from the IDs table */
   if (!sql_error) {
       sql_error = qi_write_objects( &sql_connection, id_table, qis->filtered,
-		                qis->fast, &(qe->condat), acc_credit, acl, par_list);
+		                qis->fast, qis->qc->G_group_search, &(qe->condat), acc_credit, acl, par_list);
   }
 
   /* drop the table */

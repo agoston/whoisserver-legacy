@@ -180,6 +180,7 @@ char *QC_query_command_to_string(Query_command *query_command) {
 	  query_command->recursive?"y":"n",
           str2,
           query_command->c_irt_search ? "TRUE" : "FALSE",
+          query_command->G_group_search ? "TRUE" : "FALSE",
           query_command->g,
           query_command->l,
           query_command->m,
@@ -304,6 +305,7 @@ QC_init_struct (Query_command *query_command)
 {
     query_command->query_type = QC_SYNERR;
     query_command->c_irt_search = FALSE;
+    query_command->G_group_search = TRUE; /* grouping is on by default */
     query_command->d = 0;
     query_command->fast = 0;
     query_command->g = 0;
@@ -416,7 +418,7 @@ int QC_fill (const char *query_str,
 
   dieif( (gst = mg_new(0)) == NULL );
   
-  while ((c = mg_getopt(opt_argc, opt_argv, "acdgi:klmq:rs:t:v:xFKLMRST:V:", 
+  while ((c = mg_getopt(opt_argc, opt_argv, "acdgi:klmq:rs:t:v:xFKLMRSTG:V:", 
 			gst)) != EOF) {
     num_flags++;
 
@@ -443,6 +445,9 @@ int QC_fill (const char *query_str,
         if (ip_flag_used) ip_flag_duplicated++;
         ip_flag_used = 'c';
         break;
+
+      case 'G':
+        query_command->G_group_search=0;
 
       case 'd':
         query_command->d=1;

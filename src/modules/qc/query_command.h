@@ -82,6 +82,8 @@ typedef struct Query_command_t {
   /* -c: query for the most specific inetnum/inet6num with the "mnt-irt:" 
          attribute set */
   gboolean c_irt_search;
+  /* -G: non-grouped ouput (non-grouped) */
+  gboolean G_group_search;
 
   int d;
   int fast;
