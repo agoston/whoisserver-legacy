@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -1788,7 +1788,7 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
         /* parents */
         rir = ca_get_rir;   
         rir = remove_EOLs(rir);
-        if (strcasecmp(rir, "AFRINIC") == 0 ) {
+        if (strcasecmp(rir, "AFRINIC") == 0 )
         {
            GList    *qitem;
            for( qitem = g_list_first(*datlist); qitem != NULL; qitem = g_list_next(qitem)) {
