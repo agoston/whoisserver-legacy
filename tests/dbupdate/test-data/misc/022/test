@@ -1,0 +1,29 @@
+# misc tests
+# CASE 22: Create an assignment inetnum object 
+#          with parent: attributes
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 22: The creation will succeed
+#rir AFRINIC
+
+
+password: LIR
+password: END-USER
+
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 
+parent:       192.168.128.0 - 192.168.255.255
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+parent:       192.168.128.1 - 192.168.255.255
+parent:       192.168.128.2 - 192.168.255.255

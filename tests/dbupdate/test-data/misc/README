@@ -222,3 +222,14 @@
 # RESULT 21: The circular creations will fail
 
 
+# CASE 22: Create an assignment inetnum object 
+#          with parent: attributes
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 22: The creation will succeed
+#rir AFRINIC
+
+
