@@ -1453,33 +1453,23 @@ IP_pref_2_rang( ip_range_t *rangptr, ip_prefix_t *prefptr )
 int
 IP_rang_2_pref( ip_range_t *rangptr, ip_prefix_t *prefptr )
 {
-  /* begin & end = mask */
-  /* count contiguous '1' bits starting from the highest digit -> prefix length */
-  /* IP address = begin */
+  /* begin ^ end = inverted mask */
 
   ip_addr_t res;
-  int i = 0;
-  int k = 0;
+  int i;
+  int k;
   unsigned len = 0;
 
   prefptr->ip = rangptr->begin;
 
-  for (i=3; i >=0; i--)
-  {
-    res.words[i] = rangptr->begin.words[i] & rangptr->end.words[i];
-  }
-
   for (i=3; i >=0; i--) 
   {
-    for (k = (1 << 31) ; k >= 1; ( k >> 1) ) 
+    for (k = 31; k >= 0; k-- ) 
     {
-      if ( (res.words[i] & k ) == k ) 
+      /* check bit number k */
+      if (((rangptr->begin.words[i] >> k) & 1) ^ ((rangptr->end.words[i] >> k) & 1) == 0)
       {
         len ++;
-      } 
-      else 
-      {
-        break;
       }
     }
   }
