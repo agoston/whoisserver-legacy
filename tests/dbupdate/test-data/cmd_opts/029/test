@@ -9,5 +9,5 @@
 # RESULT 29: X.509 certificate file does not exist reported
 #
 # exit code should be 20
-?20
-$ -c $RIP_CONFIG -x ~/db/conf/fred -f
+$DBUPDATE_IGNORE_EXIT_CODE=20
+$DBUPDATE_FLAGS_EXT=-c $RIP_CONFIG -x ~/db/conf/fred -f

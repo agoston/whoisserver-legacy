@@ -10,7 +10,7 @@
 # RESULT 12: invalid option - reported
 #            but help request still processed
 %
-$$ -c $RIP_CONFIG - -mf $TEST 
+$DBUPDATE_FLAGS=-c $RIP_CONFIG - -mf $TEST 
 %
 From: dbtest@ripe.net
 Subject: help

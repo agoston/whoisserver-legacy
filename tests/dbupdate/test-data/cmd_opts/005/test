@@ -13,5 +13,5 @@
 #           invalid option file reported
 %
 %
-?11
-$ -c $RIP_CONFIG r-p file  
+$DBUPDATE_IGNORE_EXIT_CODE=11
+$DBUPDATE_FLAGS_EXT=-c $RIP_CONFIG r-p file  

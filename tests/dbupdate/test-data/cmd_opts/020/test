@@ -9,7 +9,7 @@
 #
 # RESULT 20: Help text returned.
 %
-$ -c $RIP_CONFIG -m -rpf
+$DBUPDATE_FLAGS_EXT=-c $RIP_CONFIG -m -rpf
 %
 From: dbtest@ripe.net
 Subject: help

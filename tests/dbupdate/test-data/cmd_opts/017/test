@@ -9,5 +9,5 @@
 # RESULT 17: missing mandatory option -c reported
 %
 %
-?11
-$$ -prf $TEST 
+$DBUPDATE_IGNORE_EXIT_CODE=11
+$DBUPDATE_FLAGS=-prf $TEST 

@@ -12,5 +12,5 @@
 #            no ack created
 %
 %
-?11
-$$ -c $RIP_CONFIG --print--redirect -k help
+$DBUPDATE_IGNORE_EXIT_CODE=11
+$DBUPDATE_FLAGS=-c $RIP_CONFIG --print--redirect -k help

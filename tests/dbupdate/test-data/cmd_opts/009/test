@@ -12,5 +12,5 @@
 # RESULT 9: missing argument for option --file reported
 %
 %
-?11
-$$ -c $RIP_CONFIG --file 
+$DBUPDATE_IGNORE_EXIT_CODE=11
+$DBUPDATE_FLAGS=-c $RIP_CONFIG --file 

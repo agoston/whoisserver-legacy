@@ -11,5 +11,5 @@
 # RESULT 28: config file does not exist reported
 %
 %
-?12
-$ -c $CURRENT_DIR -f
+$DBUPDATE_IGNORE_EXIT_CODE=12
+$DBUPDATE_FLAGS_EXT=-c $CURRENT_DIR -f

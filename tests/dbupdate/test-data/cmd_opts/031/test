@@ -10,5 +10,5 @@
 # RESULT 31: invalid combination of options -m and -x reported
 #
 # exit code should be 11
-?11
-$ -c $RIP_CONFIG -m --x509 $CURRENT_DIR/cert.pem -f 
+$DBUPDATE_IGNORE_EXIT_CODE=11
+$DBUPDATE_FLAGS_EXT=-c $RIP_CONFIG -m --x509 $CURRENT_DIR/cert.pem -f 

@@ -11,7 +11,7 @@
 #            but help request still processed
 %
 %
-$ -c $RIP_CONFIG -- -mf 
+$DBUPDATE_FLAGS_EXT=-c $RIP_CONFIG -- -mf 
 %
 From: dbtest@ripe.net
 Subject: help

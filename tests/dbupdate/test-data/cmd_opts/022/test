@@ -10,7 +10,7 @@
 # RESULT 22: Help text returned.
 %
 %
-$ -c $RIP_CONFIG --mail --redirect --print --file 
+$DBUPDATE_FLAGS_EXT=-c $RIP_CONFIG --mail --redirect --print --file 
 %
 From: dbtest@ripe.net
 subject: help

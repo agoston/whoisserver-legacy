@@ -12,5 +12,5 @@
 #           (p and r are valid short options)
 %
 %
-?11
-$ -c $RIP_CONFIG -print -f 
+$DBUPDATE_IGNORE_EXIT_CODE=11
+$DBUPDATE_FLAGS_EXT=-c $RIP_CONFIG -print -f 
