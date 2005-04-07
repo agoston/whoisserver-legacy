@@ -175,12 +175,14 @@ char *QC_query_command_to_string(Query_command *query_command) {
   str2 = MA_to_string(query_command->object_type_bitmap, DF_get_class_names());
   str3 = WK_to_string(query_command->keytypes_bitmap);
   
-  sprintf(result_buf, "Query_command : inv_attrs=%s, recursive=%s, object_type=%s, (c=%s,g=%d,l=%d,m=%d,q=%d,t=%d,v=%d,x=%d,F=%d,K=%d,L=%d,M=%d,R=%d), possible keytypes=%s, keys=[%s]",
+  sprintf(result_buf, "Query_command : inv_attrs=%s, recursive=%s, object_type=%s, (c=%s,G=%s,B=%s,b=%s,g=%d,l=%d,m=%d,q=%d,t=%d,v=%d,x=%d,F=%d,K=%d,L=%d,M=%d,R=%d), possible keytypes=%s, keys=[%s]",
           str1,
 	  query_command->recursive?"y":"n",
           str2,
           query_command->c_irt_search ? "TRUE" : "FALSE",
           query_command->G_group_search ? "TRUE" : "FALSE",
+          query_command->B ? "TRUE" : "FALSE",
+          query_command->b ? "TRUE" : "FALSE",
           query_command->g,
           query_command->l,
           query_command->m,
@@ -306,6 +308,8 @@ QC_init_struct (Query_command *query_command)
     query_command->query_type = QC_SYNERR;
     query_command->c_irt_search = FALSE;
     query_command->G_group_search = TRUE; /* grouping is on by default */
+    query_command->B = FALSE; /* "original" output is off by default */
+    query_command->b = FALSE;
     query_command->d = 0;
     query_command->fast = 0;
     query_command->g = 0;
@@ -418,7 +422,7 @@ int QC_fill (const char *query_str,
 
   dieif( (gst = mg_new(0)) == NULL );
   
-  while ((c = mg_getopt(opt_argc, opt_argv, "acdgi:klmq:rs:t:v:xFKLMRSTG:V:", 
+  while ((c = mg_getopt(opt_argc, opt_argv, "acdgi:klbmq:rs:t:v:xBGFKLMRST:V:", 
 			gst)) != EOF) {
     num_flags++;
 
@@ -446,8 +450,25 @@ int QC_fill (const char *query_str,
         ip_flag_used = 'c';
         break;
 
-      case 'G':
-        query_command->G_group_search=0;
+			case 'G':
+				query_command->G_group_search=FALSE;
+			break;
+
+			case 'B':
+				query_command->B=TRUE;
+			break;
+
+      case 'b':
+        query_command->b=TRUE;
+				query_command->c_irt_search = TRUE;
+        query_command->l = 0;
+        query_command->m = 0;
+        query_command->x = 0;
+        query_command->L = 0;
+        query_command->M = 0;
+        if (ip_flag_used) ip_flag_duplicated++;
+        ip_flag_used = 'b';
+			break;
 
       case 'd':
         query_command->d=1;
@@ -651,13 +672,13 @@ int QC_fill (const char *query_str,
       break;
 
       case 'F':
-        query_command->fast=1;
-	query_command->recursive=0; /* implies no recursion */
+				query_command->fast=1;
+				query_command->recursive=0; /* implies no recursion */
       break;
 
       case 'K':
         query_command->filtered=1;
-	query_command->recursive=0; /* implies no recursion */
+				query_command->recursive=0; /* implies no recursion */
       break;
 
       case 'L':
@@ -801,6 +822,30 @@ int QC_fill (const char *query_str,
             synerrflg++;
         }
     }
+
+		/* check uncompatible flags */
+		if ((query_command->b == 1) && (query_command->recursive == 0)) {
+			/* -b -r is error, we need person/role/organisation objects */
+      /* WARNING:903 */
+        char *fmt = ca_get_qc_fmt_uncompflag;
+        query_command->parse_messages = 
+            g_list_append(query_command->parse_messages, 
+                          g_strdup_printf(fmt,"-b","-r"));
+
+				UT_free(fmt);
+				badparerr++;
+		}
+
+		if ((query_command->b == 1) && (query_command->G_group_search == 0)) {
+			/* -G -b is error, we need grouping */
+      /* WARNING:903 */
+        char *fmt = ca_get_qc_fmt_uncompflag;
+        query_command->parse_messages = 
+            g_list_append(query_command->parse_messages, 
+                          g_strdup_printf(fmt,"-b","-G"));
+				UT_free(fmt);
+				badparerr++;
+		}
 
     /* copy the key */
     query_command->keys = g_strjoinv(" ", opt_argv + gst->optind);

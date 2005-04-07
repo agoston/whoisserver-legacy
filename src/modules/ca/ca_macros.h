@@ -411,6 +411,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define ca_get_qc_fmt_fixedlookup	ca_get_string(CA_QC_FMT_FIXEDLOOKUP)
 #define ca_set_qc_fmt_fixedlookup	ca_set_string(CA_QC_FMT_FIXEDLOOKUP)
 
+#define ca_get_qc_fmt_uncompflag	ca_get_string(CA_QC_FMT_UNCOMPFLAG)
+#define ca_set_qc_fmt_uncompflag	ca_set_string(CA_QC_FMT_UNCOMPFLAG)
+
 #define ca_get_qi_ref_tmout	ca_get_string(CA_QI_REF_TMOUT)
 #define ca_set_qi_ref_tmout	ca_set_string(CA_QI_REF_TMOUT)
 

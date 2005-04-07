@@ -2,6 +2,40 @@
 
 <ripe_attributes version="$Revision: 1.1 $" author="$Author: can $">
 
+  <ripe_attribute name="abuse-mailbox" code="am">
+    <description>
+   Specifies the e-mail address to which abuse complaints should be sent.
+    </description>
+    <syntax>e-mail</syntax>
+
+    <representation>
+    <sqltable name="abuse_mailbox">
+      <insert qtype="ud_lf_ot">
+        INSERT abuse_mailbox
+        SET thread_id=%d, object_id=%ld, object_type=%d, abuse_mailbox='%s'
+      </insert>
+      <update qtype="ud_leaf_">
+        UPDATE abuse_mailbox
+        SET thread_id=%d
+        WHERE object_id=%ld
+        AND abuse_mailbox='%s'
+      </update>
+    </sqltable>
+    </representation>
+
+    <keys searchable="inverse">
+
+      <queries>
+        <sqlquery keytype="wk_email" class="ANY">
+          SELECT object_id,0
+          FROM   notify i
+          WHERE  i.notify = '%s'
+    AND  i.thread_id = 0
+        </sqlquery>
+      </queries>
+    </keys>
+  </ripe_attribute>
+
   <ripe_attribute name="address" code="ad">
     <description>
       Full postal address of a contact.
@@ -1941,13 +1975,6 @@
     <description>
    Text of the limerick. Must be humorous, but not malicious or
    insulting.
-    </description>
-    <syntax>free-form</syntax>
-  </ripe_attribute>
-
-  <ripe_attribute name="trouble" code="tb">
-    <description>
-   Contains information on who to contact when there are problems.
     </description>
     <syntax>free-form</syntax>
   </ripe_attribute>

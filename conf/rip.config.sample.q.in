@@ -390,6 +390,13 @@ QC_USELESSIPFLAG %
 QC_USELESSIPFLAG % An IP flag (-l, -L, -m, -M, -x, or -c) used without an IP key.
 
 #
+# Uncompatible flags
+
+QC_FMT_UNCOMPFLAG %%ERROR:206: invalid combination of flags passed
+QC_FMT_UNCOMPFLAG %%
+QC_FMT_UNCOMPFLAG %% The key "%s" cannot be used together with "%s".
+
+#
 # Useless no-referral flag
 
 QC_USELESSNOREFFLAG %WARNING:904: useless no-referral flag passed
