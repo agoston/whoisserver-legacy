@@ -157,12 +157,13 @@ MM_mail_info_t *MM_extract_mail_info(const gchar *stream) {
   ret->content = mm_explode_mime(body, contents);
 
   mail_close(mail_stream);
+  LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: mail stream closed");
   if (from) {
     g_free(from);
   }
-  g_free(subject);
-  g_free(date);
-  g_free(message_id);
+  free(subject);
+  free(date);
+  free(message_id);
   if (cc) {
     g_free(cc);
   }
