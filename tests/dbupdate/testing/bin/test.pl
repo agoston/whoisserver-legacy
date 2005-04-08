@@ -184,7 +184,7 @@ my $string;
 			  error('E_SINGATTR', $attr);
 	   	}
   	}
-    elsif ( ($attr eq "whois") && ( $val !~ /^[\s]*?!|DATE_ON|DATE_OFF[\s]*?$/oi))  {
+    elsif ( ($attr eq "whois") && ( $val !~ /^[\s]*?!|DATE_ON|DATE_OFF|(QUERY.+)[\s]*?$/oi))  {
       error('E_INVATTR', $string);
 
     }
@@ -758,12 +758,15 @@ my $list = $_[1];
     my $string = $_;
     if ($string =~ /^[a-z-]+/oi)  {
       my $object = "";
-      while ($string && ($string =~ /^[a-z0-9-]+/oi) ) {
-        # enter object parsing mode
-        $string =~ /^(.*?):[\s]*(.*?)[\s]*$/i;
-        $object = $object.$1.":".$2."\n";
+      #while ($string && ($string =~ /^[a-z0-9-]+/oi) ) {
+      while ($string && ($string !~ /^$/oi) ) {
+        #enter object parsing mode
+        #$string =~ /^(.*?):[\s]*(.*?)[\s]*$/i;
+        #$object = $object.$1.":".$2."\n";
+        $object = $object.$string;
         $string = <$FILE>;
       }
+print STDERR "OBJECT [$object]\n";
       # object in $object;
       my $tmp = $object;
       my $name;
@@ -779,6 +782,8 @@ my $list = $_[1];
       elsif ($object =~ /^(.+?):(.+?)[\n]/iom ) {
         $name = $1." ".$2;
       }
+      $name =~ s/[\s]+/ /;
+print STDERR "NAME [$name]\n";
       $list->{$name} = $tmp;
     } 
   }
@@ -792,18 +797,20 @@ sub gather_objects_whois($$) {
  foreach my $object (@{$objs}) {
    my $tmp = $object;
    my $name;
-   if ($object =~ /^(route):[\s]*(.*?)[\n](.*?)(origin):(.*?)[\n]/iosm) {
+   if ($object =~ /^(route):[\s]*(.*?)[\n](.*?)(origin):[\s]*(.*?)[\n]/iosm) {
         $name = $1." ".$2.", ".$5;
    }
-   elsif ($object =~ /^(person):[\s]*(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
+   elsif ($object =~ /^(person):[\s]*(.*?)[\n](.*?)(nic-hdl):[\s]*(.*?)[\n]/iosm) {
      $name = $1." ".$5;
    }
-   elsif ($object =~ /^(role):[\s]*(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
+   elsif ($object =~ /^(role):[\s]*(.*?)[\n](.*?)(nic-hdl):[\s]*(.*?)[\n]/iosm) {
      $name = $1." ".$5;
    }             
    elsif ($object =~ /^(.+?):[\s]*(.+?)[\n]/iom ) { 
      $name = $1." ".$2;
    } 
+print STDERR "\nname  [$name]\n\n";
+print STDERR "\nobject  [$tmp]\n\n";
    $list->{$name} = $tmp;
  }
  return(1);
@@ -866,11 +873,11 @@ my $found = { };
       # take the object's first key as the search key
       my $run = $obj;
       $run =~ s/^(.*?)[\s]+(.*?),[\s]*(.*?)$/$1 $2/i;
-      $run = " -r -x -T ".$run;
+      $run = " -G -B -r -x -T ".$run;
 
       # run query and get objects from WHOIS
       my $whois = new RipeWhois ( 'Host' => getvar('WHOIS_HOST'), 
-                                  'Port' => getvar('WHOIS_PORT'), 
+                                  'Port' => getvar('SVWHOIS_PORT'), 
                                   'FormatMode' => 0 );
       if (! $whois) {
         error ('E_WHOIS');
@@ -892,24 +899,34 @@ my $found = { };
         if (exists $expected->{$obj})	{
           # add the date if it is not there
           unless ($expected->{$obj} =~ /changed:(.*?)[\s]+[\d]+[\s]*/) {
-            $expected->{$obj} =~ s/changed:(.*?)[\n]/changed:$1 $date\n/iosm;
+            $expected->{$obj} =~ s/changed:      (.*?)[\n]/changed:$1 $date\n/iosm;
           }
         }
       }
       elsif	($query =~ /DATE_OFF/io)	{
-        # filter dates out in found object
+        # filter dates out in found object & expected object
         if (exists $found->{$obj})	{
           $found->{$obj} =~ s/changed:(.*?)[\s]+([0-9]*)[\s]*[\n]/changed:$1\n/iosm;
+          $expected->{$obj} =~ s/changed:(.*?)[\s]+([0-9]*)[\s]*[\n]/changed:$1\n/iosm;
         }
       }
       
       # match expected objects with found ones
-      if ( exists $found->{$obj} ) {
-        $found->{$obj} =~ s/:\s*/:/g;
-      }
-      my $expected_tmp = $expected->{$obj};
-      $expected_tmp =~ s/\n$//s;
-      if ( (!is_negative($tmp)) && (exists ($found->{$obj})) && ($expected_tmp eq $found->{$obj}) ) {
+      #if ( exists $found->{$obj} ) {
+      #  $found->{$obj} =~ s/:\s*/:/g;
+      #}
+
+			my $expected_tmp;
+			if (exists $expected->{$obj}) {
+      	$expected_tmp = $expected->{$obj};
+      	$expected_tmp =~ s/\n$//s;
+			}
+#$found->{$obj} =~ s/\n/]\n/gm;
+#$expected_tmp =~ s/\n/]\n/gm;
+#print STDERR "\nfound\n\n[$found->{$obj}]\n\n";
+#print STDERR "\nfexpected\n\n[$expected_tmp]\n\n";
+
+      if ( (!is_negative($tmp)) && (exists ($found->{$obj})) && $expected_tmp && ($expected_tmp eq $found->{$obj}) ) {
          #OK;
       }
       elsif ( is_negative($tmp) && !exists $found->{$obj}) {
@@ -918,6 +935,25 @@ my $found = { };
       else {
          # FAILURE
          push @{$entry->{"whoisdiag"}}, $tmp;
+				 if ($expected_tmp && exists $found->{$obj}) {
+					my @lines_found = split ("\n", $found->{$obj});
+					my @lines_expected = split ("\n", $expected_tmp);
+					my $c = 0;
+
+ 			    foreach my $line (@lines_expected) {
+      		if ($line ne $lines_found[$c]) {
+						push @{$entry->{"whoisdiag"}}, "In line $c:\n";
+						push @{$entry->{"whoisdiag"}}, "expected [$line]\nfound    [$lines_found[$c]]\n";
+		      }
+    		  $c++;
+			    }
+				 }
+				 if (!$expected_tmp && !is_negative($tmp)) {
+					  push @{$entry->{"whoisdiag"}}, "no whois object for [$obj]\n";
+				 }
+				 if (!exists $found->{$obj} && !is_negative($tmp)) {
+					  push @{$entry->{"whoisdiag"}}, "no defined object for [$obj]\n";
+				 }
       }
     }
   }
@@ -983,7 +1019,7 @@ my @REQUIRED =  qw/ BASEDIR CONFDIR BINDIR DATADIR LOGDIR DUMPDIR WHOISDIR TMPDI
 					FILTERS 
 					DBUPDATE DBUPDATE_GEN 
 					DBUPDATE_TEXT DBUPDATE_MAIL DBUPDATE_NET DBUPDATE_TRACE
-					WHOIS_PORT WHOIS_HOST
+					WHOIS_HOST
 					MAKE_DB MAKE_DB_FLAGS LOAD_FILE
           SYNC_RING
 					RIP_CONFIG 

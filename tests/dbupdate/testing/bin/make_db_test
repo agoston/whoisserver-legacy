@@ -110,7 +110,7 @@ DEFCURRENTSERIAL=`cat ${OBJDIR}/${SOURCE}.CURRENTSERIAL` || \
 CURRENTSERIAL=${DEFCURRENTSERIAL:=1}
 
 # Directory where the load_file.sh script is located
-SCRIPTDIR=$TOPDIR/scripts; export SCRIPTDIR
+SCRIPTDIR=$TOPDIR/bin; export SCRIPTDIR
 # Location of the loader binary
 LOADER=$TOPDIR/bin/loader
 # Update log. Use /dev/null for huge databases.
@@ -119,7 +119,7 @@ UPDLOG=/dev/tty
 #################### LOCATION OF THE UTILITIES #####################################
 
 # Location of the utility that fetches config variables
-GETVAR="$TOPDIR/utils/getvar -s $SOURCE -c $PROPERTIES"
+GETVAR="$TOPDIR/bin/getvar -s $SOURCE -c $PROPERTIES"
 
 # Filter that uses to convert files to RPSL format
 FILTER=cat
@@ -139,7 +139,7 @@ SQLDB=`$GETVAR -p dbname` || error_exit "unknown source $SOURCE"
 
 # MySQL commands
 # note: the "CMD" versions include appropriate starup options
-MYSQLBIN=/usr/local/mysql/bin
+MYSQLBIN=/usr/bin
 MYSQL=$MYSQLBIN/mysql
 MYSQLCMD="$MYSQL -h$SQLHOST -P$SQLPORT -u$SQLUSER -p$SQLPSWD"
 MYSQLADMIN=$MYSQLBIN/mysqladmin
@@ -180,7 +180,7 @@ if [ $? -ne 0 ]; then
   error_exit "Error loading database=$DB for source=${SOURCE}, $0 exiting"
 fi
 
-REMADMINCMD="$TOPDIR/utils/remadmin.pl -h $WHOISHOST -p $CONFPORT"
+REMADMINCMD="$TOPDIR/bin/remadmin.pl -h $WHOISHOST -p $CONFPORT"
 PAUSEQUERIES="$REMADMINCMD set queries pause"
 RESUMEQUERIES="$REMADMINCMD set queries resume"
 RESUMEUPDATES="$REMADMINCMD set updates resume"
