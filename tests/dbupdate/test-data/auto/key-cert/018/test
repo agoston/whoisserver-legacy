@@ -2,7 +2,7 @@
 #
 # CASE 18: We try to create key-cert object with X509 certificate
 #          with AUTO-1 name and invalid generated attributes.
-#          (changed first char of fp and removed email addr from owner)
+#          (changed first char of fp and removed emailAddress addr from owner)
 #
 #
 #SUCCESS

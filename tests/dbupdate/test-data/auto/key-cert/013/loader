@@ -112,7 +112,7 @@ source: DB-TEST
 
 key-cert:     X509-1
 method:       X509
-owner:        /C=NL/O=RIPE NCC/OU=Members/CN=uk.bt.test-user/Email=test-user@linux.testlab.ripe.net
+owner:        /C=NL/O=RIPE NCC/OU=Members/CN=uk.bt.test-user/emailAddress=test-user@linux.testlab.ripe.net
 fingerpr:     AC:B5:B1:36:95:F3:46:93:B1:2D:58:EB:E1:46:DA:3F
 certif:       -----BEGIN CERTIFICATE-----
 certif:       MIID8zCCA1ygAwIBAgICAIIwDQYJKoZIhvcNAQEEBQAwcTELMAkGA1UEBhMCRVUx
