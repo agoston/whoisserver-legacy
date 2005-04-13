@@ -320,23 +320,23 @@ lu_whois_lookup (LU_server_t *server, rpsl_object_t **obj,
     {
       *end_of_key = '\0';
     }
-    query = g_strdup_printf("-s %s -r -x -T %s %s", source, type, key_copy);
+    query = g_strdup_printf("-G -B -s %s -r -x -T %s %s", source, type, key_copy);
     g_free(key_copy);
   }
 
   /* also special case inetnum and inet6num, since we want the -x flag */
   else if (!strcasecmp(type, "inetnum") || !strcasecmp(type, "inet6num")) 
   {
-    query = g_strdup_printf("-s %s -r -x -T %s %s", source, type, key);
+    query = g_strdup_printf("-G -B -s %s -r -x -T %s %s", source, type, key);
   }
   /* also special case domain, since we want the -R flag */
   else if (!strcasecmp(type, "domain"))
   {
-    query = g_strdup_printf("-s %s -r -R -T %s %s", source, type, key);
+    query = g_strdup_printf("-G -B -s %s -r -R -T %s %s", source, type, key);
   }
   else
   {
-    query = g_strdup_printf("-s %s -r -T %s %s", source, type, key);
+    query = g_strdup_printf("-G -B -s %s -r -T %s %s", source, type, key);
   }
 
   /* XXX: There is a bug in the core server that causes a WHOIS query to 
@@ -496,14 +496,14 @@ gboolean query_ret;
    LG_log(lu_context, LG_DEBUG, "lu_whois_inverse_lookup: types=\"%s\", key=\"%s\", \
                                  inverse_keys=\"%s\", source=\"%s\"", 
                                  types_string->str, key, inverse_keys_string->str, source);
-   query = g_strdup_printf("-s %s -r -i %s -T %s %s", source, inverse_keys_string->str, types_string->str, key);
+   query = g_strdup_printf("-G -B -s %s -r -i %s -T %s %s", source, inverse_keys_string->str, types_string->str, key);
  }
  else 
  {
    LG_log(lu_context, LG_DEBUG, "lu_whois_inverse_lookup: types=all, key=\"%s\", \
                                  inverse_keys=\"%s\", source=\"%s\"", 
                                  key, inverse_keys_string->str, source);
-   query = g_strdup_printf("-s %s -r -i %s %s", source, inverse_keys_string->str, key);
+   query = g_strdup_printf("-G -B -s %s -r -i %s %s", source, inverse_keys_string->str, key);
  }
 
  /* free the temporary strings */
@@ -776,7 +776,7 @@ lu_whois_check_overlap (LU_server_t *server, GList **overlap,
   split = ut_g_strsplit_v1(range, " - ", 0);
 
   /* query for overlap candidates */
-  query = g_strdup_printf("-s %s -r -T %s -L %s", lookup_source, class, split[0]);
+  query = g_strdup_printf("-G -B -s %s -r -T %s -L %s", lookup_source, class, split[0]);
   if (! lu_whois_query(server->info, query, &start_parents)) 
   {
     ret_val = LU_ERROR;
@@ -786,7 +786,7 @@ lu_whois_check_overlap (LU_server_t *server, GList **overlap,
   /* if start ip != end ip, query end ip */
   if (strncasecmp(split[0], split[1],strlen(split[0])) != 0) 
   {
-    query = g_strdup_printf("-s %s -r -T %s -L %s", lookup_source, class, split[1]);
+    query = g_strdup_printf("-G -B -s %s -r -T %s -L %s", lookup_source, class, split[1]);
     if (! lu_whois_query(server->info, query, &end_parents))  
     {
       ret_val = LU_ERROR;
@@ -856,7 +856,7 @@ LU_ret_t LU_get_inetnum_from_domain(LU_server_t *server,gchar *domain,
     ret_val = LU_ERROR;
   } else {
     LG_log(lu_context, LG_FUNC, "inetnum is %s",inetnum_str);
-    query = g_strdup_printf("-Tinetnum,inet6num -s %s -r %s", source, inetnum_str);
+    query = g_strdup_printf("-G -B -Tinetnum,inet6num -s %s -r %s", source, inetnum_str);
     query_ret = lu_whois_query(server->info, query, &query_result);
     g_free(query);
     if (!query_ret) {
@@ -955,7 +955,7 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
         parent_type = class;
       }
       /* preform lookup */
-      query = g_strdup_printf("-s %s -r -T %s %s", lookup_source, 
+      query = g_strdup_printf("-G -B -s %s -r -T %s %s", lookup_source, 
                               parent_type, parent_name);
     }
     UT_free(parent_name);
@@ -971,7 +971,7 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
     LG_log(lu_context, LG_DEBUG, "lu_whois_get_parents: processing ASN");
 
     key = rpsl_object_get_key_value(obj);
-    query = g_strdup_printf("-s %s -r -T as-block %s", lookup_source, key);
+    query = g_strdup_printf("-G -B -s %s -r -T as-block %s", lookup_source, key);
     UT_free(key);
     query_ret = lu_whois_query(server->info, query, parents);
     g_free(query);
@@ -985,7 +985,7 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
     LG_log(lu_context, LG_DEBUG, "lu_whois_get_parents: processing IP allocation");
 
     key = rpsl_object_get_key_value(obj);
-    query = g_strdup_printf("-s %s -r -T %s -l %s", lookup_source, class, key);
+    query = g_strdup_printf("-G -B -s %s -r -T %s -l %s", lookup_source, class, key);
     UT_free(key);
     query_ret = lu_whois_query(server->info, query, parents);
     g_free(query);
@@ -1006,14 +1006,14 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
     key = rpsl_attr_get_clean_value(attr);
 
     /* look for exact match route first */
-    query = g_strdup_printf("-T%s -s %s -r -x %s", class, lookup_source, key);
+    query = g_strdup_printf("-G -B -T%s -s %s -r -x %s", class, lookup_source, key);
     query_ret = lu_whois_query(server->info, query, &net_parents);
     g_free(query);
 
     if (query_ret && ! net_parents)
     {
       /* look for less specific route */
-      query = g_strdup_printf("-T%s -s %s -r -l %s", class, lookup_source, key);
+      query = g_strdup_printf("-G -B -T%s -s %s -r -l %s", class, lookup_source, key);
       query_ret = lu_whois_query(server->info, query, &net_parents);
       g_free(query);
       
@@ -1022,11 +1022,11 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
         /* look for exact match inetnum/inet6num */
         if ( !strcasecmp(class, "route") )
         {
-          query = g_strdup_printf("-Tinetnum -s %s -r -x %s", lookup_source, key);
+          query = g_strdup_printf("-G -B -Tinetnum -s %s -r -x %s", lookup_source, key);
         }
         else
         {
-          query = g_strdup_printf("-Tinet6num -s %s -r -x %s", lookup_source, key);
+          query = g_strdup_printf("-G -B -Tinet6num -s %s -r -x %s", lookup_source, key);
         } 
         query_ret = lu_whois_query(server->info, query, &net_parents);
         g_free(query);
@@ -1035,11 +1035,11 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
         {
           /* look for less specific inetnum/inet6num */
           if( !strcasecmp(class, "route") ){
-            query = g_strdup_printf("-Tinetnum -s %s -r -l %s", lookup_source, key);
+            query = g_strdup_printf("-G -B -Tinetnum -s %s -r -l %s", lookup_source, key);
           }
           else
           {
-            query = g_strdup_printf("-Tinet6num -s %s -r -l %s", lookup_source, key);
+            query = g_strdup_printf("-G -B -Tinet6num -s %s -r -l %s", lookup_source, key);
           }
           query_ret = lu_whois_query(server->info, query, &net_parents);
           g_free(query);
@@ -1057,7 +1057,7 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
       assert(g_list_length(attrs) == 1);
       key = rpsl_attr_get_clean_value((rpsl_attr_t *)attrs->data);
       rpsl_attr_delete_list(attrs);
-      query = g_strdup_printf("-s %s -r -T aut-num %s", lookup_source, key);
+      query = g_strdup_printf("-G -B -s %s -r -T aut-num %s", lookup_source, key);
       UT_free(key);
       query_ret = lu_whois_query(server->info, query, parents);
       g_free(query);
@@ -1084,7 +1084,7 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
     while ((ret_val == LU_OKAY) && (parent_name != NULL) && (*parents == NULL))
     {
       parent_name++;  /* skip the dot, '.' */
-      query = g_strdup_printf("-s %s -R -r -T domain %s", lookup_source, 
+      query = g_strdup_printf("-G -B -s %s -R -r -T domain %s", lookup_source, 
                               parent_name);
       query_ret = lu_whois_query(server->info, query, parents);
       g_free(query);
