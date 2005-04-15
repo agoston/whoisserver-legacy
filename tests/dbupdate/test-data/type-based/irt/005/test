@@ -2,6 +2,7 @@
 # CASE 5: We try to create irt object IRT-REQUEST
 # with NO OVERRIDE (user)
 # this is to check that the user can do it him/herself.
+# with abuse-mailbox attr
 %
 % requires initial objects to be loaded
 #
@@ -21,6 +22,7 @@ signature:           PGPKEY-471DBBEA
 encryption:          PGPKEY-471DBBEA
 admin-c:             TP1-DB-TEST
 tech-c:              TP1-DB-TEST
+abuse-mailbox:       dbtest@ripe.net
 auth:                CRYPT-PW agl7a6gyad/e6   # irt
 mnt-by:              TEST-MNT
 notify:              dbtest@ripe.net
