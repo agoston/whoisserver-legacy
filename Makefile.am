@@ -7,7 +7,6 @@ EXTRA_DIST = README \
 	     README.solaris \
 	     RELEASE-NOTES \
 	     UPDATE-DB-3.2.0 \
-	     WISHLIST \
 	     conf/SAMPLE.CURRENTSERIAL \
 	     conf/ack_template conf/ack_text \
 	     conf/delcheck-erx-ipv4-16 \
@@ -331,7 +330,7 @@ install-exec-hook:
 	${INSTALL} -m 0755 ./src/SQL/create.second-stage $(DESTDIR)/${bindir}/SQL
 	${INSTALL} -m 0755 ./src/SQL/create.third-stage $(DESTDIR)/${bindir}/SQL
 
-uninstall-hook:
+uninstall-local:
 	rm -f $(DESTDIR)/${bindir}/SQL/aux.index.2
 	rm -f $(DESTDIR)/${bindir}/SQL/create.RIPADMIN.sql
 	rm -f $(DESTDIR)/${bindir}/SQL/create.tables.sql

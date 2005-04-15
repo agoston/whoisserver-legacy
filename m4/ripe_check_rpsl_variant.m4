@@ -48,7 +48,10 @@ AC_ARG_WITH(rpslvariant,
       do
         if test -f $file
         then
-          ln -sf $file 2>/dev/null
+          if ! test -f `basename $file`
+          then
+            ln -sf $file 2>/dev/null
+          fi
         fi
       done
       mkdir -p $ac_abs_builddir/include
@@ -57,7 +60,10 @@ AC_ARG_WITH(rpslvariant,
       do
         if test -f $file
         then
-          ln -sf $file 2>/dev/null
+          if ! test -f `basename $file`
+          then
+            ln -sf $file 2>/dev/null
+          fi
         fi
       done
       cd $OPWD
