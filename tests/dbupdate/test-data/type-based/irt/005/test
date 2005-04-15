@@ -26,5 +26,5 @@ mnt-by:              TEST-MNT
 notify:              dbtest@ripe.net
 changed:             dbtest@ripe.net
 source:              DB-TEST
-password:            test
+password:            auth
 
