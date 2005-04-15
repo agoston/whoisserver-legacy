@@ -529,4 +529,13 @@
 # RESULT 44: The creation will fail
 # rir AFRINIC
 
+# organisation object tests
+# CASE 45: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 45: The creation will succeed
 
