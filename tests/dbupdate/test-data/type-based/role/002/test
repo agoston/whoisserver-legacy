@@ -16,8 +16,7 @@ address:      Nowhereland
 phone:        +49 700 00006467
 fax-no:       +49 700 00006467
 e-mail:       dbtest@ripe.net
-trouble:      Please send any ABUSE to /dev/null
-trouble:      included logs with time stamp we will follow it up.
+e-mail:       dbtest1@ripe.net
 nic-hdl:      ROLE-DB-TEST
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
