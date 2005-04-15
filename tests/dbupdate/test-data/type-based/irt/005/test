@@ -1,0 +1,30 @@
+
+# CASE 5: We try to create irt object IRT-REQUEST
+# with NO OVERRIDE (user)
+# this is to check that the user can do it him/herself.
+%
+% requires initial objects to be loaded
+#
+# create irt object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed.
+
+
+irt:                 IRT-REQUEST
+address:             Singel 258
+                     1016 AB  Amsterdam
+                     The Netherlands
+e-mail:              dbtest@ripe.net
+signature:           PGPKEY-471DBBEA
+encryption:          PGPKEY-471DBBEA
+admin-c:             TP1-DB-TEST
+tech-c:              TP1-DB-TEST
+auth:                CRYPT-PW agl7a6gyad/e6   # irt
+mnt-by:              TEST-MNT
+notify:              dbtest@ripe.net
+changed:             dbtest@ripe.net
+source:              DB-TEST
+password:            test
+
