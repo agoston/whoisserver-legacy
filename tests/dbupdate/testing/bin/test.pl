@@ -188,7 +188,7 @@ my $string;
 			  error('E_SINGATTR', $attr);
 	   	}
   	}
-    elsif ( ($attr eq "whois") && ( $val !~ /^[\s]*?!|DATE_ON|DATE_OFF[\s]*?$/oi))  {
+    elsif ( ($attr eq "whois") && ( $val !~ /^[\s]*?!|DATE_ON|DATE_OFF[\s]*?(EXACT)?$/oi))  {
       error('E_INVATTR', $string);
 
     }
@@ -467,6 +467,17 @@ my %ident = (
   my $string = <LOGFILE>;
   while ( defined $string )  {
       $curpos = tell(LOGFILE);
+			my $path = getvar('CURRENT_DIR');
+#print STDERR "DEBUG: logfile is [$logfile]\n";
+#print STDERR "DEBUG: path is [$path]\n";
+#print STDERR "DEBUG: string is [$string]\n";
+
+			if ($string =~ /$path/i) {
+			# skip the string with 'test stamp'
+				$oldpos = $curpos;
+      	$string = <LOGFILE>;
+				next;
+			}
 
        if ($string !~ /@{$patterns{$pat}}[0]/) {
          # skip   
@@ -701,7 +712,11 @@ my $logstring = getvar('LOGSTRING');
       # read the file into $lines
       open (LOGFILE, "< $logfile")
         or error('E_FOPEN', $logfile, $!);
-      @{$lines} = <LOGFILE>;
+			$lines = [ ];
+			my $path = getvar('CURRENT_DIR');
+			foreach my $string (<LOGFILE>) {
+				push @{$lines}, $string unless ($string =~ /$path/);
+			}
     }
     else {
       $lines = [ ] if (! find_output($entry, $logfile, $lines));
@@ -771,7 +786,7 @@ my $list = $_[1];
         $object = $object.$string;
         $string = <$FILE>;
       }
-print STDERR "OBJECT [$object]\n";
+#print STDERR "OBJECT [$object]\n";
       # object in $object;
       my $tmp = $object;
       my $name;
@@ -788,7 +803,7 @@ print STDERR "OBJECT [$object]\n";
         $name = $1." ".$2;
       }
       $name =~ s/[\s]+/ /;
-print STDERR "NAME [$name]\n";
+#print STDERR "NAME [$name]\n";
       $list->{$name} = $tmp;
     } 
   }
@@ -814,8 +829,8 @@ sub gather_objects_whois($$) {
    elsif ($object =~ /^(.+?):[\s]*(.+?)[\n]/iom ) { 
      $name = $1." ".$2;
    } 
-print STDERR "\nname  [$name]\n\n";
-print STDERR "\nobject  [$tmp]\n\n";
+#print STDERR "\nname  [$name]\n\n";
+#print STDERR "\nobject  [$tmp]\n\n";
    $list->{$name} = $tmp;
  }
  return(1);
@@ -915,6 +930,16 @@ my $found = { };
           $expected->{$obj} =~ s/changed:(.*?)[\s]+([0-9]*)[\s]*[\n]/changed:$1\n/iosm;
         }
       }
+
+			if ($query !~ /EXACT/io) {
+				# if no exact matching, cut out the spaces between attribute and value
+				if (exists $expected->{$obj}) {
+					$expected->{$obj} =~ s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/mg;
+				}
+				if (exists $found->{$obj}) {
+        	$found->{$obj} =~ s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/mg;
+      	}
+			}
       
       # match expected objects with found ones
       #if ( exists $found->{$obj} ) {
@@ -929,7 +954,7 @@ my $found = { };
 #$found->{$obj} =~ s/\n/]\n/gm;
 #$expected_tmp =~ s/\n/]\n/gm;
 #print STDERR "\nfound\n\n[$found->{$obj}]\n\n";
-#print STDERR "\nfexpected\n\n[$expected_tmp]\n\n";
+#print STDERR "\nexpected\n\n[$expected_tmp]\n\n";
 
       if ( (!is_negative($tmp)) && (exists ($found->{$obj})) && $expected_tmp && ($expected_tmp eq $found->{$obj}) ) {
          #OK;
@@ -1681,7 +1706,7 @@ sub set_test_variables()   {
   }
   foreach my $var (keys %thash) {
     setvar ($var, $thash{$var});
-    #report ("DEBUG: setting [$var] to [$thash{$var}]\n");
+    report ("DEBUG: setting [$var] to [$thash{$var}]\n");
   }
   close (FILE);
 
@@ -2022,7 +2047,7 @@ my $result = "FAILED";
         delvar ('DBUPDATE_FLAGS') if (getvar('DBUPDATE_FLAGS'));
         delvar ('DBUPDATE_FLAGS_EXT') if (getvar('DBUPDATE_FLAGS_EXT'));
         delvar ('SCRIPT') if (getvar('SCRIPT'));
-        delvar ('RIR') if (getvar('RIR'));
+        delvar ('TEST_RIR') if (getvar('TEST_RIR'));
         delvar ('DBUPDATE_IGNORE_EXIT_CODE') if (getvar('DBUPDATE_IGNORE_EXIT_CODE'));
 
 	# 10. return result
