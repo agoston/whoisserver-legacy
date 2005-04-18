@@ -1,0 +1,12 @@
+
+# CASE 2: TP2-DB-TEST with -B flag
+%
+% requires initial objects to be loaded
+#
+# query person object, check that there changed, e-mail and notify attribute
+#
+#SUCCESS
+#
+# RESULT 2: The query will succeed.
+
+
