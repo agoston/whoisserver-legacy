@@ -775,11 +775,13 @@ my $FILE = $_[0];
 my $list = $_[1];
 
   while (<$FILE>)  {
+#	  print STDERR "string [$_]\n";
     my $string = $_;
     if ($string =~ /^[a-z-]+/oi)  {
       my $object = "";
       #while ($string && ($string =~ /^[a-z0-9-]+/oi) ) {
       while ($string && ($string !~ /^$/oi) ) {
+#				print STDERR "string [$string]\n";
         #enter object parsing mode
         #$string =~ /^(.*?):[\s]*(.*?)[\s]*$/i;
         #$object = $object.$1.":".$2."\n";
@@ -953,7 +955,7 @@ my $found = { };
 			}
 #$found->{$obj} =~ s/\n/]\n/gm;
 #$expected_tmp =~ s/\n/]\n/gm;
-#print STDERR "\nfound\n\n[$found->{$obj}]\n\n";
+#print STDERR "\nfound\n\n[$found->{$obj}] with name [$obj]\n\n";
 #print STDERR "\nexpected\n\n[$expected_tmp]\n\n";
 
       if ( (!is_negative($tmp)) && (exists ($found->{$obj})) && $expected_tmp && ($expected_tmp eq $found->{$obj}) ) {
@@ -979,10 +981,10 @@ my $found = { };
 			    }
 				 }
 				 if (!$expected_tmp && !is_negative($tmp)) {
-					  push @{$entry->{"whoisdiag"}}, "no whois object for [$obj]\n";
+					  push @{$entry->{"whoisdiag"}}, "no defined object for [$obj]\n";
 				 }
 				 if (!exists $found->{$obj} && !is_negative($tmp)) {
-					  push @{$entry->{"whoisdiag"}}, "no defined object for [$obj]\n";
+					  push @{$entry->{"whoisdiag"}}, "no whois object for [$obj]\n";
 				 }
       }
     }
@@ -1038,15 +1040,30 @@ my $object;
 
 	}
 
+  my $query_orig = $query;
+	$query =~ s/^[\s]*EXACT[\s]+//i;
+
 	my $whois = IO::Socket::INET->new(getvar('WHOIS_HOST').":".getvar('SVWHOIS_PORT')) 
 		or error ('E_WHOIS', 'whois', $!);
 	$whois->print($query, "\n");
+
+#print STDERR "DEBUG: query [$query]\n";
 
 	my $line;
 	do {
 			  $line = <$whois>;
 				push @received_lines, $line if ($line);
   } while ($line);
+
+  if ($query_orig !~ /EXACT/io) {
+     # if no exact matching, cut out the spaces between attribute and value
+		 foreach (@received_lines) {
+       s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/g;
+     }
+		 foreach (@expected_lines) {
+       s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/g;
+     }
+  }
 
 	for (my $i = 0; $i < scalar (@expected_lines); $i++) {
 		if ($expected_lines[$i] && $received_lines[$i] &&
@@ -1706,7 +1723,7 @@ sub set_test_variables()   {
   }
   foreach my $var (keys %thash) {
     setvar ($var, $thash{$var});
-    report ("DEBUG: setting [$var] to [$thash{$var}]\n");
+#    report ("DEBUG: setting [$var] to [$thash{$var}]\n");
   }
   close (FILE);
 
@@ -1952,6 +1969,9 @@ foreach (qw/ TEST DBUPDATE_FILE FILTERS_LOCAL LOADER_FILE /) {
 sub run_test($)	{
 my $filters = $_[0];
 my $dir = getvar('CURRENT_DIR');
+
+my @vars_cleanup = ('DBUPDATE_FLAGS', 'DBUPDATE_FLAGS_EXT', 'SCRIPT', 'TEST_RIR', 'DBUPDATE_IGNORE_EXIT_CODE');
+
 # initialize filenames
 init_paths();
 # get and set the per-test variables from the 'test' file
@@ -1965,6 +1985,10 @@ my $rir = getvar('RIR');
 
 if ($test_rir && $rir) {
   if ($test_rir !~ /\b$rir\b/i) {
+		# unset the variables
+		foreach my $var (@vars_cleanup) {
+    	delvar ($var) if (getvar($var));
+		}
     # don't run the test
     return "SKIPPED";
   }
@@ -2043,12 +2067,10 @@ my $result = "FAILED";
 
 	$result = print_report($objects);
 
-        # unset the variables
-        delvar ('DBUPDATE_FLAGS') if (getvar('DBUPDATE_FLAGS'));
-        delvar ('DBUPDATE_FLAGS_EXT') if (getvar('DBUPDATE_FLAGS_EXT'));
-        delvar ('SCRIPT') if (getvar('SCRIPT'));
-        delvar ('TEST_RIR') if (getvar('TEST_RIR'));
-        delvar ('DBUPDATE_IGNORE_EXIT_CODE') if (getvar('DBUPDATE_IGNORE_EXIT_CODE'));
+  # 9. unset the variables
+  foreach my $var (@vars_cleanup) {
+    delvar ($var) if (getvar($var));
+  }
 
 	# 10. return result
 	return($result);
