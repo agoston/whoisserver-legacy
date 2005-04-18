@@ -7,8 +7,7 @@
 #SUCCESS
 #
 # RESULT 42: The modification will succeed
-# rir AFRINIC
-
+$TEST_RIR=AFRINIC
 
 organisation:  ORG-Eoof1-DB-TEST
 org-name:      EXAMPLE organisation object for tests
