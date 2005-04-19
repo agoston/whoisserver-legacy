@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5 $
+  $Revision: 1.5.2.2 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -897,7 +897,7 @@ static int write_results(SQ_result_set_t *result,
 			 acc_st    *acc_credit,
 			 acl_st    *acl,
        GList *par_list,
-			 GHashTable **groups
+			 GHashTable *groups
 			 ) {
   SQ_row_t *row;
   char *str;
@@ -939,7 +939,7 @@ static int write_results(SQ_result_set_t *result,
         recursive = atoi(rec);
         UT_free (rec);
 				dieif (  (rec = SQ_get_column_string(result, row, 6)) == NULL );
-        gid = atoi(rec);
+        gid = atol(rec);
         UT_free (rec);
       } /* if grouped == 1 */
 
@@ -984,8 +984,8 @@ static int write_results(SQ_result_set_t *result,
         /* filter out contact info - DEFAULT */
         if (original == 0) 
         {
-					if (((grouped == 1) && ((int) g_hash_table_lookup(*groups, &gid) == 1)) ||
-              ((grouped == 0) && (g_hash_table_size(*groups) > 0))
+					if (((grouped == 1) && (g_hash_table_lookup(groups, gid) != NULL )) ||
+              ((grouped == 0) && (g_hash_table_size(groups) > 0))
 							) {
 						abuse_attr_exists = 1;
 					}
@@ -1107,6 +1107,7 @@ list_has_attr (sk_conn_st *condat,
     int sql_error;
     SQ_row_t *row;
     long gid;
+		*groups = NULL;
 
     /* query database for references from this object to an attribute */
     sql_command = g_string_new("");
@@ -1119,8 +1120,8 @@ list_has_attr (sk_conn_st *condat,
     }
     g_string_free(sql_command, TRUE);
 
-    /* get the rows */
 		*groups = g_hash_table_new(NULL, NULL);
+    /* get the rows */
 
 		while ((row = SQ_row_next(result_ptr)) != NULL ) {
 			if (SQ_get_column_int(result_ptr, row, 0, &gid) != 0) {
@@ -1128,7 +1129,7 @@ list_has_attr (sk_conn_st *condat,
                       __FILE__, __LINE__);
 			}
 			else { // save the gid
-				g_hash_table_insert(*groups, &gid, (int *) 1);
+				g_hash_table_insert(*groups, (void *) gid, (int *) 1);
 			}
 		}
 
@@ -1258,7 +1259,7 @@ qi_write_objects(SQ_connection_t **sql_connection,
 		list_has_attr(condat, *sql_connection, id_table, "abuse_mailbox", &groups);
 
     retrieved_objects = write_results(result, filtered, fast, grouped, original, brief,
-												condat, acc_credit, acl, par_list, &groups);
+												condat, acc_credit, acl, par_list, groups);
 
 		g_hash_table_destroy(groups);
 
@@ -2112,8 +2113,8 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
                         }
                       }
                     }
-                    parent_list = (char *) UT_realloc (parent_list, strlen(parent_list)+66); 
-                    strcat (parent_list, "parent:       ");
+                    parent_list = (char *) UT_realloc (parent_list, strlen(parent_list)+68); 
+                    strcat (parent_list, "parent:         ");
                     strcat (parent_list, range_str);
                     strcat (parent_list, "\n");
                   } else { 
