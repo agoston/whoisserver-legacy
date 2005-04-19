@@ -1,10 +1,10 @@
 
-# CASE 4: TP2-DB-TEST with no flags
-# object does not contain abuse-mailbox attr
+# CASE 4: TP2-DB-TEST with -B flag
+# object containa abuse-mailbox attr
 %
 % requires initial objects to be loaded
 #
-# query person object, check that there is no changed, notify attrs, but e-mail attr is visible
+# query person object, check that that it is original
 #
 #SUCCESS
 #
