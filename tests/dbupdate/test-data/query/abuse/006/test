@@ -1,0 +1,13 @@
+
+# CASE 6: ROLE-DB-TEST with no flags
+# role object contains abuse-mailbox attr
+%
+% requires initial objects to be loaded
+#
+# query role object, check that it contact attrs are filtered out
+#
+#SUCCESS
+#
+# RESULT 6: The query will succeed.
+
+

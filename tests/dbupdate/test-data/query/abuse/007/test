@@ -1,0 +1,13 @@
+
+# CASE 7: TEST-DBM-MNT with no flags
+# role object contains no abuse-mailbox attr
+%
+% requires initial objects to be loaded
+#
+# query mntner object, check that it contact attrs are filtered out
+#
+#SUCCESS
+#
+# RESULT 7: The query will succeed.
+
+
