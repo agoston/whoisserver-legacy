@@ -1,0 +1,12 @@
+
+# CASE 020: -b <iprange>
+%
+% requires initial objects to be loaded
+#
+# check that only inetnum attr is present
+#
+#SUCCESS
+#
+# RESULT 020: The query will succeed.
+
+
