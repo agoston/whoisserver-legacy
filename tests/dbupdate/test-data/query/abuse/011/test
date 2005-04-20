@@ -1,0 +1,13 @@
+
+# CASE 011: inverse query for trouble attr
+# -r query
+%
+% requires initial objects to be loaded
+#
+# query e-mail address, check that error is returned
+#
+#FAILURE
+#
+# RESULT 011: The query will fail.
+
+
