@@ -1,0 +1,12 @@
+
+# CASE 028: -r -i pn tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# grouping used, attrs filtered, no recursion
+#
+#SUCCESS
+#
+# RESULT 028: The query will succeed.
+
+
