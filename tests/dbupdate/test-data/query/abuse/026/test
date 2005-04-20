@@ -1,0 +1,12 @@
+
+# CASE 026: -B -i pn tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# grouping used, attrs original
+#
+#SUCCESS
+#
+# RESULT 026: The query will succeed.
+
+
