@@ -1,0 +1,13 @@
+
+# CASE 014: -b -L <iprange>
+# error test
+%
+% requires initial objects to be loaded
+#
+# check that 'duplicate ip flag passed' error is returned
+#
+#SUCCESS
+#
+# RESULT 014: The query will succeed.
+
+
