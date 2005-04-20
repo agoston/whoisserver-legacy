@@ -1,5 +1,5 @@
 /*
- * $Id: ns_util.c,v 1.1 2004/12/27 16:38:43 can Exp $
+ * $Id: ns_util.c,v 1.1 2004/12/27 17:52:36 can Exp $
  */
 
 #include "ns_util.h"
@@ -442,7 +442,7 @@ gchar **ns_decompose_object(LG_context_t * lg_ctx, RT_context_t * rt_ctx,
     } else {
 
       /* create ranges */
-      ret_val = g_new(gchar *, range_end - range_start + 1);
+      ret_val = g_new(gchar *, range_end - range_start + 2);
       i = 0;
       while (range_start <= range_end) {
         object = rpsl_object_init(object_str);
