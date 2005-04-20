@@ -1,0 +1,12 @@
+
+# CASE 022: -G -i pn tp1-db-test
+%
+% requires initial objects to be loaded
+#
+# check that no grouping is used but contact data filtered
+#
+#SUCCESS
+#
+# RESULT 022: The query will succeed.
+
+
