@@ -3,7 +3,7 @@
 <!-- XXX: will want to add core template in the future, to 
           document which fields are mandatory for core (e.g. nic-hdl) -->
 
-<ripe_classes version="$Revision: 1.1 $" author="$Author: can $">
+<ripe_classes version="$Revision: 1.1.2.2 $" author="$Author: katie $">
 
   <ripe_class name="domain" main_sql_table="domain" code="dn">
     <description>
@@ -207,6 +207,7 @@
       <auth         choice="mandatory" number="multiple" />
       <remarks      choice="optional"  number="multiple" />
       <notify       choice="optional"  number="multiple" />
+      <abuse-mailbox choice="optional" number="multiple" />
       <mnt-by       choice="mandatory" number="multiple" />
       <referral-by  choice="mandatory" number="single"   />
       <changed      choice="mandatory" number="multiple" />
@@ -261,6 +262,7 @@
       <nic-hdl      choice="mandatory" number="single"   />
       <remarks      choice="optional"  number="multiple" />
       <notify       choice="optional"  number="multiple" />
+      <abuse-mailbox choice="optional" number="multiple" />
       <mnt-by       choice="optional"  number="multiple" />
       <changed      choice="mandatory" number="multiple" />
       <source       choice="mandatory" number="single"   />
@@ -305,13 +307,13 @@
       <phone        choice="optional"  number="multiple" />
       <fax-no       choice="optional"  number="multiple" />
       <e-mail       choice="mandatory" number="multiple" />
-      <trouble      choice="optional"  number="multiple" />
       <org          choice="optional"  number="multiple" />
       <admin-c      choice="mandatory" number="multiple" />
       <tech-c       choice="mandatory" number="multiple" />
       <nic-hdl      choice="mandatory" number="single"   />
       <remarks      choice="optional"  number="multiple" />
       <notify       choice="optional"  number="multiple" />
+      <abuse-mailbox choice="optional" number="multiple" />
       <mnt-by       choice="optional"  number="multiple" />
       <changed      choice="mandatory" number="multiple" />
       <source       choice="mandatory" number="single"   />
@@ -359,6 +361,7 @@
       <ref-nfy      choice="optional"  number="multiple" />
       <mnt-ref      choice="mandatory" number="multiple" />
       <notify       choice="optional"  number="multiple" />
+      <abuse-mailbox choice="optional" number="multiple" />
       <mnt-by       choice="mandatory" number="multiple" />
       <changed      choice="mandatory" number="multiple" />
       <source       choice="mandatory" number="single"   />
@@ -891,8 +894,9 @@
       <phone        choice="optional"  number="multiple" />
       <fax-no       choice="optional"  number="multiple" />
       <e-mail       choice="mandatory" number="multiple" />
-      <signature    choice="mandatory" number="multiple" />
-      <encryption   choice="mandatory" number="multiple" />
+      <abuse-mailbox choice="optional" number="multiple" />
+      <signature    choice="optional"  number="multiple" />
+      <encryption   choice="optional"  number="multiple" />
       <org          choice="optional"  number="multiple" />
       <admin-c      choice="mandatory" number="multiple" />
       <tech-c       choice="mandatory" number="multiple" />

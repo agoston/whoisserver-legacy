@@ -1,6 +1,6 @@
 <!DOCTYPE ripe_attributes SYSTEM "attributes.dtd">
 
-<ripe_attributes version="$Revision: 1.1 $" author="$Author: can $">
+<ripe_attributes version="$Revision: 1.1.2.1 $" author="$Author: katie $">
 
   <ripe_attribute name="abuse-mailbox" code="am">
     <description>
@@ -28,8 +28,8 @@
       <queries>
         <sqlquery keytype="wk_email" class="ANY">
           SELECT object_id,0
-          FROM   notify i
-          WHERE  i.notify = '%s'
+          FROM   abuse_mailbox i
+          WHERE  i.abuse_mailbox = '%s'
     AND  i.thread_id = 0
         </sqlquery>
       </queries>

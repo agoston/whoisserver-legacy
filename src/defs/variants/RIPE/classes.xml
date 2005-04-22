@@ -3,7 +3,7 @@
 <!-- XXX: will want to add core template in the future, to 
           document which fields are mandatory for core (e.g. nic-hdl) -->
 
-<ripe_classes version="$Revision: 1.1 $" author="$Author: can $">
+<ripe_classes version="$Revision: 1.1.2.1 $" author="$Author: katie $">
 
   <ripe_class name="domain" main_sql_table="domain" code="dn">
     <description>
@@ -894,6 +894,7 @@
       <phone        choice="optional"  number="multiple" />
       <fax-no       choice="optional"  number="multiple" />
       <e-mail       choice="mandatory" number="multiple" />
+      <abuse-mailbox choice="optional" number="multiple" />
       <signature    choice="optional"  number="multiple" />
       <encryption   choice="optional"  number="multiple" />
       <org          choice="optional"  number="multiple" />
