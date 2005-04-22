@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.1.2.2 $
 
   Query command module (qc).  This is what the whois query gets stored as in
   memory.
@@ -446,6 +446,7 @@ int QC_fill (const char *query_str,
         query_command->x = 0;
         query_command->L = 0;
         query_command->M = 0;
+        query_command->b = 0;
         if (ip_flag_used) ip_flag_duplicated++;
         ip_flag_used = 'c';
         break;
@@ -555,6 +556,7 @@ int QC_fill (const char *query_str,
         query_command->x = 0;
         query_command->L = 0;
         query_command->M = 0;
+        query_command->b = FALSE;
         if (ip_flag_used) ip_flag_duplicated++;
         ip_flag_used = 'l';
       break;
@@ -566,6 +568,7 @@ int QC_fill (const char *query_str,
         query_command->x = 0;
         query_command->L = 0;
         query_command->M = 0;
+        query_command->b = FALSE;
         if (ip_flag_used) ip_flag_duplicated++;
         ip_flag_used = 'm';
       break;
@@ -688,6 +691,7 @@ int QC_fill (const char *query_str,
         query_command->x = 0;
         query_command->L = 1;
         query_command->M = 0;
+        query_command->b = FALSE;
         if (ip_flag_used) ip_flag_duplicated++;
         ip_flag_used = 'L';
       break;
@@ -699,6 +703,7 @@ int QC_fill (const char *query_str,
         query_command->x = 0;
         query_command->L = 0;
         query_command->M = 1;
+        query_command->b = FALSE;
         if (ip_flag_used) ip_flag_duplicated++;
         ip_flag_used = 'M';
       break;
@@ -824,7 +829,29 @@ int QC_fill (const char *query_str,
     }
 
 		/* check uncompatible flags */
-		if ((query_command->b == 1) && (query_command->recursive == 0)) {
+		if ((query_command->b == 1) && (query_command->filtered == 1)) {
+			/* -b -K is error, we need person/role/organisation objects */
+      /* WARNING:903 */
+        char *fmt = ca_get_qc_fmt_uncompflag;
+        query_command->parse_messages = 
+            g_list_append(query_command->parse_messages, 
+                          g_strdup_printf(fmt,"-b","-K"));
+
+				UT_free(fmt);
+				badparerr++;
+		}
+		else if ((query_command->b == 1) && (query_command->fast == 1)) {
+			/* -b -F is error, we need person/role/organisation objects */
+      /* WARNING:903 */
+        char *fmt = ca_get_qc_fmt_uncompflag;
+        query_command->parse_messages = 
+            g_list_append(query_command->parse_messages, 
+                          g_strdup_printf(fmt,"-b","-F"));
+
+				UT_free(fmt);
+				badparerr++;
+		}
+		else if ((query_command->b == 1) && (query_command->recursive == 0)) {
 			/* -b -r is error, we need person/role/organisation objects */
       /* WARNING:903 */
         char *fmt = ca_get_qc_fmt_uncompflag;
@@ -843,6 +870,17 @@ int QC_fill (const char *query_str,
         query_command->parse_messages = 
             g_list_append(query_command->parse_messages, 
                           g_strdup_printf(fmt,"-b","-G"));
+				UT_free(fmt);
+				badparerr++;
+		}
+
+		if ((query_command->b == 1) && (query_command->B == 1)) {
+			/* -b -B is error: can't be brief and original */
+      /* WARNING:903 */
+        char *fmt = ca_get_qc_fmt_uncompflag;
+        query_command->parse_messages = 
+            g_list_append(query_command->parse_messages, 
+                          g_strdup_printf(fmt,"-b","-B"));
 				UT_free(fmt);
 				badparerr++;
 		}

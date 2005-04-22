@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5.2.2 $
+  $Revision: 1.5.2.3 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -699,6 +699,7 @@ char *brief_filter (const char *str) {
   g_strfreev(lines);
   result = UT_strdup(result_buff->str);
   g_string_free(result_buff, TRUE);
+
   return result;
 }
 
@@ -953,10 +954,10 @@ static int write_results(SQ_result_set_t *result,
       /* decrement credit for accounting purposes */
       AC_count_object( acc_credit, acl, 
 		       type == C_PN || type == C_RO || type == C_MT || type == C_OA); /* is private? */
-            /* person, role, mntner and organisation objects are counted as private objects */
-            /* We don't count IRT objects as private as we want users to see them always    */
-      /* break the loop if the credit has just been exceeded and 
-	 further results denied */
+						/* person, role, mntner and organisation objects are counted as private objects */
+						/* We don't count IRT objects as private as we want users to see them always    */
+						/* break the loop if the credit has just been exceeded and 
+						further results denied */
       if( AC_credit_isdenied( acc_credit ) ) {
 				continue; 
       } /* if credit_isdenied */
@@ -973,7 +974,7 @@ static int write_results(SQ_result_set_t *result,
         UT_free(id);
         UT_free(objt);
 
-				/* brief output */
+				/* brief output - for inetnum, inet6num, irt, person, role */
 				if (brief == 1)
 				{
 					cont_filter = brief_filter(str);
@@ -1255,13 +1256,17 @@ qi_write_objects(SQ_connection_t **sql_connection,
   
   if( condat->rtc == 0) {
 
-		/* check the abuse_mailbox attributes */
-		list_has_attr(condat, *sql_connection, id_table, "abuse_mailbox", &groups);
+		if (original == 0)	{
+			/* check the abuse_mailbox attributes */
+			list_has_attr(condat, *sql_connection, id_table, "abuse_mailbox", &groups);
+		}
 
     retrieved_objects = write_results(result, filtered, fast, grouped, original, brief,
 												condat, acc_credit, acl, par_list, groups);
 
-		g_hash_table_destroy(groups);
+		if (groups != NULL) {
+			g_hash_table_destroy(groups);
+		}
 
     SQ_free_result(result); 
   }
