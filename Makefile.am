@@ -266,30 +266,30 @@ EXTRA_DIST = README \
              src/history/dbsupport.h \
              src/history/miniconf.h
 
-MOSTLYCLEANFILES = ./src/modules/rpsl/*.o \
-		   ./src/modules/rpsl/*.lex.c \
-		   ./src/modules/rpsl/*.tab.c \
-		   ./src/modules/rpsl/syntax \
-		   ./conf/sample.db.gz \
-		   ./src/defs/*.class \
-		   ./src/defs/Makefile.syntax \
-		   ./src/defs/attribute_tab.h \
-		   ./src/defs/syntax_tab.h \
-		   ./src/defs/class_tab.h \
-		   ./src/defs/alltodo \
-		   ./src/include/*.def \
-		   ./src/librpsl.a
+#MOSTLYCLEANFILES = ./src/modules/rpsl/*.o \
+#		   ./src/modules/rpsl/*.lex.c \
+#		   ./src/modules/rpsl/*.tab.c \
+#		   ./src/modules/rpsl/syntax \
+#		   ./conf/sample.db.gz \
+#		   ./src/defs/*.class \
+#		   ./src/defs/Makefile.syntax \
+#		   ./src/defs/attribute_tab.h \
+#		   ./src/defs/syntax_tab.h \
+#		   ./src/defs/class_tab.h \
+#		   ./src/defs/alltodo \
+#		   ./src/include/*.def \
+#		   ./src/librpsl.a
 
-DISTCLEANFILES = ./src/modules/rpsl/*.y \
-                 ./src/modules/rpsl/*.l \
-                 ./src/modules/rpsl/attribute.c \
-                 ./src/modules/rpsl/class.c \
-                 ./src/modules/rpsl/rpsl_test.c \
-                 ./src/modules/rpsl/syntax.c \
-                 ./src/modules/rpsl/test_syntax.c \
-                 ./src/defs/attributes.xml \
-                 ./src/defs/classes.xml \
-                 ./src/defs/syntax.xml
+#DISTCLEANFILES = ./src/modules/rpsl/*.y \
+#                 ./src/modules/rpsl/*.l \
+#                 ./src/modules/rpsl/attribute.c \
+#                 ./src/modules/rpsl/class.c \
+#                 ./src/modules/rpsl/rpsl_test.c \
+#                 ./src/modules/rpsl/syntax.c \
+#                 ./src/modules/rpsl/test_syntax.c \
+#                 ./src/defs/attributes.xml \
+#                 ./src/defs/classes.xml \
+#                 ./src/defs/syntax.xml
 
 install-exec-hook:
 	${mkinstalldirs} $(DESTDIR)${topdir} ${DESTDIR}${bindir} \
