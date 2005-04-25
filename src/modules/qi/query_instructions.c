@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5.2.4 $
+  $Revision: 1.5.2.5 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -1007,7 +1007,7 @@ static int write_results(SQ_result_set_t *result,
         if (filtered == 0) {
           if ((grouped == 1) && (recursive == 0))  {
             char banner[STR_XL];
-						char fmt_banner = ca_get_qi_fmt_group_banner;
+						char *fmt_banner = ca_get_qi_fmt_group_banner;
             sprintf (banner, fmt_banner, pkey);
             SK_cd_puts(condat, banner);
             SK_cd_puts(condat, "\n\n");
