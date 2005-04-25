@@ -43,8 +43,7 @@ AC_ARG_WITH(rpslvariant,
       OPWD=`pwd`
       cd $ac_abs_builddir/src/defs
       for file in $ac_abs_srcdir/src/defs/variants/$rpslvariant/*.xml \
-                  $ac_abs_srcdir/src/defs/variants/$rpslvariant/*.h \
-                  $ac_abs_srcdir/src/defs/*.dtd
+                  $ac_abs_srcdir/src/defs/variants/$rpslvariant/*.h
       do
         if test -f $file
         then
