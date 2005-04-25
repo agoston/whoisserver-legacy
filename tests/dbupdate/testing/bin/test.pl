@@ -37,7 +37,6 @@ use strict;
 use POSIX qw(strftime);
 use Getopt::Long;
 
-use RipeWhois;
 use IPC::Open3;
 use IO::Select;
 use IO::Socket;
@@ -897,17 +896,34 @@ my $found = { };
       $run =~ s/^(.*?)[\s]+(.*?),[\s]*(.*?)$/$1 $2/i;
       $run = " -G -B -r -x -T ".$run;
 
-      # run query and get objects from WHOIS
-      my $whois = new RipeWhois ( 'Host' => getvar('WHOIS_HOST'), 
-                                  'Port' => getvar('SVWHOIS_PORT'), 
-                                  'FormatMode' => 0 );
-      if (! $whois) {
-        error ('E_WHOIS');
-      }
-      my @objs = $whois->QueryObjects($run);
+			my $whois = IO::Socket::INET->new(getvar('WHOIS_HOST').":".getvar('SVWHOIS_PORT'))
+			    or error ('E_WHOIS', 'whois', $!);
+	 	  $whois->print($run, "\n");
 
-      #open (WHOIS, getvar('WHOIS')." ". getvar('WHOIS_FLAGS'). " $run 2>&1 |")
-      #  or error('E_FOPEN', "whois: $run", $!);
+			#print STDERR "DEBUG: query [$run]\n";
+
+			my @received_lines;
+						
+		  my $line;
+		  do {
+		     $line = <$whois>;
+		     push @received_lines, $line if ($line);
+		  } while ($line);
+
+			my @objs;
+			my $object;
+			foreach my $line (@received_lines) {
+				if ($line =~ /^$/o) {
+					if ($object && ($object !~ /^$/o)) {
+						chomp $object;
+						push @objs, $object;
+					}
+					$object = "";
+				}
+				elsif ($line !~ /^%/o) {
+					$object .= $line;
+				}
+			}
 
       gather_objects_whois(\@objs, $found) if (@objs);
 
