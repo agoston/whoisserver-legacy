@@ -2,7 +2,7 @@
 #define READ_QUERY_INSTRUCTIONS
 
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.2.2.2 $
 
   Query instruction module (qi)
   config module.
@@ -115,10 +115,6 @@ Ie. Try using a LEFT JOIN to do the "NOT IN"/ "MINUS" equivalent.
 #endif 
 
 #define MAX_INSTRUCTIONS 100
-
-#define DEFAULT_GROUP_BANNER "%% Information related to '%s'"
-
-#define DEFAULT_FILTER_BANNER "% Note: this output has been filtered."
 
 #define LIST_HAS_ATTR "SELECT DISTINCT gid FROM %s IDS,%s REF WHERE IDS.id=REF.object_id"
 

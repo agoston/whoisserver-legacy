@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5.2.3 $
+  $Revision: 1.5.2.4 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -928,7 +928,8 @@ static int write_results(SQ_result_set_t *result,
 
     	if ((original == 0) && (retrieved_objects == 0)) { 
 				/* this is DEFAULT */
-    		SK_cd_puts(condat, DEFAULT_FILTER_BANNER);
+				char *banner = ca_get_qi_filter_banner;
+    		SK_cd_puts(condat, banner);
       	SK_cd_puts(condat, "\n\n");  
     	}
 
@@ -1006,7 +1007,8 @@ static int write_results(SQ_result_set_t *result,
         if (filtered == 0) {
           if ((grouped == 1) && (recursive == 0))  {
             char banner[STR_XL];
-            sprintf (banner, DEFAULT_GROUP_BANNER, pkey);
+						char fmt_banner = ca_get_qi_fmt_group_banner;
+            sprintf (banner, fmt_banner, pkey);
             SK_cd_puts(condat, banner);
             SK_cd_puts(condat, "\n\n");
             UT_free(pkey);
