@@ -62,6 +62,7 @@ DROP TABLE IF EXISTS transaction_rec;
 DROP TABLE IF EXISTS dummy_rec;
 DROP TABLE IF EXISTS tid;
 DROP TABLE IF EXISTS x509;
+DROP TABLE IF EXISTS abuse_mailbox;
 
 
 
@@ -851,6 +852,17 @@ CREATE TABLE org (
   PRIMARY KEY  (org_id,object_id)
 );
 
+#
+# Table structure for table 'abuse_mailbox'
+#
+
+CREATE TABLE abuse_mailbox (
+	thread_id int(11) NOT NULL default '0',
+	object_id int(10) unsigned NOT NULL default '0',
+	abuse_mailbox varchar(80) NOT NULL default '',
+	object_type tinyint(3) unsigned NOT NULL default '0',
+	PRIMARY KEY  (abuse_mailbox,object_id)
+);
 
 # make some indexes
 
