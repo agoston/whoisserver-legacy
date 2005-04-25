@@ -394,14 +394,14 @@ QC_FMT_DUPIPFLAG %% Only "-%s" will be used for this query.
 
 QC_USELESSIPFLAG %WARNING:902: useless IP flag passed
 QC_USELESSIPFLAG %
-QC_USELESSIPFLAG % An IP flag (-l, -L, -m, -M, -x, or -c) used without an IP key.
+QC_USELESSIPFLAG % An IP flag (-l, -L, -m, -M, -x, -b, or -c) used without an IP key.
 
 #
 # Uncompatible flags
 
 QC_FMT_UNCOMPFLAG %%ERROR:206: invalid combination of flags passed
 QC_FMT_UNCOMPFLAG %%
-QC_FMT_UNCOMPFLAG %% The key "%s" cannot be used together with "%s".
+QC_FMT_UNCOMPFLAG %% The flags "%s" and "%s" cannot be used together.
 
 #
 # Useless no-referral flag
@@ -477,6 +477,16 @@ QI_FMT_REFHEADER %%REFERRAL START
 # Referral trailer 
 
 QI_REFTRAILER %%REFERRAL END
+
+#
+# Banner for grouping (by default)
+
+QI_FMT_GROUP_BANNER %% Information related to '%s'
+
+#
+# Banner for filtering (by default)
+
+QI_FILTER_BANNER % Note: this output has been filtered.
 
 
 
