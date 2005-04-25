@@ -814,7 +814,7 @@ char *yytext;
   notes:
     Tokens are defined in the associated grammar, mp_default.y.
 
-  $Id: mp_default.l,v 1.2 2004/12/10 16:37:37 can Exp $
+  $Id: mp_default.l,v 1.1 2004/12/27 17:52:39 can Exp $
 */
 
 #line 42 "mp_default.l"

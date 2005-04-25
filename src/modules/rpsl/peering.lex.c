@@ -477,7 +477,7 @@ char *yytext;
   notes:
     Tokens are defined in the associated grammar, peering.y.
 
-  $Id: peering.l,v 1.3 2002/01/30 13:34:21 shane Exp $
+  $Id: peering.l,v 1.1 2004/12/27 17:52:40 can Exp $
 */
 #line 33 "peering.l"
 #include <string.h>

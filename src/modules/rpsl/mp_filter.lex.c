@@ -791,7 +791,7 @@ char *yytext;
   notes:
     Tokens are defined in the associated grammar, mp_filter.y.
 
-  $Id: mp_filter.l,v 1.2 2004/12/10 16:37:39 can Exp $
+  $Id: mp_filter.l,v 1.1 2004/12/27 17:52:39 can Exp $
 */
 /******************
   Copyright (c)                                         RIPE NCC

@@ -787,7 +787,7 @@ char *yytext;
   notes:
     Tokens are defined in the associated grammar, mp_import.y.
 
-  $Id: mp_import.l,v 1.2 2004/12/10 16:37:40 can Exp $
+  $Id: mp_import.l,v 1.1 2004/12/27 17:52:39 can Exp $
 */
 #line 42 "mp_import.l"
 #include <string.h>
