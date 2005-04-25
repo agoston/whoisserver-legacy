@@ -266,16 +266,12 @@ EXTRA_DIST = README \
              src/history/dbsupport.h \
              src/history/miniconf.h
 
-MOSTLYCLEANFILES = ./src/modules/rpsl/*.l \
-		   ./src/modules/rpsl/*.y \
-		   ./src/modules/rpsl/*.h \
-		   ./src/modules/rpsl/*.o \
+MOSTLYCLEANFILES = ./src/modules/rpsl/*.o \
 		   ./src/modules/rpsl/*.lex.c \
 		   ./src/modules/rpsl/*.tab.c \
 		   ./src/modules/rpsl/syntax \
 		   ./conf/sample.db.gz \
 		   ./src/defs/*.class \
-		   ./src/defs/*.xml \
 		   ./src/defs/Makefile.syntax \
 		   ./src/defs/attribute_tab.h \
 		   ./src/defs/syntax_tab.h \
