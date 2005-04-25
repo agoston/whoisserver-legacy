@@ -173,7 +173,7 @@ struct rpsl_template {
 };
 
 /* default column to start data on */
-#define RPSL_STD_COLUMN 14
+#define RPSL_STD_COLUMN 16
 
 /* Allow C++ code to link */
 #ifdef __cplusplus
