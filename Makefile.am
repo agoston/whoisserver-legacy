@@ -287,7 +287,6 @@ DISTCLEANFILES = ./src/modules/rpsl/*.y \
                  ./src/modules/rpsl/class.c \
                  ./src/modules/rpsl/rpsl_test.c \
                  ./src/modules/rpsl/syntax.c \
-                 ./src/modules/rpsl/syntax_api.c \
                  ./src/modules/rpsl/test_syntax.c \
                  ./src/include/*.h \
                  ./src/defs/attributes.xml \
