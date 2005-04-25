@@ -281,7 +281,6 @@ MOSTLYCLEANFILES = ./src/modules/rpsl/*.o \
 		   ./src/librpsl.a
 
 DISTCLEANFILES = ./src/modules/rpsl/*.y \
-                 ./src/modules/rpsl/*.h \
                  ./src/modules/rpsl/*.l \
                  ./src/modules/rpsl/attribute.c \
                  ./src/modules/rpsl/class.c \
