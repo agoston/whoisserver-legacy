@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5.2.6 $
+  $Revision: 1.5.2.7 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -642,11 +642,11 @@ char *QI_fast_output(const char *str)
 /*++++++++++++++++++++++++++++++++++++++
 
   This is for -b query flag. Assumes objects are grouped (to have recursive results by relevance).
-	No object separators (in the group).
-	The code is basically inverted contact_attr_filter().
-	Merging those two functions makes them unreadable, hence a separate function.
+  No object separators (in the group).
+  The code is basically inverted contact_attr_filter().
+  Merging those two functions makes them unreadable, hence a separate function.
 
-  const char *str  						- object to be filtered
+  const char *str  - object to be filtered
 
 */
 char *brief_filter (const char *str) {
@@ -660,19 +660,19 @@ char *brief_filter (const char *str) {
   gboolean filtering_an_attribute = FALSE;
   gboolean filtered = FALSE;
   GString *result_buff = g_string_sized_new(STR_XL);
-  gchar **lines = ut_g_strsplit_v1(str, "\n", 0);
+  gchar **lines = g_strsplit(str, "\n", 0);
 
   g_string_assign(result_buff, "");
 
-	for (j=0; lines[j] != NULL; j++) {
-		for (i=0; i < sizeof(attr_list)/sizeof(char *); i++ ) {
+  for (j=0; lines[j] != NULL; j++) {
+  for (i=0; i < sizeof(attr_list)/sizeof(char *); i++ ) {
       int attr_name_len = strlen(attr_list[i]);
-			if ((strncmp(attr_list[i], lines[j], attr_name_len) == 0) &&
-				(lines[j][attr_name_len] == ':'))
-			{
-				filtering_an_attribute = TRUE;
+      if ((strncmp(attr_list[i], lines[j], attr_name_len) == 0) &&
+          (lines[j][attr_name_len] == ':'))
+      {
+        filtering_an_attribute = TRUE;
         filtered = TRUE;
-				g_string_sprintfa(result_buff, "%s\n", lines[j]);
+        g_string_sprintfa(result_buff, "%s\n", lines[j]);
         break;
       }
     }
@@ -681,16 +681,16 @@ char *brief_filter (const char *str) {
       continue; // go to next line 
     }
     if (filtering_an_attribute == TRUE) {
-			switch (lines[j][0]) {
-				case ' ':
-				case '\t':
-				case '+':
-					g_string_sprintfa(result_buff, "%s\n", lines[j]);
-					break;
+      switch (lines[j][0]) {
+        case ' ':
+        case '\t':
+        case '+':
+          g_string_sprintfa(result_buff, "%s\n", lines[j]);
+        break;
 
-				default:
+        default:
           filtering_an_attribute = FALSE;
-			}
+      }
     } else {
       filtering_an_attribute = FALSE;
     }
@@ -713,7 +713,7 @@ char *brief_filter (const char *str) {
   from the object.
 
   const char *str  - object to be filtered
-	unsigned abuse_attr_exists - is there abuse-mailbox attr (in the group or in the list)
+  unsigned abuse_attr_exists - is there abuse-mailbox attr (in the group or in the list)
 
 */
 char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
@@ -735,13 +735,13 @@ char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
     start = 0;
   }
 
-	for (j=0; lines[j] != NULL; j++) {
-		for (i=start; i < sizeof(attr_list)/sizeof(char *); i++ ) {
+  for (j=0; lines[j] != NULL; j++) {
+    for (i=start; i < sizeof(attr_list)/sizeof(char *); i++ ) {
       int attr_name_len = strlen(attr_list[i]);
-			if ((strncmp(attr_list[i], lines[j], attr_name_len) == 0) &&
-				(lines[j][attr_name_len] == ':'))
-			{
-				filtering_an_attribute = TRUE;
+      if ((strncmp(attr_list[i], lines[j], attr_name_len) == 0) &&
+          (lines[j][attr_name_len] == ':'))
+      {
+        filtering_an_attribute = TRUE;
         filtered = TRUE;
         break;
       }
@@ -751,17 +751,17 @@ char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
       continue; // go to next line 
     }
     if (filtering_an_attribute == TRUE) {
-			switch (lines[j][0]) {
-				case ' ':
-				case '\t':
-				case '+':
+      switch (lines[j][0]) {
+        case ' ':
+        case '\t':
+        case '+':
           { /* do nothing */ }
-					break;
+          break;
 
-				default:
-					g_string_sprintfa(result_buff, "%s\n", lines[j]);  
+        default:
+          g_string_sprintfa(result_buff, "%s\n", lines[j]);  
           filtering_an_attribute = FALSE;
-			}
+     }
     } else {
       g_string_sprintfa(result_buff, "%s\n", lines[j]);
       filtering_an_attribute = FALSE;
