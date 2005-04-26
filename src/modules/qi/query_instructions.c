@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5.2.7 $
+  $Revision: 1.5.2.8 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -727,7 +727,7 @@ char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
   gboolean filtering_an_attribute = FALSE;
   gboolean filtered = FALSE;
   GString *result_buff = g_string_sized_new(STR_XL);
-  gchar **lines = ut_g_strsplit_v1(str, "\n", 0);
+  gchar **lines = g_strsplit(str, "\n", 0);
 
   g_string_assign(result_buff, "");
 
