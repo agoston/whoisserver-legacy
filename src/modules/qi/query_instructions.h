@@ -2,7 +2,7 @@
 #define READ_QUERY_INSTRUCTIONS
 
 /***************************************
-  $Revision: 1.2.2.2 $
+  $Revision: 1.2.2.3 $
 
   Query instruction module (qi)
   config module.
@@ -51,9 +51,9 @@
 #define QI_SQLERR   2
 
 typedef struct {
-  sql_key_t object_id;    // the key to a full-text record in SQL
-  char *    parent_list;  // formatted list of parent ranges; 
-                          // please free after use
+  sql_key_t object_id;    /* the key to a full-text record in SQL */
+  char *    parent_list;  /* formatted list of parent ranges; */
+                          /* please free after use */
 } id_parent_t;
 
 /*
@@ -95,7 +95,8 @@ Ie. Try using a LEFT JOIN to do the "NOT IN"/ "MINUS" equivalent.
 */
 
 /* RIPE 6 */
-//#define Q_OBJECTS     "SELECT last.object_id, last.sequence_id, last.object ,last.object_type FROM  %s IDS STRAIGHT_JOIN last,object_order WHERE last.object_id=IDS.id AND last.object_type != 100 AND last.object_type = object_order.object_type ORDER BY recursive, order_code" 
+/*#define Q_OBJECTS     "SELECT last.object_id, last.sequence_id, last.object ,last.object_type FROM  %s IDS STRAIGHT_JOIN last,object_order WHERE last.object_id=IDS.id AND last.object_type != 100 AND last.object_type = object_order.object_type ORDER BY recursive, order_code" 
+ */
 
 #define Q_OBJECTS "SELECT last.object_id, last.sequence_id, last.object, last.object_type, last.pkey, recursive, gid FROM %s IDS, last, last glast, object_order, object_order gorder WHERE (IDS.gid=glast.object_id AND glast.object_type=gorder.object_type AND glast.object_type != 100) AND (IDS.id=last.object_id AND last.object_type=object_order.object_type AND last.object_type != 100) ORDER BY %s recursive, object_order.order_code" 
 

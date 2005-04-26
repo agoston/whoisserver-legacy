@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5.2.8 $
+  $Revision: 1.5.2.9 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -678,7 +678,7 @@ char *brief_filter (const char *str) {
     }
     if (filtered == TRUE) {
       filtered = FALSE;
-      continue; // go to next line 
+      continue; /* go to next line */
     }
     if (filtering_an_attribute == TRUE) {
       switch (lines[j][0]) {
@@ -748,7 +748,7 @@ char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
     }
     if (filtered == TRUE) {
       filtered = FALSE;
-      continue; // go to next line 
+      continue; /* go to next line */
     }
     if (filtering_an_attribute == TRUE) {
       switch (lines[j][0]) {
@@ -1037,7 +1037,7 @@ static int write_results(SQ_result_set_t *result,
       UT_free(str);
     } /* while */
     if (filtered == 0 && brief == 1 && retrieved_objects > 0) {
-      SK_cd_puts(condat, "\n"); // ending \n for brief output
+      SK_cd_puts(condat, "\n"); /* ending \n for brief output */
     }
   } /* if (result != NULL) */
   
@@ -1133,7 +1133,7 @@ list_has_attr (sk_conn_st *condat,
               LG_log(sql_context, LG_ERROR, "bad column at %s:%d",
                       __FILE__, __LINE__);
       }
-      else { // save the gid
+      else { /* save the gid */
         g_hash_table_insert(*groups, (void *) gid, (int *) 1);
       }
     }
