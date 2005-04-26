@@ -37,7 +37,10 @@ use strict;
 use POSIX qw(strftime);
 use Getopt::Long;
 
-use RipeWhois;
+use IPC::Open3;
+use IO::Select;
+use IO::Socket;
+use IO::Handle;
 
 # global configuration
 our $CONFIG = { };
@@ -294,11 +297,12 @@ foreach (@fp_as_array)	{
 	$filter_pattern{$_} = "";
 }
 $filter_pattern{'whois'} = "";
+$filter_pattern{'query'} = "";
 
 # filter attr
 $filter_pattern{"filter"} = "";
 
-my %object_pattern = ('object','','body','','whois','','lines','');
+my %object_pattern = ('object','','body','','whois','','lines','','query','');
 my $data = [ ];
 
   # die if filter file not found - fatal for global file
@@ -462,6 +466,17 @@ my %ident = (
   my $string = <LOGFILE>;
   while ( defined $string )  {
       $curpos = tell(LOGFILE);
+			my $path = getvar('CURRENT_DIR');
+#print STDERR "DEBUG: logfile is [$logfile]\n";
+#print STDERR "DEBUG: path is [$path]\n";
+#print STDERR "DEBUG: string is [$string]\n";
+
+			if ($string =~ /$path/i) {
+			# skip the string with 'test stamp'
+				$oldpos = $curpos;
+      	$string = <LOGFILE>;
+				next;
+			}
 
        if ($string !~ /@{$patterns{$pat}}[0]/) {
          # skip   
@@ -696,7 +711,11 @@ my $logstring = getvar('LOGSTRING');
       # read the file into $lines
       open (LOGFILE, "< $logfile")
         or error('E_FOPEN', $logfile, $!);
-      @{$lines} = <LOGFILE>;
+			$lines = [ ];
+			my $path = getvar('CURRENT_DIR');
+			foreach my $string (<LOGFILE>) {
+				push @{$lines}, $string unless ($string =~ /$path/);
+			}
     }
     else {
       $lines = [ ] if (! find_output($entry, $logfile, $lines));
@@ -755,15 +774,20 @@ my $FILE = $_[0];
 my $list = $_[1];
 
   while (<$FILE>)  {
+#	  print STDERR "string [$_]\n";
     my $string = $_;
     if ($string =~ /^[a-z-]+/oi)  {
       my $object = "";
-      while ($string && ($string =~ /^[a-z0-9-]+/oi) ) {
-        # enter object parsing mode
-        $string =~ /^(.*?):[\s]*(.*?)[\s]*$/i;
-        $object = $object.$1.":".$2."\n";
+      #while ($string && ($string =~ /^[a-z0-9-]+/oi) ) {
+      while ($string && ($string !~ /^$/oi) ) {
+#				print STDERR "string [$string]\n";
+        #enter object parsing mode
+        #$string =~ /^(.*?):[\s]*(.*?)[\s]*$/i;
+        #$object = $object.$1.":".$2."\n";
+        $object = $object.$string;
         $string = <$FILE>;
       }
+#print STDERR "OBJECT [$object]\n";
       # object in $object;
       my $tmp = $object;
       my $name;
@@ -779,6 +803,8 @@ my $list = $_[1];
       elsif ($object =~ /^(.+?):(.+?)[\n]/iom ) {
         $name = $1." ".$2;
       }
+      $name =~ s/[\s]+/ /;
+#print STDERR "NAME [$name]\n";
       $list->{$name} = $tmp;
     } 
   }
@@ -805,6 +831,7 @@ sub gather_objects_whois($$) {
      $name = $1." ".$2;
    } 
 #print STDERR "\nname  [$name]\n\n";
+#print STDERR "\nobject  [$tmp]\n\n";
    $list->{$name} = $tmp;
  }
  return(1);
@@ -867,19 +894,36 @@ my $found = { };
       # take the object's first key as the search key
       my $run = $obj;
       $run =~ s/^(.*?)[\s]+(.*?),[\s]*(.*?)$/$1 $2/i;
-      $run = " -r -x -T ".$run;
+      $run = " -G -B -r -x -T ".$run;
 
-      # run query and get objects from WHOIS
-      my $whois = new RipeWhois ( 'Host' => getvar('WHOIS_HOST'), 
-                                  'Port' => getvar('WHOIS_PORT'), 
-                                  'FormatMode' => 0 );
-      if (! $whois) {
-        error ('E_WHOIS');
-      }
-      my @objs = $whois->QueryObjects($run);
+			my $whois = IO::Socket::INET->new(getvar('WHOIS_HOST').":".getvar('SVWHOIS_PORT'))
+			    or error ('E_WHOIS', 'whois', $!);
+	 	  $whois->print($run, "\n");
 
-      #open (WHOIS, getvar('WHOIS')." ". getvar('WHOIS_FLAGS'). " $run 2>&1 |")
-      #  or error('E_FOPEN', "whois: $run", $!);
+			#print STDERR "DEBUG: query [$run]\n";
+
+			my @received_lines;
+						
+		  my $line;
+		  do {
+		     $line = <$whois>;
+		     push @received_lines, $line if ($line);
+		  } while ($line);
+
+			my @objs;
+			my $object;
+			foreach my $line (@received_lines) {
+				if ($line =~ /^$/o) {
+					if ($object && ($object !~ /^$/o)) {
+						chomp $object;
+						push @objs, $object;
+					}
+					$object = "";
+				}
+				elsif ($line !~ /^%/o) {
+					$object .= $line;
+				}
+			}
 
       gather_objects_whois(\@objs, $found) if (@objs);
 
@@ -893,26 +937,44 @@ my $found = { };
         if (exists $expected->{$obj})	{
           # add the date if it is not there
           unless ($expected->{$obj} =~ /changed:(.*?)[\s]+[\d]+[\s]*/) {
-            $expected->{$obj} =~ s/changed:(.*?)[\n]/changed:$1 $date\n/iosm;
+            $expected->{$obj} =~ s/changed:      (.*?)[\n]/changed:$1 $date\n/iosm;
           }
         }
       }
       elsif	($query =~ /DATE_OFF/io)	{
-        # filter dates out in found object
+        # filter dates out in found object & expected object
         if (exists $found->{$obj})	{
           $found->{$obj} =~ s/changed:(.*?)[\s]+([0-9]*)[\s]*[\n]/changed:$1\n/iosm;
+          $expected->{$obj} =~ s/changed:(.*?)[\s]+([0-9]*)[\s]*[\n]/changed:$1\n/iosm;
         }
       }
+
+			if ($query !~ /EXACT/io) {
+				# if no exact matching, cut out the spaces between attribute and value
+				if (exists $expected->{$obj}) {
+					$expected->{$obj} =~ s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/mg;
+				}
+				if (exists $found->{$obj}) {
+        	$found->{$obj} =~ s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/mg;
+      	}
+			}
       
       # match expected objects with found ones
-      if ( exists $found->{$obj} ) {
-        $found->{$obj} =~ s/:\s*/:/g;
-      }
-      my $expected_tmp = $expected->{$obj};
-      $expected_tmp =~ s/\n$//s;
-#print STDERR "\nfound\n\n[$found->{$obj}]\n\n";
-#print STDERR "\nfexpected\n\n[$expected_tmp]\n\n";
-      if ( (!is_negative($tmp)) && (exists ($found->{$obj})) && ($expected_tmp eq $found->{$obj}) ) {
+      #if ( exists $found->{$obj} ) {
+      #  $found->{$obj} =~ s/:\s*/:/g;
+      #}
+
+			my $expected_tmp;
+			if (exists $expected->{$obj}) {
+      	$expected_tmp = $expected->{$obj};
+      	$expected_tmp =~ s/\n$//s;
+			}
+#$found->{$obj} =~ s/\n/]\n/gm;
+#$expected_tmp =~ s/\n/]\n/gm;
+#print STDERR "\nfound\n\n[$found->{$obj}] with name [$obj]\n\n";
+#print STDERR "\nexpected\n\n[$expected_tmp]\n\n";
+
+      if ( (!is_negative($tmp)) && (exists ($found->{$obj})) && $expected_tmp && ($expected_tmp eq $found->{$obj}) ) {
          #OK;
       }
       elsif ( is_negative($tmp) && !exists $found->{$obj}) {
@@ -921,9 +983,120 @@ my $found = { };
       else {
          # FAILURE
          push @{$entry->{"whoisdiag"}}, $tmp;
+				 if ($expected_tmp && exists $found->{$obj}) {
+					my @lines_found = split ("\n", $found->{$obj});
+					my @lines_expected = split ("\n", $expected_tmp);
+					my $c = 0;
+
+ 			    foreach my $line (@lines_expected) {
+      		if ($line ne $lines_found[$c]) {
+						push @{$entry->{"whoisdiag"}}, "In line $c:\n";
+						push @{$entry->{"whoisdiag"}}, "expected [$line]\nfound    [$lines_found[$c]]\n";
+		      }
+    		  $c++;
+			    }
+				 }
+				 if (!$expected_tmp && !is_negative($tmp)) {
+					  push @{$entry->{"whoisdiag"}}, "no defined object for [$obj]\n";
+				 }
+				 if (!exists $found->{$obj} && !is_negative($tmp)) {
+					  push @{$entry->{"whoisdiag"}}, "no whois object for [$obj]\n";
+				 }
       }
     }
   }
+  return(1);
+}
+
+##############################
+# Function: match_query()
+# Descr: take whois query and match output with query file
+#				note: this can be done only once!
+# Input:
+#       $objects   reference to the hash containing object hashes, 
+#                  in the form attr=>value
+#       $filters   reference to the hash containing filters hashes,
+#                  in the form attr=>value
+#           
+# Return: nothing or die if I/O error or syntax error
+# Output: nothing
+# Remarks: modifies the objects to put diagnostics in, if error occured.
+sub match_query($$)	{
+my $objects = $_[0];
+my $filters = $_[1];
+my $query;
+my @expected_lines;
+my @received_lines;
+my $objectfile = getvar('CURRENT_DIR')."/".getvar('QUERY_FILE');
+my $object;
+
+	# in fact, we will match only one query from object 'all' against one file.
+  foreach my $entry (@{$objects}) {
+		if ($entry->{"object"} =~ /all/io) {
+    	my $queries = $entry->{"query"};
+			foreach my $t (@{$queries}) {
+				$query = $t;
+				$object = $entry;
+				last;
+			}
+		}
+	}
+
+  if (!$query) {
+		return(1);
+  }
+
+	if ($query !~ /^!/io) {
+		# require query file
+		open (QUERY_FILE, "< $objectfile")
+          or error ('E_FOPEN', $objectfile, $!);
+		@expected_lines = <QUERY_FILE>;
+		 close (QUERY_FILE)
+          or error ('E_FCLOSE', $objectfile, $!);
+
+	}
+
+  my $query_orig = $query;
+	$query =~ s/^[\s]*EXACT[\s]+//i;
+
+	my $whois = IO::Socket::INET->new(getvar('WHOIS_HOST').":".getvar('SVWHOIS_PORT')) 
+		or error ('E_WHOIS', 'whois', $!);
+	$whois->print($query, "\n");
+
+#print STDERR "DEBUG: query [$query]\n";
+
+	my $line;
+	do {
+			  $line = <$whois>;
+				push @received_lines, $line if ($line);
+  } while ($line);
+
+  if ($query_orig !~ /EXACT/io) {
+     # if no exact matching, cut out the spaces between attribute and value
+		 foreach (@received_lines) {
+       s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/g;
+     }
+		 foreach (@expected_lines) {
+       s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/g;
+     }
+  }
+
+	for (my $i = 0; $i < scalar (@expected_lines); $i++) {
+		if ($expected_lines[$i] && $received_lines[$i] &&
+				$expected_lines[$i] eq $received_lines[$i]) {
+			if ($query =~ /^!/io) {	
+				push @{$object->{"querydiag"}}, "In line $i: expected [$expected_lines[$i]] received [$received_lines[$i]]\n";
+			}
+		}
+		else {
+			if ($query !~ /^!/io) {
+				push @{$object->{"querydiag"}}, "In line $i: expected [ ", $expected_lines[$i] ? $expected_lines[$i] : "", "] received [ ", $received_lines[$i] ? $received_lines[$i] : "", "]\n";
+			}
+		}
+	}
+ 
+  $whois->close();
+
   return(1);
 }
 
@@ -986,12 +1159,12 @@ my @REQUIRED =  qw/ BASEDIR CONFDIR BINDIR DATADIR LOGDIR DUMPDIR WHOISDIR TMPDI
 					FILTERS 
 					DBUPDATE DBUPDATE_GEN 
 					DBUPDATE_TEXT DBUPDATE_MAIL DBUPDATE_NET DBUPDATE_TRACE
-					WHOIS_PORT WHOIS_HOST
+					WHOIS_HOST
 					MAKE_DB MAKE_DB_FLAGS LOAD_FILE
           SYNC_RING
 					RIP_CONFIG 
           REPORTLOG SUMMARYLOG STDOUTLOG STDERRLOG
-					LOADER_FILE DBUPDATE_FILE TEST WHOIS_FILE DEBUG
+					LOADER_FILE DBUPDATE_FILE TEST WHOIS_FILE DEBUG QUERY_FILE
 					FILTERS_LOCAL EXCLUDE
 					/;
 
@@ -1058,8 +1231,6 @@ sub exec_dbupdate($)	{
 my $commandline = $_[0];
 my $objects = 0;
 
-  use IPC::Open3;
-  use IO::Select;
   $SIG{'CHLD'} = 'DEFAULT';
   my $input_redirect;
 
@@ -1412,6 +1583,7 @@ my $temporary = 0;
   unless (close(MAKE_DB)) {
     # report the whole make_db output if something goes wrong
     foreach (@status) {
+			 s/%/%%/;
        report($_);
     }
     error('E_COMMRUN', $commandline, $!);
@@ -1477,6 +1649,7 @@ my $objects = $_[0];
   my @diag = split('[\s]+',getvar('LOGSTRING'));
   # add whois diagnostics to LOGSTRING
   push @diag, "whois";
+  push @diag, "query";
   my $res = "OK";
   
   foreach my $entry(@{$objects}) {
@@ -1566,7 +1739,7 @@ sub set_test_variables()   {
   }
   foreach my $var (keys %thash) {
     setvar ($var, $thash{$var});
-    #report ("DEBUG: setting [$var] to [$thash{$var}]\n");
+#    report ("DEBUG: setting [$var] to [$thash{$var}]\n");
   }
   close (FILE);
 
@@ -1812,6 +1985,9 @@ foreach (qw/ TEST DBUPDATE_FILE FILTERS_LOCAL LOADER_FILE /) {
 sub run_test($)	{
 my $filters = $_[0];
 my $dir = getvar('CURRENT_DIR');
+
+my @vars_cleanup = ('DBUPDATE_FLAGS', 'DBUPDATE_FLAGS_EXT', 'SCRIPT', 'TEST_RIR', 'DBUPDATE_IGNORE_EXIT_CODE');
+
 # initialize filenames
 init_paths();
 # get and set the per-test variables from the 'test' file
@@ -1825,6 +2001,10 @@ my $rir = getvar('RIR');
 
 if ($test_rir && $rir) {
   if ($test_rir !~ /\b$rir\b/i) {
+		# unset the variables
+		foreach my $var (@vars_cleanup) {
+    	delvar ($var) if (getvar($var));
+		}
     # don't run the test
     return "SKIPPED";
   }
@@ -1834,6 +2014,7 @@ my $result = "FAILED";
 
   # 0.a clean old logs
   clean_logs();
+  stamp_test($dir);
 
 	# 00. TRACING
 
@@ -1895,16 +2076,17 @@ my $result = "FAILED";
 	# 7. match whois output with the one expected and add diagnostics to the object
 	timeout('E_TIME', 'whois', \&match_whois, $objects, $local_filters);
 
+	# 7a. match query output with one expected
+	timeout('E_TIME', 'query', \&match_query, $objects, $local_filters);
+
 	# 8. print report
 
 	$result = print_report($objects);
 
-        # unset the variables
-        delvar ('DBUPDATE_FLAGS') if (getvar('DBUPDATE_FLAGS'));
-        delvar ('DBUPDATE_FLAGS_EXT') if (getvar('DBUPDATE_FLAGS_EXT'));
-        delvar ('SCRIPT') if (getvar('SCRIPT'));
-        delvar ('RIR') if (getvar('RIR'));
-        delvar ('DBUPDATE_IGNORE_EXIT_CODE') if (getvar('DBUPDATE_IGNORE_EXIT_CODE'));
+  # 9. unset the variables
+  foreach my $var (@vars_cleanup) {
+    delvar ($var) if (getvar($var));
+  }
 
 	# 10. return result
 	return($result);
@@ -1986,12 +2168,39 @@ my $reportlog = getvar('REPORTLOG');
     or die "Can't open file $reportlog: $!";
 
   $format =~ s/(E_\S*)/defined($ERR->{$1})?$ERR->{$1}:$1/ie;
+  $format =~ s/%([HMS])/%%$1/g;
 
   printf REPORTLOG $format, @args;
   printf STDOUT $format, @args if (getvar('OUTPUT_REPORT'));
 	close (REPORTLOG) 
     or die "Can't close file $reportlog: $!";
 
+}
+
+sub stamp_test($) {
+	# to 'dir-stamp' the test output in a log file
+
+  my $dir = $_[0];
+  my $logstring = getvar('LOGSTRING');
+  my @logs = split('[\s]+', $logstring);
+  foreach my $log (@logs) {
+    if ($log =~ /report/i) {
+			next;
+		}
+		$log = uc($log);
+		$log .= "LOG";
+    my $tolog = getvar($log);
+
+  open (LOG, ">> $tolog ")
+    or die "Can't open file $tolog: $!";
+
+  print LOG "<<< TEST RUN $dir >>>\n";
+  #print STDOUT "DEBUG <<< printing to $tolog >>>\n";
+
+  close (LOG) 
+    or die "Can't close file $tolog: $!";
+
+	}
 }
 
 sub is_ignored ($) {
