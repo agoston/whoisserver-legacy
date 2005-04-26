@@ -48,7 +48,7 @@ irt_creation (au_plugin_callback_info_t *info)
 
   LG_log(au_context, LG_FUNC, ">irt_creation: entering");
 
-  /* only override works */
+  /* anyone can do it */
   ret_val = AU_AUTHORISED;
   au_override(&ret_val, &override, info);
 
