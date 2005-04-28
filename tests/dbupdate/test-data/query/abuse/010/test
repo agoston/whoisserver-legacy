@@ -1,0 +1,15 @@
+
+# CASE 010: inverse query for abuse-mailbox attr
+# irt object contains abuse-mailbox attr
+# person object
+# -r query
+%
+% requires initial objects to be loaded
+#
+# query e-mail address, check that 2 objects are returned
+#
+#SUCCESS
+#
+# RESULT 010: The query will succeed.
+
+

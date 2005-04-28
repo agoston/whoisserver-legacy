@@ -1,4 +1,5 @@
 typedef enum _A_Type_t {
+  A_AM,
   A_AD,
   A_AC,
   A_AG,
@@ -74,7 +75,6 @@ typedef enum _A_Type_t {
   A_TC,
   A_OG,
   A_TX,
-  A_TB,
   A_DT,
   A_ZC,
   A_IR,

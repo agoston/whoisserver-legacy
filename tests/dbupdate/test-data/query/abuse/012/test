@@ -1,0 +1,12 @@
+
+# CASE 012: -b <iprange>
+%
+% requires initial objects to be loaded
+#
+# check that only inetnum and abuse-mailbox attrs are present
+#
+#SUCCESS
+#
+# RESULT 012: The query will succeed.
+
+

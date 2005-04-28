@@ -1,0 +1,20 @@
+% This is the MyDB Whois server.
+
+% Note: this output has been filtered.
+
+% Information related to 'IRT-REQUEST'
+
+irt:            IRT-REQUEST
+address:        Singel 258
+                1016 AB  Amsterdam
+                The Netherlands
+signature:      PGPKEY-4EA45E47
+encryption:     PGPKEY-4EA45E47
+admin-c:        TP1-DB-TEST
+tech-c:         TP1-DB-TEST
+auth:           CRYPT-PW agl7a6gyad/e6   # irt
+mnt-by:         TEST-MNT
+abuse-mailbox:  dbtest@ripe.net
+source:         DB-TEST
+
+

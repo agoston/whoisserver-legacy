@@ -8,8 +8,7 @@
 #NOOP
 #
 # RESULT 38: The creation will be forwarded to hostmaster
-# rir AFRINIC
-
+$TEST_RIR=AFRINIC
 
 organisation:  AUTO-1
 org-name:      EXAMPLE TTTTTT

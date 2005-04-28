@@ -1,0 +1,18 @@
+% This is the MyDB Whois server.
+
+% Note: this output has been filtered.
+
+% Information related to 'ROLE-DB-TEST'
+
+role:           test role 
+address:        Somewhere
+phone:          +49 700 00006467
+fax-no:         +49 700 00006467
+nic-hdl:        ROLE-DB-TEST
+admin-c:        TP1-DB-TEST
+tech-c:         TP1-DB-TEST
+mnt-by:         TEST-MNT
+abuse-mailbox:  dbtest@ripe.net
+source:         DB-TEST
+
+

@@ -1,0 +1,12 @@
+
+# CASE 025: -i pn tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# grouping used, attrs filtered out
+#
+#SUCCESS
+#
+# RESULT 025: The query will succeed.
+
+

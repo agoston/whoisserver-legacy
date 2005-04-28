@@ -1,4 +1,5 @@
 UD_query Insert[] = {
+  {UD_LF_OT, " INSERT abuse_mailbox         SET thread_id=%d, object_id=%ld, object_type=%d, abuse_mailbox='%s' "},
   {UD_NULL_, ""},
   {UD_AUX__, " INSERT admin_c          SELECT %d, %ld, person_role.object_id, %d          FROM person_role          WHERE person_role.nic_hdl='%s' "},
   {UD_NULL_, ""},
@@ -74,7 +75,6 @@ UD_query Insert[] = {
   {UD_AUX__, " INSERT tech_c          SELECT %d, %ld, person_role.object_id, %d          FROM person_role          WHERE person_role.nic_hdl='%s' "},
   {UD_AUX__, " INSERT org         SELECT %d, %ld, organisation.object_id, %d          FROM organisation WHERE organisation.organisation='%s' "},
   {UD_NULL_, ""},
-  {UD_NULL_, ""},
   {UD_LEAF_, " INSERT upd_to         SET thread_id=%d, object_id=%ld, upd_to='%s' "},
   {UD_AUX__, " INSERT zone_c         SELECT %d, %ld, person_role.object_id, %d         FROM person_role         WHERE person_role.nic_hdl='%s' "},
   {UD_MAIN_, " INSERT inet_rtr         SET thread_id=%d, object_id=%ld, inet_rtr='%s' "},
@@ -98,6 +98,7 @@ UD_query Insert[] = {
 }; /* Insert */
 
 UD_query Update[] = {
+  {UD_LEAF_, " UPDATE abuse_mailbox         SET thread_id=%d         WHERE object_id=%ld         AND abuse_mailbox='%s' "},
   {UD_NULL_, ""},
   {UD_AX_PR, " UPDATE admin_c         SET thread_id=%d         WHERE object_id=%ld         AND pe_ro_id=%ld "},
   {UD_NULL_, ""},
@@ -173,7 +174,6 @@ UD_query Update[] = {
   {UD_AX_PR, " UPDATE tech_c         SET thread_id=%d         WHERE object_id=%ld         AND pe_ro_id=%ld "},
   {UD_AX_OA, " UPDATE org         SET thread_id=%d         WHERE object_id=%ld         AND org_id=%ld "},
   {UD_NULL_, ""},
-  {UD_NULL_, ""},
   {UD_LEAF_, " UPDATE upd_to         SET thread_id=%d         WHERE object_id=%ld         AND upd_to='%s' "},
   {UD_AX_PR, " UPDATE zone_c         SET thread_id=%d         WHERE object_id=%ld         AND pe_ro_id=%ld "},
   {UD_MAIN_, ""},
@@ -197,6 +197,7 @@ UD_query Update[] = {
 }; /* Update */
 
 UD_query Dummy[] = {
+  {UD_NULL_, ""},
   {UD_NULL_, ""},
   {UD_AX_PR, " INSERT person_role          SET thread_id=%d, object_id=%ld, nic_hdl='%s', object_type=%d, dummy=1 "},
   {UD_NULL_, ""},
@@ -273,7 +274,6 @@ UD_query Dummy[] = {
   {UD_AX_OA, " INSERT organisation         SET thread_id=%d, object_id=%ld, organisation='%s', dummy=1 "},
   {UD_NULL_, ""},
   {UD_NULL_, ""},
-  {UD_NULL_, ""},
   {UD_AX_PR, " INSERT person_role         SET thread_id=%d, object_id=%ld, nic_hdl='%s', object_type=%d, dummy=1 "},
   {UD_NULL_, ""},
   {UD_NULL_, ""},
@@ -296,6 +296,7 @@ UD_query Dummy[] = {
 }; /* Dummy */
 
 UD_query Select[] = {
+  {UD_NULL_, ""},
   {UD_NULL_, ""},
   {UD_NULL_, ""},
   {UD_NULL_, ""},
@@ -364,7 +365,6 @@ UD_query Select[] = {
   {UD_NULL_, ""},
   {UD_NULL_, ""},
   {UD_MAIN_, " route_set='%s' AND "},
-  {UD_NULL_, ""},
   {UD_NULL_, ""},
   {UD_NULL_, ""},
   {UD_NULL_, ""},

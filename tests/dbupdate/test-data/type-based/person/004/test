@@ -1,0 +1,26 @@
+
+# CASE 4: We try to create person object test person with abuse-mailbox attribute
+%
+% requires initial objects to be loaded
+#
+# create person object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed.
+
+
+person:       test person
+address:      Singel
+phone:        +0123456789
+e-mail:       dbtest@ripe.net
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+notify:       dbtest@ripe.net
+abuse-mailbox: dbtest@ripe.net
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+
+password: auth

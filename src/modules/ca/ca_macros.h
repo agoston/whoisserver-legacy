@@ -411,6 +411,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define ca_get_qc_fmt_fixedlookup	ca_get_string(CA_QC_FMT_FIXEDLOOKUP)
 #define ca_set_qc_fmt_fixedlookup	ca_set_string(CA_QC_FMT_FIXEDLOOKUP)
 
+#define ca_get_qc_fmt_uncompflag	ca_get_string(CA_QC_FMT_UNCOMPFLAG)
+#define ca_set_qc_fmt_uncompflag	ca_set_string(CA_QC_FMT_UNCOMPFLAG)
+
 #define ca_get_qi_ref_tmout	ca_get_string(CA_QI_REF_TMOUT)
 #define ca_set_qi_ref_tmout	ca_set_string(CA_QI_REF_TMOUT)
 
@@ -425,6 +428,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define ca_get_qi_fmt_refheader	ca_get_string(CA_QI_FMT_REFHEADER)
 #define ca_set_qi_fmt_refheader	ca_set_string(CA_QI_FMT_REFHEADER)
+
+#define ca_get_qi_fmt_group_banner ca_get_string(CA_QI_FMT_GROUP_BANNER)
+#define ca_set_qi_fmt_group_banner ca_set_string(CA_QI_FMT_GROUP_BANNER)
+
+#define ca_get_qi_filter_banner ca_get_string(CA_QI_FILTER_BANNER)
+#define ca_set_qi_filter_banner ca_set_string(CA_QI_FILTER_BANNER)
 
 #define ca_get_er_ud_def	ca_get_dirlist(CA_ER_UD_DEF)
 #define ca_set_er_ud_def	ca_set_dirlist(CA_ER_UD_DEF)

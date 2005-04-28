@@ -1,0 +1,12 @@
+
+# CASE 023: -G -i pn tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# make sure email,notify and changed attrs are filtered out in objects
+#
+#SUCCESS
+#
+# RESULT 023: The query will succeed.
+
+

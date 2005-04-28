@@ -1,4 +1,6 @@
 char * const Attribute_aliases[] = {
+  "am",
+  "abuse-mailbox",
   "ad",
   "address",
   "ac",
@@ -149,8 +151,6 @@ char * const Attribute_aliases[] = {
   "org",
   "tx",
   "text",
-  "tb",
-  "trouble",
   "dt",
   "upd-to",
   "zc",

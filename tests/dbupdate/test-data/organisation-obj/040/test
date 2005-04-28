@@ -7,8 +7,7 @@
 #NOOP
 #
 # RESULT 40: The deletion will be forwarded to hostmaster
-# rir AFRINIC
-
+$TEST_RIR=AFRINIC
 
 organisation:  ORG-Eoof1-DB-TEST
 org-name:      EXAMPLE organisation object for tests

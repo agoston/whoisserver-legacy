@@ -1,0 +1,13 @@
+
+# CASE 1: TP2-DB-TEST with no flags
+% e-mail attribute should be visible
+%
+% requires initial objects to be loaded
+#
+# query person object 
+#
+#SUCCESS
+#
+# RESULT 1: The query will succeed.
+
+

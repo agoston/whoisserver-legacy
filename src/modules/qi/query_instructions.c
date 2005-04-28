@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.6 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -79,13 +79,26 @@ void *qi_kill_body(void *arg)
 {
   SQ_connection_t *sql_connection = arg;
   LG_log(qi_context, LG_DEBUG,
-	 "rtc: killing SQL connection %d", (sql_connection)->thread_id);
+  "rtc: killing SQL connection %d", (sql_connection)->thread_id);
   /* abort the running query */
   SQ_abort_query(sql_connection);
 
   return NULL;
 }
 
+/* a helper function to clean config variables */
+
+char *remove_EOLs(char *arg)
+{
+  while ( strlen(arg) > 0 &&
+          (arg[strlen(arg) - 1] == '\n' ||
+           arg[strlen(arg) - 1] == '\r') )
+  {
+    arg[strlen(arg) - 1] = '\0';
+  }
+
+  return arg;
+}
 
 
 /*++++++++++++++++++++++++++++++++++++++
@@ -115,7 +128,7 @@ void *qi_kill_body(void *arg)
     marek.
   ++++++++++++++++++++++++++++++++++++++*/
 int sql_execute_watched(sk_conn_st *condat, SQ_connection_t **sql_connection, 
-			const char *query, SQ_result_set_t **result_ptr)
+    const char *query, SQ_result_set_t **result_ptr)
 {
   int retval = 0; /* return value of sq_execute_query */
   SQ_connection_t *tempcon;
@@ -624,6 +637,145 @@ char *QI_fast_output(const char *str)
   return result;
 } /* fast_output() */
 
+
+/* brief_filter() */
+/*++++++++++++++++++++++++++++++++++++++
+
+  This is for -b query flag. Assumes objects are grouped (to have recursive results by relevance).
+  No object separators (in the group).
+  The code is basically inverted contact_attr_filter().
+  Merging those two functions makes them unreadable, hence a separate function.
+
+  const char *str  - object to be filtered
+
+*/
+char *brief_filter (const char *str) {
+
+  char *result;
+  char *attr_list[3] = {"inetnum",
+                        "inet6num",
+                        "abuse-mailbox"
+                       };
+  int i,j;
+  gboolean filtering_an_attribute = FALSE;
+  gboolean filtered = FALSE;
+  GString *result_buff = g_string_sized_new(STR_XL);
+  gchar **lines = ut_g_strsplit_v1(str, "\n", 0);
+
+  g_string_assign(result_buff, "");
+
+  for (j=0; lines[j] != NULL; j++) {
+    for (i=0; i < sizeof(attr_list)/sizeof(char *); i++ ) {
+      int attr_name_len = strlen(attr_list[i]);
+      if ((strncmp(attr_list[i], lines[j], attr_name_len) == 0) &&
+          (lines[j][attr_name_len] == ':'))
+      {
+        filtering_an_attribute = TRUE;
+        filtered = TRUE;
+        g_string_sprintfa(result_buff, "%s\n", lines[j]);
+        break;
+      }
+    }
+    if (filtered == TRUE) {
+      filtered = FALSE;
+      continue; /* go to next line */
+    }
+    if (filtering_an_attribute == TRUE) {
+      switch (lines[j][0]) {
+        case ' ':
+        case '\t':
+        case '+':
+          g_string_sprintfa(result_buff, "%s\n", lines[j]);
+        break;
+
+        default:
+          filtering_an_attribute = FALSE;
+      }
+    } else {
+      filtering_an_attribute = FALSE;
+    }
+  }
+
+  g_strfreev(lines);
+  result = UT_strdup(result_buff->str);
+  g_string_free(result_buff, TRUE);
+
+  return result;
+}
+
+/* contact_attr_filter() */
+/*++++++++++++++++++++++++++++++++++++++
+
+  This is a default behaviour and can be switched off with '-B' flag.
+  If there is 'abuse-mailbox:' attribute in the object, 
+  'e-mail:', 'notify:' and 'changed:' attributes will be removed from the object.
+  If there is no 'abuse-mailbox:' attribute, 'notify:' and 'changed:' will be removed
+  from the object.
+
+  const char *str  - object to be filtered
+  unsigned abuse_attr_exists - is there abuse-mailbox attr (in the group or in the list)
+
+*/
+char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
+
+  char *result;
+  char *attr_list[3] = {"e-mail",
+                        "notify",
+                        "changed"
+                       };
+  int i,j,start = 1;
+  gboolean filtering_an_attribute = FALSE;
+  gboolean filtered = FALSE;
+  GString *result_buff = g_string_sized_new(STR_XL);
+  gchar **lines = ut_g_strsplit_v1(str, "\n", 0);
+
+  g_string_assign(result_buff, "");
+
+  if (abuse_attr_exists == TRUE) {
+    start = 0;
+  }
+
+  for (j=0; lines[j] != NULL; j++) {
+    for (i=start; i < sizeof(attr_list)/sizeof(char *); i++ ) {
+      int attr_name_len = strlen(attr_list[i]);
+      if ((strncmp(attr_list[i], lines[j], attr_name_len) == 0) &&
+          (lines[j][attr_name_len] == ':'))
+      {
+        filtering_an_attribute = TRUE;
+        filtered = TRUE;
+        break;
+      }
+    }
+    if (filtered == TRUE) {
+      filtered = FALSE;
+      continue; /* go to next line */
+    }
+    if (filtering_an_attribute == TRUE) {
+      switch (lines[j][0]) {
+        case ' ':
+        case '\t':
+        case '+':
+          { /* do nothing */ }
+          break;
+
+        default:
+          g_string_sprintfa(result_buff, "%s\n", lines[j]);  
+          filtering_an_attribute = FALSE;
+     }
+    } else {
+      g_string_sprintfa(result_buff, "%s\n", lines[j]);
+      filtering_an_attribute = FALSE;
+    }
+  }
+
+  g_strfreev(lines);
+  result = UT_strdup(result_buff->str);
+  g_string_free(result_buff, TRUE);
+  return result;
+
+}
+
+
 /* filter() */
 /*++++++++++++++++++++++++++++++++++++++
   Basically it's for the '-K' flag for non-set (and non-radix) objects.
@@ -722,90 +874,161 @@ char *add_parent(int id, char *str, GList *par_list)
 
   SQ_result_set_t *result The result set returned from the sql query.
   unsigned filtered       if the objects should go through a filter (-K)
+  unsigned fast           fast output
+  unsigned grouped        grouped output
+  unsigned original       original output
+  unsigned brief 		      brief output
   sk_conn_st *condat      Connection data for the client    
 
   More:
   +html+ <PRE>
   Authors:
         ottrey - initial design
-	marek - rewritten for accounting and cancellation.
+  marek - rewritten for accounting and cancellation.
   +html+ </PRE>
 
   ++++++++++++++++++++++++++++++++++++++*/
 static int write_results(SQ_result_set_t *result, 
-			 unsigned filtered,
-			 unsigned fast,
-			 sk_conn_st *condat,
-			 acc_st    *acc_credit,
-			 acl_st    *acl,
-       GList *par_list
-			 ) {
+       unsigned filtered,
+       unsigned fast,
+       unsigned grouped,
+       unsigned original,
+       unsigned brief,
+       sk_conn_st *condat,
+       acc_st    *acc_credit,
+       acl_st    *acl,
+       GList *par_list,
+       GHashTable *groups
+ ) {
   SQ_row_t *row;
   char *str;
   char *id;
   char *filtrate;
   char *fasted;
+  char *cont_filter;
   int retrieved_objects=0;
   char *objt;
+  char *pkey;
+  char *rec;
+  int recursive;
   int type;
+  long gid;
+  int abuse_attr_exists=0;
 
   /* Get all the results - one at a time */
   if (result != NULL) {
+  
     /* here we are making use of the mysql_store_result capability
        of interrupting the cycle of reading rows. mysql_use_result
        would not allow that, would have to be read until end */
     
     while ( condat->rtc == 0 
-	    && AC_credit_isdenied( acc_credit ) == 0
-	    && (row = SQ_row_next(result)) != NULL ) {
-      
+      && AC_credit_isdenied( acc_credit ) == 0
+      && (row = SQ_row_next(result)) != NULL ) {
+
+      if ((original == 0) && (retrieved_objects == 0)) { 
+        /* this is DEFAULT */
+        char *banner = ca_get_qi_filter_banner;
+        SK_cd_puts(condat, banner);
+        SK_cd_puts(condat, "\n");  
+      }
+
       dieif (  (id = SQ_get_column_string(result, row, 0)) == NULL )
       dieif (  (objt = SQ_get_column_string(result, row, 3)) == NULL );
+      if (grouped == 1) {
+        dieif (  (pkey = SQ_get_column_string(result, row, 4)) == NULL );
+        dieif (  (rec = SQ_get_column_string(result, row, 5)) == NULL );
+        recursive = atoi(rec);
+        UT_free (rec);
+        dieif (  (rec = SQ_get_column_string(result, row, 6)) == NULL );
+        gid = atol(rec);
+        UT_free (rec);
+      } /* if grouped == 1 */
 
       /* get + add object type */
       type = atoi(objt);
-	
+
       /* ASP_QI_LAST_DET */
       LG_log(qi_context, LG_DEBUG, 
-	     "Retrieved serial id = %d , type = %s", atoi(id), objt);
-	
+       "Retrieved serial id = %d , type = %s", atoi(id), objt);
+
       /* decrement credit for accounting purposes */
       AC_count_object( acc_credit, acl, 
-		       type == C_PN || type == C_RO || type == C_MT || type == C_OA); /* is private? */
-            /* person, role, mntner and organisation objects are counted as private objects */
-            /* We don't count IRT objects as private as we want users to see them always    */
-      /* break the loop if the credit has just been exceeded and 
-	 further results denied */
+      type == C_PN || type == C_RO || type == C_MT || type == C_OA); /* is private? */
+      /* person, role, mntner and organisation objects are counted as private objects */
+      /* We don't count IRT objects as private as we want users to see them always    */
+      /* break the loop if the credit has just been exceeded and */
+      /* further results denied */
       if( AC_credit_isdenied( acc_credit ) ) {
-	continue; 
-      }
+        continue; 
+      } /* if credit_isdenied */
       
       if ((str = SQ_get_column_string(result, row, 2)) == NULL) { die; } 
       else {
-        
-        if (type == C_IN || type == C_I6) {
+        char *rir;
+        rir = ca_get_rir;   
+        rir = remove_EOLs(rir);
+        if ((strcasecmp(rir, "AFRINIC") == 0) && (type == C_IN || type == C_I6)) {
           /* add "parent:" attribute for inet(6)num */
           str = add_parent(atoi(id), str, par_list);
-        }
+        } /* if afrinic */
         UT_free(id);
         UT_free(objt);
+
+        /* brief output - for inetnum, inet6num, irt, person, role */
+        if (brief == 1)
+        {
+          cont_filter = brief_filter(str);
+          UT_free(str);
+          str = cont_filter;
+        }
+
+        /* filter out contact info - DEFAULT */
+        if (original == 0) 
+        {
+          if (groups != NULL) {
+            if (((grouped == 1) && (g_hash_table_lookup(groups, gid) != NULL )) ||
+                ((grouped == 0) && (g_hash_table_size(groups) > 0))
+            ) 
+            {
+              abuse_attr_exists = 1;
+            }
+          }
+          cont_filter = contact_attr_filter(str, abuse_attr_exists);
+          UT_free(str);
+          str = cont_filter;
+        }
 
         /* The fast output stage */
         if (fast == 1) {
           fasted = QI_fast_output(str);
           UT_free(str);
           str = fasted;
-        }
-	
+        } /* if fast == 1 */
+
         /* The filtering stage */
         if (filtered == 0) {
+          if ((grouped == 1) && (recursive == 0))  {
+            char banner[STR_XL];
+            char *fmt_banner = ca_get_qi_fmt_group_banner;
+            sprintf (banner, fmt_banner, pkey);
+            SK_cd_puts(condat, banner);
+            SK_cd_puts(condat, "\n");
+            UT_free(pkey);
+          }
+          if ((brief == 1) && (recursive == 0) && (retrieved_objects > 0)) {
+            SK_cd_puts(condat, "\n");
+          }
           SK_cd_puts(condat, str);
-	  SK_cd_puts(condat, "\n");
+          if (brief == 0) {
+            SK_cd_puts(condat, "\n");
+          }
         }
-        else { 
-	  
-	  /* XXX accounting should be done AFTER filtering, not to count
-	     objects filtered out */
+        else 
+        { 
+
+          /* XXX accounting should be done AFTER filtering, not to count
+          objects filtered out */
 
           filtrate = filter(str);
           SK_cd_puts(condat, filtrate);
@@ -814,8 +1037,11 @@ static int write_results(SQ_result_set_t *result,
         retrieved_objects++;
       }
       UT_free(str);
+    } /* while */
+    if (filtered == 0 && brief == 1 && retrieved_objects > 0) {
+      SK_cd_puts(condat, "\n"); /* ending \n for brief output */
     }
-  }
+  } /* if (result != NULL) */
   
   return retrieved_objects;
 } /* write_results() */
@@ -862,6 +1088,126 @@ __report_sql_error(sk_conn_st *condat,
 		      sql_command);
 }
 
+/* list_has_attr() */
+/*++++++++++++++++++++++++++++++++++++++
+  See if any object from idtable has an attribute.
+  This looks into MySQL directly so it is suitable only for 
+  lookup/inverse keys (which have separate tables).
+
+  condat           connection data for the client
+  sql_connection   connection to the database
+  id_table         table to search
+  ref_table        table to search for references
+  groups           a hash table containing group ids which have abuse_mailbox attr in the group; 
+                   NULL for non-grouped
+  ++++++++++++++++++++++++++++++++++++++*/
+gboolean
+list_has_attr (sk_conn_st *condat, 
+               SQ_connection_t *sql_connection, 
+               char *id_table,
+               const char *ref_table,
+               GHashTable **groups
+               )
+{
+    GString *sql_command;
+    SQ_result_set_t *result_ptr;
+    int sql_error;
+    SQ_row_t *row;
+    long gid;
+    *groups = NULL;
+
+    /* query database for references from this object to an attribute */
+    sql_command = g_string_new("");
+    g_string_sprintf(sql_command, LIST_HAS_ATTR, id_table, ref_table);
+    if (SQ_execute_query(sql_connection, sql_command->str, &result_ptr) == -1) {
+        sql_error = SQ_errno(sql_connection);
+        report_sql_error(condat, sql_connection, sql_command->str);
+        g_string_free(sql_command, TRUE);
+        return FALSE;
+    }
+    g_string_free(sql_command, TRUE);
+
+    *groups = g_hash_table_new(NULL, NULL);
+    /* get the rows */
+
+    while ((row = SQ_row_next(result_ptr)) != NULL ) {
+      if (SQ_get_column_int(result_ptr, row, 0, &gid) != 0) {
+              LG_log(sql_context, LG_ERROR, "bad column at %s:%d",
+                      __FILE__, __LINE__);
+      }
+      else { /* save the gid */
+        g_hash_table_insert(*groups, (void *) gid, (int *) 1);
+      }
+    }
+
+    SQ_free_result(result_ptr);
+    if (g_hash_table_size(*groups) > 0) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+} /* list_has_attr() */
+
+/* object_has_attr() */
+/*++++++++++++++++++++++++++++++++++++++
+  See if the object has an attr attribute (defined by table name)
+
+  condat           connection data for the client
+  sql_connection   connection to the database
+  object_id        object_id
+  table            table where to search
+  ++++++++++++++++++++++++++++++++++++++*/
+gboolean
+object_has_attr (sk_conn_st *condat, 
+                     SQ_connection_t *sql_connection, 
+                     int object_id,
+                     const char *table
+                )
+{
+    GString *sql_command;
+    SQ_result_set_t *result_ptr;
+    int sql_error;
+    SQ_row_t *row;
+    long num_attr_ref;
+
+    /* query database for references from this object to an abuse-mailbox */
+    sql_command = g_string_new("");
+    g_string_sprintf(sql_command, 
+                     "SELECT COUNT(*) FROM %s WHERE object_id=%d", 
+                     table, object_id);
+    if (SQ_execute_query(sql_connection, sql_command->str, &result_ptr) == -1) {
+        sql_error = SQ_errno(sql_connection);
+        report_sql_error(condat, sql_connection, sql_command->str);
+        g_string_free(sql_command, TRUE);
+        return FALSE;
+    }
+    g_string_free(sql_command, TRUE);
+
+    /* get number of references */
+    row = SQ_row_next(result_ptr);
+    if (row == NULL) {
+        /* if the object is deleted after we have gotten a reference to it,
+           the lookup will fail - in such a case treat it the same as 
+           an object without any "attr" attributes */
+        num_attr_ref = 0;
+    } else {
+        if (SQ_get_column_int(result_ptr, row, 0, &num_attr_ref) != 0) {
+            LG_log(sql_context, LG_ERROR, "bad column at %s:%d", 
+                      __FILE__, __LINE__);
+            num_attr_ref = 0;
+        }
+    }
+    SQ_free_result(result_ptr);
+
+    /* return appropriate result */
+    if (num_attr_ref > 0) {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+}
+
 /* write_objects() */
 /*++++++++++++++++++++++++++++++++++++++
   
@@ -881,20 +1227,29 @@ __report_sql_error(sk_conn_st *condat,
   ++++++++++++++++++++++++++++++++++++++*/
 static int 
 qi_write_objects(SQ_connection_t **sql_connection, 
-			  char *id_table, 
-			  unsigned int filtered, 
-			  unsigned int fast, 
-			  sk_conn_st *condat,
-			  acc_st    *acc_credit,
-			  acl_st    *acl,
+        char *id_table, 
+        unsigned int filtered, 
+        unsigned int fast, 
+        unsigned int grouped,
+        unsigned int original,
+        unsigned int brief,
+        sk_conn_st *condat,
+        acc_st    *acc_credit,
+        acl_st    *acl,
         GList *par_list
-			  ) 
+        ) 
 {
   SQ_result_set_t *result = NULL;
   int retrieved_objects=0;
   char sql_command[STR_XL];  
+  GHashTable *groups = NULL;
 
-  sprintf(sql_command, Q_OBJECTS, id_table);
+  if (grouped == 1) {
+    sprintf(sql_command, Q_OBJECTS, id_table, "gorder.order_code, gid, ");
+  }
+  else {
+    sprintf(sql_command, Q_OBJECTS, id_table, "");
+  }
 
   if (sql_execute_watched(condat, sql_connection, sql_command, &result) == -1) {
       report_sql_error(condat, *sql_connection, sql_command);
@@ -906,69 +1261,23 @@ qi_write_objects(SQ_connection_t **sql_connection,
   */
   
   if( condat->rtc == 0) {
-    retrieved_objects = write_results(result, filtered, fast, condat, 
-				      acc_credit, acl, par_list);
+
+    if (original == 0) {
+      /* check the abuse_mailbox attributes */
+      list_has_attr(condat, *sql_connection, id_table, "abuse_mailbox", &groups);
+    }
+
+    retrieved_objects = write_results(result, filtered, fast, grouped, original, brief,
+    condat, acc_credit, acl, par_list, groups);
+
+    if (groups != NULL) {
+      g_hash_table_destroy(groups);
+    }
+
     SQ_free_result(result); 
   }
   return 0;
 } /* qi_write_objects */
-
-/* rx_node_has_mnt_irt() */
-/*++++++++++++++++++++++++++++++++++++++
-  See if the node has an "mnt-irt:" attribute.
-
-  condat           connection data for the client
-  sql_connection   connection to the database
-  rx_data          data node returned from the RX module
-  ++++++++++++++++++++++++++++++++++++++*/
-gboolean
-rx_node_has_mnt_irt (sk_conn_st *condat, 
-                     SQ_connection_t *sql_connection, 
-                     int object_id)
-{
-    GString *sql_command;
-    SQ_result_set_t *result_ptr;
-    int sql_error;
-    SQ_row_t *row;
-    long num_irt_ref;
-
-    /* query database for references from this object to an IRT */
-    sql_command = g_string_new("");
-    g_string_sprintf(sql_command, 
-                     "SELECT COUNT(*) FROM mnt_irt WHERE object_id=%d",
-                     object_id);
-    if (SQ_execute_query(sql_connection, sql_command->str, &result_ptr) == -1) {
-        sql_error = SQ_errno(sql_connection);
-        report_sql_error(condat, sql_connection, sql_command->str);
-        g_string_free(sql_command, TRUE);
-        return FALSE;
-    }
-    g_string_free(sql_command, TRUE);
-
-    /* get number of references */
-    row = SQ_row_next(result_ptr);
-    if (row == NULL) {
-        /* if the object is deleted after we have gotten a reference to it,
-           the lookup will fail - in such a case treat it the same as 
-           an object without any mnt_irt attributes */
-        num_irt_ref = 0;
-    } else {
-        if (SQ_get_column_int(result_ptr, row, 0, &num_irt_ref) != 0) {
-            LG_log(sql_context, LG_ERROR, "bad column at %s:%d", 
-                      __FILE__, __LINE__);
-            num_irt_ref = 0;
-        }
-    }
-    SQ_free_result(result_ptr);
-
-    /* return appropriate result */
-    if (num_irt_ref > 0) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
-}
-
 
 /* mnt_irt_filter() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -987,7 +1296,7 @@ rx_node_has_mnt_irt (sk_conn_st *condat,
          we call this function, mnt_irt_filter(), and search the list for 
          the first entry that has an "mnt-irt:" attribute, by looking in 
          the "mnt_irt" table in MySQL for a reference (see the 
-         rx_node_has_mnt_irt() for details).
+         object_has_attr() for details).
 
          If a reference is found, the list is replaced with a list 
          containing the single entry.  If no reference is found, the list
@@ -1013,7 +1322,7 @@ mnt_irt_filter (sk_conn_st *condat,
         object_id = rx_data->leafcpy.data_key;
 
         /* see if this is the node we are looking for */
-        if (rx_node_has_mnt_irt(condat, sql_connection, object_id)) {
+        if (object_has_attr(condat, sql_connection, object_id, "mnt_irt")) {
             /* use this entry, and remove from old list */
             new_datlist = g_list_append(NULL, rx_data);
             *datlist = g_list_remove_link(*datlist, p);
@@ -1606,20 +1915,6 @@ exit_qi_collect_domain:
 //  return error;
 //}/* add_ref_name */
 
-/* a helper function to clean config variables */
-
-char *remove_EOLs(char *arg)
-{
-  while ( strlen(arg) > 0 &&
-          (arg[strlen(arg) - 1] == '\n' || 
-           arg[strlen(arg) - 1] == '\r') )
-  {
-    arg[strlen(arg) - 1] = '\0';
-  }
- 
-  return arg;
-}
-
 /* qi_collect_ids */
 /*++++++++++++++++++++++++++++++++++++++ 
   
@@ -1673,11 +1968,11 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
   char sub_table[64];
   int limit ;
              /* a limit on the max number of objects to be returned
-		from a single search. For some queries the object types
-		are not known at this stage, so the limit must be
-		the higher number of the two: private / public,
-		or unlimited if any of them is 'unlimited'.
-	     */
+             from a single search. For some queries the object types
+             are not known at this stage, so the limit must be
+             the higher number of the two: private / public,
+             or unlimited if any of them is 'unlimited'.
+             */
   char limit_str[32];
   int sql_error;
 
@@ -1829,8 +2124,8 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
                         }
                       }
                     }
-                    parent_list = (char *) UT_realloc (parent_list, strlen(parent_list)+66); 
-                    strcat (parent_list, "parent:       ");
+                    parent_list = (char *) UT_realloc (parent_list, strlen(parent_list)+68); 
+                    strcat (parent_list, "parent:         ");
                     strcat (parent_list, range_str);
                     strcat (parent_list, "\n");
                   } else { 
@@ -1915,11 +2210,12 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
 static
 int
 qi_fetch_references(SQ_connection_t **sql_connection,
-		    Query_environ *qe,
-		    char *id_table,
-		    acc_st *acc_credit,
-		    acl_st *acl
-		    )
+      Query_environ *qe,
+      char *id_table,
+      acc_st *acc_credit,
+      acl_st *acl,
+      unsigned irt_search
+      )
 {
     char rec_table[64];
     char sql_command[STR_XL];
@@ -1944,7 +2240,7 @@ qi_fetch_references(SQ_connection_t **sql_connection,
        ( like: INSERT into ID_123 SELECT * FROM ID_123,admin_c WHERE ... )
     */
     sprintf(sql_command, 
-     "CREATE " TEMPORARY " TABLE %s ( id int PRIMARY KEY NOT NULL, recursive BOOL DEFAULT 1 ) TYPE=HEAP", 
+     "CREATE " TEMPORARY " TABLE %s ( id int NOT NULL, recursive BOOL DEFAULT 1, gid INT NOT NULL DEFAULT 0, PRIMARY KEY (id, gid)) TYPE=HEAP", 
      rec_table);
     if (SQ_execute_query(*sql_connection, sql_command, NULL) == -1) {
         report_sql_error(&qe->condat, *sql_connection, sql_command);
@@ -1960,60 +2256,67 @@ qi_fetch_references(SQ_connection_t **sql_connection,
         == -1)
     {
         sql_error = SQ_errno(*sql_connection);
-	report_sql_error(&qe->condat, *sql_connection, sql_command);
+        report_sql_error(&qe->condat, *sql_connection, sql_command);
     }
     
     if (!sql_error) {
         sprintf(sql_command, Q_REC, rec_table, id_table, "admin_c");
-        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, 
-	    NULL) == -1) 
+        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, NULL) == -1) 
         {
-	    sql_error = SQ_errno(*sql_connection);
-	    report_sql_error(&qe->condat, *sql_connection, sql_command);
-	}
+            sql_error = SQ_errno(*sql_connection);
+            report_sql_error(&qe->condat, *sql_connection, sql_command);
+        }
     }
     
     if (!sql_error) {
         sprintf(sql_command, Q_REC, rec_table, id_table, "tech_c");
-        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, 
-	    NULL) == -1) 
+        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, NULL) == -1) 
         {
-	    sql_error = SQ_errno(*sql_connection);
-	    report_sql_error(&qe->condat, *sql_connection, sql_command);
-	}
+            sql_error = SQ_errno(*sql_connection);
+            report_sql_error(&qe->condat, *sql_connection, sql_command);
+        }
     }
 
     if (!sql_error) {
         sprintf(sql_command, Q_REC, rec_table, id_table, "zone_c");
-        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, 
-	    NULL) == -1) 
+        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, NULL) == -1) 
         {
-	    sql_error = SQ_errno(*sql_connection);
-	    report_sql_error(&qe->condat, *sql_connection, sql_command);
-	}
+            sql_error = SQ_errno(*sql_connection);
+            report_sql_error(&qe->condat, *sql_connection, sql_command);
+        }
     }
 
     /* find the organisation objects */
     if (!sql_error) {
         sprintf(sql_command, Q_REC_ORG, rec_table, id_table, "org");
-        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, 
-	    NULL) == -1) 
+        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, NULL) == -1) 
         {
-	    sql_error = SQ_errno(*sql_connection);
-	    report_sql_error(&qe->condat, *sql_connection, sql_command);
-	}
+            sql_error = SQ_errno(*sql_connection);
+            report_sql_error(&qe->condat, *sql_connection, sql_command);
+        }
     }
     
+    /* find the irt objects (for -c) */
+    if (!sql_error && (irt_search == 1)) {
+        sprintf(sql_command, Q_REC_IRT, rec_table, id_table, "mnt_irt");
+        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, NULL) == -1) 
+        {
+            sql_error = SQ_errno(*sql_connection);
+            report_sql_error(&qe->condat, *sql_connection, sql_command);
+        }
+    }
 
     /* if we've lost connection, don't bother with this extra work */
     if (!sql_error && (qe->condat.rtc == 0)) {
+
         /* now copy things back to the main temporary table   */
         sprintf(sql_command, "INSERT IGNORE INTO %s SELECT * FROM %s", 
-	       id_table, rec_table);
+         id_table, rec_table);
         if (SQ_execute_query(*sql_connection, sql_command, NULL) == -1 ) {
-	    sql_error = SQ_errno(*sql_connection);
-	    report_sql_error(&qe->condat, *sql_connection, sql_command);
-	}
+            sql_error = SQ_errno(*sql_connection);
+            report_sql_error(&qe->condat, *sql_connection, sql_command);
+        }
+
     }
 
     /* Now drop the IDS recursive table (try to do this even if
@@ -2021,7 +2324,7 @@ qi_fetch_references(SQ_connection_t **sql_connection,
     sprintf(sql_command, "DROP TABLE IF EXISTS %s", rec_table);
     if (SQ_execute_query(*sql_connection, sql_command, NULL) == -1 ) {
         sql_error = SQ_errno(*sql_connection);
-	report_sql_error(&qe->condat, *sql_connection, sql_command);
+        report_sql_error(&qe->condat, *sql_connection, sql_command);
     }
 
     /* return error, if any */
@@ -2097,7 +2400,7 @@ int QI_execute(ca_dbSource_t *dbhdl,
   sql_error = 0;
 
   sprintf(id_table, "ID_%lu_%u",   mysql_thread_id(sql_connection),
-	  pthread_self());
+  pthread_self());
 
   /* see if there was a leftover table from a crashed session 
    * (assume the ID cannot be currently in use)
@@ -2112,7 +2415,7 @@ int QI_execute(ca_dbSource_t *dbhdl,
   if (!sql_error) {
       sprintf(sql_command, 
               "CREATE " TEMPORARY 
-	      " TABLE %s ( id INT PRIMARY KEY NOT NULL, recursive BOOL DEFAULT 0 ) TYPE=HEAP", id_table);
+              " TABLE %s ( id INT PRIMARY KEY NOT NULL, recursive BOOL DEFAULT 0 ) TYPE=HEAP", id_table);
       if (SQ_execute_query(sql_connection, sql_command, NULL) == -1 ) {
           sql_error = SQ_errno(sql_connection);
           report_sql_error(&qe->condat, sql_connection, sql_command);
@@ -2140,23 +2443,50 @@ int QI_execute(ca_dbSource_t *dbhdl,
           }
 
           sql_error = insert_radix_serials(&(qe->condat), 
-	                                   sql_connection, 
-	                                   id_table, 
-					   datlist);
+                                   sql_connection, 
+                                   id_table, 
+                                   datlist);
       }
 
       SK_watchstop(&(qe->condat));
   }
 
+  /* change the idtable */
+  if (!sql_error) {
+    if (qis->qc->G_group_search == TRUE)
+    {
+      sprintf(sql_command, Q_ALTER_TMP_GROUPED, id_table);
+    }
+    else 
+    {
+      sprintf(sql_command, Q_ALTER_TMP, id_table);
+    }
 
+    if (SQ_execute_query(sql_connection, sql_command, NULL) == -1 ) 
+    {
+      sql_error = SQ_errno(sql_connection);
+      report_sql_error(&qe->condat, sql_connection, sql_command);
+    }
+    if (!sql_error) 
+    {
+      sprintf(sql_command, Q_UPD_TMP, id_table);
+      if (SQ_execute_query(sql_connection, sql_command, NULL) == -1 ) 
+      {
+        sql_error = SQ_errno(sql_connection);
+        report_sql_error(&qe->condat, sql_connection, sql_command);
+      }
+    }
+  }
 
-  /* fetch recursive objects (ac,tc,zc,ah,org) */
+  /* fetch recursive objects (ac,tc,zc,ah,org,irt(if -c)) */
   if (!sql_error && qis->recursive && (qe->condat.rtc == 0)) {
       sql_error = qi_fetch_references(&sql_connection, 
                                       qe, 
-				      id_table, 
-				      acc_credit, 
-				      acl);
+                                      id_table, 
+                                      acc_credit, 
+                                      acl,
+                                      qis->qc->c_irt_search
+                                      );
   } /* if recursive */
   
   /* display */
@@ -2172,7 +2502,8 @@ int QI_execute(ca_dbSource_t *dbhdl,
   /* display objects from the IDs table */
   if (!sql_error) {
       sql_error = qi_write_objects( &sql_connection, id_table, qis->filtered,
-		                qis->fast, &(qe->condat), acc_credit, acl, par_list);
+                    qis->fast, qis->qc->G_group_search, qis->qc->B, qis->qc->b,
+                    &(qe->condat), acc_credit, acl, par_list);
   }
 
   /* drop the table */

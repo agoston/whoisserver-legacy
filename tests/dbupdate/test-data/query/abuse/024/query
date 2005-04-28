@@ -1,0 +1,39 @@
+% This is the MyDB Whois server.
+
+role:           test role 
+address:        Somewhere
+phone:          +49 700 00006467
+fax-no:         +49 700 00006467
+e-mail:         dbtest@ripe.net
+nic-hdl:        ROLE-DB-TEST
+admin-c:        TP2-DB-TEST
+tech-c:         TP2-DB-TEST
+mnt-by:         TEST-MNT
+abuse-mailbox:  dbtest-role1@ripe.net
+notify:         dbtest@ripe.net
+changed:        dbtest@ripe.net
+source:         DB-TEST
+
+role:           test role1
+address:        Somewhere
+phone:          +49 700 00006467
+fax-no:         +49 700 00006467
+e-mail:         dbtest@ripe.net
+nic-hdl:        ROLE2-DB-TEST
+admin-c:        TP2-DB-TEST
+tech-c:         TP2-DB-TEST
+mnt-by:         TEST-MNT
+abuse-mailbox:  dbtest-role2@ripe.net
+notify:         dbtest@ripe.net
+changed:        dbtest@ripe.net
+source:         DB-TEST
+
+person:         test person2
+address:        Singel
+phone:          +0123456789
+nic-hdl:        TP2-DB-TEST
+e-mail:		dbtest@ripe.net
+changed:        dbtest@ripe.net 20020101
+source:         DB-TEST
+
+

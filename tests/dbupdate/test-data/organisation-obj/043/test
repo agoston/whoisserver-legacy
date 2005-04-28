@@ -7,8 +7,7 @@
 #SUCCESS
 #
 # RESULT 43: The deletion will succeed
-# rir AFRINIC
-
+$TEST_RIR=AFRINIC
 
 organisation:  ORG-Eoof1-DB-TEST
 org-name:      EXAMPLE organisation object for tests

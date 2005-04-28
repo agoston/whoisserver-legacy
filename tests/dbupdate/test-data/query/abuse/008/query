@@ -1,0 +1,18 @@
+% This is the MyDB Whois server.
+
+% Note: this output has been filtered.
+
+% Information related to 'ORG-TEST1-DB-TEST'
+
+organisation:  ORG-TEST1-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      NON-REGISTRY
+address:       Address
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+abuse-mailbox: dbtest@ripe.net
+source:        DB-TEST
+
+

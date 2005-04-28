@@ -1,0 +1,13 @@
+
+# CASE 8: ORG-TEST-DB-TEST with no flags
+# organisation object contains abuse-mailbox attr
+%
+% requires initial objects to be loaded
+#
+# query organisation object, check that it contact attrs are filtered out
+#
+#SUCCESS
+#
+# RESULT 8: The query will succeed.
+
+

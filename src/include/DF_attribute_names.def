@@ -1,4 +1,5 @@
 char * const Attribute_names[] = {
+  "abuse-mailbox",
   "address",
   "admin-c",
   "aggr-mtd",
@@ -74,7 +75,6 @@ char * const Attribute_names[] = {
   "tech-c",
   "org",
   "text",
-  "trouble",
   "upd-to",
   "zone-c",
   "inet-rtr",

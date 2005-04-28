@@ -187,7 +187,7 @@ my $string;
 			  error('E_SINGATTR', $attr);
 	   	}
   	}
-    elsif ( ($attr eq "whois") && ( $val !~ /^[\s]*?!|DATE_ON|DATE_OFF[\s]*?$/oi))  {
+    elsif ( ($attr eq "whois") && ( $val !~ /^[\s]*?!|DATE_ON|DATE_OFF[\s]*?(EXACT)?$/oi))  {
       error('E_INVATTR', $string);
 
     }

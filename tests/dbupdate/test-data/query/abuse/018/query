@@ -1,0 +1,7 @@
+% This is the MyDB Whois server.
+
+%ERROR:206: invalid combination of flags passed
+%
+% The flags "-b" and "-F" cannot be used together.
+
+

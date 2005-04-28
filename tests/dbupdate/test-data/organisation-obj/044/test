@@ -9,8 +9,7 @@
 #FAILED
 #
 # RESULT 44: The creation will fail
-# rir AFRINIC
-
+$TEST_RIR=AFRINIC
 
 organisation:  AUTO-1
 org-name:      EXAMPLE TTTTTT

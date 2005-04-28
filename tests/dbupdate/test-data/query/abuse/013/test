@@ -1,0 +1,12 @@
+
+# CASE 013: -b <iprange>
+%
+% requires initial objects to be loaded
+#
+# check that no objects are returned (inetnum has no mnt-irt)
+#
+#FAILURE
+#
+# RESULT 013: The query will fail.
+
+

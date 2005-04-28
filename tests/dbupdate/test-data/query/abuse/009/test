@@ -1,0 +1,13 @@
+
+# CASE 9: IRT-REQUEST with no flags
+# irt object contains abuse-mailbox attr
+%
+% requires initial objects to be loaded
+#
+# query irt object, check that it contact attrs are filtered out
+#
+#SUCCESS
+#
+# RESULT 9: The query will succeed.
+
+

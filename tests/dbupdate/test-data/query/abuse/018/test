@@ -1,0 +1,13 @@
+
+# CASE 018: -b -F <iprange>
+# error test
+%
+% requires initial objects to be loaded
+#
+# check that 'uncompatible flags passed' error is returned
+#
+#FAILURE
+#
+# RESULT 018: The query will fail.
+
+

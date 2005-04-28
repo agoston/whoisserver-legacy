@@ -1,0 +1,13 @@
+
+# CASE 4: TP2-DB-TEST with -B flag
+# object containa abuse-mailbox attr
+%
+% requires initial objects to be loaded
+#
+# query person object, check that that it is original
+#
+#SUCCESS
+#
+# RESULT 4: The query will succeed.
+
+

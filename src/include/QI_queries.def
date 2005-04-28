@@ -543,6 +543,15 @@ Query_t Query[] = {
   {
     R_SQL,
     Q_INVERSE,
+    WK_EMAIL,
+    A_AM,
+    C_ANY,
+    "SELECT object_id,0           FROM   abuse_mailbox i           WHERE  i.abuse_mailbox = '%s'     AND  i.thread_id = 0",
+    "SQL:ANY/am/WK_EMAIL"
+    },
+  {
+    R_SQL,
+    Q_INVERSE,
     WK_AUTNUM,
     A_LA,
     C_IR,

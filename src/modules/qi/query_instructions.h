@@ -2,7 +2,7 @@
 #define READ_QUERY_INSTRUCTIONS
 
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2.2.4 $
 
   Query instruction module (qi)
   config module.
@@ -51,9 +51,9 @@
 #define QI_SQLERR   2
 
 typedef struct {
-  sql_key_t object_id;    // the key to a full-text record in SQL
-  char *    parent_list;  // formatted list of parent ranges; 
-                          // please free after use
+  sql_key_t object_id;    /* the key to a full-text record in SQL */
+  char *    parent_list;  /* formatted list of parent ranges; */
+                          /* please free after use */
 } id_parent_t;
 
 /*
@@ -95,14 +95,21 @@ Ie. Try using a LEFT JOIN to do the "NOT IN"/ "MINUS" equivalent.
 */
 
 /* RIPE 6 */
-#define Q_OBJECTS     "SELECT last.object_id, last.sequence_id, last.object ,last.object_type FROM  %s IDS STRAIGHT_JOIN last,object_order WHERE last.object_id=IDS.id AND last.object_type != 100 AND last.object_type = object_order.object_type ORDER BY recursive, order_code" 
+/*#define Q_OBJECTS     "SELECT last.object_id, last.sequence_id, last.object ,last.object_type FROM  %s IDS STRAIGHT_JOIN last,object_order WHERE last.object_id=IDS.id AND last.object_type != 100 AND last.object_type = object_order.object_type ORDER BY recursive, order_code" 
+ */
 
-
+#define Q_OBJECTS "SELECT last.object_id, last.sequence_id, last.object, last.object_type, last.pkey, recursive, gid FROM %s IDS, last, last glast, object_order, object_order gorder WHERE (IDS.gid=glast.object_id AND glast.object_type=gorder.object_type AND glast.object_type != 100) AND (IDS.id=last.object_id AND last.object_type=object_order.object_type AND last.object_type != 100) ORDER BY %s recursive, object_order.order_code" 
 
 /* Query for finding person/role objects recursively (when -r  isn't specified) */
-#define Q_REC         "INSERT IGNORE INTO %s SELECT pe_ro_id,1 FROM %s IDS STRAIGHT_JOIN %s WHERE object_id = IDS.id"
+#define Q_REC         "INSERT IGNORE INTO %s SELECT pe_ro_id,1,object_id FROM %s IDS, %s WHERE object_id = IDS.id"
 /* Query for finding organisation objects recursively (when -r isn't specified) */
-#define Q_REC_ORG  "INSERT IGNORE INTO %s SELECT org_id,1 FROM %s IDS STRAIGHT_JOIN %s WHERE object_id = IDS.id"
+#define Q_REC_ORG  "INSERT IGNORE INTO %s SELECT org_id,1,object_id FROM %s IDS, %s WHERE object_id = IDS.id"
+/* Query for finding irt objects recursively (when -c (or -b) is specified) */
+#define Q_REC_IRT  "INSERT IGNORE INTO %s SELECT irt_id,1,object_id FROM %s IDS, %s WHERE object_id = IDS.id"
+ 
+#define Q_ALTER_TMP "ALTER TABLE %s ADD COLUMN gid INT NOT NULL DEFAULT 0"
+#define Q_ALTER_TMP_GROUPED "ALTER TABLE %s ADD COLUMN gid INT NOT NULL DEFAULT 0, DROP PRIMARY KEY, ADD PRIMARY KEY (id, gid)"
+#define Q_UPD_TMP "UPDATE %s SET gid=id"
 
 #if 0
 #define Q_NO_OBJECTS  "SELECT object_id, sequence_id, object FROM last WHERE object_id = 0"
@@ -110,6 +117,7 @@ Ie. Try using a LEFT JOIN to do the "NOT IN"/ "MINUS" equivalent.
 
 #define MAX_INSTRUCTIONS 100
 
+#define LIST_HAS_ATTR "SELECT DISTINCT gid FROM %s IDS,%s REF WHERE IDS.id=REF.object_id"
 
 typedef struct Query_instruction_t {
   R_Type_t search_type;

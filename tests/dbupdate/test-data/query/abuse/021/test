@@ -1,0 +1,12 @@
+
+# CASE 021: -c ip
+%
+% requires initial objects to be loaded
+#
+# check that only inetnum, person, irt are present
+#
+#SUCCESS
+#
+# RESULT 021: The query will succeed.
+
+

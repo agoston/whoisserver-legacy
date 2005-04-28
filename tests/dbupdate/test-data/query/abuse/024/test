@@ -1,0 +1,12 @@
+
+# CASE 024: -G -B -i pn tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# make sure the old output is shown
+#
+#SUCCESS
+#
+# RESULT 024: The query will succeed.
+
+
