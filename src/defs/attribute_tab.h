@@ -2784,6 +2784,84 @@ attribute_t attribute_tab[] = {
         0,
         /* foreign_code */
         NULL,
+    },
+    {
+        /* name */
+        "poem",
+        /* id */
+        95,
+        /* altname */
+        NULL,
+        /* xmlname */
+        "poem",
+        /* code */
+        "po",
+        /* syntax_offset */
+        68,   /* poem */
+        /* is_lookup */
+        1,
+        /* is_inverse */
+        0,
+        /* is_primary */
+        1,
+        /* is_list */
+        0,
+        /* is_ripe_list */
+        0,
+        /* foreign_code */
+        NULL,
+    },
+    {
+        /* name */
+        "poetic-form",
+        /* id */
+        96,
+        /* altname */
+        NULL,
+        /* xmlname */
+        "poetic-form",
+        /* code */
+        "pf",
+        /* syntax_offset */
+        69,   /* poetic-form */
+        /* is_lookup */
+        1,
+        /* is_inverse */
+        0,
+        /* is_primary */
+        1,
+        /* is_list */
+        0,
+        /* is_ripe_list */
+        0,
+        /* foreign_code */
+        NULL,
+    },
+    {
+        /* name */
+        "form",
+        /* id */
+        97,
+        /* altname */
+        NULL,
+        /* xmlname */
+        "form",
+        /* code */
+        "fr",
+        /* syntax_offset */
+        69,   /* poetic-form */
+        /* is_lookup */
+        0,
+        /* is_inverse */
+        1,
+        /* is_primary */
+        0,
+        /* is_list */
+        1,
+        /* is_ripe_list */
+        0,
+        /* foreign_code */
+        "pf"
     }
 };
 

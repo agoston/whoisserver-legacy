@@ -1967,6 +1967,62 @@ syntax_t syntax_tab[] = {
         NULL,
         /* front_end_parser */
         NULL 
+    },
+    {
+        /* name */
+        "poem",
+        /* core_regex_pattern */
+        "^.{1,80}$",
+        /* core_regex, set by syntax_init() */
+        NULL,
+        /* core_reserved_regex_pattern */
+        NULL,
+        /* core_reserved_regex, set by syntax_init() */
+        NULL,
+        /* core_parser_reset */
+        NULL,
+        /* core_parser */
+        NULL,
+        /* front_end_regex_pattern */
+        "^POEM-[A-Z0-9][A-Z0-9_-]*$",
+        /* front_end_regex, set by syntax_init() */
+        NULL,
+        /* front_end_reserved_regex_pattern */
+        NULL,
+        /* front_end_reserved_regex, set by syntax_init() */
+        NULL,
+        /* front_end_parser_reset */
+        NULL,
+        /* front_end_parser */
+        NULL 
+    },
+    {
+        /* name */
+        "poetic-form",
+        /* core_regex_pattern */
+        "^.{1,80}$",
+        /* core_regex, set by syntax_init() */
+        NULL,
+        /* core_reserved_regex_pattern */
+        NULL,
+        /* core_reserved_regex, set by syntax_init() */
+        NULL,
+        /* core_parser_reset */
+        NULL,
+        /* core_parser */
+        NULL,
+        /* front_end_regex_pattern */
+        "^FORM-[A-Z0-9][A-Z0-9_-]*$",
+        /* front_end_regex, set by syntax_init() */
+        NULL,
+        /* front_end_reserved_regex_pattern */
+        NULL,
+        /* front_end_reserved_regex, set by syntax_init() */
+        NULL,
+        /* front_end_parser_reset */
+        NULL,
+        /* front_end_parser */
+        NULL 
     }
 };
 

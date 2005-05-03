@@ -3385,6 +3385,239 @@ class_t class_tab[] = {
         },
         /* attr_hash (set by class_init()) */
         NULL
+    },
+    {
+        /* name */
+        "poem",
+        /* id */
+        20,
+        /* num_attr */
+        13,
+        /* attr[] */
+        {
+            /* attribute: poem (poem) */
+            {
+                /* offset */
+                107,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_SINGLE
+            },
+            /* attribute: descr (descr) */
+            {
+                /* offset */
+                16,
+                /* choice */
+                ATTR_OPTIONAL,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: form (form) */
+            {
+                /* offset */
+                109,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_SINGLE
+            },
+            /* attribute: text (text) */
+            {
+                /* offset */
+                84,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: admin-c (admin-c) */
+            {
+                /* offset */
+                1,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: author (author) */
+            {
+                /* offset */
+                8,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: remarks (remarks) */
+            {
+                /* offset */
+                71,
+                /* choice */
+                ATTR_OPTIONAL,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: notify (notify) */
+            {
+                /* offset */
+                60,
+                /* choice */
+                ATTR_OPTIONAL,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: mnt-by (mnt-by) */
+            {
+                /* offset */
+                47,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: changed (changed) */
+            {
+                /* offset */
+                10,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: source (source) */
+            {
+                /* offset */
+                77,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_SINGLE
+            },
+            /* attribute: delete (delete) */
+            {
+                /* offset */
+                105,
+                /* choice */
+                ATTR_OPTIONAL,
+                /* number */
+                ATTR_SINGLE
+            },
+            /* attribute: override (override) */
+            {
+                /* offset */
+                106,
+                /* choice */
+                ATTR_OPTIONAL,
+                /* number */
+                ATTR_SINGLE
+            }
+        },
+        /* attr_hash (set by class_init()) */
+        NULL
+    },
+    {
+        /* name */
+        "poetic-form",
+        /* id */
+        21,
+        /* num_attr */
+        10,
+        /* attr[] */
+        {
+            /* attribute: poetic-form (poetic-form) */
+            {
+                /* offset */
+                108,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_SINGLE
+            },
+            /* attribute: descr (descr) */
+            {
+                /* offset */
+                16,
+                /* choice */
+                ATTR_OPTIONAL,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: admin-c (admin-c) */
+            {
+                /* offset */
+                1,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: remarks (remarks) */
+            {
+                /* offset */
+                71,
+                /* choice */
+                ATTR_OPTIONAL,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: notify (notify) */
+            {
+                /* offset */
+                60,
+                /* choice */
+                ATTR_OPTIONAL,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: mnt-by (mnt-by) */
+            {
+                /* offset */
+                47,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: changed (changed) */
+            {
+                /* offset */
+                10,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_MULTIPLE
+            },
+            /* attribute: source (source) */
+            {
+                /* offset */
+                77,
+                /* choice */
+                ATTR_MANDATORY,
+                /* number */
+                ATTR_SINGLE
+            },
+            /* attribute: delete (delete) */
+            {
+                /* offset */
+                105,
+                /* choice */
+                ATTR_OPTIONAL,
+                /* number */
+                ATTR_SINGLE
+            },
+            /* attribute: override (override) */
+            {
+                /* offset */
+                106,
+                /* choice */
+                ATTR_OPTIONAL,
+                /* number */
+                ATTR_SINGLE
+            }
+        },
+        /* attr_hash (set by class_init()) */
+        NULL
     }
 };
 
