@@ -1,0 +1,29 @@
+
+# CASE 1: We try to create poem object POEM-OUR-SQL
+%
+% requires initial objects to be loaded
+#
+# create POEM object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+poem:         POEM-OUR-SQL
+descr:        Our SQL
+author:       TP1-DB-TEST
+text:         In the photo, you can see
+text:         Engineers coding the DB,
+text:         You will be amazed & excited,
+text:         Impressed & delighted,
+text:         When they release Version 3!
+admin-c:      TP1-DB-TEST
+form:         FORM-LIMERICK
+mnt-by:       TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+
+password: auth
