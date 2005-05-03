@@ -1,0 +1,19 @@
+
+# CASE 2: We try to modify poem object FORM-OUR-LIMERICK
+%
+% requires initial objects to be loaded
+#
+# modify poem object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+poetic-form:  FORM-OUR-LIMERICK
+descr:        Could not find any other attribute to change!
+admin-c:      TP1-DB-TEST
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+override: password

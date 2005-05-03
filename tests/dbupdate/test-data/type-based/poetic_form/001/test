@@ -1,0 +1,19 @@
+
+# CASE 1: We try to create poetic-form FORM-OUR-LIMERICK
+%
+% requires initial objects to be loaded
+#
+# create POETIC-FORM object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+poetic-form:  FORM-OUR-LIMERICK
+descr:        Poem type for limerick
+admin-c:      TP1-DB-TEST
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: auth
