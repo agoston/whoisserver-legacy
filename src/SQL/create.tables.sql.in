@@ -879,7 +879,7 @@ CREATE TABLE poetic_form (
   PRIMARY KEY  (poetic_form),
   KEY poetic_form (poetic_form),
   KEY thread_id (thread_id),
-  KEY thread_id (poetic_form)
+  KEY poetic_form (poetic_form)
 ); 
 
 #
