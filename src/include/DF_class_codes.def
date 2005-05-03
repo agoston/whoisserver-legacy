@@ -19,5 +19,7 @@ char * const Class_codes[] = {
   "it",
   "oa",
   "r6",
+  "po",
+  "pf",
   NULL
 }; /* Class_codes */

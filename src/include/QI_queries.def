@@ -56,6 +56,15 @@ Query_t Query[] = {
     },
   {
     R_SQL,
+    Q_INVERSE,
+    WK_POETIC_FORM,
+    A_FR,
+    C_ANY,
+    "SELECT i.object_id,0           FROM   poetic_form, form i           WHERE  poetic_form.object_id = i.form_id           AND    poetic_form.poetic_form = '%s'           AND    i.thread_id = 0",
+    "SQL:ANY/fr/WK_POETIC_FORM"
+    },
+  {
+    R_SQL,
     Q_LOOKUP,
     WK_IPADDRESS,
     A_IE,
@@ -251,6 +260,15 @@ Query_t Query[] = {
     C_ANY,
     "SELECT i.object_id,0           FROM   organisation, org i           WHERE  organisation.object_id = i.org_id           AND    organisation.organisation = '%s'           AND    i.thread_id = 0",
     "SQL:ANY/og/WK_ORG_ID"
+    },
+  {
+    R_SQL,
+    Q_LOOKUP,
+    WK_POEM,
+    A_PO,
+    C_PO,
+    "SELECT object_id,0           FROM   poem           WHERE  poem = '%s'           AND    thread_id = 0",
+    "SQL:po/po/WK_POEM"
     },
   {
     R_SQL,
@@ -476,6 +494,15 @@ Query_t Query[] = {
     C_ANY,
     "SELECT object_id,0           FROM   notify i           WHERE  i.notify = '%s' 	  AND	 i.thread_id = 0",
     "SQL:ANY/ny/WK_EMAIL"
+    },
+  {
+    R_SQL,
+    Q_LOOKUP,
+    WK_POETIC_FORM,
+    A_PF,
+    C_PF,
+    "SELECT object_id,0           FROM   poetic_form           WHERE  poetic_form = '%s'           AND    thread_id = 0",
+    "SQL:pf/pf/WK_POETIC_FORM"
     },
   {
     R_SQL,

@@ -160,6 +160,24 @@ char *t_r6[] = {
   "member_of", "notify", "mnt_by", "mnt_lower", "mnt_routes6", "org", NULL
 };
 
+/* poem */
+
+char *t_po[] = {
+  "mntner","person_role","names","poetic_form",NULL,NULL,
+  "admin_c", "author", "notify", "mnt_by", "form", NULL
+};
+
+/* poetic-form */
+
+char *t_pf[] = {
+  "mntner","person_role","names",NULL,NULL,NULL,
+  "admin_c", "mnt_by", "notify", NULL
+};
+
+char *t_ipf[] = {
+  "form",NULL
+};
+
 
 char **tables[] = {
   t_ak,
@@ -182,6 +200,8 @@ char **tables[] = {
   t_it,
   t_oa,
   t_r6,
+  t_po,
+  t_pf,
   NULL
 };
 

@@ -190,5 +190,11 @@ char * const Attribute_aliases[] = {
   "delete",
   "uo",
   "override",
+  "po",
+  "poem",
+  "pf",
+  "poetic-form",
+  "fr",
+  "form",
   NULL
 }; /* Attribute_aliases */

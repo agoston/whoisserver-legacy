@@ -19,5 +19,7 @@ int const Class_dbase_code_map[] = {
   17,
   18,
   19,
+  20,
+  21,
   NULL
 }; /* Class_dbase_code_map */

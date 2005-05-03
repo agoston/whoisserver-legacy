@@ -19,5 +19,7 @@ char * const Class_names[] = {
   "irt",
   "organisation",
   "route6",
+  "poem",
+  "poetic-form",
   NULL
 }; /* Class_names */

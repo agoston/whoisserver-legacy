@@ -326,5 +326,26 @@ const char *Templates[] = {
 "changed:        [mandatory]  [multiple]   [ ]\n"
 "source:         [mandatory]  [single]     [ ]\n"
 ,
+"poem:           [mandatory]  [single]     [primary/look-up key]\n"
+"descr:          [optional]   [multiple]   [ ]\n"
+"form:           [mandatory]  [single]     [inverse key]\n"
+"text:           [mandatory]  [multiple]   [ ]\n"
+"admin-c:        [mandatory]  [multiple]   [inverse key]\n"
+"author:         [mandatory]  [multiple]   [inverse key]\n"
+"remarks:        [optional]   [multiple]   [ ]\n"
+"notify:         [optional]   [multiple]   [inverse key]\n"
+"mnt-by:         [mandatory]  [multiple]   [inverse key]\n"
+"changed:        [mandatory]  [multiple]   [ ]\n"
+"source:         [mandatory]  [single]     [ ]\n"
+,
+"poetic-form:    [mandatory]  [single]     [primary/look-up key]\n"
+"descr:          [optional]   [multiple]   [ ]\n"
+"admin-c:        [mandatory]  [multiple]   [inverse key]\n"
+"remarks:        [optional]   [multiple]   [ ]\n"
+"notify:         [optional]   [multiple]   [inverse key]\n"
+"mnt-by:         [mandatory]  [multiple]   [inverse key]\n"
+"changed:        [mandatory]  [multiple]   [ ]\n"
+"source:         [mandatory]  [single]     [ ]\n"
+,
 NULL
 }; /* Templates */

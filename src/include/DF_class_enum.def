@@ -20,6 +20,8 @@ typedef enum _C_Type_t {
   C_IT,
   C_OA,
   C_R6,
+  C_PO,
+  C_PF,
   C_END
 } C_Type_t;
 

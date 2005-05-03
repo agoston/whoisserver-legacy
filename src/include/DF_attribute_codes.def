@@ -94,5 +94,8 @@ char * const Attribute_codes[] = {
   "iy",
   "ud",
   "uo",
+  "po",
+  "pf",
+  "fr",
   NULL
 }; /* Attribute_codes */

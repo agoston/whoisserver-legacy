@@ -94,6 +94,9 @@ UD_query Insert[] = {
   {UD_LEAF_, " INSERT irt_nfy         SET thread_id=%d, object_id=%ld, irt_nfy='%s' "},
   {UD_NULL_, ""},
   {UD_NULL_, ""},
+  {UD_MAIN_, " INSERT poem         SET thread_id=%d, object_id=%ld, poem='%s' "},
+  {UD_AX_PF, " INSERT poetic_form         SET thread_id=%d, object_id=%ld, poetic_form='%s', dummy=0 "},
+  {UD_AUX__, " INSERT form         SELECT %d, %ld, poetic_form.object_id, %d         FROM poetic_form WHERE poetic_form.poetic_form='%s' "},
   {0, NULL}
 }; /* Insert */
 
@@ -193,6 +196,9 @@ UD_query Update[] = {
   {UD_LEAF_, " UPDATE irt_nfy         SET thread_id=%d         WHERE object_id=%ld         AND irt_nfy='%s' "},
   {UD_NULL_, ""},
   {UD_NULL_, ""},
+  {UD_MAIN_, ""},
+  {UD_NULL_, ""},
+  {UD_AX_FR, " UPDATE form         SET thread_id=%d         WHERE object_id=%ld         AND form_id=%ld "},
   {0, NULL}
 }; /* Update */
 
@@ -292,6 +298,9 @@ UD_query Dummy[] = {
   {UD_NULL_, ""},
   {UD_NULL_, ""},
   {UD_NULL_, ""},
+  {UD_NULL_, ""},
+  {UD_NULL_, ""},
+  {UD_AX_FR, " INSERT poetic_form         SET thread_id=%d, object_id=%ld, poetic_form='%s', dummy=1 "},
   {0, NULL}
 }; /* Dummy */
 
@@ -390,6 +399,9 @@ UD_query Select[] = {
   {UD_NULL_, ""},
   {UD_NULL_, ""},
   {UD_NULL_, ""},
+  {UD_NULL_, ""},
+  {UD_MAIN_, " poem='%s' AND "},
+  {UD_MAIN_, " poetic_form='%s' AND "},
   {UD_NULL_, ""},
   {0, NULL}
 }; /* Select */

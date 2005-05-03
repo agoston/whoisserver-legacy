@@ -39,5 +39,9 @@ int const Class_aliases_map[] = {
   16,
   17,
   17,
+  20,
+  20,
+  21,
+  21,
   NULL
 }; /* Class_aliases_map */

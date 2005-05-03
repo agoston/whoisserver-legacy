@@ -39,5 +39,9 @@ char * const Class_aliases[] = {
   "rtr-set",
   "it",
   "irt",
+  "po",
+  "poem",
+  "pf",
+  "poetic-form",
   NULL
 }; /* Class_aliases */

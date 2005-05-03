@@ -94,5 +94,8 @@ char * const Attribute_names[] = {
   "irt-nfy",
   "delete",
   "override",
+  "poem",
+  "poetic-form",
+  "form",
   NULL
 }; /* Attribute_names */
