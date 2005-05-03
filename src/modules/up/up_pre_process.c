@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.3 $
+  $Revision: 1.4 $
 
   UP pre process checks
 
@@ -279,6 +279,7 @@ int UP_check_organisation(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* if the operation is not creation, then return OK */
   if (operation != UP_CREATE)
   {
+    LG_log(lg_ctx, LG_FUNC,"<UP_check_organisation: exiting with value [%s]\n", UP_ret2str(retval));
     return retval;
   }
 
