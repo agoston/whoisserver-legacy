@@ -182,6 +182,106 @@ EXTRA_DIST = README \
              src/modules/rpsl/manual.txt \
              src/modules/rpsl/syntax.h \
              src/modules/rpsl/syntax_api.h \
+             src/modules/rpsl/aggr_bndry.lex.c \
+             src/modules/rpsl/aggr_bndry.tab.c \
+             src/modules/rpsl/aggr_mtd.lex.c \
+             src/modules/rpsl/aggr_mtd.tab.c \
+             src/modules/rpsl/attribute.c \
+             src/modules/rpsl/class.c \
+             src/modules/rpsl/components.lex.c \
+             src/modules/rpsl/components_r6.lex.c \
+             src/modules/rpsl/components_r6.tab.c \
+             src/modules/rpsl/components.tab.c \
+             src/modules/rpsl/default.lex.c \
+             src/modules/rpsl/default.tab.c \
+             src/modules/rpsl/export.lex.c \
+             src/modules/rpsl/export.tab.c \
+             src/modules/rpsl/filter.lex.c \
+             src/modules/rpsl/filter.tab.c \
+             src/modules/rpsl/ifaddr.lex.c \
+             src/modules/rpsl/ifaddr.tab.c \
+             src/modules/rpsl/import.lex.c \
+             src/modules/rpsl/import.tab.c \
+             src/modules/rpsl/inet6num.lex.c \
+             src/modules/rpsl/inet6num.tab.c \
+             src/modules/rpsl/inject.lex.c \
+             src/modules/rpsl/inject_r6.lex.c \
+             src/modules/rpsl/inject_r6.tab.c \
+             src/modules/rpsl/inject.tab.c \
+             src/modules/rpsl/interface.lex.c \
+             src/modules/rpsl/interface.tab.c \
+             src/modules/rpsl/members_is.lex.c \
+             src/modules/rpsl/members_is.tab.c \
+             src/modules/rpsl/members_rs.lex.c \
+             src/modules/rpsl/members_rs.tab.c \
+             src/modules/rpsl/mnt_routes6.lex.c \
+             src/modules/rpsl/mnt_routes6.tab.c \
+             src/modules/rpsl/mnt_routes_an.lex.c \
+             src/modules/rpsl/mnt_routes_an.tab.c \
+             src/modules/rpsl/mnt_routes.lex.c \
+             src/modules/rpsl/mnt_routes.tab.c \
+             src/modules/rpsl/mp_default.lex.c \
+             src/modules/rpsl/mp_default.tab.c \
+             src/modules/rpsl/mp_export.lex.c \
+             src/modules/rpsl/mp_export.tab.c \
+             src/modules/rpsl/mp_filter.lex.c \
+             src/modules/rpsl/mp_filter.tab.c \
+             src/modules/rpsl/mp_import.lex.c \
+             src/modules/rpsl/mp_import.tab.c \
+             src/modules/rpsl/mp_members_is.lex.c \
+             src/modules/rpsl/mp_members_is.tab.c \
+             src/modules/rpsl/mp_members_rs.lex.c \
+             src/modules/rpsl/mp_members_rs.tab.c \
+             src/modules/rpsl/mp_peering.lex.c \
+             src/modules/rpsl/mp_peering.tab.c \
+             src/modules/rpsl/mp_peer.lex.c \
+             src/modules/rpsl/mp_peer.tab.c \
+             src/modules/rpsl/peering.lex.c \
+             src/modules/rpsl/peering.tab.c \
+             src/modules/rpsl/peer.lex.c \
+             src/modules/rpsl/peer.tab.c \
+             src/modules/rpsl/refer.lex.c \
+             src/modules/rpsl/refer.tab.c \
+             src/modules/rpsl/rpsl_test.c \
+             src/modules/rpsl/syntax_api.c \
+             src/modules/rpsl/syntax.c \
+             src/modules/rpsl/test_syntax.c \
+             src/modules/rpsl/v6_filter.lex.c \
+             src/modules/rpsl/v6_filter.tab.c \
+             src/modules/rpsl/aggr_bndry.tab.h \
+             src/modules/rpsl/aggr_mtd.tab.h \
+             src/modules/rpsl/attribute.h \
+             src/modules/rpsl/class.h \
+             src/modules/rpsl/components_r6.tab.h \
+             src/modules/rpsl/components.tab.h \
+             src/modules/rpsl/default.tab.h \
+             src/modules/rpsl/export.tab.h \
+             src/modules/rpsl/filter.tab.h \
+             src/modules/rpsl/ifaddr.tab.h \
+             src/modules/rpsl/import.tab.h \
+             src/modules/rpsl/inet6num.tab.h \
+             src/modules/rpsl/inject_r6.tab.h \
+             src/modules/rpsl/inject.tab.h \
+             src/modules/rpsl/interface.tab.h \
+             src/modules/rpsl/members_is.tab.h \
+             src/modules/rpsl/members_rs.tab.h \
+             src/modules/rpsl/mnt_routes6.tab.h \
+             src/modules/rpsl/mnt_routes_an.tab.h \
+             src/modules/rpsl/mnt_routes.tab.h \
+             src/modules/rpsl/mp_default.tab.h \
+             src/modules/rpsl/mp_export.tab.h \
+             src/modules/rpsl/mp_filter.tab.h \
+             src/modules/rpsl/mp_import.tab.h \
+             src/modules/rpsl/mp_members_is.tab.h \
+             src/modules/rpsl/mp_members_rs.tab.h \
+             src/modules/rpsl/mp_peering.tab.h \
+             src/modules/rpsl/mp_peer.tab.h \
+             src/modules/rpsl/peering.tab.h \
+             src/modules/rpsl/peer.tab.h \
+             src/modules/rpsl/refer.tab.h \
+             src/modules/rpsl/syntax_api.h \
+             src/modules/rpsl/syntax.h \
+             src/modules/rpsl/v6_filter.tab.h \
              src/modules/aa/aa.h \
              src/modules/ac/access_control.h \
              src/modules/au/au.h \
@@ -368,3 +468,6 @@ uninstall-local:
 	rm -f $(DESTDIR)/${docdir}/WHOIS-HELP
 	rm -f $(DESTDIR)/${tmpdir}/load/SAMPLE/sample.db.gz
 	rm -f $(DESTDIR)/${tmpdir}/load/SAMPLE/SAMPLE.CURRENTSERIAL
+
+distclean-local:
+	rm -f src/modules/rpsl/*.o

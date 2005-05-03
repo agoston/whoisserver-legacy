@@ -29,5 +29,17 @@ syntax:
 
 all: compile-classes alltodo syntax
 
-alltodo: AttributeSyntax.class RPSLSyntax.class Defs.class ClassDef.class AttributeDef.class Query.class attributes.xml attributes.dtd classes.xml classes.dtd syntax.xml syntax.dtd
-	./makedefsall && touch alltodo
+alltodo: AttributeSyntax.class \
+         RPSLSyntax.class \
+         Defs.class \
+         ClassDef.class \
+         AttributeDef.class \
+         Query.class \
+         attributes.xml \
+         attributes.dtd \
+         classes.xml \
+         classes.dtd \
+         syntax.xml \
+         syntax.dtd
+	./makedefsall && \
+	touch alltodo
