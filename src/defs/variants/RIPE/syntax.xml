@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.1 2004/12/27 16:38:39 can Exp $
+$Id: syntax.xml,v 1.1 2004/12/27 18:17:04 can Exp $
 
 -->
 
@@ -1118,5 +1118,42 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
        </description>
    </attribute_syntax>
 
-</rpsl_syntax>
+   <attribute_syntax name="poem">
+      <core>
+          <regex>
+              ^.{1,80}$ 
+          </regex>
+       </core>
+       <front_end>
+          <regex>
+              ^POEM-[A-Z0-9][A-Z0-9_-]*$
+          </regex>
+       </front_end>
+       <description>
+     POEM-&lt;string&gt;
 
+     &lt;string&gt; can include alphanumeric characters, and "_" and 
+     "-" characters.
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="poetic-form">
+      <core>
+          <regex>
+              ^.{1,80}$
+          </regex>
+       </core>
+       <front_end>
+          <regex>
+              ^FORM-[A-Z0-9][A-Z0-9_-]*$
+          </regex>
+       </front_end>
+       <description>
+     POEM-&lt;string&gt;
+
+     &lt;string&gt; can include alphanumeric characters, and "_" and
+     "-" characters.
+       </description>
+   </attribute_syntax>
+
+</rpsl_syntax>

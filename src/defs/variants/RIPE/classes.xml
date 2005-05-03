@@ -3,7 +3,7 @@
 <!-- XXX: will want to add core template in the future, to 
           document which fields are mandatory for core (e.g. nic-hdl) -->
 
-<ripe_classes version="$Revision: 1.1.2.2 $" author="$Author: katie $">
+<ripe_classes version="$Revision: 1.2 $" author="$Author: katie $">
 
   <ripe_class name="domain" main_sql_table="domain" code="dn">
     <description>
@@ -931,5 +931,71 @@
     </delete-invquery-tables>
   </ripe_class>
 
-</ripe_classes>
+  <ripe_class name="poem" main_sql_table="poem" code="po">
+    <description>
+       A poem object contains poems that are submitted by users.
+    </description>
+    <attributes>
+      <poem         choice="mandatory" number="single"   />
+      <descr        choice="optional"  number="multiple" />
+      <form         choice="mandatory" number="single"   />
+      <text         choice="mandatory" number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <author       choice="mandatory" number="multiple" />
+      <remarks      choice="optional"  number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="20"/>
+    <rollback-tables>
+      <table name="mntner"/>
+      <table name="person_role"/>
+      <table name="names"/>
+      <table name="poetic_form"/>
+    </rollback-tables>
+    <affected-tables>
+      <table name="admin_c"/>
+      <table name="author"/>
+      <table name="notify"/>
+      <table name="mnt_by"/>
+      <table name="form"/>
+    </affected-tables>
+  </ripe_class>
 
+  <ripe_class name="poetic-form" main_sql_table="poetic_form" code="pf">
+    <description>
+       A poetic-form object defines the supported poem types. 
+    </description>
+    <attributes>
+      <poetic-form  choice="mandatory" number="single"   />
+      <descr        choice="optional"  number="multiple" />
+      <admin-c      choice="mandatory" number="multiple" />
+      <remarks      choice="optional"  number="multiple" />
+      <notify       choice="optional"  number="multiple" />
+      <mnt-by       choice="mandatory" number="multiple" />
+      <changed      choice="mandatory" number="multiple" />
+      <source       choice="mandatory" number="single"   />
+      <delete       choice="optional"  number="single"   pseudo="yes"/>
+      <override     choice="optional"  number="single"   pseudo="yes"/>
+    </attributes>
+    <dbase_code value="21"/>
+    <rollback-tables>
+      <table name="mntner"/>
+      <table name="person_role"/>
+      <table name="names"/>
+    </rollback-tables>
+    <affected-tables>
+      <table name="admin_c"/>
+      <table name="mnt_by"/>
+      <table name="notify"/>
+    </affected-tables>
+    <delete-invquery-tables>
+      <table name="form"/>
+    </delete-invquery-tables>
+  </ripe_class>
+
+</ripe_classes>

@@ -46,6 +46,9 @@ static const au_check_by_type_t rpsl_plugins[] =
   { "as-block", restricted_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
 #ifdef AFRINIC
   { "organisation", restricted_rpsl_create, restricted_rpsl_delete, restricted_rpsl_modify },
+#else
+  { "poetic-form", restricted_rpsl_create, restricted_rpsl_delete, restricted_rpsl_modify },
+  { "limerick", restricted_rpsl_create, restricted_rpsl_delete, restricted_rpsl_modify },
 #endif
   /* mntner */
   { "mntner", mntner_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },

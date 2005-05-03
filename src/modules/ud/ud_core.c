@@ -1,6 +1,6 @@
 /***************************************
   
-  $Revision: 1.61 $
+  $Revision: 1.1 $
 
   Core functions for update lower layer 
 
@@ -288,6 +288,7 @@ const GList *attr_list;
 /* compose query */
  g_string_sprintf(tr->query, "SELECT object_id FROM %s WHERE",
                              DF_get_class_sql_table(rpsl_get_class_id(rpsl_object_get_class(object))));
+
  /* add all primary keys */ 
  attr_list = rpsl_object_get_all_attr(object);
  g_list_foreach((GList *)attr_list,  ud_each_primary_key_select, tr);
@@ -765,9 +766,10 @@ const gchar *attribute_value;
 	 case UD_AX_IT:
          /* maintner */
 	 case UD_AX_MT:	
+	 case UD_AX_FR:	
 	      g_string_sprintf(query, query_fmt, tr->thread_ins, dummy_id, attribute_value, DUMMY_TYPE);
 	      break;
-         
+
          /* as_set, route_set */
 	 case UD_AX_MO:	
 	      set_name = get_set_name(tr->class_type);
@@ -944,6 +946,11 @@ const char *attribute_value;
 	 		if (!IS_DUMMY_ALLOWED(tr->mode))condition="AND dummy=0 "; else condition=NULL;
 	 		g_string_sprintf(tr->query, query_fmt, tr->thread_upd, tr->object_id, 
 	 			get_ref_id(tr, "mntner", "mntner", attribute_value, condition));
+	 		break;
+	 case UD_AX_FR: 
+	 		if (!IS_DUMMY_ALLOWED(tr->mode))condition="AND dummy=0 "; else condition=NULL;
+	 		g_string_sprintf(tr->query, query_fmt, tr->thread_upd, tr->object_id, 
+	 			get_ref_id(tr, "poetic_form", "poetic_form", attribute_value, condition));
 	 		break;
    case UD_AX_OA: 
       if (!IS_DUMMY_ALLOWED(tr->mode))condition="AND dummy=0 "; else condition=NULL;
@@ -1348,6 +1355,9 @@ const gchar *attribute_value;
                 g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:query not defined for the attribute\n" ,ERROR_U_BUG, attribute_type, attribute_value);
                 LG_log(ud_context, LG_SEVERE, "query not defined for this type of attribute:[%d:%s]\n", attribute_type, attribute_value);
                 die;
+    		break;
+   case UD_AX_PF: /* for Poetic Form tables*/
+    		g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, attribute_value);
     		break;
   }
   

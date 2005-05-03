@@ -1,6 +1,6 @@
 <!DOCTYPE ripe_attributes SYSTEM "attributes.dtd">
 
-<ripe_attributes version="$Revision: 1.1.2.2 $" author="$Author: katie $">
+<ripe_attributes version="$Revision: 1.2 $" author="$Author: katie $">
 
   <ripe_attribute name="abuse-mailbox" code="am">
     <description>
@@ -2605,6 +2605,112 @@
   <ripe_attribute name="override" code="uo">
     <description></description>
     <syntax>non-core</syntax>
+  </ripe_attribute>
+
+  <ripe_attribute name="poem" code="po">
+    <description>
+   Specifies the title of the poem.
+    </description>
+    <syntax>poem</syntax>
+
+    <representation>
+    <sqltable name="poem">
+      <insert qtype="ud_main_">
+        INSERT poem
+        SET thread_id=%d, object_id=%ld, poem='%s'
+      </insert>
+      <update qtype="ud_main_"></update>
+      <select qtype="ud_main_">
+        poem='%s' AND
+      </select>
+    </sqltable>
+    </representation>
+
+    <keys searchable="lookup">
+      <primary/>
+
+      <queries>
+        <sqlquery keytype="wk_poem" >
+          SELECT object_id,0
+          FROM   poem
+          WHERE  poem = '%s'
+          AND    thread_id = 0
+        </sqlquery>
+      </queries>
+    </keys>
+  </ripe_attribute>
+
+  <ripe_attribute name="poetic-form" code="pf">
+    <description>
+   Specifies the poem type.
+    </description>
+    <syntax>poetic-form</syntax>
+
+    <representation>
+    <sqltable name="poetic_form">
+      <insert qtype="ud_ax_pf">
+        INSERT poetic_form
+        SET thread_id=%d, object_id=%ld, poetic_form='%s', dummy=0
+      </insert>
+      <select qtype="ud_main_">
+        poetic_form='%s' AND
+      </select>
+    </sqltable>
+    </representation>
+
+    <keys searchable="lookup">
+      <primary/>
+
+      <queries>
+        <sqlquery keytype="wk_poetic_form" class="pf">
+          SELECT object_id,0
+          FROM   poetic_form
+          WHERE  poetic_form = '%s'
+          AND    thread_id = 0
+        </sqlquery>
+      </queries>
+    </keys>
+  </ripe_attribute>
+
+  <ripe_attribute name="form" code="fr">
+    <description>
+   Specifies the identifier of a registered poem type.
+    </description>
+    <syntax><list/>poetic-form</syntax>
+
+    <representation>
+    <sqltable name="form">
+      <insert qtype="ud_aux__">
+        INSERT form
+        SELECT %d, %ld, poetic_form.object_id, %d
+        FROM poetic_form WHERE poetic_form.poetic_form='%s'
+      </insert>
+      <update qtype="ud_ax_fr">
+        UPDATE form
+        SET thread_id=%d
+        WHERE object_id=%ld
+        AND form_id=%ld
+      </update>
+      <dummy qtype="ud_ax_fr">
+        INSERT poetic_form
+        SET thread_id=%d, object_id=%ld, poetic_form='%s', dummy=1
+      </dummy>
+    </sqltable>
+    </representation>
+
+    <keys searchable="inverse">
+      <foreign value="pf"/>
+
+      <queries>
+        <sqlquery keytype="wk_poetic_form" class="ANY">
+          SELECT i.object_id,0
+          FROM   poetic_form, form i
+          WHERE  poetic_form.object_id = i.form_id
+          AND    poetic_form.poetic_form = '%s'
+          AND    i.thread_id = 0
+        </sqlquery>
+      </queries>
+    </keys>
   </ripe_attribute>
 
 </ripe_attributes>

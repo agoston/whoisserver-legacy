@@ -62,8 +62,10 @@ DROP TABLE IF EXISTS transaction_rec;
 DROP TABLE IF EXISTS dummy_rec;
 DROP TABLE IF EXISTS tid;
 DROP TABLE IF EXISTS x509;
+DROP TABLE IF EXISTS poem;
+DROP TABLE IF EXISTS poetic_form;
+DROP TABLE IF EXISTS form;
 DROP TABLE IF EXISTS abuse_mailbox;
-
 
 
 
@@ -853,6 +855,48 @@ CREATE TABLE org (
 );
 
 #
+# Table structure for table 'poem'
+#
+
+CREATE TABLE poem (
+  thread_id int(11) NOT NULL default '0',
+  object_id int(10) unsigned NOT NULL default '0',
+  poem varchar(80) NOT NULL default '',
+  PRIMARY KEY  (object_id),
+  KEY poem (poem),
+  KEY thread_id (thread_id)
+);
+
+#
+# Table structure for table 'poetic_form'
+#
+
+CREATE TABLE poetic_form (
+  thread_id int(11) NOT NULL default '0',
+  object_id int(10) unsigned NOT NULL default '0',
+  poetic_form varchar(80) NOT NULL default '',
+  dummy tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (poetic_form),
+  KEY poetic_form (poetic_form),
+  KEY thread_id (thread_id),
+  KEY thread_id (poetic_form)
+); 
+
+#
+# Table structure for table 'form'
+#
+
+CREATE TABLE form (
+  thread_id int(11) NOT NULL default '0',
+  object_id int(10) unsigned NOT NULL default '0',
+  form_id int(10) unsigned NOT NULL default '0',
+  object_type tinyint(3) unsigned NOT NULL default '0',
+  PRIMARY KEY  (form_id,object_id),
+  KEY object_id (object_id),
+  KEY object_type (object_type)
+);
+
+#
 # Table structure for table 'abuse_mailbox'
 #
 
@@ -907,3 +951,5 @@ INSERT INTO object_order VALUES (15,22);
 INSERT INTO object_order VALUES (16,23);
 INSERT INTO object_order VALUES (17,41);
 INSERT INTO object_order VALUES (18,48); # organisation
+INSERT INTO object_order VALUES (20, 37);
+INSERT INTO object_order VALUES (21, 36);

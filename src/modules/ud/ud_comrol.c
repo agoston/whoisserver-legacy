@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   rollback(), commit(), delete() - rollback, commit update transaction, delete an object
 
@@ -714,6 +714,26 @@ char *sql_str;
          tr->succeeded=0; tr->error |= ERROR_U_DBS;
         }
        }   
+       break;
+
+    case C_PF:
+
+        /* Check that this poetic-form object is not referenced */
+
+       for (i=0; t_ipf[i] != NULL; i++) {
+       /* Calculate number of references */
+        sql_str= get_field_str(tr->sql_connection, "COUNT(*)", t_ipf[i], "form_id", sobject_id, NULL);
+        if(sql_str) {
+         num_rec = atol(sql_str);  UT_free(sql_str);
+         /* If there are references (and not the only self reference) we * cannot delete */
+         if(num_rec>0) {
+           g_string_sprintfa(tr->error_script,"E[%d][%ld]:ref integrity: %s\n" ,ERROR_U_OBJ, num_rec, t_ipf[i]);
+           tr->succeeded=0; tr->error |= ERROR_U_OBJ;
+         }
+        } else {
+         tr->succeeded=0; tr->error |= ERROR_U_DBS;
+        }
+       }
        break;
 
     default:

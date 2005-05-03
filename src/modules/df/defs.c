@@ -79,6 +79,8 @@ char * const  Filter_names[] = {
   "peering-set",
   "rtr-set",
   "irt",
+  "poem",
+  "poetic-form",
   NULL
 }; /* Filter_names */
 
@@ -134,6 +136,8 @@ char * const Type2main[] = {
 "irt",
 "organisation",
 "route6",
+"poem",
+"poetic_form",
 NULL
 };
 

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.34 $
+  $Revision: 1.1 $
 
   which_keytypes:  Determine which keys to look for.
   
@@ -57,6 +57,10 @@
 #define MAINTAINER "^[A-Z][A-Z0-9_-]*$"
 
 #define LIMERICK "^LIM-[A-Z0-9_-]+$"
+
+#define POEM "^POEM-[A-Z0-9][A-Z0-9_-]*$"
+
+#define POETIC_FORM "^FORM-[A-Z0-9][A-Z0-9_-]*$"
 
 #define KEYCERT "^(PGPKEY-[0-9A-F]{8})|(X509-[0-9]+)$"
 
@@ -130,6 +134,8 @@ struct {
     { WK_ASSETNAME,     ASSETNAME },
     { WK_ROUTESETNAME,  ROUTESETNAME },
     { WK_LIMERICK,      LIMERICK },
+    { WK_POEM,          POEM },
+    { WK_POETIC_FORM,   POETIC_FORM },
     { WK_ASRANGE,       ASRANGE },
     { WK_PEERINGSET,    PEERINGSET },
     { WK_FILTERSET,     FILTERSET },

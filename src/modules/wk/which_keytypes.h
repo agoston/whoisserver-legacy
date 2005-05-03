@@ -2,7 +2,7 @@
 #define READ_WHICH_KEYTYPES
 
 /***************************************
-  $Revision: 1.18 $
+  $Revision: 1.1 $
 
   Which Keytypes module (wk)
 
@@ -57,6 +57,8 @@ typedef enum WK_Type_t {
   WK_FINGERPR,       /*+ fingerprint                         +*/
   WK_ORG_ID,         /*+ organisation object ID              +*/
   WK_AUTH,           /*+ auth attribute                      +*/
+  WK_POEM,           /*+ poem name                           +*/
+  WK_POETIC_FORM,    /*+ poet type name                      +*/
   WK_END
 } WK_Type;
 
@@ -92,6 +94,8 @@ char * const Keytypes[] = {
   "irt",
   "organisation",
   "auth",
+  "poem",
+  "poetic_form",
   NULL
 }; /* Keytypes[] */
 
