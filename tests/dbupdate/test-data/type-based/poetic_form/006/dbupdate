@@ -1,0 +1,15 @@
+poem:         POEM-OUR-SQL
+descr:        Our SQL
+author:       TP1-DB-TEST
+text:         In the photo, you can see
+text:         Engineers coding the DB,
+text:         You will be amazed & excited,
+text:         Impressed & delighted,
+text:         When they release Version 3!
+admin-c:      TP1-DB-TEST
+form:         FORM-OUR-HAIKU
+mnt-by:       TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+password:    auth
