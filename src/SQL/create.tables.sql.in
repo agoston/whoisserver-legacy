@@ -878,8 +878,7 @@ CREATE TABLE poetic_form (
   dummy tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (poetic_form),
   KEY poetic_form (poetic_form),
-  KEY thread_id (thread_id),
-  KEY poetic_form (poetic_form)
+  KEY thread_id (thread_id)
 ); 
 
 #
