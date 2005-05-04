@@ -949,6 +949,6 @@ INSERT INTO object_order VALUES (14,21);
 INSERT INTO object_order VALUES (15,22);
 INSERT INTO object_order VALUES (16,23);
 INSERT INTO object_order VALUES (17,41);
-INSERT INTO object_order VALUES (18,48); # organisation
-INSERT INTO object_order VALUES (20, 37);
-INSERT INTO object_order VALUES (21, 36);
+INSERT INTO object_order VALUES (18,48);  #organisation
+INSERT INTO object_order VALUES (20, 37); #poem
+INSERT INTO object_order VALUES (21, 36); #poetic-form
