@@ -23,16 +23,6 @@
 # RESULT 2: The creation will succeed
 
 
-# CASE 3: Create an irt object
-#         with NO override
-%
-#
-# create irt object 
-#
-#SUCCESS
-#
-# RESULT 3: The creation will NOOP and a request is sent to ripe-dbm
-
 
 # CASE 4: Create an irt object
 #         with override
@@ -65,18 +55,6 @@
 #SUCCESS
 #
 # RESULT 6: The creation will succeed
-
-
-# CASE 7: Create an irt object
-#         with NO override
-#         and pgp signed mail message
-%
-#
-# create irt object 
-#
-#SUCCESS
-#
-# RESULT 7: The creation will NOOP and a request is sent to ripe-dbm
 
 
 # CASE 8: Create 2 as-block objects
