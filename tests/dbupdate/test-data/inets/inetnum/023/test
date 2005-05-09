@@ -8,7 +8,7 @@
 #
 # RESULT 23: The creation will be a NOOP
 #            and it is forwarded to the hostmaster.
-# rir AFRINIC
+$TEST_RIR=AFRINIC
 
 
 inetnum:      80.16.0.0 - 80.16.151.184
