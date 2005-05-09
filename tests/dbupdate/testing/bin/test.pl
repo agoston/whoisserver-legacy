@@ -793,18 +793,22 @@ my $list = $_[1];
       my $name;
       if ($object =~ /^(route):(.*?)[\n](.*?)(origin):(.*?)[\n]/iosm) {
         $name = $1." ".$2.", ".$5;
+        $name =~ s/,\s+/, /g;
       }
       elsif ($object =~ /^(person):(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
         $name = $1." ".$5;
+        $name =~ s/\s+/ /g;
       }
       elsif ($object =~ /^(role):(.*?)[\n](.*?)(nic-hdl):(.*?)[\n]/iosm) {
         $name = $1." ".$5;
+        $name =~ s/\s+/ /g;
       }
       elsif ($object =~ /^(.+?):(.+?)[\n]/iom ) {
         $name = $1." ".$2;
       }
       $name =~ s/[\s]+/ /;
-#print STDERR "NAME [$name]\n";
+print STDERR "NAME [$name]\n";
+print STDERR "OBJECT [$tmp]\n";
       $list->{$name} = $tmp;
     } 
   }
