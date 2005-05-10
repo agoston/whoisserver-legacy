@@ -714,7 +714,7 @@ my $logstring = getvar('LOGSTRING');
 			$lines = [ ];
 			my $path = getvar('CURRENT_DIR');
 			foreach my $string (<LOGFILE>) {
-				push @{$lines}, $string unless ($string =~ /$path/);
+				push @{$lines}, $string unless ($string =~ /TEST RUN $path/i);
 			}
     }
     else {
