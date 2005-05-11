@@ -21,6 +21,6 @@ WriteMakefile(
 	'VERSION_FROM' => 'RPSL.pm',
 	'PREREQ_PM'    => { Tie::IxHash => 1.21 },
 	'DEFINE'       => '',
-	'LIBS'         => ['-Llib -lrpsl -lglib -lpthread'],
-	'INC'          => '-Iinclude `glib-config --cflags`',
+	'LIBS'         => ['-Llib @GLIB_LIBS@ -lrpsl -lglib -lpthread'],
+	'INC'          => '-Iinclude @GLIB_CFLAGS@',
 );

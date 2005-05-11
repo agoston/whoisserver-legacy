@@ -364,6 +364,7 @@ AC_CONFIG_FILES([
   src/SQL/create.tables.sql.patch
   src/SQL/create.RIPADMIN.sql
   src/SQL/create.third-stage
+  src/opl-perl/Makefile.PL
   Makefile
   src/Makefile
   src/utils/wrapper
