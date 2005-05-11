@@ -137,8 +137,8 @@ libwk_a_SOURCES = modules/wk/which_keytypes.c
 
 bin_PROGRAMS = dbupdate whois-server \
                loader getvar \
-               history/archive history/surf history/recreate \
-               history/cleanup history/backup \
+               archive surf recreate \
+               cleanup backup \
                mr ripupdate \
                text_export
 
@@ -154,25 +154,25 @@ loader_LDADD = $(LDRIP)
 getvar_SOURCES = getvar_src/getvar.c
 getvar_LDADD = $(LDRIPNOMYSQL)
 
-history_archive_SOURCES = history/miniconf.c history/aconf.c \
+archive_SOURCES = history/miniconf.c history/aconf.c \
                           history/archive.c history/dbsupport.c
-history_archive_LDADD = $(LDHISTORY)
+archive_LDADD = $(LDHISTORY)
 
-history_surf_SOURCES = history/surf.c history/dbsupport.c \
+surf_SOURCES = history/surf.c history/dbsupport.c \
                        history/miniconf.c history/aconf.c
-history_surf_LDADD = $(LDHISTORY)
+surf_LDADD = $(LDHISTORY)
 
-history_recreate_SOURCES = history/recreate.c history/dbsupport.c \
+recreate_SOURCES = history/recreate.c history/dbsupport.c \
                            history/miniconf.c history/aconf.c
-history_recreate_LDADD = $(LDRIPFULL)
+recreate_LDADD = $(LDRIPFULL)
 
-history_cleanup_SOURCES = history/cleanup.c history/dbsupport.c \
+cleanup_SOURCES = history/cleanup.c history/dbsupport.c \
                           history/miniconf.c history/aconf.c
-history_cleanup_LDADD = $(LDHISTORY)
+cleanup_LDADD = $(LDHISTORY)
 
-history_backup_SOURCES = history/backup.c history/dbsupport.c \
+backup_SOURCES = history/backup.c history/dbsupport.c \
                          history/miniconf.c history/aconf.c
-history_backup_LDADD = $(LDHISTORY)
+backup_LDADD = $(LDHISTORY)
 
 ripupdate_SOURCES = ripupdate_src/ripupdate.c
 
@@ -181,3 +181,48 @@ mr_LDADD = $(LDRIPNOMYSQL)
 
 text_export_SOURCES = text_export_src/text_export.c
 text_export_LDADD = $(LDRIP)
+
+install-exec-hook:
+	${mkinstalldirs} $(DESTDIR)/${topdir} ${DESTDIR}${bindir} \
+	  $(DESTDIR)/${confdir} \
+	  $(DESTDIR)/${docdir} \
+	  $(DESTDIR)/${bindir}/SQL \
+	  $(DESTDIR)/${vardir} ${DESTDIR}${tmpdir} \
+	  $(DESTDIR)/${tmpdir}/load ${DESTDIR}${tmpdir}/load/SAMPLE \
+	  $(DESTDIR)/${lockdir} ${DESTDIR}${logdir} \
+	  $(DESTDIR)/${qrylog} ${DESTDIR}${dbuperr} \
+	  $(DESTDIR)/${allriperr} ${DESTDIR}${ripaudit} \
+	  $(DESTDIR)/${ripmirlog} ${DESTDIR}${ripsvrlog} \
+	  $(DESTDIR)/${sqlog} ${DESTDIR}${ripupdlog} \
+	  $(DESTDIR)/${updlog} ${DESTDIR}${acklog} \
+	  $(DESTDIR)/${notiflog} ${DESTDIR}${forwlog}
+	${INSTALL} -m 0755 ./utils/remadmin.pl $(DESTDIR)/${bindir}
+	${INSTALL} -m 0755 ./utils/make_mysql_user $(DESTDIR)/${bindir}
+	${INSTALL} -m 0755 ./utils/ripe2rpsl $(DESTDIR)/${bindir}
+	${INSTALL} -m 0755 ./utils/make_db $(DESTDIR)/${bindir}
+	${INSTALL} -m 0755 ./utils/load_all.sh $(DESTDIR)/${bindir}
+	${INSTALL} -m 0755 ./utils/whoisd.server $(DESTDIR)/${bindir}
+	${INSTALL} -m 0755 ./utils/whoisd_start $(DESTDIR)/${bindir}
+	${INSTALL} -m 0644 ../conf/rip.config.sample $(DESTDIR)/${confdir}
+	${INSTALL} -m 0644 ../conf/sources.config.sample $(DESTDIR)/${confdir}
+	${INSTALL} -m 0644 ../conf/rip.config.sample.q $(DESTDIR)/${confdir}
+	${INSTALL} -m 0644 ../conf/sources.config.sample.q $(DESTDIR)/${confdir}
+	${INSTALL} -m 0644 ../conf/ack_template $(DESTDIR)/${confdir}
+	${INSTALL} -m 0644 ../conf/ack_text $(DESTDIR)/${confdir}
+	${INSTALL} -m 0644 ../conf/forw_create_template $(DESTDIR)/${confdir}
+	${INSTALL} -m 0644 ../conf/frwd_template $(DESTDIR)/${confdir}
+	${INSTALL} -m 0644 ../conf/frwd_text $(DESTDIR)/${confdir}
+	${INSTALL} -m 0644 ../conf/notif_template $(DESTDIR)/${confdir}
+	${INSTALL} -m 0644 ../conf/notif_text $(DESTDIR)/${confdir}
+	${INSTALL} -m 0644 ../doc/AUTO-DBM-HELP $(DESTDIR)/${docdir}
+	${INSTALL} -m 0644 ../doc/WHOIS-HELP $(DESTDIR)/${docdir}
+	${INSTALL} -m 0644 ../conf/sample.db.gz  $(DESTDIR)/${tmpdir}/load/SAMPLE
+	${INSTALL} -m 0644 ../conf/SAMPLE.CURRENTSERIAL  $(DESTDIR)/${tmpdir}/load/SAMPLE
+	${INSTALL} -m 0644 ./SQL/aux.index.2 $(DESTDIR)/${bindir}/SQL
+	${INSTALL} -m 0644 ./SQL/create.RIPADMIN.sql $(DESTDIR)/${bindir}/SQL
+	${INSTALL} -m 0644 ./SQL/create.tables.sql $(DESTDIR)/${bindir}/SQL
+	${INSTALL} -m 0644 ./SQL/leaf.index.2 $(DESTDIR)/${bindir}/SQL
+	${INSTALL} -m 0644 ./SQL/main.index.1 $(DESTDIR)/${bindir}/SQL
+	${INSTALL} -m 0755 ./SQL/create.first-stage $(DESTDIR)/${bindir}/SQL
+	${INSTALL} -m 0755 ./SQL/create.second-stage $(DESTDIR)/${bindir}/SQL
+	${INSTALL} -m 0755 ./SQL/create.third-stage $(DESTDIR)/${bindir}/SQL
