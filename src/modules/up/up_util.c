@@ -724,6 +724,7 @@ int up_get_source(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                             source_data_t *source_data)
 {
   int retval;
+  char *obj_dirty_source = NULL;
   GList *attr_list = NULL;
 
   LG_log(lg_ctx, LG_FUNC,">up_get_source: entered ");
@@ -744,8 +745,21 @@ int up_get_source(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
   else
   {
-    /* set up current source data values */
-    retval = up_set_current_source_data(rt_ctx, lg_ctx, options, (*obj_source), source_data);
+    /* check if this is filtered whois output */
+    /* get the 'not' clean value, including eol comments */
+    obj_dirty_source = rpsl_attr_get_value((rpsl_attr_t *)(attr_list->data));
+    if ( strstr(obj_dirty_source, "Filtered") != NULL )
+    {
+      /* this is filtered output and cannot be used for updates */
+      RT_filtered_source(rt_ctx);
+      retval = UP_FAIL;
+    }
+    else
+    {
+      /* set up current source data values */
+      retval = up_set_current_source_data(rt_ctx, lg_ctx, options, (*obj_source), source_data);
+    }
+    
     if ( retval != UP_OK )
     {
       free(*obj_source);
