@@ -724,7 +724,7 @@ int up_get_source(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                             source_data_t *source_data)
 {
   int retval;
-  char *obj_dirty_source = NULL;
+  const char *obj_dirty_source = NULL;
   GList *attr_list = NULL;
 
   LG_log(lg_ctx, LG_FUNC,">up_get_source: entered ");
