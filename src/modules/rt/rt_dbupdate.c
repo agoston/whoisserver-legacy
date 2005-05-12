@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.3 $
+  $Revision: 1.4 $
 
   Reporting module.
 
@@ -470,6 +470,18 @@ void RT_invalid_source(RT_context_t* ctx) {
   rt_add_text_node(node, "source", (xmlChar*) source);
   rt_prepare_node(ctx, node);
   g_free(source);
+}
+
+/*+
+  RT_filtered_source - Reports filtered source.
+
+  RT_context_t* ctx - Context.
+  +*/
+void RT_filtered_source(RT_context_t* ctx) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"filtered_source");
+  rt_prepare_node(ctx, node);
 }
 
 

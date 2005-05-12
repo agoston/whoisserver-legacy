@@ -92,6 +92,10 @@
 ***Error: Source [<xsl:value-of select="source/text()"/>] not recognised.
   </xsl:template>
 
+  <xsl:template match="filtered_source">
+***Error: Cannot submit filtered whois output for updates.
+  </xsl:template>
+
 
   <xsl:template match="attr">
 <xsl:text>
