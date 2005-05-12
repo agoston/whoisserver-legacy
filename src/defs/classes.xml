@@ -3,7 +3,7 @@
 <!-- XXX: will want to add core template in the future, to 
           document which fields are mandatory for core (e.g. nic-hdl) -->
 
-<ripe_classes version="$Revision: 1.6 $" author="$Author: katie $">
+<ripe_classes version="$Revision: 1.7 $" author="$Author: arife $">
 
   <ripe_class name="domain" main_sql_table="domain" code="dn">
     <description>
@@ -233,6 +233,7 @@
       <table name="auth_override"/>
       <table name="referral_by"/>
       <table name="org"/>
+      <table name="abuse_mailbox"/>
     </affected-tables>
     <delete-invquery-tables>
       <table name="mnt_by"/>
@@ -278,6 +279,7 @@
       <table name="names"/>
       <table name="e_mail"/>
       <table name="notify"/>
+      <table name="abuse_mailbox"/>
       <table name="mnt_by"/>
       <table name="org"/>
     </affected-tables>
@@ -333,6 +335,7 @@
       <table name="admin_c"/>
       <table name="tech_c"/>
       <table name="notify"/>
+      <table name="abuse_mailbox"/>
       <table name="mnt_by"/>
       <table name="org"/>
     </affected-tables>
@@ -382,6 +385,7 @@
       <table name="mnt_by"/>
       <table name="mnt_ref"/>
       <table name="notify"/>
+      <table name="abuse_mailbox"/>
       <table name="org"/>
       <table name="e_mail"/>
       <table name="ref_nfy"/>
@@ -924,6 +928,7 @@
       <table name="mnt_by"/>
       <table name="auth"/>
       <table name="irt_nfy"/>
+      <table name="abuse_mailbox"/>
       <table name="org"/>
     </affected-tables>
     <delete-invquery-tables>
