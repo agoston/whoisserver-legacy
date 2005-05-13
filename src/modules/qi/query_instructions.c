@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.6 $
+  $Revision: 1.7 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -719,17 +719,21 @@ char *brief_filter (const char *str) {
 char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
 
   char *result;
-  char *attr_list[3] = {"e-mail",
+  char *attr_list[4] = {"e-mail",
                         "notify",
-                        "changed"
+                        "changed",
+                        "source"
                        };
   int i,j,start = 1;
   gboolean filtering_an_attribute = FALSE;
+  gboolean filtering_source_attribute = FALSE;
   gboolean filtered = FALSE;
   GString *result_buff = g_string_sized_new(STR_XL);
+  GString *source_attr = g_string_sized_new(STR_XL);
   gchar **lines = ut_g_strsplit_v1(str, "\n", 0);
 
   g_string_assign(result_buff, "");
+  g_string_assign(source_attr, "");
 
   if (abuse_attr_exists == TRUE) {
     start = 0;
@@ -741,6 +745,10 @@ char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
       if ((strncmp(attr_list[i], lines[j], attr_name_len) == 0) &&
           (lines[j][attr_name_len] == ':'))
       {
+        if (i == 3) /* this is source attribute */ {
+          filtering_source_attribute = TRUE;
+          g_string_sprintfa(source_attr, "%s", lines[j]);
+        }
         filtering_an_attribute = TRUE;
         filtered = TRUE;
         break;
@@ -755,11 +763,18 @@ char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
         case ' ':
         case '\t':
         case '+':
-          { /* do nothing */ }
+          /* do nothing for all except source */ 
+          if (filtering_source_attribute == TRUE) {
+            g_string_sprintfa(source_attr, "\n%s", lines[j]);
+          }
           break;
 
         default:
-          g_string_sprintfa(result_buff, "%s\n", lines[j]);  
+          if (filtering_source_attribute == TRUE) {
+            g_string_sprintfa(result_buff, "%s # Filtered\n", source_attr->str);
+            filtering_source_attribute = FALSE;
+          }
+          g_string_sprintfa(result_buff, "%s\n", lines[j]);
           filtering_an_attribute = FALSE;
      }
     } else {
@@ -768,9 +783,15 @@ char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
     }
   }
 
+  /* this is needed if source was the last attribute */
+  if (filtering_source_attribute == TRUE) {
+    g_string_sprintfa(result_buff, "%s # Filtered\n", source_attr->str);
+  }
+
   g_strfreev(lines);
   result = UT_strdup(result_buff->str);
   g_string_free(result_buff, TRUE);
+  g_string_free(source_attr, TRUE);
   return result;
 
 }
