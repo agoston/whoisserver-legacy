@@ -1,0 +1,12 @@
+
+# CASE 029: tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# make sure the source is filtered (end-of-line comment added)
+#
+#SUCCESS
+#
+# RESULT 029: The query will succeed.
+
+
