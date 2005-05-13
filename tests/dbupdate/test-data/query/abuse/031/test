@@ -1,0 +1,22 @@
+
+# CASE 031: tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# this is combined query and update test to test Denis' changes to dbupdate.
+# update should be rejected if Filtered is found in the source attribute
+#
+#FAILURE
+#
+# RESULT 031: The update will fail.
+
+
+person:       test person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+e-mail:       dbtest@ripe.net
+e-mail:       dbtest@ripe.net
+source:       DB-TEST # Filtered
+changed:      dbtest@ripe.net 20020101
+
