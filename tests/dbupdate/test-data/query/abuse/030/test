@@ -1,0 +1,13 @@
+
+# CASE 030: tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# make sure the source is filtered (end-of-line comment added)
+# source is not the last attribute, multiline attribute 
+#
+#SUCCESS
+#
+# RESULT 030: The query will succeed.
+
+
