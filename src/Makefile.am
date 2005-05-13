@@ -152,25 +152,20 @@ loader_LDADD = $(LDRIP)
 getvar_SOURCES = getvar_src/getvar.c
 getvar_LDADD = $(LDRIPNOMYSQL)
 
-archive_SOURCES = history/miniconf.c history/aconf.c \
-                          history/archive.c history/dbsupport.c
-archive_LDADD = $(LDHISTORY)
+#archive_SOURCES = history/miniconf.c history/aconf.c history/archive.c history/dbsupport.c
+#archive_LDADD = $(LDHISTORY)
 
-surf_SOURCES = history/surf.c history/dbsupport.c \
-                       history/miniconf.c history/aconf.c
-surf_LDADD = $(LDHISTORY)
+#surf_SOURCES = history/surf.c history/dbsupport.c history/miniconf.c history/aconf.c
+#surf_LDADD = $(LDHISTORY)
 
-recreate_SOURCES = history/recreate.c history/dbsupport.c \
-                           history/miniconf.c history/aconf.c
-recreate_LDADD = $(LDRIPFULL)
+# recreate_SOURCES = history/recreate.c history/dbsupport.c history/miniconf.c history/aconf.c
+# recreate_LDADD = $(LDRIPFULL)
 
-cleanup_SOURCES = history/cleanup.c history/dbsupport.c \
-                          history/miniconf.c history/aconf.c
-cleanup_LDADD = $(LDHISTORY)
+# cleanup_SOURCES = history/cleanup.c history/dbsupport.c history/miniconf.c history/aconf.c
+# cleanup_LDADD = $(LDHISTORY)
 
-backup_SOURCES = history/backup.c history/dbsupport.c \
-                         history/miniconf.c history/aconf.c
-backup_LDADD = $(LDHISTORY)
+# backup_SOURCES = history/backup.c history/dbsupport.c history/miniconf.c history/aconf.c
+# backup_LDADD = $(LDHISTORY)
 
 ripupdate_SOURCES = ripupdate_src/ripupdate.c
 
