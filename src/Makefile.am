@@ -137,8 +137,6 @@ libwk_a_SOURCES = modules/wk/which_keytypes.c
 
 bin_PROGRAMS = dbupdate whois-server \
                loader getvar \
-#               archive surf recreate \
-#               cleanup backup \
                mr ripupdate \
                text_export
 
