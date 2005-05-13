@@ -953,10 +953,10 @@ my $found = { };
 			if ($query !~ /EXACT/io) {
 				# if no exact matching, cut out the spaces between attribute and value
 				if (exists $expected->{$obj}) {
-					$expected->{$obj} =~ s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/mg;
+          $expected->{$obj} =~ s/^(\S+):\s+/$1:/mgi;
 				}
 				if (exists $found->{$obj}) {
-        	$found->{$obj} =~ s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/mg;
+					$found->{$obj} =~ s/^(\S+):\s+/$1:/mgi;
       	}
 			}
       
@@ -1074,11 +1074,14 @@ my $object;
 
   if ($query_orig !~ /EXACT/io) {
      # if no exact matching, cut out the spaces between attribute and value
+     # cut out the end-of-line comment from source attribute if any
 		 foreach (@received_lines) {
-       s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/g;
+       s/^(\S+):\s+/$1:/gmi;
+       s/^(source):(\S+)\s*#.*$/$1:$2/gmi;
      }
 		 foreach (@expected_lines) {
-       s/^([\s]+|[+]|[a-z0-9_-]+):[\s]+(.*)$/$1:$2/g;
+       s/^(\S+):\s+/$1:/gmi;
+       s/^(source):(\S+)\s*#.*$/$1:$2/gmi;
      }
   }
 

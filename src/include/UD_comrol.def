@@ -71,7 +71,7 @@ char *t_li[] = {
 
 char *t_mt[] = {
   "mntner","person_role","names","organisation",NULL,NULL,
-  "admin_c", "tech_c", "upd_to", "mnt_nfy", "auth", "notify", "mnt_by", "auth_override", "referral_by", "org", NULL
+  "admin_c", "tech_c", "upd_to", "mnt_nfy", "auth", "notify", "mnt_by", "auth_override", "referral_by", "org", "abuse_mailbox", NULL
 };
 
 char *t_imt[] = {
@@ -82,7 +82,7 @@ char *t_imt[] = {
 
 char *t_pn[] = {
   "mntner","organisation",NULL,NULL,NULL,NULL,
-  "names", "e_mail", "notify", "mnt_by", "org", NULL
+  "names", "e_mail", "notify", "abuse_mailbox", "mnt_by", "org", NULL
 };
 
 char *t_ipn[] = {
@@ -93,7 +93,7 @@ char *t_ipn[] = {
 
 char *t_ro[] = {
   "mntner","person_role","names","organisation",NULL,NULL,
-  "names", "e_mail", "admin_c", "tech_c", "notify", "mnt_by", "org", NULL
+  "names", "e_mail", "admin_c", "tech_c", "notify", "abuse_mailbox", "mnt_by", "org", NULL
 };
 
 /* route */
@@ -135,7 +135,7 @@ char *t_is[] = {
 
 char *t_it[] = {
   "mntner","person_role","names","organisation",NULL,NULL,
-  "admin_c", "tech_c", "notify", "mnt_by", "auth", "irt_nfy", "org", NULL
+  "admin_c", "tech_c", "notify", "mnt_by", "auth", "irt_nfy", "abuse_mailbox", "org", NULL
 };
 
 char *t_iit[] = {
@@ -146,7 +146,7 @@ char *t_iit[] = {
 
 char *t_oa[] = {
   "mntner","person_role","org_name","organisation",NULL,NULL,
-  "admin_c", "tech_c", "org_name", "mnt_by", "mnt_ref", "notify", "org", "e_mail", "ref_nfy", NULL
+  "admin_c", "tech_c", "org_name", "mnt_by", "mnt_ref", "notify", "abuse_mailbox", "org", "e_mail", "ref_nfy", NULL
 };
 
 char *t_ioa[] = {
