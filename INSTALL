@@ -15,14 +15,13 @@ site at ftp://ftp.ripe.net/ripe/dbase/software/prereq/
 You need to have the following software installed into your system (the
 versions that we have used are in brackets).  
 
-        - gcc (2.95.2), or the ucbcc compiler from Solaris
-          Workshop (6.0 update 2)
+        - gcc (2.95.2)
                 gcc home page http://www.gnu.org/software/gcc/gcc.html
 
         - GNU Make (3.79.1)
                 home page http://www.gnu.org/software/make/make.html
 
-        - glib (1.2.8, 1.2.9, 1.2.10)
+        - glib (1.2.10)
                 GTK+ home page http://www.gtk.org/
 
         - libxml2 (2.4.26)
@@ -49,16 +48,14 @@ versions that we have used are in brackets).
         - GNU Privacy Guard (1.0.4 to 1.2.2). 
                 home page http://www.gnupg.org/
 
-Optional:
-
-        - Perl (5.005_03 to 5.6.0).  It is only needed for the ripe2rpsl
-          converter and the remadmin.pl remote administration interface.
+        - Perl (5.6.0).  It is needed for the ripe2rpsl
+          converter, remadmin.pl remote administration interface and
+          reverse dns checking extensions.
                 home page http://www.perl.com/
           For remadmin.pl, you will also need the Net::Telnet module.
                 get it at http://www.cpan.org/modules/by-module/Net/
 
-        - If you want to regenerate the defs, you also need a Java 
-          compiler and runtime.  We have used Sun's JDK 1.3.1 for this 
+        - A Java compiler and runtime.  We have used Sun's JDK 1.4.2 for this 
           release.
                 home page http://java.sun.com/
 
@@ -86,9 +83,7 @@ To run the database you need to perform the following steps:
       a. Please check the "Prerequisites"; you will not be able to
          compile the code if these are not fulfilled.
       b. Edit the file "build.sh", which is a wrapper to "configure",
-         and set your site-specific variables, namely GLIBCONF,
-         MYSQLINC, MYSQLLIB, MYSQLBIN, CCLIENTINC, CCLIENTLIB, XSLTCONFIG,
-         XMLCONFIG, GPGCMD.
+         and set your site-specific variables.
          You can also choose your compiler and change the compiler flags
          if necessary.
       c. Issue "./build.sh --prefix=<your_prefix>" in the root directory
@@ -475,38 +470,3 @@ Up to now, the following tools are available:
     not compliant with RPSL. Example of such stream is RIPE-181 one.
 
   - make_mysql_user: This utility creates a MySQL user for DB access.
-
-QUESTIONNAIRE
--------------
-
-If you are using the RIPE Whois Database Software in a production
-system, please fill in this questionnaire and return it to us. This
-will provide us a picture of who is using the public releases and which
-versions are in use. This list will *not* be made publicly available.
-
-Please fill in the form and mail it to <ripe-dbm@ripe.net>
-
-Subject: Survey of RIPE Whois DB SW  version 3
-To: ripe-dbm@ripe.net
-
-Name of Organisation...............: 
-Email address......................: 
-Version of software................: 
-Name of server.....................: 
-Version of OS......................:
-Information available..............: 
-Approximate number of objects......:
-Comments (local modifications etc).: 
-
-e.g.
-
-Name of Organisation...............: RIPE NCC
-Email address......................: ripe-dbm@ripe.net
-Version of software................: 3.2.0
-Name of server.....................: whois.ripe.net
-Version of OS......................: Solaris 8
-Information available..............: RIPE IP address and routing registry
-Approximate number of objects......: 1 900 000
-Approximate queries per day........: 2 500 000
-Approximate updates per day........: 5000
-Comments (local modifications etc).: No local changes!
