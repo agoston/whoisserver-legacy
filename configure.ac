@@ -333,6 +333,14 @@ AC_CONFIG_COMMANDS([links],[
   ])
 AC_MSG_RESULT([Done])
 
+dnl ugly hack for a generated nested class name
+AC_MSG_CHECKING([Renaming a file])
+AC_CONFIG_COMMANDS([renamedlr],[
+  ln -sf src/defs/ClassDefDOLLARDOLLARClassDiagram.class \
+         src/defs/ClassDef\$ClassDiagram.class
+  ])
+AC_MSG_RESULT([Done])
+
 dnl Output & finalization
 AC_CONFIG_FILES([
   conf/rip.config.sample

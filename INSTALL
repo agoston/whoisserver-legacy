@@ -353,6 +353,10 @@ dbupdate -c <config_file> [-m] [-p] [-r] [-n] [-t] [-d] [-o <string>] \
 
 -k --keywords: String containing keywords.
 
+-x --x509: x509 certificate file that the object was signed with.
+
+-X --cert: x509 certificate itself on the command line.
+
 There are several variables that you can/should customize in the
 configuration file.
 

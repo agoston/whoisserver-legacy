@@ -68,6 +68,7 @@ EXTRA_DIST = README \
              src/defs/Defs.java \
              src/defs/Query.java \
              src/defs/RPSLSyntax.java \
+             src/defs/ClassDefDOLLARDOLLARClassDiagram.class \
              src/defs/AttributeDef.class \
              src/defs/AttributeSyntax.class \
              src/defs/Defs.class \
@@ -81,6 +82,43 @@ EXTRA_DIST = README \
 	     src/defs/syntax.dtd \
 	     src/defs/Makefile.syntax \
 	     src/defs/makedefsall.in \
+             src/defs/HOWTO \
+             src/defs/README \
+             src/defs/alltodo \
+             src/defs/variants/AFRINIC/attributes.xml \
+             src/defs/variants/AFRINIC/classes.xml \
+             src/defs/variants/AFRINIC/syntax.xml \
+             src/defs/variants/Makefile.syntax \
+             src/defs/variants/APNIC/attributes.xml \
+             src/defs/variants/APNIC/classes.xml \
+             src/defs/variants/APNIC/syntax.xml \
+             src/defs/variants/IETF/attributes.xml \
+             src/defs/variants/IETF/classes.xml \
+             src/defs/variants/IETF/syntax.xml \
+             src/defs/variants/RIPE/attributes.xml \
+             src/defs/variants/RIPE/classes.xml \
+             src/defs/variants/RIPE/syntax.xml \
+             src/defs/xalan/README \
+             src/defs/xalan/License \
+             src/defs/xalan/xerces.jar \
+             src/defs/Makefile.syntax \
+             src/defs/attribute_tab.h \
+             src/defs/attributes.dtd \
+             src/defs/attributes.xml \
+             src/defs/class_tab.h \
+             src/defs/classes.dtd \
+             src/defs/classes.xml \
+             src/defs/makedefsall.in \
+             src/defs/syntax.dtd \
+             src/defs/AttributeSyntax.class \
+             src/defs/RPSLSyntax.class \
+             src/defs/ClassDef.class \
+             src/defs/AttributeDef.class \
+             src/defs/Query.class \
+             src/defs/Defs.class \
+             src/defs/syntax_tab.h \
+             src/defs/makedefsall \
+             src/defs/syntax.xml \
              src/include/rip.h \
              src/include/stubs.h \
              src/include/comparisons.h \
@@ -109,7 +147,7 @@ EXTRA_DIST = README \
              src/utils/noperson.sed \
              src/utils/md5_pw.c \
              src/utils/README.ip6arpa \
-             src/MODULES \
+             src/MODULES.txt \
              src/modules/rpsl/manual.txt \
              src/modules/rpsl/aggr_bndry.l \
              src/modules/rpsl/aggr_bndry.y \
@@ -364,7 +402,8 @@ EXTRA_DIST = README \
              src/modules/wk/which_keytypes.h \
              src/history/aconf.h \
              src/history/dbsupport.h \
-             src/history/miniconf.h
+             src/history/miniconf.h \
+             src/opl-perl/Makefile.PL.in
 
 #MOSTLYCLEANFILES = ./src/modules/rpsl/*.o \
 #		   ./src/modules/rpsl/*.lex.c \

@@ -1,3 +1,28 @@
+Release Notes for RIPE Whois Server version 3.3.0
+*************************************************
+
+These are the major changes to the software since the latest revision.
+
+o People upgrading from 3.2.0 need to read the file UPDATE-DB-3.3.0
+o Source tree has heavily been modified, build system now uses
+  autoconf/automake in full.
+o A few new options are added to the configure script. RPSL variant can be
+  chosen during configure via --with-rpslvariant. RDNS can be turned off or
+  on with the --with-rdns option.
+o "limerick" object type is upgraded to more general "poem" and
+  "poetic-form" object types. See
+  http://www.ripe.net/ripe/maillists/archives/db-wg/2005/msg00073.html
+  for a complete definition of the changes.
+o Reverse DNS registry checking mechanism has been added. Since this is a
+  specialized requirement for the software, it's initially turned off by
+  the build script.
+o Perl RPSL library has been included in the distribution.
+o Abuse mailbox changes have been implemented, adding a few new query
+  options and changes to the default output. Please see the full list of
+  changes at:
+  http://www.ripe.net/ripe/maillists/archives/db-wg/2005/msg00057.html
+o Name of the server binary has changed: whois_rip is now whois-server.
+
 Release Notes for RIPE Whois Server version 3.2.0
 *************************************************
 
@@ -945,4 +970,4 @@ o The update functionality has been integrated.
 o Lots of bugfixes and backend improvements.
 
 
-
+$Id$
