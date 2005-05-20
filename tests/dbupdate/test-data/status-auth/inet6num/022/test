@@ -7,7 +7,7 @@
 #SUCCESS
 #
 # RESULT 22: The creation will succeed
-rir AFRINIC
+$TEST_RIR=AFRINIC
 
 
 inet6num:     2001:0610::/35

@@ -7,7 +7,7 @@
 #FAILURE
 #
 # RESULT 21: The creation will fail
-rir AFRINIC
+$TEST_RIR=AFRINIC
 
 
 inet6num:     2001:0610::/35
