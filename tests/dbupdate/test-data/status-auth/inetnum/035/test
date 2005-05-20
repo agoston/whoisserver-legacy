@@ -7,7 +7,7 @@
 #FAILURE
 #
 # RESULT 35: The creation will fail
-#rir AFRINIC
+$TEST_RIR=AFRINIC
 
 
 inetnum:      192.168.200.0 - 192.168.200.255
