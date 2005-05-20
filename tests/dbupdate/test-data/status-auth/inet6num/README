@@ -188,7 +188,7 @@
 #FAILURE
 #
 # RESULT 19: The creation will fail
-rir AFRINIC
+#rir AFRINIC
 
 
 # CASE 20: create an inet6num with SUB-ALLOCATED PA
@@ -199,7 +199,7 @@ rir AFRINIC
 #SUCCESS
 #
 # RESULT 20: The creation will succeed
-rir AFRINIC
+#rir AFRINIC
 
 
 # CASE 21: create an inet6num with SUB-ALLOCATED PA
@@ -210,7 +210,7 @@ rir AFRINIC
 #FAILURE
 #
 # RESULT 21: The creation will fail
-rir AFRINIC
+#rir AFRINIC
 
 
 # CASE 22: create an inet6num with ASSIGNED PA
@@ -221,7 +221,7 @@ rir AFRINIC
 #SUCCESS
 #
 # RESULT 22: The creation will succeed
-rir AFRINIC
+#rir AFRINIC
 
 
 # CASE 23: create an inet6num with ASSIGNED PA
@@ -232,6 +232,6 @@ rir AFRINIC
 #FAILURE
 #
 # RESULT 23: The creation will fail
-rir AFRINIC
+#rir AFRINIC
 
 
