@@ -2133,7 +2133,8 @@ sub parse_command()	{
   }
 
   # if errors in GetOptions
-  if ( !%{$CONFIG} || !$opt )	{
+  if ( !%{$CONFIG} || !$opt || ($CONFIG->{"RUNDIRS"} !~ /^\//)
+   ){
     print $ERR->{'E_COMLINE'};
     print "
     usage:
@@ -2145,7 +2146,7 @@ sub parse_command()	{
     --config, -c          configuration file
     --limit, -l        limit of mismatches (failed tests)
     --errors, -z       limit of errors (runtime errors)
-    --rundir, -r          <list of directories separated by space>\n\n";
+    --rundir, -r          <list of directories separated by space, absolute paths>\n\n";
     return;
   }
 
@@ -2231,6 +2232,8 @@ my $dir = $_[0];
 sub get_test_dirs()	{
 my @exclude_dirs;
 my $excludefile = getvar('EXCLUDE');
+my $datadir = getvar ('DATADIR');
+
 
     # find the test which should be excluded (not mandatory).
     if (defined $excludefile)	{
@@ -2239,6 +2242,7 @@ my $excludefile = getvar('EXCLUDE');
         while (<EXCLUDE>)   {
             chomp();
             s/\/$//;
+            s/^/$datadir\//;
             push @exclude_dirs, expand_dir($_) if (! is_ignored($_));
         }
         close (EXCLUDE) 
@@ -2353,10 +2357,10 @@ my $dirs = $_[0];
     print SUMMARY "% Username: ";
     print SUMMARY $ENV{USER};
     print SUMMARY "\n";
-    print SUMMARY "% TESTS RUN:      ",scalar(@{$test_dirs}),"\n";
-    print SUMMARY "% TESTS SKIPPED:  ",scalar(@{$skip_dirs}),"\n";
-    print SUMMARY "% TESTS OK:       $ok\n";
-    print SUMMARY "% TESTS FAILED:   $failed\n\n";
+    print SUMMARY "% TESTS RUN:     ",scalar(@{$test_dirs}),"\n";
+    print SUMMARY "% TESTS SKIPPED: ",scalar(@{$skip_dirs}),"\n";
+    print SUMMARY "% TESTS OK:      $ok\n";
+    print SUMMARY "% TESTS FAILED:  $failed\n\n";
     if ($failed != 0)   {
         for (sort (keys %results)) {
             print SUMMARY "% FAILED: $_\n" if ($results{$_} eq "FAILED");
