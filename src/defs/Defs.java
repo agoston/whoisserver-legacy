@@ -192,7 +192,7 @@ public class Defs {
                 return "-1";
             }
 
-	    String a = d.getEnum();
+	    String a = d.getEnumeration();
 	    
 	    //System.out.println( d );
 	    
@@ -325,10 +325,10 @@ public class Defs {
       // If the attribute has status="valid".
       if (ad.getStatus().equals("valid")) {
         // Output the attribute enum.
-        System.out.println("  " + ad.getEnum() + ",");
+        System.out.println("  " + ad.getEnumeration() + ",");
 
         for (int i=0; i<requiredAttributeEnum.length; i++) {
-            if (requiredAttributeEnum[i].equals(ad.getEnum())) {
+            if (requiredAttributeEnum[i].equals(ad.getEnumeration())) {
                 requiredSeen[i] = true;
             }
         }
@@ -361,7 +361,7 @@ public class Defs {
       // If the attribute has status="valid".
       if (ad.getStatus().equals("valid") && ad.getInverse()) {
         // Output the attribute enum.
-        System.out.print(ad.getEnum() + ", ");
+        System.out.print(ad.getEnumeration() + ", ");
       }
     }
 
@@ -465,9 +465,9 @@ public class Defs {
                              ",  /* XXX: no class code to enumerate */");
           num_bogus++;
       } else {
-          System.out.println("  " + od.getEnum() + ",");
+          System.out.println("  " + od.getEnumeration() + ",");
           for (int i=0; i<requiredClassEnum.length; i++) {
-              if (requiredClassEnum[i].equals(od.getEnum())) {
+              if (requiredClassEnum[i].equals(od.getEnumeration())) {
                   requiredSeen[i] = true;
               }
           }
@@ -496,7 +496,7 @@ public class Defs {
           System.out.print("C_BOGUS" + num_bogus + ", ");
           num_bogus++;
       } else {
-          System.out.print(cd.getEnum() + ", ");
+          System.out.print(cd.getEnumeration() + ", ");
       }
     }
     System.out.println("MA_END");
@@ -685,7 +685,7 @@ public class Defs {
 	  String ip6 = ad.getV6Load() != null 
 	      ? "\"" + ad.getV6Load() + "\"" : "NULL";
 
-	  System.out.print("  { " +  ad.getEnum() 
+	  System.out.print("  { " +  ad.getEnumeration() 
 			   + ", "   + ad.getFamily() 
 			   + ",\n\t"  + ip4.replace('\n',' ')
 			   + ",\n\t"  + ip6.replace('\n',' ')

@@ -441,7 +441,7 @@ private String getTextFromNode( Node q ) {
     return syntax;
   } // getSyntax()
 
-  public String getEnum() {
+  public String getEnumeration() {
     return new String("A_" + code).toUpperCase();
   } // getEnum()
 

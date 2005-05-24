@@ -35,7 +35,7 @@ public class ClassDef {
   public static final int EXTRA_BIT=11;
 
   private String    name;
-  private String    enum;
+  private String    enumeration;
   private String    code;
   private String    status;
   private String    main_table;
@@ -71,7 +71,7 @@ public class ClassDef {
     code      = obj.getAttributes().getNamedItem("code").getNodeValue();
     status    = obj.getAttributes().getNamedItem("status").getNodeValue();
     main_table = obj.getAttributes().getNamedItem("main_sql_table").getNodeValue();
-    enum      = new String("C_" + code).toUpperCase();
+    enumeration      = new String("C_" + code).toUpperCase();
 
     Node search = obj.getFirstChild();
     while (search != null) {
@@ -346,8 +346,8 @@ public class ClassDef {
     return foreignAttrs;
   } // getForeignAttrs()
 
-  public String getEnum() {
-    return enum;
+  public String getEnumeration() {
+    return enumeration;
   } // getEnum()
 
   public Vector getAffectedTables() {
