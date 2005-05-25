@@ -4,7 +4,7 @@ AC_PREREQ(2.59)
 AC_INIT([Whois Server], [3.3.0],
         [RIPE Database Management <ripe-dbm@ripe.net>],
         [whoisserver])
-AM_INIT_AUTOMAKE([whois],[3.3.0])
+AM_INIT_AUTOMAKE([whoisserver],[3.3.0])
 
 PRODUCT=$PACKAGE_NAME
 VERSION=$PACKAGE_VERSION

@@ -3,33 +3,49 @@ Release Notes for RIPE Whois Server version 3.3.0
 
 These are the major changes to the software since the latest revision.
 
-o People upgrading from 3.2.0 need to read the file UPDATE-DB-3.3.0
-o Source tree has heavily been modified, build system now uses
-  autoconf/automake in full.
-o A few new options are added to the configure script. RPSL variant can be
-  chosen during configure via --with-rpslvariant. RDNS can be turned off or
-  on with the --with-rdns option.
-o "limerick" object type is upgraded to more general "poem" and
-  "poetic-form" object types. See
+o People upgrading from 3.2.0 need to read the file UPDATE-DB-3.3.0.
+
+o The source tree has heavily been modified; build system now makes full 
+use of autoconf/automake.
+
+o We have added new options to the configure script. You can choose RPSL 
+variants during configure by using --with-rpslvariant. You can turn RDNS 
+off or on by using the --with-rdns option.
+
+o The LIMERICK object type has been upgraded to more the general POEM and 
+POETIC-FORM object types. You can find a complete description of this 
+change at:
+
   http://www.ripe.net/ripe/maillists/archives/db-wg/2005/msg00073.html
-  for a complete definition of the changes.
-o Reverse DNS registry checking mechanism has been added. Since this is a
-  specialized requirement for the software, it's initially turned off by
-  the build script.
-o Perl RPSL library has been included in the distribution.
-o Abuse mailbox changes have been implemented, adding a few new query
-  options and changes to the default output. Please see the full list of
-  changes at:
+
+o We have added a Reverse DNS registry checking mechanism. Since this is a 
+specialised requirement for the software, it is initially turned off by 
+default.
+
+o We have included a Perl RPSL library in the distribution.
+
+o We have implemented abuse mailbox changes, by adding a few new query 
+options and changes to the default output. You can see a full list of 
+changes at:
+
   http://www.ripe.net/ripe/maillists/archives/db-wg/2005/msg00057.html
-o Name of the server binary has changed: whois_rip is now whois-server.
-o "organisation" object type has been included.
-o RPSL-NG facilities are now included in the main branch of the software,
-  conforming to RFC4012, available at ftp://ftp.ripe.net/rfc/rfc4012.txt
-o irt and mntner objects creations are no longer manual.
-o dbupdate is now x-509 aware, along with the related key-cert objects.
-  More information on implementation is available at
+
+o We have changed the name of the server binary has changed: whois_rip is 
+now whois-server.
+
+o We have included the ORGANISATION object type.
+
+o We have included RPSL-NG facilities in the main branch of the software. This
+  conforms to the RFC at:
+
+  ftp://ftp.ripe.net/rfc/rfc4012.txt
+
+o IRT and MNTNER object creation is now automatic.
+
+o dbupdate is now x-509 aware, along with the related KEY-CERT objects.
+  You can find more information on the implementation at:
+
   http://www.ripe.net/ripe/maillists/archives/db-wg/2003/msg00144.html
-o ... and lots of other stuff.
 
 Release Notes for RIPE Whois Server version 3.2.0
 *************************************************
@@ -978,4 +994,4 @@ o The update functionality has been integrated.
 o Lots of bugfixes and backend improvements.
 
 
-$Id: RELEASE-NOTES,v 1.3 2005/05/20 10:44:31 can Exp $
+$Id: RELEASE-NOTES,v 1.4 2005/05/25 10:28:45 can Exp $
