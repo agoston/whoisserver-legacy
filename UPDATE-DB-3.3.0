@@ -1,0 +1,17 @@
+
+This file explains how to update the DB schema of a 3.2.0 installation
+to comply with the 3.3.0 release of RIPE Whois Software
+
+There are some changes in the DB schema of RIPE Whois Software between
+releases 3.2.0 and 3.3.0. They are mainly related to the new object types
+that are introduced.
+
+Sql commands that will bring a 3.2.0 database to a state compatible with
+3.3.0 release is located at doc/DIFF-320-330.sql in the distribution.
+
+On all the databases, please backup your database and run the command:
+
+$ mysql <OPTIONS> <DATABASENAME> < doc/DIFF-320-330.sql
+
+where <OPTIONS> are typically user name, password, host and port options
+for connecting the database.
