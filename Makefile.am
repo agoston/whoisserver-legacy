@@ -7,6 +7,8 @@ EXTRA_DIST = README \
 	     README.solaris \
 	     RELEASE-NOTES \
 	     UPDATE-DB-3.2.0 \
+	     UPDATE-DB-3.3.0 \
+             build.sh \
 	     conf/SAMPLE.CURRENTSERIAL \
 	     conf/ack_template conf/ack_text \
 	     conf/delcheck-erx-ipv4-16 \
