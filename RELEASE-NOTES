@@ -22,6 +22,14 @@ o Abuse mailbox changes have been implemented, adding a few new query
   changes at:
   http://www.ripe.net/ripe/maillists/archives/db-wg/2005/msg00057.html
 o Name of the server binary has changed: whois_rip is now whois-server.
+o "organisation" object type has been included.
+o RPSL-NG facilities are now included in the main branch of the software,
+  conforming to RFC4012, available at ftp://ftp.ripe.net/rfc/rfc4012.txt
+o irt and mntner objects creations are no longer manual.
+o dbupdate is now x-509 aware, along with the related key-cert objects.
+  More information on implementation is available at
+  http://www.ripe.net/ripe/maillists/archives/db-wg/2003/msg00144.html
+o ... and lots of other stuff.
 
 Release Notes for RIPE Whois Server version 3.2.0
 *************************************************
@@ -970,4 +978,4 @@ o The update functionality has been integrated.
 o Lots of bugfixes and backend improvements.
 
 
-$Id$
+$Id: RELEASE-NOTES,v 1.3 2005/05/20 10:44:31 can Exp $
