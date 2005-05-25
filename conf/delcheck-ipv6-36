@@ -1,5 +1,5 @@
 ModuleDiagnosticLevel 0
-ModuleTemplatePath /home/can/zupzup/whoisd/conf/delcheck-template.xml
+ModuleTemplatePath conf/delcheck-template.xml
 
 ParamProhibitedNameserverList              ns-v6.ripe.net
 ParamProhibitedNameserverList              ns.ripe.net

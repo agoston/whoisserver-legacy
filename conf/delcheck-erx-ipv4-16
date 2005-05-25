@@ -1,5 +1,5 @@
 ModuleDiagnosticLevel 0
-ModuleTemplatePath /home/can/zupzup/whoisd/conf/delcheck-template.xml
+ModuleTemplatePath conf/delcheck-template.xml
 
 ParamMinimumNumberNameservers              3
 ModuleNameserverIgnoreList                 ns.ripe.net
