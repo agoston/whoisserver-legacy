@@ -33,6 +33,8 @@ EXTRA_DIST = README \
 	     conf/sources.config.sample.q.in \
 	     doc/AUTO-DBM-HELP.in \
 	     doc/WHOIS-HELP.in \
+             doc/DIFF-320-330.sql \
+             doc/mysql-fine-tuning.txt \
 	     src/utils/wrapper.in \
 	     src/utils/make_mysql_user.in \
 	     src/utils/remadmin.pl.in \
