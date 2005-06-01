@@ -112,12 +112,10 @@ main()
     xmlCheckVersion(LIBXML_VERSION);
 
     /* Test that the library is greater than our minimum version */
-    if (((xslt_major_version > major) ||
+    if ((xslt_major_version > major) ||
         ((xslt_major_version == major) && (xslt_minor_version > minor)) ||
         ((xslt_major_version == major) && (xslt_minor_version == minor) &&
-        (xslt_micro_version >= micro))) &&
-        (xslt_major_version <= 1) && (xslt_minor_version <=0) &&
-        (xslt_micro_version <= 22))
+        (xslt_micro_version >= micro)))
       {
         return 0;
        }
@@ -125,7 +123,7 @@ main()
       {
         printf("\n*** An imcompatible version of libxslt (%d.%d.%d) was found.\n",
                xslt_major_version, xslt_minor_version, xslt_micro_version);
-        printf("*** You need a version of libxslt newer than %d.%d.%d, and at most 1.0.22\n", major, minor, micro);
+        printf("*** You need a version of libxslt newer than %d.%d.%d\n", major, minor, micro);
         printf("*** libxslt is always available from ftp://ftp.xmlsoft.org.\n");
         printf("***\n");
         printf("*** If you have already installed a sufficiently new version, this error\n");
