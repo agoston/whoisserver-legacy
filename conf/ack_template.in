@@ -862,10 +862,11 @@ and were NOT PROCESSED:
 
 <!-- composite/summary -->
   <xsl:template match="composite">
-    <xsl:if test="((@operation!='Forward Create')>0) and
-                    ((@operation!='Forward Modify')>0) and
-                    ((@operation!='Forward Delete')>0) and
-                    ((@operation!='Forward Policy')>0)">
+
+    <xsl:if test="((../@operation!='Forward Create')>0) and
+                    ((../@operation!='Forward Modify')>0) and
+                    ((../@operation!='Forward Delete')>0) and
+                    ((../@operation!='Forward Policy')>0)">
 
       <xsl:if test="$summary=1">
       <xsl:apply-templates select="summary"/>
