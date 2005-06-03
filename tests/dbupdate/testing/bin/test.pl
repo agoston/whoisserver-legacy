@@ -67,7 +67,9 @@ our $ERR = {'E_SINGATTR'   => "ERROR: name should be single: %s\n",
             'E_DIR'        => "ERROR: no such directory: %s\n",
             'E_UNDEF'      => "ERROR: the object is not defined: %s\n",
             'E_NOOUTPUT'   => "ERROR: no output for the object %s found in file %s\n",
-            'E_WHOIS'   => "ERROR: connection to whois failed\n",
+            'E_WHOIS'      => "ERROR: connection to whois failed\n",
+            'E_DBUPDATE'   => "ERROR: in dbupdate logging indentation: line %d function %s\n",
+            'E_DBUPDATE_LOG' => "ERROR: line %d: confused about function names\n%s should be %s\nindentation of %d\n"
            };
 
 # Global variable to keep track if we have received or our children received
@@ -379,6 +381,56 @@ my $regex = $_[0];
 
 }
 
+
+##############################
+## Function check_dbupdate($)
+#
+#
+sub check_dbupdate($) {
+  my $tmpfile = shift;
+  
+  unless (-e $tmpfile) {
+    #report ("NO FILE [$tmpfile]\n");
+    return;
+  }
+
+  report ("checked [$tmpfile]\n");
+  open (TMPFILE, "< $tmpfile")
+      or error ('E_FOPEN', $tmpfile);
+
+  # xxx: this code is from Shane
+
+  my @function_stack;
+  my $line_num = 0;
+  while (<TMPFILE>)
+{
+    $line_num++;
+    if (/^(\s+)(\S+): enter(ed|ing)/)
+    {
+        push(@function_stack, [ $2, $1 ]);
+    }
+    elsif (/^(\s+)(\S+): exiting/)
+    {
+        my $info = pop(@function_stack);
+        my ($fname, $spaces) = @{$info};
+        if ($fname eq $2)
+        {
+            unless ($spaces eq $1)
+            {
+                error ('E_DBUPDATE',$line_num,$fname);
+            }
+        }
+        else
+        {
+          error ('E_DBUPDATE_LOG', $line_num, $2, $fname, (0+@function_stack));
+        }
+    }
+}
+  close (TMPFILE);
+  unlink ($tmpfile);
+  return;
+
+}
 
 ##############################
 # Function: make_positive()
@@ -1113,7 +1165,7 @@ my $object;
 # Remarks: (hopefully) improve configurability!!!
 sub parse_rip_config()	{
 my $configfile = getvar('RIP_CONFIG');
-my @vars = ( qw/ SVWHOIS_PORT SVCONFIG_PORT GPGCMD UPDSOURCE RIR ACKLOG UPDLOG FORWLOG NOTIFLOG / );
+my @vars = ( qw/ SVWHOIS_PORT SVCONFIG_PORT GPGCMD UPDSOURCE RIR ACKLOG UPDLOG FORWLOG NOTIFLOG TMPDIR/ );
 
 # format is multiline vars, like
 # VARNAME whitespaces VALUE 
@@ -1159,7 +1211,7 @@ my $configfile;
 $configfile = getvar('CONFIG');
 
 # required config variables
-my @REQUIRED =  qw/ BASEDIR CONFDIR BINDIR DATADIR LOGDIR DUMPDIR WHOISDIR TMPDIR
+my @REQUIRED =  qw/ BASEDIR CONFDIR BINDIR DATADIR LOGDIR DUMPDIR WHOISDIR TEST_TMPDIR
 					FILTERS 
 					DBUPDATE DBUPDATE_GEN 
 					DBUPDATE_TEXT DBUPDATE_MAIL DBUPDATE_NET DBUPDATE_TRACE
@@ -1237,6 +1289,8 @@ my $objects = 0;
 
   $SIG{'CHLD'} = 'DEFAULT';
   my $input_redirect;
+  my $hostname = `hostname`;
+  chomp ($hostname);
 
   if ($commandline =~ /<[\s]*(.*)[\s]*$/) {
     $input_redirect = $1;
@@ -1283,7 +1337,6 @@ my $objects = 0;
   open (STDO, "> $outfile")
     or error ('E_FOPEN', $outfile) if (getvar('STDOUT'));
 
-
   while (my @ready = $selector->can_read) {
     foreach my $fh (@ready) {
       if (fileno($fh) == fileno(HIS_ERR)) {
@@ -1305,6 +1358,9 @@ my $objects = 0;
       $selector->remove($fh) if eof($fh);
     }
   }
+
+  my $dbupdate_state = getvar('TMPDIR')."/dbupdate.state.".$hostname.".".$pid.".tmp";
+  check_dbupdate($dbupdate_state);
 
   my $kid;
   do {
@@ -1358,7 +1414,7 @@ sub run_update(@)	{
 my $updatefile = shift(@_);
 my $tempfile = $updatefile;
 $tempfile =~ s/^(.*)\/(.*)$/$2/;
-$tempfile = getvar('TMPDIR')."/$tempfile.$$";
+$tempfile = getvar('TEST_TMPDIR')."/$tempfile.$$";
 
 my $force = shift(@_);		# flag to indicate that it should be always successful
 my $update = [ ]; 
@@ -1438,12 +1494,12 @@ my $flags;
 # Descr: delete tmp files from tmp directory. 
 #
 sub remove_tmp()	{
-my $tmpdir = getvar('TMPDIR');
+my $tmpdir = getvar('TEST_TMPDIR');
 
   my @files = glob ("$tmpdir/*.$$");
   push @files, glob ("$tmpdir/*.$$.gpg");
   foreach (@files) {
-    unlink $_;
+    #unlink $_;
   }
 }
 
@@ -1542,7 +1598,7 @@ my $source = $_[0];
 my $file = $_[1]; 
 my $tmpfile = $file;
 $tmpfile =~ s/^(.*)\/(.*)$/$2/;
-$tmpfile = getvar('TMPDIR')."/$tmpfile.$$";
+$tmpfile = getvar('TEST_TMPDIR')."/$tmpfile.$$";
 my $ret = [ ];
 my $temporary = 0;
 
@@ -1805,8 +1861,12 @@ my $source = $_[3];
    #  }
    }
    elsif (/^[\s]*$/o) {
-     #print TEMP $_;
-     if (defined $source && ($object =~ /^source:[\s]*$source[\s]+/im)) {
+     # AFRINIC pre-processing
+     if ((getvar('RIR') eq 'AFRINIC') && ($object !~ /^\s*$/)) {
+       $object =~ s/^referral-by:.+\n//im;
+       $object =~ s/^mnt-routes:.+\n//im;
+     }
+     if (defined $source && ($object =~ /^source:\s*$source\s*/im)) {
        print TEMP $object,"\n\n" ;
        $object = "";
      }
@@ -2124,7 +2184,7 @@ sub parse_command()	{
                      "stdout"         => \$CONFIG->{"STDOUT"},
                      "u"              => \$CONFIG->{"STDOUT"},
                      "rundir=s"       => \$CONFIG->{"RUNDIRS"},
-                     "r=s"            => \$CONFIG->{"RUNDIRS"}
+                     "r=s"            => \$CONFIG->{"RUNDIRS"},
                    ); 
 	
 	# delete "unset options"
@@ -2533,7 +2593,7 @@ eval {
   # prepare aux directories
   mkdir getvar("DUMPDIR") || die "Can't create directory: getvar(\"DUMPDIR\")"  unless (-x getvar("DUMPDIR"));
   mkdir getvar("LOGDIR") || die "Can't create directory: getvar(\"LOGDIR\")" unless (-x getvar("LOGDIR"));
-  mkdir getvar("TMPDIR") || die "Can't create directory: getvar(\"TMPDIR\")" unless (-x getvar("TMPDIR"));
+  mkdir getvar("TEST_TMPDIR") || die "Can't create directory: getvar(\"TEST_TMPDIR\")" unless (-x getvar("TEST_TMPDIR"));
 
   # fetch generic filters
 
