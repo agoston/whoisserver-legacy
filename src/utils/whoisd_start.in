@@ -70,7 +70,8 @@ do
 	-L*) LIBS_PATH="${LIBS_PATH} `echo \"$lib\" | sed -e 's/-L//'`";;
     esac
 done
-export LD_LIBRARY_PATH=`echo $LIBS_PATH | sed -e 's/ /:/g'`
+LD_LIBRARY_PATH=`echo $LIBS_PATH | sed -e 's/ /:/g'`
+export LD_LIBRARY_PATH
 
 # Default number of crashes before loop is stopped
 CRASHES=${CRSH:=10}
