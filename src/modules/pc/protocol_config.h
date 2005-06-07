@@ -88,6 +88,7 @@ http://cs.wwc.edu/~bellmi/ANSI_escape_codes.html
 #define HELP_SHOW_ERR     "Show the setup of the error path system"
 #define HELP_SHOW_MACROS  "Show the currently defined macros of the error path system"
 #define HELP_SHOW_UPTIME  "Show system uptime statistics"
+#define HELP_SHOW_DYNAMIC "Show status of dynamic server tag"
 
 #define HELP_SET          "Set the values of: (type set for a list)"
 #define HELP_SET_ERROR    "Invalid set command: "
@@ -115,6 +116,7 @@ http://cs.wwc.edu/~bellmi/ANSI_escape_codes.html
 
 #define HELP_SET_MACRO    "Set a new macro in the error path system"
 #define HELP_SET_COUNTER "Reset the counter for the given thread. Argument: thread_id"
+#define HELP_SET_DYNAMIC "Set server dynamic status"
 
 
 #define PC_RET_QUIT     (0xabcdef) /* make it really uniq */
@@ -173,6 +175,7 @@ struct _command show[] = {
 /*  {"err"      , show_err      , HELP_SHOW_ERR       },*/
 /*  {"macros"   , show_macros   , HELP_SHOW_MACROS    },*/
   {"uptime"   , show_uptime   , HELP_SHOW_UPTIME    },
+  {"dynamic"  , show_dynamic  , HELP_SHOW_DYNAMIC   },
   {NULL       , NULL          , NULL                }
 };
  
@@ -189,6 +192,7 @@ struct _command set[] = {
 /*  {"counter", set_counter   , HELP_SET_COUNTER   },*/
   {"auto_save",  set_auto_save, HELP_SET_AUTO_SAVE },
   {"initrx"   ,  set_initrx   , HELP_SET_INITRX    },
+  {"dynamic"  ,  set_dynamic  , HELP_SET_DYNAMIC   },
   {NULL       , NULL          , NULL               }
 };
 

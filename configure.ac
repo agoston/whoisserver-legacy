@@ -336,9 +336,7 @@ AC_MSG_RESULT([Done])
 dnl Output & finalization
 AC_CONFIG_FILES([
   conf/rip.config.sample
-  conf/rip.config.sample.q
   conf/sources.config.sample
-  conf/sources.config.sample.q
   conf/ack_template
   conf/ack_text
   conf/forw_create_template

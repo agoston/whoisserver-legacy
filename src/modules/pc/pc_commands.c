@@ -183,6 +183,27 @@ int show_consts(char *input, GString *output, sk_conn_st *condat)
   return 0;
 } /* show_consts() */
 
+/*++++++++++++++++++++++++++++++++++++++
+  
+  Display dynamic status of the server
+
+  ++++++++++++++++++++++++++++++++++++++*/
+int show_dynamic(char *input, GString *output, sk_conn_st *condat) 
+{
+  int res = 0;
+  char *result;
+
+  /* Administrator wants to see if the server is static or dynamic */
+  if ( (result = CO_const_to_string("SV.dynamic")) != NULL ) {
+    g_string_append(output,result);
+    UT_free(result);
+  } else {
+    g_string_append(output, "error getting value");
+    res = PC_RET_ERR;
+  }
+
+  return res;
+} /* show_dynamic() */
 
 /*++++++++++++++++++++++++++++++++++++++
   
@@ -396,6 +417,44 @@ int set_updates(char *input, GString *output, sk_conn_st *condat)
   }
   return res;
 }
+
+/*++++++++++++++++++++++++++++++++++++++
+  
+  Stop/Start dynamic sources.
+
+  Argument: the word "stop" or "start".
+
+  ++++++++++++++++++++++++++++++++++++++*/
+int set_dynamic(char *input, GString *output, sk_conn_st *condat) 
+{
+  char argstr[17];
+  int stop_dynamic=0, start_dynamic=0;
+  int res = 0;
+ 
+  if( sscanf(input, "%16s", argstr) == 1) {
+    stop_dynamic = (strcmp(argstr,"stop") == 0);
+    start_dynamic = (strcmp(argstr,"start") == 0);
+  }
+  
+  if( !stop_dynamic && !start_dynamic ) {
+    g_string_append(output,  "syntax error.");
+    res = PC_RET_ERR;
+  } else {
+    char *value = stop_dynamic ? "0" : "1";
+    if (CO_set_const("SV.dynamic", value) == 0) {
+      g_string_append(output, "Constant successfully set\n");
+    } else {
+      g_string_append(output, "Could not set\n");
+      res = PC_RET_ERR;
+    }
+  }
+  if (res != PC_RET_ERR) {
+    SV_switchdynamic();
+  }
+
+  return res;
+}
+
 /*++++++++++++++++++++++++++++++++++++++
   
   Pause/resume queries.

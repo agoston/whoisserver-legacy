@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.70 $
+  $Revision: 1.1 $
 
   Example code: A server for a client to connect to.
 
@@ -684,27 +684,10 @@ int SV_start(char *pidfile) {
   /* run update thread for every source with CANUPD == 'y' */
    
    for(source=0; (source_hdl = ca_get_SourceHandleByPosition(source))!=NULL ; source++){
-     update_mode = ca_get_srcmode(source_hdl);
      source_name= ca_get_srcname(source_hdl);
-
-     if(IS_UPDATE(update_mode)) { 
-     /* run RIPupdate thread */
-       fprintf(stderr,"Source [%s] Mode UPDATE [port=%d]\n", source_name, ca_get_srcupdateport(source_hdl));
-       LG_log(sv_context, LG_INFO, "Source [%s] Mode UPDATE [port=%d]", 
-              source_name, ca_get_srcupdateport(source_hdl));
-       TH_create((void *(*)(void *))UD_do_updates, (void *)source); 
-     }
-     else if(IS_NRTM_CLNT(update_mode)){
-       /* start NRTM client */
-       fprintf(stderr,"Source [%s] Mode NRTM\n", source_name);    
-       LG_log(sv_context, LG_INFO, "Source [%s] Mode NRTM", source_name);
-       TH_create((void *(*)(void *))UD_do_nrtm, (void *)source);
-     }
-     else {
-	     fprintf(stderr,"Source [%s] Mode STATIC\n", source_name);
-             LG_log(sv_context, LG_INFO, "Source [%s] Mode STATIC", 
-                    source_name);
-     }
+     
+     fprintf(stderr,"Source [%s] Mode STATIC\n", source_name);
+     LG_log(sv_context, LG_INFO, "Source [%s] Mode STATIC", source_name);
      UT_free(source_name); /* because ca_* functions return copies */   
    }    
   /* terminate the thread */
@@ -712,6 +695,56 @@ int SV_start(char *pidfile) {
   pthread_exit(NULL);
   return(1); /* we will never reach this point */
 } /* SV_start() */
+
+/* SV_switchdynamic() */
+/*++++++++++++++++++++++++++++++++++++++
+
+  Turn on dynamic updates
+
+  ++++++++++++++++++++++++++++++++++++++*/
+void SV_switchdynamic() {
+  int dynamic_status = CO_get_dynamic();
+  static int already_set = 0;
+  int source;
+  ca_dbSource_t *source_hdl;
+  char *source_name;
+  int update_mode = 0;
+
+  if (dynamic_status == 1) {
+    /* switch update and nrtm modes on */
+    for(source=0;
+        (source_hdl = ca_get_SourceHandleByPosition(source))!=NULL ;
+        source++) {
+      update_mode = ca_get_srcmode(source_hdl);
+      source_name= ca_get_srcname(source_hdl);
+      if(IS_UPDATE(update_mode)) { 
+        /* run RIPupdate thread */
+        fprintf(stderr,"Source [%s] Mode UPDATE [port=%d]\n",
+            source_name, ca_get_srcupdateport(source_hdl));
+        LG_log(sv_context, LG_INFO, "Source [%s] Mode UPDATE [port=%d]",
+            source_name, ca_get_srcupdateport(source_hdl));
+        TH_create((void *(*)(void *))UD_do_updates, (void *)source); 
+      } else if (IS_NRTM_CLNT(update_mode)) {
+        /* start NRTM client */
+        fprintf(stderr,"Source [%s] Mode NRTM\n", source_name);    
+        LG_log(sv_context, LG_INFO, "Source [%s] Mode NRTM", source_name);
+        TH_create((void *(*)(void *))UD_do_nrtm, (void *)source);
+      } else {
+        /* notify STATIC sources */
+        fprintf(stderr,"Source [%s] Mode already STATIC\n", source_name);
+        LG_log(sv_context, LG_INFO, "Source [%s] Mode already STATIC",
+            source_name);
+      }
+    }
+    already_set = 1;
+  } else {
+    if (already_set == 1) {
+      fprintf(stderr,"Cannot revert to static mode from dynamic mode\n");
+      LG_log(sv_context, LG_INFO,
+          "Cannot revert to static mode from dynamic mode");
+    }
+  }
+} /* SV_switchdynamic() */
 
 /* SV_shutdown() */
 /*++++++++++++++++++++++++++++++++++++++

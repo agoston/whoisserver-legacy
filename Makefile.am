@@ -26,11 +26,9 @@ EXTRA_DIST = README \
 	     conf/notif_template.in \
 	     conf/notif_text.in \
 	     conf/rip.config.sample.in \
-	     conf/rip.config.sample.q.in\
 	     conf/sample.db \
 	     conf/SAMPLE.CURRENTSERIAL.in \
 	     conf/sources.config.sample.in \
-	     conf/sources.config.sample.q.in \
 	     doc/AUTO-DBM-HELP.in \
 	     doc/WHOIS-HELP.in \
              doc/DIFF-320-330.sql \
@@ -452,8 +450,6 @@ uninstall-local:
 	rm -f $(DESTDIR)/${bindir}/whoisd_start
 	rm -f $(DESTDIR)/${confdir}/rip.config.sample
 	rm -f $(DESTDIR)/${confdir}/sources.config.sample
-	rm -f $(DESTDIR)/${confdir}/rip.config.sample.q
-	rm -f $(DESTDIR)/${confdir}/sources.config.sample.q
 	rm -f $(DESTDIR)/${confdir}/ack_template
 	rm -f $(DESTDIR)/${confdir}/ack_text
 	rm -f $(DESTDIR)/${confdir}/forw_create_template

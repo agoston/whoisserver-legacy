@@ -67,6 +67,7 @@ char *CO_get_socket_logfile();
 int CO_get_config_logging();
 char *CO_get_config_logfile();
 char *CO_get_config_file();
+int CO_get_dynamic();
 
 
 char *CO_get_nrtm_host();

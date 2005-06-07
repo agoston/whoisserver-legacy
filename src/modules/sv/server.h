@@ -2,7 +2,7 @@
 #define READ_SERVER
 
 /***************************************
-  $Revision: 1.14 $
+  $Revision: 1.1 $
 
   Server module (sv)
   config module.
@@ -56,6 +56,7 @@ int SV_sleep(int sleeptime);
 void *SV_signal_thread();
 void SV_watchdog(wd_args_t *wd_args);
 void SV_init (LG_context_t *ctx);
+void SV_switchdynamic();
 
 
 

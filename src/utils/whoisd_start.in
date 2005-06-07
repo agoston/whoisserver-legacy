@@ -61,11 +61,6 @@ then
  echo $0 ":$CONFIG does not exist";
  exit 1;
 fi
-if test ! -f ${CONFIG}.q
-then
- echo $0 ":${CONFIG}.q does not exist";
- exit 1;
-fi
 
 # The LD_LIBRARY_PATH should be set
 LIBS_PATH=
@@ -139,7 +134,7 @@ do
     echo "`date +'%y%m%d %H:%M:%S'`" "$WHOISRIP -p $pid_file -c ${CONFIG}" >>$err_log 
     $NOHUP_NICENESS $WHOISRIP -p $pid_file -c ${CONFIG}  >> $err_log 2>&1
     
-    # if pid file exists - that was a crash - restart the server in safe *.q mode
+    # if pid file exists - that was a crash - restart the server
     # otherwise - exit
     if test ! -f $pid_file		# This is removed if normal shutdown
     then
@@ -148,11 +143,6 @@ do
     
     rm -f $pid_file
     
-    if [ -f ${CONFIG}.q ]
-      then
-        CONFIG=${CONFIG}.q
-    fi
-
     # Shane reported that in some versions of sh this causes to fail in loops. oops Test!
     num_crashes=`expr 1 + $num_crashes`
 

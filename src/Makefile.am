@@ -198,8 +198,6 @@ install-exec-hook:
 	${INSTALL} -m 0755 ./utils/whoisd_start $(DESTDIR)/${bindir}
 	${INSTALL} -m 0644 ../conf/rip.config.sample $(DESTDIR)/${confdir}
 	${INSTALL} -m 0644 ../conf/sources.config.sample $(DESTDIR)/${confdir}
-	${INSTALL} -m 0644 ../conf/rip.config.sample.q $(DESTDIR)/${confdir}
-	${INSTALL} -m 0644 ../conf/sources.config.sample.q $(DESTDIR)/${confdir}
 	${INSTALL} -m 0644 ../conf/ack_template $(DESTDIR)/${confdir}
 	${INSTALL} -m 0644 ../conf/ack_text $(DESTDIR)/${confdir}
 	${INSTALL} -m 0644 ../conf/forw_create_template $(DESTDIR)/${confdir}

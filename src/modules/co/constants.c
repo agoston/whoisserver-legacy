@@ -68,6 +68,7 @@
 #define DEFLT_AUTHENTICATE    "0"
 #define DEFLT_WHOIS_SUSPENDED "0"
 #define DEFLT_DO_SERVER       "1"
+#define DEFLT_DO_DYNAMIC      "0"
 #define DEFLT_WELCOME         "Welcome to the whois R.I.P. server.\n"
 #define DEFLT_PROMPT          "whois R.I.P. config> "
 #define DEFLT_CLEAR_SCREEN    "0"
@@ -95,6 +96,7 @@ typedef struct _Constants {
 
   int   do_server[1]; /*+ turns off execution of the all servers(threads) +*/
   int   do_update[1]; /*+ switches on and off the updates +*/
+  int   do_dynamic[1]; /*+ controls static-dynamic status of server +*/
 
 } *Constants;
 
@@ -170,6 +172,10 @@ static char *show_boolean(const void *constant) {
  * Get Functions
  */
 
+int CO_get_dynamic() {
+  return Global_constants->do_dynamic[0];
+}
+
 int CO_get_authenticate() {
   return Global_constants->authenticate[0];
 }
@@ -244,6 +250,13 @@ static void init_constants(void) {
   constant[n].deflt=DEFLT_DO_SERVER;
   constant[n].set_func=set_boolean;
   constant[n].constant_ptr=Global_constants->do_server;
+  constant[n].show_func=show_boolean;
+  n++;
+  
+  constant[n].token="SV.dynamic";
+  constant[n].deflt=DEFLT_DO_DYNAMIC;
+  constant[n].set_func=set_boolean;
+  constant[n].constant_ptr=Global_constants->do_dynamic;
   constant[n].show_func=show_boolean;
   n++;
   
