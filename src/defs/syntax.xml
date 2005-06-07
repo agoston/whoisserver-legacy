@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.16 2005/04/27 07:29:48 katie Exp $
+$Id: syntax.xml,v 1.17 2005/05/03 09:21:17 arife Exp $
 
 -->
 
@@ -256,7 +256,7 @@ $Id: syntax.xml,v 1.16 2005/04/27 07:29:48 katie Exp $
        <front_end>
           <!-- we need to have a regex otherwise the core one will be 
                used -->
-          <regex></regex>
+          <regex>.?</regex>
        </front_end>
    </attribute_syntax>
    
