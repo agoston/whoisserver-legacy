@@ -407,6 +407,8 @@ void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_
   ut_timer_t endtime;
   acc_st copy_credit;
 
+  mysql_thread_init();
+
   /* save accounting copy */
   copy_credit = *acc_credit;
 
@@ -478,6 +480,8 @@ void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_
   
   /* end-of-result -> ONE empty line */
   SK_cd_puts(&(qe->condat), "\n");
+ 
+  mysql_thread_end();
 
 }
 
@@ -766,7 +770,6 @@ void PW_interact(int sock) {
               else {
                 /* allowed to query from passed IP */
                 PW_run_query(qe, qc, &pass_credit, &acl_eip, hostaddress,input); 
-    
               } /* effective IP denied */
     
             } /* trustpass allowed */

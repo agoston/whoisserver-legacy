@@ -313,7 +313,7 @@ object_creation (au_plugin_callback_info_t *info)
   /* report result */
   RT_org_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override, FALSE);
 
-  LG_log(au_context, LG_FUNC, "<irt_network_create: exiting with value [%s]",
+  LG_log(au_context, LG_FUNC, "<object_creation: exiting with value [%s]",
          AU_ret2str(ret_val));
   return ret_val;
 }
@@ -363,8 +363,6 @@ object_modification (au_plugin_callback_info_t *info)
   if (org == NULL)
   {
     LG_log(au_context, LG_DEBUG, "object_modify: no \"org:\"");
-    LG_log(au_context, LG_FUNC,
-           "<object_modify: exiting with value [AU_AUTHORISED]");
     ret_val = AU_AUTHORISED;
   }
 

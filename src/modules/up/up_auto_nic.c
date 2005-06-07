@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   UP auto nic handling
 
@@ -472,7 +472,7 @@ int UP_replace_refs_to_AUTO_key_from_string(RT_context_t *rt_ctx, LG_context_t *
 
   if ( rpsl_object_has_error(object, RPSL_ERRLVL_ERROR) )
   {
-    LG_log(lg_ctx, LG_DEBUG,"UP_replace_refs_to_AUTO_key_from_string: object parsed with errors");
+    LG_log(lg_ctx, LG_DEBUG,"<UP_replace_refs_to_AUTO_key_from_string: exiting: object parsed with errors");
     /* The object has RPSL syntax error.  Do not bother to replace its AUTO references */
     free(object_str_copy);
     rpsl_object_delete(object);
@@ -480,7 +480,7 @@ int UP_replace_refs_to_AUTO_key_from_string(RT_context_t *rt_ctx, LG_context_t *
   }
   else
   {
-    LG_log(lg_ctx, LG_DEBUG,"UP_replace_refs_to_AUTO_key_from_string: object parsed OK");
+    LG_log(lg_ctx, LG_DEBUG,"<UP_replace_refs_to_AUTO_key_from_string: exiting: object parsed OK");
     free(object_str_copy);
     ret_val = UP_replace_refs_to_AUTO_key(rt_ctx, lg_ctx, options, object, report_errors);
     free(*object_str);
@@ -709,7 +709,7 @@ int UP_has_ref_to_AUTO_key_from_string(LG_context_t *lg_ctx, char *object_str)
 
   if ( rpsl_object_has_error(object, RPSL_ERRLVL_ERROR) )
   {
-    LG_log(lg_ctx, LG_DEBUG,"UP_has_ref_to_AUTO_key_from_string: object parsed with errors");
+    LG_log(lg_ctx, LG_DEBUG,"<UP_has_ref_to_AUTO_key_from_string: exiting: object parsed with errors");
     /* The object has RPSL syntax error.  Do not bother to look if it has AUTO references */
     free(object_str_copy);
     rpsl_object_delete(object);
@@ -717,7 +717,7 @@ int UP_has_ref_to_AUTO_key_from_string(LG_context_t *lg_ctx, char *object_str)
   }
   else
   {
-    LG_log(lg_ctx, LG_DEBUG,"UP_has_ref_to_AUTO_key_from_string: object parsed OK");
+    LG_log(lg_ctx, LG_DEBUG,"<UP_has_ref_to_AUTO_key_from_string: exiting: object parsed OK");
     free(object_str_copy);
     ret_val = UP_has_ref_to_AUTO_key(lg_ctx, object);
     rpsl_object_delete(object);

@@ -427,6 +427,7 @@ hierarchical_rpsl_create (au_plugin_callback_info_t *info)
   first_attr = rpsl_object_get_attr_by_ofs(info->obj,0);
   if ((strcmp(first_attr->name,"domain")==0)&&(ns_is_rdns_suffix(info))) {
     LG_log(au_context,LG_DEBUG,"hierarchical_rpsl_create: domain object encountered, skipping");
+    LG_log(au_context,LG_DEBUG,"<hierarchical_rpsl_create: exiting with [AU_AUTHORISED]");
     ret_val = AU_AUTHORISED;
     override = FALSE;
     RT_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);

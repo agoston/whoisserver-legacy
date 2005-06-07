@@ -1,5 +1,5 @@
 /*
- * $Id: ns_util.c,v 1.1 2004/12/27 17:52:36 can Exp $
+ * $Id: ns_util.c,v 1.2 2005/04/20 11:03:20 denis Exp $
  */
 
 #include "ns_util.h"
@@ -213,10 +213,10 @@ gboolean ns_remove_trailing_dot(LG_context_t * lg_ctx, gchar ** object_str)
   domain = rpsl_object_get_key_value(object);
 
   if (!ns_check_suffix(object, TRUE)) {
-    LG_log(lg_ctx, LG_DEBUG, "object is NOT rdns related");
+    LG_log(lg_ctx, LG_DEBUG, "object is not a domain with trailing dot");
     ret_val = FALSE;
   } else {
-    LG_log(lg_ctx, LG_DEBUG, "object is rdns related");
+    LG_log(lg_ctx, LG_DEBUG, "object is a domain with trailing dot");
     /* Remove . at the end if any */
     p = strrchr(domain, '.');
     if ((p != NULL) && (strcmp(p, ".") == 0)) {

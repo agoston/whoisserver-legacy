@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   NT (Notifications) module
 
@@ -553,7 +553,7 @@ GList *nt_get_nfy_vector(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     }
   }
   
-  LG_log(lg_ctx, LG_FUNC,"nt_get_nfy_vector: exiting with total %s attributes [%i]\n", nfy_type, g_list_length(list_of_nfy_attrs) );
+  LG_log(lg_ctx, LG_FUNC,"<nt_get_nfy_vector: exiting with total %s attributes [%i]\n", nfy_type, g_list_length(list_of_nfy_attrs) );
   return list_of_nfy_attrs; 
 }
 
@@ -1716,7 +1716,7 @@ void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   free(template);
   free(forwlog);
   free(out_mess);
-  LG_log(lg_ctx, LG_FUNC,"<NT_forw_create_req exiting\n");
+  LG_log(lg_ctx, LG_FUNC,"<NT_forw_create_req: exiting\n");
 }
 
 

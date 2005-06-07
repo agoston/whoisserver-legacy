@@ -235,6 +235,9 @@ gboolean KM_key_return_get_signature_ok(KM_key_return_t* key_info) {
 void km_key_return_add(km_key_return_t* kr,
   gchar* key, gchar* value) {
   g_hash_table_insert(kr->hash, g_strdup(key), g_strdup(value));
+  LG_log(lg_ctx, LG_FUNC, ">km_key_return_add: entered with key [%s] value [%s]",
+                               key, value);
+  LG_log(lg_ctx, LG_FUNC, "<km_key_return_add: exiting");
 }
 
 /*

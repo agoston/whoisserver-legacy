@@ -193,6 +193,7 @@ GList *ep_split_pgp(gchar ***split, GList *credentials) {
       (*split)++;
       //CHECK free of my_split
       g_string_free(my_split, TRUE);
+      LG_log(ep_ctx, LG_FUNC, "<ep_split_pgp: exiting");
       return return_list;
     }
     (*split)++;

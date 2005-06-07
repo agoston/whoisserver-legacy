@@ -173,8 +173,8 @@ void km_X509_key_get_fingerprint(gchar *out_dir, km_key_return_t *kr, gchar *key
 
   sprintf(in_file,"%s/km_in_%d", out_dir, (int)(getpid()) );
   sprintf(status_file,"%s/km_status_%d", out_dir, (int)(getpid()) );
-  LG_log(lg_ctx, LG_DEBUG,">km_X509_key_get_fingerprint: input file [%s]", in_file);
-  LG_log(lg_ctx, LG_DEBUG,">km_X509_key_get_fingerprint: status file [%s]", status_file);
+  LG_log(lg_ctx, LG_DEBUG,"km_X509_key_get_fingerprint: input file [%s]", in_file);
+  LG_log(lg_ctx, LG_DEBUG,"km_X509_key_get_fingerprint: status file [%s]", status_file);
 
   /* write the certificate to the input file */
   general = fopen(in_file, "w");
@@ -191,7 +191,7 @@ void km_X509_key_get_fingerprint(gchar *out_dir, km_key_return_t *kr, gchar *key
   g_string_append(openssl_line, " 2> ");
   g_string_append(openssl_line, status_file);
 
-  LG_log(lg_ctx, LG_DEBUG,">km_X509_key_get_fingerprint: openssl cmd [%s]", openssl_line->str);
+  LG_log(lg_ctx, LG_DEBUG,"km_X509_key_get_fingerprint: openssl cmd [%s]", openssl_line->str);
   system(openssl_line->str);
   g_string_free(openssl_line, TRUE);
 
@@ -207,28 +207,28 @@ void km_X509_key_get_fingerprint(gchar *out_dir, km_key_return_t *kr, gchar *key
     {
       strcpy(finger_print, key_str + 12);
       finger_print[strlen(finger_print)-1] = 0;
-      LG_log(lg_ctx, LG_DEBUG,">km_X509_key_get_fingerprint: finger_print [%s]", finger_print);
+      LG_log(lg_ctx, LG_DEBUG,"km_X509_key_get_fingerprint: finger_print [%s]", finger_print);
     }
     if ((key_str = strstr(txt, "subject=")) !=NULL)
     {
       strcpy(subject, key_str + 8);
       subject[strlen(subject)-1] = 0;
-      LG_log(lg_ctx, LG_DEBUG,">km_X509_key_get_fingerprint: subject [%s]", subject);
+      LG_log(lg_ctx, LG_DEBUG,"km_X509_key_get_fingerprint: subject [%s]", subject);
     }
     if ((key_str = strstr(txt, "no start line")) !=NULL)
     {
       strcpy(err_str, "no start line");
-      LG_log(lg_ctx, LG_DEBUG,">km_X509_key_get_fingerprint: [%s]", err_str);
+      LG_log(lg_ctx, LG_DEBUG,"km_X509_key_get_fingerprint: [%s]", err_str);
     }
     if ((key_str = strstr(txt, "bad end line")) !=NULL)
     {
       strcpy(err_str, "bad end line");
-      LG_log(lg_ctx, LG_DEBUG,">km_X509_key_get_fingerprint: [%s]", err_str);
+      LG_log(lg_ctx, LG_DEBUG,"km_X509_key_get_fingerprint: [%s]", err_str);
     }
     if ((key_str = strstr(txt, "bad base64 decode")) !=NULL)
     {
       strcpy(err_str, "bad base64 decode");
-      LG_log(lg_ctx, LG_DEBUG,">km_X509_key_get_fingerprint: [%s]", err_str);
+      LG_log(lg_ctx, LG_DEBUG,"km_X509_key_get_fingerprint: [%s]", err_str);
     }
   }
   fclose(general);
@@ -261,7 +261,7 @@ void km_X509_key_get_fingerprint(gchar *out_dir, km_key_return_t *kr, gchar *key
     {
       km_status |= KM_NO_FP;
     }
-    LG_log(lg_ctx, LG_DEBUG,">km_X509_key_get_fingerprint: no fingerprint, status [%d]", km_status);
+    LG_log(lg_ctx, LG_DEBUG,"km_X509_key_get_fingerprint: no fingerprint, status [%d]", km_status);
   }
   if (subject[0])
   {
@@ -277,7 +277,7 @@ void km_X509_key_get_fingerprint(gchar *out_dir, km_key_return_t *kr, gchar *key
     {
       km_status |= KM_NO_SJ;
     }
-    LG_log(lg_ctx, LG_DEBUG,">km_X509_key_get_fingerprint: no subject, status [%d]", km_status);
+    LG_log(lg_ctx, LG_DEBUG,"km_X509_key_get_fingerprint: no subject, status [%d]", km_status);
   }
   
   /* update the status */

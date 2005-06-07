@@ -89,6 +89,7 @@ typedef struct
   int test_mode;             /* flag set from command line or config value */
   int mail_input;            /* flag set from command line */
   int debug;                 /* flag set from command line */
+  int save;                  /* flag set from command line */
   int debug_level;           /* output level for debug */
   int redirect;              /* flag set from command line */
   int print;                 /* flag set from command line */

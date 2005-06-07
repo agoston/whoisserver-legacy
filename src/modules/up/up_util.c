@@ -1254,6 +1254,7 @@ int up_external_transact(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   int retval = UP_OK;
 
   LG_log(lg_ctx, LG_FUNC,">up_external_transact: entered with operation [%s]", UP_op2str(operation));
+  LG_log(lg_ctx, LG_FUNC,"<up_external_transact: exiting");
 
   return retval;
 }
@@ -1748,7 +1749,7 @@ int up_source_commit(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   char *ripupd_result = NULL;
 
   LG_log(lg_ctx, LG_FUNC,">up_source_commit: entered with operation [%s]", UP_op2str(operation));
-  LG_log(lg_ctx, LG_FUNC,">up_source_commit: the object is [%s]", rpsl_object_get_text(preproc_obj,0));
+  LG_log(lg_ctx, LG_FUNC,"up_source_commit: the object is [%s]", rpsl_object_get_text(preproc_obj,0));
 
   /* send the object to the database */
   retval = up_send_object_db(rt_ctx, lg_ctx, options, source_data, preproc_obj, 

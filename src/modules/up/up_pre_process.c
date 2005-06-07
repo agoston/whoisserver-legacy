@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.5 $
 
   UP pre process checks
 
@@ -1095,7 +1095,7 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   if (attr_list == NULL)
   {
-    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: cannot fetch %s inetnum: attribute");
+    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: exiting: cannot fetch %s inetnum: attribute");
     return UP_FAIL;
   }
 
@@ -1105,7 +1105,7 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    */
   if ( ! up_is_inetnum_cidr(object))
   {
-    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: not CIDR");
+    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: exiting: not CIDR");
     rpsl_attr_delete_list(attr_list);
     return UP_OK;
   }
@@ -1114,7 +1114,7 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   if (prefix == NULL)
   {
-    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: g_strdup() returned NULL");
+    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: exiting: g_strdup() returned NULL");
     rpsl_attr_delete_list(attr_list);
     return UP_FAIL;
   }
@@ -1125,7 +1125,7 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* handle error condition when the range could not be parsed */
   if (ip_retval != IP_OK)
   {
-    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: IP_smart_range() could not parse [%s]", prefix);
+    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: exiting: IP_smart_range() could not parse [%s]", prefix);
     RT_inetnum_prefix_convert_failed(rt_ctx, prefix);
     rpsl_attr_delete_list(attr_list);
     g_free(prefix);
@@ -1136,7 +1136,7 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   ip_retval = IP_rang_b2a(&range, ascii_range, IP_RANGSTR_MAX);
   if (ip_retval != IP_OK)
   {
-    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: IP_rang_b2a() failed on [%s]", prefix);
+    LG_log(lg_ctx, LG_ERROR,"<up_convert_inetnum_prefix: exiting: IP_rang_b2a() failed on [%s]", prefix);
     rpsl_attr_delete_list(attr_list);
     g_free(prefix);
     return UP_FAIL;
@@ -1147,7 +1147,7 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   if (attr == NULL)
   {
-    LG_log(lg_ctx, LG_FUNC,"<up_convert_inetnum_prefix: cannot fetch attribute at offset 0");
+    LG_log(lg_ctx, LG_FUNC,"<up_convert_inetnum_prefix: exiting: cannot fetch attribute at offset 0");
     g_free(prefix);
     return UP_FAIL;
   }
@@ -1445,6 +1445,7 @@ int up_override(LG_context_t *lg_ctx, GList *credentials)
     retval = UP_OK;
   }
   
+  LG_log(lg_ctx, LG_FUNC, "<up_override: exiting with [%s]", UP_ret2str(retval));
   return retval;
 }
 
