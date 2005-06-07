@@ -58,7 +58,8 @@ opt opt_list[] = { { 'm', "mail", 0},
                    { 'o', "origin", 1},
                    { 'k', "keywords", 1},
                    { 'x', "x509", 1},
-                   { 'X', "cert", 3}
+                   { 'X', "cert", 3},
+                   { 's', "save", 0}
                  };
 
 /* list of keywords */
@@ -111,6 +112,10 @@ void set_option(options_struct_t *options, char *arg_str, char *optarg, int form
   if ( (form==0 && *arg_str=='m') || (form==1 && !strcmp(arg_str, "mail")) )
   {
     options->mail_input = 1;
+  }
+  if ( (form==0 && *arg_str=='s') || (form==1 && !strcmp(arg_str, "save")) )
+  {
+    options->save = 1;
   }
   else if ( (form==0 && *arg_str=='f') || (form==1 && !strcmp(arg_str, "file")) )
   {
@@ -549,6 +554,8 @@ void log_options(LG_context_t *lg_ctx, options_struct_t *options, char *args_str
     LG_log(lg_ctx, LG_DEBUG,"log_options: test mode set");
   if ( options->redirect )
     LG_log(lg_ctx, LG_DEBUG,"log_options: redirect set");
+  if ( options->save )
+    LG_log(lg_ctx, LG_DEBUG,"log_options: save set");
   if ( options->print )
     LG_log(lg_ctx, LG_DEBUG,"log_options: print set");
   if ( options->origin )
@@ -1061,7 +1068,7 @@ int main(int argc, char **argv)
   ep_input_structure_t *input = NULL; /* structure containing un-folded data */
 
   mail_hdr_t mail_hdr = { NULL, NULL, NULL, NULL, NULL, NULL, NULL };
-  options_struct_t options = { NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, NULL, { NULL }, NULL, NULL, NULL};
+  options_struct_t options = { NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, NULL, { NULL }, NULL, NULL, NULL};
   options.mail_hdr_data = mail_hdr;
   
 
@@ -1271,7 +1278,10 @@ int main(int argc, char **argv)
   fclose(state);
   if ( state_file_name )
   {
-    unlink(state_file_name);
+    if (options.save == 0)
+    {
+      unlink(state_file_name);
+    }
     free(state_file_name);
     state_file_name = NULL;
   }
