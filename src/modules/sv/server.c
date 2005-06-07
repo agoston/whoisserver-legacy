@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   Example code: A server for a client to connect to.
 
@@ -644,31 +644,45 @@ int SV_start(char *pidfile) {
     printf("Not running as root, keeping current uid and gid\n");
   } else {
     struct passwd *passwent;
+    char *procuser;
+    int lenproc;
 
-    printf("*Running* as root, dropping privileges: ");
-    passwent = getpwnam(ca_get_processuser);
+    printf("*Running* as root, dropping privileges:\n");
+    procuser=strdup(ca_get_processuser);
+
+    /* chop off any trailing newline */
+    lenproc = strlen(procuser);
+    if ((lenproc > 0) && (procuser[lenproc-1] == '\n'))
+    {
+      procuser[lenproc-1] = '\0';
+    }
+
+    passwent = getpwnam(procuser);
     if (passwent == NULL) {
-      printf("getpwnam failed for %s", ca_get_processuser);
+      printf(" getpwnam failed for %s - %s\n",
+        procuser,strerror(errno));
       die;
     }
-    printf("uid: %d, gid: %d",passwent->pw_uid,passwent->pw_gid);
     if ((setgid(passwent->pw_gid)) != 0) {
       printf("can't setgid(%d)\n",passwent->pw_gid);
       die;
     }
+    printf("Gid: %d ",passwent->pw_gid);
     if ((setegid(passwent->pw_gid)) != 0) {
       printf("can't setegid(%d)\n",passwent->pw_gid);
       die;
     }
+    printf("Egid: %d ",passwent->pw_gid);
     if ((setuid(passwent->pw_uid)) != 0) {
       printf("can't setuid(%d)\n",passwent->pw_uid);
       die;
     }
+    printf("Uid: %d ",passwent->pw_uid);
     if ((seteuid(passwent->pw_uid)) != 0) {
       printf("can't seteuid(%d)\n",passwent->pw_uid);
       die;
     }
-    free(passwent);
+    printf("Euid: %d ",passwent->pw_uid);
     printf(".\n");
   }
 
