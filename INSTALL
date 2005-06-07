@@ -443,7 +443,7 @@ created:
 <your_prefix>
  |
  bin/  - main server executables
- conf/ - configuration files (*.q files define the static mode)
+ conf/ - configuration files 
  log/  - log infrastructure
  scripts/ - bootstrapping and auxillary scripts
   |
