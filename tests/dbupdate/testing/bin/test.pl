@@ -394,7 +394,7 @@ sub check_dbupdate($) {
     return;
   }
 
-  report ("checked [$tmpfile]\n");
+ # report ("checked [$tmpfile]\n");
   open (TMPFILE, "< $tmpfile")
       or error ('E_FOPEN', $tmpfile);
 
