@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   Example code: A server for a client to connect to.
 
@@ -48,6 +48,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/poll.h>
+#include <pwd.h>
 
 /* Listening sockets */
 int SV_whois_sock;
@@ -616,12 +617,63 @@ int SV_start(char *pidfile) {
   /* 6. Create a socket on the necessary ports/addresses and bind to them. */
   /* whois socket */
   SV_whois_sock = SK_getsock(SOCK_STREAM, whois_port, 128, INADDR_ANY);
-/* Currently binds to INADDR_ANY. Will need to get specific address */
-/*  SV_whois_sock = SK_getsock(SOCK_STREAM,whois_port,whois_addr); */
+  printf("Whois  port: %d\n",whois_port);
   /* config interface socket */
   SV_config_sock = SK_getsock(SOCK_STREAM, config_port, 5, INADDR_ANY);
+  printf("Config port: %d\n",config_port);
   /* nrt socket */
   SV_mirror_sock = SK_getsock(SOCK_STREAM,mirror_port, 128, INADDR_ANY);
+  printf("Mirror port: %d\n",mirror_port);
+  /* per source update ports */
+  for (source=0;
+       (source_hdl = ca_get_SourceHandleByPosition(source))!=NULL;
+       source++){
+    update_mode = ca_get_srcmode(source_hdl);
+    if(IS_UPDATE(update_mode)) {
+      update_port = ca_get_srcupdateport(source_hdl);
+      SV_update_sock[source] =
+        SK_getsock(SOCK_STREAM, update_port, 128, INADDR_ANY);
+      printf("Update port: %d for %s\n", update_port, source_hdl);
+    } else {
+      SV_update_sock[source] = 0;
+    }
+  }
+
+  /* (after 6). Drop root privileges, if any */
+  if (getuid() != 0) {
+    printf("Not running as root, keeping current uid and gid\n");
+  } else {
+    struct passwd *passwent;
+
+    printf("*Running* as root, dropping privileges: ");
+    passwent = getpwnam(ca_get_processuser);
+    if (passwent == NULL) {
+      printf("getpwnam failed for %s", ca_get_processuser);
+      die;
+    }
+    printf("uid: %d, gid: %d",passwent->pw_uid,passwent->pw_gid);
+    if ((setgid(passwent->pw_gid)) != 0) {
+      printf("can't setgid(%d)\n",passwent->pw_gid);
+      die;
+    }
+    if ((setegid(passwent->pw_gid)) != 0) {
+      printf("can't setegid(%d)\n",passwent->pw_gid);
+      die;
+    }
+    if ((setuid(passwent->pw_uid)) != 0) {
+      printf("can't setuid(%d)\n",passwent->pw_uid);
+      die;
+    }
+    if ((seteuid(passwent->pw_uid)) != 0) {
+      printf("can't seteuid(%d)\n",passwent->pw_uid);
+      die;
+    }
+    free(passwent);
+    printf(".\n");
+  }
+
+/* Currently binds to INADDR_ANY. Will need to get specific address */
+/*  SV_whois_sock = SK_getsock(SOCK_STREAM,whois_port,whois_addr); */
   
   /* Check every Database and create sockets */
   /* we need first to create and bind all of them */
@@ -645,17 +697,6 @@ int SV_start(char *pidfile) {
      UT_free(db_name);
      UT_free(db_user);
      UT_free(db_passwd);
-     
-     update_mode = ca_get_srcmode(source_hdl);
-     if(IS_UPDATE(update_mode)) {
-       /* update_port = SK_atoport(CO_get_update_port(), "tcp"); */
-       update_port = ca_get_srcupdateport(source_hdl); 
-       printf("XXX htons(update_port)=%d\n", update_port);
-       /* XXX ask AMRM to change the name of the function */
- 
-       SV_update_sock[source] = SK_getsock(SOCK_STREAM, update_port, 128, INADDR_ANY);
-     }
-     else SV_update_sock[source] = 0;
   }   
   SV_update_sock[source+1]=-1; /* end of socket array */
    

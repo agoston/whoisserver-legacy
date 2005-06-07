@@ -464,3 +464,6 @@ uninstall-local:
 
 distclean-local:
 	rm -f src/modules/rpsl/*.o
+
+cadict:
+	$(M4) -d src/modules/ca/dictGen.m4 > src/modules/ca/ca_dictionary.h

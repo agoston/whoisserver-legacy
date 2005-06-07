@@ -39,6 +39,13 @@ RIR   RIPE
 ######################
 
 #
+# Effective user name for the process. If the server is started
+# by root, it will switch to PROCESSUSER after binding
+# sockets
+#
+PROCESSUSER dbase
+
+#
 # The directory where all sorts of lockfiles are kept
 
 LOCKDIR @lockdir@
