@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.69 $
+  $Revision: 1.1 $
 
   Functions to process data stream( file, network socket, etc.)
 
@@ -196,7 +196,7 @@ long keycert_id_submitted;
       {
         keycert_id = keycert_id_submitted;
         /* strip leading zeroes */
-        key_cert_formatted = UT_malloc(strlen(key_cert_submitted));
+        key_cert_formatted = UT_malloc(strlen(key_cert_submitted)+1);
         sprintf(key_cert_formatted, "X509-%ld", keycert_id_submitted);
         rpsl_attr_replace_value((rpsl_attr_t *)key_cert, key_cert_formatted);
         UT_free(key_cert_formatted);
