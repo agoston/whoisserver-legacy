@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.3 $
+  $Revision: 1.4 $
 
   Example code: A server for a client to connect to.
 
@@ -82,7 +82,7 @@ SV_init (LG_context_t *ctx)
 /* Logging results */
 static void log_print(const char *arg) {
 
-  printf(arg);
+  fprintf(stderr,arg);
 
 } /* log_print() */
 
@@ -462,7 +462,7 @@ static void  *main_loop(void *arg) {
     */
     argcopy = UT_malloc( sizeof(svr_args) );
     memcpy( argcopy, argset, sizeof(svr_args) );
-    TH_create( SV_do_child, (void *)argcopy );
+    TH_create( SV_do_child, (void *)argcopy);
   } 
 
   TA_delete();
@@ -552,6 +552,7 @@ int SV_start(char *pidfile) {
   int db_port;
   SQ_connection_t *db_connection;
   int shutdown_pipe[2];
+  int retval=1;
 
   /* Store the starting time */
   gettimeofday(&tval, NULL);
@@ -617,13 +618,13 @@ int SV_start(char *pidfile) {
   /* 6. Create a socket on the necessary ports/addresses and bind to them. */
   /* whois socket */
   SV_whois_sock = SK_getsock(SOCK_STREAM, whois_port, 128, INADDR_ANY);
-  printf("Whois  port: %d\n",whois_port);
+  fprintf(stderr,"Whois  port: %d\n",whois_port);
   /* config interface socket */
   SV_config_sock = SK_getsock(SOCK_STREAM, config_port, 5, INADDR_ANY);
-  printf("Config port: %d\n",config_port);
+  fprintf(stderr,"Config port: %d\n",config_port);
   /* nrt socket */
   SV_mirror_sock = SK_getsock(SOCK_STREAM,mirror_port, 128, INADDR_ANY);
-  printf("Mirror port: %d\n",mirror_port);
+  fprintf(stderr,"Mirror port: %d\n",mirror_port);
   /* per source update ports */
   for (source=0;
        (source_hdl = ca_get_SourceHandleByPosition(source))!=NULL;
@@ -633,7 +634,7 @@ int SV_start(char *pidfile) {
       update_port = ca_get_srcupdateport(source_hdl);
       SV_update_sock[source] =
         SK_getsock(SOCK_STREAM, update_port, 128, INADDR_ANY);
-      printf("Update port: %d for %s\n", update_port, source_hdl);
+      fprintf(stderr,"Update port: %d for %s\n", update_port, source_hdl);
     } else {
       SV_update_sock[source] = 0;
     }
@@ -641,13 +642,13 @@ int SV_start(char *pidfile) {
 
   /* (after 6). Drop root privileges, if any */
   if (getuid() != 0) {
-    printf("Not running as root, keeping current uid and gid\n");
+    fprintf(stderr,"Not running as root, keeping current uid and gid\n");
   } else {
     struct passwd *passwent;
     char *procuser;
     int lenproc;
 
-    printf("*Running* as root, dropping privileges:\n");
+    fprintf(stderr,"*Running* as root, dropping privileges:\n");
     procuser=strdup(ca_get_processuser);
 
     /* chop off any trailing newline */
@@ -659,31 +660,31 @@ int SV_start(char *pidfile) {
 
     passwent = getpwnam(procuser);
     if (passwent == NULL) {
-      printf(" getpwnam failed for %s - %s\n",
+      fprintf(stderr," getpwnam failed for %s - %s\n",
         procuser,strerror(errno));
       die;
     }
     if ((setgid(passwent->pw_gid)) != 0) {
-      printf("can't setgid(%d)\n",passwent->pw_gid);
+      fprintf(stderr,"can't setgid(%d)\n",passwent->pw_gid);
       die;
     }
-    printf("Gid: %d ",passwent->pw_gid);
+    fprintf(stderr,"Gid: %d ",passwent->pw_gid);
     if ((setegid(passwent->pw_gid)) != 0) {
-      printf("can't setegid(%d)\n",passwent->pw_gid);
+      fprintf(stderr,"can't setegid(%d)\n",passwent->pw_gid);
       die;
     }
-    printf("Egid: %d ",passwent->pw_gid);
+    fprintf(stderr,"Egid: %d ",passwent->pw_gid);
     if ((setuid(passwent->pw_uid)) != 0) {
-      printf("can't setuid(%d)\n",passwent->pw_uid);
+      fprintf(stderr,"can't setuid(%d)\n",passwent->pw_uid);
       die;
     }
-    printf("Uid: %d ",passwent->pw_uid);
+    fprintf(stderr,"Uid: %d ",passwent->pw_uid);
     if ((seteuid(passwent->pw_uid)) != 0) {
-      printf("can't seteuid(%d)\n",passwent->pw_uid);
+      fprintf(stderr,"can't seteuid(%d)\n",passwent->pw_uid);
       die;
     }
-    printf("Euid: %d ",passwent->pw_uid);
-    printf(".\n");
+    fprintf(stderr,"Euid: %d ",passwent->pw_uid);
+    fprintf(stderr,".\n");
   }
 
 /* Currently binds to INADDR_ANY. Will need to get specific address */
@@ -747,8 +748,24 @@ int SV_start(char *pidfile) {
    }    
   /* terminate the thread */
   /* XXX not return becase then we terminate the whole process */
-  pthread_exit(NULL);
-  return(1); /* we will never reach this point */
+
+  /* Loop until the server goes down */
+  struct pollfd ufds;
+  ufds.fd = SV_shutdown_recv_fd;
+  ufds.events = POLLIN | POLLPRI;
+  ufds.revents = 0;
+  while (1) {
+
+    retval = poll(&ufds, 1, 500);
+    if (retval != 0) {
+      fprintf(stderr,"Whois server going down.\n");
+      pthread_exit(NULL);
+      return(1);
+    }
+  }
+
+  /* we will never reach this point */
+  // return(1);
 } /* SV_start() */
 
 /* SV_switchdynamic() */

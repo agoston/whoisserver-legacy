@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.39 $
+  $Revision: 1.1 $
 
   Example code: main server code.
 
@@ -166,8 +166,9 @@ int main(int argc, char** argv) {
   int c, ret, errflg=0;
   LG_context_t* boot_ctx;
 
-/* Initialize GLib library to be thread-safe */
-   g_thread_init(NULL); 
+  /* Initialize GLib library to be thread-safe */
+  g_thread_init(NULL); 
+
   /* parse command line options */     
   prop_file_name = NULL;
   pid_file_name = NULL;
@@ -209,14 +210,13 @@ int main(int argc, char** argv) {
 
   sv_init_modules();
 
-  printf("%s\n", ca_get_allriperr);
+  /* fprintf(stderr,"%s\n", ca_get_allriperr); */
   /* Initialize error handling */
   error_init(argc, argv);
 
   /*  Start the server */
 
   ret = SV_start(pid_file_name);
-  
   
   if(ret != 0) return(1); else return(0);
 
