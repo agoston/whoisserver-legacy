@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   Reporting module.
 
@@ -195,7 +195,7 @@ gchar* RT_get(RT_context_t* ctx, gint level, gchar* template_name) {
   sprintf(level_string, "%d", level); 
   xmlNewProp(xmlDocGetRootElement(doc), (xmlChar*)"level", (xmlChar*)level_string);
 
-  xmlDocDump(stdout, doc);
+  // xmlDocDump(stdout, doc);
 
   text = xsltApplyStylesheet(xslt, doc, params);
   xmlFreeDoc(doc);
