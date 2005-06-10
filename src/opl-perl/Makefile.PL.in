@@ -14,6 +14,8 @@ foreach $path (@search_path){
 }
 
 
+my $libs = `pkg-config gthread-2.0 glib-2.0 --libs`;
+
 WriteMakefile(
     'ABSTRACT'		=> 'RPSL',
     'AUTHOR'		=> 'Kevin Baker <kevin@ripe.net>',
@@ -21,6 +23,6 @@ WriteMakefile(
 	'VERSION_FROM' => 'RPSL.pm',
 	'PREREQ_PM'    => { Tie::IxHash => 1.21 },
 	'DEFINE'       => '',
-	'LIBS'         => ['-Llib @GLIB_LIBS@ -lrpsl -lglib -lpthread'],
-	'INC'          => '-Iinclude @GLIB_CFLAGS@',
+	'LIBS'         => ['-L. -lrpsl -Llib '. $libs],
+	'INC'          => '-I../include `pkg-config gthread-2.0 glib-2.0 --cflags`',
 );

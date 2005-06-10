@@ -16,7 +16,7 @@ use Tie::IxHash;
 
 
 our @ISA = qw(Exporter DynaLoader);
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 
 
