@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.5 $
 
   Example code: A server for a client to connect to.
 
@@ -757,7 +757,7 @@ int SV_start(char *pidfile) {
   while (1) {
 
     retval = poll(&ufds, 1, 500);
-    if (retval != 0) {
+    if ((retval != 0)&&(ufds.revents != 0)) {
       fprintf(stderr,"Whois server going down.\n");
       pthread_exit(NULL);
       return(1);
