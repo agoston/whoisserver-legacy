@@ -52,6 +52,7 @@ opl-uninstall:
 	rm -vf ${DESTDIR}$(libdir)/librpsl.a
 
 opl-perl: opl
+	${INSTALL} -m 0644 opl/librpsl.a opl-perl/librpsl_perl_dist.a
 	cd opl-perl; \
 	$(PERL5) Makefile.PL; \
 	$(OPLMAKE) ; \

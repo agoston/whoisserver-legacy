@@ -5,6 +5,7 @@ Makefile.PL
 RPSL.pm
 RPSL.xs
 typemap
+librpsl_perl_dist.a
 Attribute/Attribute.pm
 Attribute/Changes
 Attribute/MANIFEST

@@ -23,6 +23,6 @@ WriteMakefile(
 	'VERSION_FROM' => 'RPSL.pm',
 	'PREREQ_PM'    => { Tie::IxHash => 1.21 },
 	'DEFINE'       => '',
-	'LIBS'         => ['-L. -lrpsl -Llib '. $libs],
+	'LIBS'         => ['-L. -lrpsl_perl_dist -Llib '. $libs],
 	'INC'          => '-I../include `pkg-config gthread-2.0 glib-2.0 --cflags`',
 );
