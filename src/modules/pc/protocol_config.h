@@ -2,7 +2,7 @@
 #define READ_PROTOCOL_CONFIG
 
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   Protocol config module (pc).  This is the protocol that the admin uses to
   talk to the server.
@@ -116,8 +116,8 @@ http://cs.wwc.edu/~bellmi/ANSI_escape_codes.html
 
 #define HELP_SET_MACRO    "Set a new macro in the error path system"
 #define HELP_SET_COUNTER "Reset the counter for the given thread. Argument: thread_id"
-#define HELP_SET_DYNAMIC "Set server dynamic status"
-
+#define HELP_SET_DYNAMIC "Set server dynamic status.\n" \
+                         "\tSyntax: set dynamic {start|stop}\n" \
 
 #define PC_RET_QUIT     (0xabcdef) /* make it really uniq */
 #define PC_RET_ERR      (1)
