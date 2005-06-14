@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.3 $
+  $Revision: 1.4 $
 
   rollback(), commit(), delete() - rollback, commit update transaction, delete an object
 
@@ -716,6 +716,7 @@ char *sql_str;
        }   
        break;
 
+#ifndef AFRINIC
     case C_PF:
 
         /* Check that this poetic-form object is not referenced */
@@ -735,6 +736,7 @@ char *sql_str;
         }
        }
        break;
+#endif
 
     default:
         break;    
