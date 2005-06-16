@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.7 $
+  $Revision: 1.8 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -222,7 +222,7 @@ static void qi_create_name_query(GString *query_str, const char *sql_query, cons
   /* Allocate stuff - use dynamic strings (initialised to some length) */
   GString *from_clause = g_string_sized_new(STR_L);
   GString *where_clause = g_string_sized_new(STR_L);
-  gchar **words = ut_g_strsplit_v1(keys, " ", 0);
+  gchar **words = ut_g_strsplit_v1((char*)keys, " ", 0);
 
   /* double quotes " are used in queries to allow querying for 
      names like O'Hara */
@@ -270,7 +270,7 @@ static void qi_create_org_name_query(GString *query_str, const char *sql_query, 
   /* Allocate stuff - use dynamic strings (initialised to some length) */
   GString *from_clause = g_string_sized_new(STR_L);
   GString *where_clause = g_string_sized_new(STR_L);
-  gchar **words = ut_g_strsplit_v1(keys, " ", 0);
+  gchar **words = ut_g_strsplit_v1((char*)keys, " ", 0);
 
   /* double quotes " are used in queries to allow querying for 
      names like O'Hara */
@@ -566,7 +566,7 @@ char *QI_fast_output(const char *str)
   int i,j;
   char *result;
   GString *result_buff = g_string_sized_new(STR_XL);
-  gchar **lines = ut_g_strsplit_v1(str, "\n", 0);
+  gchar **lines = ut_g_strsplit_v1((char*)str, "\n", 0);
   unsigned char *value, *colon;
   char *attr;
 
@@ -660,7 +660,7 @@ char *brief_filter (const char *str) {
   gboolean filtering_an_attribute = FALSE;
   gboolean filtered = FALSE;
   GString *result_buff = g_string_sized_new(STR_XL);
-  gchar **lines = ut_g_strsplit_v1(str, "\n", 0);
+  gchar **lines = ut_g_strsplit_v1((char*)str, "\n", 0);
 
   g_string_assign(result_buff, "");
 
@@ -730,7 +730,7 @@ char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
   gboolean filtered = FALSE;
   GString *result_buff = g_string_sized_new(STR_XL);
   GString *source_attr = g_string_sized_new(STR_XL);
-  gchar **lines = ut_g_strsplit_v1(str, "\n", 0);
+  gchar **lines = ut_g_strsplit_v1((char*)str, "\n", 0);
 
   g_string_assign(result_buff, "");
   g_string_assign(source_attr, "");
@@ -817,7 +817,7 @@ char *filter(const char *str) {
   int i,j, passed=0;
   char *result;
   GString *result_buff = g_string_sized_new(STR_XL);
-  gchar **lines = ut_g_strsplit_v1(str, "\n", 0);
+  gchar **lines = ut_g_strsplit_v1((char*)str, "\n", 0);
   char * const *filter_names;
   gboolean filtering_an_attribute = FALSE;
   
@@ -929,7 +929,7 @@ static int write_results(SQ_result_set_t *result,
   char *cont_filter;
   int retrieved_objects=0;
   char *objt;
-  char *pkey;
+  char *pkey=NULL;
   char *rec;
   int recursive;
   int type;
@@ -952,12 +952,16 @@ static int write_results(SQ_result_set_t *result,
         char *banner = ca_get_qi_filter_banner;
         SK_cd_puts(condat, banner);
         SK_cd_puts(condat, "\n");  
+        free(banner);
       }
 
       dieif (  (id = SQ_get_column_string(result, row, 0)) == NULL )
       dieif (  (objt = SQ_get_column_string(result, row, 3)) == NULL );
       if (grouped == 1) {
-        dieif (  (pkey = SQ_get_column_string(result, row, 4)) == NULL );
+        if (pkey == NULL) {
+          pkey = SQ_get_column_string(result, row, 4);
+        }
+        dieif (  pkey == NULL );
         dieif (  (rec = SQ_get_column_string(result, row, 5)) == NULL );
         recursive = atoi(rec);
         UT_free (rec);
@@ -993,6 +997,7 @@ static int write_results(SQ_result_set_t *result,
           /* add "parent:" attribute for inet(6)num */
           str = add_parent(atoi(id), str, par_list);
         } /* if afrinic */
+        UT_free(rir);
         UT_free(id);
         UT_free(objt);
 
@@ -1008,7 +1013,7 @@ static int write_results(SQ_result_set_t *result,
         if (original == 0) 
         {
           if (groups != NULL) {
-            if (((grouped == 1) && (g_hash_table_lookup(groups, gid) != NULL )) ||
+            if (((grouped == 1) && (g_hash_table_lookup(groups, (long*)gid) != NULL )) ||
                 ((grouped == 0) && (g_hash_table_size(groups) > 0))
             ) 
             {
@@ -1033,9 +1038,13 @@ static int write_results(SQ_result_set_t *result,
             char banner[STR_XL];
             char *fmt_banner = ca_get_qi_fmt_group_banner;
             sprintf (banner, fmt_banner, pkey);
+            if (pkey!=NULL) {
+              UT_free(pkey);
+            }
+            pkey=NULL;
+            free(fmt_banner);
             SK_cd_puts(condat, banner);
             SK_cd_puts(condat, "\n");
-            UT_free(pkey);
           }
           if ((brief == 1) && (recursive == 0) && (retrieved_objects > 0)) {
             SK_cd_puts(condat, "\n");
@@ -1064,6 +1073,9 @@ static int write_results(SQ_result_set_t *result,
     }
   } /* if (result != NULL) */
   
+  if (pkey != NULL ) {
+    UT_free(pkey);
+  }
   return retrieved_objects;
 } /* write_results() */
 

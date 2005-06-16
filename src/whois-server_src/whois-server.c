@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   Example code: main server code.
 
@@ -207,6 +207,7 @@ int main(int argc, char** argv) {
   LG_ctx_add_appender(boot_ctx, LG_app_get_file_info_dump(stderr));
   UT_init(boot_ctx);
   ca_init(prop_file_name);
+  g_free(prop_file_name);
 
   sv_init_modules();
 
