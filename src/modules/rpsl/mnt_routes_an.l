@@ -9,7 +9,7 @@
   notes:
     Tokens are defined in the associated grammar, mnt_routes_an.y.
 
-  $Id: mnt_routes_an.l,v 1.1 2004/12/27 16:38:46 can Exp $
+  $Id: mnt_routes_an.l,v 1.1 2004/12/27 17:52:39 can Exp $
 */
 
 /******************
@@ -42,7 +42,7 @@ IPV6DC         (({QUAD}:){0,6}{QUAD})?::({QUAD}(:{QUAD}){0,6})?
 PRFXV4         {IPV4}\/{INT}
 PRFXV6         {IPV6}\/{INT}
 PRFXV6DC       {IPV6DC}\/{INT}
-MNTNER         [A-Z0-9]([-A-Z0-9]*[A-Z0-9])?
+MNTNER         [A-Z0-9]([A-Z0-9_-]*[A-Z0-9])?
 
 %{
 #include <stdlib.h>
