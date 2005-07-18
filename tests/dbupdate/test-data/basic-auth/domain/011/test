@@ -1,0 +1,29 @@
+# domain authorisation tests
+# CASE 11: We try to create domain object using dash notation
+#        mnt-by TEST-MNT pass
+# parent mnt-by RIPE-NCC-HM-MNT pass
+#
+# (See also issue NCC#2005070991)
+# Create FAILED: [domain] 1.1.193.in-addr.arpa
+# Create FAILED: [domain] 2.1.193.in-addr.arpa
+#
+# create two domain object 
+#
+#FAILURE
+#
+# RESULT 11: The creation will fail but expantion will be done.
+
+domain:         1-2.1.193.in-addr.arpa
+descr:          Test-notation
+mnt-by:         TEST-DBM-MNT
+nserver:        ns1.some.net
+nserver:        ns2.some.net
+notify:         dbtest@ripe.net
+admin-c:        TP1-DB-TEST
+tech-c:         TP1-DB-TEST
+zone-c:         TP1-DB-TEST
+changed:        dbtest@ripe.net 20030101
+source:         DB-TEST
+
+password: auth
+password: hostmaster

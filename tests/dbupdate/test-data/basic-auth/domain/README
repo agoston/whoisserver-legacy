@@ -118,3 +118,18 @@
 #
 # RESULT 10: The creation will fail.
 
+# domain authorisation tests
+# CASE 11: We try to create domain object using dash notation
+#        mnt-by TEST-MNT pass
+# parent mnt-by RIPE-NCC-HM-MNT pass
+#
+# (See also issue NCC#2005070991)
+# Create FAILED: [domain] 1.1.193.in-addr.arpa
+# Create FAILED: [domain] 2.1.193.in-addr.arpa
+#
+# create two domain object 
+#
+#FAILURE
+#
+# RESULT 11: The creation will fail but expantion will be done.
+
