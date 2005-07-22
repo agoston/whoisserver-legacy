@@ -71,7 +71,7 @@ char *t_li[] = {
 
 char *t_mt[] = {
   "mntner","person_role","names","organisation",NULL,NULL,
-  "admin_c", "tech_c", "upd_to", "mnt_nfy", "auth", "notify", "mnt_by", "auth_override", "referral_by", "org", "abuse_mailbox", NULL
+  "admin_c", "tech_c", "upd_to", "mnt_nfy", "auth", "notify", "abuse_mailbox", "mnt_by", "auth_override", "referral_by", "org", NULL
 };
 
 char *t_imt[] = {
@@ -135,7 +135,7 @@ char *t_is[] = {
 
 char *t_it[] = {
   "mntner","person_role","names","organisation",NULL,NULL,
-  "admin_c", "tech_c", "notify", "mnt_by", "auth", "irt_nfy", "abuse_mailbox", "org", NULL
+  "admin_c", "tech_c", "notify", "abuse_mailbox", "mnt_by", "auth", "irt_nfy", "org", NULL
 };
 
 char *t_iit[] = {

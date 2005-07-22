@@ -18,6 +18,7 @@ typedef enum _A_Type_t {
   A_DE,
   A_DI,
   A_DN,
+  A_DS,
   A_EM,
   A_EX,
   A_ME,

@@ -1,5 +1,5 @@
 /*
- * $Id: ns_rir.c,v 1.1 2004/12/27 16:38:43 can Exp $
+ * $Id: ns_rir.c,v 1.1 2004/12/27 17:52:36 can Exp $
  */
 
 #include "ns_rir.h"
@@ -34,7 +34,7 @@ static GTree *rdns_read_delegations_tree(LG_context_t * lg_ctx,
   /* populate tree by reading the file */
   while (fgets(line, 160, f)) { /* a line could hardly be longer */
     if (strchr(line, '|') != NULL) {
-      items = g_strsplit(g_strchomp(line), "|", 4);
+      items = g_strsplit(g_strchomp(line), "|", 5);
       g_strdown(items[1]);
       p = strstr(items[1], "ip6.arpa");
       /* following case requires 2 insertions,
@@ -69,6 +69,12 @@ static GTree *rdns_read_erx_delegations(LG_context_t * lg_ctx,
                                         char *file_name)
 {
   return (rdns_read_delegations_tree(lg_ctx, file_name, 2));
+}
+
+static GTree *rdns_read_ds_delegations(LG_context_t * lg_ctx,
+                                        char *file_name)
+{
+  return (rdns_read_delegations_tree(lg_ctx, file_name, 3));
 }
 
 /*
@@ -230,5 +236,34 @@ gboolean ns_is_erx(gchar * domain)
     g_free(erx_val);
   }
   rdns_done_delegations(erx_tree);
+  return ret_val;
+}
+gboolean ns_ds_accepted(gchar * domain)
+{
+  gboolean ret_val;             /* return value */
+  GTree *ds_tree;              /* ds tree */
+  gchar *ds_val;               /* ds value in the tree */
+
+  LG_log(au_context, LG_DEBUG, "reading delegations file for ds");
+  ds_tree =
+      rdns_read_ds_delegations(au_context, ca_get_ns_delegationsfile);
+  if (ds_tree == NULL) {
+    LG_log(au_context, LG_DEBUG, "can't populate ds delegations tree");
+    ret_val = FALSE;            /* failsafe, we assume it's not ds */
+  } else {
+    ds_val =
+        ds_val =
+        g_strdup(rdns_who_delegates(au_context, ds_tree, domain));
+    LG_log(au_context, LG_DEBUG, "ds value: %s", ds_val);
+    if (ds_val[0] != '1') {
+      LG_log(au_context, LG_DEBUG, "DS is not accepted");
+      ret_val = FALSE;
+    } else {
+      LG_log(au_context, LG_DEBUG, "DS is accepted");
+      ret_val = TRUE;
+    }
+    g_free(ds_val);
+  }
+  rdns_done_delegations(ds_tree);
   return ret_val;
 }

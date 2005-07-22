@@ -1,5 +1,5 @@
 /*
- * $Id: ns_xml.c,v 1.1 2004/12/27 16:38:43 can Exp $
+ * $Id: ns_xml.c,v 1.1 2004/12/27 17:52:36 can Exp $
  */
 
 #include "ns_xml.h"
@@ -89,7 +89,7 @@ void ns_report_warnings(gpointer data, gpointer user_data)
  * Check delegation related problems for the domain
  */
 AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info,
-                            gchar * domain, gchar ** nservers,
+                            gchar * domain, gchar ** nservers, gchar ** ds_rdata,
                             gchar * delcheck_conf_file)
 {
   xmlChar *severity_node =
@@ -111,8 +111,22 @@ AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info,
   xmlNodeSetPtr nodeset;        /* result nodeset from an xpath query */
 
   LG_log(au_context, LG_DEBUG, "invoking delcheck");
+  
+  LG_log(au_context, LG_DEBUG, "with parameters: ");
+  LG_log(au_context, LG_DEBUG, "delcheck_conf_file=[%s]",delcheck_conf_file);
+  LG_log(au_context, LG_DEBUG, "domain=[%s]",domain);
 
-  rdns_perl_delcheck(delcheck_conf_file, domain, nservers,
+  if (nservers == NULL) {
+    LG_log(au_context, LG_DEBUG, "NO nameservers");
+  } else {
+    LG_log(au_context, LG_DEBUG, "nservers=[%s]",g_strjoinv(",", (gchar **) nservers));
+  }
+  if (ds_rdata == NULL) {
+    LG_log(au_context, LG_DEBUG, "NO ds-rdata");
+  } else {
+    LG_log(au_context, LG_DEBUG, "ds-rdata=[%s]",g_strjoinv(",", (gchar **) ds_rdata));
+  }
+  rdns_perl_delcheck(delcheck_conf_file, domain, nservers, ds_rdata,
                      &delcheck_result, &delcheck_errors);
   if (delcheck_errors != NULL) {
     LG_log(au_context, LG_DEBUG, "error in running delcheck:");

@@ -1,5 +1,5 @@
 /*
- * $Id: ns_rir.h,v 1.1 2004/12/27 16:38:43 can Exp $
+ * $Id: ns_rir.h,v 1.1 2004/12/27 17:52:36 can Exp $
  */
 
 #ifndef NSRIR_H_
@@ -15,5 +15,6 @@ gchar *rdns_who_delegates(LG_context_t *, GTree *, gchar *);
 AU_ret_t ns_find_rir(au_plugin_callback_info_t *, gchar *);
 
 gboolean ns_is_erx(gchar *);
+gboolean ns_ds_accepted(gchar *);
 
 #endif

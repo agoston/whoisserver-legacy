@@ -1,5 +1,5 @@
 /*
- * $Id: ns_perl.h,v 1.1 2004/12/27 16:38:43 can Exp $
+ * $Id: ns_perl.h,v 1.1 2004/12/27 17:52:36 can Exp $
  */
 
 #ifndef NS_PERL_H_
@@ -12,7 +12,7 @@
 #include "ca_macros.h"
 #include "lg.h"
 
-void rdns_perl_delcheck(gchar *, gchar *, gchar **, gchar **, gchar **);
+void rdns_perl_delcheck(gchar *, gchar *, gchar **, gchar **, gchar **, gchar **);
 gchar *ns_find_delcheck_conf(LG_context_t *, gchar *);
 
 #endif

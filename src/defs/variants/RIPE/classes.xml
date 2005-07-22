@@ -3,7 +3,7 @@
 <!-- XXX: will want to add core template in the future, to 
           document which fields are mandatory for core (e.g. nic-hdl) -->
 
-<ripe_classes version="$Revision: 1.3 $" author="$Author: arife $">
+<ripe_classes version="$Revision: 1.4 $" author="$Author: arife $">
 
   <ripe_class name="domain" main_sql_table="domain" code="dn">
     <description>
@@ -19,6 +19,7 @@
       <tech-c      choice="mandatory" number="multiple" />
       <zone-c      choice="mandatory" number="multiple" />
       <nserver     choice="optional"  number="multiple" />
+      <ds-rdata    choice="optional"  number="multiple" />
       <sub-dom     choice="optional"  number="multiple" />
       <dom-net     choice="optional"  number="multiple" />
       <remarks     choice="optional"  number="multiple" />

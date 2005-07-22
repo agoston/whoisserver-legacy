@@ -525,9 +525,35 @@ attribute_t attribute_tab[] = {
     },
     {
         /* name */
-        "e-mail",
+        "ds-rdata",
         /* id */
         19,
+        /* altname */
+        NULL,
+        /* xmlname */
+        "ds-rdata",
+        /* code */
+        "ds",
+        /* syntax_offset */
+        70,   /* ds-rdata */
+        /* is_lookup */
+        0,
+        /* is_inverse */
+        0,
+        /* is_primary */
+        0,
+        /* is_list */
+        0,
+        /* is_ripe_list */
+        0,
+        /* foreign_code */
+        NULL,
+    },
+    {
+        /* name */
+        "e-mail",
+        /* id */
+        20,
         /* altname */
         NULL,
         /* xmlname */
@@ -553,7 +579,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "export",
         /* id */
-        20,
+        21,
         /* altname */
         NULL,
         /* xmlname */
@@ -579,7 +605,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mp-export",
         /* id */
-        21,
+        22,
         /* altname */
         NULL,
         /* xmlname */
@@ -605,7 +631,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "export-comps",
         /* id */
-        22,
+        23,
         /* altname */
         NULL,
         /* xmlname */
@@ -631,7 +657,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "export-comps",
         /* id */
-        22,
+        23,
         /* altname */
         NULL,
         /* xmlname */
@@ -657,7 +683,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "fax-no",
         /* id */
-        23,
+        24,
         /* altname */
         NULL,
         /* xmlname */
@@ -683,7 +709,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "filter",
         /* id */
-        24,
+        25,
         /* altname */
         NULL,
         /* xmlname */
@@ -709,7 +735,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mp-filter",
         /* id */
-        25,
+        26,
         /* altname */
         NULL,
         /* xmlname */
@@ -735,7 +761,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "filter-set",
         /* id */
-        26,
+        27,
         /* altname */
         NULL,
         /* xmlname */
@@ -761,7 +787,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "fingerpr",
         /* id */
-        27,
+        28,
         /* altname */
         NULL,
         /* xmlname */
@@ -787,7 +813,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "holes",
         /* id */
-        28,
+        29,
         /* altname */
         NULL,
         /* xmlname */
@@ -813,7 +839,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "holes",
         /* id */
-        28,
+        29,
         /* altname */
         NULL,
         /* xmlname */
@@ -839,7 +865,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "ifaddr",
         /* id */
-        29,
+        30,
         /* altname */
         NULL,
         /* xmlname */
@@ -865,7 +891,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "interface",
         /* id */
-        30,
+        31,
         /* altname */
         NULL,
         /* xmlname */
@@ -891,7 +917,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "import",
         /* id */
-        31,
+        32,
         /* altname */
         NULL,
         /* xmlname */
@@ -917,7 +943,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mp-import",
         /* id */
-        32,
+        33,
         /* altname */
         NULL,
         /* xmlname */
@@ -943,7 +969,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "inetnum",
         /* id */
-        33,
+        34,
         /* altname */
         NULL,
         /* xmlname */
@@ -969,7 +995,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "inet6num",
         /* id */
-        34,
+        35,
         /* altname */
         NULL,
         /* xmlname */
@@ -995,7 +1021,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "inject",
         /* id */
-        35,
+        36,
         /* altname */
         NULL,
         /* xmlname */
@@ -1021,7 +1047,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "inject",
         /* id */
-        35,
+        36,
         /* altname */
         NULL,
         /* xmlname */
@@ -1047,7 +1073,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "key-cert",
         /* id */
-        36,
+        37,
         /* altname */
         NULL,
         /* xmlname */
@@ -1073,7 +1099,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mbrs-by-ref",
         /* id */
-        37,
+        38,
         /* altname */
         NULL,
         /* xmlname */
@@ -1099,7 +1125,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "members",
         /* id */
-        38,
+        39,
         /* altname */
         NULL,
         /* xmlname */
@@ -1125,7 +1151,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "members",
         /* id */
-        38,
+        39,
         /* altname */
         NULL,
         /* xmlname */
@@ -1151,7 +1177,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mp-members",
         /* id */
-        39,
+        40,
         /* altname */
         NULL,
         /* xmlname */
@@ -1177,7 +1203,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "members",
         /* id */
-        38,
+        39,
         /* altname */
         NULL,
         /* xmlname */
@@ -1203,7 +1229,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mp-members",
         /* id */
-        39,
+        40,
         /* altname */
         NULL,
         /* xmlname */
@@ -1229,7 +1255,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "method",
         /* id */
-        40,
+        41,
         /* altname */
         NULL,
         /* xmlname */
@@ -1255,7 +1281,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mnt-by",
         /* id */
-        41,
+        42,
         /* altname */
         NULL,
         /* xmlname */
@@ -1281,7 +1307,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mnt-lower",
         /* id */
-        42,
+        43,
         /* altname */
         NULL,
         /* xmlname */
@@ -1307,7 +1333,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mnt-ref",
         /* id */
-        43,
+        44,
         /* altname */
         NULL,
         /* xmlname */
@@ -1333,7 +1359,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mnt-domains",
         /* id */
-        44,
+        45,
         /* altname */
         NULL,
         /* xmlname */
@@ -1359,7 +1385,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mnt-nfy",
         /* id */
-        45,
+        46,
         /* altname */
         NULL,
         /* xmlname */
@@ -1385,7 +1411,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "ref-nfy",
         /* id */
-        46,
+        47,
         /* altname */
         NULL,
         /* xmlname */
@@ -1411,7 +1437,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mnt-routes",
         /* id */
-        47,
+        48,
         /* altname */
         NULL,
         /* xmlname */
@@ -1437,7 +1463,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mnt-routes",
         /* id */
-        47,
+        48,
         /* altname */
         NULL,
         /* xmlname */
@@ -1463,7 +1489,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mnt-routes",
         /* id */
-        47,
+        48,
         /* altname */
         NULL,
         /* xmlname */
@@ -1489,7 +1515,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mntner",
         /* id */
-        48,
+        49,
         /* altname */
         NULL,
         /* xmlname */
@@ -1515,7 +1541,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "netname",
         /* id */
-        49,
+        50,
         /* altname */
         NULL,
         /* xmlname */
@@ -1541,7 +1567,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "nic-hdl",
         /* id */
-        50,
+        51,
         /* altname */
         NULL,
         /* xmlname */
@@ -1567,7 +1593,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "organisation",
         /* id */
-        51,
+        52,
         /* altname */
         NULL,
         /* xmlname */
@@ -1593,7 +1619,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "notify",
         /* id */
-        52,
+        53,
         /* altname */
         NULL,
         /* xmlname */
@@ -1619,7 +1645,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "origin",
         /* id */
-        53,
+        54,
         /* altname */
         NULL,
         /* xmlname */
@@ -1645,7 +1671,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "owner",
         /* id */
-        54,
+        55,
         /* altname */
         NULL,
         /* xmlname */
@@ -1671,7 +1697,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "peer",
         /* id */
-        55,
+        56,
         /* altname */
         NULL,
         /* xmlname */
@@ -1697,7 +1723,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mp-peer",
         /* id */
-        56,
+        57,
         /* altname */
         NULL,
         /* xmlname */
@@ -1723,7 +1749,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "peering",
         /* id */
-        57,
+        58,
         /* altname */
         NULL,
         /* xmlname */
@@ -1749,7 +1775,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mp-peering",
         /* id */
-        58,
+        59,
         /* altname */
         NULL,
         /* xmlname */
@@ -1775,7 +1801,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "person",
         /* id */
-        59,
+        60,
         /* altname */
         NULL,
         /* xmlname */
@@ -1801,7 +1827,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "org-name",
         /* id */
-        60,
+        61,
         /* altname */
         NULL,
         /* xmlname */
@@ -1827,7 +1853,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "phone",
         /* id */
-        61,
+        62,
         /* altname */
         NULL,
         /* xmlname */
@@ -1853,7 +1879,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "referral-by",
         /* id */
-        62,
+        63,
         /* altname */
         NULL,
         /* xmlname */
@@ -1879,7 +1905,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "remarks",
         /* id */
-        63,
+        64,
         /* altname */
         NULL,
         /* xmlname */
@@ -1905,7 +1931,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "nserver",
         /* id */
-        64,
+        65,
         /* altname */
         NULL,
         /* xmlname */
@@ -1931,7 +1957,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "refer",
         /* id */
-        65,
+        66,
         /* altname */
         NULL,
         /* xmlname */
@@ -1957,7 +1983,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "rev-srv",
         /* id */
-        66,
+        67,
         /* altname */
         NULL,
         /* xmlname */
@@ -1983,7 +2009,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "role",
         /* id */
-        67,
+        68,
         /* altname */
         NULL,
         /* xmlname */
@@ -2009,7 +2035,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "route-set",
         /* id */
-        68,
+        69,
         /* altname */
         NULL,
         /* xmlname */
@@ -2035,7 +2061,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "source",
         /* id */
-        69,
+        70,
         /* altname */
         NULL,
         /* xmlname */
@@ -2061,7 +2087,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "status",
         /* id */
-        70,
+        71,
         /* altname */
         NULL,
         /* xmlname */
@@ -2087,7 +2113,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "status",
         /* id */
-        70,
+        71,
         /* altname */
         NULL,
         /* xmlname */
@@ -2113,7 +2139,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "org-type",
         /* id */
-        71,
+        72,
         /* altname */
         NULL,
         /* xmlname */
@@ -2139,7 +2165,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "sub-dom",
         /* id */
-        72,
+        73,
         /* altname */
         NULL,
         /* xmlname */
@@ -2165,7 +2191,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "tech-c",
         /* id */
-        73,
+        74,
         /* altname */
         NULL,
         /* xmlname */
@@ -2191,7 +2217,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "org",
         /* id */
-        74,
+        75,
         /* altname */
         NULL,
         /* xmlname */
@@ -2217,7 +2243,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "text",
         /* id */
-        75,
+        76,
         /* altname */
         NULL,
         /* xmlname */
@@ -2243,7 +2269,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "upd-to",
         /* id */
-        76,
+        77,
         /* altname */
         NULL,
         /* xmlname */
@@ -2269,7 +2295,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "zone-c",
         /* id */
-        77,
+        78,
         /* altname */
         NULL,
         /* xmlname */
@@ -2295,7 +2321,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "inet-rtr",
         /* id */
-        78,
+        79,
         /* altname */
         NULL,
         /* xmlname */
@@ -2321,7 +2347,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "as-block",
         /* id */
-        79,
+        80,
         /* altname */
         NULL,
         /* xmlname */
@@ -2347,7 +2373,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "aut-num",
         /* id */
-        80,
+        81,
         /* altname */
         NULL,
         /* xmlname */
@@ -2373,7 +2399,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "limerick",
         /* id */
-        81,
+        82,
         /* altname */
         NULL,
         /* xmlname */
@@ -2399,7 +2425,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "route",
         /* id */
-        82,
+        83,
         /* altname */
         NULL,
         /* xmlname */
@@ -2425,7 +2451,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "route6",
         /* id */
-        83,
+        84,
         /* altname */
         NULL,
         /* xmlname */
@@ -2451,7 +2477,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "peering-set",
         /* id */
-        84,
+        85,
         /* altname */
         NULL,
         /* xmlname */
@@ -2477,7 +2503,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "rtr-set",
         /* id */
-        85,
+        86,
         /* altname */
         NULL,
         /* xmlname */
@@ -2503,7 +2529,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "local-as",
         /* id */
-        86,
+        87,
         /* altname */
         "localas",
         /* xmlname */
@@ -2529,7 +2555,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "member-of",
         /* id */
-        87,
+        88,
         /* altname */
         NULL,
         /* xmlname */
@@ -2555,7 +2581,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "member-of",
         /* id */
-        87,
+        88,
         /* altname */
         NULL,
         /* xmlname */
@@ -2581,7 +2607,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "member-of",
         /* id */
-        87,
+        88,
         /* altname */
         NULL,
         /* xmlname */
@@ -2607,7 +2633,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "mnt-irt",
         /* id */
-        88,
+        89,
         /* altname */
         NULL,
         /* xmlname */
@@ -2633,7 +2659,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "irt",
         /* id */
-        89,
+        90,
         /* altname */
         NULL,
         /* xmlname */
@@ -2659,7 +2685,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "signature",
         /* id */
-        90,
+        91,
         /* altname */
         NULL,
         /* xmlname */
@@ -2685,7 +2711,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "encryption",
         /* id */
-        91,
+        92,
         /* altname */
         NULL,
         /* xmlname */
@@ -2711,7 +2737,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "irt-nfy",
         /* id */
-        92,
+        93,
         /* altname */
         NULL,
         /* xmlname */
@@ -2737,7 +2763,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "delete",
         /* id */
-        93,
+        94,
         /* altname */
         NULL,
         /* xmlname */
@@ -2763,7 +2789,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "override",
         /* id */
-        94,
+        95,
         /* altname */
         NULL,
         /* xmlname */
@@ -2789,7 +2815,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "poem",
         /* id */
-        95,
+        96,
         /* altname */
         NULL,
         /* xmlname */
@@ -2815,7 +2841,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "poetic-form",
         /* id */
-        96,
+        97,
         /* altname */
         NULL,
         /* xmlname */
@@ -2841,7 +2867,7 @@ attribute_t attribute_tab[] = {
         /* name */
         "form",
         /* id */
-        97,
+        98,
         /* altname */
         NULL,
         /* xmlname */

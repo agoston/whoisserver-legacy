@@ -1,5 +1,5 @@
 /*
- * $Id: ns_util.h,v 1.1 2004/12/27 16:38:43 can Exp $
+ * $Id: ns_util.h,v 1.1 2004/12/27 17:52:36 can Exp $
  */
 
 #ifndef NSUTIL_H
@@ -22,6 +22,8 @@
 gchar *ns_par(gchar *);
 
 gchar **ns_nservers(rpsl_object_t *, RT_context_t *, gchar *, AU_ret_t *);
+
+gchar **ns_ds_rdata(rpsl_object_t *, RT_context_t *, gchar *, AU_ret_t *);
 
 gboolean ns_is_rdns_suffix(au_plugin_callback_info_t *);
 

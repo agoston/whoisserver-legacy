@@ -1,5 +1,5 @@
 /*
- * $Id: ns_perl.c,v 1.1 2004/12/27 16:38:43 can Exp $
+ * $Id: ns_perl.c,v 1.1 2004/12/27 17:52:36 can Exp $
  */
 
 #include <EXTERN.h>             /* from the Perl distribution     */
@@ -32,7 +32,7 @@ EXTERN_C void xs_init(pTHX)
  * Invoke delchecker, and communicate the result
  * result and errors must be g_freed, if not NULL
  */
-void rdns_perl_delcheck(gchar * conf, gchar * domain, gchar ** nservers,
+void rdns_perl_delcheck(gchar * conf, gchar * domain, gchar ** nservers, gchar ** ds_rdata,
                         gchar ** result, gchar ** errors)
 {
   STRLEN n_a;                   /* perl embedding related */
@@ -42,6 +42,7 @@ void rdns_perl_delcheck(gchar * conf, gchar * domain, gchar ** nservers,
   gchar *command;               /* Perl code to execute */
   gchar *errorPerl;             /* Error string from Perl */
   gchar *resultPerl;            /* Result from delegations checking */
+  gchar *ds_rdata_str = NULL;   /* string for array of ds-rdata records */
 
   /* check if nservers are filled */
   if ((nservers == NULL) || (nservers[0] == NULL)) {
@@ -59,11 +60,17 @@ void rdns_perl_delcheck(gchar * conf, gchar * domain, gchar ** nservers,
   /* Prepare the Perl code, placing configuration file, domain and nserver
    * strings
    */
+  if (ds_rdata != NULL) {
+    ds_rdata_str = g_strdup_printf ("'%s'", g_strjoinv("','", (gchar **) ds_rdata));
+  } else {
+    ds_rdata_str = g_strdup("");
+  }
   command = g_strdup_printf("\
       use warnings; \
       $error=''; \
       $result=''; \
       eval { \
+        use lib '/home/katie/usr/local/lib/perl5/site_perl'; \
         require Net::DelCheck; \
         $checker = new Net::DelCheck('%s'); \
         if ( !defined $checker ) { \
@@ -74,7 +81,7 @@ void rdns_perl_delcheck(gchar * conf, gchar * domain, gchar ** nservers,
           if (@errors) { \
             die  (join (' ', @errors )); \
           }  else { \
-            $result = $checker->check; \
+            $result = $checker->check(%s); \
           } \
         } \
       }; \
@@ -84,7 +91,13 @@ void rdns_perl_delcheck(gchar * conf, gchar * domain, gchar ** nservers,
       } else { \
         $error=\"\"; \
       } \
-        ", conf, domain, g_strjoinv("','", (gchar **) nservers));
+        ", conf, domain, g_strjoinv("','", (gchar **) nservers), ds_rdata_str);
+
+  { char buf[2000];
+     sprintf (buf, "DEBUG: delcheck string [%s]\n", command);
+     fprintf (stderr, buf);
+  }
+
 
   /* Execute the Perl code, get result and error */
   eval_pv(command, TRUE);
@@ -116,6 +129,9 @@ void rdns_perl_delcheck(gchar * conf, gchar * domain, gchar ** nservers,
 
   /* Function cleanup */
   g_free(command);
+  if (ds_rdata_str != NULL) {
+    g_free(ds_rdata_str);
+  }
 }
 
 /*

@@ -37,6 +37,8 @@ char * const Attribute_aliases[] = {
   "dom-net",
   "dn",
   "domain",
+  "ds",
+  "ds-rdata",
   "em",
   "e-mail",
   "ex",
