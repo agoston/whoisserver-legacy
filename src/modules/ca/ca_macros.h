@@ -169,6 +169,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define ca_get_processuser	ca_get_string(CA_PROCESSUSER)
 #define ca_set_processuser	ca_set_string(CA_PROCESSUSER)
 
+#define ca_get_coresize ca_get_int(CA_CORESIZE)
+#define ca_set_coresize ca_set_int(CA_CORESIZE)
+
 #define ca_get_rir	ca_get_string(CA_RIR)
 #define ca_set_rir	ca_set_string(CA_RIR)
 

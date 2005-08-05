@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5 $
+  $Revision: 1.6 $
 
   Example code: A server for a client to connect to.
 
@@ -43,6 +43,8 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 #include <netinet/in.h>
 #include <errno.h>
 #include <unistd.h>
@@ -553,6 +555,7 @@ int SV_start(char *pidfile) {
   SQ_connection_t *db_connection;
   int shutdown_pipe[2];
   int retval=1;
+  struct rlimit rlim;
 
   /* Store the starting time */
   gettimeofday(&tval, NULL);
@@ -686,6 +689,19 @@ int SV_start(char *pidfile) {
     fprintf(stderr,"Euid: %d ",passwent->pw_uid);
     fprintf(stderr,".\n");
   }
+
+/* Set the Core size, taken from configuration */
+
+  fprintf(stderr,"Setting the core size...");
+  if ((getrlimit(RLIMIT_CORE,&rlim)) != 0) {
+    fprintf(stderr," getrlimit() failed!");
+  } else {
+    rlim.rlim_cur=ca_get_coresize;
+    if ((setrlimit(RLIMIT_CORE,&rlim)) != 0) {
+      fprintf(stderr," setrlimit() failed!");
+    }
+  }
+  fprintf(stderr,"\n");
 
 /* Currently binds to INADDR_ANY. Will need to get specific address */
 /*  SV_whois_sock = SK_getsock(SOCK_STREAM,whois_port,whois_addr); */
