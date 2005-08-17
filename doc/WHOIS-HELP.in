@@ -11,6 +11,9 @@
                  returned.
 -c <ip-lookup>   Requests first level less specific inetnum or inet6num
                  objects with the "mnt-irt:" attribute.
+-b <ip-lookup>   Requests first level less specific inetnum or inet6num
+                 objects with the "mnt-irt:" attribute. Only object keys
+                 and "abuse-mailbox:" attributes are visible.
 -d <ip-lookup>   Enables use of the -m, -M, -l and -L flags for lookups on
                  reverse delegation domains.
 
@@ -35,6 +38,9 @@
 -g (mirroring request) Request a NRTM stream from the server. 
                  See [REF], section 4. "Mirroring the RIPE Database" for
                  more information".
+-G               Disables the grouping of objects by relevance.
+-B               Disables the filtering of "notify:", "changed:" and "e-mail:"
+                 attributes.
 
 -R               Switches off use referral mechanism for domain lookups,
                  so that the database returns an object in the RIPE
@@ -61,3 +67,5 @@
 
 [REF] RIPE Database Reference Manual.
       http://www.ripe.net/ripe/docs/databaseref-manual.html
+
+

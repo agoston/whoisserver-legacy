@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   Example code: A thread.
 
@@ -73,17 +73,13 @@
   ++++++++++++++++++++++++++++++++++++++*/
 void TH_acquire_read_lock(rw_lock_t *prw_lock) { 
   struct timespec to;
-  int err;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
   to.tv_nsec = 0;
   pthread_mutex_lock(&prw_lock->rw_mutex);
 
   while (prw_lock->rw_count < 0) {
-    err = pthread_cond_timedwait(&prw_lock->rw_cond, &prw_lock->rw_mutex, &to);
-    if (err == ETIMEDOUT) {
-      break;
-    }
+    pthread_cond_timedwait(&prw_lock->rw_cond, &prw_lock->rw_mutex, &to);
   }
 
   ++prw_lock->rw_count;
@@ -134,7 +130,6 @@ void TH_release_read_lock(rw_lock_t *prw_lock) {
   ++++++++++++++++++++++++++++++++++++++*/
 void TH_acquire_write_lock(rw_lock_t *prw_lock) { 
   struct timespec to;
-  int err;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
   to.tv_nsec = 0;
@@ -142,10 +137,7 @@ void TH_acquire_write_lock(rw_lock_t *prw_lock) {
   pthread_mutex_lock(&prw_lock->rw_mutex);
 
   while (prw_lock->rw_count != 0) {
-    err = pthread_cond_timedwait(&prw_lock->rw_cond, &prw_lock->rw_mutex, &to);
-    if (err == ETIMEDOUT) {
-      break;
-    }
+    pthread_cond_timedwait(&prw_lock->rw_cond, &prw_lock->rw_mutex, &to);
   }
 
   prw_lock->rw_count = -1;
@@ -221,7 +213,6 @@ void TH_init_read_write_lock(rw_lock_t *prw_lock) {
   ++++++++++++++++++++++++++++++++++++++*/
 void TH_acquire_read_lockw(rw_lock_t *prw_lock) { 
   struct timespec to;
-  int err;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
   to.tv_nsec = 0;
@@ -229,10 +220,7 @@ void TH_acquire_read_lockw(rw_lock_t *prw_lock) {
   pthread_mutex_lock(&prw_lock->rw_mutex);
 
   while (prw_lock->w_count != 0) {
-    err = pthread_cond_timedwait(&prw_lock->w_cond, &prw_lock->rw_mutex, &to);
-    if (err == ETIMEDOUT) {
-      break;
-    }
+    pthread_cond_timedwait(&prw_lock->w_cond, &prw_lock->rw_mutex, &to);
   }
 
   ++prw_lock->rw_count;
@@ -283,7 +271,6 @@ void TH_release_read_lockw(rw_lock_t *prw_lock) {
   ++++++++++++++++++++++++++++++++++++++*/
 void TH_acquire_write_lockw(rw_lock_t *prw_lock) { 
   struct timespec to;
-  int err;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
   to.tv_nsec = 0;
@@ -292,20 +279,14 @@ void TH_acquire_write_lockw(rw_lock_t *prw_lock) {
 
  /* check for writers */
   while (prw_lock->w_count != 0) {
-    err = pthread_cond_timedwait(&prw_lock->w_cond, &prw_lock->rw_mutex, &to);
-    if (err == ETIMEDOUT) {
-      break;
-    }
+    pthread_cond_timedwait(&prw_lock->w_cond, &prw_lock->rw_mutex, &to);
   }
 
   prw_lock->w_count = 1;
  
  /* wait until all readers are gone */
   while (prw_lock->rw_count != 0) {
-    err = pthread_cond_timedwait(&prw_lock->rw_cond, &prw_lock->rw_mutex, &to);
-    if (err == ETIMEDOUT) {
-      break;
-    }
+    pthread_cond_timedwait(&prw_lock->rw_cond, &prw_lock->rw_mutex, &to);
   }
  
   pthread_mutex_unlock(&prw_lock->rw_mutex);
