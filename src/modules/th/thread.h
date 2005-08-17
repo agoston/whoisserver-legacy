@@ -2,7 +2,7 @@
 #define READ_THREAD
 
 /***************************************
-  $Revision: 1.19 $
+  $Revision: 1.1 $
 
   Thread module (th)
 
@@ -51,6 +51,10 @@ typedef struct _wd_args_t {
   pthread_t tid;
 } wd_args_t;  
 */
+
+/* Timeout for locks in seconds */
+#define CONDWAITTIMEOUT 1
+
 /* Readers writers lock functions favoring readers */
 void TH_acquire_read_lock(rw_lock_t *prw_lock);
 void TH_release_read_lock(rw_lock_t *prw_lock);
