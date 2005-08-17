@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.6 $
+  $Revision: 1.7 $
 
   Example code: A server for a client to connect to.
 
@@ -51,6 +51,7 @@
 #include <string.h>
 #include <sys/poll.h>
 #include <pwd.h>
+#include <sys/prctl.h>
 
 /* Listening sockets */
 int SV_whois_sock;
@@ -689,21 +690,12 @@ int SV_start(char *pidfile) {
     fprintf(stderr,"Euid: %d ",passwent->pw_uid);
     fprintf(stderr,".\n");
   }
-
-/* Set the Core size, taken from configuration */
-
-  fprintf(stderr,"Setting the core size...");
-  if ((getrlimit(RLIMIT_CORE,&rlim)) != 0) {
-    fprintf(stderr," getrlimit() failed!");
-  } else {
-    rlim.rlim_cur=ca_get_coresize;
-    if ((setrlimit(RLIMIT_CORE,&rlim)) != 0) {
-      fprintf(stderr," setrlimit() failed!");
-    }
+  
+  /* Set Dumpable flag - Linux specific TODO */
+  if (prctl(PR_SET_DUMPABLE,1,0,0,0)<0) {
+    fprintf(stderr,"Warning: Can't set DUMPABLE status\n");
   }
-  fprintf(stderr,"\n");
 
-/* Currently binds to INADDR_ANY. Will need to get specific address */
 /*  SV_whois_sock = SK_getsock(SOCK_STREAM,whois_port,whois_addr); */
   
   /* Check every Database and create sockets */
