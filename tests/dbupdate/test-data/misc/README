@@ -232,4 +232,13 @@
 # RESULT 22: The creation will succeed
 #rir AFRINIC
 
+# misc tests
+# CASE 23: Create a role object
+#          with non-existing person object in admin-c and tech-c
+#
+# create role object
+#
+#FAILURE
+#
+# RESULT 23: The creation will fail
 
