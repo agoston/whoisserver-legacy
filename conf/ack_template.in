@@ -657,6 +657,15 @@ No PGP error on object
   </xsl:if>
   </xsl:template>
 
+  <xsl:template match="rdns_auth_result">
+  <xsl:if test="ok">
+
+***Info: RDNS Authorisation passed</xsl:if>
+  <xsl:if test="fail">
+
+***Error: RDNS Authorisation failed</xsl:if>
+  </xsl:template>
+
 
 <!-- lists -->
   <xsl:template match="list">

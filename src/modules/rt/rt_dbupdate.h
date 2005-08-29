@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.5 $
 
   Reporting module.
 
@@ -263,5 +263,6 @@ void RT_rdns_notdelegated(RT_context_t*);
 void RT_rdns_delcheckwarning(RT_context_t*,gchar*);
 void RT_rdns_threshold(RT_context_t*);
 void RT_rdns_invalid_range(RT_context_t*,gchar*);
+void RT_rdns_auth_result(RT_context_t* ctx, gboolean result, gboolean override);
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ns_auth.c,v 1.1 2004/12/27 16:38:43 can Exp $
+ * $Id: ns_auth.c,v 1.1 2004/12/27 17:52:36 can Exp $
  */
 
 #include "rip.h"
@@ -102,7 +102,7 @@ AU_ret_t rdns_deletion(au_plugin_callback_info_t * info)
 
   /* override */
   au_override(&ret_val, &override, info);
-  RT_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
+  RT_rdns_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
 
   LG_log(au_context, LG_FUNC, "<rdns_deletion: exiting");
   return ret_val;
@@ -184,7 +184,7 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
 
   /* override */
   au_override(&ret_val, &override, info);
-  RT_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
+  RT_rdns_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
 
   LG_log(au_context, LG_FUNC, "<rdns_modification: exiting");
 
@@ -338,7 +338,7 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
 
   /* override */
   au_override(&ret_val, &override, info);
-  RT_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
+  RT_rdns_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
 
   /* cleanup */
   if (source != NULL) {

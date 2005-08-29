@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.8 $
+  $Revision: 1.9 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -958,9 +958,8 @@ static int write_results(SQ_result_set_t *result,
       dieif (  (id = SQ_get_column_string(result, row, 0)) == NULL )
       dieif (  (objt = SQ_get_column_string(result, row, 3)) == NULL );
       if (grouped == 1) {
-        if (pkey == NULL) {
-          pkey = SQ_get_column_string(result, row, 4);
-        }
+        UT_free(pkey);
+        pkey = SQ_get_column_string(result, row, 4);
         dieif (  pkey == NULL );
         dieif (  (rec = SQ_get_column_string(result, row, 5)) == NULL );
         recursive = atoi(rec);

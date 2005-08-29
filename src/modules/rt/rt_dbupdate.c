@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.5 $
 
   Reporting module.
 
@@ -1803,6 +1803,24 @@ void RT_rdns_message(RT_context_t* ctx, gchar *severity,gchar* message) {
   xmlNodePtr node;
   node = xmlNewNode(NULL, (xmlChar*)severity);
   rt_add_text_node(node, "", (xmlChar*)message);
+  rt_prepare_node(ctx, node);
+}
+
+void RT_rdns_auth_result(RT_context_t* ctx, gboolean result, gboolean override) {
+  xmlNodePtr node;
+  xmlNodePtr child;
+
+  node = xmlNewNode(NULL, (xmlChar*)"rdns_auth_result");
+  if (override) {
+    rt_xml_set_prop(node, (xmlChar*)"override", (xmlChar*)"yes");
+  }
+  if (result) {
+    child = xmlNewNode(NULL, (xmlChar*)"ok");
+  }
+  else {
+    child = xmlNewNode(NULL, (xmlChar*)"fail");
+  }
+  xmlAddChild(node, child);
   rt_prepare_node(ctx, node);
 }
 

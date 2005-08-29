@@ -177,6 +177,7 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
       whois_info->socket = -1;
       g_string_free(reply, TRUE);
       LG_log(lu_context, LG_WARN, "lu_whois_query: error reading timeout from WHOIS server");
+      LG_log(lu_context, LG_FUNC, "<lu_whois_query: exiting with value [FALSE]");
       return FALSE;
     }
     if (read_ret == 0) 
