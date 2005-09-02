@@ -539,7 +539,7 @@ attribute_t attribute_tab[] = {
         /* is_lookup */
         0,
         /* is_inverse */
-        0,
+        1,
         /* is_primary */
         0,
         /* is_list */

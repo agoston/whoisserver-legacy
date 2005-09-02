@@ -51,6 +51,7 @@
       <table name="inaddr_arpa"/>
       <table name="ip6int"/>
       <table name="org"/>
+      <table name="ds_rdata"/>
     </affected-tables>
   </ripe_class>
 

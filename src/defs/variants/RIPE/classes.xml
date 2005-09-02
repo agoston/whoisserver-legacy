@@ -3,7 +3,7 @@
 <!-- XXX: will want to add core template in the future, to 
           document which fields are mandatory for core (e.g. nic-hdl) -->
 
-<ripe_classes version="$Revision: 1.4 $" author="$Author: arife $">
+<ripe_classes version="$Revision: 1.4.2.1 $" author="$Author: katie $">
 
   <ripe_class name="domain" main_sql_table="domain" code="dn">
     <description>
@@ -51,6 +51,7 @@
       <table name="inaddr_arpa"/>
       <table name="ip6int"/>
       <table name="org"/>
+      <table name="ds_rdata"/>
     </affected-tables>
   </ripe_class>
 

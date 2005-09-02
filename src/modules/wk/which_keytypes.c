@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   which_keytypes:  Determine which keys to look for.
   
@@ -113,6 +113,9 @@
 /* fingerpr: ([A-Z0-9]{4})( [A-Z0-9]{4}){9}*/
 #define FINGERPR "^(([A-F0-9]{4} ){9}[A-F0-9]{4})|(([A-F0-9]{2} ){15}[A-F0-9]{2})|(([A-F0-9]{2}:){15}[A-F0-9]{2})$"
 
+/* ds-rdata: */
+#define DS_RDATA "^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])( ([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))( ([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])|RSAMD5|DH|DSA|ECC|RSASHA1|INDIRECT|PRIVATEDNS|PRIVATEOID)([ 0-9a-fA-F]{1,128})$"
+
 /* structure for simple keys, with a single regular expression to match */
 /* NOTE: the WK_NAME, WK_DOMAIN, and WK_HOSTNAME are not handled here   */
 struct {
@@ -143,6 +146,7 @@ struct {
     { WK_IRT,           IRT },
     { WK_FINGERPR,      FINGERPR },
     { WK_ORG_ID,        ORG_ID },
+    { WK_DS_RDATA,      DS_RDATA },
     { WK_AUTH,          AUTH }
 };
 #define WK_REGEX_LIST_LEN  (sizeof(wk_regex_list)/sizeof(wk_regex_list[0]))
