@@ -196,9 +196,8 @@ parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj, ...)
     {
         parent = p->data;
         key = rpsl_object_get_key_value(parent);
-        rt_msg = g_strdup_printf("parent %s does not have \"status:\"\n          %s",
-          key, status_types_msg->str);
-        RT_status_check_failed(ctx, rt_msg);
+        RT_status_check_failed_parentwithoutstatus(ctx, key,
+          status_types_msg->str);
         g_free(rt_msg);
         UT_free(key);
     }
@@ -290,7 +289,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
     ret_val = AU_UNAUTHORISED_CONT;
     LG_log(au_context, LG_ERROR, "ripe_inetnum_checks: no \"status:\" on updated inetnum");
 
-    RT_status_check_failed(info->ctx, "missing \"status:\" attribute");
+    RT_status_check_failed_missingstatus(info->ctx);
   }
   else
   {
@@ -320,8 +319,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
       }
       else
       {
-        RT_status_check_failed(info->ctx, 
-          "ALLOCATED inetnum objects require the RIPE NCC maintainer");
+        RT_status_check_failed_allocated(info->ctx);
         ret_val = AU_UNAUTHORISED_CONT;
       }
     }
@@ -386,8 +384,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
       LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: changing to EARLY-REGISTRATION");
       ret_val = AU_UNAUTHORISED_CONT;
 
-      RT_status_check_failed(info->ctx, 
-          "only the administrator can use EARLY-REGISTRATION status");
+      RT_status_check_failed_earlyregistration(info->ctx);
     }
     /* changing to NOT-SET */
     else if ((strcmp(new_status, "NOT-SET") == 0) &&
@@ -396,8 +393,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
       LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: changing to NOT-SET");
       ret_val = AU_UNAUTHORISED_CONT;
 
-      RT_status_check_failed(info->ctx, 
-          "only the administrator can use NOT-SET status");
+      RT_status_check_failed_notset(info->ctx);
     }
     else
     {
@@ -457,7 +453,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
   {
     ret_val = AU_UNAUTHORISED_CONT;
     LG_log(au_context, LG_ERROR, "ripe_inet6num_checks: no \"status:\" on updated inet6num");
-    RT_status_check_failed(info->ctx, "missing \"status:\" attribute");
+    RT_status_check_failed_missingstatus(info->ctx);
   }
   else
   {
@@ -498,8 +494,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
       }
       else
       {
-        RT_status_check_failed(info->ctx, 
-          "ALLOCATED-BY-RIR inet6num objects require the RIPE NCC maintainer");
+        RT_status_check_failed_allocbyrir(info->ctx);
         ret_val = AU_UNAUTHORISED_CONT;
       }
     }
@@ -598,7 +593,7 @@ afrinic_inetnum_checks (au_plugin_callback_info_t *info)
     ret_val = AU_UNAUTHORISED_CONT;
     LG_log(au_context, LG_ERROR, "afrinic_inetnum_checks: no \"status:\" on updated inetnum");
 
-    RT_status_check_failed(info->ctx, "missing \"status:\" attribute");
+    RT_status_check_failed_missingstatus(info->ctx);
   }
   else
   {
@@ -652,8 +647,7 @@ afrinic_inetnum_checks (au_plugin_callback_info_t *info)
       }
       else
       {
-        RT_status_check_failed(info->ctx, 
-          "ALLOCATED inetnum objects require the AfriNic maintainer");
+        RT_status_check_failed_allocafrinic(info->ctx);
         ret_val = AU_UNAUTHORISED_CONT;
       }
     }
@@ -710,8 +704,7 @@ afrinic_inetnum_checks (au_plugin_callback_info_t *info)
       LG_log(au_context, LG_DEBUG, "afrinic_inetnum_checks: status changing to EARLY-REGISTRATION");
       ret_val = AU_UNAUTHORISED_CONT;
 
-      RT_status_check_failed(info->ctx, 
-          "only the administrator can use EARLY-REGISTRATION status");
+      RT_status_check_failed_earlyregistration(info->ctx);
     }
     /* changing to NOT-SET */
     else if ((strcmp(new_status, "NOT-SET") == 0) &&
@@ -720,8 +713,7 @@ afrinic_inetnum_checks (au_plugin_callback_info_t *info)
       LG_log(au_context, LG_DEBUG, "afrinic_inetnum_checks: status changing to NOT-SET");
       ret_val = AU_UNAUTHORISED_CONT;
 
-      RT_status_check_failed(info->ctx, 
-          "only the administrator can use NOT-SET status");
+      RT_status_check_failed_notset(info->ctx);
     }
     else
     {
@@ -781,7 +773,7 @@ afrinic_inet6num_checks (au_plugin_callback_info_t *info)
   {
     ret_val = AU_UNAUTHORISED_CONT;
     LG_log(au_context, LG_ERROR, "afrinic_inet6num_checks: no \"status:\" on updated inet6num");
-    RT_status_check_failed(info->ctx, "missing \"status:\" attribute");
+    RT_status_check_failed_missingstatus(info->ctx);
   }
   else
   {
@@ -822,8 +814,7 @@ afrinic_inet6num_checks (au_plugin_callback_info_t *info)
       }
       else
       {
-        RT_status_check_failed(info->ctx, 
-          "ALLOCATED-BY-RIR inet6num objects require the AfriNic maintainer");
+        RT_status_check_failed_allocbyrirafrinic(info->ctx);
         ret_val = AU_UNAUTHORISED_CONT;
       }
     }

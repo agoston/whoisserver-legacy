@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5 $
+  $Revision: 1.6 $
 
   Reporting module.
 
@@ -264,5 +264,15 @@ void RT_rdns_delcheckwarning(RT_context_t*,gchar*);
 void RT_rdns_threshold(RT_context_t*);
 void RT_rdns_invalid_range(RT_context_t*,gchar*);
 void RT_rdns_auth_result(RT_context_t* ctx, gboolean result, gboolean override);
+
+/* status check related */
+void RT_status_check_failed_parentwithoutstatus(RT_context_t*,gchar*,gchar*);
+void RT_status_check_failed_missingstatus(RT_context_t*);
+void RT_status_check_failed_allocated(RT_context_t*);
+void RT_status_check_failed_earlyregistration(RT_context_t*);
+void RT_status_check_failed_notset(RT_context_t*);
+void RT_status_check_failed_allocbyrir(RT_context_t*);
+void RT_status_check_failed_allocbyrirafrinic(RT_context_t*);
+void RT_status_check_failed_allocafrinic(RT_context_t*);
 
 #endif

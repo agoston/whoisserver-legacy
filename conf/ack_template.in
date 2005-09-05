@@ -12,6 +12,12 @@
 <xsl:variable name="level_critical">6</xsl:variable>
 <xsl:variable name="level_fatal">7</xsl:variable>
 
+<xsl:template match="status_check_failed_parentwithoutstatus">
+
+***Error: parent <xsl:value-of select="parent/text()"/> does not have status:
+  <xsl:value-of select="parent/text()"/>
+</xsl:template>
+  
 <xsl:template match="RDNSrir">
 
 ***Info: Majority RIR is <xsl:apply-templates/>.
@@ -510,11 +516,6 @@ No PGP error on object
           to the old object, then delete the old object.
   </xsl:template>
 
-  <xsl:template match="status_check_failed">
-
-***Error: <xsl:value-of select="reason/text()"/>
-  </xsl:template>
-  
   <xsl:template match="rip_update_error">
   <xsl:text>
 </xsl:text><xsl:value-of select="error/text()"/>
@@ -655,15 +656,6 @@ No PGP error on object
 ***Error: Authorisation failed</xsl:if>
 
   </xsl:if>
-  </xsl:template>
-
-  <xsl:template match="rdns_auth_result">
-  <xsl:if test="ok">
-
-***Info: RDNS Authorisation passed</xsl:if>
-  <xsl:if test="fail">
-
-***Error: RDNS Authorisation failed</xsl:if>
   </xsl:template>
 
 
