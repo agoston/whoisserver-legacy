@@ -14,7 +14,7 @@
 
 <xsl:template match="status_check_failed_parentwithoutstatus">
 
-***Error: parent <xsl:value-of select="parent/text()"/> does not have status:
+***Error: parent <xsl:value-of select="parent/text()"/> does not have "status:"
   <xsl:value-of select="status/text()"/>
 </xsl:template>
 
@@ -693,6 +693,14 @@ No PGP error on object
   </xsl:if>
   </xsl:template>
 
+  <xsl:template match="rdns_auth_result">
+  <xsl:if test="ok">
+
+***Info: RDNS Authorisation passed</xsl:if>
+  <xsl:if test="fail">
+
+***Error: RDNS Authorisation failed</xsl:if>
+  </xsl:template>
 
 <!-- lists -->
   <xsl:template match="list">
