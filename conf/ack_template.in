@@ -15,9 +15,44 @@
 <xsl:template match="status_check_failed_parentwithoutstatus">
 
 ***Error: parent <xsl:value-of select="parent/text()"/> does not have status:
-  <xsl:value-of select="parent/text()"/>
+  <xsl:value-of select="status/text()"/>
 </xsl:template>
-  
+
+<xsl:template match="status_check_failed_missingstatus">
+
+***Error: missing "status:" attribute
+</xsl:template>
+
+<xsl:template match="status_check_failed_allocated">
+
+***Error: ALLOCATED inetnum objects require the RIPE NCC maintainer
+</xsl:template>
+
+<xsl:template match="status_check_failed_allocbyrirafrinic">
+
+***Error: ALLOCATED-BY-RIR inet6num objects require the AfriNic maintainer
+</xsl:template>
+
+<xsl:template match="status_check_failed_allocbyrir">
+
+***Error: ALLOCATED-BY-RIR inet6num objects require the RIPE NCC maintainer
+</xsl:template>
+
+<xsl:template match="status_check_failed_allocafrinic">
+
+***Error: ALLOCATED inetnum objects require the AfriNic maintainer
+</xsl:template>
+
+<xsl:template match="status_check_failed_notset">
+
+***Error: only the administrator can use NOT-SET status
+</xsl:template>
+
+<xsl:template match="status_check_failed_earlyregistration">
+
+***Error: only the administrator can use EARLY-REGISTRATION status
+</xsl:template>
+
 <xsl:template match="RDNSrir">
 
 ***Info: Majority RIR is <xsl:apply-templates/>.
