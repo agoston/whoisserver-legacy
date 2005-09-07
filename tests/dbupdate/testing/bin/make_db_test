@@ -90,7 +90,7 @@ ls $PROPERTIES >/dev/null 2>&1 || error_exit "cannot find config file $PROPERTIE
 # The root of the distribution
 
 MYSQLLIBDIR=/usr/local/mysql/lib/mysql
-GLIBCONFIG=/usr/local/bin/glib-config
+GLIBCONFIG=true
 GLIB=`${GLIBCONFIG} --exec-prefix`/lib
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MYSQLLIBDIR:$GLIB; export LD_LIBRARY_PATH
 LD_LIBRARY_PATH=/home/dbase/src/orange/local/lib:$LD_LIBRARY_PATH

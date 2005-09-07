@@ -84,7 +84,6 @@ parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj, ...)
   GList *all_parent_status;
 
   GString *status_types_msg;
-  gchar *rt_msg;
 
   GList *removed_link;
   GList *p;
@@ -198,7 +197,6 @@ parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj, ...)
         key = rpsl_object_get_key_value(parent);
         RT_status_check_failed_parentwithoutstatus(ctx, key,
           status_types_msg->str);
-        g_free(rt_msg);
         UT_free(key);
     }
 
@@ -647,7 +645,7 @@ afrinic_inetnum_checks (au_plugin_callback_info_t *info)
       }
       else
       {
-        RT_status_check_failed_allocafrinic(info->ctx);
+        RT_status_check_failed_allocated(info->ctx);
         ret_val = AU_UNAUTHORISED_CONT;
       }
     }
@@ -814,7 +812,7 @@ afrinic_inet6num_checks (au_plugin_callback_info_t *info)
       }
       else
       {
-        RT_status_check_failed_allocbyrirafrinic(info->ctx);
+        RT_status_check_failed_allocbyrir(info->ctx);
         ret_val = AU_UNAUTHORISED_CONT;
       }
     }

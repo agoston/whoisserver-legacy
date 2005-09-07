@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.6 $
+  $Revision: 1.7 $
 
   Reporting module.
 
@@ -1876,8 +1876,8 @@ void RT_status_check_failed_parentwithoutstatus(
   xmlNodePtr node;
   
   node = xmlNewNode(NULL, (xmlChar*)"status_check_failed_parentwithoutstatus");
-  rt_add_text_node(node, "", (xmlChar*) parent);
-  rt_add_text_node(node, "", (xmlChar*) status);
+  rt_add_text_node(node, "parent", (xmlChar*) parent);
+  rt_add_text_node(node, "status", (xmlChar*) status);
   rt_prepare_node(ctx, node);
 }
 
@@ -1900,16 +1900,8 @@ void RT_status_check_failed_notset(RT_context_t *ctx) {
   RT_status_check_failed_message(ctx,"status_check_failed_notset");
 }
 
-void RT_status_check_failed_allocafrinic(RT_context_t *ctx) {
-  RT_status_check_failed_message(ctx,"status_check_failed_allocafrinic");
-}
-
 void RT_status_check_failed_allocbyrir(RT_context_t *ctx) {
   RT_status_check_failed_message(ctx,"status_check_failed_allocbyrir");
-}
-
-void RT_status_check_failed_allocbyrirafrinic(RT_context_t *ctx) {
-  RT_status_check_failed_message(ctx,"status_check_failed_allocbyrirafrinic");
 }
 
 void RT_status_check_failed_allocated(RT_context_t *ctx) {

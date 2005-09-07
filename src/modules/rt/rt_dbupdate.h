@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.6 $
+  $Revision: 1.7 $
 
   Reporting module.
 
@@ -272,7 +272,5 @@ void RT_status_check_failed_allocated(RT_context_t*);
 void RT_status_check_failed_earlyregistration(RT_context_t*);
 void RT_status_check_failed_notset(RT_context_t*);
 void RT_status_check_failed_allocbyrir(RT_context_t*);
-void RT_status_check_failed_allocbyrirafrinic(RT_context_t*);
-void RT_status_check_failed_allocafrinic(RT_context_t*);
 
 #endif

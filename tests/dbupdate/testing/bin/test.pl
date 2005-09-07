@@ -2289,7 +2289,7 @@ my $dir = $_[0];
 # Remarks: here expand_dir function is recursive and used to retrieve the directory trees of indefinite depth
 
 sub get_test_dirs()	{
-my @exclude_dirs;
+my @exclude_dirs = ();
 my $excludefile = getvar('EXCLUDE');
 my $datadir = getvar ('DATADIR');
 
