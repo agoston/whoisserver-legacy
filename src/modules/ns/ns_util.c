@@ -1,5 +1,5 @@
 /*
- * $Id: ns_util.c,v 1.2 2005/04/20 11:03:20 denis Exp $
+ * $Id: ns_util.c,v 1.3 2005/06/07 13:20:07 katie Exp $
  */
 
 #include "ns_util.h"
@@ -186,6 +186,35 @@ static gboolean ns_check_suffix(rpsl_object_t * obj, gboolean with_dot)
 }
 
 /*
+ * checks if the domain object has a dot at the end
+ */
+static gboolean ns_is_domain_dotted(rpsl_object_t * obj)
+{
+  gchar *domain;
+  gchar *last_char;
+  gchar *rpsl_text;
+  gboolean ret_val = FALSE;
+
+  /* Find what kind of object it is */
+  rpsl_text = rpsl_object_get_text(obj, 0);
+  if (strncmp(rpsl_text, "domain:", 7) == 0) {  /* it is a domain object */
+
+    /* Extract the domain name */
+    domain = rpsl_object_get_key_value(obj);
+    if (strlen(domain) > 0) {
+      last_char = domain[(strlen(domain) - 1)];
+      if (last_char == '.') {
+        ret_val = TRUE;
+      }
+    }
+    free(domain);
+  }
+
+  free(rpsl_text);
+  return ret_val;
+}
+
+/*
  * removes the trailing dot from string
  */
 gboolean ns_remove_trailing_dot(LG_context_t * lg_ctx, gchar ** object_str)
@@ -212,7 +241,7 @@ gboolean ns_remove_trailing_dot(LG_context_t * lg_ctx, gchar ** object_str)
   /* Extract the domain name */
   domain = rpsl_object_get_key_value(object);
 
-  if (!ns_check_suffix(object, TRUE)) {
+  if ((!ns_check_suffix(object, TRUE)) && (!ns_is_domain_dotted(object))) {
     LG_log(lg_ctx, LG_DEBUG, "object is not a domain with trailing dot");
     ret_val = FALSE;
   } else {
