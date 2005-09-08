@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   which_keytypes:  Determine which keys to look for.
   
@@ -38,7 +38,7 @@
 #include <pthread.h>
 #include <regex.h>
 
-#define DOMAINNAME "^[ ]*[a-zA-Z0-9/-]*(\\.[a-zA-Z0-9-]+)*[ ]*$"
+#define DOMAINNAME "^[ ]*[a-zA-Z0-9/-]*(\\.[a-zA-Z0-9-]+)*\.?[ ]*$"
 /* add a constraint: there must be at least one character in the domain name
    because the TLD must not be composed of digits only */
 #define DOMAINALPHA  "[a-zA-Z]"

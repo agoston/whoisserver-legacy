@@ -1,0 +1,12 @@
+
+# CASE 1: AB.BA query
+%
+% requires initial objects to be loaded
+#
+# query domain object 
+#
+#SUCCESS
+#
+# RESULT 1: The query will succeed.
+
+

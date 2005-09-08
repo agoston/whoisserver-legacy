@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   Query command module (qc).  This is what the whois query gets stored as in
   memory.
@@ -983,6 +983,20 @@ int QC_fill (const char *query_str,
             query_command->parse_messages = 
                 g_list_append(query_command->parse_messages, 
                               ca_get_qc_uselessnorefflag);
+        }
+
+        /* check if the domain query contains a dot at the end, remove if
+         * any
+         * WARNING:906 */
+        if (MA_isset(query_command->keytypes_bitmap, WK_DOMAIN)) {
+          char *domain_dot = strrchr(query_command->keys,'.');
+          if ((domain_dot != NULL)&&(strcmp(domain_dot,".")==0)) {
+            domain_dot[0] = '\0';
+            char *fmt = ca_get_qc_trailingdotindomain;
+            query_command->parse_messages =
+              g_list_append(query_command->parse_messages,
+                  g_strdup_printf(fmt,query_command->keys));
+          }
         }
 
         /* tracing */

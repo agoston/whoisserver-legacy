@@ -411,6 +411,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define ca_get_qc_uselessnorefflag	ca_get_string(CA_QC_USELESSNOREFFLAG)
 #define ca_set_qc_uselessnorefflag	ca_set_string(CA_QC_USELESSNOREFFLAG)
 
+#define ca_get_qc_trailingdotindomain	ca_get_string(CA_QC_TRAILINGDOTINDOMAIN)
+#define ca_set_qc_trailingdotindomain	ca_set_string(CA_QC_TRAILINGDOTINDOMAIN)
+
 #define ca_get_qc_fmt_fixedlookup	ca_get_string(CA_QC_FMT_FIXEDLOOKUP)
 #define ca_set_qc_fmt_fixedlookup	ca_set_string(CA_QC_FMT_FIXEDLOOKUP)
 
