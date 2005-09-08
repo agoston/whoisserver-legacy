@@ -1,5 +1,5 @@
 /*
- * $Id: ns_util.c,v 1.3 2005/06/07 13:20:07 katie Exp $
+ * $Id: ns_util.c,v 1.4 2005/09/07 10:47:32 can Exp $
  */
 
 #include "ns_util.h"
@@ -191,7 +191,7 @@ static gboolean ns_check_suffix(rpsl_object_t * obj, gboolean with_dot)
 static gboolean ns_is_domain_dotted(rpsl_object_t * obj)
 {
   gchar *domain;
-  gchar *last_char;
+  gchar last_char;
   gchar *rpsl_text;
   gboolean ret_val = FALSE;
 

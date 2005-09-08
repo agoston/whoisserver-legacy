@@ -44,7 +44,7 @@ GList *ep_grab_pgp(GString *split, GList *credentials) {
     cred  = CR_credential_new(CR_PGP, KM_key_return_get_key_id(kr), sig_ok);
     creds = g_list_append(creds, cred);
     unescaped_content = KM_key_return_get_signed_text(kr);
-    gsplit = ut_g_strsplit_v1(unescaped_content, "\n", -1);
+    gsplit = ut_g_strsplit_v1((char*)unescaped_content, "\n", -1);
     return_list = ep_split_text(gsplit, creds);
     g_strfreev(gsplit);
   }

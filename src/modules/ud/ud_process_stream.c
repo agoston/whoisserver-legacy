@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   Functions to process data stream( file, network socket, etc.)
 
@@ -235,7 +235,7 @@ char *nic_submitted, *nic_db;
       /* Convert nh to the database format */
       nic_db = NH_convert_org(nh_ptr);
       /* we need to make a copy as we free the whole list later */
-      rpsl_attr_replace_value(organisation_attr, nic_db);
+      rpsl_attr_replace_value((rpsl_attr_t*)organisation_attr, nic_db);
       UT_free(nic_db);
     }
 
@@ -334,7 +334,7 @@ int i;
   
 
   /* split the names into words */
-  names = ut_g_strsplit_v1(rpsl_attr_get_value(attr), " ", 0);
+  names = ut_g_strsplit_v1((gchar*)rpsl_attr_get_value(attr), " ", 0);
   new_obj =  g_string_new("");
 
 

@@ -190,7 +190,7 @@ main (int argc, char *argv[])
   whois = LU_whois_init(whois_server, whois_port, 30);
 
   /* initialise AU */
-  AU_init(ctx, whois);
+  AU_init(ctx, (int)whois);
 
   /* read object */
   obj = read_object(input_file);

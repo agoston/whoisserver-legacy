@@ -555,7 +555,7 @@ char *mnt_routes_antext;
   notes:
     Tokens are defined in the associated grammar, mnt_routes_an.y.
 
-  $Id: mnt_routes_an.l,v 1.2 2005/06/24 13:03:06 peter Exp $
+  $Id: mnt_routes_an.lex.c,v 1.3 2005/08/17 08:25:49 can Exp $
 */
 
 /******************
@@ -614,9 +614,9 @@ void yy_input(char *buf, int *result, int max_size);
 
 #ifndef YY_SKIP_YYWRAP
 #ifdef __cplusplus
-extern "C" int mnt_routes_anwrap (void );
+//extern "C" int mnt_routes_anwrap (void );
 #else
-extern int mnt_routes_anwrap (void );
+//extern int mnt_routes_anwrap (void );
 #endif
 #endif
 

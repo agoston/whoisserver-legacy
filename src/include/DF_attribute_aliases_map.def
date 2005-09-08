@@ -196,5 +196,5 @@ int const Attribute_aliases_map[] = {
   96,
   97,
   97,
-  NULL
+  (int)NULL
 }; /* Attribute_aliases_map */

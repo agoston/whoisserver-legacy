@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1.2.4 $
+  $Revision: 1.2 $
 
   Query command module (qc).  This is what the whois query gets stored as in
   memory.
@@ -395,7 +395,7 @@ int QC_fill (const char *query_str,
   num_client_ip = 0;
 
   /* split into words */
-  opt_argv = ut_g_strsplit_v1(query_str, " ", -1);
+  opt_argv = ut_g_strsplit_v1((char*)query_str, " ", -1);
 
   /* count number of non-empty words */
   opt_argc = 0;

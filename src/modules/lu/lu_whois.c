@@ -193,7 +193,7 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
   whois_info->socket = -1;
 
   /* convert to objects result */
-  split_reply = ut_g_strsplit_v1(reply->str, "\n\n", 0);
+  split_reply = (gchar**)ut_g_strsplit_v1(reply->str, "\n\n", 0);
   g_string_free(reply, TRUE);
 
   error_code = 0;
@@ -774,7 +774,7 @@ lu_whois_check_overlap (LU_server_t *server, GList **overlap,
  
   /* construct new ranges */
   range = rpsl_object_get_key_value(obj);
-  split = ut_g_strsplit_v1(range, " - ", 0);
+  split = (gchar**)ut_g_strsplit_v1(range, " - ", 0);
 
   /* query for overlap candidates */
   query = g_strdup_printf("-G -B -s %s -r -T %s -L %s", lookup_source, class, split[0]);

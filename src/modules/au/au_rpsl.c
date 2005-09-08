@@ -1324,7 +1324,7 @@ AU_ret_t au_check_mnt_routes_prefix (GList **mntners, rpsl_object_t *parent, cha
   if ((invalid_list != NULL) && (failed_mntners != NULL))
   {
     LG_log(au_context, LG_INFO, "au_check_mnt_routes_prefix: adding errors to report");
-    RT_invalid_mnt_routes(info->ctx, rpsl_object_get_key_value(parent), rpsl_object_get_class(parent), 
+    RT_invalid_mnt_routes(info->ctx, rpsl_object_get_key_value(parent), (gchar*)rpsl_object_get_class(parent), 
                           parent_text, failed_mntners, invalid_list);
     ret_val |= AU_UNAUTHORISED_CONT;   
   }

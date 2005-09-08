@@ -76,7 +76,7 @@ MM_mail_info_t *MM_extract_mail_info(const gchar *stream) {
   /* write mail to temp file */
   /* Why do we do this??? EG */  
   write(tmp_file_handle, ones, 5);
-  write(tmp_file_handle, stream, strlen(stream));
+  write(tmp_file_handle, (char*)stream, (long)strlen(stream));
   close(tmp_file_handle);
 
   /* open mail stream in temp file */
@@ -131,7 +131,7 @@ MM_mail_info_t *MM_extract_mail_info(const gchar *stream) {
   sprintf(from, "%s@%s", env->sender->mailbox, env->sender->host);
 */
   subject = strdup(env->subject ? env->subject : "");
-  date = strdup(env->date ? env->date : "");
+  date = strdup((char*)env->date ? (char*)env->date : "");
   message_id = strdup(env->message_id ? env->message_id : "");
   cc = NULL;
   if (env->cc) {

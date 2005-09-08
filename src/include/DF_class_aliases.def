@@ -43,5 +43,5 @@ char * const Class_aliases[] = {
   "poem",
   "pf",
   "poetic-form",
-  NULL
+  (int)NULL
 }; /* Class_aliases */

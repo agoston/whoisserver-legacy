@@ -43,5 +43,5 @@ int const Class_aliases_map[] = {
   20,
   21,
   21,
-  NULL
+  (int)NULL
 }; /* Class_aliases_map */

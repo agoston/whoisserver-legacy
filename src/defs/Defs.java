@@ -278,7 +278,7 @@ public class Defs {
       String a = (String)e.nextElement();
       System.out.println("  \"" + a + "\",");
     }
-    System.out.println("  " + "NULL" + "\n" + "}; /* Attribute_aliases */");
+    System.out.println("  " + "(int)NULL" + "\n" + "}; /* Attribute_aliases */");
   } // printDF_attribute_aliases()
 
   private void printDF_attribute_aliases_map() {
@@ -288,7 +288,7 @@ public class Defs {
       Integer am = (Integer)e.nextElement();
       System.out.println("  " + am + ",");
     }
-    System.out.println("  " + "NULL" + "\n" + "}; /* Attribute_aliases_map */");
+    System.out.println("  " + "(int)NULL" + "\n" + "}; /* Attribute_aliases_map */");
   } // printDF_attribute_aliases_map()
 
   private void printDF_attribute_codes() {
@@ -392,7 +392,7 @@ public class Defs {
       String a = (String)e.nextElement();
       System.out.println("  \"" + a + "\",");
     }
-    System.out.println("  " + "NULL" + "\n" + "}; /* Class_aliases */");
+    System.out.println("  " + "(int)NULL" + "\n" + "}; /* Class_aliases */");
   } // printDF_class_aliases()
 
   private void printDF_class_main_tables() {
@@ -417,7 +417,7 @@ public class Defs {
       Integer am = (Integer)e.nextElement();
       System.out.println("  " + am + ",");
     }
-    System.out.println("  " + "NULL" + "\n" + "}; /* Class_aliases_map */");
+    System.out.println("  " + "(int)NULL" + "\n" + "}; /* Class_aliases_map */");
   } // printDF_class_aliases_map()
 
   private void printDF_class_codes() {
@@ -445,7 +445,7 @@ public class Defs {
           System.out.println("  " + cd.getDbaseCode() + ",");
       }
     }
-    System.out.println("  " + "NULL" + "\n" + "}; /* Class_dbase_code_map */");
+    System.out.println("  " + "(int)NULL" + "\n" + "}; /* Class_dbase_code_map */");
   } // printDF_class_dbase_code_map()
 
   private void printDF_class_enum() {

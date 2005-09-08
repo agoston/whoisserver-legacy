@@ -14,14 +14,13 @@ export CLASSPATH
 
 # produce a single def file
 makedef() {
-  echo "Making $2 $3"
+#echo "Making $2 $3"
   OPWD=`pwd`
   cd @abs_top_srcdir@/src/defs
-  echo $JAVA Defs $1 $3 \> @abs_top_builddir@/src/include/$2
   $JAVA Defs $1 $3 > @abs_top_builddir@/src/include/$2
   JAVA_EXIT_CODE=$?
   if [ $JAVA_EXIT_CODE -ne 0 ]; then exit $JAVA_EXIT_CODE; fi
-  echo "done"
+#echo "done"
   cd $OPWD
 } # makedefs()
 
@@ -30,10 +29,10 @@ for file in @abs_top_srcdir@/src/defs/*.xml
 do
   if test ! -f `basename $file`
   then
-    echo "Copying $file"
+#echo "Copying $file"
     cp -f $file .
-  else
-    echo "$file exists, not copying"
+#else
+#echo "$file exists, not copying"
   fi
 done
 

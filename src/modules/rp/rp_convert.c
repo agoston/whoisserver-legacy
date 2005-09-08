@@ -119,7 +119,7 @@ RP_asc2pack(rp_upd_pack_t *pack, rp_attr_t type, const char *string)
   
   if( type == A_DN && err == IP_OK) {
     /* Check if it is an in-addr.arpa domain, set domain ptr only then */
-    pack->d.domain = string;
+    pack->d.domain = (char*)string;
   }
 
   return err;
@@ -172,7 +172,7 @@ void rp_make_short(rp_upd_pack_t *pack, char **ptr, unsigned *len)
 /***************** set the values in rx_*_data thingies ***************/
 int RP_pack_set_orig(rp_attr_t  attr, rp_upd_pack_t *pack, const char *origin)
 {
-  pack->d.origin = origin;
+  pack->d.origin = (char*)origin;
   return(IP_OK);
   /* ignore attr */
 }
@@ -201,7 +201,7 @@ int ret;
 int RP_pack_set_revd(rp_attr_t  attr, const char *avalue, rp_upd_pack_t *pack)
 {
   dieif(IP_revd_a2b(&(pack->uni.u.rt), avalue) != IP_OK); /* assuming correctness checked */
-  pack->d.domain = avalue;
+  pack->d.domain = (char*)avalue;
   pack->uni.space = IP_pref_b2_space( &(pack->uni.u.rt) );
   RP_pack_set_type(attr, pack);
   return(IP_OK);

@@ -233,7 +233,7 @@ object_creation (au_plugin_callback_info_t *info)
 
   /* grab key */
   key = rpsl_object_get_key_value(info->obj);
-  type = rpsl_object_get_class(info->obj);
+  type = (char*)rpsl_object_get_class(info->obj);
 
   org = rpsl_object_get_attr(info->obj, "org");
   if (org == NULL)
@@ -355,7 +355,7 @@ object_modification (au_plugin_callback_info_t *info)
 
   /* grab key */
   key = rpsl_object_get_key_value(info->obj);
-  type = rpsl_object_get_class(info->obj);
+  type = (char*)rpsl_object_get_class(info->obj);
 
 
   /* see if there are any "org:" on the new object */

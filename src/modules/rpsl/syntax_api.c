@@ -88,7 +88,7 @@ attribute_clean (const gchar *val)
     gchar *ret_val;
 
     /* split our value up into lines */
-    lines = ut_g_strsplit_v1(val, "\n", 0);
+    lines = (gchar**)ut_g_strsplit_v1(val, "\n", 0);
 
     for (i=0; lines[i] != NULL; i++) {
         /* remove comments */
@@ -158,7 +158,7 @@ attribute_clean_lines (const gchar *val)
     gchar *ret_val;
 
     /* split our value up into lines */
-    lines = ut_g_strsplit_v1(val, "\n", 0);
+    lines = (gchar**)ut_g_strsplit_v1(val, "\n", 0);
 
     /* clean each line separately */
     for (i=0; lines[i] != NULL; i++) {
@@ -255,7 +255,7 @@ generic_list_split (const char *val, const char *separator_char)
     has_empty_last_element = str_ends_with(tmp_str, separator_char);
 
     /* split based on separator character */
-    ret_val = ut_g_strsplit_v1(tmp_str, separator_char, 0);
+    ret_val = (gchar**)ut_g_strsplit_v1(tmp_str, separator_char, 0);
 
     /* free our temporary variable */
     g_free(tmp_str);
@@ -1494,7 +1494,7 @@ add_aligned_val (GString *s, const rpsl_attr_t *attr, int col)
 
     /* adding is (relatively) easy */
     if (col_to_add > 0) { 
-        lines = ut_g_strsplit_v1(val, "\n", 0);
+        lines = (gchar**)ut_g_strsplit_v1(val, "\n", 0);
         /* for the first line, append the spaces and the line itself */
         q = lines[0];
         while ((*q == ' ') || (*q == '\t')) {
@@ -1529,7 +1529,7 @@ add_aligned_val (GString *s, const rpsl_attr_t *attr, int col)
     else if (col_to_add < 0) {
         col_to_sub = -col_to_add;
 
-        lines = ut_g_strsplit_v1(val, "\n", 0);
+        lines = (gchar**)ut_g_strsplit_v1(val, "\n", 0);
 
         /* add first line after subtracting columns */
         separate_leading_whitespace(lines[0], &ws, &non_ws);

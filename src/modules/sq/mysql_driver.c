@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.44 $
+  $Revision: 1.1 $
 
   SQL module (sq) - this is a MySQL implementation of the SQL module.
 
@@ -856,7 +856,7 @@ char *SQ_info_to_string(SQ_connection_t *sql_connection) {
                     mysql_get_server_info(sql_connection));
 
   /* Information about the most recently executed query. */
-  str_tmp = mysql_info(sql_connection);
+  str_tmp = (char*)mysql_info(sql_connection);
   if (str_tmp != NULL) {
     g_string_sprintfa(buf, "mysql_info()=\"%s\"\n", str_tmp);
   } else {
@@ -911,7 +911,7 @@ char *SQ_info_to_string(SQ_connection_t *sql_connection) {
   ++++++++++++++++++++++++++++++++++++++*/
 char *SQ_error(SQ_connection_t *sql_connection) {
 
-  return mysql_error(sql_connection);
+  return (char*)mysql_error(sql_connection);
 
 } /* SQ_error() */
 
@@ -971,7 +971,7 @@ int ii;
 char *colon, *buf_ptr, buf[20]; 
 char *infoline;
 
-  infoline=mysql_info(sql_connection); 
+  infoline=(char*)mysql_info(sql_connection); 
   ii=0;
   colon = infoline;
   while (*colon != '\0') {

@@ -14,7 +14,7 @@ RPSLSyntax.class: RPSLSyntax.java
 .PHONY: compile-classes
 
 %.class: %.java
-	$(JAVAC) -d @abs_top_builddir@/src/defs -classpath @abs_top_srcdir@/src/defs:@abs_top_builddir@/src/defs:@abs_top_srcdir@/src/defs/xalan $^
+	@$(JAVAC) -d @abs_top_builddir@/src/defs -classpath @abs_top_srcdir@/src/defs:@abs_top_builddir@/src/defs:@abs_top_srcdir@/src/defs/xalan $^
 
 compile-classes: $(noinst_DATA)
 

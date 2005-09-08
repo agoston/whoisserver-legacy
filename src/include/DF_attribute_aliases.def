@@ -196,5 +196,5 @@ char * const Attribute_aliases[] = {
   "poetic-form",
   "fr",
   "form",
-  NULL
+  (int)NULL
 }; /* Attribute_aliases */
