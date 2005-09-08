@@ -431,7 +431,12 @@ QC_FMT_FIXEDLOOKUP %%WARNING:905: fixed lookup key
 QC_FMT_FIXEDLOOKUP %%
 QC_FMT_FIXEDLOOKUP %% The key "%s" has been changed to "%s" for lookup.
 
-
+#
+# Trailing dot in domain objects
+#
+QC_TRAILINGDOTINDOMAIN %%WARNING:906: trailing dot in domain query
+QC_TRAILINGDOTINDOMAIN %%
+QC_TRAILINGDOTINDOMAIN %% The key has been changed to "%s" for lookup.
 
 ##
 ## Referral texts

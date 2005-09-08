@@ -342,6 +342,12 @@ QC_FMT_BADOBJTYPE %%
 QC_FMT_BADOBJTYPE %% "%s" is not a known object type.
 QC_FMT_BADOBJTYPE %% Use "-q types" to list known object types.
 
+#
+# Trailing dot in domain objects
+#
+QC_TRAILINGDOTINDOMAIN %%WARNING:906: trailing dot in domain query
+QC_TRAILINGDOTINDOMAIN %%
+QC_TRAILINGDOTINDOMAIN %% The key has been changed to "%s" for lookup.
 
 ##
 ## Referral texts
