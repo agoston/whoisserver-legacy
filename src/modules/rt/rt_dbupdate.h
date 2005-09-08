@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.7 $
+  $Revision: 1.8 $
 
   Reporting module.
 
@@ -253,7 +253,7 @@ void RT_auth_result(RT_context_t* ctx, gboolean result, gboolean override);
 void RT_rdns_message(RT_context_t*, gchar*,gchar*);
 
 void RT_rdns_overlap(RT_context_t*);
-void RT_rdns_trailingdotremoved(RT_context_t*);
+void RT_rdns_trailingdotremoved(RT_context_t*,gchar*);
 void RT_rdns_rir(RT_context_t*,gchar*);
 void RT_rdns_useotherrir(RT_context_t*,gchar*);
 void RT_rdns_cannotregister(RT_context_t*);

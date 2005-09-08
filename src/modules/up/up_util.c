@@ -1877,6 +1877,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   GList *current_server_list = NULL;
   GList *attr = NULL;
   gboolean is_dot_removed;
+  gchar *domain_key;
 
   source_data_t source_data = {NULL, NULL, NULL, 0, 0, NULL, 0, NULL, NULL, NULL, NULL};
   key_info_t    key_info    = {NULL, NULL};
@@ -1904,7 +1905,9 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   if ( is_dot_removed )
   {
-    RT_rdns_trailingdotremoved(rt_ctx);
+    domain_key = rpsl_object_get_key_value(object);
+    RT_rdns_trailingdotremoved(rt_ctx,domain_key);
+    free(domain_key);
     rpsl_object_delete(object);
     object = rpsl_object_init(object_str);
   } 

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.7 $
+  $Revision: 1.8 $
 
   Reporting module.
 
@@ -1828,8 +1828,8 @@ void RT_rdns_overlap(RT_context_t *ctx) {
   RT_rdns_message(ctx,"RDNSoverlap","");
 }
 
-void RT_rdns_trailingdotremoved(RT_context_t *ctx) {
-  RT_rdns_message(ctx,"RDNSremovedtrailingdot","");
+void RT_rdns_trailingdotremoved(RT_context_t *ctx,gchar *domain) {
+  RT_rdns_message(ctx,"RDNSremovedtrailingdot",domain);
 }
 
 void RT_rdns_rir(RT_context_t *ctx,gchar *message) {
