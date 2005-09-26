@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.18 2005/06/07 13:22:05 katie Exp $
+$Id: syntax.xml,v 1.4 2005/09/26 13:26:57 katie Exp $
 
 -->
 
@@ -189,7 +189,7 @@ $Id: syntax.xml,v 1.18 2005/06/07 13:22:05 katie Exp $
            <parser_name>mp_members_is</parser_name>
        </front_end>
        <description>
-     afi &lt;list of afi&gt; list of
+     list of
      &lt;inet-rtr-name&gt; or
      &lt;rtr-set-name&gt; or
      &lt;ipv4-address&gt; or
@@ -213,7 +213,7 @@ $Id: syntax.xml,v 1.18 2005/06/07 13:22:05 katie Exp $
           <parser_name>mp_members_rs</parser_name>
        </front_end>
        <description>
-     afi &lt;afi-list&gt; list of &lt;address-prefix-range&gt; or
+     list of &lt;address-prefix-range&gt; or
      &lt;route-set-name&gt; or
      &lt;route-set-name&gt;&lt;range-operator&gt;.
        </description>
@@ -1149,7 +1149,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
           </regex>
        </front_end>
        <description>
-     FORM-&lt;string&gt;
+     POEM-&lt;string&gt;
 
      &lt;string&gt; can include alphanumeric characters, and "_" and
      "-" characters.

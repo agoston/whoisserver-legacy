@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.2 2005/05/03 09:15:54 arife Exp $
+$Id: syntax.xml,v 1.3 2005/06/07 13:22:05 katie Exp $
 
 -->
 
@@ -189,7 +189,7 @@ $Id: syntax.xml,v 1.2 2005/05/03 09:15:54 arife Exp $
            <parser_name>mp_members_is</parser_name>
        </front_end>
        <description>
-     afi &lt;list of afi&gt; list of
+     list of
      &lt;inet-rtr-name&gt; or
      &lt;rtr-set-name&gt; or
      &lt;ipv4-address&gt; or
@@ -213,7 +213,7 @@ $Id: syntax.xml,v 1.2 2005/05/03 09:15:54 arife Exp $
           <parser_name>mp_members_rs</parser_name>
        </front_end>
        <description>
-     afi &lt;afi-list&gt; list of &lt;address-prefix-range&gt; or
+     list of &lt;address-prefix-range&gt; or
      &lt;route-set-name&gt; or
      &lt;route-set-name&gt;&lt;range-operator&gt;.
        </description>
