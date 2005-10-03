@@ -46,13 +46,6 @@ RIR   RIPE
 PROCESSUSER dbase
 
 #
-# Core size for the process.
-# Setting it to 0 disables cores, -1 enables cores of unlimited size.
-# Any other positive value is valid.
-#
-CORESIZE -1
-
-#
 # The directory where all sorts of lockfiles are kept
 
 LOCKDIR @lockdir@
