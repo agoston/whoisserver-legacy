@@ -37,7 +37,6 @@ descr:          Mntner for RIPE DBM objects.
 admin-c:        TP1-DB-TEST
 tech-c:         TP1-DB-TEST
 auth:           CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
-upd-to:         dbtest@ripe.net
 mnt-by:         TEST-DBM-MNT
 referral-by:    TEST-DBM-MNT
 source:         DB-TEST
@@ -47,7 +46,6 @@ descr:          RIPE-NCC Hostmaster Maintainer
 admin-c:        TP1-DB-TEST
 tech-c:         TP1-DB-TEST
 auth:           CRYPT-PW qw9MK.3f3f5k2    # hostmaster
-upd-to:         dbtest@ripe.net
 mnt-by:         RIPE-NCC-HM-MNT
 referral-by:    TEST-DBM-MNT
 source:         DB-TEST
