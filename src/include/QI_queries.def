@@ -633,6 +633,15 @@ Query_t Query[] = {
   {
     R_SQL,
     Q_INVERSE,
+    WK_DS_RDATA,
+    A_DS,
+    C_DN,
+    "SELECT object_id,0           FROM   ds_rdata i           WHERE  i.ds_rdata = '%s'           AND    i.thread_id = 0",
+    "SQL:dn/ds/WK_DS_RDATA"
+    },
+  {
+    R_SQL,
+    Q_INVERSE,
     WK_EMAIL,
     A_DT,
     C_MT,

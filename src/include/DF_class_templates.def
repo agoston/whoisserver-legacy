@@ -53,7 +53,7 @@ const char *Templates[] = {
 "tech-c:         [mandatory]  [multiple]   [inverse key]\n"
 "zone-c:         [mandatory]  [multiple]   [inverse key]\n"
 "nserver:        [optional]   [multiple]   [inverse key]\n"
-"ds-rdata:       [optional]   [multiple]   [ ]\n"
+"ds-rdata:       [optional]   [multiple]   [inverse key]\n"
 "sub-dom:        [optional]   [multiple]   [inverse key]\n"
 "dom-net:        [optional]   [multiple]   [ ]\n"
 "remarks:        [optional]   [multiple]   [ ]\n"

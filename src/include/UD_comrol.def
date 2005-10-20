@@ -29,7 +29,7 @@ char *t_an[] = {
 
 char *t_dn[] = {
   "mntner","person_role","names",NULL,NULL,NULL,
-  "admin_c", "tech_c", "zone_c", "nserver", "sub_dom", "notify", "mnt_by", "mnt_lower", "refer", "inaddr_arpa", "ip6int", "org", NULL
+  "admin_c", "tech_c", "zone_c", "nserver", "sub_dom", "notify", "mnt_by", "mnt_lower", "refer", "inaddr_arpa", "ip6int", "org", "ds_rdata", NULL
 };
 
 /* inet-rtr */
