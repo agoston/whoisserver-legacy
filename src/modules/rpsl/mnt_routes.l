@@ -44,6 +44,25 @@ void yy_input(char *buf, int *result, int max_size);
 
 {MNTNAME} { return TKN_MNTNER; }
 
+{PRFXV4} {
+    ip_prefix_t ptr;
+    int retval;
+
+    retval = IP_pref_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+        all the rest is parser error */
+      case IP_OK: return TKN_PRFXV4;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      default: syntax_error("IP prefix \"%s\" contains invalid prefix", yytext);
+                     break;
+    }
+    return TKN_PRFXV4;
+}
+
+
 {PRFXV4RNG} {
     /* check the prefix range by converting it and 
        issue syntax errors based on the error codes */
@@ -53,35 +72,15 @@ void yy_input(char *buf, int *result, int max_size);
 
     retval = IP_pref_rang_t2b(&ptr, yytext, IP_PLAIN);
     switch (retval) {
-      /* the only returns we may really get are:
-         IP_OK, IP_INVBIT, IP_NOLEN, IP_NORANG 
-         all the rest will be caught by the regexp and give general parse error
-      */
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+         all the rest is parser error */
       case IP_OK: return TKN_PRFXV4RNG;
                   break;
-      case IP_NOCAP: syntax_error("IP prefix range \"%s\" contains no \"^\"", yytext);
-                     break;  
-      case IP_ADTOLO: syntax_error("IP prefix range \"%s\" address too long", yytext);
-                     break; 
-      case IP_NOSLAS: syntax_error("IP prefix range \"%s\" contains no slash", yytext);
-                     break;  
-      case IP_INVIP4: syntax_error("IP prefix range \"%s\" contains invalid IP address", yytext);
-                     break;
-      case IP_PRTOLO: syntax_error("IP prefix range \"%s\" prefix too long", yytext);
-                     break;
-      case IP_INVPRF: syntax_error("IP prefix range \"%s\" contains invalid characters", yytext);
-                     break;
       case IP_INVBIT: syntax_error("IP prefix range \"%s\" doesn't start on the correct boundary", yytext);
-                     break;
-      case IP_INVPRN: syntax_error("IP prefix range \"%s\" has invalid format", yytext);
                      break;
       case IP_NOLEN: syntax_error("IP prefix range \"%s\" range is not within the prefix length", yytext);
                      break;
       case IP_NORANG: syntax_error("IP prefix range \"%s\" range end is less than end start", yytext);
-                     break;
-      case IP_WROLEN: syntax_error("IP prefix range \"%s\" contains invalid prefix length", yytext);
-                     break;
-      case IP_WRORANG: syntax_error("IP prefix range \"%s\" contains invalid range(s)", yytext);
                      break;
       default: syntax_error("IP prefix range \"%s\" contains invalid prefix range", yytext);
                      break;

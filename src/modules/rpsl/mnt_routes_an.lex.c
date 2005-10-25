@@ -352,8 +352,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 8
-#define YY_END_OF_BUFFER 9
+#define YY_NUM_RULES 11
+#define YY_END_OF_BUFFER 12
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -361,20 +361,22 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[107] =
+static yyconst flex_int16_t yy_accept[122] =
     {   0,
-        0,    0,    9,    7,    1,    1,    6,    7,    6,    6,
-        6,    1,    0,    0,    6,    0,    6,    6,    0,    6,
-        0,    6,    6,    0,    0,    0,    2,    0,    6,    6,
-        0,    0,    5,    0,    0,    0,    6,    0,    0,    0,
+        0,    0,   12,   10,    1,    1,    3,   10,    3,    3,
+        3,    1,    0,    0,    3,    0,    3,    3,    0,    3,
+        0,    3,    3,    0,    0,    0,    2,    0,    3,    3,
+        0,    0,    6,    0,    0,    0,    3,    0,    0,    0,
+        0,    0,    0,    0,    0,    0,    9,    9,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        0,    9,    0,    0,    0,    4,    0,    0,    0,    0,
+        0,    0,    0,    0,    0,    0,    0,    7,    7,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        3,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        7,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 
-        4,    0,    0,    0,    0,    0
+        0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        5,    0,    0,    0,    0,    0,    8,    8,    0,    8,
+        0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -383,16 +385,16 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    2,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    4,    5,    6,    7,    7,    7,
-        7,    7,    7,    7,    7,    7,    7,    8,    1,    1,
-        1,    1,    1,    1,    9,   10,   10,   10,   10,   10,
-       11,   11,   11,   11,   11,   11,   11,   12,   11,   11,
-       11,   11,   11,   11,   11,   11,   11,   11,   13,   11,
-        1,    1,    1,    1,    4,    1,    9,   10,   10,   10,
+        1,    1,    4,    1,    5,    6,    7,    8,    8,    8,
+        8,    8,    8,    8,    8,    8,    8,    9,    1,    1,
+        1,    1,    1,    1,   12,   13,   13,   13,   13,   13,
+       14,   14,   14,   14,   14,   14,   14,   15,   14,   14,
+       14,   14,   14,   14,   14,   14,   14,   14,   16,   14,
+        1,    1,    1,   10,   11,    1,   12,   13,   13,   13,
 
-       10,   10,   11,   11,   11,   11,   11,   11,   11,   12,
-       11,   11,   11,   11,   11,   11,   11,   11,   11,   11,
-       13,   11,    1,    1,    1,    1,    1,    1,    1,    1,
+       13,   13,   14,   14,   14,   14,   14,   14,   14,   15,
+       14,   14,   14,   14,   14,   14,   14,   14,   14,   14,
+       16,   14,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -409,124 +411,136 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst flex_int32_t yy_meta[14] =
+static yyconst flex_int32_t yy_meta[17] =
     {   0,
-        1,    2,    2,    3,    1,    4,    5,    6,    5,    5,
-        3,    3,    3
+        1,    1,    1,    1,    2,    1,    3,    4,    5,    1,
+        2,    4,    4,    2,    2,    2
     } ;
 
-static yyconst flex_int16_t yy_base[165] =
+static yyconst flex_int16_t yy_base[179] =
     {   0,
-        0,    0,  275,  276,    0,    0,   10,  266,   19,  261,
-      268,    0,  267,  263,   25,  261,   31,  264,  261,   35,
-       44,   45,   51,  258,  258,   53,  260,  256,   55,   61,
-      254,  253,  253,   63,    0,   67,  251,  250,  249,   69,
-       72,  249,  247,  246,  245,   75,   78,    0,   81,  244,
-      243,   83,   86,  243,  241,  121,  118,  115,   89,    0,
-      113,  109,  106,   92,   95,  103,  100,   97,   94,   98,
-        0,   91,   88,  101,  104,   85,   82,   77,   74,  107,
-        0,   71,   68,  110,  113,   65,   62,   59,   55,  116,
-        0,   52,   51,  119,   47,   42,   40,   40,   37,   38,
+        0,    0,  311,  312,   15,   17,   16,  301,   27,  294,
+       29,   34,   33,  300,   37,  298,   33,    0,  299,  289,
+       40,   43,   46,  295,  295,   50,    0,  294,   54,  292,
+      291,  290,   56,   58,    0,   62,  289,  288,  287,   67,
+       67,   70,  287,  285,  284,  283,  312,   18,   71,   74,
+        0,   77,  282,  281,  281,   79,   80,  280,  278,  277,
+      276,  276,   83,   84,    0,   86,  274,  273,   88,   91,
+       97,  272,  271,  270,   97,  100,    0,  312,   53,  269,
+      268,  101,  104,  268,  266,  265,  264,  105,  108,    0,
+      264,  262,  261,  109,  112,  260,  259,  258,  113,  116,
 
-       36,   36,   35,   34,   31,  276,   31,  125,  126,  129,
-      130,  133,  135,  137,  140,   25,  142,  144,  147,  150,
-      152,  154,  157,   24,  159,  161,  164,  167,  169,  171,
-      174,   23,  176,  178,  181,  184,  186,  188,  191,   22,
-      193,  195,  198,  201,  203,  205,  208,   20,  210,  212,
-      215,  218,  220,  222,  225,   11,  227,  230,  232,  235,
-      237,  239,  241,  243
+        0,  257,  258,  117,  257,  254,  254,  254,  120,  253,
+      120,  252,  251,  127,  131,  127,  312,  128,   95,   91,
+      312,  135,  136,  139,  140,  143,  145,  147,  150,   78,
+      152,  154,  157,  160,  162,  164,  167,   69,  169,  171,
+      174,  177,  179,  181,  184,   65,  186,  188,  191,  194,
+      196,  198,  201,   49,  203,  205,  208,  211,  213,  215,
+      218,   43,  220,  222,  225,  228,  230,  232,  235,   39,
+      237,  240,  242,  245,  247,  249,  251,  253
     } ;
 
-static yyconst flex_int16_t yy_def[165] =
+static yyconst flex_int16_t yy_def[179] =
     {   0,
-      106,    1,  106,  106,  107,  107,  106,  106,    7,    9,
-      108,  107,  108,  106,    7,  109,   15,  108,  110,  108,
-      106,   15,   22,  111,  106,  112,  108,  106,   22,   29,
-      113,  114,  106,  115,  116,  106,   29,  117,  118,  119,
-      120,  106,  106,  121,  122,  106,  123,  124,  106,  125,
-      126,  127,  128,  106,  106,  129,  130,   46,  131,  132,
-      106,  133,  134,  135,  136,  106,  137,  138,   46,  139,
-      140,  141,  142,  143,  144,  106,  145,  146,   46,  147,
-      148,  149,  150,  151,  152,  106,  153,  154,   46,  155,
-      156,  157,  158,  159,  160,  106,  106,  161,   46,  162,
+      121,    1,  121,  121,  121,  121,  121,  121,    7,    9,
+      122,  121,  122,  121,    7,  123,   15,   13,  124,   13,
+      121,   15,   22,  125,  121,  126,   13,  121,   13,   13,
+      127,  128,  121,  129,  130,  121,   29,  131,  132,  121,
+      133,  134,  121,  121,  135,  136,  121,  121,  121,  137,
+      138,  121,  139,  140,  121,  141,  142,  121,  121,  143,
+      144,  121,  121,  145,  146,  121,  147,  148,  149,  150,
+      121,  121,  151,  152,  121,  153,  154,  121,  121,  155,
+      156,  157,  158,  121,  121,  159,  160,  121,  161,  162,
+      121,  163,  164,  165,  166,  121,  167,  168,  121,  169,
 
-      106,  163,  164,  106,  106,    0,  106,  106,  106,  106,
-      106,  106,  106,  106,  106,  106,  106,  106,  106,  106,
-      106,  106,  106,  106,  106,  106,  106,  106,  106,  106,
-      106,  106,  106,  106,  106,  106,  106,  106,  106,  106,
-      106,  106,  106,  106,  106,  106,  106,  106,  106,  106,
-      106,  106,  106,  106,  106,  106,  106,  106,  106,  106,
-      106,  106,  106,  106
+      170,  171,  172,  173,  174,  121,  121,  175,  121,  176,
+      121,  177,  178,  121,  121,  121,  121,  121,  121,  121,
+        0,  121,  121,  121,  121,  121,  121,  121,  121,  121,
+      121,  121,  121,  121,  121,  121,  121,  121,  121,  121,
+      121,  121,  121,  121,  121,  121,  121,  121,  121,  121,
+      121,  121,  121,  121,  121,  121,  121,  121,  121,  121,
+      121,  121,  121,  121,  121,  121,  121,  121,  121,  121,
+      121,  121,  121,  121,  121,  121,  121,  121
     } ;
 
-static yyconst flex_int16_t yy_nxt[290] =
+static yyconst flex_int16_t yy_nxt[329] =
     {   0,
-        4,    5,    6,    4,    4,    4,    7,    8,    9,   10,
-       11,   11,   11,   13,   14,   95,   15,   16,   17,   17,
-       18,   18,   18,  106,   85,   17,   75,   65,   53,   41,
-       20,   22,   12,   23,   23,  106,   25,   23,   13,   97,
-       25,   97,  101,   25,   91,   97,  101,   27,   28,   88,
-       21,   29,   25,   30,   30,  106,   97,   30,   25,   88,
-       35,   37,   81,   18,   18,  106,   19,   18,   25,   88,
-       35,   42,   78,   36,   25,   88,   35,   25,   78,   48,
-       25,   71,   35,   25,   19,   48,   54,   49,   25,   78,
-       48,   25,   68,   60,   25,   78,   60,   25,   68,   60,
+        4,    5,    6,    4,    4,    4,    4,    7,    8,    4,
+        4,    9,   10,   11,   11,   11,   12,   12,   12,   12,
+       13,   14,   55,   15,   16,   48,   13,   17,   17,   18,
+       18,   18,  121,   13,   17,   12,   12,   13,  121,   13,
+       23,   20,  105,   13,   22,   28,   95,   21,   23,   23,
+       29,  121,   83,   30,   30,   30,   25,   84,   35,   14,
+       79,   37,   16,   33,   25,   40,   35,   43,   70,   36,
+       47,   47,   57,   25,   48,   35,   25,   25,   51,   35,
+       25,   42,   51,   58,   52,   25,   25,   51,   65,   25,
+       25,   51,   65,   66,   25,   71,   65,   25,  120,   77,
 
-       25,   60,   71,   25,   19,   71,   25,   68,   71,   25,
-       57,   81,   25,   68,   81,   25,   57,   81,   25,   61,
-       91,   25,   48,   91,   25,   19,   91,   18,   57,   18,
-       24,   24,   26,   26,   31,   31,   34,   34,   34,   38,
-       38,   39,   39,   40,   40,   40,   43,   43,   44,   44,
-       46,   46,   46,   47,   47,   47,   50,   50,   51,   51,
-       52,   52,   52,   55,   55,   56,   56,   58,   58,   58,
-       59,   59,   59,   62,   62,   63,   63,   64,   64,   64,
-       66,   66,   67,   67,   69,   69,   69,   70,   70,   70,
-       72,   72,   73,   73,   74,   74,   74,   76,   76,   77,
+       78,   78,  120,   25,   79,   65,   25,   25,   77,   77,
+       25,   25,   90,   77,   25,   25,   90,   90,   25,   25,
+      101,   90,   25,   25,  101,  101,   25,  111,  101,  114,
+      117,  117,  119,   25,  118,  118,   18,  107,   18,   24,
+       24,   26,   26,   31,   31,   34,   34,   34,   38,   38,
+       39,   39,   41,   41,   41,   44,   44,   45,   45,   49,
+       49,   49,   50,   50,   50,   53,   53,   54,   54,   56,
+       56,   56,   59,   59,   60,   60,   63,   63,   63,   64,
+       64,   64,   67,   67,   68,   68,   69,   69,   69,   72,
+       72,   73,   73,   75,   75,   75,   76,   76,   76,   80,
 
-       77,   79,   79,   79,   80,   80,   80,   82,   82,   83,
-       83,   84,   84,   84,   86,   86,   87,   87,   89,   89,
-       89,   90,   90,   90,   92,   92,   93,   93,   94,   94,
-       94,   96,   96,   98,   98,   99,   99,   99,  100,  100,
-      102,  102,  103,  103,  104,  104,  105,  105,   45,   61,
-       57,   45,   19,   45,   32,   49,   45,   32,  106,   33,
-       19,   32,   36,   13,   33,   32,   25,   13,   19,   21,
-       13,   13,   18,   19,  106,    3,  106,  106,  106,  106,
-      106,  106,  106,  106,  106,  106,  106,  106,  106
+       80,   81,   81,   82,   82,   82,   85,   85,   86,   86,
+       88,   88,   88,   89,   89,   89,   92,   92,   93,   93,
+       94,   94,   94,   96,   96,   97,   97,   99,   99,   99,
+      100,  100,  100,  102,  102,  103,  103,  104,  104,  104,
+      106,  106,  108,  108,  109,  109,  109,  110,  110,  112,
+      112,  113,  113,  115,  115,  116,  116,   25,  107,   25,
+      107,  111,   98,   25,  107,   98,   19,   98,   87,   98,
+       87,   91,   19,   87,   74,   91,   87,   74,   19,   74,
+       61,   74,   61,   62,   19,   61,   46,   66,   62,   61,
+       46,   19,   46,   32,   52,   46,   32,  121,   19,   32,
+
+       16,   36,   33,   32,   27,   25,   19,   21,   18,   19,
+      121,    3,  121,  121,  121,  121,  121,  121,  121,  121,
+      121,  121,  121,  121,  121,  121,  121,  121
     } ;
 
-static yyconst flex_int16_t yy_chk[290] =
+static yyconst flex_int16_t yy_chk[329] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    7,    7,  156,    7,    7,    7,    7,
-        7,    7,    7,    9,  148,    9,  140,  132,  124,  116,
-        9,   15,  107,   15,   15,   17,  105,   17,   20,  104,
-      103,  102,  101,  100,   99,   98,   97,   20,   21,   96,
-       21,   22,   95,   22,   22,   23,   93,   23,   26,   92,
-       26,   29,   89,   29,   29,   30,   88,   30,   34,   87,
-       34,   36,   86,   36,   40,   83,   40,   41,   82,   41,
-       46,   79,   46,   47,   78,   47,   49,   49,   52,   77,
-       52,   53,   76,   53,   59,   73,   59,   64,   72,   64,
+        1,    1,    1,    1,    1,    1,    5,    5,    6,    6,
+        7,    7,   48,    7,    7,   48,    7,    7,    7,    7,
+        7,    7,    9,   11,    9,   12,   12,   13,   17,   11,
+       17,    9,  170,   13,   15,   21,  162,   21,   15,   15,
+       22,   23,  154,   23,   22,   22,   26,   79,   26,   29,
+       79,   29,   29,   33,   34,   33,   34,   36,  146,   36,
+       40,   40,  138,   41,   40,   41,   42,   49,   42,   49,
+       50,  130,   50,   52,   52,   56,   57,   56,   57,   63,
+       64,   63,   64,   66,   69,   66,   69,   70,  120,   70,
 
-       65,   69,   65,   70,   68,   70,   74,   67,   74,   75,
-       66,   75,   80,   63,   80,   84,   62,   84,   85,   61,
-       85,   90,   58,   90,   94,   57,   94,  108,   56,  108,
-      109,  109,  110,  110,  111,  111,  112,  112,  112,  113,
-      113,  114,  114,  115,  115,  115,  117,  117,  118,  118,
-      119,  119,  119,  120,  120,  120,  121,  121,  122,  122,
-      123,  123,  123,  125,  125,  126,  126,  127,  127,  127,
-      128,  128,  128,  129,  129,  130,  130,  131,  131,  131,
-      133,  133,  134,  134,  135,  135,  135,  136,  136,  136,
-      137,  137,  138,  138,  139,  139,  139,  141,  141,  142,
+       71,   71,  119,   75,   71,   75,   76,   82,   76,   82,
+       83,   88,   83,   88,   89,   94,   89,   94,   95,   99,
+       95,   99,  100,  104,  100,  104,  109,  111,  109,  111,
+      114,  114,  118,  116,  114,  118,  122,  115,  122,  123,
+      123,  124,  124,  125,  125,  126,  126,  126,  127,  127,
+      128,  128,  129,  129,  129,  131,  131,  132,  132,  133,
+      133,  133,  134,  134,  134,  135,  135,  136,  136,  137,
+      137,  137,  139,  139,  140,  140,  141,  141,  141,  142,
+      142,  142,  143,  143,  144,  144,  145,  145,  145,  147,
+      147,  148,  148,  149,  149,  149,  150,  150,  150,  151,
 
-      142,  143,  143,  143,  144,  144,  144,  145,  145,  146,
-      146,  147,  147,  147,  149,  149,  150,  150,  151,  151,
-      151,  152,  152,  152,  153,  153,  154,  154,  155,  155,
-      155,  157,  157,  158,  158,  159,  159,  159,  160,  160,
-      161,  161,  162,  162,  163,  163,  164,  164,   55,   54,
-       51,   50,   45,   44,   43,   42,   39,   38,   37,   33,
-       32,   31,   28,   27,   25,   24,   19,   18,   16,   14,
-       13,   11,   10,    8,    3,  106,  106,  106,  106,  106,
-      106,  106,  106,  106,  106,  106,  106,  106,  106
+      151,  152,  152,  153,  153,  153,  155,  155,  156,  156,
+      157,  157,  157,  158,  158,  158,  159,  159,  160,  160,
+      161,  161,  161,  163,  163,  164,  164,  165,  165,  165,
+      166,  166,  166,  167,  167,  168,  168,  169,  169,  169,
+      171,  171,  172,  172,  173,  173,  173,  174,  174,  175,
+      175,  176,  176,  177,  177,  178,  178,  113,  112,  110,
+      108,  107,  106,  105,  103,  102,   98,   97,   96,   93,
+       92,   91,   87,   86,   85,   84,   81,   80,   74,   73,
+       72,   68,   67,   62,   61,   60,   59,   58,   55,   54,
+       53,   46,   45,   44,   43,   39,   38,   37,   32,   31,
+
+       30,   28,   25,   24,   20,   19,   16,   14,   10,    8,
+        3,  121,  121,  121,  121,  121,  121,  121,  121,  121,
+      121,  121,  121,  121,  121,  121,  121,  121
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -555,7 +569,7 @@ char *mnt_routes_antext;
   notes:
     Tokens are defined in the associated grammar, mnt_routes_an.y.
 
-  $Id: mnt_routes_an.lex.c,v 1.3 2005/08/17 08:25:49 can Exp $
+  $Id: mnt_routes_an.l,v 1.2 2005/06/24 13:03:06 peter Exp $
 */
 
 /******************
@@ -578,21 +592,21 @@ char *mnt_routes_antext;
   AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
   ***************************************/
-#line 48 "mnt_routes_an.l"
+#line 51 "mnt_routes_an.l"
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <iproutines.h>
 
 /* tokens defined in the grammar */
 #include "mnt_routes_an.tab.h"
 
-/* #define mnt_routes_anwrap mnt_routes_anwrap */
-int mnt_routes_anwrap() { return(yywrap()); }
+#define mnt_routes_anwrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
 #define YY_INPUT(buf,result,max_size) yy_input(buf,&result,max_size)
-#line 595 "mnt_routes_an.lex.c"
+#line 610 "mnt_routes_an.lex.c"
 
 #define INITIAL 0
 
@@ -614,9 +628,9 @@ void yy_input(char *buf, int *result, int max_size);
 
 #ifndef YY_SKIP_YYWRAP
 #ifdef __cplusplus
-//extern "C" int mnt_routes_anwrap (void );
+extern "C" int mnt_routes_anwrap (void );
 #else
-//extern int mnt_routes_anwrap (void );
+extern int mnt_routes_anwrap (void );
 #endif
 #endif
 
@@ -743,10 +757,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 63 "mnt_routes_an.l"
+#line 67 "mnt_routes_an.l"
 
 
-#line 749 "mnt_routes_an.lex.c"
+#line 764 "mnt_routes_an.lex.c"
 
 	if ( (yy_init) )
 		{
@@ -799,13 +813,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 107 )
+				if ( yy_current_state >= 122 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 276 );
+		while ( yy_base[yy_current_state] != 312 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -832,129 +846,174 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 65 "mnt_routes_an.l"
+#line 69 "mnt_routes_an.l"
 { ; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 67 "mnt_routes_an.l"
+#line 71 "mnt_routes_an.l"
 { return KEYW_ANY; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 69 "mnt_routes_an.l"
+#line 73 "mnt_routes_an.l"
+{ return TKN_MNTNER; }
+	YY_BREAK
+case 4:
+YY_RULE_SETUP
+#line 76 "mnt_routes_an.l"
 {
-    /* check each number of 1.2.3.4/5 in prefix is valid */
-    long int val;
-    char *s, *p;
-    p = s = mnt_routes_antext;
-    while (*s != '/') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
-             syntax_error("IP prefix \"%s\" contains an invalid octet", 
-                          mnt_routes_antext);
-        }
-        p = s + 1;
-    }
-    val = strtol(p, NULL, 10);
-    if ((val < 0) || (val > 32)) {
-        syntax_error("IP prefix \"%s\" contains an invalid prefix length", 
-                     mnt_routes_antext);
+    ip_prefix_t ptr;
+    int retval;
+
+    retval = IP_pref_t2b(&ptr, mnt_routes_antext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+        all the rest is parser error */
+      case IP_OK: return TKN_PRFXV4;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix \"%s\" doesn't start on the correct boundary", mnt_routes_antext);
+                     break;
+      default: syntax_error("IP prefix \"%s\" contains invalid prefix", mnt_routes_antext);
+                     break;
     }
     return TKN_PRFXV4;
 }
 	YY_BREAK
-case 4:
+case 5:
 YY_RULE_SETUP
-#line 90 "mnt_routes_an.l"
+#line 94 "mnt_routes_an.l"
 {
-    /* check each quad of 1A:3:7:8:AAAA:BBBB:DEAD:BEEF/55 in prefix is valid */
-    long int val;
-    char *s, *p;
-    p = s = mnt_routes_antext;
-    while (*s != '/') {
-        val = strtol(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
-             syntax_error("IPv6 prefix \"%s\" contains an invalid quad",
-                          mnt_routes_antext);
-        }
-        p = s + 1;
-    }
-    val = strtol(p, NULL, 10);
-    if ((val < 0) || (val > 128)) {
-        syntax_error("IPv6 prefix \"%s\" contains an invalid prefix length",
-                     mnt_routes_antext);
+    ip_prefix_t ptr;
+    int retval;
+
+    retval = IP_pref_t2b(&ptr, mnt_routes_antext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+        all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6;
+                  break;
+      case IP_INVBIT: syntax_error("IPv6 prefix \"%s\" doesn't start on the correct boundary", mnt_routes_antext);
+                     break;
+      default: syntax_error("IPv6 prefix \"%s\" contains invalid prefix", mnt_routes_antext);
+                     break;
     }
     return TKN_PRFXV6;
 }
 	YY_BREAK
-case 5:
+case 6:
 YY_RULE_SETUP
 #line 111 "mnt_routes_an.l"
 {
-    /* check each quad of 1A::AAAA:BBBB:DEAD:BEEF/55 in prefix is valid */
-    long int val;
-    char *s, *p, *r;
-    int leftquads = 0;
-    int rightquads = 0;
+    ip_prefix_t ptr;
+    int retval;
 
-    r = p = s = mnt_routes_antext;
-    while (*s != '/') {
-        val = strtol(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
-             syntax_error("IPv6 prefix \"%s\" contains an invalid quad",
-                          mnt_routes_antext);
-        }
-        p = s + 1;
+    retval = IP_pref_t2b(&ptr, mnt_routes_antext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+        all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6DC;
+                  break;
+      case IP_INVBIT: syntax_error("IPv6 prefix \"%s\" doesn't start on the correct boundary", mnt_routes_antext);
+                     break;
+      default: syntax_error("IPv6 prefix \"%s\" contains invalid prefix", mnt_routes_antext);
+                     break;
     }
-    val = strtol(p, NULL, 10);
-    if ((val < 0) || (val > 128)) {
-        syntax_error("IPv6 prefix \"%s\" contains an invalid prefix length",
-                     mnt_routes_antext);
-    }
-
-    /* And now, count colons to the left of "::" - this is
-       one less then the number of left quads */
-
-    r = strchr(mnt_routes_antext, ':');
-    leftquads++;
-    while (r[1] != ':') {
-        leftquads++;
-        r = strchr(r+1, ':');
-    }
-    /* skip "::" */
-    r += 2;
-    /* count colons to the right of "::" - one less then the number of right quads */
-    if (r[0] != '\0') {
-        do {
-            rightquads++;
-            r = strchr(r+1, ':');
-        } while (r != NULL);
-    }
-    /* check for too many quads */
-    if ((leftquads + rightquads) > 8) {
-        syntax_error("IPv6 address \"%s\" contains too many digits", mnt_routes_antext);
-    }
-
     return TKN_PRFXV6DC;
 }
 	YY_BREAK
-case 6:
-YY_RULE_SETUP
-#line 159 "mnt_routes_an.l"
-{ return TKN_MNTNER; }
-	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 161 "mnt_routes_an.l"
-{ return mnt_routes_antext[0]; }
+#line 130 "mnt_routes_an.l"
+{
+    /* check the prefix range by converting it and 
+       issue syntax errors based on the error codes */
+
+    ip_prefix_range_t ptr;
+    int retval;
+
+    retval = IP_pref_rang_t2b(&ptr, mnt_routes_antext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+         all the rest is parser error */
+      case IP_OK: return TKN_PRFXV4RNG;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix range \"%s\" doesn't start on the correct boundary", mnt_routes_antext);
+                     break;
+      case IP_NOLEN: syntax_error("IP prefix range \"%s\" range is not within the prefix length", mnt_routes_antext);
+                     break;
+      case IP_NORANG: syntax_error("IP prefix range \"%s\" range end is less than end start", mnt_routes_antext);
+                     break;
+      default: syntax_error("IP prefix range \"%s\" contains invalid prefix range", mnt_routes_antext);
+                     break;
+    }
+}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 163 "mnt_routes_an.l"
+#line 155 "mnt_routes_an.l"
+{
+    /* check the prefix range by converting it and 
+       issue syntax errors based on the error codes */
+
+    ip_prefix_range_t ptr;
+    int retval;
+
+    retval = IP_pref_rang_t2b(&ptr, mnt_routes_antext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+         all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6RNG;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix range \"%s\" doesn't start on the correct boundary", mnt_routes_antext);
+                     break;
+      case IP_NOLEN: syntax_error("IP prefix range \"%s\" range is not within the prefix length", mnt_routes_antext);
+                     break;
+      case IP_NORANG: syntax_error("IP prefix range \"%s\" range end is less than end start", mnt_routes_antext);
+                     break;
+      default: syntax_error("IP prefix range \"%s\" contains invalid prefix range", mnt_routes_antext);
+                     break;
+    }
+}
+	YY_BREAK
+case 9:
+YY_RULE_SETUP
+#line 180 "mnt_routes_an.l"
+{
+    /* check the prefix range by converting it and 
+       issue syntax errors based on the error codes */
+
+    ip_prefix_range_t ptr;
+    int retval;
+
+    retval = IP_pref_rang_t2b(&ptr, mnt_routes_antext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+         all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6DCRNG;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix range \"%s\" doesn't start on the correct boundary", mnt_routes_antext);
+                     break;
+      case IP_NOLEN: syntax_error("IP prefix range \"%s\" range is not within the prefix length", mnt_routes_antext);
+                     break;
+      case IP_NORANG: syntax_error("IP prefix range \"%s\" range end is less than end start", mnt_routes_antext);
+                     break;
+      default: syntax_error("IP prefix range \"%s\" contains invalid prefix range", mnt_routes_antext);
+                     break;
+    }
+}
+	YY_BREAK
+case 10:
+YY_RULE_SETUP
+#line 204 "mnt_routes_an.l"
+{ return mnt_routes_antext[0]; }
+	YY_BREAK
+case 11:
+YY_RULE_SETUP
+#line 206 "mnt_routes_an.l"
 ECHO;
 	YY_BREAK
-#line 957 "mnt_routes_an.lex.c"
+#line 1017 "mnt_routes_an.lex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1238,7 +1297,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 107 )
+			if ( yy_current_state >= 122 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1266,11 +1325,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 107 )
+		if ( yy_current_state >= 122 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 106);
+	yy_is_jam = (yy_current_state == 121);
 
 	return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1920,7 +1979,7 @@ void mnt_routes_anfree (void * ptr )
 #undef YY_DECL_IS_OURS
 #undef YY_DECL
 #endif
-#line 163 "mnt_routes_an.l"
+#line 206 "mnt_routes_an.l"
 
 
 

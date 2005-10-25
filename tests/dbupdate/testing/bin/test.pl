@@ -593,6 +593,7 @@ my $line_count=0;
    foreach my $string (@{$lines})  {
      $line_count++;
      foreach my $regex (@{$regexps})  {
+#     print "matching reg ", $regex,"\n";
        eval { $regex =~ /$regex/; };
        if ($@) {
          report ($@);

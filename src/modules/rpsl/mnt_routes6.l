@@ -3,12 +3,12 @@
   filename: mnt_routes6.l
 
   description:
-    Defines the tokenizer for an RPSSng mnt-routes6 attribute.
+    Defines the tokenizer for an RPSSng mnt-routes attribute
+    of inet6num class.
 
   notes:
     Tokens are defined in the associated grammar, mnt_routes6.y.
 
-  $Id: mnt_routes6.l,v 1.1 2004/12/27 16:38:46 can Exp $
 */
 
 /******************
@@ -33,15 +33,24 @@
   ***************************************/
 %}
 
+INT            [0-9]+
 QUAD           [0-9A-F]{1,4}
-BITS           ([1-9]?[0-9])|(1[0-1][0-9])|(12[0-8])
-IPV6DC         (({QUAD}:){0,6}{QUAD})?::({QUAD}(:{QUAD}){0,6})?\/{BITS}
-MNTNER         [A-Z0-9]([-A-Z0-9]*[A-Z0-9])?
+IPV4           {INT}(\.{INT}){3}
+IPV6           {QUAD}(:{QUAD}){7}
+IPV6DC         (({QUAD}:){0,6}{QUAD})?::({QUAD}(:{QUAD}){0,6})?
+PRFXV4         {IPV4}\/{INT}
+PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
+PRFXV6         {IPV6}\/{INT}
+PRFXV6RNG      {PRFXV6}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
+PRFXV6DC       {IPV6DC}\/{INT}
+PRFXV6DCRNG    {PRFXV6DC}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
+MNTNER         [A-Z0-9]([A-Z0-9_-]*[A-Z0-9])?
 
 %{
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <iproutines.h>
 
 /* tokens defined in the grammar */
 #include "mnt_routes6.tab.h"
@@ -58,11 +67,138 @@ void yy_input(char *buf, int *result, int max_size);
 
 [ \t\n]+    { ; }
 
-ANY                { return KEYW_ANY; }
-
-{IPV6DC}           { return TKN_IPV6DC; }
+ANY     { return KEYW_ANY; }
 
 {MNTNER}           { return TKN_MNTNER; }
+
+
+{PRFXV4} {
+    ip_prefix_t ptr;
+    int retval;
+
+    retval = IP_pref_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+        all the rest is parser error */
+      case IP_OK: return TKN_PRFXV4;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      default: syntax_error("IP prefix \"%s\" contains invalid prefix", yytext);
+                     break;
+    }
+    return TKN_PRFXV4;
+}
+
+{PRFXV6} {
+    ip_prefix_t ptr;
+    int retval;
+
+    retval = IP_pref_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+        all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6;
+                  break;
+      case IP_INVBIT: syntax_error("IPv6 prefix \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      default: syntax_error("IPv6 prefix \"%s\" contains invalid prefix", yytext);
+                     break;
+    }
+    return TKN_PRFXV6;
+}
+{PRFXV6DC} {
+    ip_prefix_t ptr;
+    int retval;
+
+    retval = IP_pref_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+        all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6DC;
+                  break;
+      case IP_INVBIT: syntax_error("IPv6 prefix \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      default: syntax_error("IPv6 prefix \"%s\" contains invalid prefix", yytext);
+                     break;
+    }
+    return TKN_PRFXV6DC;
+}
+
+
+{PRFXV4RNG} {
+    /* check the prefix range by converting it and 
+       issue syntax errors based on the error codes */
+
+    ip_prefix_range_t ptr;
+    int retval;
+
+    retval = IP_pref_rang_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+         all the rest is parser error */
+      case IP_OK: return TKN_PRFXV4RNG;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix range \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      case IP_NOLEN: syntax_error("IP prefix range \"%s\" range is not within the prefix length", yytext);
+                     break;
+      case IP_NORANG: syntax_error("IP prefix range \"%s\" range end is less than end start", yytext);
+                     break;
+      default: syntax_error("IP prefix range \"%s\" contains invalid prefix range", yytext);
+                     break;
+    }
+}
+
+
+{PRFXV6RNG} {
+    /* check the prefix range by converting it and 
+       issue syntax errors based on the error codes */
+
+    ip_prefix_range_t ptr;
+    int retval;
+
+    retval = IP_pref_rang_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+         all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6RNG;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix range \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      case IP_NOLEN: syntax_error("IP prefix range \"%s\" range is not within the prefix length", yytext);
+                     break;
+      case IP_NORANG: syntax_error("IP prefix range \"%s\" range end is less than end start", yytext);
+                     break;
+      default: syntax_error("IP prefix range \"%s\" contains invalid prefix range", yytext);
+                     break;
+    }
+}
+
+
+{PRFXV6DCRNG} {
+    /* check the prefix range by converting it and 
+       issue syntax errors based on the error codes */
+
+    ip_prefix_range_t ptr;
+    int retval;
+
+    retval = IP_pref_rang_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+         all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6DCRNG;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix range \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      case IP_NOLEN: syntax_error("IP prefix range \"%s\" range is not within the prefix length", yytext);
+                     break;
+      case IP_NORANG: syntax_error("IP prefix range \"%s\" range end is less than end start", yytext);
+                     break;
+      default: syntax_error("IP prefix range \"%s\" contains invalid prefix range", yytext);
+                     break;
+    }
+}
 
 . { return yytext[0]; }
 

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.3 $
 
   IP handling (ip). ip.c  - conversions between ascii and binary forms 
                             of IP addresses, prefixes and ranges.
@@ -521,9 +521,10 @@ IP_rang_t2b(ip_range_t *rangptr, const char *rangstr, ip_exp_t expf)
 
 /*+ convert a prefix range string into a binary range struct. 
     the prefix range can be the following:
+    x.x.x.x/l          n=m=l
     x.x.x.x/l^n        n = m
-    x.x.x.x/l^-        n = (l + 1), m = 32
-    x.x.x.x/l^+        n = l, m = 32
+    x.x.x.x/l^-        n = (l + 1), m = IP_sizebits(prefix->ip->space)
+    x.x.x.x/l^+        n = l, m = IP_sizebits(prefix->ip->space)
     x.x.x.x/l^n-m      n, m
 +*/ 
 int IP_pref_rang_t2b(ip_prefix_range_t *prefrangptr, const char *prefrangstr, ip_exp_t expf)
@@ -532,14 +533,27 @@ int IP_pref_rang_t2b(ip_prefix_range_t *prefrangptr, const char *prefrangstr, ip
   char *cap;
   unsigned len;
   int err = IP_OK;
+  int sizebits = 0;
     
   if( expf != IP_PLAIN && expf != IP_EXPN ) {
     return IP_INVARG;
   }
 
   if( (cap=index(prefrangstr, '^')) == NULL ) {
-    /* die;  */ /* error: missing cap in prefix range */
-    return    IP_NOCAP;
+    /* this is plain prefix */
+    /* do NOT return    IP_NOCAP, convert the prefix instead; */
+    len = strlen(prefrangstr);
+    strncpy(prefix, prefrangstr, len);
+    prefix[len]=0;
+    if( (err=IP_pref_t2b( &(prefrangptr->prefix), prefix, expf)) != IP_OK) 
+    {
+      /* die;   */ /* set error flag: incorrect address format */
+      return err;
+    }
+    sizebits = IP_sizebits(prefrangptr->prefix.ip.space);
+    prefrangptr->n = prefrangptr->prefix.bits;
+    prefrangptr->m = prefrangptr->prefix.bits;
+
   }
   else 
   {
@@ -561,17 +575,18 @@ int IP_pref_rang_t2b(ip_prefix_range_t *prefrangptr, const char *prefrangstr, ip
 
     /* calculate n and m, tight checks */
     cap ++;
+    sizebits = IP_sizebits(prefrangptr->prefix.ip.space);
 
     switch (*cap) {
       case '-': 
         /* all exclusive more specifics */
         prefrangptr->n = prefrangptr->prefix.bits + 1;
-        prefrangptr->m = 32; 
+        prefrangptr->m = sizebits; 
         break;
       case '+':
         /* all inclusive more specifics */
         prefrangptr->n = prefrangptr->prefix.bits;
-        prefrangptr->m = 32;
+        prefrangptr->m = sizebits;
         break;
       default:
         if (strstr (cap, "-") != NULL )
@@ -595,12 +610,12 @@ int IP_pref_rang_t2b(ip_prefix_range_t *prefrangptr, const char *prefrangstr, ip
         break;
     }
   }
-  if ((prefrangptr->prefix.bits > 32) || (prefrangptr->prefix.bits < 0))
+  if ((prefrangptr->prefix.bits > sizebits) || (prefrangptr->prefix.bits < 0))
   {
     return IP_WROLEN;
   }
-  if ((prefrangptr->n > 32) || (prefrangptr->n < 0) ||
-      (prefrangptr->m > 32) || (prefrangptr->m < 0) )
+  if ((prefrangptr->n > sizebits) || (prefrangptr->n < 0) ||
+      (prefrangptr->m > sizebits) || (prefrangptr->m < 0) )
   {
     return IP_WRORANG;
   }
@@ -1188,27 +1203,25 @@ IP_addr_in_pref(ip_addr_t *ptra, ip_prefix_t *prefix)
 
 /*+ checks if an IP address is contained within the range
   returns 1 if it is, 0 otherwise
+  0 is also returned if they are from different space (V4, V6)
+  it seems logical that they cannot contain each other in this case.
 
-  It is the responsility of the caller to ensure that both address
-  and range are from the same IP space.
-  
-  works only for IPv4
 +*/
 
 int IP_addr_in_rang(ip_addr_t *ptra, ip_range_t *rangptr)
 {
-/*  if( rangptr->end.space == IP_V4 ) {
-    return (  rangptr->begin.words[0]  <=  ptra->words[0]
-	      && rangptr->end.words[0]  >=  ptra->words[0] );
-  }
-  else {
-*/
+  
+  if (IP_sizebits(ptra->space) == IP_sizebits (rangptr->begin.space)) {
     return( IP_addr_cmp(ptra, &rangptr->begin, 
-			IP_sizebits(rangptr->end.space)) >= 0 /* adr >= begin */
-	    && IP_addr_cmp(ptra, &rangptr->end, 
-			   IP_sizebits(rangptr->end.space)) <= 0  /* adr <= end */
-	    );
-/*  }*/
+      IP_sizebits(rangptr->end.space)) >= 0 /* adr >= begin */
+      && IP_addr_cmp(ptra, &rangptr->end, 
+      IP_sizebits(rangptr->end.space)) <= 0  /* adr <= end */
+    );
+  }
+  else 
+  {
+     return 0;
+  }
 }
 
 /**************************************************************************/

@@ -7,8 +7,14 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 notify:       dbtest@ripe.net
 mnt-by:       RIPE-NCC-HM-MNT
-mnt-routes:   RIPE-NCC-HM-MNT {1.2.3.0/24^+, 1.2.3.0/24^-, 1.2.3.0/24^24, 1.2.3.0/24^25-26 }
-mnt-routes:   RIPE-NCC-HM-MNT {ANY }
+mnt-routes:   RIPE-NCC-HM-MNT {1.2.3.0/24^+, 1.2.3.0/24^-, 1.2.3.0/24^24, 1.2.3.0/24^25-26, 1.2.3.0/24}
+mnt-routes:   RIPE-NCC-HM-MNT ANY
+mnt-routes:   RIPE-NCC-HM-MNT {2001:0640:2000::/35}
+mnt-routes:   RIPE-NCC-HM-MNT {2001:0640:2000::/35, 2001:0640:2000::/35^35}
+mnt-routes:   RIPE-NCC-HM-MNT {2001:0640:2000::/35^-, 2001:0640:2000::/35^+}
+mnt-routes:   RIPE-NCC-HM-MNT {2001:0640:2000::/35^36-37, 2001:0640:2000::/35^35-35}
+mnt-routes:   RIPE-NCC-HM-MNT {1.2.3.0/24, 2001:0640:2000::/35}
+mnt-routes:   RIPE-NCC-HM-MNT {2001:0640:2000:0:0:0:0:0/35, 2001:0640:2000::/35}
 changed:      dbtest@ripe.net
 source:       DB-TEST
 

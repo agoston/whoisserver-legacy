@@ -36,21 +36,27 @@
 int yyerror(const char *s);
 %}
 
-%token TKN_PRFXV4 TKN_PRFXV6 TKN_PRFXV6DC TKN_MNTNER KEYW_ANY
+%token TKN_PRFXV4 TKN_PRFXV6 TKN_PRFXV6DC TKN_MNTNER KEYW_ANY TKN_PRFXV4RNG TKN_PRFXV6RNG TKN_PRFXV6DCRNG
 
 %%
 
 mnt_routes_an: TKN_MNTNER
 | TKN_MNTNER '{' ip_prefix_list '}'
-| TKN_MNTNER '{' KEYW_ANY '}'
+| TKN_MNTNER KEYW_ANY 
 ;
 
 ip_prefix_list: TKN_PRFXV4
+| TKN_PRFXV4RNG
 | TKN_PRFXV6
+| TKN_PRFXV6RNG
 | TKN_PRFXV6DC
+| TKN_PRFXV6DCRNG
 | ip_prefix_list ',' TKN_PRFXV4
+| ip_prefix_list ',' TKN_PRFXV4RNG
 | ip_prefix_list ',' TKN_PRFXV6
+| ip_prefix_list ',' TKN_PRFXV6RNG
 | ip_prefix_list ',' TKN_PRFXV6DC
+| ip_prefix_list ',' TKN_PRFXV6DCRNG
 ;
 
 %%

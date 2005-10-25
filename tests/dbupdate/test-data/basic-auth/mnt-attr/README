@@ -158,3 +158,114 @@
 #
 # RESULT 13: The creation will fail
 
+# mnt-attr tests
+# CASE 14: We try to create route6 object. 
+#         mnt-routes in less specific inet6num contains this prefix
+%
+#
+# create route object 
+#
+#SUCCEES
+#
+# RESULT 14: The creation will succeed
+
+
+# mnt-attr tests
+# CASE 15: We try to create route6 object. 
+#         mnt-routes in less specific inet6num contains irrelevant prefix
+#         'no applicable mntner found' error
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 15: The creation will fail
+
+
+# mnt-attr tests
+# CASE 16: We try to create route6 object. 
+#         mnt-routes in less specific inet6num does not contain this prefix
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 16: The creation will fail
+
+
+# mnt-attr tests
+# CASE 17: We try to create route6 object. 
+#         mnt-routes in less specific inet6num contains prefix that doesn't start on correct bit boundary
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 17: The creation will fail
+
+
+# mnt-attr tests
+# CASE 18: We try to create route6 object. 
+#         mnt-routes in aut-num contains this prefix and other ipv4 prefix
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 18: The creation will succeed
+
+
+# mnt-attr tests
+# CASE 19: We try to create route6 object. 
+#         mnt-routes in aut-num contains only ipv4 prefixes
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 19: The creation will fail
+
+
+# mnt-attr tests
+# CASE 20: We try to create route object. 
+#         mnt-routes in aut-num contains only ipv6 prefixes
+%
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 20: The creation will fail
+
+
+# mnt-attr tests
+# CASE 21: We try to create route object. 
+#         mnt-routes in aut-num contains ipv4/ipv6 prefixes
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 21: The creation will succeed
+
+
+# mnt-attr tests
+# CASE 22: We try to create route6 object. 
+#          exact match exists but case is different in the prefix
+#          it should authorise from exact match mnt-routes, not mnt-lower!!!
+#
+%
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 22: The creation will succeed
+
+

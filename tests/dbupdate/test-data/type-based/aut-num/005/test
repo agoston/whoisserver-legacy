@@ -1,5 +1,5 @@
 
-# CASE 5: We try to create aut-num object AS123 with mnt-routes containing prefixes
+# CASE 5: We try to create aut-num object AS123 with mnt-routes containing prefixes V4 and V6
 %
 % requires initial objects to be loaded
 #
@@ -7,8 +7,9 @@
 #
 #SUCCESS
 #
-# RESULT 5: The creation will succeed. But for now it **FAILS**
+# RESULT 5: 
 #           see bug 252 for this.
+#           bug is fixed so it succeeds!
 
 
 aut-num:      AS123
@@ -20,8 +21,14 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 notify:       dbtest@ripe.net
 mnt-by:       RIPE-NCC-HM-MNT
-mnt-routes:   RIPE-NCC-HM-MNT {1.2.3.0/24^+, 1.2.3.0/24^-, 1.2.3.0/24^24, 1.2.3.0/24^25-26 }
-mnt-routes:   RIPE-NCC-HM-MNT {ANY }
+mnt-routes:   RIPE-NCC-HM-MNT {1.2.3.0/24^+, 1.2.3.0/24^-, 1.2.3.0/24^24, 1.2.3.0/24^25-26, 1.2.3.0/24}
+mnt-routes:   RIPE-NCC-HM-MNT ANY
+mnt-routes:   RIPE-NCC-HM-MNT {2001:0640:2000::/35}
+mnt-routes:   RIPE-NCC-HM-MNT {2001:0640:2000::/35, 2001:0640:2000::/35^35}
+mnt-routes:   RIPE-NCC-HM-MNT {2001:0640:2000::/35^-, 2001:0640:2000::/35^+}
+mnt-routes:   RIPE-NCC-HM-MNT {2001:0640:2000::/35^36-37, 2001:0640:2000::/35^35-35}
+mnt-routes:   RIPE-NCC-HM-MNT {1.2.3.0/24, 2001:0640:2000::/35}
+mnt-routes:   RIPE-NCC-HM-MNT {2001:0640:2000:0:0:0:0:0/35, 2001:0640:2000::/35}
 changed:      dbtest@ripe.net
 source:       DB-TEST
 

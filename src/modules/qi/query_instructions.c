@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.9 $
+  $Revision: 1.10 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -719,10 +719,13 @@ char *brief_filter (const char *str) {
 char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
 
   char *result;
-  char *attr_list[4] = {"e-mail",
+  char *attr_list[7] = {"e-mail",
                         "notify",
                         "changed",
-                        "source"
+                        "ref-nfy",
+                        "mnt-nfy",
+                        "upd-to",
+                        "source" /* special case, please keep it last element */
                        };
   int i,j,start = 1;
   gboolean filtering_an_attribute = FALSE;
@@ -745,7 +748,7 @@ char *contact_attr_filter (const char *str, unsigned abuse_attr_exists) {
       if ((strncmp(attr_list[i], lines[j], attr_name_len) == 0) &&
           (lines[j][attr_name_len] == ':'))
       {
-        if (i == 3) /* this is source attribute */ {
+        if (i == 6) /* this is source attribute */ {
           filtering_source_attribute = TRUE;
           g_string_sprintfa(source_attr, "%s", lines[j]);
         }

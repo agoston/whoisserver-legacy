@@ -313,6 +313,14 @@ PW_ERR_LINETOOLONG %
 PW_ERR_LINETOOLONG % Input exceeds the maximum line length.
 
 #
+# Uncompatible flags
+
+QC_FMT_UNCOMPFLAG %%ERROR:109: invalid combination of flags passed
+QC_FMT_UNCOMPFLAG %%
+QC_FMT_UNCOMPFLAG %% The flags "%s" and "%s" cannot be used together.
+
+#
+#
 # For data retrieved with the "-K" flag
 
 PW_K_FILTER % Note: this output has been filtered.
@@ -402,13 +410,6 @@ QC_FMT_DUPIPFLAG %% Only "-%s" will be used for this query.
 QC_USELESSIPFLAG %WARNING:902: useless IP flag passed
 QC_USELESSIPFLAG %
 QC_USELESSIPFLAG % An IP flag (-l, -L, -m, -M, -x, -b, or -c) used without an IP key.
-
-#
-# Uncompatible flags
-
-QC_FMT_UNCOMPFLAG %%ERROR:206: invalid combination of flags passed
-QC_FMT_UNCOMPFLAG %%
-QC_FMT_UNCOMPFLAG %% The flags "%s" and "%s" cannot be used together.
 
 #
 # Useless no-referral flag

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.3 $
+  $Revision: 1.4 $
 
   Query command module (qc).  This is what the whois query gets stored as in
   memory.
@@ -831,7 +831,7 @@ int QC_fill (const char *query_str,
 		/* check uncompatible flags */
     if ((query_command->b == 1) && (query_command->filtered == 1)) {
     /* -b -K is error, we need person/role/organisation objects */
-    /* ERROR:206 */
+    /* ERROR:109 */
         char *fmt = ca_get_qc_fmt_uncompflag;
         query_command->parse_messages = g_list_append(query_command->parse_messages, g_strdup_printf(fmt,"-b","-K"));
 
@@ -840,7 +840,7 @@ int QC_fill (const char *query_str,
     }
     else if ((query_command->b == 1) && (query_command->fast == 1)) {
     /* -b -F is error, we need person/role/organisation objects */
-    /* ERROR:206 */
+    /* ERROR:109 */
         char *fmt = ca_get_qc_fmt_uncompflag;
         query_command->parse_messages = g_list_append(query_command->parse_messages, g_strdup_printf(fmt,"-b","-F"));
 
@@ -849,7 +849,7 @@ int QC_fill (const char *query_str,
     }
     else if ((query_command->b == 1) && (query_command->recursive == 0)) {
     /* -b -r is error, we need person/role/organisation objects */
-    /* ERROR:206 */
+    /* ERROR:109 */
         char *fmt = ca_get_qc_fmt_uncompflag;
         query_command->parse_messages = g_list_append(query_command->parse_messages, g_strdup_printf(fmt,"-b","-r"));
 
@@ -859,7 +859,7 @@ int QC_fill (const char *query_str,
 
     if ((query_command->b == 1) && (query_command->G_group_search == 0)) {
     /* -G -b is error, we need grouping */
-    /* ERROR:206 */
+    /* ERROR:109 */
         char *fmt = ca_get_qc_fmt_uncompflag;
         query_command->parse_messages = g_list_append(query_command->parse_messages, g_strdup_printf(fmt,"-b","-G"));
         UT_free(fmt);
@@ -868,7 +868,7 @@ int QC_fill (const char *query_str,
 
     if ((query_command->b == 1) && (query_command->B == 1)) {
     /* -b -B is error: can't be brief and original */
-    /* ERROR:206 */
+    /* ERROR:109 */
         char *fmt = ca_get_qc_fmt_uncompflag;
         query_command->parse_messages = g_list_append(query_command->parse_messages, g_strdup_printf(fmt,"-b","-B"));
         UT_free(fmt);

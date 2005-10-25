@@ -9,7 +9,7 @@
   notes:
     Tokens are defined in the associated grammar, mnt_routes_an.y.
 
-  $Id: mnt_routes_an.l,v 1.1 2004/12/27 17:52:39 can Exp $
+  $Id: mnt_routes_an.l,v 1.2 2005/06/24 13:03:06 peter Exp $
 */
 
 /******************
@@ -40,14 +40,18 @@ IPV4           {INT}(\.{INT}){3}
 IPV6           {QUAD}(:{QUAD}){7}
 IPV6DC         (({QUAD}:){0,6}{QUAD})?::({QUAD}(:{QUAD}){0,6})?
 PRFXV4         {IPV4}\/{INT}
+PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 PRFXV6         {IPV6}\/{INT}
+PRFXV6RNG      {PRFXV6}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 PRFXV6DC       {IPV6DC}\/{INT}
+PRFXV6DCRNG    {PRFXV6DC}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 MNTNER         [A-Z0-9]([A-Z0-9_-]*[A-Z0-9])?
 
 %{
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <iproutines.h>
 
 /* tokens defined in the grammar */
 #include "mnt_routes_an.tab.h"
@@ -66,97 +70,136 @@ void yy_input(char *buf, int *result, int max_size);
 
 ANY     { return KEYW_ANY; }
 
+{MNTNER}           { return TKN_MNTNER; }
+
+
 {PRFXV4} {
-    /* check each number of 1.2.3.4/5 in prefix is valid */
-    long int val;
-    char *s, *p;
-    p = s = yytext;
-    while (*s != '/') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
-             syntax_error("IP prefix \"%s\" contains an invalid octet", 
-                          yytext);
-        }
-        p = s + 1;
-    }
-    val = strtol(p, NULL, 10);
-    if ((val < 0) || (val > 32)) {
-        syntax_error("IP prefix \"%s\" contains an invalid prefix length", 
-                     yytext);
+    ip_prefix_t ptr;
+    int retval;
+
+    retval = IP_pref_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+        all the rest is parser error */
+      case IP_OK: return TKN_PRFXV4;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      default: syntax_error("IP prefix \"%s\" contains invalid prefix", yytext);
+                     break;
     }
     return TKN_PRFXV4;
 }
 
 {PRFXV6} {
-    /* check each quad of 1A:3:7:8:AAAA:BBBB:DEAD:BEEF/55 in prefix is valid */
-    long int val;
-    char *s, *p;
-    p = s = yytext;
-    while (*s != '/') {
-        val = strtol(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
-             syntax_error("IPv6 prefix \"%s\" contains an invalid quad",
-                          yytext);
-        }
-        p = s + 1;
-    }
-    val = strtol(p, NULL, 10);
-    if ((val < 0) || (val > 128)) {
-        syntax_error("IPv6 prefix \"%s\" contains an invalid prefix length",
-                     yytext);
+    ip_prefix_t ptr;
+    int retval;
+
+    retval = IP_pref_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+        all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6;
+                  break;
+      case IP_INVBIT: syntax_error("IPv6 prefix \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      default: syntax_error("IPv6 prefix \"%s\" contains invalid prefix", yytext);
+                     break;
     }
     return TKN_PRFXV6;
 }
-
 {PRFXV6DC} {
-    /* check each quad of 1A::AAAA:BBBB:DEAD:BEEF/55 in prefix is valid */
-    long int val;
-    char *s, *p, *r;
-    int leftquads = 0;
-    int rightquads = 0;
+    ip_prefix_t ptr;
+    int retval;
 
-    r = p = s = yytext;
-    while (*s != '/') {
-        val = strtol(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
-             syntax_error("IPv6 prefix \"%s\" contains an invalid quad",
-                          yytext);
-        }
-        p = s + 1;
+    retval = IP_pref_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+        all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6DC;
+                  break;
+      case IP_INVBIT: syntax_error("IPv6 prefix \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      default: syntax_error("IPv6 prefix \"%s\" contains invalid prefix", yytext);
+                     break;
     }
-    val = strtol(p, NULL, 10);
-    if ((val < 0) || (val > 128)) {
-        syntax_error("IPv6 prefix \"%s\" contains an invalid prefix length",
-                     yytext);
-    }
-
-    /* And now, count colons to the left of "::" - this is
-       one less then the number of left quads */
-
-    r = strchr(yytext, ':');
-    leftquads++;
-    while (r[1] != ':') {
-        leftquads++;
-        r = strchr(r+1, ':');
-    }
-    /* skip "::" */
-    r += 2;
-    /* count colons to the right of "::" - one less then the number of right quads */
-    if (r[0] != '\0') {
-        do {
-            rightquads++;
-            r = strchr(r+1, ':');
-        } while (r != NULL);
-    }
-    /* check for too many quads */
-    if ((leftquads + rightquads) > 8) {
-        syntax_error("IPv6 address \"%s\" contains too many digits", yytext);
-    }
-
     return TKN_PRFXV6DC;
 }
 
-{MNTNER}           { return TKN_MNTNER; }
+
+{PRFXV4RNG} {
+    /* check the prefix range by converting it and 
+       issue syntax errors based on the error codes */
+
+    ip_prefix_range_t ptr;
+    int retval;
+
+    retval = IP_pref_rang_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+         all the rest is parser error */
+      case IP_OK: return TKN_PRFXV4RNG;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix range \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      case IP_NOLEN: syntax_error("IP prefix range \"%s\" range is not within the prefix length", yytext);
+                     break;
+      case IP_NORANG: syntax_error("IP prefix range \"%s\" range end is less than end start", yytext);
+                     break;
+      default: syntax_error("IP prefix range \"%s\" contains invalid prefix range", yytext);
+                     break;
+    }
+}
+
+
+{PRFXV6RNG} {
+    /* check the prefix range by converting it and 
+       issue syntax errors based on the error codes */
+
+    ip_prefix_range_t ptr;
+    int retval;
+
+    retval = IP_pref_rang_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+         all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6RNG;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix range \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      case IP_NOLEN: syntax_error("IP prefix range \"%s\" range is not within the prefix length", yytext);
+                     break;
+      case IP_NORANG: syntax_error("IP prefix range \"%s\" range end is less than end start", yytext);
+                     break;
+      default: syntax_error("IP prefix range \"%s\" contains invalid prefix range", yytext);
+                     break;
+    }
+}
+
+
+{PRFXV6DCRNG} {
+    /* check the prefix range by converting it and 
+       issue syntax errors based on the error codes */
+
+    ip_prefix_range_t ptr;
+    int retval;
+
+    retval = IP_pref_rang_t2b(&ptr, yytext, IP_PLAIN);
+    switch (retval) {
+      /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
+         all the rest is parser error */
+      case IP_OK: return TKN_PRFXV6DCRNG;
+                  break;
+      case IP_INVBIT: syntax_error("IP prefix range \"%s\" doesn't start on the correct boundary", yytext);
+                     break;
+      case IP_NOLEN: syntax_error("IP prefix range \"%s\" range is not within the prefix length", yytext);
+                     break;
+      case IP_NORANG: syntax_error("IP prefix range \"%s\" range end is less than end start", yytext);
+                     break;
+      default: syntax_error("IP prefix range \"%s\" contains invalid prefix range", yytext);
+                     break;
+    }
+}
 
 . { return yytext[0]; }
 

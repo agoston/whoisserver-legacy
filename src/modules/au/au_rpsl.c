@@ -912,7 +912,7 @@ route6_rpsl_create (au_plugin_callback_info_t *info)
       /* check for exact match route prefix or inetnum */
       if ( ! strcmp(type, "route6") )
       {
-        if ( ! strcmp( attr_value, parent_attr_value ) )
+        if ( ! strcasecmp( attr_value, parent_attr_value ) )
         {
           exact = TRUE;
         }

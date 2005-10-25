@@ -3,7 +3,8 @@
   filename: mnt_routes6.y
 
   description:
-    Defines the grammar for an RPSSng mnt-routes6 attribute.
+    Defines the grammar for an RPSSng mnt-routes attribute
+    of inet6num class.
 
   notes:
     Defines tokens for the associated lexer, mnt_routes6.l.
@@ -35,17 +36,23 @@
 int yyerror(const char *s);
 %}
 
-%token TKN_IPV6DC TKN_MNTNER KEYW_ANY
+%token TKN_PRFXV4 TKN_PRFXV6 TKN_PRFXV6DC TKN_MNTNER KEYW_ANY TKN_PRFXV4RNG TKN_PRFXV6RNG TKN_PRFXV6DCRNG
 
 %%
 
-mnt_routes6: TKN_MNTNER
-| TKN_MNTNER '{' ipv6_prefix_list '}'
-| TKN_MNTNER '{' KEYW_ANY '}'
+mnt_routes_an: TKN_MNTNER
+| TKN_MNTNER '{' ip_prefix_list '}'
+| TKN_MNTNER KEYW_ANY 
 ;
 
-ipv6_prefix_list: TKN_IPV6DC
-| ipv6_prefix_list ',' TKN_IPV6DC
+ip_prefix_list: TKN_PRFXV6
+| TKN_PRFXV6RNG
+| TKN_PRFXV6DC
+| TKN_PRFXV6DCRNG
+| ip_prefix_list ',' TKN_PRFXV6
+| ip_prefix_list ',' TKN_PRFXV6RNG
+| ip_prefix_list ',' TKN_PRFXV6DC
+| ip_prefix_list ',' TKN_PRFXV6DCRNG
 ;
 
 %%

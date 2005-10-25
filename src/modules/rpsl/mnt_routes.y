@@ -14,7 +14,7 @@
 %}
 
 %token KEYW_ANY
-%token TKN_PRFXV4RNG TKN_MNTNER
+%token TKN_PRFXV4 TKN_PRFXV4RNG TKN_MNTNER
 
 %{
 #include <stdio.h>
@@ -34,18 +34,15 @@ int main();
 mnt_routes: TKN_MNTNER opt_item_list;
 
 opt_item_list:
-| '{' item_list '}'
+| '{' prefix_range_list '}'
+| KEYW_ANY
 ;
 
-item_list: KEYW_ANY
-| prefix_range_list 
+prefix_range_list: prefix_range_item
+| prefix_range_list ',' prefix_range_item
 ;
 
-prefix_range_list: prefix_range
-| prefix_range_list ',' prefix_range
-;
-
-prefix_range: TKN_PRFXV4RNG
+prefix_range_item: TKN_PRFXV4RNG | TKN_PRFXV4
 ;
 
 %%

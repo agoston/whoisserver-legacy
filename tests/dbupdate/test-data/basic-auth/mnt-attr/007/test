@@ -1,7 +1,7 @@
 # mnt-attr tests
 # CASE 7: We try to create 20.13.0.0/16 route object. 
-#         mnt-routes contains invalid prefix range (no "^") 
-#         general parse error
+#         mnt-routes contains prefix not on correct boundary
+#         returns error
 %
 #
 # create route object 

@@ -19,8 +19,9 @@ status:       ASSIGNED PA
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       RIPE-NCC-HM-MNT
-mnt-routes:       RIPE-NCC-HM-MNT {80.16.0.0/16^+, 80.16.0.0/16^-, 80.16.0.0/16^16, 80.16.0.0/16^16-24}
-mnt-routes:       RIPE-NCC-HM-MNT {ANY }
+mnt-routes:       RIPE-NCC-HM-MNT {80.16.0.0/16^+, 80.16.0.0/16^-, 80.16.0.0/16^16, 80.16.0.0/16^16-24, 80.16.0.0/24}
+mnt-routes:       RIPE-NCC-HM-MNT ANY
+mnt-routes:       RIPE-NCC-HM-MNT {80.16.0.0/16, 80.16.0.0/16^+}
 notify:       dbtest@ripe.net
 changed: dbtest@ripe.net 20021111
 source:       DB-TEST

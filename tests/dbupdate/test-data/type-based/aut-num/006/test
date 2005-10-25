@@ -1,5 +1,5 @@
 
-# CASE 6: We try to create aut-num object AS123 with mnt-routes only {ANY}
+# CASE 6: We try to create aut-num object AS123 with mnt-routes only ANY
 %
 % requires initial objects to be loaded
 #
@@ -19,7 +19,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 notify:       dbtest@ripe.net
 mnt-by:       RIPE-NCC-HM-MNT
-mnt-routes:   RIPE-NCC-HM-MNT {ANY }
+mnt-routes:   RIPE-NCC-HM-MNT ANY
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
