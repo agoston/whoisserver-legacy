@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.3 2005/06/07 13:22:05 katie Exp $
+$Id: syntax.xml,v 1.3.2.1 2005/07/22 12:21:59 katie Exp $
 
 -->
 
@@ -1159,7 +1159,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
    <attribute_syntax name="ds-rdata">
       <core>
           <regex>
-              ^.{1,80}$
+              ^.{1,255}$
           </regex>
        </core>
        <front_end>

@@ -2028,7 +2028,7 @@ syntax_t syntax_tab[] = {
         /* name */
         "ds-rdata",
         /* core_regex_pattern */
-        "^.{1,80}$",
+        "^.{1,255}$",
         /* core_regex, set by syntax_init() */
         NULL,
         /* core_reserved_regex_pattern */
