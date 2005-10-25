@@ -1,5 +1,5 @@
 /*
- * $Id: ns_auth.c,v 1.1 2004/12/27 17:52:36 can Exp $
+ * $Id: ns_auth.c,v 1.1.4.1 2005/07/22 12:24:31 katie Exp $
  */
 
 #include "rip.h"
@@ -119,6 +119,7 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
   rpsl_object_t *old_object;
   gchar *domain = NULL;         /* domain entries */
   gchar **nservers;             /* array of nserver entries */
+  gchar **ds_rdata;             /* array of ds-rdata entries */
   gboolean override;
   gchar *delcheck_conf_file;    /* conf file to use in delchecker */
 
@@ -161,12 +162,27 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
           if (au_check_result != AU_AUTHORISED) {
             ret_val = au_check_result;
           } else {
-            /* do the delcheck */
-            au_check_result =
-                ns_domain_delcheck(info, domain, nservers,
-                                   delcheck_conf_file);
+            /* find ds-rdata records */
+            ds_rdata = ns_ds_rdata(info->obj, info->ctx, domain, &au_check_result);
             if (au_check_result != AU_AUTHORISED) {
               ret_val = au_check_result;
+            } else {
+              
+              if (ds_rdata != NULL && ns_ds_accepted(domain) == FALSE) {
+                 RT_ds_not_accepted(info->ctx);
+                 au_check_result = AU_UNAUTHORISED_CONT;
+              }
+              else {
+                /* call delcheck */
+                au_check_result = ns_domain_delcheck(info, domain, nservers, ds_rdata, delcheck_conf_file);
+              }
+
+              if (ds_rdata != NULL)  {
+                g_strfreev(ds_rdata);
+              }
+              if (au_check_result != AU_AUTHORISED) {
+                ret_val = au_check_result;
+              }
             }
           }
           if (nservers != NULL) {
@@ -271,6 +287,7 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
   gchar *domain = NULL;         /* domain name of the object */
   gchar *source = NULL;         /* domain name of the object */
   gchar **nservers = NULL;      /* array of nserver entries */
+  gchar **ds_rdata = NULL;      /* array of ds-rdata entries*/
   AU_ret_t au_check_result;     /* result returned from functions */
   GList *source_attrs;          /* used to retrieve source attribute */
   gboolean override;
@@ -302,6 +319,9 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
       if (au_check_result != AU_AUTHORISED) {
         ret_val = AU_UNAUTHORISED_CONT;
       } else {
+        
+        /* find ds-rdata records */
+        ds_rdata = ns_ds_rdata(info->obj, info->ctx, domain, &au_check_result);
 
         /* Check if we're the related party, fail if not */
         au_check_result = ns_find_rir(info, domain);
@@ -322,10 +342,16 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
               ret_val = au_check_result;
             } else {
 
-              /* Do the delcheck, baby */
-              au_check_result =
-                  ns_domain_delcheck(info, domain, nservers,
+              if ( ds_rdata != NULL && ns_ds_accepted(domain) == FALSE) {
+                  RT_ds_not_accepted(info->ctx);
+                  au_check_result = AU_UNAUTHORISED_CONT;
+              }
+              else {
+                /* call delcheck */
+                au_check_result =
+                  ns_domain_delcheck(info, domain, nservers, ds_rdata,
                                      delcheck_conf_file);
+              }
               if (au_check_result != AU_AUTHORISED) {
                 ret_val = au_check_result;
               }
@@ -349,6 +375,9 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
   }
   if (nservers != NULL) {
     g_strfreev(nservers);
+  }
+  if (ds_rdata != NULL) {
+    g_strfreev(ds_rdata);
   }
   if (delcheck_conf_file != NULL) {
     g_free(delcheck_conf_file);

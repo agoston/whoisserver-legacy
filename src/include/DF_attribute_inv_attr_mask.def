@@ -1,1 +1,1 @@
-#define INV_ATTR_MASK A_AM, A_AC, A_AT, A_AH, A_FP, A_MR, A_MB, A_ML, A_MZ, A_MD, A_MN, A_RN, A_MU, A_NY, A_OR, A_RB, A_NS, A_RZ, A_SD, A_TC, A_OG, A_DT, A_ZC, A_LA, A_MO, A_MI, A_IY, A_FR, MA_END
+#define INV_ATTR_MASK A_AM, A_AC, A_AT, A_AH, A_DS, A_FP, A_MR, A_MB, A_ML, A_MZ, A_MD, A_MN, A_RN, A_MU, A_NY, A_OR, A_RB, A_NS, A_RZ, A_SD, A_TC, A_OG, A_DT, A_ZC, A_LA, A_MO, A_MI, A_IY, A_FR, MA_END

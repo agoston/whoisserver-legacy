@@ -18,6 +18,7 @@ char * const Attribute_names[] = {
   "descr",
   "dom-net",
   "domain",
+  "ds-rdata",
   "e-mail",
   "export",
   "mp-export",

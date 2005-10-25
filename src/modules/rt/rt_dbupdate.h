@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.8 $
+  $Revision: 1.5.2.1 $
 
   Reporting module.
 
@@ -182,6 +182,7 @@ void RT_RIP_update_ok(RT_context_t* ctx);
 void RT_non_exist_mntner(RT_context_t* ctx, const gchar* mntner);
 void RT_parent_not_exist(RT_context_t* ctx);
 void RT_overlap_inetnums(RT_context_t* ctx, GList *overlap);
+void RT_ds_not_accepted(RT_context_t* ctx);
 void RT_origin_not_exist(RT_context_t* ctx);
 void RT_slash_not_allowed(RT_context_t* ctx);
 void RT_manual_creation(RT_context_t* ctx);

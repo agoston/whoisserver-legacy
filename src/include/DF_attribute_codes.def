@@ -18,6 +18,7 @@ char * const Attribute_codes[] = {
   "de",
   "di",
   "dn",
+  "ds",
   "em",
   "ex",
   "me",

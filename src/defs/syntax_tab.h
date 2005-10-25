@@ -2023,6 +2023,34 @@ syntax_t syntax_tab[] = {
         NULL,
         /* front_end_parser */
         NULL 
+    },
+    {
+        /* name */
+        "ds-rdata",
+        /* core_regex_pattern */
+        "^.{1,255}$",
+        /* core_regex, set by syntax_init() */
+        NULL,
+        /* core_reserved_regex_pattern */
+        NULL,
+        /* core_reserved_regex, set by syntax_init() */
+        NULL,
+        /* core_parser_reset */
+        NULL,
+        /* core_parser */
+        NULL,
+        /* front_end_regex_pattern */
+        "^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])( ([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))( ([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])|RSAMD5|DH|DSA|ECC|RSASHA1|INDIRECT|PRIVATEDNS|PRIVATEOID)([ 0-9a-fA-F]{1,128})$",
+        /* front_end_regex, set by syntax_init() */
+        NULL,
+        /* front_end_reserved_regex_pattern */
+        NULL,
+        /* front_end_reserved_regex, set by syntax_init() */
+        NULL,
+        /* front_end_parser_reset */
+        NULL,
+        /* front_end_parser */
+        NULL 
     }
 };
 

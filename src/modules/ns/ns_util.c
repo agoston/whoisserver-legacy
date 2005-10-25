@@ -1,5 +1,5 @@
 /*
- * $Id: ns_util.c,v 1.4 2005/09/07 10:47:32 can Exp $
+ * $Id: ns_util.c,v 1.3.2.1 2005/07/22 12:24:31 katie Exp $
  */
 
 #include "ns_util.h"
@@ -101,6 +101,47 @@ gchar *ns_par(gchar * str)
   g_free(p);
 
   return (resultp);
+}
+
+
+/* Extract the related ds-rdata attributes */
+
+gchar **ns_ds_rdata(rpsl_object_t * obj, RT_context_t * ctx,
+                    gchar * domain, AU_ret_t * result)
+{
+  GList *ds_rdata_attrs;        /* ds-rdata attributes from rpsl object */
+  gchar *str;                   /* generic temporary string */
+  gchar **ds_rdata;             /* result */
+  int length;                   /* number of attrs */
+  int i;                        /* count */
+  GList *item;                  /* temp GList item */ 
+
+  ds_rdata_attrs = rpsl_object_get_attr(obj, "ds-rdata");
+
+  if (ds_rdata_attrs == NULL) { 
+    LG_log(au_context, LG_DEBUG, "object contains no ds-rdata");
+    *result = AU_AUTHORISED;
+    ds_rdata = NULL;
+  }
+  else 
+  {  /* extract ds-rdata records */
+     length = g_list_length(ds_rdata_attrs);
+     ds_rdata = g_new(char *, length + 1);
+     i = 0;
+     for( item = g_list_first(ds_rdata_attrs); item != NULL; item = g_list_next(item))
+     {
+          str = rpsl_attr_get_clean_value((rpsl_attr_t *) (item->data));
+          ds_rdata[i] = g_strdup(str);
+          LG_log(au_context, LG_DEBUG, "found ds-rdata value: [%s]", str);
+          ds_rdata[i + 1] = NULL;
+          free(str);
+          i++;
+     }
+     rpsl_attr_delete_list(ds_rdata_attrs);
+     *result = AU_AUTHORISED;
+  }
+  return ds_rdata;
+
 }
 
 /*

@@ -3,7 +3,7 @@
 <!-- XXX: will want to add core template in the future, to 
           document which fields are mandatory for core (e.g. nic-hdl) -->
 
-<ripe_classes version="$Revision: 1.7 $" author="$Author: arife $">
+<ripe_classes version="$Revision: 1.8.2.2 $" author="$Author: katie $">
 
   <ripe_class name="domain" main_sql_table="domain" code="dn">
     <description>
@@ -19,6 +19,7 @@
       <tech-c      choice="mandatory" number="multiple" />
       <zone-c      choice="mandatory" number="multiple" />
       <nserver     choice="optional"  number="multiple" />
+      <ds-rdata    choice="optional"  number="multiple" />
       <sub-dom     choice="optional"  number="multiple" />
       <dom-net     choice="optional"  number="multiple" />
       <remarks     choice="optional"  number="multiple" />
@@ -50,6 +51,7 @@
       <table name="inaddr_arpa"/>
       <table name="ip6int"/>
       <table name="org"/>
+      <table name="ds_rdata"/>
     </affected-tables>
   </ripe_class>
 
@@ -229,11 +231,11 @@
       <table name="mnt_nfy"/>
       <table name="auth"/>
       <table name="notify"/>
+      <table name="abuse_mailbox"/>
       <table name="mnt_by"/>
       <table name="auth_override"/>
       <table name="referral_by"/>
       <table name="org"/>
-      <table name="abuse_mailbox"/>
     </affected-tables>
     <delete-invquery-tables>
       <table name="mnt_by"/>
@@ -925,10 +927,10 @@
       <table name="admin_c"/>
       <table name="tech_c"/>
       <table name="notify"/>
+      <table name="abuse_mailbox"/>
       <table name="mnt_by"/>
       <table name="auth"/>
       <table name="irt_nfy"/>
-      <table name="abuse_mailbox"/>
       <table name="org"/>
     </affected-tables>
     <delete-invquery-tables>

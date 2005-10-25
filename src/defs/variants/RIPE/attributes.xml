@@ -1,6 +1,6 @@
 <!DOCTYPE ripe_attributes SYSTEM "attributes.dtd">
 
-<ripe_attributes version="$Revision: 1.3 $" author="$Author: arife $">
+<ripe_attributes version="$Revision: 1.3.2.2 $" author="$Author: katie $">
 
   <ripe_attribute name="abuse-mailbox" code="am">
     <description>
@@ -356,6 +356,43 @@
         <radixquery keytype="wk_ip6prefix" space="IP_V6" />
       </queries>
     </keys>
+  </ripe_attribute>
+
+
+  <ripe_attribute name="ds-rdata" code="ds">
+    <description>
+      DS records for this domain.
+    </description>
+    <syntax>ds-rdata</syntax>
+
+    <representation> 
+    <sqltable name="ds_rdata">
+      <insert qtype="ud_leaf_">
+        INSERT ds_rdata 
+        SET thread_id=%d, object_id=%ld, ds_rdata='%s'
+      </insert>
+      <update qtype="ud_leaf_">
+        UPDATE ds_rdata 
+        SET thread_id=%d 
+        WHERE object_id=%ld 
+        AND ds_rdata='%s'
+      </update>
+    </sqltable>
+    </representation>
+
+    <keys searchable="inverse">
+
+      <queries>
+        <sqlquery keytype="wk_ds_rdata" class="dn">
+          SELECT object_id,0
+          FROM   ds_rdata i
+          WHERE  i.ds_rdata = '%s'
+          AND    i.thread_id = 0        
+        </sqlquery>
+      </queries>
+
+   </keys>
+
   </ripe_attribute>
 
   <ripe_attribute name="e-mail" code="em">

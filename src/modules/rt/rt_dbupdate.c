@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.8 $
+  $Revision: 1.5.2.1 $
 
   Reporting module.
 
@@ -1223,6 +1223,20 @@ void RT_parent_not_exist(RT_context_t* ctx) {
 
   rt_prepare_node(ctx, node);
 }
+
+/*+
+  RT_ds_not_accepted - Report that we don't accept DS records for this zone
+
+  RT_context_t* ctx - Context.
+  +*/
+void RT_ds_not_accepted(RT_context_t* ctx) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"ds_not_accepted");
+
+  rt_prepare_node(ctx, node);
+}
+
 
 /*+
   RT_origin_not_exist - Report that route object has no origin AS in the DB

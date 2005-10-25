@@ -66,6 +66,7 @@ DROP TABLE IF EXISTS poem;
 DROP TABLE IF EXISTS poetic_form;
 DROP TABLE IF EXISTS form;
 DROP TABLE IF EXISTS abuse_mailbox;
+DROP TABLE IF EXISTS ds_rdata;
 
 
 
@@ -546,6 +547,16 @@ CREATE TABLE fingerpr (
   PRIMARY KEY  (fingerpr,object_id)
 );
 
+#
+# Table structure for table 'ds_rdata'
+#
+
+CREATE TABLE ds_rdata (
+  thread_id int(11) NOT NULL default '0',
+  object_id int(10) unsigned NOT NULL default '0',
+  ds_rdata varchar(80) NOT NULL default '',
+  PRIMARY KEY  (ds_rdata,object_id)
+);
 #
 # Table structure for table 'nserver'
 #
