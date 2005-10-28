@@ -109,6 +109,10 @@
           between 0-255 and the first number must be less than the second.
 </xsl:template>
 
+<xsl:template match="ds_not_accepted">
+
+***Error: DS records are not accepted for this zone.
+</xsl:template>
 
   <xsl:template match="syntax_error">
 <xsl:text>
