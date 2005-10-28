@@ -77,6 +77,12 @@
 </xsl:template>
 
 
+<xsl:template match="ds_not_accepted"
+
+***Error: DS records are not accepted for this zone.
+</xsl:template>
+
+
   <xsl:template match="syntax_error">
 <xsl:text>
 ***Error: Syntax error in object
