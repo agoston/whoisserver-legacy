@@ -250,7 +250,7 @@ CREATE TABLE interface (
   interface_v6_msp varchar(20) NOT NULL default '',
   interface_v6_lsp varchar(20) NOT NULL default '',
   interface_v4 int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (interface_v6_lsp,interface_v6_lsp,interface_v4,object_id)
+  PRIMARY KEY  (interface_v6_msp,interface_v6_lsp,interface_v4,object_id)
 );
 
 #
