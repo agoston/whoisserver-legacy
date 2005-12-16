@@ -33,8 +33,10 @@ AC_ARG_WITH(rpslvariant,
       AC_MSG_ERROR([$rpslvariant is invalid])
       ;;
   esac
+  echo "$rpslvariant" > ./rpslvariant
   AC_CONFIG_COMMANDS(rpslvariant,
   [
+      rpslvariant=`cat ./rpslvariant`
       if test x$rpslvariant = x
       then
         rpslvariant=RIPE
@@ -45,11 +47,13 @@ AC_ARG_WITH(rpslvariant,
       for file in $ac_abs_srcdir/src/defs/variants/$rpslvariant/*.xml \
                   $ac_abs_srcdir/src/defs/variants/$rpslvariant/*.h
       do
+        echo "---> $file"
         if test -f $file
         then
           if ! test -f `basename $file`
           then
-            ln -sf $file 2>/dev/null
+            echo ln -sf $file
+            ln -sf $file
           fi
         fi
       done
@@ -57,11 +61,13 @@ AC_ARG_WITH(rpslvariant,
       cd $ac_abs_builddir/include
       for file in $ac_abs_srcdir/src/defs/variants/$rpslvariant/*.def
       do
+        echo "---> $file"
         if test -f $file
         then
           if ! test -f `basename $file`
           then
-            ln -sf $file 2>/dev/null
+            echo ln -sf $file
+            ln -sf $file
           fi
         fi
       done
