@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.1 2004/12/27 18:17:04 can Exp $
+$Id: syntax.xml,v 1.4 2005/01/30 18:16:37 denis Exp $
 
 -->
 
@@ -455,8 +455,8 @@ $Id: syntax.xml,v 1.1 2004/12/27 18:17:04 can Exp $
            </regex>
        </front_end>
        <description>
-     Domain name as specified in RFC 1034 wit or without
-     railing dot (".").  The total length should not exceed
+     Domain name as specified in RFC 1034 with or without
+     trailing dot (".").  The total length should not exceed
      254 characters (octets).
        </description>
    </attribute_syntax>
@@ -474,8 +474,8 @@ $Id: syntax.xml,v 1.1 2004/12/27 18:17:04 can Exp $
            </regex>
        </front_end>
        <description>
-     Domain name as specified in RFC 1034 wit or without
-     railing dot (".").  The total length should not exceed
+     Domain name as specified in RFC 1034 with or without
+     trailing dot (".").  The total length should not exceed
      254 characters (octets).
        </description>
    </attribute_syntax>
