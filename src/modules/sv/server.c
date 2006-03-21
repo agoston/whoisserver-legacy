@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.7 $
+  $Revision: 1.8 $
 
   Example code: A server for a client to connect to.
 
@@ -692,9 +692,10 @@ int SV_start(char *pidfile) {
   }
   
   /* Set Dumpable flag - Linux specific TODO */
-  if (prctl(PR_SET_DUMPABLE,1,0,0,0)<0) {
-    fprintf(stderr,"Warning: Can't set DUMPABLE status\n");
-  }
+  /* Removed 20060321 - add it prior to distribution */
+  //if (prctl(PR_SET_DUMPABLE,1,0,0,0)<0) {
+  //  fprintf(stderr,"Warning: Can't set DUMPABLE status\n");
+  //}
 
 /*  SV_whois_sock = SK_getsock(SOCK_STREAM,whois_port,whois_addr); */
   
