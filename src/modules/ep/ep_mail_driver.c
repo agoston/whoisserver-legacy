@@ -133,7 +133,8 @@ EP_sig_type ep_get_sig_type(gchar *bulk_sig)
       {
         sig_type = EP_PGP;
       }
-      else if ( strstr(current_line, "application/x-pkcs7-signature") )
+      else if ( strstr(current_line, "application/x-pkcs7-signature") ||
+                strstr(current_line, "application/pkcs7-signature") )
       {
         sig_type = EP_X509;
       }
@@ -177,6 +178,7 @@ GList *ep_x509_signed_process(MM_content_t *content, GList *credentials) {
   signature = ((MM_content_t*)content->parts->next->data)->bulk_content;
 
   /* reconstruct the signed message from the mime parts */
+  /* note that the 'x-' is optional (old format) in 'x-pkcs7' */
     mess = g_string_new(NULL);
     mess = g_string_append(mess, "Content-Type: multipart/signed; protocol=\"application/x-pkcs7-signature\"; micalg=sha1; boundary=\"----bnd\"\n\n");
     mess = g_string_append(mess, "------bnd\n");
