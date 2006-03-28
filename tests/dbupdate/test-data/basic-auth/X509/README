@@ -296,5 +296,26 @@
 #          but each with the same certificate and fingerprint.
 #          Correct certificate supplied.
 #          Database has three key-cert objects with same fingerprint
+#
+# input from LIR Portal
+# ./dbupdate -c ~/db/conf/rip.config -r --cert "certificate" -f test
+#
+#
+#SUCCESS
+#
+# RESULT 23: The modify will succeed.
+
+
+# CASE 24: We try to modify a person object protected by a mntner
+#          with a password and an X509 certificate.
+#          Correct signature supplied.
+#          Use 'pkcs7-signature' instead of 'x-pkcs7-signature'
+#
+# ./dbupdate -c ~/db/conf/rip.config -rm -f test
+#
+#
+#SUCCESS
+#
+# RESULT 24: The modify will succeed.
 
 
