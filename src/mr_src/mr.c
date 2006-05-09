@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.7 $
+  $Revision: 1.1 $
 
   Wrapper for NRTM client
 
@@ -12,9 +12,9 @@
         andrei (17/01/2000) Created.
   ******************/ /******************
   Copyright (c) 2000                             RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -33,7 +33,7 @@
 
 #include "rip.h"
 
-#include <stdio.h> 
+#include <stdio.h>
 #include <unistd.h>
 #include <sys/param.h>
 #include <sys/types.h>
@@ -54,7 +54,8 @@ int main(int argc, char **argv)
 char input[MAX_INPUT_SIZE], output[MAX_INPUT_SIZE+1];
 char *mserver=NULL;
 int listen_port=0, connect_port=0;
-int listening_socket, client_socket, server_socket;
+int client_socket, server_socket;
+int listening_socket;
 sk_conn_st client_conn;
 struct hostent *hptr;
 struct sockaddr_in serv_addr;
@@ -79,7 +80,7 @@ LG_context_t *null_ctx;
      switch (c) {
       case 'l':
 	listen_port = atoi(optarg);
-	break;	
+	break;
       case 'h':
 	mserver = optarg;
 	break;
@@ -88,7 +89,7 @@ LG_context_t *null_ctx;
 	break;
       case 'f':
         filter_name = optarg;
-	break;	
+	break;
       case '?':
       default :
 	errflg++;
@@ -99,10 +100,10 @@ LG_context_t *null_ctx;
 	exit (2);
      }
 
-  listening_socket = SK_getsock(SOCK_STREAM, listen_port, BACKLOG, INADDR_ANY);
+  listening_socket = SK_getsock(NULL, listen_port, SOCK_STREAM, BACKLOG);
   bzero(&timeout, sizeof(timeout));
   timeout.tv_sec=TIMEOUT;
-  
+
   while (1) {
      client_socket = SK_accept_connection(listening_socket);
      if(client_socket==-1) {fprintf(stderr, "cannot accept client\n"); continue; }
@@ -117,16 +118,16 @@ LG_context_t *null_ctx;
      if ((server_socket=socket(AF_INET, SOCK_STREAM, 0))==-1){
        perror("socket");
        exit(1);
-     }  
+     }
      hptr=gethostbyname(mserver);
-     if (hptr) { 
+     if (hptr) {
         paddr=(struct in_addr *)hptr->h_addr;
         bzero(&serv_addr, sizeof(serv_addr));
         serv_addr.sin_family=AF_INET;
         serv_addr.sin_port=connect_port;
         memcpy(&serv_addr.sin_addr, paddr, sizeof(struct in_addr));
         fprintf(stderr,"Trying %s port %d\n", inet_ntoa(serv_addr.sin_addr), connect_port);
-        if(connect(server_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr))==-1) { 
+        if(connect(server_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr))==-1) {
           perror("connect");
 	  close(client_socket);
           close(server_socket);
@@ -141,30 +142,30 @@ LG_context_t *null_ctx;
       sleep(TIMEOUT);
       continue;
      }
-     
+
      fprintf(stderr, "Sending Invitation");
-     
+
      sprintf(output, "%s\n", input);
      res = SK_puts(server_socket, output, &timeout);
-     if(res < 0) { 
-        perror("write"); 
+     if(res < 0) {
+        perror("write");
         sleep(TIMEOUT);
         continue;
      }
      fprintf(stderr, "...sent \n");
 
      if((pid=fork())==0){
-	     close(listening_socket);
+	     SK_close(listening_socket);
 	     if(dup2(server_socket, 0)==-1) perror("dup2-serv"); ; /* provide input from the mirror server */
 	     if(dup2(client_socket, 1)==-1) perror("dup2-clnt"); ; /* direct output to the client */
 	     fprintf(stderr, "Executing convertor: %s\n", filter_name);
 	     execlp(filter_name,filter_name, NULL);
 	     fprintf(stderr, "Cannot execute %s\n", filter_name);
-     } 
+     }
      fprintf(stderr, "waiting for convertor to finish...\n");
      wait(&pid); /* wait untill conversion finishes */
      fprintf(stderr, "...converting stream done\n");
-     
+
      close(server_socket);
      close(client_socket);
 

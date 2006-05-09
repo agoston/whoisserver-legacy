@@ -7,14 +7,14 @@
   Access Control module (ac) - the header file.
 
   Status: NOT REVUED, NOT TESTED
- 
+
   Design and implementation by: Marek Bukowy
 
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -38,7 +38,7 @@
 #include "lg.h"
 
 #ifdef AC_IMPL
-#define EXTDEF 
+#define EXTDEF
 #else
 #define EXTDEF extern
 #endif
@@ -74,7 +74,7 @@ typedef enum {
    of the admin interface (with getsubopt)
 */
 char* AC_ar_acl[]  = {
-  "maxprivate",  
+  "maxprivate",
   "maxpublic",
   "maxdenials",
   "deny",
@@ -102,13 +102,13 @@ typedef struct {
   int denials;
   int queries;
   int referrals;
-  int public_objects;     
-  int private_objects;    
+  int public_objects;
+  int private_objects;
   float public_bonus;       /* those two are .. */
   float private_bonus;      /* .. maintained only in the runtime tree */
   ut_timer_t timestamp;     /* in-memory is ut_timer_t */
   int sim_connections;
-  AC_acc_status changed; 
+  AC_acc_status changed;
 } acc_st;
 
 
@@ -157,15 +157,17 @@ SQ_connection_t *AC_dbopen_admin(void);
 
 
 /* declare global accounting trees */
-EXTDEF rx_tree_t  *act_runtime;
+EXTDEF rx_tree_t  *act_runtime[MAX_IPSPACE_ID+1];
+
+/* Unused variables
 EXTDEF rx_tree_t  *act_hour;
-EXTDEF rx_tree_t  *act_minute;
+EXTDEF rx_tree_t  *act_minute;*/
 
 EXTDEF int ac_auto_save;
 
 
 /* declare global access control list tree */
-EXTDEF rx_tree_t  *act_acl;
+EXTDEF rx_tree_t  *act_acl[MAX_IPSPACE_ID+1];
 
 #undef EXTDEF
 

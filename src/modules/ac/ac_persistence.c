@@ -10,9 +10,9 @@
 
   ******************/ /******************
   Copyright (c) 2002                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -20,7 +20,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -77,7 +77,7 @@ static char on_save = 0;    /* lack of trylock in TH requires this */
 */
 void AC_decay_leaf_l(acc_st *leaf);
 char AC_prunable(acc_st *leaf);
-extern ut_timer_t oldest_timestamp;
+extern ut_timer_t oldest_timestamp[MAX_IPSPACE_ID+1];
 
 /*
   AC_acc_copy_l:
@@ -128,15 +128,17 @@ int AC_persistence_get_leaves_hook_l(rx_node_t* node, int level,
 */
 GList* ac_persistence_get_leaves() {
   GList *list;
-  int ret_err;
+  int ret_err, i;
 
   list = NULL;
 
-  TH_acquire_write_lock(&(act_runtime->rwlock));
-  rx_walk_tree(act_runtime->top_ptr, AC_persistence_get_leaves_hook_l,
-    RX_WALK_SKPGLU, 255, 0, 0, &list, &ret_err);
-  /* dieif(ret_err != RX_OK); -- can be safely ignored as result is always OK*/
-  TH_release_write_lock(&(act_runtime->rwlock));
+	for (i = MIN_IPSPACE_ID; i <= MAX_IPSPACE_ID; i++) {
+	  TH_acquire_write_lock(&(act_runtime[i]->rwlock));
+	  rx_walk_tree(act_runtime[i]->top_ptr, AC_persistence_get_leaves_hook_l,
+	    RX_WALK_SKPGLU, 255, 0, 0, &list, &ret_err);
+	  /* dieif(ret_err != RX_OK); -- can be safely ignored as result is always OK*/
+	  TH_release_write_lock(&(act_runtime[i]->rwlock));
+	}
 
   return list;
 } /* ac_persistence_get_leaves */
@@ -151,11 +153,42 @@ void AC_delete_timestamp_l(SQ_connection_t* conn) {
   sprintf(delete_query,
           "DELETE FROM access "
           "      WHERE timestamp<%11.0f AND addr_passes=0 AND denials=0 ",
-          ceil(UT_time_getvalue(&oldest_timestamp)) - 10);
-  //printf("%s\n", delete_query);
-  SQ_execute_query(conn, delete_query, NULL); //ignoring ?!?
+          ceil(UT_time_getvalue(&oldest_timestamp[IP_V4])) - 10);
+  SQ_execute_query(conn, delete_query, NULL);
+
+	/* ... and the same for v6 table */
+  sprintf(delete_query,
+          "DELETE FROM access6 "
+          "      WHERE timestamp<%11.0f AND addr_passes=0 AND denials=0 ",
+          ceil(UT_time_getvalue(&oldest_timestamp[IP_V6])) - 10);
+  SQ_execute_query(conn, delete_query, NULL);
 }
 
+
+int AC_persistence_get_resultset(SQ_connection_t* sql_conn, int space, SQ_result_set_t **rs) {
+  switch (space) {
+  	case IP_V4:
+  		return SQ_execute_query(sql_conn, "SELECT connections, "
+	                                         "addr_passes, denials, queries, "
+	                                         "referrals, public_objects, "
+	                                         "private_objects, public_bonus, "
+	                                         "private_bonus, timestamp, prefix, "
+	                                         "prefix_length "
+                                 				"FROM   access", rs);
+
+    case IP_V6:
+  		return SQ_execute_query(sql_conn, "SELECT connections, "
+	                                         "addr_passes, denials, queries, "
+	                                         "referrals, public_objects, "
+	                                         "private_objects, public_bonus, "
+	                                         "private_bonus, timestamp, prefix1, "
+	                                         "prefix2, prefix3, prefix4, prefix_length  "
+                                 				"FROM   access6", rs);
+
+		default:
+			die;
+  }
+}
 /*
   AC_persistence_load:
 
@@ -188,82 +221,137 @@ void AC_persistence_load(void) {
   SQ_connection_t* sql_conn;
   SQ_result_set_t* rs;
   SQ_row_t *row;
-  int ret_err = RX_OK;
+  int ret_err = RX_OK, i;
   unsigned long timestamp;
 
 
   sql_conn = AC_dbopen_admin();
 
-  if (SQ_execute_query(sql_conn, "SELECT prefix, prefix_length, connections, "
-                                         "addr_passes, denials, queries, "
-                                         "referrals, public_objects, "
-                                         "private_objects, public_bonus, "
-                                         "private_bonus, timestamp "
-                                 "FROM   access", &rs) == 0) {
-    TH_acquire_write_lock(&(act_runtime->rwlock));
+	for (i = MIN_IPSPACE_ID; i <= MAX_IPSPACE_ID; i++) {
+	  if (AC_persistence_get_resultset(sql_conn, i, &rs) == 0) {
+	    TH_acquire_write_lock(&(act_runtime[i]->rwlock));
 
-    while ((row = SQ_row_next(rs)) != NULL && ret_err == RX_OK) {
-      acc_st *acc;
-      ip_prefix_t ip;
+	    while ((row = SQ_row_next(rs)) != NULL && ret_err == RX_OK) {
+	      acc_st *acc;
+	      ip_prefix_t ip;
 
-      /* Repeat with me: With pre-historic languages you have to do basic
-                         memory management. 8-) */
-      acc = UT_malloc(sizeof(acc_st));
+	      /* Repeat with me: With pre-historic languages you have to do basic
+	                         memory management. 8-) */
+	      acc = UT_malloc(sizeof(acc_st));
 
-      IP_pref_f2b_v4(&ip, 
-                     SQ_get_column_string_nocopy(rs, row, 0),
-                     SQ_get_column_string_nocopy(rs, row, 1));
+	      switch (i) {
+	      	case IP_V4:
+	      		IP_pref_f2b_v4(&ip,
+	          		           SQ_get_column_string_nocopy(rs, row, 10),
+	              		       SQ_get_column_string_nocopy(rs, row, 11));
+		       	break;
 
-      /*
-        SQ_get_column_int errors are not detected.
-        In theory it should not be a problem
-      */
-      SQ_get_column_int(rs, row,  2, (long *)&acc->connections);
-      SQ_get_column_int(rs, row,  3, (long *)&acc->addrpasses);
-      SQ_get_column_int(rs, row,  4, (long *)&acc->denials);
-      SQ_get_column_int(rs, row,  5, (long *)&acc->queries);
-      SQ_get_column_int(rs, row,  6, (long *)&acc->referrals);
-      SQ_get_column_int(rs, row,  7, (long *)&acc->public_objects);
-      SQ_get_column_int(rs, row,  8, (long *)&acc->private_objects);
-      acc->public_bonus = atof(SQ_get_column_string_nocopy(rs, row, 9));
-      acc->private_bonus = atof(SQ_get_column_string_nocopy(rs, row, 10));
-      SQ_get_column_int(rs, row, 11, (long*)&timestamp);
+		      case IP_V6:
+	      		IP_pref_f2b_v6_32(&ip,
+	          		           SQ_get_column_string_nocopy(rs, row, 10),
+	          		           SQ_get_column_string_nocopy(rs, row, 11),
+	          		           SQ_get_column_string_nocopy(rs, row, 12),
+	          		           SQ_get_column_string_nocopy(rs, row, 13),
+	              		       SQ_get_column_string_nocopy(rs, row, 14));
+		       	break;
+	      }
 
-      UT_time_set(&acc->timestamp, timestamp, 0);
+	      /*
+	        SQ_get_column_int errors are not detected.
+	        In theory it should not be a problem
 
-      /* clear simultaneous connections counter */
+	        FIXME: on x86+gcc, sizeof(long)==sizeof(int), however, this is not
+	        			 necessarily true on other platforms, which leads to 0s in all
+	        			 fields on lsb->msb architectures
+	        			 Should fix SQ_* module declaration to int*
+	      */
+	      SQ_get_column_int(rs, row,  0, (long *)&acc->connections);
+	      SQ_get_column_int(rs, row,  1, (long *)&acc->addrpasses);
+	      SQ_get_column_int(rs, row,  2, (long *)&acc->denials);
+	      SQ_get_column_int(rs, row,  3, (long *)&acc->queries);
+	      SQ_get_column_int(rs, row,  4, (long *)&acc->referrals);
+	      SQ_get_column_int(rs, row,  5, (long *)&acc->public_objects);
+	      SQ_get_column_int(rs, row,  6, (long *)&acc->private_objects);
+	      acc->public_bonus = atof(SQ_get_column_string_nocopy(rs, row, 7));
+	      acc->private_bonus = atof(SQ_get_column_string_nocopy(rs, row, 8));
+	      SQ_get_column_int(rs, row, 9, (long*)&timestamp);
 
-      acc->sim_connections = 0;
+	      UT_time_set(&acc->timestamp, timestamp, 0);
 
-      /* Mark it as not changed */
-      acc->changed = AC_ACC_NOT_CHANGED;
+	      /* clear simultaneous connections counter */
 
-      AC_decay_leaf_l(acc);
-      /* lets be memory efficient and not create if it is decayed */
-      if (AC_prunable(acc)) {
-        UT_free(acc);
-      }
-      else {
-        if (UT_timediff(&acc->timestamp, &oldest_timestamp) > 0 &&
-            acc->denials == 0 && acc->addrpasses == 0) {
-          oldest_timestamp = acc->timestamp;
-        }
-        // what about if it already exists?
-        ret_err = rx_bin_node(RX_OPER_CRE, &ip, act_runtime, (rx_dataleaf_t*) acc);
-      }
-    }
-    // if ret_err...
+	      acc->sim_connections = 0;
 
-    SQ_free_result(rs);
-    TH_release_write_lock(&(act_runtime->rwlock));
-  }
-  else {
-    LG_log(access_ctx, LG_ERROR, "Couldn't load access table");
-  }
+	      /* Mark it as not changed */
+	      acc->changed = AC_ACC_NOT_CHANGED;
+
+	      AC_decay_leaf_l(acc);
+	      /* lets be memory efficient and not create if it is decayed */
+	      if (AC_prunable(acc)) {
+	        UT_free(acc);
+	      } else {
+	        if (UT_timediff(&acc->timestamp, &oldest_timestamp[i]) > 0 &&
+	            acc->denials == 0 && acc->addrpasses == 0) {
+	          oldest_timestamp[i] = acc->timestamp;
+	        }
+	        // what about if it already exists?
+	        ret_err = rx_bin_node(RX_OPER_CRE, &ip, act_runtime[i], (rx_dataleaf_t*) acc);
+	      }
+	    }
+	    // if ret_err...
+
+	    SQ_free_result(rs);
+	    TH_release_write_lock(&(act_runtime[i]->rwlock));
+	  }
+	  else {
+	    LG_log(access_ctx, LG_ERROR, "Couldn't load access table: %s", SQ_error(sql_conn));
+	  }
+	}
+
   AC_delete_timestamp_l(sql_conn);
   SQ_close_connection(sql_conn);
 
 } /* AC_persistence_load */
+
+/* insert/update the acc element into DB
+ * handle both v4 and v6 addresses */
+int AC_persistence_store_record(SQ_connection_t *sql_conn, ip_prefix_t *ip, acc_st *acc) {
+	char *fieldnames, *tablename, actvalues[64], sql[512];
+	switch (ip->ip.space) {
+		case IP_V4: {
+			fieldnames = "prefix";
+			tablename = "access";
+			snprintf(actvalues, 256, "%u", IP_addr_b2v4_addr(&ip->ip));
+			break;
+		}
+
+		case IP_V6: {
+			fieldnames = "prefix1, prefix2, prefix3, prefix4";
+			tablename = "access6";
+			snprintf(actvalues, 256, "%u, %u, %u, %u", IP_addr_b2v6_addr(&ip->ip, 0), IP_addr_b2v6_addr(&ip->ip, 1),
+																								 IP_addr_b2v6_addr(&ip->ip, 2), IP_addr_b2v6_addr(&ip->ip, 3));
+			break;
+		}
+
+		default:
+			die;
+	}
+
+	/* use REPLACE, so we don't need to run an UPDATE command if duplicate key found */
+	/* (this is a mysql-specific sql command) */
+  sprintf(sql, "REPLACE INTO %s(%s, prefix_length, connections, addr_passes, denials, queries, referrals, public_objects, private_objects, public_bonus, private_bonus, timestamp)"
+			" VALUES(%s, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %10.0f)",
+    tablename, fieldnames, actvalues,
+    IP_pref_b2_len(ip),
+    acc->connections, acc->addrpasses,
+    acc->denials, acc->queries,
+    acc->referrals, acc->public_objects,
+    acc->private_objects, acc->public_bonus,
+    acc->private_bonus,
+    ceil(UT_time_getvalue(&acc->timestamp)));
+
+  return SQ_execute_query(sql_conn, sql, NULL);
+}
 
 /*
   AC_persistence_walk_l:
@@ -286,7 +374,6 @@ void AC_persistence_load(void) {
 static void AC_persistence_walk_l(GList *list) {
   acc_ip *element;
   SQ_connection_t *sql_conn;
-  char sql[500];
   GList *curr_list;
 
   sql_conn  = AC_dbopen_admin();
@@ -295,60 +382,21 @@ static void AC_persistence_walk_l(GList *list) {
   while (curr_list) {
     element   = curr_list->data;
     curr_list = g_list_next(curr_list);
-    if (element->acc.changed == AC_ACC_NOT_CHANGED ||
-        IP_pref_b2v4_addr(&element->ip) == 0) continue;
+    if (element->acc.changed == AC_ACC_NOT_CHANGED
+    		|| IP_addr_isnull(&element->ip.ip) == 0) continue;
+
     if (element->acc.changed == AC_ACC_NEW) {
-      sprintf(sql, "INSERT INTO access(prefix, prefix_length, connections, addr_passes, denials, queries, referrals, public_objects, private_objects, public_bonus, private_bonus, timestamp) VALUES(%u, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %10.0f)",
-        IP_pref_b2v4_addr(&element->ip),
-        IP_pref_b2_len(&element->ip),
-        element->acc.connections,
-        element->acc.addrpasses,
-        element->acc.denials,
-        element->acc.queries,
-        element->acc.referrals,
-        element->acc.public_objects,
-        element->acc.private_objects,
-        element->acc.public_bonus,
-        element->acc.private_bonus,
-        ceil(UT_time_getvalue(&element->acc.timestamp))
-      );
-      //printf("%s\n", sql);
-      if (SQ_execute_query(sql_conn, sql, NULL) == 0 ) {
-        continue;
-      }
-      /* It is OK to fail, let's wait for UPDATE */
-    }
-    sprintf(sql, "UPDATE access "
-                    "SET connections = %d, addr_passes = %d, denials = %d, "
-                         "queries = %d, referrals = %d, public_objects = %d, "
-                         "private_objects = %d , public_bonus = %f, "
-                         "private_bonus = %f, timestamp = %10.0f "
-                  "WHERE prefix = %u AND prefix_length = %d",
-      element->acc.connections,
-      element->acc.addrpasses,
-      element->acc.denials,
-      element->acc.queries,
-      element->acc.referrals,
-      element->acc.public_objects,
-      element->acc.private_objects,
-      element->acc.public_bonus,
-      element->acc.private_bonus,
-      ceil(UT_time_getvalue(&element->acc.timestamp)),
-      IP_pref_b2v4_addr(&element->ip),
-      IP_pref_b2_len(&element->ip)
-    );
-    //printf("%s\n", sql);
-    if (SQ_execute_query(sql_conn, sql, NULL) != 0 ) {
-      LG_log(access_ctx, LG_ERROR, "Problems with database updates on "
-                                   "admin database");
-      SQ_close_connection(sql_conn);
-      return;
+    	if (AC_persistence_store_record(sql_conn, &element->ip, &element->acc) != 0 ) {
+	      LG_log(access_ctx, LG_ERROR, "Problems with database updates on "
+	                                   "admin database");
+	      SQ_close_connection(sql_conn);
+	      return;
+    	}
     }
   }
   AC_delete_timestamp_l(sql_conn);
   SQ_close_connection(sql_conn);
 }
-
 
 
 /*
@@ -414,7 +462,7 @@ int AC_persistence_save(void) {
     return AC_SAVING;
   }
   /* else ...
-     We have a go! 
+     We have a go!
   */
   on_save = 1;
   TH_release_write_lock(&save_lock);
@@ -442,9 +490,13 @@ int AC_persistence_save(void) {
    4. Sets auto save.
 */
 int AC_persistence_init(void) {
+	int i;
+
   TH_init_read_write_lock(&save_lock);
 
-  UT_timeget(&oldest_timestamp);
+	for (i = MIN_IPSPACE_ID; i <= MAX_IPSPACE_ID; i++) {
+	  UT_timeget(&oldest_timestamp[i]);
+	}
 
   if (ca_get_ac_load) {
     AC_persistence_load();

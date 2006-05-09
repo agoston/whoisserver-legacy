@@ -9,9 +9,9 @@
 
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -19,7 +19,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -65,16 +65,16 @@ NOSTUBS to disable it. */
 /* this prints the filename and line number where it was placed,
    and then commits suicide (read: segfault) by writing to address NULL.
    This in normal conditions generates a coredump for later analysis.
-   
-   isdigit() is used to avoid warnings from lint. 
-   do..while is to allow treating this macro as a single instruction 
+
+   isdigit() is used to avoid warnings from lint.
+   do..while is to allow treating this macro as a single instruction
    (eg in an if).
 */
 
 #define die   do{ \
 	fprintf(stderr,"died: +%d %s\n",__LINE__, __FILE__);\
 	*((int*)NULL)=0; \
-	} while(isdigit('a'))		
+	} while(1)
 
 #define dieif(a) if(a) { \
         fprintf(stderr,"died on "#a" in: +%d %s\n",__LINE__, __FILE__);\
@@ -82,17 +82,17 @@ NOSTUBS to disable it. */
 	}
 
 
-#define SQL_TBLNAM_MAX 32 
+#define SQL_TBLNAM_MAX 32
 
 
-/* struct to hold the table name. 
+/* struct to hold the table name.
    Wrapped in a struct to make it behave like a normal object (ref by
 value)
 
    in fact, this type should be made engine-dependent.
 */
 
-typedef struct {              
+typedef struct {
   char val[SQL_TBLNAM_MAX];
 } sql_tblnam_t;
 
@@ -104,10 +104,10 @@ typedef long sql_key_t;
 
 #ifdef HAVE_STRSEP
 /* good */
-#else 
+#else
 #  if defined(HAVE_STRTOK_R) && !defined(HAVE_STRSEP)
-/* emulate strsep with strtok_r 
-   by making first arg to strtok_r point to the last 
+/* emulate strsep with strtok_r
+   by making first arg to strtok_r point to the last
 
 char *
 strsep(char **stringp, const char *delim)

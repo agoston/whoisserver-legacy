@@ -1,7 +1,7 @@
 #ifndef SK_H
 #define SK_H
 /***************************************
-  $Revision: 1.16 $
+  $Revision: 1.1 $
 
   Socket module (sk)
 
@@ -9,9 +9,9 @@
 
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -19,7 +19,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -62,7 +62,7 @@
 typedef struct {
   int            sock;         /* socket descriptor # */
   struct timeval rd_timeout;   /* preset timeout values */
-  struct timeval wr_timeout; 
+  struct timeval wr_timeout;
   unsigned short rtc;          /* RTC flags (reason-to-close) */
 
   pthread_t      watchdog;     /* thread id of the watchdog associated */
@@ -89,7 +89,7 @@ typedef struct {
 
 /* reasons to close: socket-wise .... */
 #define SK_DISCONNECT  8
-#define SK_INTERRUPT  16 
+#define SK_INTERRUPT  16
 #define SK_TIMEOUT    32
 
 /* ... and user-wise: */
@@ -103,12 +103,14 @@ extern "C" {
 
 int SK_atoport(const char *service, const char *proto);
 int SK_close(int  socket);
-int SK_getsock(int socket_type, unsigned port, int backlog, uint32_t bind_address);
+int SK_setsockflags(int socket, int flags);
+int SK_clearsockflags(int socket, int flags);
+int SK_getsock(const char* node, unsigned port, int socket_type, int backlog);
 int SK_connect(int *sock, char *hostname, unsigned port, unsigned timeout);
 int SK_accept_connection(int listening_socket);
-int SK_write(int sockfd, 
-             const char *buf, 
-	     int count, 
+int SK_write(int sockfd,
+             const char *buf,
+	     int count,
 	     const struct timeval *timeout,
 	     int *count_sent);
 int SK_puts(int  sockfd, const char *str, const struct timeval *timeout);
