@@ -880,7 +880,7 @@ syntax_t syntax_tab[] = {
         /* name */
         "org-name",
         /* core_regex_pattern */
-        "^[][A-Z0-9._\"*()@,&:!'`+\\/-]{1,64}( [][A-Z0-9._\"*()@,&:!'`+\\/-]{1,64}){0,11}$",
+        "^[][A-Z0-9._\"*()@,&:!'`+\\/-]{1,64}( [][A-Z0-9._\"*()@,&:!'`+\\/-]{1,64}){0,29}$",
         /* core_regex, set by syntax_init() */
         NULL,
         /* core_reserved_regex_pattern */
@@ -892,7 +892,7 @@ syntax_t syntax_tab[] = {
         /* core_parser */
         NULL,
         /* front_end_regex_pattern */
-        "^[][A-Z0-9\"*().@]([][A-Z0-9._\"*()@,&:!'`+\\/-]+)?([[:space:]]+[][A-Z0-9()&@\\/\"',.:-]([][A-Z0-9._\"*()@,&:!'`+\\/-]+)?)*$",
+        "^[][A-Z0-9._\"*()@,&:!'`+\\/-]{1,64}( [][A-Z0-9._\"*()@,&:!'`+\\/-]{1,64}){0,29}$",
         /* front_end_regex, set by syntax_init() */
         NULL,
         /* front_end_reserved_regex_pattern */

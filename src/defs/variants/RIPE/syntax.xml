@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.5 2005/10/25 12:30:00 katie Exp $
+$Id: syntax.xml,v 1.6 2006/03/21 09:57:16 can Exp $
 
 -->
 
@@ -546,12 +546,14 @@ $Id: syntax.xml,v 1.5 2005/10/25 12:30:00 katie Exp $
        <core>
           <regex>
           <!-- Not more than 12 words <64 char each --> 
-            ^[][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}( [][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}){0,11}$
+            ^[][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}( [][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}){0,29}$
           </regex>
        </core>   
        <front_end>
            <regex>
-           ^[][A-Z0-9"*().@]([][A-Z0-9._"*()@,&amp;:!'`+\/-]+)?([[:space:]]+[][A-Z0-9()&amp;@\/"',.:-]([][A-Z0-9._"*()@,&amp;:!'`+\/-]+)?)*$
+           <!-- ^[][A-Z0-9"*().@]([][A-Z0-9._"*()@,&amp;:!'`+\/-]+)?([[:space:]]+[][A-Z0-9()&amp;@\/"',.:-]([][A-Z0-9._"*()@,&amp;:!'`+\/-]+)?)*$ -->
+           <!-- same as backend -->
+            ^[][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}( [][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}){0,29}$
            </regex>
        </front_end>
        <description>
