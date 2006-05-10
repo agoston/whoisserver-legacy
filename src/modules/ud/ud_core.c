@@ -1,6 +1,6 @@
 /***************************************
   
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   Core functions for update lower layer 
 
@@ -793,7 +793,7 @@ const gchar *attribute_value;
   /* for legacy person/role reference try to allocate a nic handle in NHR, */
   /* if failied - create records in names table */
   if(query_type == UD_AX_PR) {
-      if(NH_parse(attribute_value, &nh_ptr)>0) {
+      if(ACT_UPD_NHR(tr->action) && (NH_parse(attribute_value, &nh_ptr)>0)) { 
        int nhres;
       /* go ahead and register */
         if(NH_check(nh_ptr, tr->sql_connection)>0){

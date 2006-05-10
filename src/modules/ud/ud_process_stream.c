@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   Functions to process data stream( file, network socket, etc.)
 
@@ -311,6 +311,7 @@ GList *org_name_attrs;
 const GList *p;
 GString *new_obj;
 rpsl_object_t *ret_val;
+rpsl_object_t error;
 C_Type_t class_type;
 int i;
 
@@ -353,6 +354,9 @@ int i;
         g_string_sprintfa(new_obj, "%s:%s\n", rpsl_attr_get_name(p->data), rpsl_attr_get_value(p->data));
     }
   }else{/* else, this is an organisation object */
+
+    /* remove org-name attribute */
+    rpsl_object_remove_attr_name(object, "org-name", &error);
 
     /* We will add the org-name attributes at the end of the object */ 
     old_attrs = rpsl_object_get_all_attr(object);

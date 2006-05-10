@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.10 $
+  $Revision: 1.11 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -280,7 +280,7 @@ static void qi_create_org_name_query(GString *query_str, const char *sql_query, 
     g_string_sprintfa(where_clause, "N%.2d.name=\"%s\"", 0, words[0]);
 
     for (i=1; (i < MAX_NAMES) && (words[i] != NULL); i++) {
-      g_string_sprintfa(from_clause, ", names N%.2d", i);
+      g_string_sprintfa(from_clause, ", org_name N%.2d", i);
       g_string_sprintfa(where_clause, 
           " AND N%.2d.name=\"%s\" AND N00.object_id = N%.2d.object_id", 
           i, words[i], i);
