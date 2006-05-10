@@ -1,0 +1,25 @@
+# organisation object tests
+# CASE 54: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         name has tabs and spaces in it
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 54: The creation will succeed
+
+
+organisation:  AUTO-1
+org-name:      Person    EXAMPLE1   TEST1
+org-type:      NON-REGISTRY
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+abuse-mailbox: dbtest@ripe.net
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm

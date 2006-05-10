@@ -1,0 +1,18 @@
+% This is the MyDB Whois server.
+
+% Information related to 'ORG-PE1-DB-TEST'
+
+organisation:   ORG-PE1-DB-TEST
+org-name:       Person EXAMPLE1
+org-type:       NON-REGISTRY
+address:        Address
+e-mail:         dbtest@ripe.net
+admin-c:        TP1-DB-TEST
+tech-c:         TP1-DB-TEST
+mnt-ref:        TEST-DBM-MNT
+mnt-by:         TEST-DBM-MNT
+abuse-mailbox:  dbtest@ripe.net
+changed:        dbtest@ripe.net 20030102
+source:         DB-TEST
+
+

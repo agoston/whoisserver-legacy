@@ -1,0 +1,54 @@
+# organisation object tests
+# CASE 55: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         name has 30 words 64 chars each
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 55: The creation will succeed
+
+
+organisation:  AUTO-1
+org-name:      1ordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ 2ordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ 3ordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ 4ordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ 4ordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ 5ordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ 6ordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ 7ordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ 8ordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ 9ordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ 0ordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ aordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ bordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ cordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ dordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ eordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ fordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ gordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ hordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ iordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ jordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ kordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ lordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ mordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ nordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ oordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ pordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ rordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ sordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+ tordwordwordwordwordwordwordwordwordwordwordwordwordwordwordword 
+org-type:      NON-REGISTRY
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+abuse-mailbox: dbtest@ripe.net
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
