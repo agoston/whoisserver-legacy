@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.9 $
+  $Revision: 1.9.4.1 $
 
   Example code: A server for a client to connect to.
 
@@ -433,6 +433,7 @@ static void  *main_loop(void *arg) {
   char chnum[16];
   struct pollfd pfd[2];
 	ip_addr_t *clientip;
+	acl_st clientacl;
 
 	clientip = UT_malloc(sizeof(ip_addr_t));	/* always keep an instance allocated */
 
@@ -462,8 +463,8 @@ static void  *main_loop(void *arg) {
 
     /* wait for new connections */
     args->conn_sock = SK_accept_connection(args->accept_sock);
-    if(args->conn_sock == -1) {
-      break;
+    if (args->conn_sock == -1) {
+      continue;
     }
 
     /* check whether the client already reached the simultaneous connection limit,
@@ -472,19 +473,22 @@ static void  *main_loop(void *arg) {
 			gpointer orig_key, client_conn_num;
 
 			SK_getpeerip(args->conn_sock, clientip);
+			AC_check_acl(clientip, NULL, &clientacl);
 			pthread_mutex_lock(args->conn_lock);
 
 			if (g_hash_table_lookup_extended(args->conn_ipnum, clientip, &orig_key, &client_conn_num)) {
 				args->conn_ip = orig_key;
 				int i = (int)client_conn_num;
-				if (i >= 6) {
+				if (i >= clientacl.maxconn) {
 					/* close the connection without further warning */
 					char buf[IP_ADDRSTR_MAX];
 					pthread_mutex_unlock(args->conn_lock);
 					IP_addr_b2a(clientip, buf, sizeof(buf));
 
 					SK_close(args->conn_sock);
-					fprintf(stderr, "Refused connection from %s (reason: more than 6 simultaneous connections)\n", buf);
+					/* FIXME: this should go to the log as well, but now I wanted to make it DOS-resistant,
+					 * so it's important to handle as many refused connections/sec as possible */
+					fprintf(stderr, "Refused connection from %s (reason: too many simultaneous connections)\n", buf);
 					continue;
 				}
 				client_conn_num = (void*)(i+1);
