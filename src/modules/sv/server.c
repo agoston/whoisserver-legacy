@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.9.4.2 $
+  $Revision: 1.10 $
 
   Example code: A server for a client to connect to.
 
@@ -488,7 +488,7 @@ static void  *main_loop(void *arg) {
 					SK_close(args->conn_sock);
 					/* FIXME: this should go to the log as well, but now I wanted to make it DOS-resistant,
 					 * so it's important to handle as many refused connections/sec as possible */
-					fprintf(stderr, "Refused connection from %s (reason: too many simultaneous connections)\n", buf);
+					//fprintf(stderr, "Refused connection from %s (reason: too many simultaneous connections)\n", buf);
 					continue;
 				}
 				client_conn_num = (void*)(i+1);
