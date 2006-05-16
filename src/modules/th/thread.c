@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3.4.1 $
 
   Example code: A thread.
 
@@ -13,7 +13,7 @@
   +html+ <DD><UL>
   +html+ </UL>
   +html+ </DL>
- 
+
   ******************/ /******************
   Modification History:
         ottrey (02/03/1999) Created.
@@ -22,9 +22,9 @@
         joao   (22/06/1999) Redid thread startup
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -32,7 +32,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -71,7 +71,7 @@
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_read_lock(rw_lock_t *prw_lock) { 
+void TH_acquire_read_lock(rw_lock_t *prw_lock) {
   struct timespec to;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
@@ -101,7 +101,7 @@ void TH_acquire_read_lock(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_read_lock(rw_lock_t *prw_lock) { 
+void TH_release_read_lock(rw_lock_t *prw_lock) {
   pthread_mutex_lock(&prw_lock->rw_mutex);
 
   --prw_lock->rw_count;
@@ -128,7 +128,7 @@ void TH_release_read_lock(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_write_lock(rw_lock_t *prw_lock) { 
+void TH_acquire_write_lock(rw_lock_t *prw_lock) {
   struct timespec to;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
@@ -159,7 +159,7 @@ void TH_acquire_write_lock(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_write_lock(rw_lock_t *prw_lock) { 
+void TH_release_write_lock(rw_lock_t *prw_lock) {
   pthread_mutex_lock(&prw_lock->rw_mutex);
   prw_lock->rw_count = 0;
   pthread_mutex_unlock(&prw_lock->rw_mutex);
@@ -183,7 +183,7 @@ void TH_release_write_lock(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_init_read_write_lock(rw_lock_t *prw_lock) { 
+void TH_init_read_write_lock(rw_lock_t *prw_lock) {
   pthread_mutex_init(&prw_lock->rw_mutex, NULL);
   pthread_cond_init(&prw_lock->rw_cond, NULL);
   pthread_cond_init(&prw_lock->w_cond, NULL);
@@ -211,7 +211,7 @@ void TH_init_read_write_lock(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_read_lockw(rw_lock_t *prw_lock) { 
+void TH_acquire_read_lockw(rw_lock_t *prw_lock) {
   struct timespec to;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
@@ -242,7 +242,7 @@ void TH_acquire_read_lockw(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_read_lockw(rw_lock_t *prw_lock) { 
+void TH_release_read_lockw(rw_lock_t *prw_lock) {
   pthread_mutex_lock(&prw_lock->rw_mutex);
 
   --prw_lock->rw_count;
@@ -269,7 +269,7 @@ void TH_release_read_lockw(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_write_lockw(rw_lock_t *prw_lock) { 
+void TH_acquire_write_lockw(rw_lock_t *prw_lock) {
   struct timespec to;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
@@ -283,12 +283,12 @@ void TH_acquire_write_lockw(rw_lock_t *prw_lock) {
   }
 
   prw_lock->w_count = 1;
- 
+
  /* wait until all readers are gone */
   while (prw_lock->rw_count != 0) {
     pthread_cond_timedwait(&prw_lock->rw_cond, &prw_lock->rw_mutex, &to);
   }
- 
+
   pthread_mutex_unlock(&prw_lock->rw_mutex);
 
 } /* TH_acquire_write_lockw() */
@@ -307,7 +307,7 @@ void TH_acquire_write_lockw(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_write_lockw(rw_lock_t *prw_lock) { 
+void TH_release_write_lockw(rw_lock_t *prw_lock) {
   pthread_mutex_lock(&prw_lock->rw_mutex);
   prw_lock->w_count = 0;
   pthread_mutex_unlock(&prw_lock->rw_mutex);
@@ -331,7 +331,7 @@ void TH_release_write_lockw(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_init_read_write_lockw(rw_lock_t *prw_lock) { 
+void TH_init_read_write_lockw(rw_lock_t *prw_lock) {
   pthread_mutex_init(&prw_lock->rw_mutex, NULL);
   pthread_cond_init(&prw_lock->rw_cond, NULL);
   pthread_cond_init(&prw_lock->w_cond, NULL);
@@ -364,7 +364,7 @@ char *TH_to_string(void) {
 
   sprintf(tmp, "[pthread_self] = \"%lu\" ", (long unsigned)pthread_self());
   strcat(thread_info_buffer, tmp);
-  
+
   /*
   thread_name = (char *)pthread_getspecific(Name);
 
@@ -376,16 +376,16 @@ char *TH_to_string(void) {
   }
   strcat(thread_info_buffer, tmp);
   */
-  
+
   strcat(thread_info_buffer, "}");
-  
+
   return UT_strdup(thread_info_buffer);
 } /* TH_to_string() */
 
 
 /*++++++++++++++++++++++++++++++++++++++
 
-  This is the routine that creates a thread. 
+  This is the routine that creates a thread.
 
    More:
   +html+ <PRE>
@@ -395,39 +395,35 @@ char *TH_to_string(void) {
 	andrei
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-pthread_t TH_create(void *do_function(void *), void *arguments ) {
-  pthread_t tid;
-  pthread_attr_t attr;
-  int ret;
+pthread_t TH_create(void *do_function(void *), void *arguments) {
+	pthread_t tid;
+	pthread_attr_t attr;
+	int ret;
+	size_t ssize;
 
-#if defined(SCO)
-  size_t ssize;
-#endif
+	/* Start a new thread. */
+	pthread_attr_init(&attr);	/* initialize attr with default attributes */
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-    /* Start a new thread. */
-    pthread_attr_init(&attr);     /* initialize attr with default attributes */
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+	pthread_attr_getstacksize(&attr, &ssize);
+	/* don't know if this stack size will be enough, but if ssize is set so low, we shouldn't set it more than absolutely needed */
+	if (ssize < 262144) {
+		pthread_attr_setstacksize(&attr, 262144);
+	}
 
-#if defined(SCO)
-    /*********
-      For SCO, we need to increase the stack size, because the default is
-      exceedingly small.
+	/* And we shouldn't use more than 1M, because we will run out of virtual address space on 32 bit systems
+	 * (note that each thread has its own stack address space) */
+	if (ssize > 1048576) {
+		pthread_attr_setstacksize(&attr, 1048576);
+	}
 
-      Note: see also modules/sk/cd_watchdog.c
-     *********/
-    dieif(pthread_attr_getstacksize(&attr, &ssize) != 0);
-    if (ssize > 0) {
-        dieif(pthread_attr_setstacksize(&attr, ssize * 4) != 0);
-    }
-#endif
+	ret = pthread_create(&tid, &attr, do_function, arguments);
+	if (ret != 0) {
+		fprintf(stderr, "pthread_create(): %d: %s\n", errno, strerror(errno));
+		die;
+	}
+	pthread_attr_destroy(&attr);
 
-    ret = pthread_create(&tid, &attr, do_function, arguments);
-    if( ret !=0 ) die;
-    pthread_attr_destroy(&attr);
+	return tid;
 
-    return tid;
-
-} /* TH_run() */
-
-
-
+}

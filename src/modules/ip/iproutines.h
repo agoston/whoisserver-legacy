@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2.8.1 $
 
   IP handling (ip). iproutines.h  - header file for conversions routines.
                                     defines data structures for IP module.
@@ -10,9 +10,9 @@
 
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -20,7 +20,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -33,7 +33,7 @@
 #ifndef _IP_H
 #define _IP_H
 
-/* NOTE: some #include calls are further down in the file */ 
+/* NOTE: some #include calls are further down in the file */
 
 #include <sys/types.h>
 #include <glib.h>
@@ -48,9 +48,9 @@
 #define IP_NO6YET  4
 #define IP_NOSLAS  5
 #define IP_ADTOLO  6
-#define IP_PRTOLO  7 
-#define IP_INVPRF  8 
-#define IP_NOREVD  9 
+#define IP_PRTOLO  7
+#define IP_INVPRF  8
+#define IP_NOREVD  9
 #define IP_TOSHRT 10
 #define IP_NOCAP  11
 #define IP_INVPRN 12
@@ -63,7 +63,7 @@
 #define IP_INVBIT -1
 
 
-/*+ the key type (for ascii keys - tells what it was before it was 
+/*+ the key type (for ascii keys - tells what it was before it was
     converted into prefixes in smart_conv() +*/
 
 typedef enum {
@@ -77,12 +77,12 @@ typedef enum {
 typedef enum {
   IP_V4 = 1,
   IP_V6
-} ip_space_t;  
+} ip_space_t;
 
 
 typedef unsigned int   ip_limb_t; /* the limb must be at least 32 bit wide */
 typedef uint64_t       ip_v6word_t;
-/* should use 64bit for ipv6:   
+/* should use 64bit for ipv6:
    u_int64_t (bsd,linux)
    uint64_t (solaris)
 */
@@ -91,18 +91,18 @@ typedef uint64_t       ip_v6word_t;
 /*+ address structure +*/
 typedef struct {
   ip_limb_t  words[IPLIMBNUM];    /*+ 32/128 bit ip addr. SUBJECT TO CHANGE +*/
-                             
-  ip_space_t space;       /*+ MUST NOT BE char ! prefixes are compared with 
-			    memcmp, so there may be absolutely no unitialised 
+
+  ip_space_t space;       /*+ MUST NOT BE char ! prefixes are compared with
+			    memcmp, so there may be absolutely no unitialised
 			    bytes  +*/
 } ip_addr_internal_t;
 
 /*+ prefix structure +*/
 typedef struct {
   unsigned                bits;		/*+ length in bits. +*/
-  ip_addr_internal_t      ip;	        /*+ the IP of the prefix +*/        
+  ip_addr_internal_t      ip;	        /*+ the IP of the prefix +*/
 } ip_prefix_internal_t;
- 
+
 /*+ range structure +*/
 typedef struct {
   ip_addr_internal_t         begin;        /*+ IP where the range begins. +*/
@@ -127,14 +127,14 @@ typedef ip_addr_internal_t   ip_addr_t;
 typedef ip_range_internal_t  ip_range_t;
 typedef ip_prefix_internal_t ip_prefix_t;
 typedef ip_prefix_range_internal_t ip_prefix_range_t;
-#endif 
+#endif
 
 
-/*+ 
-  stores size/span of an allocation 
-  SUBJECT TO CHANGE: will be bigger for IPv6 
+/*+
+  stores size/span of an allocation
+  SUBJECT TO CHANGE: will be bigger for IPv6
   +*/
-typedef unsigned int  ip_rangesize_t; 
+typedef unsigned int  ip_rangesize_t;
 
 /*+  the length of a string that should be able to hold a prefix / range
     when used with b2a functions.
@@ -143,7 +143,7 @@ typedef unsigned int  ip_rangesize_t;
 #define IP_PREFSTR_MAX 64
 #define IP_RANGSTR_MAX 128
 
-/*+ 
+/*+
   IP expansion mode - for use with t2b functions, they control
   whether the input is supposed to be fully expanded or contain shortcuts
   (eg. enabling saying 0/0 instead 0.0.0.0/0)
@@ -158,7 +158,7 @@ typedef enum {
 #ifdef __cplusplus
 extern "C" {
 #endif
- 
+
 
 
 /* prototypes */
@@ -176,7 +176,7 @@ int IP_pref_rang_t2b(ip_prefix_range_t *prefrangptr, const char *prefrangstr, ip
 #define IP_rang_e2b(a,b) IP_rang_t2b(a,b,IP_PLAIN)
 #define IP_revd_e2b(a,b) IP_revd_t2b(a,b,IP_PLAIN)
 
-/*+ the a2b macros will fully expand an address. 
+/*+ the a2b macros will fully expand an address.
   The details depend on the individual functions. +*/
 #define IP_addr_a2b(a,b) IP_addr_t2b(a,b,IP_EXPN)
 #define IP_pref_a2b(a,b) IP_pref_t2b(a,b,IP_EXPN)
@@ -186,10 +186,10 @@ int IP_pref_rang_t2b(ip_prefix_range_t *prefrangptr, const char *prefrangstr, ip
 /* text fragments to binary */
 int IP_addr_f2b_v4(ip_addr_t *addrptr, const char *adrstr);
 int IP_rang_f2b_v4(ip_range_t *rangptr, const char *beginstr,  const char *endstr);
-int IP_pref_f2b_v4(ip_prefix_t *prefptr, const char *prefixstr, 
+int IP_pref_f2b_v4(ip_prefix_t *prefptr, const char *prefixstr,
 			const char *lengthstr);
 int IP_addr_f2b_v6(ip_addr_t *addrptr, const char *msbstr, const char *lsbstr );
-int IP_pref_f2b_v6(ip_prefix_t *prefptr, const char *msbstr, const char *lsbstr, 
+int IP_pref_f2b_v6(ip_prefix_t *prefptr, const char *msbstr, const char *lsbstr,
 			const char *lengthstr);
 
 int IP_addr_b2a(ip_addr_t *binaddr, char *ascaddr, unsigned strmax );
@@ -198,7 +198,7 @@ int IP_rang_b2a(ip_range_t *rangptr, char *ascaddr, unsigned strmax);
 int IP_rang_classful(ip_range_t *rangptr, ip_addr_t *addrptr);
 int IP_pref_2_rang( ip_range_t *rangptr, ip_prefix_t *prefptr );
 int IP_rang_2_pref( ip_range_t *rangptr, ip_prefix_t *prefptr );
-  
+
 /* utility functions: testers/converters */
 int  IP_addr_bit_get(ip_addr_t *binaddr, unsigned bitnum);
 int IP_addr_bit_set(ip_addr_t *binaddr, unsigned bitnum, unsigned bitval);
@@ -207,9 +207,9 @@ unsigned  IP_sizebits(ip_space_t spc_id);
 int IP_pref_bit_fix( ip_prefix_t *prefix );
 int IP_addr_in_pref(ip_addr_t *ptra, ip_prefix_t *prefix);
 int IP_addr_in_rang(ip_addr_t *ptra, ip_range_t *rangptr);
-int IP_smart_conv(char *key, int justcheck, int encomp, 
+int IP_smart_conv(char *key, int justcheck, int encomp,
 		       GList **preflist, ip_exp_t expf, ip_keytype_t *keytype);
-int IP_smart_range(char *key, ip_range_t *rangptr, ip_exp_t expf, 
+int IP_smart_range(char *key, ip_range_t *rangptr, ip_exp_t expf,
 			ip_keytype_t *keytype);
 int IP_rang_overlap(ip_range_t *range1, ip_range_t *range2);
 
@@ -223,7 +223,7 @@ unsigned IP_pref_b2_space(ip_prefix_t *prefix);
 unsigned IP_rang_b2_space(ip_range_t *myrang);
 
 unsigned IP_addr_b2v4_addr(ip_addr_t *addrptr);
-ip_v6word_t IP_addr_b2v6_hi(ip_addr_t *addrptr); 
+ip_v6word_t IP_addr_b2v6_hi(ip_addr_t *addrptr);
 ip_v6word_t IP_addr_b2v6_lo(ip_addr_t *addrptr);
 
 unsigned IP_pref_b2_space(ip_prefix_t *prefix);
@@ -233,17 +233,17 @@ unsigned IP_pref_b2_len(ip_prefix_t *prefix);
 
 unsigned IP_pref_b2v4_addr(ip_prefix_t *prefix);
 void IP_addr_b2v4(ip_addr_t *addrptr, unsigned *address);
-void IP_pref_b2v4(ip_prefix_t *prefptr, 
-		   unsigned int *prefix, 
+void IP_pref_b2v4(ip_prefix_t *prefptr,
+		   unsigned int *prefix,
 		   unsigned int *prefix_length);
 #define IP_revd_b2v4(a,b,c) IP_pref_b2v4(a,b,c)
-void IP_pref_b2v6(ip_prefix_t *prefptr, 
-		  ip_v6word_t *high, 
-		  ip_v6word_t *low, 
+void IP_pref_b2v6(ip_prefix_t *prefptr,
+		  ip_v6word_t *high,
+		  ip_v6word_t *low,
 		  unsigned int *prefix_length);
 #define IP_revd_b2v6(a,b,c,d) IP_pref_b2v6(a,b,c,d)
 void IP_rang_b2v4(ip_range_t *myrang,
-		  unsigned *begin, 
+		  unsigned *begin,
 		  unsigned *end);
 
 /******** constructing from raw values **********/
@@ -252,7 +252,7 @@ int IP_addr_v6_mk(ip_addr_t *addrptr,
 		       ip_v6word_t high, ip_v6word_t low);
 int IP_pref_v4_mk(ip_prefix_t *prefix,
 		       unsigned prefval, unsigned preflen);
-int IP_rang_v4_mk(ip_range_t *rangptr, 
+int IP_rang_v4_mk(ip_range_t *rangptr,
 		       unsigned addrbegin, unsigned addrend);
 /* a2v4 functions to convert the ascii to binary, and
   then set the raw values at the pointers provided. */
@@ -272,6 +272,11 @@ void IP_rang_encomp(ip_range_t *rangptr);
 unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist);
 int IP_pref_in_prefrang(ip_prefix_t *prefix, ip_prefix_range_t *prefixrange);
 
+/* Hash function of *ip_addr_t for GLib */
+guint ip_addr_t_pointer_hash(gconstpointer key);
+/* Equal function for *ip_addr_t for GLib */
+gboolean ip_addr_t_pointer_equals(gconstpointer a, gconstpointer b);
+
 #ifdef __cplusplus
 }
 #endif
@@ -281,10 +286,10 @@ int IP_pref_in_prefrang(ip_prefix_t *prefix, ip_prefix_range_t *prefixrange);
 */
 #ifdef IP_IMPL
 const ip_addr_t IP_ADDR_UNSPEC={{0,0,0,0},0}; /* unlikely to be real :-)
-					       as there is no space 0 
-					       bonus: it's a natural state after 
+					       as there is no space 0
+					       bonus: it's a natural state after
 					       initializing to 0 */
- 
+
 
 
 

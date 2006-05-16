@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.3 $
 
   Protocol whois module (pw).  Whois protocol.
 
@@ -12,9 +12,9 @@
   OSs Tested          : Solaris 2.6
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -48,7 +48,7 @@ LG_context_t *query_context;
 /*++++++++++++++++++++++++++++++++++++++
 
 void
-display_file        opens a file and displays its contents to the 
+display_file        opens a file and displays its contents to the
                     connection described in conn. structure.
 
 
@@ -69,7 +69,7 @@ display_file(sk_conn_st *condat, char *filename)
   /* open our file */
   fpint = open(filename, O_RDONLY);
   if (fpint == 0) {
-    LG_log(pw_context, LG_ERROR, "open() failure \"%s\" : %s (%d)", 
+    LG_log(pw_context, LG_ERROR, "open() failure \"%s\" : %s (%d)",
 	   filename, strerror(errno), errno);
     return;
   }
@@ -118,24 +118,24 @@ display_file(sk_conn_st *condat, char *filename)
 
 /*++++++++++++++++++++++++++++++++++++++
 
-  static void 
+  static void
   pw_log_query              logs the query to a file after it has finished.
                             Takes many parameters to have access to as much
-			    information as possible, including the original 
-			    query, accounting, response time, status of the 
+			    information as possible, including the original
+			    query, accounting, response time, status of the
 			    client connection, etc.
 
 
-  Query_environ *qe       query environment    
+  Query_environ *qe       query environment
 
-  Query_command *qc       query command structure 
+  Query_command *qc       query command structure
 
-  acc_st *copy_credit     numbers of objects returned / referrals made 
+  acc_st *copy_credit     numbers of objects returned / referrals made
                           during this query
                           (calculated as original credit assigned before
 			  the query minus what's left after the query).
 
-  ut_timer_t begintime    time the processing began  
+  ut_timer_t begintime    time the processing began
 
   ut_timer_t endtime      time the processing finished
 
@@ -144,26 +144,26 @@ display_file(sk_conn_st *condat, char *filename)
   char *input             original query (trailing whitespaces chopped off)
 
   ++++++++++++++++++++++++++++++++++++++*/
-static 
-void pw_log_query( Query_environ *qe, 
-		   Query_command *qc, 
-		   acc_st *copy_credit,   
-		   ut_timer_t begintime,   
-		   ut_timer_t endtime, 
-		   char *hostaddress, 
-		   char *input) 
+static
+void pw_log_query( Query_environ *qe,
+		   Query_command *qc,
+		   acc_st *copy_credit,
+		   ut_timer_t begintime,
+		   ut_timer_t endtime,
+		   char *hostaddress,
+		   char *input)
 {
   char *qrystat = AC_credit_to_string(copy_credit);
-  float elapsed;	  
+  float elapsed;
   char *qrytypestr =
     qc->query_type == QC_REAL ? "" : QC_get_qrytype(qc->query_type);
-  
-  
+
+
   elapsed = UT_timediff( &begintime, &endtime);
-  
-  /* log the connection/query/#results/time/denial to file */ 
+
+  /* log the connection/query/#results/time/denial to file */
   LG_log(query_context, LG_INFO, "<%s> %s%s %.2fs [%s] --  %s",
-	    qrystat, 
+	    qrystat,
 	    qe->condat.rtc ? "INT " : "",
 	    qrytypestr,
 	    elapsed, hostaddress, input
@@ -171,19 +171,19 @@ void pw_log_query( Query_environ *qe,
   UT_free(qrystat);
 } /* pw_log_query */
 
-     
+
 
 
 /*++++++++++++++++++++++++++++++++++++++
 
-  void 
+  void
   PW_process_qc          processes the query commands determined in QC,
                          This is where all the real action of the query
 			 part is invoked.
 
   Query_environ *qe      query environment
 
-  Query_command *qc      query command structure 
+  Query_command *qc      query command structure
 
   acc_st *acc_credit     credit assigned to this IP
 
@@ -192,9 +192,9 @@ void pw_log_query( Query_environ *qe,
   char *hostaddress      IP address of the query
 
   ++++++++++++++++++++++++++++++++++++++*/
-void PW_process_qc(Query_environ *qe, 
+void PW_process_qc(Query_environ *qe,
 		   Query_command *qc,
-		   acc_st *acc_credit, 
+		   acc_st *acc_credit,
 		   acl_st *acl_eip,
                    char *hostaddress)
 {
@@ -204,7 +204,7 @@ void PW_process_qc(Query_environ *qe,
 
   switch( qc->query_type ) {
   case QC_PARERR:
-    /* parameter error. relevant error message is already printed */ 
+    /* parameter error. relevant error message is already printed */
     /* force disconnection on error */
     qe->k = 0;
     break;
@@ -215,7 +215,7 @@ void PW_process_qc(Query_environ *qe,
     if (qe->k) {
 /* XXX: in the query new code this newline is not necessary! */
 /*        SK_cd_puts(&(qe->condat), "\n");*/
-        break;       
+        break;
     }
     /* if not -k, treat as an empty query, and FALLTHROUGH */
   case QC_EMPTY:
@@ -230,7 +230,7 @@ void PW_process_qc(Query_environ *qe,
     qe->condat.rtc = SK_NOTEXT;
     break;
   case QC_HELP:
-  case QC_SYNERR: 
+  case QC_SYNERR:
     {
       char *rep = ca_get_pw_help_file ;
       display_file( &(qe->condat), rep);
@@ -263,22 +263,22 @@ void PW_process_qc(Query_environ *qe,
       }
       break;
     case QC_Q_VERSION:
-      SK_cd_puts(&(qe->condat), "% RIP version " VERSION "\n\n"); 
+      SK_cd_puts(&(qe->condat), "% RIP version " VERSION "\n\n");
       break;
-    default: 
+    default:
       /* EMPTY */;
     } /* -q */
-    
+
     if (qc->t >= 0) {
       SK_cd_printf(&(qe->condat), "%s\n", DF_get_class_template(qc->t));
     }
     if (qc->v >= 0) {
-      SK_cd_puts(&(qe->condat), DF_get_class_template_v(qc->v)); 
+      SK_cd_puts(&(qe->condat), DF_get_class_template_v(qc->v));
       /* no need for newline here, because it's all broken for any */
       /* automated processor at this point anyway */
     }
     break;
-    
+
   case QC_FILTERED:
     {
       char *rep = ca_get_pw_k_filter ;
@@ -288,8 +288,8 @@ void PW_process_qc(Query_environ *qe,
     /* FALLTROUGH */
   case QC_REAL:
     qis = QI_new(qc,qe);
- 
-    /* go through all sources, 
+
+    /* go through all sources,
        stop if connection broken - further action is meaningless */
     for( qitem = g_list_first(qe->sources_list);
 	 qitem != NULL && qe->condat.rtc == 0;
@@ -298,9 +298,9 @@ void PW_process_qc(Query_environ *qe,
 
       /* QI will decrement the credit counters */
       PW_record_query_start();
-      err = QI_execute(qitem->data, qis, qe, acc_credit, acl_eip );      
+      err = QI_execute(qitem->data, qis, qe, acc_credit, acl_eip );
       PW_record_query_end();
-      if( !NOERR(err) ) { 
+      if( !NOERR(err) ) {
 	if( err == QI_CANTDB ) {
 	  SK_cd_puts(&(qe->condat), "% WARNING: Failed to make connection to ");
 	  SK_cd_puts(&(qe->condat), (char *)qitem->data);
@@ -312,20 +312,20 @@ void PW_process_qc(Query_environ *qe,
     }/* for every source */
 
     QI_free(qis);
-    
+
     if( AC_credit_isdenied(acc_credit) ) {
       /* host reached the limit of returned contact information */
       char *rep = ca_get_pw_fmt_limit_reached ;
       SK_cd_printf(&(qe->condat), rep,hostaddress);
       UT_free(rep);
     }
-    
+
     break;
   default: die;
   }
 } /* PW_process_qc */
 
-/* 
+/*
    Occasionally, we need to pause queries to the Whois database.  This
    occurs, for instance, when the database is reloaded for one of the
    databases we mirror without using NRTM.
@@ -369,14 +369,14 @@ PW_startqueries()
 }
 
 /* PW_record_query_start() */
-void 
+void
 PW_record_query_start()
 {
     TH_acquire_read_lockw(&queries_lock);
 }
 
 /* PW_record_query_end() */
-void 
+void
 PW_record_query_end()
 {
     TH_release_read_lockw(&queries_lock);
@@ -388,14 +388,14 @@ PW_record_query_end()
 
 	Query_environ *qe      query environment
 
-    Query_command *qc      query command structure 
+    Query_command *qc      query command structure
 
     acc_st *acc_credit     credit assigned to this IP
 
-    acl_st *acl_ip		  acl record for this IP		  
+    acl_st *acl_ip		  acl record for this IP
 
     char *hostaddress     IP address of the host as a string
-    
+
     char *input			  query as a string. may be empty string ""
 
 ++++++++++++++++++++++++++++++++++++++*/
@@ -421,10 +421,10 @@ void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_
   if( qc->query_type == QC_REAL ) {
     copy_credit.queries ++;
   }
-  
+
   /* now, do some accounting stuff */
 
-  /* calc. the credit used, result  into copy_credit 
+  /* calc. the credit used, result  into copy_credit
      This step MUST NOT be forgotten. It must complement
      the initial calculation of a credit, otherwise accounting
      will go bgzzzzzt.
@@ -452,7 +452,7 @@ void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_
     }
     else {
       /* something happened. Hope for working socket and display message
-         (won't hurt even if socket not operable) 
+         (won't hurt even if socket not operable)
       */
       char *rep = ca_get_pw_connclosed ;
       SK_cd_puts(&(qe->condat), rep);
@@ -461,32 +461,32 @@ void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_
   } /* if credit is denied */
 
   /* LOGGING */
- 
+
   UT_timeget(&endtime);
 
   /* query logging */
   pw_log_query(qe, qc, &copy_credit, begintime, endtime,
                hostaddress, input);
 
-  /* Commit the credit. This will deny if bonus limit hit 
+  /* Commit the credit. This will deny if bonus limit hit
      and clear the copy */
 
   /* to avoid increasing the number of (simultaneous) connections (is already committed in PW_interact) */
-  copy_credit.sim_connections = 0; 
-  copy_credit.connections = 0; 
+  copy_credit.sim_connections = 0;
+  copy_credit.connections = 0;
 
   /* ATTENTION: copy_credit is zeroed here !!! */
   AC_commit(&(qe->condat.eIP), &copy_credit, acl_ip);
-  
+
   /* end-of-result -> ONE empty line */
   SK_cd_puts(&(qe->condat), "\n");
- 
+
   mysql_thread_end();
 
 }
 
 /*+++++++++++++++++++++++++++++++++++
-	
+
 	void PW_log_denied_query		logs denied queries
 
     Query_environ *qe		query environment
@@ -494,8 +494,8 @@ void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_
     Query_command *qc		query command structure (or NULL pointer)
 
     char *hostaddress		IP address of the querying host as a string
- 
-    char *input				query as a string. may be empty string ""  
+
+    char *input				query as a string. may be empty string ""
 
 +++++++++++++++++++++++++++++++++++++*/
 void PW_log_denied_query(Query_environ *qe, Query_command *qc, char *hostaddress, char *input)
@@ -543,8 +543,8 @@ void PW_log_denied_query(Query_environ *qe, Query_command *qc, char *hostaddress
 
 
 /*++++++++++++++++++++++++++++++++++++++
-  
-  void 
+
+  void
   PW_interact             Main loop for interaction with a single client.
                           The function sets up the accounting for the client,
 			  invokes parsing, execution, logging and accounting
@@ -565,14 +565,14 @@ void PW_interact(int sock) {
   GList *message_node;
 
   /* Get the IP of the client */
-  hostaddress = SK_getpeername(sock);	  
+  hostaddress = SK_getpeername(sock);
   LG_log(pw_context, LG_DEBUG, "connection from %s", hostaddress);
-  
+
   /* Initialize the query environment. */
   qe = QC_environ_new(hostaddress, sock);
-  
+
   /* init the connection structure, set timeout for reading the query */
-  SK_cd_make( &(qe->condat), sock, (unsigned) ca_get_keepopen); 
+  SK_cd_make( &(qe->condat), sock, (unsigned) ca_get_keepopen);
 
   TA_setcondat(&(qe->condat));
 
@@ -587,10 +587,10 @@ void PW_interact(int sock) {
 	/* increase the number of connections */
     tmp_acc.connections = 1;
 
-    AC_commit( &(qe->condat.rIP), &tmp_acc, &acl_rip);   
+    AC_commit( &(qe->condat.rIP), &tmp_acc, &acl_rip);
   }
 
-  /* this is main loop. it runs at least once and 
+  /* this is main loop. it runs at least once and
   exits if one of these is true:
   1. sim_conn > maxconn
   2. sim_conn > threshold
@@ -601,8 +601,8 @@ void PW_interact(int sock) {
   */
   do  {
 
-  /* main variables: 
-  real_credit 			used for sim_connections accounting. 
+  /* main variables:
+  real_credit 			used for sim_connections accounting.
   acc_credit 			used to store real IP accounting for normal queries.
   pass_credit 			used to store passed IP accounting for normal queries.
   acl_rip				stores real IP acl record
@@ -616,16 +616,19 @@ void PW_interact(int sock) {
   /* need this copy for sim_connections */
   AC_fetch_acc(&(qe->condat.rIP), &real_credit);
 
-  if ( real_credit.sim_connections > acl_rip.maxconn ) 	{
-
-    /* maxconn limit reached: say nothing and prepare to drop connection */
-    PW_log_denied_query(qe, NULL, hostaddress, "");
-
-    /* keep in mind */
-    deny = 1;
-
-  } 
-  else if ( real_credit.sim_connections > acl_rip.threshold )	{
+/**
+ *  this is checked in server.c:main_loop() now to avoid creating threads unnecessarily
+ */
+//  if ( real_credit.sim_connections > acl_rip.maxconn ) 	{
+//
+//    /* maxconn limit reached: say nothing and prepare to drop connection */
+//    PW_log_denied_query(qe, NULL, hostaddress, "");
+//
+//    /* keep in mind */
+//    deny = 1;
+//
+//  } else
+  if ( real_credit.sim_connections > acl_rip.threshold )	{
 
     /* threshold exceeded: show the message and prepare to drop connection */
     /* greeting */
@@ -665,7 +668,7 @@ void PW_interact(int sock) {
   }
   else {
      /* okay, we actually have to read the query now */
- 
+
       /* print the greeting */
       char *rep = ca_get_pw_banner;
       SK_cd_printf(&(qe->condat), "%s\n", rep);
@@ -695,47 +698,47 @@ void PW_interact(int sock) {
 
           /* remove trailing whitespace (including "\n") */
           g_strchomp(input);
-    
+
           TA_setactivity(input);
           TA_increment();
-          
+
           qc = QC_create(input, qe);
-    
+
           /* output any messages from parsing */
           message_node = qc->parse_messages;
           while (message_node != NULL) {
               SK_cd_printf(&(qe->condat), "%s\n", (char*)message_node->data);
               message_node = g_list_next(message_node);
           }
-    
+
           /* ADDRESS PASSING: check if -V option has passed IP in it */
           if( ! STRUCT_EQUAL(qe->pIP,IP_ADDR_UNSPEC)) {
 		    if ( ! acl_rip.trustpass )	{
               /* host not authorised to pass addresses with -V */
-    
+
               /* display the deny banner */
               char *rep = ca_get_pw_fmt_acl_addrpass ;
               SK_cd_printf(&(qe->condat), rep, hostaddress);
               UT_free(rep);
-    
+
               /* XXX shall we deny such user ? Now we can... */
-              LG_log(pw_context, LG_INFO, 
+              LG_log(pw_context, LG_INFO,
                      "unauthorised address passing by %s", hostaddress);
-    
+
               /* commit denial count */
               AC_commit_denials(&(qe->condat.rIP), &acl_rip);
               PW_log_denied_query(qe, qc, hostaddress, input);
-    
+
             } /* if trustpass not allowed */
 		    else	{
 		      /* address passing allowed, set effective IP */
-    
+
               /* increase addrpasses count */
               acc_st tmp_acc;
               memset(&tmp_acc, 0, sizeof(acc_st));
               tmp_acc.addrpasses=1;
               AC_commit( &(qe->condat.rIP), &tmp_acc, &acl_rip);
-    
+
               /* set eIP to this IP */
               qe->condat.eIP = qe->pIP;
 
@@ -745,48 +748,48 @@ void PW_interact(int sock) {
                 IP_addr_b2a(&qe->condat.eIP, buf, IP_ADDRSTR_MAX);
                 UT_free(qe->condat.ip);
                 qe->condat.ip = buf;
-              }   
-    
+              }
+
               /* check ACL. Get the proper acl record. Calculate credit */
               AC_check_acl( &(qe->condat.eIP), &pass_credit, &acl_eip);
-    
+
               copy_credit = pass_credit;
-    
+
 	          if (acl_eip.deny)	{
-    
+
                 /* passed IP permanently denied */
                 char *rep = ca_get_pw_fmt_acl_permdeny ;
                 SK_cd_printf(&(qe->condat), rep, hostaddress);
                 UT_free(rep);
-    
+
                 /* increase denial count */
                 AC_commit_denials(&(qe->condat.eIP), &acl_eip);
                 PW_log_denied_query(qe, qc, hostaddress, input);
-                
+
                 /* keep in mind */
                 deny = 1;
-    
+
               }
               else {
                 /* allowed to query from passed IP */
-                PW_run_query(qe, qc, &pass_credit, &acl_eip, hostaddress,input); 
+                PW_run_query(qe, qc, &pass_credit, &acl_eip, hostaddress,input);
               } /* effective IP denied */
-    
+
             } /* trustpass allowed */
-    
+
            } /* if address is passed in the query */
 
            else {
               /* allowed to query from real IP */
               PW_run_query(qe, qc, &acc_credit, &acl_rip, hostaddress, input);
-    
+
            } /* else address is not passed in the query */
 
            /* free the query command structure */
            QC_free(qc);
 
         }  /* fit in the buffer ... */
-      
+
     } /* reading the query ... */
 
   } /* do, for exit states see comment above */
