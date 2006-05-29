@@ -109,4 +109,16 @@ mnt-by: TEST-MNT
 changed: dbtest@ripe.net 20020101
 source: DB-TEST
 
+inetnum:       80.16.151.184 - 80.16.151.255
+netname:       TEST-NET-NAME
+descr:         TEST network
+country:       NL
+status:        ALLOCATED PA
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-by:        RIPE-NCC-HM-MNT
+notify:        dbtest@ripe.net
+changed:       dbtest@ripe.net 20030101
+source:        DB-TEST
+
 % End of loader data file
