@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.1.6.1 $
 
   stubs.h - header file with things defined just to provisionally fix the TBDs.
 
@@ -70,16 +70,11 @@ NOSTUBS to disable it. */
    do..while is to allow treating this macro as a single instruction
    (eg in an if).
 */
+void do_nice_die();
 
-#define die   do{ \
-	fprintf(stderr,"died: +%d %s\n",__LINE__, __FILE__);\
-	*((int*)NULL)=0; \
-	} while(1)
+#define die   do_nice_die(__LINE__, __FILE__);
 
-#define dieif(a) if(a) { \
-        fprintf(stderr,"died on "#a" in: +%d %s\n",__LINE__, __FILE__);\
-	*((int*)NULL)=0; \
-	}
+#define dieif(a) if(a) do_nice_die(__LINE__, __FILE__);
 
 
 #define SQL_TBLNAM_MAX 32
