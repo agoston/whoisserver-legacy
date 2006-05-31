@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1.6.1 $
+  $Revision: 1.1.6.2 $
 
   stubs.h - header file with things defined just to provisionally fix the TBDs.
 
@@ -70,7 +70,9 @@ NOSTUBS to disable it. */
    do..while is to allow treating this macro as a single instruction
    (eg in an if).
 */
-void do_nice_die();
+
+/* implemented in thread.c */
+void do_nice_die(int line, char *file);
 
 #define die   do_nice_die(__LINE__, __FILE__);
 
