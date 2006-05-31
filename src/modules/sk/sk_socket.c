@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.1.6.1 $
 
   Socket module - routines facilitating calls to socket library.
 
@@ -792,4 +792,3 @@ int SK_getpeerip(int  sockfd, ip_addr_t *ip) {
 
   return ret;
 }
-

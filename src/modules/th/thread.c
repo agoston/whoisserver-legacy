@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   Example code: A thread.
 
@@ -13,7 +13,7 @@
   +html+ <DD><UL>
   +html+ </UL>
   +html+ </DL>
- 
+
   ******************/ /******************
   Modification History:
         ottrey (02/03/1999) Created.
@@ -22,9 +22,9 @@
         joao   (22/06/1999) Redid thread startup
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -32,7 +32,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -71,7 +71,7 @@
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_read_lock(rw_lock_t *prw_lock) { 
+void TH_acquire_read_lock(rw_lock_t *prw_lock) {
   struct timespec to;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
@@ -101,7 +101,7 @@ void TH_acquire_read_lock(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_read_lock(rw_lock_t *prw_lock) { 
+void TH_release_read_lock(rw_lock_t *prw_lock) {
   pthread_mutex_lock(&prw_lock->rw_mutex);
 
   --prw_lock->rw_count;
@@ -128,7 +128,7 @@ void TH_release_read_lock(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_write_lock(rw_lock_t *prw_lock) { 
+void TH_acquire_write_lock(rw_lock_t *prw_lock) {
   struct timespec to;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
@@ -159,7 +159,7 @@ void TH_acquire_write_lock(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_write_lock(rw_lock_t *prw_lock) { 
+void TH_release_write_lock(rw_lock_t *prw_lock) {
   pthread_mutex_lock(&prw_lock->rw_mutex);
   prw_lock->rw_count = 0;
   pthread_mutex_unlock(&prw_lock->rw_mutex);
@@ -183,7 +183,7 @@ void TH_release_write_lock(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_init_read_write_lock(rw_lock_t *prw_lock) { 
+void TH_init_read_write_lock(rw_lock_t *prw_lock) {
   pthread_mutex_init(&prw_lock->rw_mutex, NULL);
   pthread_cond_init(&prw_lock->rw_cond, NULL);
   pthread_cond_init(&prw_lock->w_cond, NULL);
@@ -211,7 +211,7 @@ void TH_init_read_write_lock(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_read_lockw(rw_lock_t *prw_lock) { 
+void TH_acquire_read_lockw(rw_lock_t *prw_lock) {
   struct timespec to;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
@@ -242,7 +242,7 @@ void TH_acquire_read_lockw(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_read_lockw(rw_lock_t *prw_lock) { 
+void TH_release_read_lockw(rw_lock_t *prw_lock) {
   pthread_mutex_lock(&prw_lock->rw_mutex);
 
   --prw_lock->rw_count;
@@ -269,7 +269,7 @@ void TH_release_read_lockw(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_write_lockw(rw_lock_t *prw_lock) { 
+void TH_acquire_write_lockw(rw_lock_t *prw_lock) {
   struct timespec to;
 
   to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
@@ -283,12 +283,12 @@ void TH_acquire_write_lockw(rw_lock_t *prw_lock) {
   }
 
   prw_lock->w_count = 1;
- 
+
  /* wait until all readers are gone */
   while (prw_lock->rw_count != 0) {
     pthread_cond_timedwait(&prw_lock->rw_cond, &prw_lock->rw_mutex, &to);
   }
- 
+
   pthread_mutex_unlock(&prw_lock->rw_mutex);
 
 } /* TH_acquire_write_lockw() */
@@ -307,7 +307,7 @@ void TH_acquire_write_lockw(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_write_lockw(rw_lock_t *prw_lock) { 
+void TH_release_write_lockw(rw_lock_t *prw_lock) {
   pthread_mutex_lock(&prw_lock->rw_mutex);
   prw_lock->w_count = 0;
   pthread_mutex_unlock(&prw_lock->rw_mutex);
@@ -331,7 +331,7 @@ void TH_release_write_lockw(rw_lock_t *prw_lock) {
         ottrey
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-void TH_init_read_write_lockw(rw_lock_t *prw_lock) { 
+void TH_init_read_write_lockw(rw_lock_t *prw_lock) {
   pthread_mutex_init(&prw_lock->rw_mutex, NULL);
   pthread_cond_init(&prw_lock->rw_cond, NULL);
   pthread_cond_init(&prw_lock->w_cond, NULL);
@@ -364,7 +364,7 @@ char *TH_to_string(void) {
 
   sprintf(tmp, "[pthread_self] = \"%lu\" ", (long unsigned)pthread_self());
   strcat(thread_info_buffer, tmp);
-  
+
   /*
   thread_name = (char *)pthread_getspecific(Name);
 
@@ -376,16 +376,16 @@ char *TH_to_string(void) {
   }
   strcat(thread_info_buffer, tmp);
   */
-  
+
   strcat(thread_info_buffer, "}");
-  
+
   return UT_strdup(thread_info_buffer);
 } /* TH_to_string() */
 
 
 /*++++++++++++++++++++++++++++++++++++++
 
-  This is the routine that creates a thread. 
+  This is the routine that creates a thread.
 
    More:
   +html+ <PRE>
@@ -429,5 +429,29 @@ pthread_t TH_create(void *do_function(void *), void *arguments ) {
 
 } /* TH_run() */
 
+/* This function is called for macros 'die' and 'dieif', both defined in stubs.h
+ * We do a simple stderr output which tells the position of the die macro,
+ * then call gdb to do a complete backtrace (at least that's the intended
+ * and default feature; it can be modified in rip.config:COMMAND_ON_DIE)
+ */
 
+#ifdef __linux__
+#include <linux/unistd.h>
+_syscall0(pid_t,gettid)
+pid_t gettid(void);
+#endif
+
+void do_nice_die(int line, char *file) {
+	fprintf(stderr,"died: +%d %s\n",line, file);
+
+#ifdef __linux__
+	fprintf(stderr, "Backtrace:\n");
+	char buf[1024];
+	snprintf(buf, 1024, ca_get_command_on_die, gettid());
+	system(buf);
+#endif
+
+	/* that's the legacy way to bail out - it generates a segfault, so core can be dumped if needed */
+	*((int*)NULL)=0;
+}
 
