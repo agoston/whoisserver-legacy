@@ -1,6 +1,6 @@
 /***************************************
   
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   Core functions for update lower layer 
 
@@ -767,6 +767,7 @@ const gchar *attribute_value;
          /* maintner */
 	 case UD_AX_MT:	
 	 case UD_AX_FR:	
+	 case UD_AX_OA:	
 	      g_string_sprintf(query, query_fmt, tr->thread_ins, dummy_id, attribute_value, DUMMY_TYPE);
 	      break;
 
