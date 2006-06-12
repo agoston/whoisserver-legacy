@@ -8,7 +8,7 @@
 # RESULT 3: The creation will fail.
 
 
-inetnum:      80.16.151.185 - 80.16.151.255
+inetnum:      80.16.151.184 - 80.16.151.266
 netname:      TEST-NET-NAME
 descr:        TEST network
 country:      NL
