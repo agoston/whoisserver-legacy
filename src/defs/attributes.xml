@@ -1,6 +1,6 @@
 <!DOCTYPE ripe_attributes SYSTEM "attributes.dtd">
 
-<ripe_attributes version="$Revision: 1.8.2.2 $" author="$Author: katie $">
+<ripe_attributes version="$Revision: 1.5 $" author="$Author: katie $">
 
   <ripe_attribute name="abuse-mailbox" code="am">
     <description>
@@ -251,6 +251,7 @@
     <description>
    Specifies who submitted the update, and when the object was
    updated. 
+   This attribute is filtered from the default whois output.
     </description>
     <syntax>changed</syntax>
   </ripe_attribute>
@@ -396,7 +397,10 @@
 
   <ripe_attribute name="e-mail" code="em">
     <description>
-   The e-mail address of a person or role.
+   The e-mail address of a person, role, organisation or irt team.
+   This attribute is filtered from the default whois output when at
+   least one of the objects returned by the query contains an 
+   abuse-mailbox attribute.
     </description>
     <syntax>e-mail</syntax>
     <representation>
@@ -1082,6 +1086,9 @@
     <description>
    Specifies the e-mail address to be notified when a reference to the
    organisation object is added or removed.
+   This attribute is filtered from the default whois output when at
+   least one of the objects returned by the query contains an 
+   abuse-mailbox attribute.
     </description>
     <syntax>e-mail</syntax>
 
@@ -1422,6 +1429,7 @@
     <description>
    Specifies the e-mail address to which notifications of changes
    to an object should be sent.
+   This attribute is filtered from the default whois output.
     </description>
     <syntax>e-mail</syntax>
 
@@ -1669,7 +1677,7 @@
     <description>
    Specifies the nameservers of the domain.
     </description>
-    <syntax><ripe-list/>domain-name</syntax>
+    <syntax>nameserver</syntax>
 
     <representation>
     <sqltable name="nserver">
