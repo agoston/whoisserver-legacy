@@ -75,6 +75,4 @@ int UP_check_policy(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                      rpsl_object_t *preproc_obj, char **reason,
                      GList *credentials);
 
-int up_normalise_nserver(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *preproc_obj);
-
 #endif
