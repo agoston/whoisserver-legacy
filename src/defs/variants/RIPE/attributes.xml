@@ -1677,7 +1677,7 @@
     <description>
    Specifies the nameservers of the domain.
     </description>
-    <syntax>nameserver</syntax>
+    <syntax><ripe-list/>domain-name</syntax>
 
     <representation>
     <sqltable name="nserver">
