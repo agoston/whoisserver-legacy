@@ -14,7 +14,6 @@ $(RIPLIBDIR)/librpsl.a: syntax_api.o class.o attribute.o syntax.o\
         filter.lex.o filter.tab.o \
         v6_filter.lex.o v6_filter.tab.o \
         mp_filter.lex.o mp_filter.tab.o \
-        nserver.lex.o nserver.tab.o \
         refer.lex.o refer.tab.o \
         inet6num.lex.o inet6num.tab.o \
         mnt_routes.lex.o mnt_routes.tab.o \
@@ -124,18 +123,6 @@ mp_filter.lex.c: mp_filter.l
 
 mp_filter.tab.c mp_filter.tab.h: mp_filter.y
 	bison -d -pmp_filter mp_filter.y
-
-nserver.lex.o: nserver.lex.c nserver.tab.h
-	$(CC) $(CFLAGS) -c nserver.lex.c
-
-nserver.tab.o: nserver.tab.c nserver.tab.h
-	$(CC) $(CFLAGS) -c nserver.tab.c
-
-nserver.lex.c: nserver.l
-	flex -i -Pnserver -onserver.lex.c nserver.l
-
-nserver.tab.c nserver.tab.h: nserver.y
-	bison -d -pnserver nserver.y
 
 refer.lex.o: refer.lex.c refer.tab.h
 	$(CC) $(CFLAGS) -c refer.lex.c
