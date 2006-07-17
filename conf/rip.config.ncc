@@ -202,6 +202,15 @@ SVMIRROR_PORT 43003
 PW_HELP_FILE /export/db/doc/WHOIS-HELP
 
 
+#
+# Shell command to be executed on die()
+# Will be snprintf()-ed, with the thread's PID as param
+# then executed with system()
+# For source code, see stubs.h:die and thread.c:do_nice_die()
+#
+
+COMMAND_ON_DIE /usr/bin/gdb -q -batch -x /home/agoston/whoisserver/conf/gdbcomm --pid=%d 1>&2
+
 ###########
 ##
 ## Access control

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.3.4.1 $
+  $Revision: 1.4 $
 
   Example code: A thread.
 
@@ -426,4 +426,36 @@ pthread_t TH_create(void *do_function(void *), void *arguments) {
 
 	return tid;
 
+}
+
+/* This function is called for macros 'die' and 'dieif', both defined in stubs.h
+ * We do a simple stderr output which tells the position of the die macro,
+ * then call gdb to do a complete backtrace (at least that's the intended
+ * and default feature; it can be modified in rip.config:COMMAND_ON_DIE)
+ *
+ * Note that automatic gdb backtrace output is only available on linux, as
+ * gettid() is linux-specific.
+ */
+
+#ifdef __linux__
+#include <linux/unistd.h>
+_syscall0(pid_t,gettid)
+pid_t gettid(void);
+#endif
+
+void do_nice_die(int line, char *file) {
+	fprintf(stderr,"died: +%d %s\n",line, file);
+
+#ifdef __linux__
+	char *command = ca_get_command_on_die;
+	if (command) {
+		fprintf(stderr, "Backtrace:\n");
+		char buf[1024];
+		snprintf(buf, 1024, command, gettid());
+		system(buf);
+	}
+#endif
+
+	/* that's the legacy way to bail out - it generates a segfault, so core can be dumped if needed */
+	*((int*)NULL)=0;
 }

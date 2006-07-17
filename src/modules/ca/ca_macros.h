@@ -465,5 +465,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define ca_get_ns_severity	ca_get_int(CA_NS_SEVERITY)
 #define ca_set_ns_severity	ca_set_int(CA_NS_SEVERITY)
 
+#define ca_get_command_on_die	ca_get_string(CA_COMMAND_ON_DIE)
+#define ca_set_command_on_die	ca_set_string(CA_COMMAND_ON_DIE)
+
 #endif	/* CA_MACROS */
 

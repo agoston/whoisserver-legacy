@@ -87,6 +87,7 @@ void LG_dev_free(LG_device_t*);
 LG_device_t* LG_dev_get_file(FILE*);
 LG_device_t* LG_dev_daily(char* path);
 void LG_dev_vfprintf(LG_device_t*, const char*, va_list);
+void LG_dev_vasprintf(LG_device_t* dev, const char* message, va_list ap);
 
 char* LG_frm_replicator(const LG_level_t, void** data, const char*);
 LG_formatter_t* LG_frm_dbupdate_prepared();
@@ -99,6 +100,7 @@ void LG_app_free(LG_appender_t*);
 void LG_app_set_level(LG_appender_t*, LG_level_t);
 void LG_app_set_formatter(LG_appender_t*, LG_formatter_t*);
 LG_appender_t* LG_app_get_file_info_dump(FILE*);
+LG_appender_t* LG_app_get_filedes_dump(int fd);
 LG_appender_t* LG_app_get_daily_info_dump(gchar* path);
 
 

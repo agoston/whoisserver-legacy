@@ -100,7 +100,7 @@ void UP_internal_error(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* close down the logging */
   LG_ctx_free(lg_ctx);
   /* close the state log file, but do not delete the file */
-  fclose(options->state);
+  close(options->statefd);
 
   /* report abnormal termination to the wrapper */
   exit(20);
@@ -212,7 +212,7 @@ char *UP_get_temp_filename(LG_context_t *lg_ctx, char *type)
   tmpfilename = (char *)malloc(length);
 
   pidlong=pid;
-  snprintf(tmpfilename, length, "%s/dbupdate.%s.%s.%ld.tmp", tmpdir, type, hostname, pidlong );
+  snprintf(tmpfilename, length, "%s/dbupdate.%s.%s.%ld.%ld.tmp", tmpdir, type, hostname, time(NULL), pidlong );
   free(tmpdir);
 
   if ( lg_ctx )
