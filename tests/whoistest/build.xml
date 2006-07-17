@@ -1,0 +1,41 @@
+<project name="WhoisTest" default="dist" basedir=".">
+
+	<!-- set global properties for this build -->
+	<property name="bin"  location="bin"/>
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp/>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${bin}"/>
+	</target>
+
+	<target name="compile" depends="init">
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac srcdir="." destdir="${bin}"/>
+	</target>
+
+	<target name="dist" depends="compile">
+		<!-- Create the distribution directory -->
+		<mkdir dir="${bin}"/>
+
+		<!-- delete the jar file, just in case -->
+		<delete file="${bin}/whoistest.jar"/>
+
+		<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+		<!--jar jarfile="${bin}/whoistest-${DSTAMP}.jar" basedir="${build}"/-->
+		
+		<jar jarfile="${bin}/whoistest.jar" basedir="${bin}">
+			<manifest>
+				<attribute name="Main-Class" value="WhoisTest"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="clean">
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete dir="${bin}"/>
+	</target>
+	
+	<target name="re" depends="clean,dist"/>
+</project>
