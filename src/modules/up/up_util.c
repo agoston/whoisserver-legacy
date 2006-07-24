@@ -1985,8 +1985,8 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval = up_convert_inetnum_prefix(rt_ctx, lg_ctx, object, &inetnum_key_converted);
   }
 
-  /* Normalise nserver attribute in domain objects: lowercase IP, $
-  *    * remove trailing dot in hostname. */$
+  /* Normalise nserver attribute in domain objects: lowercase IP, 
+  *    * remove trailing dot in hostname. */
   if( object_class != NULL && ! strcasecmp(object_class, "domain") )
     {
       /* 
