@@ -16,6 +16,8 @@ extern void v6_filter_reset();
 extern int v6_filterparse();
 extern void mp_filter_reset();
 extern int mp_filterparse();
+extern void nserver_reset();
+extern int nserverparse();
 extern void refer_reset();
 extern int referparse();
 extern void inet6num_reset();
@@ -763,6 +765,34 @@ syntax_t syntax_tab[] = {
         NULL,
         /* front_end_parser */
         NULL 
+    },
+    {
+        /* name */
+        "nameserver",
+        /* core_regex_pattern */
+        NULL,
+        /* core_regex, set by syntax_init() */
+        NULL,
+        /* core_reserved_regex_pattern */
+        NULL,
+        /* core_reserved_regex, set by syntax_init() */
+        NULL,
+        /* core_parser_reset */
+        NULL,
+        /* core_parser */
+        NULL,
+        /* front_end_regex_pattern */
+        NULL,
+        /* front_end_regex, set by syntax_init() */
+        NULL,
+        /* front_end_reserved_regex_pattern */
+        NULL,
+        /* front_end_reserved_regex, set by syntax_init() */
+        NULL,
+        /* front_end_parser_reset */
+        nserver_reset,
+        /* front_end_parser */
+        nserverparse
     },
     {
         /* name */
