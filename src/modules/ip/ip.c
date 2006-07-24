@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5 $
+  $Revision: 1.6 $
 
   IP handling (ip). ip.c  - conversions between ascii and binary forms
                             of IP addresses, prefixes and ranges.
@@ -970,6 +970,85 @@ IP_addr_s2b(ip_addr_t *addrptr,
   }
   return IP_OK;
 }
+
+
+/**************************************************************************/
+/*+converts the IP binary address (binaddr) to a string (ascaddr)
+   of at most strmax characters. Independent of the result
+   (success or failure) it messes up the string.
+    This works only for IPv6; to convert binary address 
+    to fully uncompressed lowercase form.
++*/
+int
+IP_addr_b2a_uncompress( ip_addr_t *binaddr, char *ascaddr, unsigned strmax )
+{
+  if(binaddr->space == IP_V6)
+  {
+    /* IPv6 */
+    unsigned tmpv6[4];
+    int i;
+    int p;
+    char *col = NULL;
+    char *j;
+    char *head = NULL;
+    char *tail = NULL;
+    int head_dots = 0;
+    int tail_dots = 0;
+    GString *tmp;
+
+    /* inet_* operates on network byte format numbers, so we need
+   	to prepare a tmp. data with it */
+
+    for(i=0; i<4; i++) {  
+      tmpv6[i] = htonl(binaddr->words[i]);
+    }
+
+    if( inet_ntop(AF_INET6, tmpv6, ascaddr, strmax) == NULL ) {
+      return IP_TOSHRT;
+    }
+
+    /* now put missing octets */
+    tmp = g_string_sized_new(1024);
+
+    col = strstr (ascaddr, "::");
+    if (col != NULL) {
+      head = g_strndup(ascaddr, col - (ascaddr));
+      if ( col + 2 < (ascaddr) + strlen (ascaddr)) {
+        tail = g_strndup(col + 2, strlen(col+2));
+      } else {
+        tail = g_strdup("");
+      }
+      for (j = head; j < (head + strlen(head)); j++) {
+        if (*j == ':') {
+          head_dots++;
+        }
+      }
+      for (j = tail; j < (tail + strlen(tail)); j++) {
+        if (*j == ':') {
+          tail_dots++;
+        }
+      }
+      if (strlen(head) > 0) {
+        g_string_sprintfa(tmp, "%s", head);
+      } else {
+        g_string_sprintfa(tmp, "0");
+      }
+      for (p=0; p<(6 - head_dots - tail_dots); p++) {
+        g_string_sprintfa(tmp, ":0");
+      }
+      if (strlen(tail) > 0) {
+        g_string_sprintfa(tmp, ":%s", tail);
+      } else {
+        g_string_sprintfa(tmp, ":0");
+      }
+      strncpy (ascaddr, tmp->str, strlen(tmp->str));
+      ascaddr[strlen(tmp->str)] = 0;
+      g_string_free(tmp, TRUE);
+    }
+  }
+  return IP_OK;
+}
+
 
 /**************************************************************************/
 /*+converts the IP binary address (binaddr) to a string (ascaddr)

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.8 $
+  $Revision: 1.7 $
 
   UP pre process checks
 
@@ -1795,4 +1795,107 @@ int UP_generate_keycert_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   KM_key_return_free(key_data);
   LG_log(lg_ctx, LG_FUNC,"<UP_generate_keycert_attrs: exiting with value [%s]", UP_ret2str(retval));
   return retval;
+}
+
+int up_normalise_nserver(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *preproc_obj)
+{
+  int retval = UP_OK;
+  gchar *elm = NULL;
+  gchar *p = NULL;
+  GList *nservers_list = NULL;
+  GList *nserver_item = NULL;
+  char *nserver = NULL;
+  gchar **tokens = NULL;
+  GString *modified_attr_value = NULL;
+  rpsl_attr_t *changed = NULL;
+  int pos;
+  ip_addr_t address;
+  gchar converted[1024];
+  
+  /* we know the object has passed the syntax check already, so we don't have to check it here. */
+
+  LG_log(lg_ctx, LG_FUNC,">entering up_normalise_nserver");
+
+  nservers_list = rpsl_object_get_attr(preproc_obj, "nserver");
+
+  for ( nserver_item = nservers_list; nserver_item != NULL ; nserver_item = g_list_next(nserver_item) )
+  {
+    nserver = rpsl_attr_get_clean_value( (rpsl_attr_t *)(nserver_item->data) );
+    tokens = g_strsplit(nserver, " ", 2);
+
+    if (tokens[0] != NULL)
+    {
+      /* remove trailing dot if any */
+      p = strrchr(tokens[0], '.');
+      if ((p != NULL) && (strcmp(p, ".") == 0)) 
+      {
+        LG_log(lg_ctx, LG_DEBUG, "removing trailing . from %s", tokens[0]);
+        *p = 0;
+        /* call RT function here that will give a warning */
+      }
+      LG_log(lg_ctx, LG_DEBUG, "result: %s", tokens[0]);
+    }
+    
+    /* may be followed by an IP (v6)address */
+    if (tokens[1] != NULL)
+    {
+      if (strchr (tokens[1] , ':')) 
+      {
+        IP_addr_t2b(&address, tokens[1], IP_PLAIN);
+        IP_addr_b2a_uncompress(&address, converted, sizeof(converted));
+        if (strcmp(converted, tokens[1]))
+        {
+          LG_log(lg_ctx, LG_DEBUG, "IPv6 address %s converted to %s", tokens[1], converted);
+          //call RT function here that will give a warning 
+        }
+        // swap the pointers 
+        elm = tokens[1];
+        tokens[1] = g_strdup(converted);
+        g_free(elm);
+      }
+    }
+    
+    /* tokens contains the processed values */
+    modified_attr_value = g_string_sized_new(1024);
+    if (tokens[0] != NULL)
+    {
+      g_string_sprintfa (modified_attr_value, "%s", tokens[0]);
+    }
+    if (tokens[1] != NULL)
+    {
+      g_string_sprintfa (modified_attr_value, " %s", tokens[1]);
+    }
+    
+    /* modify the attribute */
+    LG_log(lg_ctx, LG_DEBUG, "modified_attr_value %s", modified_attr_value->str);
+
+    /* copy */
+    changed = rpsl_attr_copy((rpsl_attr_t *)(nserver_item->data));
+    rpsl_attr_replace_value (changed, modified_attr_value->str);
+    
+    /* delete original */
+    pos = rpsl_attr_get_ofs(changed);
+    rpsl_object_remove_attr(preproc_obj, pos, NULL);
+
+    /* add new */
+    rpsl_object_add_attr(preproc_obj, changed, pos, NULL);
+    
+    g_string_free(modified_attr_value, TRUE);
+    g_strfreev(tokens);
+    
+  }
+
+  rpsl_attr_delete_list(nservers_list);
+  
+  nservers_list = rpsl_object_get_attr(preproc_obj, "nserver");
+  for ( nserver_item = nservers_list; nserver_item != NULL ; nserver_item = g_list_next(nserver_item) )
+  {
+    nserver = rpsl_attr_get_clean_value( (rpsl_attr_t *)(nserver_item->data) );
+    LG_log(lg_ctx, LG_DEBUG, "resulting attribute: %s", nserver);
+  }
+  rpsl_attr_delete_list(nservers_list);
+
+  LG_log(lg_ctx, LG_FUNC,"<exiting up_normalise_nserver");
+
+  return UP_OK;
 }
