@@ -1116,7 +1116,7 @@ int main(int argc, char **argv)
     exit(13);
   }
 
-	die;
+//	die;
 
   /* set up a reporting context */
   rt_ctx = RT_start();
