@@ -559,7 +559,7 @@ char *nservertext;
   notes:
     Tokens are defined in the associated grammar, nserver.y.
 
-  $Id: nserver.l,v 1.1 2006/06/12 15:05:00 katie Exp $
+  $Id: nserver.l,v 1.1 2006/06/14 13:58:25 katie Exp $
 */
 
 /******************
@@ -853,6 +853,7 @@ YY_RULE_SETUP
     ip_addr_t ptr;
     int retval;
 
+
     retval = IP_addr_t2b(&ptr, nservertext, IP_PLAIN);
     switch (retval) {
       /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
@@ -866,7 +867,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 86 "nserver.l"
+#line 87 "nserver.l"
 {
     ip_addr_t ptr;
     int retval;
@@ -884,7 +885,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 101 "nserver.l"
+#line 102 "nserver.l"
 {
     ip_addr_t ptr;
     int retval;
@@ -902,7 +903,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 116 "nserver.l"
+#line 117 "nserver.l"
 {
     if (strlen(nservertext) > 255) 
     {
@@ -913,15 +914,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 124 "nserver.l"
+#line 125 "nserver.l"
 { return nservertext[0]; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 126 "nserver.l"
+#line 127 "nserver.l"
 ECHO;
 	YY_BREAK
-#line 925 "nserver.lex.c"
+#line 926 "nserver.lex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1887,7 +1888,7 @@ void nserverfree (void * ptr )
 #undef YY_DECL_IS_OURS
 #undef YY_DECL
 #endif
-#line 126 "nserver.l"
+#line 127 "nserver.l"
 
 
 
