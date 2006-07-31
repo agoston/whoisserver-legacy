@@ -245,18 +245,18 @@ union yyalloc
 #endif
 
 /* YYFINAL -- State number of the termination state. */
-#define YYFINAL  3
+#define YYFINAL  8
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   1
+#define YYLAST   4
 
 /* YYNTOKENS -- Number of terminals. */
 #define YYNTOKENS  7
 /* YYNNTS -- Number of nonterminals. */
-#define YYNNTS  2
+#define YYNNTS  4
 /* YYNRULES -- Number of rules. */
-#define YYNRULES  2
+#define YYNRULES  7
 /* YYNRULES -- Number of states. */
-#define YYNSTATES  4
+#define YYNSTATES  9
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -302,19 +302,20 @@ static const unsigned char yytranslate[] =
    YYRHS.  */
 static const unsigned char yyprhs[] =
 {
-       0,     0,     3
+       0,     0,     3,     5,     7,     9,    12,    15
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS. */
 static const yysigned_char yyrhs[] =
 {
-       8,     0,    -1,     6,    -1
+       8,     0,    -1,     6,    -1,     9,    -1,    10,    -1,     6,
+       5,    -1,     6,     3,    -1,     6,     4,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned char yyrline[] =
 {
-       0,    45,    45
+       0,    45,    45,    46,    47,    50,    53,    54
 };
 #endif
 
@@ -324,7 +325,7 @@ static const unsigned char yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "TKN_IPV6", "TKN_IPV6DC", "TKN_IPV4",
-  "TKN_HOSTNAME", "$accept", "nserver", 0
+  "TKN_HOSTNAME", "$accept", "nserver", "ipv4_glue", "ipv6_glue", 0
 };
 #endif
 
@@ -340,13 +341,13 @@ static const unsigned short int yytoknum[] =
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const unsigned char yyr1[] =
 {
-       0,     7,     8
+       0,     7,     8,     8,     8,     9,    10,    10
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const unsigned char yyr2[] =
 {
-       0,     2,     1
+       0,     2,     1,     1,     1,     2,     2,     2
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -354,27 +355,27 @@ static const unsigned char yyr2[] =
    means the default is an error.  */
 static const unsigned char yydefact[] =
 {
-       0,     2,     0,     1
+       0,     2,     0,     3,     4,     6,     7,     5,     1
 };
 
 /* YYDEFGOTO[NTERM-NUM]. */
 static const yysigned_char yydefgoto[] =
 {
-      -1,     2
+      -1,     2,     3,     4
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -7
+#define YYPACT_NINF -4
 static const yysigned_char yypact[] =
 {
-      -6,    -7,     1,    -7
+      -2,    -3,     3,    -4,    -4,    -4,    -4,    -4,    -4
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yysigned_char yypgoto[] =
 {
-      -7,    -7
+      -4,    -4,    -4,    -4
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -384,19 +385,19 @@ static const yysigned_char yypgoto[] =
 #define YYTABLE_NINF -1
 static const unsigned char yytable[] =
 {
-       1,     3
+       5,     6,     7,     8,     1
 };
 
 static const unsigned char yycheck[] =
 {
-       6,     0
+       3,     4,     5,     0,     6
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const unsigned char yystos[] =
 {
-       0,     6,     8,     0
+       0,     6,     8,     9,    10,     3,     4,     5,     0
 };
 
 #if ! defined (YYSIZE_T) && defined (__SIZE_TYPE__)
@@ -1011,7 +1012,7 @@ yyreduce:
     }
 
 /* Line 1010 of yacc.c.  */
-#line 1015 "nserver.tab.c"
+#line 1016 "nserver.tab.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1236,7 +1237,7 @@ yyreturn:
 }
 
 
-#line 48 "nserver.y"
+#line 57 "nserver.y"
 
 
 #undef nservererror

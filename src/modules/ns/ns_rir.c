@@ -1,5 +1,5 @@
 /*
- * $Id: ns_rir.c,v 1.1.4.1 2005/07/22 12:24:31 katie Exp $
+ * $Id: ns_rir.c,v 1.2 2005/10/25 12:30:00 katie Exp $
  */
 
 #include "ns_rir.h"
@@ -176,6 +176,10 @@ AU_ret_t ns_find_rir(au_plugin_callback_info_t * info, gchar * domain)
   GTree *delegations_tree;      /* delegations tree */
   gchar *majorityRIR;           /* which rir is related */
   gchar *ns_rir;                /* which rir we're working for */
+
+  if (ns_is_e164_arpa(info)) {
+    return AU_AUTHORISED;
+  }
 
   ns_rir = g_strdup(ca_get_ns_rir);
   g_strchomp(ns_rir);           /* do we need this for every conf var? */
