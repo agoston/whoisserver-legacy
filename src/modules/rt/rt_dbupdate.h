@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5.2.1 $
+  $Revision: 1.10 $
 
   Reporting module.
 
@@ -260,6 +260,7 @@ void RT_rdns_useotherrir(RT_context_t*,gchar*);
 void RT_rdns_cannotregister(RT_context_t*);
 void RT_rdns_nonservers(RT_context_t*);
 void RT_rdns_parenthasourns(RT_context_t*);
+void RT_rdns_parentisnotenum(RT_context_t*);
 void RT_rdns_notdelegated(RT_context_t*);
 void RT_rdns_delcheckwarning(RT_context_t*,gchar*);
 void RT_rdns_threshold(RT_context_t*);

@@ -1,5 +1,5 @@
 /*
- * $Id: ns_auth.c,v 1.3 2005/10/25 12:30:00 katie Exp $
+ * $Id: ns_auth.c,v 1.3.8.1 2006/07/31 10:36:20 katie Exp $
  */
 
 #include "rip.h"
@@ -222,6 +222,8 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
  * Flat authorisation for e164.arpa dns object 
  * similar to ns_hierarchical_creation, but there is no check
  * for corresponding inetnum object
+ * also, we make sure that the parent object is 'e164.arpa' - no further
+ * hierarchies are allowed.
 */
 
 static AU_ret_t ns_flat_creation(au_plugin_callback_info_t * info,
@@ -230,6 +232,7 @@ static AU_ret_t ns_flat_creation(au_plugin_callback_info_t * info,
   AU_ret_t ret_val;             /* result of the function */
   GList *parents = NULL;        /* parent domains */
   rpsl_object_t *parent;        /* rpsl object for the parent */
+  gchar *parent_key;            /* key of the parent object */
   
   if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY) {
     /* error getting parent list */
@@ -241,10 +244,17 @@ static AU_ret_t ns_flat_creation(au_plugin_callback_info_t * info,
     RT_parent_not_exist(info->ctx);
     ret_val = AU_UNAUTHORISED_CONT;
   } else {
-    /* might need to alter this to prohobit subdomains */
     /* one parent is enough */
     parent = parents->data;
-    ret_val = au_check_multiple_authentications (CHECK_MNT_LOWER_THEN_MNT_BY, parent, "parent", info);
+    /* check whether parent is e164.arpa */
+    parent_key = rpsl_object_get_key_value(parent);
+    if (strcasecmp (parent_key, "e164.arpa") == 0 ) {
+      ret_val = au_check_multiple_authentications (CHECK_MNT_LOWER_THEN_MNT_BY, parent, "parent", info);
+    } else {
+      RT_rdns_parentisnotenum(info->ctx);
+      LG_log(au_context, LG_DEBUG, "parent is not e164.arpa");
+      ret_val = AU_UNAUTHORISED_CONT;
+    }
   }
   
   return ret_val;

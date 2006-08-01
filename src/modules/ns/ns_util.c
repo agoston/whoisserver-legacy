@@ -1,5 +1,5 @@
 /*
- * $Id: ns_util.c,v 1.6 2005/10/25 12:30:00 katie Exp $
+ * $Id: ns_util.c,v 1.6.8.1 2006/07/31 10:36:20 katie Exp $
  */
 
 #include "ns_util.h"
@@ -263,7 +263,15 @@ static gboolean ns_check_suffix(rpsl_object_t * obj, gboolean with_dot)
     }
     p = stristr(domain, ns_suffix_dotted);
     if ((p != NULL) && (strcasecmp(p, ns_suffix_dotted) == 0)) {
-      ret_val = TRUE;
+
+      if (p != ns_suffix_dotted) /* domain: something.?suffix */ {
+        /* make sure suffix is preceded by dot */ 
+        if (((p-1) != NULL) && (*(p-1) == '.')) {
+          ret_val = TRUE;
+        }
+      } else {
+        ret_val = TRUE;
+      }
     }
     g_free(ns_suffix_dotted);
     i++;
