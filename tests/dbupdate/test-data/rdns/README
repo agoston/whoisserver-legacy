@@ -306,3 +306,25 @@
 #
 # RESULT 033: creation will fail
 
+# rdns tests
+# CASE 034: 
+#
+# create domain object
+# DS=1
+#
+#FAILURE
+#
+# RESULT 034: creation will fail but no "DS rejected" message
+
+# rdns tests
+# CASE 035: 
+#
+# create 1.e164.arpa domain object
+# make sure we can't submit DS record in e164.arpa related object.
+# !!! THIS TEST WILL FAIL AFTER THE CODECHANGE TO ALLOW DS IN E164.ARPA zone.
+
+#
+#FAILURE
+#
+# RESULT 035: creation will succeed
+
