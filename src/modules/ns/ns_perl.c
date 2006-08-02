@@ -1,5 +1,5 @@
 /*
- * $Id: ns_perl.c,v 1.3 2005/10/25 12:30:48 katie Exp $
+ * $Id: ns_perl.c,v 1.3.8.1 2006/07/31 10:36:20 katie Exp $
  */
 
 #include <EXTERN.h>             /* from the Perl distribution     */
@@ -70,7 +70,6 @@ void rdns_perl_delcheck(gchar * conf, gchar * domain, gchar ** nservers, gchar *
       $error=''; \
       $result=''; \
       eval { \
-        use lib '/home/katie/share/perl/5.8.4'; \
         require Net::DelCheck; \
         $checker = new Net::DelCheck('%s'); \
         if ( !defined $checker ) { \
