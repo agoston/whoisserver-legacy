@@ -1,8 +1,9 @@
 /*
- * $Id: ns_rir.c,v 1.2 2005/10/25 12:30:00 katie Exp $
+ * $Id: ns_rir.c,v 1.2.8.1 2006/07/31 10:36:20 katie Exp $
  */
 
 #include "ns_rir.h"
+#include "ns_util.h"
 #include "ca_configFns.h"
 #include "ca_defs.h"
 #include "ca_dictionary.h"
@@ -248,6 +249,14 @@ gboolean ns_ds_accepted(gchar * domain)
   GTree *ds_tree;              /* ds tree */
   gchar *ds_val;               /* ds value in the tree */
 
+  /* e164.arpa -> DS not accepted */
+  /* this will have to be changed when e164.arpa is signed. */
+  if (ns_has_e164_arpa_suffix(domain) == TRUE) {
+    LG_log(au_context, LG_DEBUG, "NOT reading delegations file: domain is e164.arpa related");
+    LG_log(au_context, LG_DEBUG, "DS record not allowed.");
+    return FALSE;
+  }
+
   LG_log(au_context, LG_DEBUG, "reading delegations file for ds");
   ds_tree =
       rdns_read_ds_delegations(au_context, ca_get_ns_delegationsfile);
@@ -255,9 +264,7 @@ gboolean ns_ds_accepted(gchar * domain)
     LG_log(au_context, LG_DEBUG, "can't populate ds delegations tree");
     ret_val = FALSE;            /* failsafe, we assume it's not ds */
   } else {
-    ds_val =
-        ds_val =
-        g_strdup(rdns_who_delegates(au_context, ds_tree, domain));
+    ds_val = g_strdup(rdns_who_delegates(au_context, ds_tree, domain));
     LG_log(au_context, LG_DEBUG, "ds value: %s", ds_val);
     if (ds_val[0] != '1') {
       LG_log(au_context, LG_DEBUG, "DS is not accepted");
