@@ -1,0 +1,14 @@
+# irt tests
+# CASE 20: inetnum 1 + route + irt 1
+#          query for inetnum 1
+#          
+# whois -Bc -T inetnum   inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 20: inetnum 1 + irt 1 returned
+#            person objects for inetnum 1 returned
+
+
+
+

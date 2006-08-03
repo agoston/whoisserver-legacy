@@ -1,0 +1,13 @@
+# irt tests
+# CASE 15: inetnum 1 + irt
+#          query for inetnum 1
+#          
+# whois -rB inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 15: inetnum 1 returned
+
+
+
+

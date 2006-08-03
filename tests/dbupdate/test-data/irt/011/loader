@@ -1,0 +1,233 @@
+% irt tests
+%
+
+%----------------------------------------------------------------
+%        Standard Template Objects
+
+
+% admin-c, tech-c person
+
+person:       test person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP1-DB-TEST
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% referral-by maintainer
+
+mntner:       TEST-DBM-MNT
+descr:        Mntner for RIPE DBM objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+upd-to:       dbtest@ripe.net
+mnt-by:       TEST-DBM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% allocation maintainer
+
+mntner:       RIPE-NCC-HM-MNT
+descr:        RIPE-NCC Hostmaster Maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+upd-to:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
+source:       DB-TEST
+
+
+% root inetnum object
+
+inetnum:      0.0.0.0 - 255.255.255.255
+netname:      IANA-BLK
+descr:        The whole IPv4 address space
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED UNSPECIFIED
+remarks:      The country is really worldwide.
+remarks:      This address space is assigned at various other places in
+remarks:      the world and might therefore not be in the RIPE database.
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+mnt-routes:   RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% root inet6num object
+
+inet6num:     0::/0
+netname:      ROOT
+descr:        Root inet6num object
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+status:       ALLOCATED-BY-RIR
+remarks:      This network in not allocated.
+              This object is here for Database
+              consistency and to allow hierarchical
+              authorisation checks.
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+%      End of Standard Template Objects
+%----------------------------------------------------------------
+
+
+mntner:       TEST-MNT
+descr:        Test maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+upd-to:       dbtest@ripe.net
+auth:         CRYPT-PW asMa4KAw.CNBs   # test-mnt
+mnt-by:       TEST-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
+source:       DB-TEST
+
+
+% person objects
+
+person:       test irt1 person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP12-DB-TEST
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+person:       test irt2 person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP22-DB-TEST
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+person:       test irt3 person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP32-DB-TEST
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% aut-num objects
+
+as-block:     AS3154 - AS3353
+descr:        RIPE NCC ASN block
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+aut-num:      AS3333
+as-name:      RIPE-NCC-AS
+descr:        RIPE Network Coordination Centre
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+aut-num:      AS3300
+as-name:      RIPE-NCC-AS
+descr:        RIPE Network Coordination Centre
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% inetnum objects
+
+inetnum:      192.168.0.0 - 192.168.255.255
+netname:      RIPE-NET16
+descr:        /16 to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED PA
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+inetnum:      192.168.201.0 - 192.168.201.255
+netname:      RIPE-NET24
+descr:        /24 to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       LIR-PARTITIONED PA
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+inetnum:      192.168.201.100 - 192.168.201.255
+netname:      RIPE-NET2
+descr:        /nn to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% route objects
+
+
+
+% irt objects
+
+irt:          IRT-ONE
+address:      Singel 258
+e-mail:       dbtest@ripe.net
+admin-c:      TP12-DB-TEST
+tech-c:       TP12-DB-TEST
+auth:         CRYPT-PW agl7a6gyad/e6   # irt
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+irt:          IRT-TWO
+address:      Singel 258
+e-mail:       dbtest@ripe.net
+admin-c:      TP22-DB-TEST
+tech-c:       TP22-DB-TEST
+auth:         CRYPT-PW agl7a6gyad/e6   # irt
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+irt:          IRT-THREE
+address:      Singel 258
+e-mail:       dbtest@ripe.net
+admin-c:      TP32-DB-TEST
+tech-c:       TP32-DB-TEST
+auth:         CRYPT-PW agl7a6gyad/e6   # irt
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% End of loader data file

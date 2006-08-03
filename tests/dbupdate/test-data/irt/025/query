@@ -1,0 +1,36 @@
+% This is the MyDB Whois server.
+
+% Information related to '192.168.201.100 - 192.168.201.255'
+
+inetnum:      192.168.201.100 - 192.168.201.255
+netname:      RIPE-NET2
+descr:        /nn to contain our tests
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+irt:          IRT-TWO
+address:      Singel 258
+e-mail:       dbtest@ripe.net
+admin-c:      TP22-DB-TEST
+tech-c:       TP22-DB-TEST
+auth:         CRYPT-PW agl7a6gyad/e6   # irt
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+% Information related to '192.168.201.0/24AS3333'
+
+route:        192.168.201.0/24
+descr:        RIPE-NCC
+origin:       AS3333
+admin-c:      TP1-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+

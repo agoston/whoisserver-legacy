@@ -1,0 +1,13 @@
+# irt tests
+# CASE 22: inetnum 1 + route + irt 1
+#          query for inetnum 1
+#          
+# whois -Bc -T irt inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 22: no objects returned
+
+
+
+
