@@ -1,530 +1,740 @@
-<DELCHECK_TEMPLATE version="20040611">
-
-<!-- This one is output if no problem codes are generated  -->
-<!-- If it's not here, just the root element of the report -->
-<!-- is output.                                            -->
-
-<NO_PROBLEM>
-	INFO: No problems were found.
-</NO_PROBLEM>
-
-
-<!-- ERRORS ERRORS ERRORS ERRORS -->
-<!-- ERRORS ERRORS ERRORS ERRORS -->
-<!-- ERRORS ERRORS ERRORS ERRORS -->
-
-
-<PROBLEM code="PROBLEM_MNAME_DOESNT_RESOLVE" severity="20">
-  
-  <SHORT>
-	ERROR (20 points): Could not look up an IP address for the 
-	mname (primary nameserver) <ARG no="1" /> listed in the 
-	SOA record at this server.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_COULDNT_LOOKUP_NS_ADDRESS" severity="20">
-  
-  <SHORT>
-	ERROR (20 points): Could not look up an IP address for nameserver
-	<ARG no="1" /> found in the submitted domain object.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_MULTIPLE_SOA_AT_SERVER" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The server at <ARG no="1" /> 
-	(<ARG no="2" />) returns multiple SOA records.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_NO_SOA_AT_SERVER" severity="20">
-
-  <SHORT>
-	ERROR (20 points): Could not get an SOA record from 
-	<ARG no="2" /> (<ARG no="1" />).
-  </SHORT>
-  
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_DUPLICATE_DELEGATED_NS_NAME" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The nameserver name <ARG no="1" /> appears more
-	than once in the submitted domain object.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_DUPLICATE_NS_NAME_LISTED_AT_ZONE" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The nameserver name <ARG no="1" /> was listed 
-	more than once in this zone at <ARG no="3" /> (<ARG no="2" />).
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_DUPLICATE_DELEGATED_NS_IP" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The IP address <ARG no="1" /> is identical 
-	for the nameserver(s) <ARG no="2" />
-	found in the submitted domain object.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_TOO_FEW_DELEGATED_NAMESERVERS" severity="20">
-
-  <SHORT>
-	ERROR (20 points): At least <ARG no="3" /> nameservers are 
-	required for each properly delegated zone. Only <ARG no="1" /> 
-	was found in your submission. 
-  </SHORT>
-
-</PROBLEM>
-
-
-<PROBLEM code="PROBLEM_DOMAIN_NAME_TOO_LONG" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The domain name <ARG no="1" /> of <ARG no="2" />
-	is too long.  It is <ARG no="3" /> octets compared to the maximum of
-	<ARG no="4" /> octets permitted by RFC 2181, section 11.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_DOMAIN_NAME_LABEL_TOO_LONG" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The label <ARG no="1" /> in the domain 
-	name <ARG no="2" /> of <ARG no="3" /> is too long.
-	It is <ARG no="4" /> octets, the maximum is <ARG no="4" /> octets.
-        A domain name is formed by labels separated by dots.
-        The maximum length of such a label is 63 octets, specified in
-        RFC 2181, section 11.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_DOMAIN_NAME_LABEL_EMPTY" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The domain name <ARG no="1" /> of <ARG no="2" /> 
-	contains zero length labels. A domain name is formed by labels 
-	separated by dots. The minimum length of such a label is 1 octet, 
-	as specified in RFC 2181, section 11. 
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_HOSTNAME_LABEL_ILLEGAL_CHARACTERS" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The label <ARG no="1" /> in the 
-	hostname <ARG no="2" /> of <ARG no="3" /> contains 
-	illegal characters. A hostname label must consist of
-	the characters A-Z, a-z, 0-9 or '-'. Please see RFC 1912,
-	section 2.1, for more information on hostname restrictions.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_HOSTNAME_ONE_LABEL" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The hostname <ARG no="1" /> of <ARG no="2"/> only 
-	has one label. A domain name is formed by labels separated by dots.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_HOSTNAME_LABEL_ILLEGAL_START_OR_END" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The label <ARG no="1" /> in the hostname 
-	<ARG no="2" /> of <ARG no="3" /> does not
-	start and end with a letter or digit. Please see RFC 1912,
-	section 2.1, for more information on hostname restrictions.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_NON_AA_NAMESERVER" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The delegated nameserver
-	 <ARG no="2" /> (<ARG no="1" />) returned non-authoritative
-	records for the zone.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_SERIAL_NUMBERS_DIFFER" severity="20">
-
-  <SHORT>
-	ERROR (20 points): Found differing serial numbers in the SOA records
-	returned for the zone at the nameservers:
-
-	 <ARG no="2" /> (<ARG no="1" />) : <ARG no="3" />
-	 <ARG no="5" /> (<ARG no="4" />) : <ARG no="6" />
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_SOA_VALUES_DIFFER" severity="20">
-
-  <SHORT>
-	ERROR (20 points): Found differing values in the SOA records returned
-	for the zone at  <ARG no="2" /> (<ARG no="1" />) and
-	<ARG no="4" /> (<ARG no="3" />). 
-	The following values were different:
-
-	<ARG no="5" />
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_NS_NAME_NOT_CANONICAL" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The delegated nameserver
-	name <ARG no="1" /> is not canonical.
-  </SHORT>
-
-</PROBLEM>
-
-
-<PROBLEM code="PROBLEM_SOA_RECORD_FIELD_EMPTY" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The <ARG no="1" /> field in the SOA 
-	record returned by this nameserver
-	was undefined or empty. This field should always have a value.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_RNAME_DUPLICATE_ZONE" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The rname (e-mail contact) field <ARG no="1" />
-	in the SOA record returned from this nameserver  contains
-	the zone name twice. This probably results from a missing '.'
-	on the end of the rname	in the master zone file.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_RNAME_HAS_AT_SIGN" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The rname (e-mail contact) field <ARG no="1" />
-	in the SOA record returned from	this nameserver contains
-	an '@' sign.
-        Please see RFC 1912, section 2.2 for more information on the rname
-        field.
-  </SHORT>
-
-</PROBLEM>
-
-
-<PROBLEM code="PROBLEM_RNAME_BAD_SYNTAX" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The rname (e-mail contact) field <ARG no="1" />
-	in the SOA record returned by this server is
-	syntactically incorrect.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_SERIAL_CONTAINS_NON_NUMERIC" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The serial number <ARG no="1" /> in the 
-	SOA record returned
-	by this server is not all numeric digits (0-9).
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_SERIAL_IN_FUTURE" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The serial number <ARG no="1" /> 
-	in the SOA record returned
-	by this server is a time in the future.
-  </SHORT>
-
-</PROBLEM>
-
-
-<PROBLEM code="PROBLEM_EXPIRE_LESS_THAN_REFRESH" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The expire value <ARG no="1" /> in the SOA 
-	record returned by this
-	nameserver is less than the refresh value <ARG no="2" /> in the
-	same record.
-  </SHORT>
-
-</PROBLEM>
-
-
-<PROBLEM code="PROBLEM_INCONSISTENT_NS_LISTING" severity="20">
-
-  <SHORT>
-	ERROR (20 points): Nameserver <ARG no="1" /> is listed at:
-
-		 <ARG no="3" /> (<ARG no="2" />),
-
-	but not at:
-
-		 <ARG no="5" /> (<ARG no="4" />).
-
-	All nameservers should have a consistent set of nameservers listed
-	for the zone.
-  </SHORT>
-
-</PROBLEM>
-
-
-<PROBLEM code="PROBLEM_LISTED_NAMESERVER_NOT_IN_DELEGATED_LIST" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The nameserver <ARG no="1" /> was 
-	found listed for the zone
-	at <ARG no="3" /> (<ARG no="2" />), but was not one of the
-	delegated nameservers
-	(<ARG no="4" />).
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_DELEGATED_NS_NOT_LISTED_AT_ZONE" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The submitted nameserver 
-	<ARG no="1" /> is not listed for the zone by the nameserver at
-	<ARG no="3" /> (<ARG no="2" />).
-  </SHORT>
-
-</PROBLEM>
-
-
+<?xml version="1.0" standalone="yes"?>
+<!-- This xml document has been generated using master2whois.xsl -->
+<!-- $Id: master2whois.xsl,v 1.2 2006/01/23 17:21:10 katie Exp $ -->
+<!-- DO NOT EDIT THIS FILE. EDIT THE MASTER FILE -->
+<!-- Also read the Net::DelCheck documentation on how this is used. -->
+
+<DELCHECK_TEMPLATE version="20060620">
+<NO_PROBLEM>	INFO: No problems were found.
+	</NO_PROBLEM>
 <PROBLEM code="PROBLEM_BAD_IP" severity="20">
-  <SHORT>
-	ERROR (20 points): The checker returned the IP 
-	address <ARG no="1" /> for <ARG no="2" />. This is 
+<SHORT>
+	ERROR (20 points): The checker returned the IP
+	address <ARG no="1"/> for <ARG no="2"/>. This is 
 	syntactically bad and unusable.
-  </SHORT>
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_UNUSABLE_IP" severity="20">
-  <SHORT>
-	ERROR (20 points): The checker returned the IP 
-	address <ARG no="1" /> for
-	<ARG no="2" />. This is unusable as a 
-	nameserver IP because <ARG no="3" />.
-  </SHORT>
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_UNUSABLE_HOSTNAME" severity="20">
-  <SHORT>
-	ERROR (20 points): The hostname <ARG no="1" /> of 
-	<ARG no="2" /> is unusable.
-  </SHORT>
+	
+</SHORT>
 </PROBLEM>
 
 <PROBLEM code="PROBLEM_BAD_PORT" severity="20">
-
-  <SHORT>
-	ERROR (20 points): Port <ARG no="1" /> was specified for
-	(<ARG no="2" />). This is syntactically invalid and
+<SHORT>
+	ERROR (20 points): Port <ARG no="1"/> was specified for
+	(<ARG no="2"/>). This is syntactically invalid and
 	unusable.
-  </SHORT>
-
+	
+</SHORT>
 </PROBLEM>
 
-<PROBLEM code="PROBLEM_REQUIRED_NAMESERVER_MISSING" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The RIPE NCC nameserver <ARG no="2" /> 
-	was not present in the 
-	submitted list of delegated nameservers
-	for this zone. This is required by the
-	RIPE NCC for this type/size of zone.
-  </SHORT>
-
+<PROBLEM code="PROBLEM_COULDNT_LOOKUP_NS_ADDRESS" severity="20">
+<SHORT>
+	ERROR (20 points): Could not look up an IP address for nameserver
+	<ARG no="1"/> found in the submitted domain object.
+	
+</SHORT>
 </PROBLEM>
 
-<PROBLEM code="PROBLEM_PROHIBITED_NAMESERVER_PRESENT" severity="20">
-
-  <SHORT>
-	ERROR (20 points): The nameserver <ARG no="1" /> is present in the
-	submitted list of delegated nameservers
-	for this zone (<ARG no="2" />). The RIPE NCC does not 
-	run secondary for zones of this type/size.
-  </SHORT>
-
+<PROBLEM code="PROBLEM_DELEGATED_NS_NOT_LISTED_AT_ZONE" severity="20">
+<SHORT>
+	ERROR (20 points): The submitted nameserver
+	<ARG no="1"/> is not listed for the zone by the nameserver at
+	<ARG no="3"/> (<ARG no="2"/>).
+	
+</SHORT>
 </PROBLEM>
 
-<!-- WARNINGS WARNINGS WARNINGS WARNIGNS -->
-<!-- WARNINGS WARNINGS WARNINGS WARNIGNS -->
-<!-- WARNINGS WARNINGS WARNINGS WARNIGNS -->
-
-<PROBLEM code="PROBLEM_REVERSE_DOMAIN_IN_RNAME" severity="2">
-
-  <SHORT>
-	WARNING (2 points): The rname (e-mail contact) field <ARG no="1" />
-        in the SOA record returned by this server is in a reverse domain
-        (in-addr.arpa, ip6.int or ip6.arpa).
-  </SHORT>
-
-
+<PROBLEM code="PROBLEM_DELEGATED_NS_ON_SAME_SUBNET" severity="0">
+<SHORT>
+	INFO: The delegated nameservers
+	<ARG no="2"/> (<ARG no="1"/>) and <ARG no="4"/> (<ARG no="3"/>)
+	may not be on the same subnet.
+	
+</SHORT>
 </PROBLEM>
 
-<PROBLEM code="PROBLEM_NO_REVERSE_MAPPING" severity="4">
-
-  <SHORT>
-	WARNING (4 points): Could not find a PTR record mapping <ARG no="1" />
-	to <ARG no="2" />.
-        For every IP address there should be a matching PTR record
-        registered Please see RFC1912, section 2.1 for more information.
-  </SHORT>
-
+<PROBLEM code="PROBLEM_DOMAIN_NAME_LABEL_EMPTY" severity="20">
+<SHORT>
+	ERROR (20 points): The domain name <ARG no="1"/> of <ARG no="2"/>
+	contains zero length labels. A domain name is formed by labels 
+	separated by dots. The minimum length of such a label is 1 octet, 
+	as specified in RFC 2181, section 11. 
+	
+</SHORT>
 </PROBLEM>
 
-<PROBLEM code="PROBLEM_WRONG_REVERSE_MAPPING" severity="4">
+<PROBLEM code="PROBLEM_DOMAIN_NAME_LABEL_TOO_LONG" severity="20">
+<SHORT>
+	ERROR (20 points): The label <ARG no="1"/> in the domain 
+	name <ARG no="2"/> of <ARG no="3"/> is too long.
+	It is <ARG no="4"/> octets, the maximum is 63 octets.
+	A domain name is formed by labels separated by dots.
+	The maximum length of such a label is 63 octets, specified in
+	RFC 2181, section 11.
+	
+</SHORT>
+</PROBLEM>
 
-  <SHORT>
-	WARNING (4 points): None of the PTR records found for 
-	<ARG no="1" /> mapped back to <ARG no="2" />.
-	For every IP address there should be a matching PTR record
-	registered Please see RFC1912, section 2.1 for more information.
-  </SHORT>
+<PROBLEM code="PROBLEM_DOMAIN_NAME_TOO_LONG" severity="20">
+<SHORT>
+	ERROR (20 points): The domain name <ARG no="1"/> of <ARG no="2"/>
+	is too long.  It is <ARG no="3"/> octets compared to the maximum of
+	<ARG no="4"/> octets permitted by RFC 2181, section 11.
+	
+</SHORT>
+</PROBLEM>
 
+<PROBLEM code="PROBLEM_DUPLICATE_DELEGATED_NS_IP" severity="20">
+<SHORT>
+	ERROR (20 points): The IP address <ARG no="1"/> is identical
+	for the nameserver(s) <ARG no="2"/>
+	found in the submitted domain object.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_DUPLICATE_DELEGATED_NS_NAME" severity="20">
+<SHORT>
+	ERROR (20 points): The nameserver name <ARG no="1"/> appears more
+	than once in the submitted domain object.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_DUPLICATE_NS_NAME_LISTED_AT_ZONE" severity="20">
+<SHORT>
+	ERROR (20 points): The nameserver name <ARG no="1"/> was listed
+	more than once in this zone at <ARG no="3"/> (<ARG no="2"/>).
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_EXPIRE_LESS_THAN_REFRESH" severity="20">
+<SHORT>
+	ERROR (20 points): The expire value <ARG no="1"/> in the SOA
+	record returned by this
+	nameserver is less than the refresh value <ARG no="2"/> in the
+	same record.
+	
+</SHORT>
 </PROBLEM>
 
 <PROBLEM code="PROBLEM_EXPIRE_LESS_THAN_REFRESH_RETRY_SUM" severity="7">
-
-  <SHORT>
-	WARNING (7 points): The expire value <ARG no="1" /> in the SOA record 
+<SHORT>
+	WARNING (7 points): The expire value <ARG no="1"/> in the SOA record
 	returned by this nameserver is less than the sum of the 
-	refresh (<ARG no="2" />) and
-	retry (<ARG no="3" />) values in the same record.
-  </SHORT>
-
-</PROBLEM>
-
-
-<!-- INFOS INFOS INFOS INFOS INFOS -->
-<!-- INFOS INFOS INFOS INFOS INFOS -->
-<!-- INFOS INFOS INFOS INFOS INFOS -->
-
-
-<PROBLEM code="PROBLEM_MNAME_NOT_LISTED_AS_NS" severity="0">
-
-  <SHORT>
-	INFO: The mname (primary nameserver) <ARG no="1" /> in the SOA record
-	listed at this server is not in the list of servers
-	at this nameserver (<ARG no="2" />).
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_SERIAL_NOT_RECOMMENDED_FORMAT" severity="0">
-
-  <SHORT>
-	INFO: The serial number <ARG no="1" /> in the SOA record returned by
-	this server is not in the recommended YYYYMMDDnn format.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_REFRESH_OUT_OF_RANGE" severity="0">
-
-  <SHORT>
-	INFO: The refresh value <ARG no="1" /> (<ARG no="2" />) in 
-	the SOA record returned by
-	this nameserver is not within the recommended range.
-        RFC 1912 recommends 20 minutes to 12 hours for this value.
-  </SHORT>
-
-</PROBLEM>
-
-<PROBLEM code="PROBLEM_RETRY_OUT_OF_RANGE" severity="0">
-
-  <SHORT>
-	INFO: The retry value <ARG no="1" /> (<ARG no="2" />) in the SOA record
-	returned by this nameserver is not within the recommended range. 
-	RFC 1912 recommends a fraction of the refresh for this value. We
-	have interpreted this as <ARG no="2" /> to <ARG no="3" /> of the
-	refresh.
-  </SHORT>
-
+	refresh (<ARG no="2"/>) and
+	retry (<ARG no="3"/>) values in the same record.
+	
+</SHORT>
 </PROBLEM>
 
 <PROBLEM code="PROBLEM_EXPIRE_OUT_OF_RANGE" severity="0">
-
-  <SHORT>
-	INFO: The expire value <ARG no="1" /> (<ARG no="2" />) 
+<SHORT>
+	INFO: The expire value <ARG no="1"/> (<ARG no="2"/>) 
 	in the SOA record returned by this
 	nameserver is not within the suggested range.
 	RFC 1912 recommends between two and four weeks for this value.
-  </SHORT>
-
+	
+</SHORT>
 </PROBLEM>
 
-<PROBLEM code="PROBLEM_MINIMUM_OUT_OF_RANGE" severity="0">
-
-  <SHORT>
-	INFO: The minimum value <ARG no="1" /> (<ARG no="2" />) 
-	in the SOA record returned by this
-	nameserver is not within the suggested range. RFC 1912
-	suggests 1-5 days as typical values.
-  </SHORT>
-
+<PROBLEM code="PROBLEM_HOSTNAME_IN_NUMERIC_TLD" severity="20">
+<SHORT>
+	ERROR (20 points): The hostname <ARG no="1"/> of
+	<ARG no="2"/> has a numeric Top Level Domain. 
+	This is probably because you entered the IP address instead of the hostname.
+	
+</SHORT>
 </PROBLEM>
 
+<PROBLEM code="PROBLEM_HOSTNAME_LABEL_ILLEGAL_CHARACTERS" severity="20">
+<SHORT>
+	ERROR (20 points): The label <ARG no="1"/> in the
+	hostname <ARG no="2"/> of <ARG no="3"/> contains 
+	illegal characters. A hostname label must consist of
+	the characters A-Z, a-z, 0-9 or '-'. Please see RFC 1912,
+	section 2.1, for more information on hostname restrictions.
+	
+</SHORT>
+</PROBLEM>
 
-<PROBLEM code="PROBLEM_DELEGATED_NS_ON_SAME_SUBNET" severity="0">
+<PROBLEM code="PROBLEM_HOSTNAME_LABEL_ILLEGAL_START_OR_END" severity="20">
+<SHORT>
+	ERROR (20 points): The label <ARG no="1"/> in the hostname
+	<ARG no="2"/> of <ARG no="3"/> does not
+	start and end with a letter or digit. Please see RFC 1912,
+	section 2.1, for more information on hostname restrictions.
+	
+</SHORT>
+</PROBLEM>
 
-  <SHORT>
-	INFO: The delegated nameservers 
-	<ARG no="2" /> (<ARG no="1" />) and <ARG no="4" /> (<ARG no="3" />)
-	may be on the same subnet.
-  </SHORT>
+<PROBLEM code="PROBLEM_HOSTNAME_ONE_LABEL" severity="20">
+<SHORT>
+	ERROR (20 points): The hostname <ARG no="1"/> of <ARG no="2"/> only
+	has one label. A domain name is formed by labels separated by dots.
+	
+</SHORT>
+</PROBLEM>
 
+<PROBLEM code="PROBLEM_INCONSISTENT_NS_LISTING" severity="20">
+<SHORT>
+	ERROR (20 points): Nameserver <ARG no="1"/> is listed at:
+	
+	<ARG no="3"/> (<ARG no="2"/>),
+	
+	but not at:
+	
+	<ARG no="5"/> (<ARG no="4"/>).
+	
+	All nameservers should have a consistent set of nameservers listed
+	for the zone.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_LISTED_NAMESERVER_NOT_IN_DELEGATED_LIST" severity="0">
+<SHORT>
+	INFO: The nameserver <ARG no="1"/> was
+	found listed for the zone
+	at <ARG no="3"/> (<ARG no="2"/>), but was not one of the
+	delegated nameservers
+	(<ARG no="4"/>).
+	
+</SHORT>
 </PROBLEM>
 
 <PROBLEM code="PROBLEM_LOOKUP" severity="0">
-
-  <SHORT>
+<SHORT>
 	INFO: The checker encountered an error when looking up
-	<ARG no="1" /> records for the name <ARG no="2" /> at
-	<ARG no="3" />:
+	<ARG no="1"/> records for the name <ARG no="2"/> at
+	<ARG no="3"/>:
+	<ARG no="4"/>
+	
+</SHORT>
+</PROBLEM>
 
-		<ARG no="4" />
-  </SHORT>
+<PROBLEM code="PROBLEM_MAILCHECK_A_LOOKUP" severity="2">
+<SHORT>
+	WARNING (2 points): We could not lookup the A address for <ARG no="1"/>
+	The resolver returened the folowing RCODE: <ARG no="2"/> 
+	
+</SHORT>
+</PROBLEM>
 
+<PROBLEM code="PROBLEM_MAILCHECK_CONNECTION_FAILED" severity="0">
+<SHORT>
+	INFO: We could not set up a TCP connection to port 25 of <ARG no="1"/> which
+	supposedly is the receiving MTA for <ARG no="2"/>
+	(<ARG no="3"/>)
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_MAILCHECK_MX_LOOKUP" severity="2">
+<SHORT>
+	WARNING (2 points): We could not lookup the MX address for <ARG no="1"/>
+	The resolver returened the folowing RCODE: <ARG no="2"/> 
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_MAILCHECK_SMTP_FAILURE" severity="0">
+<SHORT>
+	INFO: A failure occured during the SMTP session with <ARG no="1"/>
+	This one of the mail servers that accepts mails for the 
+	 email address in the SOA rname field <ARG no="2"/>
+	The MTA returned: <ARG no="3"/>
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_MINIMUM_OUT_OF_RANGE" severity="0">
+<SHORT>
+	INFO: The minimum value <ARG no="1"/> (<ARG no="2"/>) 
+	in the SOA record returned by this
+	nameserver is not within the suggested range. RFC 2308
+	suggests 1-3 hours as typical values.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_MNAME_DOESNT_RESOLVE" severity="20">
+<SHORT>
+	ERROR (20 points): Could not look up an IP address for the
+	mname (primary nameserver) <ARG no="1"/> listed in the
+	SOA record at this server.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_MNAME_NOT_LISTED_AS_NS" severity="0">
+<SHORT>
+	INFO: The mname (primary nameserver) <ARG no="1"/> in the SOA record
+	listed at this server is not in the list of servers
+	at this nameserver (<ARG no="2"/>).
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_MULTIPLE_SOA_AT_SERVER" severity="20">
+<SHORT>
+	ERROR (20 points): The server at <ARG no="1"/>
+	(<ARG no="2"/>) returns multiple SOA records.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_NON_AA_NAMESERVER" severity="20">
+<SHORT>
+	ERROR (20 points): The delegated nameserver
+	<ARG no="2"/> (<ARG no="1"/>) returned non-authoritative
+	records for the zone.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_NO_REVERSE_MAPPING" severity="0">
+<SHORT>
+	INFO: Could not find a PTR record mapping <ARG no="1"/>
+	to <ARG no="2"/>.
+	For every IP address there should be a matching PTR record
+	registered Please see RFC1912, section 2.1 for more information.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_NO_SOA_AT_SERVER" severity="20">
+<SHORT>
+	ERROR (20 points): Could not get an SOA record from
+	<ARG no="2"/> (<ARG no="1"/>).
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_NS_NAME_NOT_CANONICAL" severity="20">
+<SHORT>
+	ERROR (20 points): The delegated nameserver
+	name <ARG no="1"/> is not canonical.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_PROHIBITED_NAMESERVER_PRESENT" severity="20">
+<SHORT>
+	ERROR (20 points): The nameserver <ARG no="1"/> is present in the
+	submitted list of delegated nameservers
+	for this zone (<ARG no="2"/>). The RIPE NCC does not 
+	run secondary for zones of this type/size.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_REFRESH_OUT_OF_RANGE" severity="0">
+<SHORT>
+	INFO: The refresh value <ARG no="1"/> (<ARG no="2"/>) in
+	the SOA record returned by
+	this nameserver is not within the recommended range.
+	RFC 1912 recommends 20 minutes to 12 hours for this value.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_REQUIRED_NAMESERVER_MISSING" severity="20">
+<SHORT>
+	ERROR (20 points): The nameserver(s) <ARG no="2"/>
+	was/were not present in the 
+	submitted list of delegated nameservers
+	for this zone. This is required by the
+	RIPE NCC for this type/size of zone.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_RETRY_OUT_OF_RANGE" severity="0">
+<SHORT>
+	INFO: The retry value <ARG no="1"/> (<ARG no="2"/>) in the SOA record
+	returned by this nameserver is not within the recommended range. 
+	RFC 1912 recommends a fraction of the refresh for this value. We
+	have interpreted this as a fraction between <ARG no="3"/> to <ARG no="4"/> times the
+	refresh value i.e. between <ARG no="5"/> and <ARG no="6"/>.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_REVERSE_DOMAIN_IN_RNAME" severity="2">
+<SHORT>
+	WARNING (2 points): The rname (e-mail contact) field <ARG no="1"/>
+	in the SOA record returned by this server is in a reverse domain
+	(in-addr.arpa, ip6.int or ip6.arpa).
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_RNAME_BAD_SYNTAX" severity="20">
+<SHORT>
+	ERROR (20 points): The rname (e-mail contact) field <ARG no="1"/>
+	in the SOA record returned by this server is
+	syntactically incorrect.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_RNAME_DUPLICATE_ZONE" severity="10">
+<SHORT>
+	WARNING (10 points): The rname (e-mail contact) field <ARG no="1"/>
+	in the SOA record returned from this nameserver  contains
+	the zone name twice. This probably results from a missing '.'
+	on the end of the rname in the master zone file.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_RNAME_HAS_AT_SIGN" severity="20">
+<SHORT>
+	ERROR (20 points): The rname (e-mail contact) field <ARG no="1"/>
+	in the SOA record returned from this nameserver contains
+	an '@' sign.
+	Please see RFC 1912, section 2.2 for more information on the rname
+	field.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_SERIAL_IN_FUTURE" severity="0">
+<SHORT>
+	INFO: The serial number <ARG no="1"/>
+	in the SOA record returned
+	by this server is a time in the future.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_SERIAL_NOT_RECOMMENDED_FORMAT" severity="0">
+<SHORT>
+	INFO: The serial number <ARG no="1"/> in the SOA record returned by
+	this server is not in the recommended YYYYMMDDnn format.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_SERIAL_NUMBERS_DIFFER" severity="10">
+<SHORT>
+	WARNING (10 points): Found differing serial numbers in the SOA records
+	returned for the zone at the nameservers:
+	
+	<ARG no="2"/> (<ARG no="1"/>) : <ARG no="3"/>
+	<ARG no="5"/> (<ARG no="4"/>) : <ARG no="6"/>
+	
+</SHORT>
 </PROBLEM>
 
 <PROBLEM code="PROBLEM_SKIPPED_SERIAL_NUMBER" severity="0">
-
-  <SHORT>
-      INFO: Several tests were skipped for one of more servers
-      having the version of the zone with serial number
-       <ARG no="1" />, which had already been checked.
-  </SHORT>
-
+<SHORT>
+	INFO: Several tests were skipped for one of more servers
+	having the version of the zone with serial number
+	<ARG no="1"/>, which had already been checked.
+	
+</SHORT>
 </PROBLEM>
+
+<PROBLEM code="PROBLEM_SOA_RECORD_FIELD_EMPTY" severity="20">
+<SHORT>
+	ERROR (20 points): The <ARG no="1"/> field in the SOA
+	record returned by this nameserver
+	was undefined or empty. This field should always have a value.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_SOA_VALUES_DIFFER" severity="20">
+<SHORT>
+	ERROR (20 points): Found differing values in the SOA records returned
+	for the zone at  <ARG no="2"/> (<ARG no="1"/>) and
+	<ARG no="4"/> (<ARG no="3"/>). 
+	The following values were different:
+	
+	[<ARG no="5"/>]
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_TOO_FEW_DELEGATED_NAMESERVERS" severity="20">
+<SHORT>
+	ERROR (20 points): At least <ARG no="3"/> nameservers are
+	required for each properly delegated zone. We found only <ARG no="1"/> 
+	in your submission.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_UNUSABLE_HOSTNAME" severity="20">
+<SHORT>
+	ERROR (20 points): The hostname <ARG no="1"/> of
+	<ARG no="2"/> is unusable.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_UNUSABLE_IP" severity="20">
+<SHORT>
+	ERROR (20 points): The checker returned the IP
+	address <ARG no="1"/> for
+	<ARG no="2"/>. This is unusable as a 
+	nameserver IP because <ARG no="3"/>.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_WRONG_REVERSE_MAPPING" severity="0">
+<SHORT>
+	INFO: None of the PTR records found for
+	<ARG no="1"/> mapped back to <ARG no="2"/>.
+	For every IP address there should be a matching PTR record
+	registered Please see RFC1912, section 2.1 for more information.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_RRSET_TTLS_NOT_EQUAL" severity="5">
+<SHORT>
+	WARNING (5 points): The nameserver records in the NS set should all have the exact same
+	TTL (see RFC2181).
+	We found at least two differing TTLs (<ARG no="1"/> and <ARG no="2"/>)
+	The offending RRs are:
+	<ARG no="3"/> 
+	<ARG no="4"/> 
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_NS_TTL_TOO_SHORT" severity="4">
+<SHORT>
+	WARNING (4 points): The TTL on the NS RRs is to short.
+	We found it to be <ARG no="1"/>.
+	To avoid excesive load on the DNS parent server the TTL should be 
+	 <ARG no="2"/> or more.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_GLUE_IP_MISSING" severity="20">
+<SHORT>
+	ERROR (20 points): The glue nameserver <ARG no="1"/>
+	is specified without the IPv4 or IPv6 address.
+	Every glue nameserver must have at least one IPv4 or IPv6 address.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_GLUE_OUTSIDE_ZONE" severity="20">
+<SHORT>
+	ERROR (20 points): The glue nameserver <ARG no="1"/>
+	must be within the domain that is being delegated.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_GLUE_IP_RR_MISSING" severity="20">
+<SHORT>
+	ERROR (20 points): The glue nameserver <ARG no="1"/>
+	must be authoritative for at least one of its own A/AAAA records.
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_NOT_ALL_SERVERS_RETURN_DNSSECDATA" severity="20">
+<SHORT>
+	ERROR (20 points): Nameserver <ARG no="1"/> did not return DNSSEC data.
+	Either your zone is nog signed or the server is not configured
+	with DNSSEC
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_INCONSISTENT_DNSKEY_LISTING" severity="20">
+<SHORT>
+	ERROR (20 points): DNSKEY RR
+    <ARG no="1"/>
+    is listed at:
+    
+	
+	
+      <ARG no="3"/>
+      (
+      <ARG no="2"/>
+      ),
+    
+	
+	but not at:
+	
+	
+      <ARG no="5"/>
+      (
+      <ARG no="4"/>
+      ).
+    
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_NO_MATCHING_DNSKEY_FOR_DS" severity="20">
+<SHORT>
+	ERROR (20 points): The submitted DS RR:
+	
+      <ARG no="1"/>
+      doesn't have corresponding DNSKEY record listed for the zone.
+    
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_DS_POINTING_TO_NON_SEP_DNSKEY" severity="4">
+<SHORT>
+	WARNING (4 points): 
+      Although some of your keys in your DNSKEY RRset have a SEP flag set
+    
+	we observed that the following DS RR
+	
+      <ARG no="1"/>
+      is pointing to
+    
+	
+      <ARG no="2"/>
+    
+	
+      (<ARG no="3"/>)
+    
+	That DNSKEY is not marked as a Secure Entry Point key
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_SEP_FLAG_NOT_USED" severity="0">
+<SHORT>
+	INFO: None of your DNSKEYs is marked as a Secure Entry Point key
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_SEP_KEY_NOT_SELF_SIGNED" severity="20">
+<SHORT>
+	ERROR (20 points): The following DS RR
+	
+      <ARG no="1"/>
+      is pointing to
+    
+	
+      <ARG no="2"/>
+    
+	
+      (<ARG no="3"/>)
+    
+	
+	Any key that a DS points to should sign the DNSKEY RRset
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_DS_DIGEST_ALGORITHM_NOT_KNOWN" severity="0">
+<SHORT>
+	INFO: 
+      <ARG no="1"/>
+      uses a Digest type that is not implemented by this checker.
+    
+	
+      We cannot verify if the chain of trust is intact.
+    
+	
+      You should be conciously using digest types other than SHA1
+    
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_DS_AND_DNSKEYRR_DO_NOT_MATCH" severity="20">
+<SHORT>
+	ERROR (20 points):  the digest in 
+	
+     <ARG no="1"/>
+   
+	
+     does not properly match the digest calculated over
+   
+	
+     <ARG no="2"/>
+   
+	Your input may be corrupted.
+   
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_DNSSEC_ALGORITHM_NOT_IMPLEMENTED" severity="0">
+<SHORT>
+	INFO: The signature over  <ARG no="1"/> 
+	 is made with algorithm code <ARG no="2"/>
+	 The checker does not implement this algorithm and can therefore not
+	 validate the chain of trust
+	
+	It is assumed that using algoritm type  <ARG no="2"/> is a conscious choice. 
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_CHAIN_OF_TRUST_DOES_NOT_VALIDATE" severity="0">
+<SHORT>
+	INFO: The chain of trust starting with 
+	<ARG no="1"/>
+    
+	 and terminating with a signature made overt the SOA RR made with DNSKEY of key id <ARG no="2"/>. 
+	 does not validate
+	<ARG no="3"/>
+    
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_NO_CHAINS_OF_TRUST_VALIDATE" severity="20">
+<SHORT>
+	ERROR (20 points): 
+      We have tried all possible chains of trust from the supplied
+    
+	
+      DS RRs to the SOA RR.
+    
+	
+      All possible trust paths failed to verify. Errors on the individual
+    
+	
+      trust paths are reported elsewhere in this report.
+    
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_SIGNATURE_VALIDITY_NEARS_EXPIRATION" severity="0">
+<SHORT>
+	INFO:  The signature made with key id <ARG no="1"/>
+    
+	 Has a signature validity interval between
+    <ARG no="2"/> and
+    <ARG no="3"/>
+    
+	4/5th of this interval has expired.
+    
+	You probably need to resign your data
+    
+	
+</SHORT>
+</PROBLEM>
+
+<PROBLEM code="PROBLEM_TTL_LARGE_FRACTION_OF_SIGNATURE_VALIDITY" severity="0">
+<SHORT>
+	INFO: The SOA TTL (<ARG no="1"/>) is
+    larger than half the RRSIG validity interval (<ARG no="2"/>) 
+    
+	
+</SHORT>
+</PROBLEM>
+
 
 </DELCHECK_TEMPLATE>
