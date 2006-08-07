@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5.2.1 $
+  $Revision: 1.10.8.1 $
 
   Reporting module.
 
@@ -1864,6 +1864,10 @@ void RT_rdns_nonservers(RT_context_t *ctx) {
 
 void RT_rdns_parenthasourns(RT_context_t *ctx) {
   RT_rdns_message(ctx,"RDNSparenthasourns","");
+}
+
+void RT_rdns_parentisnotenum(RT_context_t *ctx) {
+  RT_rdns_message(ctx,"RDNSparentisnotenum","");
 }
 
 void RT_rdns_notdelegated(RT_context_t *ctx) {

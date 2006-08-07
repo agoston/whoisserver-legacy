@@ -1,5 +1,5 @@
 /*
- * $Id: ns_util.c,v 1.3.2.1 2005/07/22 12:24:31 katie Exp $
+ * $Id: ns_util.c,v 1.6.8.2 2006/08/01 10:35:37 katie Exp $
  */
 
 #include "ns_util.h"
@@ -143,7 +143,14 @@ gchar **ns_ds_rdata(rpsl_object_t * obj, RT_context_t * ctx,
   return ds_rdata;
 
 }
-
+/* helper function to make the code more readable */
+int process_nameserver (int i, gchar *string, gchar **nservers) {
+    nservers[i] = g_strdup(string);
+    LG_log (au_context, LG_DEBUG, "extracting nameserver: %s", string);
+    nservers[i + 1] = NULL;
+    i++;
+    return i;
+}
 /*
  * Extract the related nservers
  */
@@ -155,6 +162,7 @@ gchar **ns_nservers(rpsl_object_t * obj, RT_context_t * ctx,
   gint i;                       /* generic temporary int */
   gchar *str;                   /* generic temporary string */
   gchar **nservers;             /* result */
+  gchar **tokens;               /* splitted list*/
 
   nserver_attrs = rpsl_object_get_attr(obj, "nserver");
   rpsl_attr_split_multiple(&nserver_attrs);
@@ -166,26 +174,66 @@ gchar **ns_nservers(rpsl_object_t * obj, RT_context_t * ctx,
   } else {
     while ((nserver_attrs->next) != NULL) {
       nserver_count++;
+      if (strstr( rpsl_attr_get_clean_value((rpsl_attr_t *) (nserver_attrs->data)), " ") != NULL ) {
+        nserver_count ++;
+      }
       nserver_attrs = nserver_attrs->next;
     }
-    nservers = g_new(char *, nserver_count + 1);
+    nservers = g_new(char *, nserver_count + 2);
     i = 0;
     while ((nserver_attrs->prev) != NULL) {
       str =
           rpsl_attr_get_clean_value((rpsl_attr_t *) (nserver_attrs->data));
-      nservers[i] = g_strdup(str);
-      nservers[i + 1] = NULL;
+      if (strstr (str, " ") == NULL) {
+        i = process_nameserver (i, str, nservers);
+      }
+      else {
+        tokens = g_strsplit(str, " ", 2);
+        if (tokens[0] != NULL) {
+          nservers[i] = g_strdup(tokens[0]);
+          LG_log (au_context, LG_DEBUG, "extracting nameserver: %s", tokens[0]);
+          nservers[i + 1] = NULL;
+          i++;
+        }
+        if (tokens[1] != NULL) {
+          nservers[i] = g_strdup(tokens[1]);
+          LG_log (au_context, LG_DEBUG, "extracting IP address: %s", tokens[1]);
+          nservers[i + 1] = NULL;
+          i++;
+        }
+        g_strfreev(tokens);
+      }
       free(str);
-      i++;
       nserver_attrs = nserver_attrs->prev;
     }
     str = rpsl_attr_get_clean_value((rpsl_attr_t *) (nserver_attrs->data));
-    nservers[i] = g_strdup(str);
-    nservers[i + 1] = NULL;
+    if (strstr (str, " ") == NULL) {
+      nservers[i] = g_strdup(str);
+      LG_log (au_context, LG_DEBUG, "extracting nameserver: %s", str);
+      nservers[i + 1] = NULL;
+      i++;
+    }
+    else {
+      tokens = g_strsplit(str, " ", 2);
+      if (tokens[0] != NULL) {
+        nservers[i] = g_strdup(tokens[0]);
+        LG_log (au_context, LG_DEBUG, "extracting nameserver: %s", tokens[0]);
+        nservers[i + 1] = NULL;
+        i++;
+      }
+      if (tokens[1] != NULL) {
+        nservers[i] = g_strdup(tokens[1]);
+        LG_log (au_context, LG_DEBUG, "extracting IP address: %s", tokens[1]);
+        nservers[i + 1] = NULL;
+        i++;
+      }
+      g_strfreev(tokens);
+    }
     free(str);
     rpsl_attr_delete_list(nserver_attrs);
     *result = AU_AUTHORISED;
   }
+  
   return nservers;
 }
 
@@ -215,7 +263,15 @@ static gboolean ns_check_suffix(rpsl_object_t * obj, gboolean with_dot)
     }
     p = stristr(domain, ns_suffix_dotted);
     if ((p != NULL) && (strcasecmp(p, ns_suffix_dotted) == 0)) {
-      ret_val = TRUE;
+
+      if (p != ns_suffix_dotted) /* domain: something.?suffix */ {
+        /* make sure suffix is preceded by dot */ 
+        if (((p-1) != NULL) && (*(p-1) == '.')) {
+          ret_val = TRUE;
+        }
+      } else {
+        ret_val = TRUE;
+      }
     }
     g_free(ns_suffix_dotted);
     i++;
@@ -328,6 +384,38 @@ gboolean ns_remove_trailing_dot(LG_context_t * lg_ctx, gchar ** object_str)
   rpsl_object_delete(object);
   free(domain);
   return ret_val;
+}
+
+/* 
+ * check whether this is e164.arpa domain
+*/
+gboolean ns_is_e164_arpa(au_plugin_callback_info_t * info)
+{
+  gchar *domain;
+  
+  domain = rpsl_object_get_key_value(info->obj);
+
+  if (ns_has_e164_arpa_suffix(domain)) {
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+
+}
+/* true if ends with e164.arpa */
+gboolean ns_has_e164_arpa_suffix(gchar * domain)
+{
+  gchar *p;
+
+  p = stristr (domain, "e164.arpa");
+  if (p != NULL && (strcasecmp(p, "e164.arpa") == 0 )) {
+    LG_log(au_context, LG_DEBUG, "object is e164.arpa related");
+    return TRUE;
+  } else {
+    LG_log(au_context, LG_DEBUG, "object is NOT e164.arpa related");
+    return FALSE;
+  }
 }
 
 /*

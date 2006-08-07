@@ -1,8 +1,9 @@
 /*
- * $Id: ns_rir.c,v 1.1.4.1 2005/07/22 12:24:31 katie Exp $
+ * $Id: ns_rir.c,v 1.2.8.2 2006/08/02 12:49:02 katie Exp $
  */
 
 #include "ns_rir.h"
+#include "ns_util.h"
 #include "ca_configFns.h"
 #include "ca_defs.h"
 #include "ca_dictionary.h"
@@ -177,6 +178,10 @@ AU_ret_t ns_find_rir(au_plugin_callback_info_t * info, gchar * domain)
   gchar *majorityRIR;           /* which rir is related */
   gchar *ns_rir;                /* which rir we're working for */
 
+  if (ns_is_e164_arpa(info)) {
+    return AU_AUTHORISED;
+  }
+
   ns_rir = g_strdup(ca_get_ns_rir);
   g_strchomp(ns_rir);           /* do we need this for every conf var? */
   LG_log(au_context, LG_DEBUG, "reading delegations file");
@@ -244,6 +249,14 @@ gboolean ns_ds_accepted(gchar * domain)
   GTree *ds_tree;              /* ds tree */
   gchar *ds_val;               /* ds value in the tree */
 
+  /* e164.arpa -> DS not accepted */
+  /* this will have to be changed when e164.arpa is signed. */
+  if (ns_has_e164_arpa_suffix(domain) == TRUE) {
+    LG_log(au_context, LG_DEBUG, "NOT reading delegations file: domain is e164.arpa related");
+    LG_log(au_context, LG_DEBUG, "DS record not allowed.");
+    return FALSE;
+  }
+
   LG_log(au_context, LG_DEBUG, "reading delegations file for ds");
   ds_tree =
       rdns_read_ds_delegations(au_context, ca_get_ns_delegationsfile);
@@ -251,9 +264,7 @@ gboolean ns_ds_accepted(gchar * domain)
     LG_log(au_context, LG_DEBUG, "can't populate ds delegations tree");
     ret_val = FALSE;            /* failsafe, we assume it's not ds */
   } else {
-    ds_val =
-        ds_val =
-        g_strdup(rdns_who_delegates(au_context, ds_tree, domain));
+    ds_val = g_strdup(rdns_who_delegates(au_context, ds_tree, domain));
     LG_log(au_context, LG_DEBUG, "ds value: %s", ds_val);
     if (ds_val[0] != '1') {
       LG_log(au_context, LG_DEBUG, "DS is not accepted");

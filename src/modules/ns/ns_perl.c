@@ -1,5 +1,5 @@
 /*
- * $Id: ns_perl.c,v 1.2 2005/10/25 12:30:00 katie Exp $
+ * $Id: ns_perl.c,v 1.3.8.2 2006/08/02 14:44:23 katie Exp $
  */
 
 #include <EXTERN.h>             /* from the Perl distribution     */
@@ -177,6 +177,11 @@ gchar *ns_find_delcheck_conf(LG_context_t * lg_context, gchar * domain)
       result = g_strdup_printf("%sipv6-48", prefix);
     }
   }
+
+  if (ns_has_e164_arpa_suffix(domain)) {
+    result = g_strdup_printf("%senum", prefix);
+  }
+  
   if (result == NULL) {
     LG_log(lg_context, LG_DEBUG, "no delchecker configuration found.");
   } else {

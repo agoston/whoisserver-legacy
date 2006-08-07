@@ -1985,6 +1985,18 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval = up_convert_inetnum_prefix(rt_ctx, lg_ctx, object, &inetnum_key_converted);
   }
 
+  /* Normalise nserver attribute in domain objects: lowercase IP, 
+  *    * remove trailing dot in hostname. */
+  if( object_class != NULL && ! strcasecmp(object_class, "domain") )
+    {
+      /* 
+         The cleanup is performed on the original object submitted.
+         This modified object becomes the 'new original' object.
+         The modified object will be used in all further operations and reporting.
+       */
+      retval = up_normalise_nserver(rt_ctx, lg_ctx, object);
+    }
+  
   if ( retval != UP_OK ) goto up_process_object_exit;
 
   /* find source from object and set current source */

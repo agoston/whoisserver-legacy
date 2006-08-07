@@ -8,7 +8,7 @@
   notes:
     Tokens are defined in the associated grammar, nserver.y.
 
-  $Id: nserver.l,v 1.1 2006/06/12 15:05:00 katie Exp $
+  $Id: nserver.l,v 1.1.2.1 2006/07/24 13:47:11 katie Exp $
 */
 
 /******************
@@ -44,8 +44,9 @@ IPV4           {INT}(\.{INT}){3}
 QUAD           [0-9a-fA-F]{1,4}
 IPV6           {QUAD}(:{QUAD}){7}
 IPV6DC         (({QUAD}:){0,6}{QUAD})?::({QUAD}(:{QUAD}){0,6})?
-LABEL          [A-Za-z]([-A-Za-z0-9]+[A-Za-z0-9])*
-HOSTNAME       {LABEL}(\.{LABEL})*(\.)?
+STARTLABEL     [A-Za-z]+([-A-Za-z0-9]+[A-Za-z0-9])*
+LABEL          [A-Za-z0-9]+([-A-Za-z0-9]+[A-Za-z0-9])*
+HOSTNAME       {STARTLABEL}(\.{LABEL})*(\.)?
 
 %{
 #include <stdlib.h>
@@ -71,6 +72,7 @@ void yy_input(char *buf, int *result, int max_size);
 
     ip_addr_t ptr;
     int retval;
+
 
     retval = IP_addr_t2b(&ptr, yytext, IP_PLAIN);
     switch (retval) {

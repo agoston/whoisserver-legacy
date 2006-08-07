@@ -93,7 +93,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ag",
         /* syntax_offset */
-        51,   /* aggr-mtd */
+        52,   /* aggr-mtd */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -119,7 +119,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ab",
         /* syntax_offset */
-        52,   /* aggr-bndry */
+        53,   /* aggr-bndry */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -223,7 +223,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "at",
         /* syntax_offset */
-        32,   /* auth-scheme */
+        33,   /* auth-scheme */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -275,7 +275,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ce",
         /* syntax_offset */
-        41,   /* public-key */
+        42,   /* public-key */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -327,7 +327,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "co",
         /* syntax_offset */
-        49,   /* components */
+        50,   /* components */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -353,7 +353,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "co",
         /* syntax_offset */
-        50,   /* components-r6 */
+        51,   /* components-r6 */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -379,7 +379,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "cy",
         /* syntax_offset */
-        35,   /* country-code */
+        36,   /* country-code */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -405,7 +405,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "df",
         /* syntax_offset */
-        53,   /* default */
+        54,   /* default */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -431,7 +431,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ma",
         /* syntax_offset */
-        54,   /* mp-default */
+        55,   /* mp-default */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -483,7 +483,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "di",
         /* syntax_offset */
-        26,   /* ipv4-address */
+        27,   /* ipv4-address */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -535,7 +535,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ds",
         /* syntax_offset */
-        70,   /* ds-rdata */
+        71,   /* ds-rdata */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -587,7 +587,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ex",
         /* syntax_offset */
-        55,   /* export */
+        56,   /* export */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -613,7 +613,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "me",
         /* syntax_offset */
-        56,   /* mp-export */
+        57,   /* mp-export */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -691,7 +691,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "fx",
         /* syntax_offset */
-        31,   /* telephone-number */
+        32,   /* telephone-number */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -795,7 +795,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "fp",
         /* syntax_offset */
-        42,   /* fingerpr */
+        43,   /* fingerpr */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -821,7 +821,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ho",
         /* syntax_offset */
-        45,   /* address-prefix */
+        46,   /* address-prefix */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -847,7 +847,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ho",
         /* syntax_offset */
-        34,   /* inet6num */
+        35,   /* inet6num */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -873,7 +873,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "if",
         /* syntax_offset */
-        59,   /* ifaddr */
+        60,   /* ifaddr */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -899,7 +899,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ie",
         /* syntax_offset */
-        60,   /* interface */
+        61,   /* interface */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -925,7 +925,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ip",
         /* syntax_offset */
-        57,   /* import */
+        58,   /* import */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -951,7 +951,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "my",
         /* syntax_offset */
-        58,   /* mp-import */
+        59,   /* mp-import */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -977,7 +977,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "in",
         /* syntax_offset */
-        33,   /* inetnum */
+        34,   /* inetnum */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -1003,7 +1003,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "i6",
         /* syntax_offset */
-        34,   /* inet6num */
+        35,   /* inet6num */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -1029,7 +1029,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ij",
         /* syntax_offset */
-        61,   /* inject */
+        62,   /* inject */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1055,7 +1055,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ij",
         /* syntax_offset */
-        62,   /* inject-r6 */
+        63,   /* inject-r6 */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1081,7 +1081,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "kc",
         /* syntax_offset */
-        43,   /* key-cert */
+        44,   /* key-cert */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -1263,7 +1263,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "mh",
         /* syntax_offset */
-        44,   /* method */
+        45,   /* method */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1445,7 +1445,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "mu",
         /* syntax_offset */
-        38,   /* mnt-routes */
+        39,   /* mnt-routes */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1471,7 +1471,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "mu",
         /* syntax_offset */
-        39,   /* mnt-routes6 */
+        40,   /* mnt-routes6 */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1497,7 +1497,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "mu",
         /* syntax_offset */
-        40,   /* mnt-routes-an */
+        41,   /* mnt-routes-an */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1653,7 +1653,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "or",
         /* syntax_offset */
-        46,   /* as-number */
+        47,   /* as-number */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1705,7 +1705,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "pe",
         /* syntax_offset */
-        65,   /* peer */
+        66,   /* peer */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1731,7 +1731,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "mp",
         /* syntax_offset */
-        66,   /* mp-peer */
+        67,   /* mp-peer */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1757,7 +1757,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "pg",
         /* syntax_offset */
-        63,   /* peering */
+        64,   /* peering */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1783,7 +1783,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "mg",
         /* syntax_offset */
-        64,   /* mp-peering */
+        65,   /* mp-peering */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1809,7 +1809,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "pn",
         /* syntax_offset */
-        28,   /* person-name */
+        29,   /* person-name */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -1835,7 +1835,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "on",
         /* syntax_offset */
-        29,   /* org-name */
+        30,   /* org-name */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -1861,7 +1861,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ph",
         /* syntax_offset */
-        31,   /* telephone-number */
+        32,   /* telephone-number */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1939,7 +1939,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ns",
         /* syntax_offset */
-        24,   /* domain-name */
+        25,   /* nameserver */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -1949,7 +1949,7 @@ attribute_t attribute_tab[] = {
         /* is_list */
         0,
         /* is_ripe_list */
-        1,
+        0,
         /* foreign_code */
         NULL,
     },
@@ -1965,7 +1965,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "rf",
         /* syntax_offset */
-        27,   /* refer */
+        28,   /* refer */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -2017,7 +2017,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ro",
         /* syntax_offset */
-        28,   /* person-name */
+        29,   /* person-name */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -2095,7 +2095,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "st",
         /* syntax_offset */
-        36,   /* status-in */
+        37,   /* status-in */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -2121,7 +2121,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "st",
         /* syntax_offset */
-        37,   /* status-i6 */
+        38,   /* status-i6 */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -2147,7 +2147,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ot",
         /* syntax_offset */
-        30,   /* org-type */
+        31,   /* org-type */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -2173,7 +2173,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "sd",
         /* syntax_offset */
-        25,   /* subdomain-name */
+        26,   /* subdomain-name */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -2355,7 +2355,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "ak",
         /* syntax_offset */
-        47,   /* as-block */
+        48,   /* as-block */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -2381,7 +2381,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "an",
         /* syntax_offset */
-        46,   /* as-number */
+        47,   /* as-number */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -2407,7 +2407,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "li",
         /* syntax_offset */
-        48,   /* limerick */
+        49,   /* limerick */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -2433,7 +2433,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "rt",
         /* syntax_offset */
-        45,   /* address-prefix */
+        46,   /* address-prefix */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -2459,7 +2459,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "r6",
         /* syntax_offset */
-        34,   /* inet6num */
+        35,   /* inet6num */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -2537,7 +2537,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "la",
         /* syntax_offset */
-        46,   /* as-number */
+        47,   /* as-number */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -2693,7 +2693,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "sg",
         /* syntax_offset */
-        43,   /* key-cert */
+        44,   /* key-cert */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -2719,7 +2719,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "en",
         /* syntax_offset */
-        43,   /* key-cert */
+        44,   /* key-cert */
         /* is_lookup */
         0,
         /* is_inverse */
@@ -2823,7 +2823,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "po",
         /* syntax_offset */
-        68,   /* poem */
+        69,   /* poem */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -2849,7 +2849,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "pf",
         /* syntax_offset */
-        69,   /* poetic-form */
+        70,   /* poetic-form */
         /* is_lookup */
         1,
         /* is_inverse */
@@ -2875,7 +2875,7 @@ attribute_t attribute_tab[] = {
         /* code */
         "fr",
         /* syntax_offset */
-        69,   /* poetic-form */
+        70,   /* poetic-form */
         /* is_lookup */
         0,
         /* is_inverse */

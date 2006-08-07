@@ -202,3 +202,129 @@
 # RESULT 20: update will fail
 
 
+# rdns tests
+# CASE 024: 
+#
+# create 1.e164.arpa domain object
+#
+#FAILURE
+#
+# RESULT 024: creation will fail because there is no parent object
+
+
+# rdns tests
+# CASE 024: 
+#
+# create 1.e164.arpa domain object
+#
+#FAILURE
+#
+# RESULT 024: creation will fail because there is no parent object
+
+# rdns tests
+# CASE 025: 
+#
+# create 1.e164.arpa domain object
+#
+#SUCCESS
+#
+# RESULT 025: creation will succeed
+
+# rdns tests
+# CASE 026: 
+#
+# create 1.1.e164.arpa domain object
+# 1.e164.arpa exists
+#
+#FAILURE
+#
+# RESULT 026: creation will fail
+
+# rdns tests
+# CASE 027: 
+#
+# create 1.e164.arpa domain object
+# checking various syntax 
+#
+#SUCCESS
+#
+# RESULT 027: creation will succeed
+
+# rdns tests
+# CASE 028: 
+#
+# create e164.arpa domain object
+#
+#SUCCESS
+#
+# RESULT 028: creation will succeed
+
+# rdns tests
+# CASE 029: 
+#
+# update e164.arpa domain object
+#
+#SUCCESS
+#
+# RESULT 029: modification will succeed
+
+# rdns tests
+# CASE 030: 
+#
+# update 1.e164.arpa domain object
+#
+#SUCCESS
+#
+# RESULT 030: modification will succeed
+
+# rdns tests
+# CASE 031: 
+#
+# delete 1.e164.arpa domain object
+#
+#SUCCESS
+#
+# RESULT 031: deleiton will succeed
+
+# rdns tests
+# CASE 032: 
+#
+# create 1.e164.arpa domain object
+# to check the bugfix for names line 111in-addr.arpa or 111e164.arpa (suffix not matched correctly).
+#
+#FAILURE
+#
+# RESULT 032: creation will fail
+
+# rdns tests
+# CASE 033:
+#
+# create 1.e164.arpa domain object
+# must fail with rdns errors - no override
+#
+#FAILURE
+#
+# RESULT 033: creation will fail
+
+# rdns tests
+# CASE 034: 
+#
+# create domain object
+# DS=1
+#
+#FAILURE
+#
+# RESULT 034: creation will fail but no "DS rejected" message
+
+# rdns tests
+# CASE 035: 
+#
+# create 1.e164.arpa domain object
+# make sure we can't submit DS record in e164.arpa related object.
+# !!! THIS TEST WILL FAIL AFTER THE CODECHANGE TO ALLOW DS IN E164.ARPA zone.
+
+#
+#FAILURE
+#
+# RESULT 035: creation will succeed
+

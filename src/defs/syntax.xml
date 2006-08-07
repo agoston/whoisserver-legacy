@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.9 2006/05/17 10:13:31 katie Exp $
+$Id: syntax.xml,v 1.27.2.1 2006/07/24 09:25:11 katie Exp $
 
 -->
 
@@ -453,6 +453,17 @@ $Id: syntax.xml,v 1.9 2006/05/17 10:13:31 katie Exp $
            <regex>
              ^[A-Z0-9]([-A-Z0-9]*[A-Z0-9])?(\.[A-Z0-9]([-A-Z0-9]*[A-Z0-9])?)*(\.)?$
            </regex>
+       </front_end>
+       <description>
+     Domain name as specified in RFC 1034 with or without
+     trailing dot (".").  The total length should not exceed
+     254 characters (octets).
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="nameserver">
+       <front_end>
+           <parser_name>nserver</parser_name>
        </front_end>
        <description>
      Domain name as specified in RFC 1034 with or without
