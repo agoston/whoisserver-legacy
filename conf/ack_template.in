@@ -96,6 +96,11 @@
 ***Info: Parent has RIPE NCC nameservers.
 </xsl:template>
 
+<xsl:template match="RDNSparentisnotenum">
+
+***Error: Parent is not e164.arpa.
+</xsl:template>
+
 <xsl:template match="RDNSoverlap">
 
 ***Error: Overlapping parent inetnum objects found.
