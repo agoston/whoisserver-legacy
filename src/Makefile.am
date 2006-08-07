@@ -41,8 +41,8 @@ noinst_LIBRARIES = libaa.a libac.a libau.a libca.a libco.a libcr.a \
 librip.a:
 	$(AR) cru @abs_top_builddir@/src/librip.a @abs_top_builddir@/src/*.o @abs_top_builddir@/src/modules/rpsl/*.o
 
-opl: ut.o ut_string.o ip.o lg.o memwrap.o numconv.o syntax
-	rm -f opl/librpsl.a ; $(AR) cru opl/librpsl.a modules/rpsl/*.o ut.o ut_string.o ip.o lg.o memwrap.o numconv.o
+opl: ut.o ut_string.o ip.o lg.o memwrap.o numconv.o thread.o ca_configFns.o  ca_initFn.o  ca_sanityCheck.o  ca_sourceLoader.o  ca_values.o syntax
+	rm -f opl/librpsl.a ; $(AR) cru opl/librpsl.a modules/rpsl/*.o ut.o ut_string.o ip.o lg.o memwrap.o numconv.o thread.o ca_configFns.o  ca_initFn.o  ca_sanityCheck.o  ca_sourceLoader.o  ca_values.o
 
 opl-install: opl
 	${mkinstalldirs} $(libdir)
