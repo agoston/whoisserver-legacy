@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.11.2.1 2006/07/24 09:24:56 katie Exp $
+$Id: syntax.xml,v 1.12 2006/08/07 11:20:28 katie Exp $
 
 -->
 
@@ -466,9 +466,16 @@ $Id: syntax.xml,v 1.11.2.1 2006/07/24 09:24:56 katie Exp $
            <parser_name>nserver</parser_name>
        </front_end>
        <description>
-     Domain name as specified in RFC 1034 with or without
+     Nameserver name as specified in RFC 1034 with or without
      trailing dot (".").  The total length should not exceed
      254 characters (octets).
+
+     The nameserver name may be optionally followed by IPv4 address
+     in decimal dotted quad form (e.g. 192.0.2.1) or IPv6 address
+     in lowercase canonical form (Section 2.2.1, RFC 4291).
+
+     The nameserver name may be followed by an IP address only when
+     the name is inside of the domain being delegated.
        </description>
    </attribute_syntax>
 
