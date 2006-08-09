@@ -2,7 +2,7 @@
 #define READ_QUERY_INSTRUCTIONS
 
 /***************************************
-  $Revision: 1.2.2.4 $
+  $Revision: 1.3 $
 
   Query instruction module (qi)
   config module.
@@ -105,7 +105,7 @@ Ie. Try using a LEFT JOIN to do the "NOT IN"/ "MINUS" equivalent.
 /* Query for finding organisation objects recursively (when -r isn't specified) */
 #define Q_REC_ORG  "INSERT IGNORE INTO %s SELECT org_id,1,object_id FROM %s IDS, %s WHERE object_id = IDS.id"
 /* Query for finding irt objects recursively (when -c (or -b) is specified) */
-#define Q_REC_IRT  "INSERT IGNORE INTO %s SELECT irt_id,1,object_id FROM %s IDS, %s WHERE object_id = IDS.id"
+#define Q_REC_IRT  "INSERT IGNORE INTO %s SELECT irt_id,1,%s FROM %s WHERE object_id = %d"
  
 #define Q_ALTER_TMP "ALTER TABLE %s ADD COLUMN gid INT NOT NULL DEFAULT 0"
 #define Q_ALTER_TMP_GROUPED "ALTER TABLE %s ADD COLUMN gid INT NOT NULL DEFAULT 0, DROP PRIMARY KEY, ADD PRIMARY KEY (id, gid)"
@@ -118,6 +118,14 @@ Ie. Try using a LEFT JOIN to do the "NOT IN"/ "MINUS" equivalent.
 #define MAX_INSTRUCTIONS 100
 
 #define LIST_HAS_ATTR "SELECT DISTINCT gid FROM %s IDS,%s REF WHERE IDS.id=REF.object_id"
+
+typedef struct Ref_queries_t
+{
+  char *query;
+  char *search_table;
+} Ref_queries; 
+
+
 
 typedef struct Query_instruction_t {
   R_Type_t search_type;
