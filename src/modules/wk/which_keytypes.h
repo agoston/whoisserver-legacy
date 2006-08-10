@@ -2,7 +2,7 @@
 #define READ_WHICH_KEYTYPES
 
 /***************************************
-  $Revision: 1.2.2.1 $
+  $Revision: 1.3 $
 
   Which Keytypes module (wk)
 
@@ -93,6 +93,7 @@ char * const Keytypes[] = {
   "peering_set",
   "rtr_set",
   "irt",
+  "fingerpr",
   "organisation",
   "auth",
   "poem",
