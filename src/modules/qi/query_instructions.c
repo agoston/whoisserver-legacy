@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.12 $
+  $Revision: 1.13 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -1382,8 +1382,6 @@ mnt_irt_filter (sk_conn_st *condat,
     int inet_found = 0;
     int irt_found = 0;
 
-fprintf(stderr, "Entered mnt_irt_filter\n");
-
     /* empty datlist */
     new_datlist = NULL;
     *irt_inet_id = 0;
@@ -1400,7 +1398,6 @@ fprintf(stderr, "Entered mnt_irt_filter\n");
         if ( ! irt_found && 
 	      object_has_attr(condat, sql_connection, object_id, "mnt_irt")) {
             /* save this object_id */
-fprintf(stderr, "irt found object_id=%d\n", object_id);
 	    *irt_inet_id = object_id;
 	    irt_found = 1;
         } 
@@ -1413,7 +1410,6 @@ fprintf(stderr, "irt found object_id=%d\n", object_id);
 	       when the objects are displayed in the output */
 	    *irt_gid = object_id;
             /* move this entry to the new list */
-fprintf(stderr, "inet found object_id=%d\n", object_id);
             new_datlist = g_list_append(new_datlist, rx_data);
 	    p_old = p;
             p=g_list_previous(p);
@@ -1425,7 +1421,6 @@ fprintf(stderr, "inet found object_id=%d\n", object_id);
 	else if ( object_has_attr(condat, sql_connection, object_id, "route") ||
 	          object_has_attr(condat, sql_connection, object_id, "route6") ) {
             /* move this entry to the new list */
-fprintf(stderr, "route(6) found object_id=%d\n", object_id);
             new_datlist = g_list_append(new_datlist, rx_data);
 	    p_old = p;
             p=g_list_previous(p);
@@ -1437,7 +1432,6 @@ fprintf(stderr, "route(6) found object_id=%d\n", object_id);
             p=g_list_previous(p);
 	}
     }
-fprintf(stderr, "loop finished\n");
 
     /* free our old datlist */
     for (p=*datlist; p != NULL; p = g_list_next(p)) {
@@ -1445,16 +1439,9 @@ fprintf(stderr, "loop finished\n");
         UT_free(rx_data->leafcpy.data_ptr);
     }
     wr_clear_list(datlist);
-fprintf(stderr, "old datlist cleared\n");
 
     /* use our new datlist */
     *datlist = new_datlist;
-fprintf(stderr, "object_ids from new datlist\n");
-for (p=*datlist; p != NULL; p = g_list_next(p)) {
-    rx_data = (rx_datcpy_t *)p->data;
-    object_id = rx_data->leafcpy.data_key;
-    fprintf(stderr, "%d\n", object_id);
-}
 }
 
 
