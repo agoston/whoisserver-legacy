@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.10 $
+  $Revision: 1.11 $
 
   Example code: A server for a client to connect to.
 
@@ -477,8 +477,8 @@ static void  *main_loop(void *arg) {
 			pthread_mutex_lock(args->conn_lock);
 
 			if (g_hash_table_lookup_extended(args->conn_ipnum, clientip, &orig_key, &client_conn_num)) {
-				args->conn_ip = orig_key;
 				int i = (int)client_conn_num;
+				args->conn_ip = orig_key;
 				if (i >= clientacl.maxconn) {
 					/* close the connection without further warning */
 					char buf[IP_ADDRSTR_MAX];
@@ -621,6 +621,7 @@ int SV_start(char *pidfile) {
   int shutdown_pipe[2];
   int retval=1;
   struct rlimit rlim;
+  struct pollfd ufds;
 
   /* Store the starting time */
   gettimeofday(&tval, NULL);
@@ -823,7 +824,6 @@ int SV_start(char *pidfile) {
   /* XXX not return becase then we terminate the whole process */
 
   /* Loop until the server goes down */
-  struct pollfd ufds;
   ufds.fd = SV_shutdown_recv_fd;
   ufds.events = POLLIN | POLLPRI;
   ufds.revents = 0;

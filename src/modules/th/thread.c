@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.5 $
 
   Example code: A thread.
 
@@ -444,13 +444,13 @@ pid_t gettid(void);
 #endif
 
 void do_nice_die(int line, char *file) {
+	char *command = ca_get_command_on_die;
 	fprintf(stderr,"died: +%d %s\n",line, file);
 
 #ifdef __linux__
-	char *command = ca_get_command_on_die;
 	if (command) {
-		fprintf(stderr, "Backtrace:\n");
 		char buf[1024];
+		fprintf(stderr, "Backtrace:\n");
 		snprintf(buf, 1024, command, gettid());
 		system(buf);
 	}
