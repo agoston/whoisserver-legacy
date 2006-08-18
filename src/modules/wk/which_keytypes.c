@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2.2.1 $
+  $Revision: 1.4 $
 
   which_keytypes:  Determine which keys to look for.
   
@@ -37,6 +37,10 @@
 #include <glib.h>
 #include <pthread.h>
 #include <regex.h>
+
+/******************************************* 
+If any IP reg exps change - check whois cgi which has a copy 
+*******************************************/
 
 #define DOMAINNAME "^[ ]*[a-zA-Z0-9/-]*(\\.[a-zA-Z0-9-]+)*\.?[ ]*$"
 /* add a constraint: there must be at least one character in the domain name
