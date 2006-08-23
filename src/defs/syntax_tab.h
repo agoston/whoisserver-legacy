@@ -1118,7 +1118,7 @@ syntax_t syntax_tab[] = {
         /* core_parser */
         NULL,
         /* front_end_regex_pattern */
-        "^((SUB-ALLOCATED PA)|NOT-SET|EARLY-REGISTRATION|((ALLOCATED (PA|PI|UNSPECIFIED))|((ASSIGNED|LIR-PARTITIONED) (PA|PI))))$",
+        "^((SUB-ALLOCATED PA)|NOT-SET|EARLY-REGISTRATION|ASSIGNED-ANYCAST|((ALLOCATED (PA|PI|UNSPECIFIED))|((ASSIGNED|LIR-PARTITIONED) (PA|PI))))$",
         /* front_end_regex, set by syntax_init() */
         NULL,
         /* front_end_reserved_regex_pattern */
@@ -1146,7 +1146,7 @@ syntax_t syntax_tab[] = {
         /* core_parser */
         NULL,
         /* front_end_regex_pattern */
-        "^(ALLOCATED-BY-RIR|ALLOCATED-BY-LIR|ASSIGNED)$",
+        "^(ALLOCATED-BY-RIR|ALLOCATED-BY-LIR|ASSIGNED|ASSIGNED-ANYCAST)$",
         /* front_end_regex, set by syntax_init() */
         NULL,
         /* front_end_reserved_regex_pattern */
