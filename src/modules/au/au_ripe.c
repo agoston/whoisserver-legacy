@@ -286,7 +286,6 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
   {
     ret_val = AU_UNAUTHORISED_CONT;
     LG_log(au_context, LG_ERROR, "ripe_inetnum_checks: no \"status:\" on updated inetnum");
-
     RT_status_check_failed_missingstatus(info->ctx);
   }
   else
@@ -306,8 +305,16 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
       }
     }
 
+    /* changing from ASSIGNED-ANYCAST not allowed */
+    if ((strcmp(new_status, "ASSIGNED-ANYCAST") != 0) &&
+             (strcmp(old_status, "ASSIGNED-ANYCAST") == 0))
+    {
+      RT_status_check_failed_anycast_modify(info->ctx);
+      ret_val = AU_UNAUTHORISED_CONT;
+      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED-ANYCAST");
+    }
     /* changing to ALLOCATED */
-    if ((strncmp(new_status, "ALLOCATED ", 10) == 0) &&
+    else if ((strncmp(new_status, "ALLOCATED ", 10) == 0) &&
         (strncmp(old_status, "ALLOCATED ", 10) != 0))
     {
       LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: ALLOCATED");
@@ -319,6 +326,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
       {
         RT_status_check_failed_allocated(info->ctx);
         ret_val = AU_UNAUTHORISED_CONT;
+        LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: status ALLOCATED can only be set by hostmaster");
       }
     }
     /* changing to LIR-PARTITIONED */
@@ -375,6 +383,47 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
       }
 
     }
+    /* changing to ASSIGNED ANYCAST */
+    else if ((strcmp(new_status, "ASSIGNED-ANYCAST") == 0) &&
+             (strcmp(old_status, "ASSIGNED-ANYCAST") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: changing to ASSIGNED-ANYCAST");
+
+      if ( strcmp(old_status, "") != 0 )
+      {
+        /* ASSIGNED ANYCAST can only be set on object creation, 
+	   not on modification */
+        RT_status_check_failed_anycast_modify(info->ctx);
+        ret_val = AU_UNAUTHORISED_CONT;
+        LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status to ASSIGNED-ANYCAST");
+      }
+      else
+      {
+	if ( ! has_rir_mntner(info->obj))
+	{
+          RT_status_check_failed_anycast_rir(info->ctx);
+          ret_val = AU_UNAUTHORISED_CONT;
+          LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: status ASSIGNED-ANYCAST can only be set by hostmaster");
+	}
+	else
+	{
+	  parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+                             "ALLOCATED PI", "ALLOCATED UNSPECIFIED", NULL);
+
+	  if (parent_status_ok)
+	  {
+            ret_val = AU_AUTHORISED;
+            LG_log(au_context, LG_ERROR, "ripe_inetnum_checks: parent status check ok");
+	  }
+	  else
+	  {
+            /* note that the RT logging is done by parent_status_is_valid() */
+            ret_val = AU_UNAUTHORISED_CONT;
+            LG_log(au_context, LG_ERROR, "ripe_inetnum_checks: parent status check failed");
+	  }
+	}
+      }
+    }
     /* changing to EARLY-REGISTRATION */
     else if ((strcmp(new_status, "EARLY-REGISTRATION") == 0) &&
              (strcmp(old_status, "EARLY-REGISTRATION") != 0))
@@ -392,6 +441,44 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
       ret_val = AU_UNAUTHORISED_CONT;
 
       RT_status_check_failed_notset(info->ctx);
+    }
+    else if ((strcmp(new_status, "ASSIGNED PA") == 0) &&
+             (strcmp(old_status, "ASSIGNED PA") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: changing to ASSIGNED PA");
+
+      parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
+          "ALLOCATED UNSPECIFIED", "ALLOCATED PA", "LIR-PARTITIONED PA", "SUB-ALLOCATED PA", "ASSIGNED PA", NULL);
+
+      if (parent_status_ok)
+      {
+        ret_val = AU_AUTHORISED;
+      }
+      else
+      {
+        /* note that the RT logging is done by parent_status_is_valid() */
+        ret_val = AU_UNAUTHORISED_CONT;
+      }
+
+    }
+    else if ((strcmp(new_status, "ASSIGNED PI") == 0) &&
+             (strcmp(old_status, "ASSIGNED PI") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: changing to ASSIGNED PI");
+
+      parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
+          "ALLOCATED UNSPECIFIED", "ALLOCATED PI", "LIR-PARTITIONED PI", "SUB-ALLOCATED PI", "ASSIGNED PI", NULL);
+
+      if (parent_status_ok)
+      {
+        ret_val = AU_AUTHORISED;
+      }
+      else
+      {
+        /* note that the RT logging is done by parent_status_is_valid() */
+        ret_val = AU_UNAUTHORISED_CONT;
+      }
+
     }
     else
     {
@@ -470,12 +557,26 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
       }
     }
 
+    /* changing from ASSIGNED-ANYCAST not allowed */
+    if ((strcmp(new_status, "ASSIGNED-ANYCAST") != 0) &&
+             (strcmp(old_status, "ASSIGNED-ANYCAST") == 0))
+    {
+      RT_status_check_failed_anycast_modify(info->ctx);
+      ret_val = AU_UNAUTHORISED_CONT;
+      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED-ANYCAST");
+    }
     /* changing to ALLOCATED-BY-RIR */
-    if ((strcmp(new_status, "ALLOCATED-BY-RIR") == 0) &&
+    else if ((strcmp(new_status, "ALLOCATED-BY-RIR") == 0) &&
         (strcmp(old_status, "ALLOCATED-BY-RIR") != 0))
     {
       LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: ALLOCATED-BY-RIR");
-      if (has_rir_mntner(info->obj))
+      if ( ! has_rir_mntner(info->obj) )
+      {
+        RT_status_check_failed_allocbyrir(info->ctx);
+        ret_val = AU_UNAUTHORISED_CONT;
+        LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: status ALLOCATED-BY-RIR can only be set by hostmaster");
+      }
+      else
       {
         LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: has RIPE NCC maintainer");
         parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
@@ -489,11 +590,6 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
           /* note that the RT logging is done by parent_status_is_valid() */
           ret_val = AU_UNAUTHORISED_CONT;
         }
-      }
-      else
-      {
-        RT_status_check_failed_allocbyrir(info->ctx);
-        ret_val = AU_UNAUTHORISED_CONT;
       }
     }
     /* changing to ALLOCATED-BY-LIR */
@@ -511,6 +607,46 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
       {
         /* note that the RT logging is done by parent_status_is_valid() */
         ret_val = AU_UNAUTHORISED_CONT;
+      }
+    }
+    else if ((strcmp(new_status, "ASSIGNED-ANYCAST") == 0) &&
+             (strcmp(old_status, "ASSIGNED-ANYCAST") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: changing to ASSIGNED-ANYCAST");
+
+      if ( strcmp(old_status, "") != 0 )
+      {
+        /* ASSIGNED ANYCAST can only be set on object creation, 
+	   not on modification */
+        RT_status_check_failed_anycast_modify(info->ctx);
+        ret_val = AU_UNAUTHORISED_CONT;
+        LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: trying to modify status to ASSIGNED-ANYCAST");
+      }
+      else
+      {
+	if ( ! has_rir_mntner(info->obj))
+	{
+          RT_status_check_failed_anycast_rir(info->ctx);
+          ret_val = AU_UNAUTHORISED_CONT;
+          LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: status ASSIGNED-ANYCAST can only be set by hostmaster");
+	}
+	else
+	{
+	  parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+                             "ALLOCATED-BY-RIR", NULL);
+
+	  if (parent_status_ok)
+	  {
+            ret_val = AU_AUTHORISED;
+            LG_log(au_context, LG_ERROR, "ripe_inet6num_checks: parent status check ok");
+	  }
+	  else
+	  {
+            /* note that the RT logging is done by parent_status_is_valid() */
+            ret_val = AU_UNAUTHORISED_CONT;
+            LG_log(au_context, LG_ERROR, "ripe_inet6num_checks: parent status check failed");
+	  }
+	}
       }
     }
     /* changing to ASSIGNED */
