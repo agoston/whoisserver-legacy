@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.10.8.1 $
+  $Revision: 1.11 $
 
   Reporting module.
 
@@ -1924,4 +1924,12 @@ void RT_status_check_failed_allocbyrir(RT_context_t *ctx) {
 
 void RT_status_check_failed_allocated(RT_context_t *ctx) {
   RT_status_check_failed_message(ctx,"status_check_failed_allocated");
+}
+
+void RT_status_check_failed_anycast_modify(RT_context_t *ctx) {
+  RT_status_check_failed_message(ctx,"status_check_failed_anycast_modify");
+}
+
+void RT_status_check_failed_anycast_rir(RT_context_t *ctx) {
+  RT_status_check_failed_message(ctx,"status_check_failed_anycast_rir");
 }
