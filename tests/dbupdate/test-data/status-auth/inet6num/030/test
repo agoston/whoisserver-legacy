@@ -1,0 +1,26 @@
+# ipv6 status tests
+# CASE 30: create an inet6num with status ASSIGNED-ANYCAST
+#          with parent status ALLOCATED-BY-LIR
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 30: The creation will fail
+
+
+inet6num:     2001:0600::/25
+netname:      EU-ZZ-2001-0600
+descr:        European Regional Registry
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    LIR-MNT
+status:       ASSIGNED-ANYCAST
+changed:      dbtest@ripe.net 20060101
+source:       DB-TEST
+
+password: LIR
+password: hostmaster
+
