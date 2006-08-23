@@ -31,8 +31,19 @@
 
 <xsl:template match="status_check_failed_allocbyrir">
 
-***Error: ALLOCATED-BY-RIR inet6num objects require the administrative
-  maintainer.
+***Error: ALLOCATED-BY-RIR inet6num objects require the administrative maintainer.
+  You probably want "status: ALLOCATED-BY-LIR" or "status: ASSIGNED".
+</xsl:template>
+
+<xsl:template match="status_check_failed_anycast_modify">
+
+***Error: Status ASSIGNED-ANYCAST can only be set when an object is created.
+          This status cannot be changed.
+</xsl:template>
+
+<xsl:template match="status_check_failed_anycast_rir">
+
+***Error: Setting status ASSIGNED-ANYCAST requires the administrative maintainer.
 </xsl:template>
 
 <xsl:template match="status_check_failed_notset">
