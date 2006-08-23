@@ -1496,10 +1496,15 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
              or a reference that cannot be resolved */
     	  snprintf(temp_str, 1024, "***Error: Unknown object referenced");
         }
-	    else if (strstr(ripupd_result, "key-cert") != NULL)
-	    {
-        /* if the response from RIPupd contains "no key-cert object" string */
-        snprintf(temp_str, 1024, "***Error: Unknown key-cert object referenced"); 
+        else if (strstr(ripupd_result, "key-cert") != NULL)
+        {
+          /* if the response from RIPupd contains "no key-cert object" string */
+          snprintf(temp_str, 1024, "***Error: Unknown key-cert object referenced"); 
+        }
+        else if (strstr(ripupd_result, "wrong prefix specified") != NULL)
+        {
+          /* if the response from RIPupd contains "wrong prefix specified" string */
+          snprintf(temp_str, 1024, "***Error: Invalid prefix specified"); 
         }
         else
         {
