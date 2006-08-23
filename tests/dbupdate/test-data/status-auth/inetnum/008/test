@@ -1,14 +1,11 @@
 # inetnum status tests
 # CASE 8: We try to create inetnum object
 # with status LIR-PARTITIONED PA under ASSIGNED PA status
-%
-% requires initial objects to be loaded
 #
 # create inetnum object 
 #
 #FAILURE
 #
-# ***but will succeed at the moment until checks are tightened***
 # RESULT 8: The creation will fail with Authorisation failed
 
 
@@ -20,7 +17,7 @@ descr:        /24 with LIR-PARTITIONED
 country:      NL
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-status:       ASSIGNED PA
+status:       LIR-PARTITIONED PA
 mnt-by:       LIR-MNT
 mnt-lower:    LIR-MNT
 changed:      dbtest@ripe.net 20020101

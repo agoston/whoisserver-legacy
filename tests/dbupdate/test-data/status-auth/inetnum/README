@@ -36,7 +36,6 @@
 #
 #FAILURE
 #
-# ***but will succeed at the moment until checks are tightened***
 # RESULT 4: The creation will fail with Authorisation failed
 
 
@@ -80,7 +79,6 @@
 #
 #FAILURE
 #
-# ***but will succeed at the moment until checks are tightened***
 # RESULT 8: The creation will fail with Authorisation failed
 
 
@@ -239,15 +237,12 @@
 # CASE 22: We try to create inetnum object
 # with status ASSIGNED PI 
 # parent object has status SUB-ALLOCATED PA
-%
-% requires initial objects to be loaded
 #
 # create inetnum object 
 #
 #FAILURE
 #
 # RESULT 22: The creation will fail
-#            *** but succeed at the moment until the checks are tightened ***
 
 
 # CASE 23: We try to create inetnum object
@@ -384,6 +379,7 @@
 # RESULT 32: The creation will fail
 
 
+######################################################
 # AfriNic tests
 
 # CASE 33: We try to create inetnum object
@@ -430,5 +426,114 @@
 #
 # RESULT 36: The creation will fail
 #rir AFRINIC
+
+# end of AfriNic tests
+######################################################
+
+
+# CASE 37: We try to create inetnum object
+# with status ALLOCATED UNSPECIFIED under ALLOCATED UNSPECIFIED
+# without the hostmaster mntner
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 37: The creation will fail
+
+
+# CASE 38: We try to create inetnum object
+# with status ASSIGNED-ANYCAST under ALLOCATED UNSPECIFIED
+# without the hostmaster mntner
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 38: The creation will fail
+
+
+# CASE 39: We try to create inetnum object
+# with status ASSIGNED-ANYCAST under ALLOCATED UNSPECIFIED
+# with the hostmaster mntner
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 39: The creation will succeed
+
+
+# CASE 40: We try to modify inetnum object
+# with status ASSIGNED-ANYCAST and change to ASSIGNED PA
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 40: The modify will fail
+
+
+# CASE 41: We try to modify inetnum object
+# with status ASSIGNED-PA and change to ASSIGNED-ANYCAST
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 41: The modify will fail
+
+
+# CASE 42: We try to modify inetnum object
+# with status ASSIGNED-ANYCAST 
+# and change some other attribute
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 42: The modify will succeed
+
+
+# CASE 43: We try to delete inetnum object
+# with status ASSIGNED-ANYCAST 
+#
+# delete inetnum object 
+#
+#SUCCESS
+#
+# RESULT 43: The deletion will succeed
+
+
+# CASE 44: We try to create inetnum object
+# with status ASSIGNED-ANYCAST under ALLOCATED PA
+# with the hostmaster mntner
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 44: The creation will fail
+
+
+# CASE 45: We try to create inetnum object
+# with status ASSIGNED-ANYCAST under ALLOCATED PI
+# with the hostmaster mntner
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 45: The creation will succeed
+
+
+# CASE 46: We try to create ASSIGNED PA inetnum object
+# under ASSIGNED-ANYCAST
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 46: The creation will fail
 
 

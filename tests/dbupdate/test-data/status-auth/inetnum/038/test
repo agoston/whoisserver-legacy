@@ -1,0 +1,27 @@
+# inetnum status tests
+# CASE 38: We try to create inetnum object
+# with status ASSIGNED-ANYCAST under ALLOCATED UNSPECIFIED
+# without the hostmaster mntner
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 38: The creation will fail
+
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED-ANYCAST
+org:          ORG-Eoof1-DB-TEST
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: test-dbm
+password: LIR
+
