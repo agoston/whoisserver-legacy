@@ -1,6 +1,6 @@
 # inetnum status tests
 # CASE 42: We try to modify inetnum object
-# with status ASSIGNED-ANYCAST 
+# with status ASSIGNED ANYCAST 
 # and change some other attribute
 #
 # create inetnum object 
@@ -16,7 +16,7 @@ descr:        /24
 country:      NL
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-status:       ASSIGNED-ANYCAST
+status:       ASSIGNED ANYCAST
 mnt-by:       END-USER-MNT
 mnt-by:       RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net 20020101
