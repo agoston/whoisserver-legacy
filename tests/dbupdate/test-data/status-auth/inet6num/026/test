@@ -1,5 +1,5 @@
 # ipv6 status tests
-# CASE 26: modify an inet6num with status ASSIGNED-ANYCAST
+# CASE 26: modify an inet6num with status ASSIGNED ANYCAST
 #          change status to ASSIGNED
 #
 # modify inet6num object 

@@ -133,7 +133,7 @@ tech-c:       TP1-DB-TEST
 mnt-by:       LIR-MNT
 mnt-by:       RIPE-NCC-HM-MNT
 mnt-lower:    LIR-MNT
-status:       ASSIGNED-ANYCAST
+status:       ASSIGNED ANYCAST
 changed:      dbtest@ripe.net 20060101
 source:       DB-TEST
 

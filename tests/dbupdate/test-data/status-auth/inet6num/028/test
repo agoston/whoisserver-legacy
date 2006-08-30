@@ -1,5 +1,5 @@
 # ipv6 status tests
-# CASE 28: modify an inet6num with status ASSIGNED-ANYCAST
+# CASE 28: modify an inet6num with status ASSIGNED ANYCAST
 #          change some other attribute
 #
 # modify inet6num object 
@@ -17,7 +17,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       LIR-MNT
 mnt-lower:    LIR-MNT
-status:       ASSIGNED-ANYCAST
+status:       ASSIGNED ANYCAST
 changed:      dbtest@ripe.net 20060101
 changed:      dbtest@ripe.net 
 source:       DB-TEST
