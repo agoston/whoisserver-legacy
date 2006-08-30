@@ -305,13 +305,13 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
       }
     }
 
-    /* changing from ASSIGNED-ANYCAST not allowed */
-    if ((strcmp(new_status, "ASSIGNED-ANYCAST") != 0) &&
-             (strcmp(old_status, "ASSIGNED-ANYCAST") == 0))
+    /* changing from ASSIGNED ANYCAST not allowed */
+    if ((strcmp(new_status, "ASSIGNED ANYCAST") != 0) &&
+             (strcmp(old_status, "ASSIGNED ANYCAST") == 0))
     {
       RT_status_check_failed_anycast_modify(info->ctx);
       ret_val = AU_UNAUTHORISED_CONT;
-      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED-ANYCAST");
+      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED ANYCAST");
     }
     /* changing to ALLOCATED */
     else if ((strncmp(new_status, "ALLOCATED ", 10) == 0) &&
@@ -384,10 +384,10 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
 
     }
     /* changing to ASSIGNED ANYCAST */
-    else if ((strcmp(new_status, "ASSIGNED-ANYCAST") == 0) &&
-             (strcmp(old_status, "ASSIGNED-ANYCAST") != 0))
+    else if ((strcmp(new_status, "ASSIGNED ANYCAST") == 0) &&
+             (strcmp(old_status, "ASSIGNED ANYCAST") != 0))
     {
-      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: changing to ASSIGNED-ANYCAST");
+      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: changing to ASSIGNED ANYCAST");
 
       if ( strcmp(old_status, "") != 0 )
       {
@@ -395,7 +395,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
 	   not on modification */
         RT_status_check_failed_anycast_modify(info->ctx);
         ret_val = AU_UNAUTHORISED_CONT;
-        LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status to ASSIGNED-ANYCAST");
+        LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status to ASSIGNED ANYCAST");
       }
       else
       {
@@ -403,7 +403,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
 	{
           RT_status_check_failed_anycast_rir(info->ctx);
           ret_val = AU_UNAUTHORISED_CONT;
-          LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: status ASSIGNED-ANYCAST can only be set by hostmaster");
+          LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: status ASSIGNED ANYCAST can only be set by hostmaster");
 	}
 	else
 	{
@@ -557,13 +557,13 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
       }
     }
 
-    /* changing from ASSIGNED-ANYCAST not allowed */
-    if ((strcmp(new_status, "ASSIGNED-ANYCAST") != 0) &&
-             (strcmp(old_status, "ASSIGNED-ANYCAST") == 0))
+    /* changing from ASSIGNED ANYCAST not allowed */
+    if ((strcmp(new_status, "ASSIGNED ANYCAST") != 0) &&
+             (strcmp(old_status, "ASSIGNED ANYCAST") == 0))
     {
       RT_status_check_failed_anycast_modify(info->ctx);
       ret_val = AU_UNAUTHORISED_CONT;
-      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED-ANYCAST");
+      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED ANYCAST");
     }
     /* changing to ALLOCATED-BY-RIR */
     else if ((strcmp(new_status, "ALLOCATED-BY-RIR") == 0) &&
@@ -609,10 +609,10 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
         ret_val = AU_UNAUTHORISED_CONT;
       }
     }
-    else if ((strcmp(new_status, "ASSIGNED-ANYCAST") == 0) &&
-             (strcmp(old_status, "ASSIGNED-ANYCAST") != 0))
+    else if ((strcmp(new_status, "ASSIGNED ANYCAST") == 0) &&
+             (strcmp(old_status, "ASSIGNED ANYCAST") != 0))
     {
-      LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: changing to ASSIGNED-ANYCAST");
+      LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: changing to ASSIGNED ANYCAST");
 
       if ( strcmp(old_status, "") != 0 )
       {
@@ -620,7 +620,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
 	   not on modification */
         RT_status_check_failed_anycast_modify(info->ctx);
         ret_val = AU_UNAUTHORISED_CONT;
-        LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: trying to modify status to ASSIGNED-ANYCAST");
+        LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: trying to modify status to ASSIGNED ANYCAST");
       }
       else
       {
@@ -628,7 +628,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
 	{
           RT_status_check_failed_anycast_rir(info->ctx);
           ret_val = AU_UNAUTHORISED_CONT;
-          LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: status ASSIGNED-ANYCAST can only be set by hostmaster");
+          LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: status ASSIGNED ANYCAST can only be set by hostmaster");
 	}
 	else
 	{
