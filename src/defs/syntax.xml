@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.29 2006/08/09 09:38:01 katie Exp $
+$Id: syntax.xml,v 1.30 2006/08/23 15:41:45 denis Exp $
 
 -->
 
@@ -709,7 +709,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
    <attribute_syntax name="status-in">
        <front_end>
            <regex>
-           ^((SUB-ALLOCATED PA)|NOT-SET|EARLY-REGISTRATION|ASSIGNED-ANYCAST|((ALLOCATED (PA|PI|UNSPECIFIED))|((ASSIGNED|LIR-PARTITIONED) (PA|PI))))$
+           ^((SUB-ALLOCATED PA)|NOT-SET|EARLY-REGISTRATION|ASSIGNED ANYCAST|((ALLOCATED (PA|PI|UNSPECIFIED))|((ASSIGNED|LIR-PARTITIONED) (PA|PI))))$
            </regex>
        </front_end>
        <description>
@@ -723,7 +723,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
      o SUB-ALLOCATED PA
      o ASSIGNED PA
      o ASSIGNED PI
-     o ASSIGNED-ANYCAST
+     o ASSIGNED ANYCAST
      o EARLY-REGISTRATION
      o NOT-SET
        </description>
@@ -732,7 +732,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
    <attribute_syntax name="status-i6">
        <front_end>
            <regex>
-               ^(ALLOCATED-BY-RIR|ALLOCATED-BY-LIR|ASSIGNED|ASSIGNED-ANYCAST)$
+               ^(ALLOCATED-BY-RIR|ALLOCATED-BY-LIR|ASSIGNED|ASSIGNED ANYCAST)$
            </regex>
        </front_end>
        <description>
@@ -741,7 +741,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
      o ALLOCATED-BY-RIR
      o ALLOCATED-BY-LIR
      o ASSIGNED
-     o ASSIGNED-ANYCAST
+     o ASSIGNED ANYCAST
        </description>
    </attribute_syntax>
 
