@@ -328,3 +328,13 @@
 #
 # RESULT 035: creation will succeed
 
+# rdns tests
+# CASE 036: 
+#
+# modify 1.e164.arpa domain object
+# must fail with rdns errors - no override
+#
+#FAILURE
+#
+# RESULT 036: modify will fail
+
