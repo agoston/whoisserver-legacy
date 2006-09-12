@@ -1,0 +1,28 @@
+
+# CASE 4: We try to create peering-set object AS200.200:prng-lipex1:AS300.300
+# AS200.200:prng-lipex1 does not exist in DB
+%
+% requires initial objects to be loaded
+#
+# create peering-set object 
+#
+#FAILURE
+#
+# RESULT 4: The creation will fail.
+
+
+
+peering-set:      AS200.200:prng-lipex1:AS300.300
+descr:        Test peering partners
+peering:      AS123.20834 at 193.109.219.24
+mp-peering:   AS123.20834 at 193.109.219.24
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+
+password: auth

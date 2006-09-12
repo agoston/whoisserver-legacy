@@ -1,0 +1,29 @@
+
+# CASE 5: We try to create inet-rtr object kst1-core.swip.net
+# it has member-of: rtrs-my-test
+# which in turn has mbrs-by-ref: TEST-MNT
+# also make a -i member-of rtrs-my-test query to see whether it works
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed.
+
+
+inet-rtr:    kst1-core.swip.net
+descr:       test router
+local-as:    AS1257.100
+ifaddr:      146.188.49.14 masklen 30 action community.append(123.456:20);
+peer:        BGP4 rtrs--my-test:AS234.345:rtrs-test asno (AS234.34)
+admin-c:     TP1-DB-TEST
+tech-c:      TP1-DB-TEST
+mnt-by:      TEST-MNT
+notify:      dbtest@ripe.net
+changed:     dbtest@ripe.net 20060101
+source:      DB-TEST
+member-of:   rtrs-my-test
+
+password: auth

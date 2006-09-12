@@ -1,0 +1,25 @@
+
+# CASE 5: We try to create route object 20.13.0.0/16,AS200
+# member-of is an route-set with as32bit-related name
+# which exists in db
+# but doesn't have mbrs-by-ref attribute!!!
+# "membership authorisation failure" expected
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will fail.
+
+
+route:   20.13.0.0/16
+descr:   test route
+origin:  AS200
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net
+source:  DB-TEST
+member-of: AS200.200:rs-test
+
+password: auth

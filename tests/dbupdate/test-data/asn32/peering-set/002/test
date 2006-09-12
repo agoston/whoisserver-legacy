@@ -1,0 +1,28 @@
+
+# CASE 2: We try to create peering-set object prng-lipex1
+# syntax errors
+%
+% requires initial objects to be loaded
+#
+# create peering-set object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+
+
+peering-set:  prng-lipex1
+descr:        Test peering partners
+peering:      AS0.20834 at 193.109.219.24
+mp-peering:   AS0.20834 at 193.109.219.24
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+
+password: auth

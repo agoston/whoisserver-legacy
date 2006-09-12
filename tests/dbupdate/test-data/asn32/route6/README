@@ -1,0 +1,97 @@
+==> route6/001/test <==
+
+# CASE 1: We try to create route6 object for ::/16,AS200
+# testing various attributes where community and as number can be present
+# aggr-bndry
+# aggr-mtd
+# components
+# inject
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+
+==> route6/002/test <==
+
+# CASE 2: We try to create route6 object ::/16,AS200
+# testing various attributes where community and as number can be present
+# aggr-bndry
+# aggr-mtd
+# components
+# inject
+# trying to introduce many errors and count them
+%
+% requires initial objects to be loaded
+#
+# create route object 
+
+==> route6/003/test <==
+
+# CASE 3: We try to create route6 object for ::/16,AS200.200
+# origin is 32bit asn
+# also make a query to check that "-i origin AS200.200" works
+#
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+==> route6/004/test <==
+
+# CASE 4: We try to create route object ::/16,AS200
+# member-of is an route-set with as32bit-related name
+# which exists in db
+# also make a query to check whether member-of works (-i member-of AS200.200:rs-test)
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#SUCCESS
+#
+
+==> route6/005/test <==
+
+# CASE 5: We try to create route object ::/16,AS200
+# member-of is an route-set with as32bit-related name
+# which exists in db
+# and doesn't have mbrs-by-ref attribute!!!
+# expecting membership authorisation error
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#FAILURE
+
+==> route6/006/test <==
+
+# CASE 6: We try to create route6 object for ::/16,AS200.200
+# origin is 32bit asn
+# asn doesn't exist in the DB
+#
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail.
+
+==> route6/007/test <==
+
+# CASE 7: We try to create route6 object for ::/16,AS200
+# making sure we can't have ipv4 in inject
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail.
+

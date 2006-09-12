@@ -1,0 +1,30 @@
+
+# CASE 4: We try to create route-set object AS200.200:RS-CUSTOMERS:AS300.300
+# AS200.200:RS-CUSTOMERS does NOT exist in the DB
+%
+% requires initial objects to be loaded
+#
+# create route-set object 
+#
+#FAILURE
+#
+# RESULT 4: The creation will fail.
+
+
+route-set:    AS200.200:RS-CUSTOMERS:AS300.300
+descr:        test announcements
+members:      47.247.0.0/16,
+               47.163.0.0/16,
+               131.147.0.0/16,
+               rs-customers:AS123.234:rs-test
+mp-members: 47.247.0.0/16, rs-customers:AS123.234:rs-test
+admin-c:    TP1-DB-TEST
+tech-c:     TP1-DB-TEST
+mnt-by:     TEST-MNT
+mnt-lower:    TEST-MNT
+notify:     dbtest@ripe.net
+changed:    dbtest@ripe.net
+source:     DB-TEST
+
+
+password: auth

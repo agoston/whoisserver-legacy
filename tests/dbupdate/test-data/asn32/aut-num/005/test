@@ -1,0 +1,28 @@
+
+# CASE 5: We try to create aut-num object AS200
+# it has member-of: as300.300:as-test:AS400.400
+# which in turn exists and has mbrs-by-ref: RIPE-NCC-HM-MNT
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will succeed.
+
+
+aut-num:      AS200
+as-name:      ASTEST
+descr:        TEST TELEKOM
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+member-of:    as300.300:as-test:AS400.400
+
+password:     hostmaster
+password:     auth
+

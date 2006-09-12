@@ -1,0 +1,38 @@
+
+# CASE 3: We try to create filter-set object fltr-customers
+# asn32 error
+%
+% requires initial objects to be loaded
+#
+# create filter-set object 
+#
+#FAILURE
+#
+# RESULT 3: The creation will fail.
+
+
+filter-set:   fltr-customers
+descr:        This filter contains customers
+filter:       <^AS0.345> OR <^AS8501 AS20965> AND community.contains(234.234:234)
+ AND as-customers:AS234.234:as-test OR rs-customers:AS234.234:rs-test
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+password: auth
+
+filter-set:   fltr-customers1
+descr:        This filter contains customers
+mp-filter:    <^AS0.345> OR <^AS8501 AS20965> AND community.contains(234.234:234)
+ AND as-customers:AS234.234:as-test OR rs-customers:AS234.234:rs-test
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+

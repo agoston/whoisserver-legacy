@@ -1,0 +1,23 @@
+
+# CASE 3: We try to create route6 object for ::/16,AS200.200
+# origin is 32bit asn
+# also make a query to check that "-i origin AS200.200" works
+#
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+
+route6:  ::/16
+descr:   test route
+origin:  AS200.200
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net
+source:  DB-TEST
+
+
+password: auth

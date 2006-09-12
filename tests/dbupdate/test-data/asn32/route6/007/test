@@ -1,0 +1,23 @@
+
+# CASE 7: We try to create route6 object for ::/16,AS200
+# making sure we can't have ipv4 in inject
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail.
+
+
+route6:  ::/16
+descr:   test route
+origin:  AS200
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net
+source:  DB-TEST
+inject: upon HAVE-COMPONENTS {128.8.0.0/16, 128.9.0.0/16, ::/8}
+
+
+password: auth

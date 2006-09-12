@@ -1,0 +1,27 @@
+# object tests - as-block
+# CASE 1: We try to create as-block object
+# maintained
+%
+% requires initial objects to be loaded
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed
+
+
+as-block:     AS101.0 - AS1000.2345
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20010101
+source:       DB-TEST
+
+password: hostmaster
+override: password

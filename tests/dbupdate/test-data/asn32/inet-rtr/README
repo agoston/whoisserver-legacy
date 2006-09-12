@@ -1,0 +1,139 @@
+==> inet-rtr/001/test <==
+
+# CASE 1: We try to create inet-rtr object kst1-core.swip.net
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+
+==> inet-rtr/002/test <==
+
+# CASE 2: We try to create inet-rtr object kst1-core.swip.net
+# introduce many syntax errors
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+
+==> inet-rtr/003/test <==
+
+# CASE 3: We try to create inet-rtr object kst1-core.swip.net
+# it has member-of: rtrs-my-test:AS200.200:rtrs-my-customers
+# which in turn has mbrs-by-ref: TEST-MNT
+# also make a -i member-of rtrs-my-test:AS200.200:rtrs-my-customers query to see whether it works
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#
+
+==> inet-rtr/004/test <==
+
+# CASE 4: We try to create inet-rtr object kst1-core.swip.net
+# it has member-of: rtrs-my-test:AS200.200:rtrs-my-customers
+# which in turn has NO mbrs-by-ref: TEST-MNT
+# expecting membership authorisation error
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#FAILURE
+#
+
+==> inet-rtr/005/test <==
+
+# CASE 5: We try to create inet-rtr object kst1-core.swip.net
+# it has member-of: rtrs-my-test
+# which in turn has mbrs-by-ref: TEST-MNT
+# also make a -i member-of rtrs-my-test query to see whether it works
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#
+
+==> inet-rtr/006/test <==
+
+# CASE 6: We try to create inet-rtr object kst1-core.swip.net
+# it has member-of: rtrs-my-test
+# which in turn has mbrs-by-ref: TEST-MNT
+# also make a -i local-as AS1257.100
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#
+
+==> inet-rtr/007/test <==
+
+# CASE 7: We try to create inet-rtr object kst1-core.swip.net
+# it has member-of: rtrs-my-test
+# which in turn has mbrs-by-ref: TEST-MNT
+# also make a 146.188.49.14 query
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#
+
+==> inet-rtr/008/test <==
+
+# CASE 8: We try to create inet-rtr object kst1-core.swip.net
+# it has member-of: rtrs-my-test
+# which in turn has mbrs-by-ref: TEST-MNT
+# also make a 2001:: query
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#
+
+==> inet-rtr/009/test <==
+
+# CASE 9: We try to create inet-rtr object kst1-core.swip.net
+# it has member-of: rtrs-my-test
+# which in turn has mbrs-by-ref: TEST-MNT
+# also make a 1.2.3.4 query (for interface attr)
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#
+
+==> inet-rtr/010/test <==
+
+# CASE 10: We try to create inet-rtr object kst1-core.swip.net
+# it has member-of: rtrs-my-test
+# which in turn has mbrs-by-ref: TEST-MNT
+# also make a -i local-as AS100
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#

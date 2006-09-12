@@ -1,0 +1,97 @@
+==> route/001/test <==
+
+# CASE 1: We try to create route object 20.13.0.0/16,AS200
+# testing various attributes where community and as number can be present
+# aggr-bndry
+# aggr-mtd
+# components
+# inject
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+
+==> route/002/test <==
+
+# CASE 2: We try to create route object 20.13.0.0/16,AS200
+# testing various attributes where community and as number can be present
+# with syntax errs
+# aggr-bndry
+# aggr-mtd
+# components
+# inject
+%
+% requires initial objects to be loaded
+#
+# create route object 
+
+==> route/003/test <==
+
+# CASE 3: We try to create route object 20.13.0.0/16,AS200
+# origin is asn32
+# make query to check that "-i origin AS200.200" works
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+==> route/004/test <==
+
+# CASE 4: We try to create route object 20.13.0.0/16,AS200
+# member-of is an route-set with as32bit-related name
+# which exists in db
+# also make a query to check whether '-i member-of AS200.200:rs-test' works
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#SUCCESS
+#
+
+==> route/005/test <==
+
+# CASE 5: We try to create route object 20.13.0.0/16,AS200
+# member-of is an route-set with as32bit-related name
+# which exists in db
+# but doesn't have mbrs-by-ref attribute!!!
+# "membership authorisation failure" expected
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#FAILURE
+
+==> route/006/test <==
+
+# CASE 6: We try to create route object 20.13.0.0/16,AS200
+# origin is asn32
+# this AS doesn't exist in the DB
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail.
+
+==> route/007/test <==
+
+# CASE 7: We try to create route object 20.13.0.0/16,AS200
+# making sure we can't have ipv6 addresses in inject
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail.
+

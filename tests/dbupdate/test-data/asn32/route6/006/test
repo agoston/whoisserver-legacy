@@ -1,0 +1,23 @@
+
+# CASE 6: We try to create route6 object for ::/16,AS200.200
+# origin is 32bit asn
+# asn doesn't exist in the DB
+#
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail.
+
+
+route6:  ::/16
+descr:   test route
+origin:  AS200.200
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net
+source:  DB-TEST
+
+
+password: auth

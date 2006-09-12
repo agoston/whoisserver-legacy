@@ -1,0 +1,25 @@
+
+# CASE 3: We try to create aut-num object AS200.200
+# parent as-block exists
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+
+aut-num:      AS200.200
+as-name:      ASTEST
+descr:        TEST TELEKOM
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+password:     hostmaster
+password:     auth

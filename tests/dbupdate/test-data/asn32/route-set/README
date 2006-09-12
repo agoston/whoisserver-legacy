@@ -1,0 +1,55 @@
+==> route-set/001/test <==
+
+# CASE 1: We try to create route-set object RS-CUSTOMERS
+%
+% requires initial objects to be loaded
+#
+# create route-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+
+==> route-set/002/test <==
+
+# CASE 2: We try to create route-set object RS-CUSTOMERS
+# syntax errors
+%
+% requires initial objects to be loaded
+#
+# create route-set object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+
+==> route-set/003/test <==
+
+# CASE 3: We try to create route-set object AS200.200:RS-CUSTOMERS:AS300.300
+# AS200.200:RS-CUSTOMERS exists in the DB
+%
+% requires initial objects to be loaded
+#
+# create route-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+
+==> route-set/004/test <==
+
+# CASE 4: We try to create route-set object AS200.200:RS-CUSTOMERS:AS300.300
+# AS200.200:RS-CUSTOMERS does NOT exist in the DB
+%
+% requires initial objects to be loaded
+#
+# create route-set object 
+#
+#FAILURE
+#
+# RESULT 4: The creation will fail.
+

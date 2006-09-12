@@ -1,0 +1,26 @@
+# object tests - as-block
+# CASE 4: We try create 16bit AS object and query it
+# parent object exist
+# as a query result, there should be 1 as-block object and 1 aut-num object
+%
+% requires initial objects to be loaded
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed
+
+
+password: hostmaster
+
+aut-num:      AS200
+as-name:      ASTEST
+descr:        TEST TELEKOM
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20010101
+source:       DB-TEST
+

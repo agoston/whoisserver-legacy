@@ -1,0 +1,97 @@
+==> aut-num/001/test <==
+
+# CASE 1: We try to create aut-num object AS123
+# this objects tests various flavors of the attributes:
+# mp-import mp-export mp-default
+# import export default
+# we test 32 AS number on itself
+# we test 32 AS number as a part of the set name
+# we test community value as a part of filter in import/export etc
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+
+==> aut-num/002/test <==
+
+# CASE 2: We try to create aut-num object AS123
+# this objects tests various flavors of the attributes:
+# mp-import mp-export mp-default
+# import export default
+# we test 32 AS number on itself
+# we test 32 AS number as a part of the set name
+# we test community value as a part of filter in import/export etc
+# many errors to count.
+%
+% requires initial objects to be loaded
+#
+
+==> aut-num/003/test <==
+
+# CASE 3: We try to create aut-num object AS200.200
+# parent as-block exists
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+
+==> aut-num/004/test <==
+
+# CASE 4: We try to create aut-num object AS200.200
+# parent as-block does not exist
+# fail with 'no parent object' error
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 4: The creation will fail.
+
+==> aut-num/005/test <==
+
+# CASE 5: We try to create aut-num object AS200
+# it has member-of: as300.300:as-test:AS400.400
+# which in turn exists and has mbrs-by-ref: RIPE-NCC-HM-MNT
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will succeed.
+
+==> aut-num/006/test <==
+
+# CASE 6: We try to create aut-num object AS200
+# it has member-of: as300.300:as-test:AS.400.400
+# which in turn exists and has NO mbrs-by-ref: RIPE-NCC-HM-MNT
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail.
+
+==> aut-num/007/test <==
+
+# CASE 7: We try to create aut-num object AS0.123
+# rejected with syntax error
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail.
+
