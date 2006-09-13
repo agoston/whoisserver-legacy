@@ -137,3 +137,19 @@
 #SUCCESS
 #
 # RESULT 10: The creation will succeed
+
+==> as-block/011/test <==
+# object tests - as-block
+# CASE 11: We create 16-bit as-block
+# query: -r -B AS0.n - AS0.m
+# should return 16-bit block
+%
+% requires initial objects to be loaded
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 11: The creation will succeed
+
+
