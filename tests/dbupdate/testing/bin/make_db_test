@@ -186,6 +186,22 @@ RESUMEQUERIES="$REMADMINCMD set queries resume"
 RESUMEUPDATES="$REMADMINCMD set updates resume"
 INITRX="$REMADMINCMD set initrx $SOURCE"
 
+# enable updates
+DYNAMICCHECK="$REMADMINCMD show dynamic"
+DYNAMICSTART="$REMADMINCMD set dynamic start"
+log "checking dynamic updates"
+DYNAMIC=`$DYNAMICCHECK`
+log "dynamic = $DYNAMIC"
+
+if [ $DYNAMIC -ne 1 ]; then
+  log "enabling dynamic updates"
+  $DYNAMICSTART
+  if [ $? -ne 0 ]; then
+    error "Error setting dynamic to start"
+    error_exit "$0 now exiting"
+  fi
+fi
+
 $PAUSEQUERIES
 if [ $? -ne 0 ]; then
    error "Error stopping queries, attempting to resume queries"
