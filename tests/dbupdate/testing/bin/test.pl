@@ -1770,7 +1770,7 @@ sub trace()	{
 
     if (getvar('TRACE_TEST')) {
         print ("TEST_TRACE: TEST TRACING START\n");
-        for my $key (keys %{$CONFIG})   {
+        for my $key (sort keys %{$CONFIG})   {
             print("TEST_TRACE: $key = $CONFIG->{$key}\n");
         }
         print ("TEST_TRACE: TEST TRACING END\n");
@@ -2351,6 +2351,18 @@ my $datadir = getvar ('DATADIR');
         }
 	}
 	my @all = (\@run, \@skipped);
+  
+  if (getvar('TRACE_TEST')) {
+    print ("TEST_TRACE: Tests to run: ", scalar (@run), "\n");
+    foreach my $t (@run) {
+      print ("TEST_TRACE: RUN $t\n");
+    }
+    print ("TEST_TRACE: Tests to skip: ", scalar (@skipped), "\n");
+    foreach my $t (@skipped) {
+      print ("TEST_TRACE: SKIP $t\n");
+    }
+  }
+
 	return(\@all);
 
 }
@@ -2670,8 +2682,8 @@ eval {
     if($received_interrupt){
       print STDERR "\nWe have received INT at some point, so quitting.\n";
       print STDERR "You might need to restart your test whois server,\n";
-      print STDERR "as we might be quitting before issuing \"set resume updates\"\n";
-      print STDERR "and/or \"set resume queries\" in the administrative interface.\n\n";
+      print STDERR "as we might be quitting before issuing \"set updates resume\"\n";
+      print STDERR "and/or \"set queries resume\" in the administrative interface.\n\n";
       last;
     }
 
