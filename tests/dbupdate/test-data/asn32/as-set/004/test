@@ -1,14 +1,11 @@
-
-# CASE 3: We try to create as-set object AS200.200:AS-TEST:AS300.300
+# CASE 4: We try to create as-set object AS200.200:AS-TEST:AS300.300
 # AS200.200:AS-TEST DOES NOT exist in the database
-%
-% requires initial objects to be loaded
 #
 # create as-set object 
 #
 #FAILURE
 #
-# RESULT 3: The creation will fail.
+# RESULT 4: The creation will fail.
 
 
 as-set:       AS200.200:AS-TEST:AS300.300

@@ -1,11 +1,9 @@
-# object tests - as-block
-# CASE 6: We create two as-blocks who are hierarchical to each other and try to query smaller one.
+# CASE 6: We create two as-blocks who are hierarchical to each other and
+# try to query smaller one.
 # 16 bit
 # should return both
-# this test is more to document existing behaviour then test anything in particular
-# to make sure 16 bit behaves the same as 32 bit
-%
-% requires initial objects to be loaded
+# this test is more to document existing behaviour then test anything 
+# in particular to make sure 16 bit behaves the same as 32 bit
 #
 # create as-block object
 #

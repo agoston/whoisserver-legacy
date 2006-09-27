@@ -1,20 +1,19 @@
-# object tests - as-block
-# CASE 2: We try to create as-block object
-# maintained
-# AS0.0 - rejected
-# syntax error
-# try now AS2.65536 - AS2.65535
-# failure
-%
-% requires initial objects to be loaded
+# CASE 2: We try to create as-block objects
+# maintained, using override
 #
-# create as-block object
+# syntax errors:
+# 0.x anywhere
+# x mixed with x.x
+# 65536 anywhere
+# range x to x-1 <-- this test fails at the moment
+#
+# create as-block objects
 #
 #FAILURE
 #
 # RESULT 2: The creation will fail
 
-# test 0.x - x.x
+# test 2a 0.x - x.x
 
 as-block:     AS0.0 - AS65535.65535
 descr:        Test block
@@ -31,7 +30,7 @@ source:       DB-TEST
 password: hostmaster
 override: password
 
-# test x.x - 0.x
+# test 2b x.x - 0.x
 
 as-block:     AS1.0 - AS0.65535
 descr:        Test block
@@ -45,7 +44,7 @@ mnt-lower:    RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
-# test x.65536 - x.x
+# test 2c x.65536 - x.x
 
 as-block:     AS2.65536 - AS65535.65535
 descr:        Test block
@@ -59,7 +58,7 @@ mnt-lower:    RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
-# test 65536.x - x.x
+# test 2d 65536.x - x.x
 
 as-block:     AS65536.2 - AS65535.65535
 descr:        Test block
@@ -73,7 +72,7 @@ mnt-lower:    RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
-# test x.x - 65536.x
+# test 2e x.x - 65536.x
 
 as-block:     AS65535.65535 - AS65536.65535
 descr:        Test block
@@ -87,7 +86,7 @@ mnt-lower:    RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
-# test x.x - x.65536
+# test 2f x.x - x.65536
 
 as-block:     AS65535.65535 - AS65535.65536
 descr:        Test block
@@ -101,7 +100,7 @@ mnt-lower:    RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
-# test x - x.x
+# test 2g x - x.x
 
 as-block:     AS65535 - AS65535.65535
 descr:        Test block
@@ -115,9 +114,23 @@ mnt-lower:    RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
-# test x.x - x
+# test 2h x.x - x
 
 as-block:     AS65535.65535 - AS65535
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+# test 2i x.x - x.x-1
+
+as-block:     AS1.10 - AS1.9
 descr:        Test block
 remarks:      These AS numbers are further assigned by RIPE NCC
 remarks:      to LIRs and end-users in the RIPE NCC region

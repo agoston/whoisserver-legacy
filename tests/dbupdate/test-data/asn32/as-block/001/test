@@ -1,8 +1,5 @@
-# object tests - as-block
 # CASE 1: We try to create as-block object
-# maintained
-%
-% requires initial objects to be loaded
+# maintained, using override
 #
 # create as-block object
 #

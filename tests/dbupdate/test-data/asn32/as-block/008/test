@@ -1,12 +1,9 @@
-# object tests - as-block
-# CASE 8: We create two as-blocks who are hierarchical to each other and AS and try to this AS.
+# CASE 8: We create an AS and try to query this AS.
+# Two hierarchical as-blocks exist.
 # 16 bit
 # currently FAILS: dbupdate dies because it finds two parent as-block objects.
 # 
-%
-% requires initial objects to be loaded
-#
-# create as-block object
+# create AS object
 #
 #SUCCESS
 #
@@ -15,31 +12,6 @@
 
 password: hostmaster
 override: password
-
-as-block:     AS100 - AS300
-descr:        Test block
-remarks:      These AS numbers are further assigned by RIPE NCC
-remarks:      to LIRs and end-users in the RIPE NCC region
-remarks:      Please refer to these documents
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-mnt-by:       RIPE-NCC-HM-MNT
-mnt-lower:    RIPE-NCC-HM-MNT
-changed:      dbtest@ripe.net 20060101
-source:       DB-TEST
-
-
-as-block:     AS101 - AS299
-descr:        Test block
-remarks:      These AS numbers are further assigned by RIPE NCC
-remarks:      to LIRs and end-users in the RIPE NCC region
-remarks:      Please refer to these documents
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-mnt-by:       RIPE-NCC-HM-MNT
-mnt-lower:    RIPE-NCC-HM-MNT
-changed:      dbtest@ripe.net 20060101
-source:       DB-TEST
 
 aut-num: AS102
 descr: test

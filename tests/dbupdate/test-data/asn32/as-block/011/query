@@ -1,5 +1,9 @@
 % This is the MyDB Whois server.
 
+%WARNING:905: fixed lookup key
+%
+% The key "AS0.100 - AS0.300" has been changed to "AS100 - AS300" for lookup.
+
 % Information related to 'AS100 - AS300'
 
 as-block:       AS100 - AS300

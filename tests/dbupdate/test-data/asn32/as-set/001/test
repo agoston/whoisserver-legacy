@@ -1,7 +1,4 @@
-
 # CASE 1: We try to create as-set object AS-TEST
-%
-% requires initial objects to be loaded
 #
 # create as-set object 
 #

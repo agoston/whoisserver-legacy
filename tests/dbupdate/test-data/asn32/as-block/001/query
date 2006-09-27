@@ -1,1 +1,15 @@
-result
+% This is the MyDB Whois server.
+
+% Information related to 'AS101.0 - AS1000.2345'
+
+as-block:       AS101.0 - AS1000.2345
+descr:          Test block
+remarks:        These AS numbers are further assigned by RIPE NCC
+remarks:        to LIRs and end-users in the RIPE NCC region
+remarks:        Please refer to these documents
+admin-c:        TP1-DB-TEST
+tech-c:         TP1-DB-TEST
+mnt-by:         RIPE-NCC-HM-MNT
+mnt-lower:      RIPE-NCC-HM-MNT
+changed:        dbtest@ripe.net 20010101
+source:         DB-TEST

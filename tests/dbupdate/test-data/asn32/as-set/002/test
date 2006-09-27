@@ -1,7 +1,5 @@
-
 # CASE 2: We try to create as-set object AS-TEST
-%
-% requires initial objects to be loaded
+# with a member AS0.1384
 #
 # create as-set object 
 #

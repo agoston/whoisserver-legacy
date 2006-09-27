@@ -1,9 +1,7 @@
-==> as-block/001/test <==
-# object tests - as-block
+# asn32/as-block tests
+
 # CASE 1: We try to create as-block object
-# maintained
-%
-% requires initial objects to be loaded
+# maintained, using override
 #
 # create as-block object
 #
@@ -12,41 +10,46 @@
 # RESULT 1: The creation will succeed
 
 
-==> as-block/002/test <==
-# object tests - as-block
-# CASE 2: We try to create as-block object
-# maintained
-# AS0.0 - rejected
-# syntax error
-# try now AS2.65536 - AS2.65535
-# failure
-%
-% requires initial objects to be loaded
+# CASE 2: We try to create as-block objects
+# maintained, using override
 #
-# create as-block object
+# syntax errors:
+# 0.x anywhere
+# x mixed with x.x
+# 65536 anywhere
+# range x to x-1 <-- this test fails at the moment
 #
+# create as-block objects
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail
 
-==> as-block/003/test <==
-# object tests - as-block
+# test 2a 0.x - x.x
+# test 2b x.x - 0.x
+# test 2c x.65536 - x.x
+# test 2d 65536.x - x.x
+# test 2e x.x - 65536.x
+# test 2f x.x - x.65536
+# test 2g x - x.x
+# test 2h x.x - x
+# test 2i x.x - x.x-1
+
+
 # CASE 3: We try create 32bit AS object and query it
-# parent object exist
+# parent as-block object exists
 # as a query result, there should be 1 as-block object and 1 aut-num object
-%
-% requires initial objects to be loaded
 #
-# create as-block object
+# create aut-num object
 #
 #SUCCESS
 #
 # RESULT 3: The creation will succeed
 
-==> as-block/004/test <==
-# object tests - as-block
+
 # CASE 4: We try create 16bit AS object and query it
 # parent object exist
 # as a query result, there should be 1 as-block object and 1 aut-num object
-%
-% requires initial objects to be loaded
 #
 # create as-block object
 #
@@ -54,69 +57,25 @@
 #
 # RESULT 4: The creation will succeed
 
-==> as-block/005/test <==
-# object tests - as-block
-# CASE 5: We try create 16bit AS object and query it as AS0.n
+
+# CASE 5: We try create 16bit AS object and query it as AS0.n (without -r)
 # parent object exist
 # as a query result, there should be 1 16-bit as-block object and 1 aut-num object
 # and maybe some warning that we have converted the query?
-%
-% requires initial objects to be loaded
 #
-# create as-block object
+# create aut-num object
 #
 #SUCCESS
 #
+# RESULT 5: The creation will succeed
 
-==> as-block/006/test <==
-# object tests - as-block
-# CASE 6: We create two as-blocks who are hierarchical to each other and try to query smaller one.
+
+# CASE 6: We create two as-blocks who are hierarchical to each other and
+# try to query smaller one.
 # 16 bit
 # should return both
-# this test is more to document existing behaviour then test anything in particular
-# to make sure 16 bit behaves the same as 32 bit
-%
-% requires initial objects to be loaded
-#
-# create as-block object
-#
-#SUCCESS
-
-==> as-block/007/test <==
-# object tests - as-block
-# CASE 7: We create two as-blocks who are hierarchical to each other and try to query bigger one.
-# 16 bit
-# should return only bigger block
-%
-% requires initial objects to be loaded
-#
-# create as-block object
-#
-#SUCCESS
-#
-# RESULT 7: The creation will succeed
-
-==> as-block/008/test <==
-# object tests - as-block
-# CASE 8: We create two as-blocks who are hierarchical to each other and AS and try to this AS.
-# 16 bit
-# currently FAILS: dbupdate dies because it finds two parent as-block objects.
-# 
-%
-% requires initial objects to be loaded
-#
-# create as-block object
-#
-#SUCCESS
-#
-
-==> as-block/009/test <==
-# object tests - as-block
-# CASE 6: We create two as-blocks who are hierarchical to each other and try to query smaller one.
-# 32 bit
-# should return both
-%
-% requires initial objects to be loaded
+# this test is more to document existing behaviour then test anything 
+# in particular to make sure 16 bit behaves the same as 32 bit
 #
 # create as-block object
 #
@@ -124,13 +83,47 @@
 #
 # RESULT 6: The creation will succeed
 
-==> as-block/010/test <==
-# object tests - as-block
-# CASE 10: We create two as-blocks who are hierarchical to each other and try to query bigger one.
+
+# CASE 7: We create two as-blocks who are hierarchical to each other and 
+# try to query bigger one.
+# 16 bit
+# should return only bigger block
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 7: The creation will succeed
+
+
+# CASE 8: We create an AS and try to query this AS.
+# Two hierarchical as-blocks exist.
+# 16 bit
+# currently FAILS: dbupdate dies because it finds two parent as-block objects.
+# 
+# create AS object
+#
+#SUCCESS
+#
+# RESULT 8: The creation will succeed
+
+
+# CASE 9: We create two as-blocks which are hierarchical to each other 
+# and try to query smaller one.
+# 32 bit
+# should return both
+#
+# create as-block objects
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed
+
+
+# CASE 10: We create two as-blocks which are hierarchical to each other
+# and try to query bigger one.
 # 32 bit
 # should return only bigger block
-%
-% requires initial objects to be loaded
 #
 # create as-block object
 #
@@ -138,13 +131,10 @@
 #
 # RESULT 10: The creation will succeed
 
-==> as-block/011/test <==
-# object tests - as-block
+
 # CASE 11: We create 16-bit as-block
 # query: -r -B AS0.n - AS0.m
 # should return 16-bit block
-%
-% requires initial objects to be loaded
 #
 # create as-block object
 #

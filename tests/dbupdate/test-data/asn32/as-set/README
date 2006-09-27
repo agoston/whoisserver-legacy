@@ -1,8 +1,4 @@
-==> as-set/001/test <==
-
 # CASE 1: We try to create as-set object AS-TEST
-%
-% requires initial objects to be loaded
 #
 # create as-set object 
 #
@@ -11,12 +7,8 @@
 # RESULT 1: The creation will succeed.
 
 
-
-==> as-set/002/test <==
-
 # CASE 2: We try to create as-set object AS-TEST
-%
-% requires initial objects to be loaded
+# with a member AS0.1384
 #
 # create as-set object 
 #
@@ -25,13 +17,8 @@
 # RESULT 2: The creation will fail.
 
 
-
-==> as-set/003/test <==
-
 # CASE 3: We try to create as-set object AS200.200:AS-TEST:AS300.300
 # AS200.200:AS-TEST exists in the database
-%
-% requires initial objects to be loaded
 #
 # create as-set object 
 #
@@ -40,16 +27,12 @@
 # RESULT 3: The creation will succeed.
 
 
-==> as-set/004/test <==
-
-# CASE 3: We try to create as-set object AS200.200:AS-TEST:AS300.300
+# CASE 4: We try to create as-set object AS200.200:AS-TEST:AS300.300
 # AS200.200:AS-TEST DOES NOT exist in the database
-%
-% requires initial objects to be loaded
 #
 # create as-set object 
 #
 #FAILURE
 #
-# RESULT 3: The creation will fail.
+# RESULT 4: The creation will fail.
 

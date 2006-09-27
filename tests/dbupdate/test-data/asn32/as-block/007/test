@@ -1,9 +1,7 @@
-# object tests - as-block
-# CASE 7: We create two as-blocks who are hierarchical to each other and try to query bigger one.
+# CASE 7: We create two as-blocks who are hierarchical to each other and 
+# try to query bigger one.
 # 16 bit
 # should return only bigger block
-%
-% requires initial objects to be loaded
 #
 # create as-block object
 #

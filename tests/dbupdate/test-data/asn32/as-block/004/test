@@ -1,11 +1,8 @@
-# object tests - as-block
 # CASE 4: We try create 16bit AS object and query it
 # parent object exist
 # as a query result, there should be 1 as-block object and 1 aut-num object
-%
-% requires initial objects to be loaded
 #
-# create as-block object
+# create aut-num object
 #
 #SUCCESS
 #

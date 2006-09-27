@@ -1,15 +1,13 @@
-# object tests - as-block
-# CASE 6: We create two as-blocks who are hierarchical to each other and try to query smaller one.
+# CASE 9: We create two as-blocks which are hierarchical to each other 
+# and try to query smaller one.
 # 32 bit
 # should return both
-%
-% requires initial objects to be loaded
 #
-# create as-block object
+# create as-block objects
 #
 #SUCCESS
 #
-# RESULT 6: The creation will succeed
+# RESULT 9: The creation will succeed
 
 
 password: hostmaster
