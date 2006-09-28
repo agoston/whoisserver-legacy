@@ -1,0 +1,39 @@
+# CASE 12: We create two as-blocks which are overlapping each other 
+# and try to query one.
+# 32 bit
+# should return only the one queried
+#
+# create as-block objects
+#
+#SUCCESS
+#
+# RESULT 12: The creation will succeed
+
+
+password: hostmaster
+override: password
+
+as-block:     AS100.0 - AS300.0
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20060101
+source:       DB-TEST
+
+
+as-block:     AS200.0 - AS400.0
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20060101
+source:       DB-TEST
