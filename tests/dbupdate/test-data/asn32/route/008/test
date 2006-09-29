@@ -1,0 +1,20 @@
+# CASE 8: We try to create route object 20.13.0.0/16,AS200
+# member-of is an route-set with as32bit-related name
+# which does not exist in db
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail.
+
+
+route:   20.13.0.0/16
+descr:   test route
+origin:  AS200
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net
+source:  DB-TEST
+member-of: AS200.200:rs-test
+
+password: auth
