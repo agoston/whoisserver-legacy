@@ -1,6 +1,6 @@
 <!DOCTYPE ripe_attributes SYSTEM "attributes.dtd">
 
-<ripe_attributes version="$Revision: 1.11.2.1 $" author="$Author: katie $">
+<ripe_attributes version="$Revision: 1.8 $" author="$Author: katie $">
 
   <ripe_attribute name="abuse-mailbox" code="am">
     <description>
@@ -2153,11 +2153,11 @@
     <sqltable name="as_block">
       <insert qtype="ud_ma_ak">
         INSERT as_block
-        SET thread_id=%d, object_id=%ld, begin_as=%d, end_as=%d
+        SET thread_id=%d, object_id=%ld, begin_as=%ld, end_as=%ld
       </insert>
       <update qtype="ud_main_"></update>
       <select qtype="ud_ma_ak">
-        begin_as=%d AND end_as=%d AND
+        begin_as=%ld AND end_as=%ld AND
       </select>
     </sqltable>
     </representation>
@@ -2168,8 +2168,8 @@
         <sqlquery keytype="wk_asrange">
           SELECT object_id,0
           FROM  as_block
-          WHERE begin_as &lt;= %u
-          AND   end_as   &gt;= %u
+          WHERE begin_as &lt;= %ld
+          AND   end_as   &gt;= %ld
           AND   thread_id = 0
         </sqlquery>
       </queries>
@@ -2211,7 +2211,7 @@
 
   <ripe_attribute name="limerick" code="li">
     <description>
-   Specifies the title of the limerick.
+   No longer accepted as valid syntax.
     </description>
     <syntax>limerick</syntax>
 
@@ -2477,6 +2477,18 @@
           AND as_set.object_id = member_of.set_id
           AND as_set = '%s'
           AND as_set.thread_id = 0
+
+        </sqlquery>
+        <sqlquery keytype="wk_rtrset" class="is">
+                <!-- the same as for route-set -->
+          SELECT member_of.object_id,0
+          FROM  rtr_set, member_of, mbrs_by_ref
+          LEFT OUTER JOIN mnt_by ON member_of.object_id = mnt_by.object_id
+          WHERE (mbrs_by_ref.mnt_id = 0 OR mbrs_by_ref.mnt_id = mnt_by.mnt_id)
+          AND member_of.set_id = mbrs_by_ref.object_id
+          AND rtr_set.object_id = member_of.set_id
+          AND rtr_set = '%s'
+          AND rtr_set.thread_id = 0
 
         </sqlquery>
       </queries>

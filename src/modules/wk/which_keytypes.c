@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.5 $
 
   which_keytypes:  Determine which keys to look for.
   
@@ -38,88 +38,6 @@
 #include <pthread.h>
 #include <regex.h>
 
-/******************************************* 
-If any IP reg exps change - check whois cgi which has a copy 
-*******************************************/
-
-#define DOMAINNAME "^[ ]*[a-zA-Z0-9/-]*(\\.[a-zA-Z0-9-]+)*\.?[ ]*$"
-/* add a constraint: there must be at least one character in the domain name
-   because the TLD must not be composed of digits only */
-#define DOMAINALPHA  "[a-zA-Z]"
-
-#define VALIDIP6PREFIX "^[0-9A-F:]*:[0-9A-F:/]*$"     /* at least one colon */
-/* "^[0-9A-F]{1,4}(:[0-9A-F]{1,4}){7}$"*/
-
-/* AS numbers, prepared for 32-bit AS numbers */
-#define ASNUM "^AS[1-9][0-9]{0,9}$"
-
-/* AS numbers, prepared for 32-bit AS numbers */
-#define ASRANGE "^AS[1-9][0-9]{0,9}[ ]*([-][ ]*AS[1-9][0-9]{0,9}){0,1}$"   /* [ ]*(-[ ]*AS[0-9]+)?   */
-
-#define NETNAME "^[A-Z][A-Z0-9_-]*$"
-
-#define MAINTAINER "^[A-Z][A-Z0-9_-]*$"
-
-#define LIMERICK "^LIM-[A-Z0-9_-]+$"
-
-#define POEM "^POEM-[A-Z0-9][A-Z0-9_-]*$"
-
-#define POETIC_FORM "^FORM-[A-Z0-9][A-Z0-9_-]*$"
-
-#define KEYCERT "^(PGPKEY-[0-9A-F]{8})|(X509-[0-9]+)$"
-
-/* made less restrictive to make consistent with other sets ... shane */
-/* made to match what we're actually looking for - shane */
-/*#define ROUTESETNAME "^RS-[A-Z0-9_:-]*$"*/
-#define ROUTESETNAME "(^|:)RS-[A-Z0-9_-]*[A-Z0-9](:|$)"
-
-/* made less restrictive to make consistent with other sets ... shane */
-/* made to match what we're actually looking for - shane */
-/*#define ASSETNAME "^AS-[A-Z0-9_:-]*$"*/
-#define ASSETNAME "(^|:)AS-[A-Z0-9_-]*[A-Z0-9](:|$)" 
-
-#define AUTONICPREFIXREGULAR "^AUTO-"
-
-#define IPRANGE "^[0-9]{1,3}(\\.[0-9]{1,3}){0,3}[ ]*-[ ]*[0-9]{1,3}(\\.[0-9]{1,3}){0,3}$"
-
-#define IPADDRESS "^[0-9.]+$"
-
-#define IPPREFIX "^[0-9.]+/[0-9]+$"
-
-/*#define PEERINGSET "^PRNG-"*/
-#define PEERINGSET "(^|:)PRNG-[A-Z0-9_-]*[A-Z0-9](:|$)" 
-
-/*#define FILTERSET  "^FLTR-"*/
-#define FILTERSET "(^|:)FLTR-[A-Z0-9_-]*[A-Z0-9](:|$)" 
-
-/*#define RTRSET     "^RTRS-"*/
-#define RTRSET "(^|:)RTRS-[A-Z0-9_-]*[A-Z0-9](:|$)" 
-
-#define IRT "^IRT-[A-Z0-9_-]+[A-Z0-9]$"
-
-#define ORG_ID "^ORG-([A-Z]{2,4}([1-9][0-9]{0,5})?(-[A-Z]([A-Z0-9_-]{0,7}[A-Z0-9])))$"
-
-#define NICHANDLE "^[A-Z0-9-]+$"
-
-/* We do not want CRYPT-PW or MD5-PWs to be inverse searchable, so only PGPKEY and X509 defined */
-#define AUTH "^(PGPKEY|X509)-"
-
-/*
-  XXX This seems to be the same as the Perl code.  But I don't see where a " " is allowed for.
-  I.e. Perl -> ^[a-zA-Z][\w\-\.\'\|\`]*$
-  Does \w include [ ;:,?/}{()+*#] ?
-#define NAME_B "^[a-zA-Z][a-zA-Z_0-9.'|`-]*$"
-*/
-#define NAME_B "^[a-zA-Z][a-zA-Z_0-9.'|`;:,?/}{()+*#&-]*$"
-
-#define EMAIL "@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*$"
-
-/* fingerpr: ([A-Z0-9]{4})( [A-Z0-9]{4}){9}*/
-#define FINGERPR "^(([A-F0-9]{4} ){9}[A-F0-9]{4})|(([A-F0-9]{2} ){15}[A-F0-9]{2})|(([A-F0-9]{2}:){15}[A-F0-9]{2})$"
-
-/* ds-rdata: */
-#define DS_RDATA "^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])( ([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))( ([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])|RSAMD5|DH|DSA|ECC|RSASHA1|INDIRECT|PRIVATEDNS|PRIVATEOID)([ 0-9a-fA-F]{1,128})$"
-
 /* structure for simple keys, with a single regular expression to match */
 /* NOTE: the WK_NAME, WK_DOMAIN, and WK_HOSTNAME are not handled here   */
 struct {
@@ -127,31 +45,31 @@ struct {
     char *pattern;		/* string for regular expression */
     regex_t regex;		/* regular expression */
 } wk_regex_list[] = {
-    { WK_NIC_HDL,       NICHANDLE },
-    { WK_EMAIL,         EMAIL },
-    { WK_MNTNER,        MAINTAINER },
-    { WK_KEY_CERT,      KEYCERT },
-    { WK_IPRANGE,       IPRANGE },
-    { WK_IPADDRESS,     IPADDRESS },
-    { WK_IPPREFIX,      IPPREFIX },
-    { WK_IP6PREFIX,     VALIDIP6PREFIX },
-    { WK_NETNAME,       NETNAME },
-    { WK_NET6NAME,      NETNAME },
-    { WK_AUTNUM,        ASNUM },
-    { WK_ASSETNAME,     ASSETNAME },
-    { WK_ROUTESETNAME,  ROUTESETNAME },
-    { WK_LIMERICK,      LIMERICK },
-    { WK_POEM,          POEM },
-    { WK_POETIC_FORM,   POETIC_FORM },
-    { WK_ASRANGE,       ASRANGE },
-    { WK_PEERINGSET,    PEERINGSET },
-    { WK_FILTERSET,     FILTERSET },
-    { WK_RTRSET,        RTRSET },
-    { WK_IRT,           IRT },
-    { WK_FINGERPR,      FINGERPR },
-    { WK_ORG_ID,        ORG_ID },
-    { WK_DS_RDATA,      DS_RDATA },
-    { WK_AUTH,          AUTH }
+    { WK_NIC_HDL,       WK_REXP_NICHANDLE },
+    { WK_EMAIL,         WK_REXP_EMAIL },
+    { WK_MNTNER,        WK_REXP_MAINTAINER },
+    { WK_KEY_CERT,      WK_REXP_KEYCERT },
+    { WK_IPRANGE,       WK_REXP_IPRANGE },
+    { WK_IPADDRESS,     WK_REXP_IPADDRESS },
+    { WK_IPPREFIX,      WK_REXP_IPPREFIX },
+    { WK_IP6PREFIX,     WK_REXP_VALIDIP6PREFIX },
+    { WK_NETNAME,       WK_REXP_NETNAME },
+    { WK_NET6NAME,      WK_REXP_NETNAME },
+    { WK_AUTNUM,        WK_REXP_ASNUM },
+    { WK_ASSETNAME,     WK_REXP_ASSETNAME },
+    { WK_ROUTESETNAME,  WK_REXP_ROUTESETNAME },
+    { WK_LIMERICK,      WK_REXP_LIMERICK },
+    { WK_POEM,          WK_REXP_POEM },
+    { WK_POETIC_FORM,   WK_REXP_POETIC_FORM },
+    { WK_ASRANGE,       WK_REXP_ASRANGE },
+    { WK_PEERINGSET,    WK_REXP_PEERINGSET },
+    { WK_FILTERSET,     WK_REXP_FILTERSET },
+    { WK_RTRSET,        WK_REXP_RTRSET },
+    { WK_IRT,           WK_REXP_IRT },
+    { WK_FINGERPR,      WK_REXP_FINGERPR },
+    { WK_ORG_ID,        WK_REXP_ORG_ID },
+    { WK_DS_RDATA,      WK_REXP_DS_RDATA },
+    { WK_AUTH,          WK_REXP_AUTH }
 };
 #define WK_REGEX_LIST_LEN  (sizeof(wk_regex_list)/sizeof(wk_regex_list[0]))
 
@@ -159,6 +77,9 @@ struct {
 static regex_t ipaddress;
 static regex_t ipprefix;
 static regex_t validip6prefix;
+
+/* regular expressions used by WK_is_aut_num() */
+static regex_t aut_num;
 
 /* regular expression used by isdomname() */
 static regex_t domainname;
@@ -180,15 +101,17 @@ wk_regex_init ()
     }
 
     /* add some special cases used by our other functions */
-    errcode = regcomp(&ipaddress, IPADDRESS, REG_EXTENDED|REG_NOSUB);
+    errcode = regcomp(&ipaddress, WK_REXP_IPADDRESS, REG_EXTENDED|REG_NOSUB);
     dieif(errcode != 0);
-    errcode = regcomp(&ipprefix, IPPREFIX, REG_EXTENDED|REG_NOSUB);
+    errcode = regcomp(&ipprefix, WK_REXP_IPPREFIX, REG_EXTENDED|REG_NOSUB);
     dieif(errcode != 0);
-    errcode = regcomp(&validip6prefix, VALIDIP6PREFIX, REG_EXTENDED|REG_NOSUB);
+    errcode = regcomp(&validip6prefix, WK_REXP_VALIDIP6PREFIX, REG_EXTENDED|REG_NOSUB);
     dieif(errcode != 0);
-    errcode = regcomp(&domainname, DOMAINNAME, REG_EXTENDED|REG_NOSUB);
+    errcode = regcomp(&aut_num, WK_REXP_ASNUM, REG_EXTENDED|REG_NOSUB);
     dieif(errcode != 0);
-    errcode = regcomp(&domainalpha, DOMAINALPHA, REG_EXTENDED|REG_NOSUB);
+    errcode = regcomp(&domainname, WK_REXP_DOMAINNAME, REG_EXTENDED|REG_NOSUB);
+    dieif(errcode != 0);
+    errcode = regcomp(&domainalpha, WK_REXP_DOMAINALPHA, REG_EXTENDED|REG_NOSUB);
     dieif(errcode != 0);
 }
 
@@ -233,6 +156,24 @@ wk_is_hostname (char *key)
     /* Fix - should check for IPADDRESS, not IPRANGE.  - Shane */
     return (wk_is_domain(key) || (regexec(&ipaddress, key, 0, NULL, 0) == 0));
 } /* wk_is_hostname() */
+
+/* 
+  determine if the key represents an aut-num
+
+  key      - object key, e.g. "AS123" or "AS2.456"
+
+  return   - 1 or 0
+
+ */
+int
+WK_is_aut_num (char *key)
+{
+
+  if (regexec(&aut_num, key, 0, NULL, 0) == 0) { 
+      return 1;
+  }
+  return 0;
+}
 
 /* WK_to_string() */
 /*++++++++++++++++++++++++++++++++++++++

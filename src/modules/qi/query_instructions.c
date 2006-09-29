@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.13 $
+  $Revision: 1.14 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -312,8 +312,14 @@ static void qi_create_org_name_query(GString *query_str, const char *sql_query, 
   construct a range query for the as_block table
   (a query for an AS block object) given a string like: 
   AS1
+  AS0.1
+  AS3.473
   AS1 - AS10
   AS1-AS10
+  AS2.123 - AS3.456
+  AS0.35 - AS60
+  Whatever the format we convert them to long integers.
+  As long as a <= b it is OK.
 
   int create_asblock_query    Returns 0 on success, -1 on failure 
                              (search term not an AS# nor range)
@@ -330,29 +336,60 @@ static void qi_create_org_name_query(GString *query_str, const char *sql_query, 
   ++++++++++++++++++++++++++++++++++++++*/
 static int create_asblock_query(GString *query_str, 
 				const char *sql_query, 
-				const char *keys) {
-  char *keycopy = UT_strdup(keys);
+				Query_command *qc) {
+  char *keycopy = UT_strdup(qc->keys);
   char *token, *cursor = keycopy;
-  int  asnums[2] = {0,0};
-  int index = 0; /* index into the asnums array */
+  long  begin_asnum = 0;
+  long  end_asnum = 0;
+  int   upper = 0;
+  int   lower = 0;
+  int   count = 0; /* two possible ASNs in a range */
 
+  while( (token = strsep( &cursor, "-" )) != NULL && count < 2) {  
 
-  while( (token = strsep( &cursor, "-" )) != NULL && index < 2) {  
-    /* discard the letters (or leading whitespace), take the number */
-    if( sscanf(token, "%*[ AS]%d", &asnums[index++]) < 1 ) {
-      return -1; /* error */
+fprintf(stderr, "token [%s]\n", token);
+    /* discard the letters (or leading whitespace), take the (number.)number */
+    if ( strchr(token, '.') == NULL ) {
+      if( sscanf(token, "%*[ AS]%d", &lower) < 1 ) {
+        goto error_return; /* error */
+      }
+    } 
+    else {
+fprintf(stderr, "scanning token with dot\n");
+      if( sscanf(token, "%*[ AS]%d.%d", &upper, &lower) < 1 ) {
+        goto error_return; /* error */
+      }
+fprintf(stderr, "upper [%d] lower [%d]\n", upper, lower);
+    }
+    if ( count++ == 0 ) {
+      begin_asnum = (65536 * upper) + lower;
+    }
+    else {
+      end_asnum = (65536 * upper) + lower;
     }
   }
-  /* if only beginning was supplied, copy it as end */
-  if( index == 1 ) {
-    asnums[1] = asnums[0];
-  }
-  
   /* now construct the query */
-  g_string_sprintf(query_str, sql_query, asnums[0], asnums[1]);
+  /* if only beginning was supplied, use it also as end */
+  if ( count == 1 ) {
+    end_asnum = begin_asnum;
+  }
+  else {
+    if ( end_asnum < begin_asnum ) {
+      qc->parse_messages = g_list_append(qc->parse_messages, 
+                                             ca_get_qi_badrange);
+      goto error_return; /* error */
+    }
+  }
+  g_string_sprintf(query_str, sql_query, begin_asnum, end_asnum);
+fprintf(stderr, "query_str [%s]\n", query_str->str);
 
   UT_free(keycopy);
   return 0;
+  
+  error_return:
+  
+  UT_free(keycopy);
+  return -1;
 }
 
 
@@ -431,7 +468,8 @@ static void add_filter(GString *query_str, const Query_command *qc)
 
   WK_Type keytype The matching keytype.
 
-  const Query_command *qc The query command.
+  Query_command *qc The query command.
+  (This is no longer const to allow error messages further down the line)
 
   mask_t *inv_attrs_bitmap The selected inverse attributes.
    
@@ -442,7 +480,7 @@ static void add_filter(GString *query_str, const Query_command *qc)
   +html+ </PRE>
 
   ++++++++++++++++++++++++++++++++++++++*/
-static char *create_query(const Query_t q, const Query_command *qc) 
+static char *create_query(const Query_t q, Query_command *qc) 
 {
   GString *result_buff;
   char *result;
@@ -460,6 +498,7 @@ static char *create_query(const Query_t q, const Query_command *qc)
 
   if ( (q.query != NULL) 
     && (q.querytype == querytype) ) {
+fprintf(stderr, "q.keytype [%d]\n",q.keytype);
     
     /* addquery = 1; */
     /* if it got here, it should be added, unless.(see asblock)*/
@@ -530,13 +569,43 @@ static char *create_query(const Query_t q, const Query_command *qc)
       addquery = 1;
     }
     else if( q.keytype == WK_ASRANGE ) {   /* as_block range composition */
-      if( create_asblock_query(result_buff, q.query, qc->keys) != 0 ) {
+      if( create_asblock_query(result_buff, q.query, qc) != 0 ) {
 	addquery = 0; /* ... unless it's not correct */
       }
       else {
 	addquery = 1;
       }
     }
+//    else if( q.keytype == WK_AUTNUM ) {   /* as_number check */
+      /* check for 16 bit number in 32 bit format */
+//      char *ptr, *ptr2;
+//fprintf(stderr, "qc->keys [%s]\n",qc->keys);
+//      if ( ptr = strstr(qc->keys, "AS0.") ) {
+//fprintf(stderr, "ptr [%s]\n",ptr);
+
+        /* fix the format */
+//        char *keycopy = UT_strdup(qc->keys);
+	/* remove the '0.' from the key */
+//	ptr += 2;  /* move past 'AS' */
+//fprintf(stderr, "ptr [%s]\n",ptr);
+//	ptr2 = ptr + 2;  /* move past '0.' */
+//fprintf(stderr, "ptr2 [%s]\n",ptr2);
+//	while ( *ptr2 != '\0' ) {
+//	  *(ptr++) = *(ptr2++);
+//	}
+//	*ptr = '\0';
+
+	/* add a warning */
+//        char *fmt = ca_get_qc_fmt_fixedlookup;
+//fprintf(stderr, "fmt [%s]\n",fmt);
+//        qc->parse_messages = g_list_append(qc->parse_messages, 
+//                                g_strdup_printf(fmt, keycopy, qc->keys));
+//        UT_free(fmt);
+//        UT_free(keycopy);
+//      }
+//      g_string_sprintf(result_buff, q.query, qc->keys);
+//      addquery = 1;
+//    }
     else {
       g_string_sprintf(result_buff, q.query, qc->keys);
       addquery = 1;
@@ -1236,7 +1305,7 @@ object_has_attr (sk_conn_st *condat,
     /* get number of references */
     row = SQ_row_next(result_ptr);
     if (row == NULL) {
-        /* if the object is deleted after we have gotten a reference to it,
+        /* if the object is deleted after we get a reference to it,
            the lookup will fail - in such a case treat it the same as 
            an object without any "attr" attributes */
         num_attr_ref = 0;
@@ -1299,12 +1368,6 @@ qi_write_objects(SQ_connection_t **sql_connection,
   unsigned int grouped = qis->qc->G_group_search;
   unsigned int original = qis->qc->B;
   
-//SELECT last.object_id, last.sequence_id, last.object, last.object_type,
-//last.pkey, recursive, gid FROM %s IDS, last, last glast, object_order, 
-//object_order gorder WHERE (IDS.gid=glast.object_id AND 
-//glast.object_type=gorder.object_type AND glast.object_type != 100) AND 
-//(IDS.id=last.object_id AND last.object_type=object_order.object_type AND 
-//last.object_type != 100) ORDER BY %s recursive, object_order.order_code
   if (grouped == 1) {
     sprintf(sql_command, Q_OBJECTS, id_table, "gorder.order_code, gid, ");
   }
@@ -2776,8 +2839,8 @@ static int valid_query(const Query_command *qc, const Query_t q) {
   Create a new set of query_instructions. Returns an allocated structure which
   must be freed after use with QI_free().
 
-  const Query_command *qc The query_command that the instructions are created
-                          from.
+  Query_command *qc The query_command that the instructions are created from.
+  (This is no longer const to allow error messages further down the line)
 
   const Query_environ *qe The environmental variables that they query is being
                           performed under.
@@ -2788,7 +2851,7 @@ static int valid_query(const Query_command *qc, const Query_t q) {
 	marek.
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-Query_instructions *QI_new(const Query_command *qc, const Query_environ *qe) {
+Query_instructions *QI_new(Query_command *qc, const Query_environ *qe) {
   Query_instructions *qis=NULL;
   Query_instruction *qi=NULL;
   Query_instruction tmp_qi;

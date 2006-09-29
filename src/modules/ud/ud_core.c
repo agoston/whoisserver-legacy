@@ -1,6 +1,6 @@
 /***************************************
   
-  $Revision: 1.3 $
+  $Revision: 1.4 $
 
   Core functions for update lower layer 
 
@@ -122,7 +122,7 @@ unsigned prefix_length;
      *pif_address = 0;
      ret = IP_pref_a2v6(ipv6_prefix, &ip_prefix, high, low, &prefix_length);
      UT_free(ipv6_prefix);
-      
+
   } else {
 
      /* Then this is an IPv4 address */
@@ -194,27 +194,49 @@ char *host;
 
 
 /* Convert AS# into integer */
-static int convert_as(const char *as)
+static int convert_as(const char *as, long *asnum)
 {
 char *ptr;
+int   upper = 0;
+int   lower = 0;
 
- ptr=(char *)as; 
- while((*ptr) && (!isdigit((int)*ptr))) ptr++;
- return(atoi(ptr));   
+  ptr=(char *)as; 
+  /* discard the letters (or leading whitespace) */
+  while ((*ptr) && (!isdigit((int)*ptr))) ptr++;
+
+  /* take the (number.)number */
+  if ( strchr(ptr, '.') == NULL ) {
+    if( sscanf(ptr, "%d", &lower) < 1 ) {
+      die; /* return 0;  /* error */
+    }
+  } 
+  else {
+    if( sscanf(ptr, "%d.%d", &upper, &lower) < 1 ) {
+      die; /* return 0; /* error */
+    }
+  }
+  *asnum = (65536 * upper) + lower;
+ 
+  return 1;   
 }
 
 /* Convert AS range (AS4321 - AS5672) into numbers */
-int convert_as_range(const char *as_range, int *begin, int *end)
+int convert_as_range(const char *as_range, long *begin, long *end)
 {
 char *range;
 char *token;
   
   range=g_strdup(as_range);
   token=range;
-  *begin=convert_as(strsep(&token, "-"));
-  *end=convert_as(token);
+  if ( ! convert_as(strsep(&token, "-"), begin) ) goto error_return;
+  if ( !  convert_as(token, end) ) goto error_return;
   UT_free(range);
-  return(0);
+  return(1);
+
+  error_return:
+  
+  UT_free(range);
+  return 0;
 }
 
 /* Convert time in ASCII format (19991224) into time_t unix time */
@@ -1004,7 +1026,7 @@ const char *attribute_value;
                         /*  IPv6 address low half: least significant half of IPv6 address, when applicable  */
                         /* when not applicable, high_ipv6, low_ipv6, if_address must be set to 0            */
                         convert_ie(attribute_value, &if_address, &high_ipv6, &low_ipv6);
-                        g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id,
+                        g_string_sprintf(tr->query, query_fmt, tr->thread_upd, tr->object_id,
                         high_ipv6, low_ipv6, if_address);
                         break;
 	 case UD_LF_RF:
@@ -1099,7 +1121,7 @@ unsigned int begin_in, end_in;
 ip_v6word_t  high, low;
 ip_v6word_t high_ipv6, low_ipv6;
 
-int begin_as, end_as;
+long begin_as, end_as;
 char * set_name;
 char * rf_host; /* needs to be freed after use*/
 int rf_type, rf_port;
@@ -1129,13 +1151,13 @@ const gchar *attribute_value;
 
  /* compose the query depending on the attribute */
   switch (query_type) {
-   case UD_MAIN_: /* for MAIN tables */
-   		if (ACT_UPDATE(tr->action)) do_query=0;
-    		else
-    		g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, attribute_value);
+    case UD_MAIN_: /* for MAIN tables */
+      if (ACT_UPDATE(tr->action)) do_query=0;
+      else
+        g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, attribute_value);
 
         /* for organisation attributes, we need to update NHR (organisation_id table) */
-    		if ((attribute_type == A_OA) && ACT_UPD_NHR(tr->action)) {
+        if ((attribute_type == A_OA) && ACT_UPD_NHR(tr->action)) {
           /* Check if we can allocate it */	 
           res = NH_check_org(tr->nh, tr->sql_connection);
           if(res == -1) { /* we cannot allocate this NIC handle (DB error) */
@@ -1154,224 +1176,229 @@ const gchar *attribute_value;
             do_query = 0;
           }
         }
+        break;
 
+    case UD_MA_OR: /* for the origin attribute */
+      if (ACT_UPDATE(tr->action)) do_query=0;
+      else {
+        /* Here, the two possible table names ('route' and 'route6') are of the
+           same name as the two possible object names. 
+           So we can use rpsl_object_get_class(tr->object) */
+        g_string_sprintf(tr->query, query_fmt, rpsl_object_get_class(tr->object), 
+        tr->thread_ins, attribute_value, tr->object_id);
+        tr->action |= TA_UPD_RX;
+        RP_pack_set_orig(attribute_type, tr->packptr, attribute_value);
+      }
+      break;
 
-    		break;
-   case UD_MA_OR: /* for the origin attribute */
-   		if (ACT_UPDATE(tr->action)) do_query=0;
-    		else {
-                  /* Here, the two possible table names ('route' and 'route6') are of the
-                     same name as the two possible object names. So we can use rpsl_object_get_class(tr->object) */
-		  g_string_sprintf(tr->query, query_fmt, rpsl_object_get_class(tr->object), tr->thread_ins, 
-                       attribute_value, tr->object_id);
-		  tr->action |= TA_UPD_RX;
-		  RP_pack_set_orig(attribute_type, tr->packptr, attribute_value);
-		}
-    		break;
-   case UD_MA_PR: /* for person_role table*/
-   		if (ACT_UPDATE(tr->action)) do_query=0;
-   		else
-   		 g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->class_type, tr->object_id,  attribute_value);
+    case UD_MA_PR: /* for person_role table*/
+      if (ACT_UPDATE(tr->action)) do_query=0;
+      else
+        g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->class_type, tr->object_id,  attribute_value);
    		
-   		/* check if we need to update NHR */
-    		if (ACT_UPD_NHR(tr->action)) {
-		 /* Check if we can allocate it */	 
-		  res = NH_check(tr->nh, tr->sql_connection);
-		  if(res == -1) { /* we cannot allocate this NIC handle (DB error) */
-		     tr->succeeded=0;
-		     tr->error |= ERROR_U_DBS;
-		     g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:cannot allocate nic-handle\n", ERROR_U_DBS, attribute_type, attribute_value);
-                     LG_log(ud_context, LG_SEVERE, "cannot allocate nic hdl[%s]\n", attribute_value);
-                     die; 
-                  }
-                  else 
-                  if(res == 0) { /* we cannot allocate this NIC handle (full space or ID in use) */
-		    tr->succeeded=0; 
-		    tr->error |= ERROR_U_OBJ;
-		    g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:nic-handle wrong or already in use\n", ERROR_U_OBJ, attribute_type, attribute_value); 
-		    result = ATTR_CREATE_DONE;
-		    do_query = 0;
-		  }
-		}
-    		break;	
-   case UD_MA_RT: /* for route table*/
-    		if (ACT_UPDATE(tr->action)) do_query=0;
-    		else {
-                  tr->action |= TA_UPD_RX;
-                  /* be strict here. bit inconsistencies should result in an error */
-    		  if(RP_pack_set_pref4(attribute_type, attribute_value, tr->packptr, &prefix, &prefix_length)==IP_OK){
-		    g_string_sprintf(tr->query, query_fmt, tr->thread_ins,  
-			  tr->object_id, prefix, prefix_length);
-                  } else {
-                    tr->succeeded=0; 
-		    tr->error |= ERROR_U_OBJ;
-		    g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value); 
-		    result = ATTR_CREATE_DONE;
-		    do_query = 0;
-                  }
-	    	}
-    		break;
-   case UD_MA_R6: /* for route6 table*/
-                if (ACT_UPDATE(tr->action)) do_query=0;
-                else {
-                  /* be strict here. bit inconsistencies should result in an error */ 
-                  if(RP_pack_set_pref6(attribute_type, attribute_value, tr->packptr, &high, &low, &prefix_length)==IP_OK){
-                    g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, high, low, prefix_length);
-                    tr->action |= TA_UPD_RX;
-                  }else {
-                    tr->succeeded=0;
-                    tr->error |= ERROR_U_OBJ;
-                    g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value);
-                    result = ATTR_CREATE_DONE;
-                    do_query = 0;
-                  }
-                }
-                break;
-   case UD_MA_IN: /* for inetnum table*/
-    		if (ACT_UPDATE(tr->action)) do_query=0;
-    		else {
-                  /* be strict here. bit inconsistencies should result in an error */
-    		  if(RP_pack_set_rang(attribute_type, attribute_value, tr->packptr, &begin_in, &end_in)==IP_OK){
-                    tr->action |= TA_UPD_RX;
-		    g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, begin_in, end_in);
-                  } else {
-                    tr->succeeded=0; 
-		    tr->error |= ERROR_U_OBJ;
-		    g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong range specified\n", ERROR_U_OBJ, attribute_type, attribute_value); 
-		    result = ATTR_CREATE_DONE;
-		    do_query = 0;
-                  }
-		}	
-    		break;
-   case UD_MA_I6: /* for inet6num table*/
-                if (ACT_UPDATE(tr->action)) do_query=0;
-    		else {
-                  /* be strict here. bit inconsistencies should result in an error */
-		  if(RP_pack_set_pref6(attribute_type, attribute_value, tr->packptr, &high, &low, &prefix_length)==IP_OK){
-		    g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, high, low, prefix_length);
-                    tr->action |= TA_UPD_RX;
-                  }else {
-                    tr->succeeded=0; 
-		    tr->error |= ERROR_U_OBJ;
-		    g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value); 
-		    result = ATTR_CREATE_DONE;
-		    do_query = 0;
-                  }
-		}	
-    		break;	
-   case UD_MA_U2: /* This is actually an update - go to update_attr - this is more logical */
-                 do_query=0;
-            	break;
-   case UD_MA_AK: /* for as_block table*/
-   		if (ACT_UPDATE(tr->action)) do_query=0;
-   		else {
-   		  convert_as_range(attribute_value, &begin_as, &end_as);
-		  g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, begin_as, end_as);
-   		}
-   		break;         	    		
-   case UD_AUX__: /* for AUX tables*/
-    		g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, tr->class_type, attribute_value);
-        /* A_OG is the code for "org:" attr */
-    		if(!IS_DUMMY_ALLOWED(tr->mode) && attribute_type!=A_OG)g_string_sprintfa(tr->query, " AND dummy=0 ");
-    		break;
-   case UD_AX_MO: /* for member_of table*/
-		set_name = get_set_name(tr->class_type);
-    		g_string_sprintf(tr->query, query_fmt, tr->thread_ins,  
-	    	 tr->object_id, set_name, tr->class_type, set_name, set_name, set_name, attribute_value);
-    		break;	
-   case UD_AX_MR: /* for mbrs_by_ref table*/
-      		if ((g_strcasecmp(attribute_value, "ANY")==0))
-      		 g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, tr->class_type, "ANY");
-      		else  
-      		 g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, tr->class_type, attribute_value);
-		break;	
-   case UD_AX_MU: /* for mnt_routes and mnt_routes6 tables */
-   		a_value=g_strdup(attribute_value); 
-		token = a_value;
-                /* we only store the mntner name, don't care about prefixes */
-		mu_mntner=strsep(&token, " \t");
-   		g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, tr->class_type, mu_mntner);
-   		UT_free(a_value);
-   		if(!IS_DUMMY_ALLOWED(tr->mode))g_string_sprintfa(tr->query, " AND dummy=0 ");
-   		break;
-   case UD_LEAF_: /* for LEAF tables*/
-    		g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, attribute_value);
-    		break;
-   case UD_LF_OT: /* for LEAF tables containing object_type field*/
-   		g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, tr->class_type, attribute_value);
-   		break; 		    		
-   case UD_LF_AT: /* check PGPKEY. If yes - check the existence of key-cert.*/
-      		if(!IS_DUMMY_ALLOWED(tr->mode)){
-      		 if(strncmp("PGPKEY", attribute_value, 6)==0) {
-      		   if(get_ref_id(tr, "key_cert", "key_cert", attribute_value, NULL)<=0) { 
-                    LG_log(tr->src_ctx, LG_INFO, "[%ld] no key-cert object[%s]", tr->transaction_id, attribute_value);
-      		    tr->error|=ERROR_U_OBJ;
-      		    tr->succeeded=0;
-      		    g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:no key-cert object\n" ,ERROR_U_OBJ, attribute_type, attribute_value);
-     		    result = ATTR_CREATE_DONE;
-     		    do_query = 0;
-     		    break;
-      	           }
-      		 }
-      		} 
-      		g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, tr->class_type, attribute_value);
-      		break;      
-   case UD_LF_IF: /* for ifaddr tables*/
-    		/* Convert ascii ip -> numeric one*/
-    		convert_if(attribute_value, &if_address);
-		g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, if_address);
-    		break;
-   case UD_LF_IE: /* for interface table */
-                /* get the components of the attribute value */
-                /*  IPv4 address: numeric value of IPv4 interface address, when applicable         */
-                /*  IPv6 address high half: most significant half of IPv6 address, when applicable  */
-                /*  IPv6 address low half: least significant half of IPv6 address, when applicable  */
-                /* when not applicable, high_ipv6, low_ipv6, if_address must be set to 0            */
-                convert_ie(attribute_value, &if_address, &high_ipv6, &low_ipv6);
-                g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, 
-                  high_ipv6, low_ipv6, if_address);
-                break;
-   case UD_LF_RF: /* for refer table*/
-    		rf_host=convert_rf(attribute_value, &rf_type, &rf_port);
-                /*XXX Maybe this is redundant */
-		if(rf_host == NULL) {
-				tr->error|=ERROR_U_OBJ;
-  	                        tr->succeeded=0;
-  	                        g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:incorrect refer attribute\n" ,
-				ERROR_U_OBJ, attribute_type, attribute_value);
-				result = ATTR_CREATE_DONE;
-				do_query = 0;
-		}
-		else {
-    		                g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, rf_type, rf_host, rf_port);
-    		                UT_free(rf_host);
-		}
-    		break;	
-   case UD_LF_AY: /* for auth_override table*/
-   		g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, convert_time(attribute_value));
-   		break;
-    	default:
-                tr->succeeded=0;
-                tr->error |= ERROR_U_BUG;
-                g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:query not defined for the attribute\n" ,ERROR_U_BUG, attribute_type, attribute_value);
-                LG_log(ud_context, LG_SEVERE, "query not defined for this type of attribute:[%d:%s]\n", attribute_type, attribute_value);
-                die;
-    		break;
-   case UD_AX_PF: /* for Poetic Form tables*/
-    		g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, attribute_value);
-    		break;
+        /* check if we need to update NHR */
+        if (ACT_UPD_NHR(tr->action)) {
+          /* Check if we can allocate it */	 
+          res = NH_check(tr->nh, tr->sql_connection);
+          if(res == -1) { /* we cannot allocate this NIC handle (DB error) */
+          tr->succeeded=0;
+          tr->error |= ERROR_U_DBS;
+          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:cannot allocate nic-handle\n", ERROR_U_DBS, attribute_type, attribute_value);
+          LG_log(ud_context, LG_SEVERE, "cannot allocate nic hdl[%s]\n", attribute_value);
+          die; 
+        }
+        else 
+        if (res == 0) { /* we cannot allocate this NIC handle (full space or ID in use) */
+          tr->succeeded=0; 
+          tr->error |= ERROR_U_OBJ;
+          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:nic-handle wrong or already in use\n", ERROR_U_OBJ, attribute_type, attribute_value); 
+          result = ATTR_CREATE_DONE;
+          do_query = 0;
+        }
+      }
+      break;	
+    case UD_MA_RT: /* for route table*/
+      if (ACT_UPDATE(tr->action)) do_query=0;
+      else {
+        tr->action |= TA_UPD_RX;
+        /* be strict here. bit inconsistencies should result in an error */
+        if (RP_pack_set_pref4(attribute_type, attribute_value, tr->packptr, &prefix, &prefix_length)==IP_OK){
+          g_string_sprintf(tr->query, query_fmt, tr->thread_ins,  
+                             tr->object_id, prefix, prefix_length);
+        } else {
+          tr->succeeded=0; 
+          tr->error |= ERROR_U_OBJ;
+          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value); 
+          result = ATTR_CREATE_DONE;
+          do_query = 0;
+        }
+      }
+      break;
+    case UD_MA_R6: /* for route6 table*/
+      if (ACT_UPDATE(tr->action)) do_query=0;
+      else {
+        /* be strict here. bit inconsistencies should result in an error */ 
+        if (RP_pack_set_pref6(attribute_type, attribute_value, tr->packptr, &high, &low, &prefix_length)==IP_OK){
+          g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, high, low, prefix_length);
+          tr->action |= TA_UPD_RX;
+        }else {
+          tr->succeeded=0;
+          tr->error |= ERROR_U_OBJ;
+          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value);
+          result = ATTR_CREATE_DONE;
+          do_query = 0;
+        }
+      }
+      break;
+    case UD_MA_IN: /* for inetnum table*/
+      if (ACT_UPDATE(tr->action)) do_query=0;
+      else {
+        /* be strict here. bit inconsistencies should result in an error */
+        if (RP_pack_set_rang(attribute_type, attribute_value, tr->packptr, &begin_in, &end_in)==IP_OK){
+          tr->action |= TA_UPD_RX;
+          g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, begin_in, end_in);
+        } else {
+          tr->succeeded=0; 
+          tr->error |= ERROR_U_OBJ;
+          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong range specified\n", ERROR_U_OBJ, attribute_type, attribute_value); 
+          result = ATTR_CREATE_DONE;
+          do_query = 0;
+        }
+      }	
+      break;
+    case UD_MA_I6: /* for inet6num table*/
+      if (ACT_UPDATE(tr->action)) do_query=0;
+      else {
+        /* be strict here. bit inconsistencies should result in an error */
+        if (RP_pack_set_pref6(attribute_type, attribute_value, tr->packptr, &high, &low, &prefix_length)==IP_OK){
+          g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, high, low, prefix_length);
+          tr->action |= TA_UPD_RX;
+        }else {
+          tr->succeeded=0; 
+          tr->error |= ERROR_U_OBJ;
+          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value); 
+          result = ATTR_CREATE_DONE;
+          do_query = 0;
+        }
+      }	
+      break;	
+    case UD_MA_U2: /* This is actually an update - go to update_attr - this is more logical */
+      do_query=0;
+      break;
+    case UD_MA_AK: /* for as_block table*/
+      if (ACT_UPDATE(tr->action)) do_query=0;
+      else {
+        convert_as_range(attribute_value, &begin_as, &end_as);
+        g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, begin_as, end_as);
+      }
+      break;         	    		
+    case UD_AUX__: /* for AUX tables*/
+      g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, tr->class_type, attribute_value);
+      /* A_OG is the code for "org:" attr */
+      if (!IS_DUMMY_ALLOWED(tr->mode) && attribute_type!=A_OG) g_string_sprintfa(tr->query, " AND dummy=0 ");
+      break;
+    case UD_AX_MO: /* for member_of table*/
+      set_name = get_set_name(tr->class_type);
+      g_string_sprintf(tr->query, query_fmt, tr->thread_ins,  
+                         tr->object_id, set_name, tr->class_type, set_name, 
+      set_name, set_name, attribute_value);
+      break;	
+    case UD_AX_MR: /* for mbrs_by_ref table*/
+      if ((g_strcasecmp(attribute_value, "ANY")==0))
+      	g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, 
+        tr->class_type, "ANY");
+      else  
+      	g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, 
+                            tr->class_type, attribute_value);
+      break;	
+    case UD_AX_MU: /* for mnt_routes and mnt_routes6 tables */
+      a_value = g_strdup(attribute_value); 
+      token = a_value;
+      /* we only store the mntner name, don't care about prefixes */
+      mu_mntner=strsep(&token, " \t");
+      g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, 
+                          tr->class_type, mu_mntner);
+      UT_free(a_value);
+      if (!IS_DUMMY_ALLOWED(tr->mode)) g_string_sprintfa(tr->query, " AND dummy=0 ");
+      break;
+    case UD_LEAF_: /* for LEAF tables*/
+      g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, attribute_value);
+      break;
+    case UD_LF_OT: /* for LEAF tables containing object_type field*/
+      g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, tr->class_type, attribute_value);
+      break; 		    		
+    case UD_LF_AT: /* check PGPKEY. If yes - check the existence of key-cert.*/
+      if (!IS_DUMMY_ALLOWED(tr->mode)){
+        if (strncmp("PGPKEY", attribute_value, 6)==0) {
+          if (get_ref_id(tr, "key_cert", "key_cert", attribute_value, NULL)<=0) { 
+            LG_log(tr->src_ctx, LG_INFO, "[%ld] no key-cert object[%s]", tr->transaction_id, attribute_value);
+            tr->error|=ERROR_U_OBJ;
+            tr->succeeded=0;
+            g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:no key-cert object\n" ,ERROR_U_OBJ, attribute_type, attribute_value);
+            result = ATTR_CREATE_DONE;
+            do_query = 0;
+            break;
+          }
+        }
+      } 
+      g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, tr->class_type, attribute_value);
+      break;      
+    case UD_LF_IF: /* for ifaddr tables*/
+      /* Convert ascii ip -> numeric one*/
+      convert_if(attribute_value, &if_address);
+      g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, if_address);
+      break;
+    case UD_LF_IE: /* for interface table */
+      /* get the components of the attribute value */
+      /*  IPv4 address: numeric value of IPv4 interface address, when applicable         */
+      /*  IPv6 address high half: most significant half of IPv6 address, when applicable  */
+      /*  IPv6 address low half: least significant half of IPv6 address, when applicable  */
+      /* when not applicable, high_ipv6, low_ipv6, if_address must be set to 0            */
+      convert_ie(attribute_value, &if_address, &high_ipv6, &low_ipv6);
+      g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, 
+                          high_ipv6, low_ipv6, if_address);
+      break;
+    case UD_LF_RF: /* for refer table*/
+      rf_host=convert_rf(attribute_value, &rf_type, &rf_port);
+      /*XXX Maybe this is redundant */
+      if (rf_host == NULL) {
+        tr->error|=ERROR_U_OBJ;
+        tr->succeeded=0;
+        g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:incorrect refer attribute\n" ,
+                             ERROR_U_OBJ, attribute_type, attribute_value);
+        result = ATTR_CREATE_DONE;
+        do_query = 0;
+      }
+      else {
+        g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, 
+        rf_type, rf_host, rf_port);
+        UT_free(rf_host);
+      }
+      break;	
+    case UD_LF_AY: /* for auth_override table*/
+      g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, convert_time(attribute_value));
+      break;
+    default:
+      tr->succeeded=0;
+      tr->error |= ERROR_U_BUG;
+      g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:query not defined for the attribute\n" ,ERROR_U_BUG, attribute_type, attribute_value);
+      LG_log(ud_context, LG_SEVERE, "query not defined for this type of attribute:[%d:%s]\n", attribute_type, attribute_value);
+      die;
+      break;
+    case UD_AX_PF: /* for Poetic Form tables*/
+      g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, attribute_value);
+      break;
   }
   
- 
- /* Make the query. For primary keys go straight to updates if we are updating the object */
-  if(do_query){
-   LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, tr->query->str);
-   sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
-   if(sql_err) result = ATTR_CREATE_ERR; else result = ATTR_CREATE_OK;
+  /* Make the query. For primary keys go straight to updates if we are updating the object */
+  if (do_query) {
+    LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, tr->query->str);
+    sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
+    if (sql_err) result = ATTR_CREATE_ERR; 
+    else result = ATTR_CREATE_OK;
   } 
 
- return(result);
-  
+  return(result);
 }/* create_attr() */
 
 /************************************************************
@@ -1408,175 +1435,174 @@ const gchar *attribute_value;
 int result;
 
 /* we still want to continue to collect all possible errors*/
- /* To switch off querying for some types of attributes */
-  do_query=1;
+/* To switch off querying for some types of attributes */
+do_query=1;
   
- /* Determine the query type */ 
+/* Determine the query type */ 
   attribute_type = rpsl_get_attr_id(rpsl_attr_get_name(attribute));
   query_type=DF_get_insert_query_type(attribute_type);
 
 /* For loading pass #1 we need to process only main tables */
-  if(tr->load_pass==1){ 
-	switch(query_type) {
-	 case UD_MAIN_:
-	 case UD_MA_U2:
-	 case UD_MA_PR:
-	 case UD_MA_RT:
-         case UD_MA_R6:
-	 case UD_MA_IN:
-	 case UD_MA_I6:
-	 case UD_MA_OR:
-	 case UD_MA_AK:
-	 		break;
-	 default:	return;	/* return for other than MAIN tables*/
-	}
+  if (tr->load_pass==1){ 
+    switch(query_type) {
+      case UD_MAIN_:
+      case UD_MA_U2:
+      case UD_MA_PR:
+      case UD_MA_RT:
+      case UD_MA_R6:
+      case UD_MA_IN:
+      case UD_MA_I6:
+      case UD_MA_OR:
+      case UD_MA_AK:
+      break;
+      default:  return;	/* return for other than MAIN tables*/
+    }
   }
   
-    query_fmt = DF_get_insert_query(attribute_type);
+  query_fmt = DF_get_insert_query(attribute_type);
 
-/* return if no query is defined for this attribute */
+  /* return if no query is defined for this attribute */
   if (strcmp(query_fmt, "") == 0) return;
 
-/* Try to create an attribute in SQL database*/
+  /* Try to create an attribute in SQL database*/
   result = create_attr(attribute, tr);
   
-/* The value is clean since the object is "flattened" */
+  /* The value is clean since the object is "flattened" */
   attribute_value = rpsl_attr_get_value(attribute);
 
   switch(result) {
   
   case ATTR_CREATE_DONE:
-     /* no more processing required */
-     break;
+    /* no more processing required */
+    break;
   
   case ATTR_CREATE_NO: 
-     /* for object updates for primary keys go straight to updates */
-     /* most of the primary keys are just skipped */
-     /* secod keys are updated, also dummy flag is reset for sets, pn/ro, mt */
-     update_attr(attribute, tr);
-     break;
+    /* for object updates for primary keys go straight to updates */
+    /* most of the primary keys are just skipped */
+    /* secod keys are updated, also dummy flag is reset for sets, pn/ro, mt */
+    update_attr(attribute, tr);
+    break;
      
-  
   case ATTR_CREATE_ERR:
-     if(SQ_errno(tr->sql_connection) == ER_DUP_ENTRY){ /* Only error "Duplicate entry" may be considered*/
-  	if (ACT_UPDATE(tr->action)) { /* In update mode this is common (so actually not an error)*/
-  		update_attr(attribute, tr);
-  	}	
-     /* Otherwise this is a duplicate attribute, just ignore it */
-     /* In the future if we are more stringent, checks may be added here */	
-     }
-     else { /* Other errors reveal a database/server problem*/
-        sq_error=SQ_error(tr->sql_connection);
-        tr->error|=ERROR_U_DBS;
-        tr->succeeded=0;
-        LG_log(ud_context, LG_ERROR, "%s[%s]\n", sq_error, tr->query->str);
-        g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:%s\n" ,ERROR_U_DBS, attribute_type, attribute_value, sq_error);
-	die;
-     }  
-     break;
-  
-  case ATTR_CREATE_OK:
-     /* If the query was successful */
-     num = SQ_get_affected_rows(tr->sql_connection);
-     if(num>0){ /* this is OK*/
-     /* Do some additional processing for member_of attribute  */
-	if ((attribute_type == A_MO) && (!IS_DUMMY_ALLOWED(tr->mode))){
-		if(auth_member_of(attribute, tr)!=0){
-		 tr->error|=ERROR_U_AUT;
-		 tr->succeeded=0;
-                 LG_log(tr->src_ctx, LG_INFO, "[%ld] membership not allowed [%d:%s]", tr->transaction_id, attribute_type, attribute_value);
-		 g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:membership not allowed\n" ,ERROR_U_AUT, attribute_type, attribute_value);	
-		}
-	}
-	else
-	  /* Do some additional processing for reverse zones domains */
-	  if ((attribute_type == A_DN) 
-	      && IP_revd_a2b(&dn_pref, attribute_value)==IP_OK ) {
-	    
-	    if(insert_reverse_domain(tr, &dn_pref) != 0 ) {
-		tr->error|=ERROR_U_DBS;
-		tr->succeeded=0;
-                LG_log(ud_context, LG_SEVERE, "cannot insert inverse domain:[%d:%s]\n", attribute_type, attribute_value);
-		die;	
-	    }
-	    else {
-	      /* save data for the radix tree update */
-	      tr->action |= TA_UPD_RX;
-	      RP_pack_set_revd(attribute_type, attribute_value, tr->packptr);
-	    }
-	  }
-     }
-     else { /* if num == 0 */
-     /* this could be an empty update or a null select */	    
-  	SQ_get_info(tr->sql_connection, sq_info); 
-  	if (sq_info[SQL_DUPLICATES]>0) {
-	/* INSERT ... SELECT ... affected 0 rows, but there is 1 duplicate */
-	/* which means that we already have such record in the table */	
-	/* this indicates that this is actually an update - update this attribute */	 
-  		if (sq_info[SQL_DUPLICATES]>1) { 
-  			tr->error|=ERROR_U_DBS;
-  			tr->succeeded=0;
-                        LG_log(ud_context, LG_SEVERE, "too many duplicates:[%d:%s]\n", attribute_type, attribute_value);
-  			die;
-  		}
-  		update_attr(attribute, tr);
-  	}
-  	else { 
-	/* this is an emty SELECT because there is no referred object */	
-	/* try to create dummy and repeat the original query*/
-  		
+    if (SQ_errno(tr->sql_connection) == ER_DUP_ENTRY){ /* Only error "Duplicate entry" may be considered*/
+       if (ACT_UPDATE(tr->action)) { /* In update mode this is common (so actually not an error)*/
+         update_attr(attribute, tr);
+       }	
+    /* Otherwise this is a duplicate attribute, just ignore it */
+    /* In the future if we are more stringent, checks may be added here */	
+    }
+    else { /* Other errors reveal a database/server problem*/
+       sq_error=SQ_error(tr->sql_connection);
+       tr->error|=ERROR_U_DBS;
+       tr->succeeded=0;
+       LG_log(ud_context, LG_ERROR, "%s[%s]\n", sq_error, tr->query->str);
+       g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:%s\n" ,ERROR_U_DBS, attribute_type, attribute_value, sq_error);
+       die;
+    }  
+    break;
 
-		dummy_err = create_dummy(attribute, tr);
-		if (dummy_err == 0) {
-		/* Dummy was created */	
-			g_string_sprintfa(tr->error_script,"W[%d][%d:%s]:dummy created\n" ,0, attribute_type, attribute_value);
-                        LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, tr->query->str);
-			sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
-			num = SQ_get_affected_rows(tr->sql_connection);
-			if (sql_err) {
-			  sq_error=SQ_error(tr->sql_connection);
-                          LG_log(ud_context, LG_ERROR, "%s[%s]\n", sq_error, tr->query->str);
-			  tr->error|=ERROR_U_DBS;
-		          tr->succeeded=0;
-		          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:%s\n" ,
-		                            ERROR_U_DBS, attribute_type, attribute_value, sq_error);
-			  die;
-		        }                    
-		        if (num==0) {
-                          LG_log(ud_context, LG_ERROR, "0 rows affected [%s]\n", tr->query->str);
-			  tr->error|=ERROR_U_DBS;
-			  tr->succeeded=0;
-			  g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:re-insert qry\n" ,
-			                    ERROR_U_DBS, attribute_type, attribute_value);
-			  die;
-			}
-		}
-		else 
-		 if(dummy_err == 1) {
-		 /* dummy not allowed */	 
-		   tr->error |= ERROR_U_OBJ;
-		   tr->succeeded=0;
-		   g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:ref integrity: reference cannot be resolved\n" ,
-                   ERROR_U_OBJ, attribute_type, attribute_value);
-                   LG_log(tr->src_ctx, LG_INFO, "[%ld] dummy not allowed [%d:%s]", tr->transaction_id, attribute_type, attribute_value);
-		 }
-		 else {
-		 /* SQL problem */	 
-		   tr->error|=ERROR_U_DBS;
-		   tr->succeeded=0;
-                   LG_log(ud_context, LG_ERROR, "dummy cannot be created [%d:%s]", attribute_type, attribute_value);
-		   g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:dummy cannot be created\n" ,ERROR_U_DBS, attribute_type, attribute_value);
-		   die;
-		}	
+   case ATTR_CREATE_OK:
+      /* If the query was successful */
+      num = SQ_get_affected_rows(tr->sql_connection);
+      if (num>0){ /* this is OK*/
+        /* Do some additional processing for member_of attribute  */
+        if ((attribute_type == A_MO) && (!IS_DUMMY_ALLOWED(tr->mode))){
+          if(auth_member_of(attribute, tr)!=0){
+          tr->error|=ERROR_U_AUT;
+          tr->succeeded=0;
+          LG_log(tr->src_ctx, LG_INFO, "[%ld] membership not allowed [%d:%s]", tr->transaction_id, attribute_type, attribute_value);
+          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:membership not allowed\n" ,ERROR_U_AUT, attribute_type, attribute_value);	
+          }
+        }
+        else {
+          /* Do some additional processing for reverse zones domains */
+          if ((attribute_type == A_DN) 
+                   && IP_revd_a2b(&dn_pref, attribute_value)==IP_OK ) {
+
+            if(insert_reverse_domain(tr, &dn_pref) != 0 ) {
+              tr->error|=ERROR_U_DBS;
+              tr->succeeded=0;
+              LG_log(ud_context, LG_SEVERE, "cannot insert inverse domain:[%d:%s]\n", attribute_type, attribute_value);
+              die;	
+            }
+            else {
+              /* save data for the radix tree update */
+              tr->action |= TA_UPD_RX;
+              RP_pack_set_revd(attribute_type, attribute_value, tr->packptr);
+            }
+          }
+        }
+      }
+      else { /* if num == 0 */
+        /* this could be an empty update or a null select */	    
+        SQ_get_info(tr->sql_connection, sq_info); 
+        if (sq_info[SQL_DUPLICATES]>0) {
+          /* INSERT ... SELECT ... affected 0 rows, but there is 1 duplicate */
+          /* which means that we already have such record in the table */	
+          /* this indicates that this is actually an update - update this attribute */	 
+          if (sq_info[SQL_DUPLICATES]>1) { 
+            tr->error|=ERROR_U_DBS;
+            tr->succeeded=0;
+            LG_log(ud_context, LG_SEVERE, "too many duplicates:[%d:%s]\n", attribute_type, attribute_value);
+            die;
+          }
+          update_attr(attribute, tr);
+        }
+        else { 
+          /* this is an emty SELECT because there is no referred object */	
+          /* try to create dummy and repeat the original query*/
+          dummy_err = create_dummy(attribute, tr);
+          if (dummy_err == 0) {
+            /* Dummy was created */	
+            g_string_sprintfa(tr->error_script,"W[%d][%d:%s]:dummy created\n" ,0, attribute_type, attribute_value);
+            LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, tr->query->str);
+            sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
+            num = SQ_get_affected_rows(tr->sql_connection);
+            if (sql_err) {
+              sq_error=SQ_error(tr->sql_connection);
+              LG_log(ud_context, LG_ERROR, "%s[%s]\n", sq_error, tr->query->str);
+              tr->error|=ERROR_U_DBS;
+              tr->succeeded=0;
+              g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:%s\n" ,
+                                   ERROR_U_DBS, attribute_type, attribute_value, sq_error);
+              die;
+            }                    
+            if (num==0) {
+              LG_log(ud_context, LG_ERROR, "0 rows affected [%s]\n", tr->query->str);
+              tr->error|=ERROR_U_DBS;
+              tr->succeeded=0;
+              g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:re-insert qry\n" ,
+		                ERROR_U_DBS, attribute_type, attribute_value);
+              die;
+            }
+          }
+          else {
+            if(dummy_err == 1) {
+              /* dummy not allowed */	 
+              tr->error |= ERROR_U_OBJ;
+              tr->succeeded=0;
+              g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:ref integrity: reference cannot be resolved\n" ,
+              ERROR_U_OBJ, attribute_type, attribute_value);
+              LG_log(tr->src_ctx, LG_INFO, "[%ld] dummy not allowed [%d:%s]", tr->transaction_id, attribute_type, attribute_value);
+            }
+            else {
+              /* SQL problem */	 
+              tr->error|=ERROR_U_DBS;
+              tr->succeeded=0;
+              LG_log(ud_context, LG_ERROR, "dummy cannot be created [%d:%s]", attribute_type, attribute_value);
+              g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:dummy cannot be created\n" ,ERROR_U_DBS, attribute_type, attribute_value);
+              die;
+            }
+          }	
   	}  /* RI*/
-     }/* if num == 0*/  
-     break;
-     
-   default:
-     LG_log(ud_context, LG_SEVERE, "unknown return code %d from create_attr()", result);
-     die;
-     break;
-   } /* switch result from create_attr() */    
+      }/* if num == 0*/  
+      break;
+
+    default:
+      LG_log(ud_context, LG_SEVERE, "unknown return code %d from create_attr()", result);
+      die;
+      break;
+  } /* switch result from create_attr() */    
 
   return;
 } /* each_attribute_process() */
@@ -1599,7 +1625,7 @@ Transaction_t *tr = (Transaction_t *)result_ptr;
 const char *query_fmt;
 unsigned int prefix, prefix_length;
 unsigned int begin_in, end_in;
-int begin_as, end_as;
+long begin_as, end_as;
 ip_prefix_t prefstr;
 ip_range_t  rangstr;
 ip_v6word_t i6_msb, i6_lsb;
@@ -1608,77 +1634,75 @@ int attribute_type;
 const gchar * attribute_value;
 int do_query;
 
-   /* get type the attribute */
-   attribute_type = rpsl_get_attr_id(rpsl_attr_get_name(attribute));
-   
-   query_fmt = DF_get_select_query(attribute_type);
+  /* get type the attribute */
+  attribute_type = rpsl_get_attr_id(rpsl_attr_get_name(attribute));
 
-   /* For a 1/2 pass fill tr->K only (used in loader 1 pass) */
-   if (tr->load_pass == 1) do_query = 0; else do_query=1;
-   
+  query_fmt = DF_get_select_query(attribute_type);
+
+  /* For a 1/2 pass fill tr->K only (used in loader 1 pass) */
+  if (tr->load_pass == 1) do_query = 0; else do_query=1;
   
   if (strcmp(query_fmt, "") != 0) {
     /* get value of the attribute. It is already clean since the object is "flattened" */ 
     attribute_value = rpsl_attr_get_value(attribute);
     
     switch (DF_get_select_query_type(attribute_type)) {
-     case UD_MAIN_: 
-     		if(do_query)g_string_sprintfa(tr->query, query_fmt, attribute_value);
-		g_string_sprintfa(tr->K, attribute_value);
-    		break;
-     case UD_MA_RT:
-                /* be strict here. bit inconsistencies should result in an error */
-                if(IP_pref_a2v4(attribute_value, &prefstr, &prefix, &prefix_length)==IP_OK){
-    		  if(do_query)g_string_sprintfa(tr->query, query_fmt, prefix, prefix_length);
-    		  g_string_sprintfa(tr->K, attribute_value);
-                } else {
-                  tr->succeeded = 0; 
-                  tr->error |= ERROR_U_OBJ;
-                  g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value);
-                }  
-                break;
-     case UD_MA_IN:
-		if(IP_rang_a2v4(attribute_value, &rangstr, &begin_in, &end_in)==IP_OK){
-		  if(do_query)g_string_sprintfa(tr->query, query_fmt, begin_in, end_in);
-    		  g_string_sprintfa(tr->K, attribute_value);
-                } else {
-                  tr->succeeded = 0; 
-                  tr->error |= ERROR_U_OBJ;
-                  g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong range specified\n", ERROR_U_OBJ, attribute_type, attribute_value);
-                }
-                break;
-     case UD_MA_R6:
-                /* be strict here. bit inconsistencies should result in an error */
-                if(IP_pref_a2v6(attribute_value, &prefstr, &i6_msb, &i6_lsb, &prefix_length)==IP_OK){
-                  if(do_query)g_string_sprintfa(tr->query, query_fmt, i6_msb, i6_lsb, prefix_length);
-                  g_string_sprintfa(tr->K, attribute_value);
-                } else {
-                  tr->succeeded = 0;
-                  tr->error |= ERROR_U_OBJ;
-                  g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value);
-                }
-                break;
-     case UD_MA_I6:
-                /* be strict here. bit inconsistencies should result in an error */
-                if(IP_pref_a2v6(attribute_value, &prefstr, &i6_msb, &i6_lsb, &prefix_length)==IP_OK){
-		  if(do_query)g_string_sprintfa(tr->query, query_fmt, i6_msb, i6_lsb, prefix_length);
-		  g_string_sprintfa(tr->K, attribute_value);
-                } else {
-                  tr->succeeded = 0; 
-                  tr->error |= ERROR_U_OBJ;
-                  g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value);
-                }
-    		break;						
-     case UD_MA_AK:
-     		convert_as_range(attribute_value, &begin_as, &end_as);
-     		if(do_query)g_string_sprintfa(tr->query, query_fmt, begin_as, end_as);
-		g_string_sprintfa(tr->K, attribute_value);
-		break;
-     default:
-                LG_log(ud_context, LG_SEVERE, "query not defined for this type of attribute:[%d:%s]\n", attribute_type, attribute_value);
-                die;
-
-    	break;
+      case UD_MAIN_: 
+        if (do_query) g_string_sprintfa(tr->query, query_fmt, attribute_value);
+        g_string_sprintfa(tr->K, attribute_value);
+        break;
+      case UD_MA_RT:
+        /* be strict here. bit inconsistencies should result in an error */
+        if (IP_pref_a2v4(attribute_value, &prefstr, &prefix, &prefix_length)==IP_OK){
+          if (do_query) g_string_sprintfa(tr->query, query_fmt, prefix, prefix_length);
+          g_string_sprintfa(tr->K, attribute_value);
+        } else {
+          tr->succeeded = 0; 
+          tr->error |= ERROR_U_OBJ;
+          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value);
+        }  
+        break;
+      case UD_MA_IN:
+        if (IP_rang_a2v4(attribute_value, &rangstr, &begin_in, &end_in)==IP_OK){
+          if  (do_query) g_string_sprintfa(tr->query, query_fmt, begin_in, end_in);
+          g_string_sprintfa(tr->K, attribute_value);
+        } else {
+          tr->succeeded = 0; 
+          tr->error |= ERROR_U_OBJ;
+          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong range specified\n", ERROR_U_OBJ, attribute_type, attribute_value);
+        }
+        break;
+      case UD_MA_R6:
+        /* be strict here. bit inconsistencies should result in an error */
+        if (IP_pref_a2v6(attribute_value, &prefstr, &i6_msb, &i6_lsb, &prefix_length)==IP_OK){
+          if (do_query) g_string_sprintfa(tr->query, query_fmt, i6_msb, i6_lsb, prefix_length);
+          g_string_sprintfa(tr->K, attribute_value);
+        } else {
+          tr->succeeded = 0;
+          tr->error |= ERROR_U_OBJ;
+          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value);
+        }
+        break;
+      case UD_MA_I6:
+        /* be strict here. bit inconsistencies should result in an error */
+        if (IP_pref_a2v6(attribute_value, &prefstr, &i6_msb, &i6_lsb, &prefix_length)==IP_OK){
+          if (do_query) g_string_sprintfa(tr->query, query_fmt, i6_msb, i6_lsb, prefix_length);
+          g_string_sprintfa(tr->K, attribute_value);
+        } else {
+          tr->succeeded = 0; 
+          tr->error |= ERROR_U_OBJ;
+          g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:wrong prefix specified\n", ERROR_U_OBJ, attribute_type, attribute_value);
+        }
+        break;						
+      case UD_MA_AK:
+        convert_as_range(attribute_value, &begin_as, &end_as);
+        if (do_query) g_string_sprintfa(tr->query, query_fmt, begin_as, end_as);
+        g_string_sprintfa(tr->K, attribute_value);
+        break;
+      default:
+        LG_log(ud_context, LG_SEVERE, "query not defined for this type of attribute:[%d:%s]\n", attribute_type, attribute_value);
+        die;
+        break;
     } 
   }
 } 
@@ -1699,35 +1723,35 @@ static int perform_create(Transaction_t *tr)
  long timestamp;
  int sql_err;
   
-      timestamp=time(NULL);
-      tr->sequence_id=1; /* we start with 1*/
+  timestamp=time(NULL);
+  tr->sequence_id=1; /* we start with 1*/
   /* Calculate the object_id - should be max+1 */
   /* XXX we cannot use autoincrement with MyISAM tables */
   /* XXX because they keep the max inserted id even if  */
   /* XXX it was deleted later, thus causing gaps we don't want */
  
-      tr->object_id = SQ_get_max_id(tr->sql_connection, "object_id", "last") +1;
-      TR_update_id(tr);
+  tr->object_id = SQ_get_max_id(tr->sql_connection, "object_id", "last") +1;
+  TR_update_id(tr);
 
-      g_string_sprintf(tr->query, "INSERT INTO last SET thread_id=%d, object_id=%ld, " 
-                              "timestamp=%ld, sequence_id=1, object_type=%d, object='%s', pkey='%s' ",
-      	              tr->thread_ins, tr->object_id, timestamp, tr->class_type, tr->object_txt, tr->K->str);
+  g_string_sprintf(tr->query, "INSERT INTO last SET thread_id=%d, object_id=%ld, " 
+                          "timestamp=%ld, sequence_id=1, object_type=%d, object='%s', pkey='%s' ",
+      	          tr->thread_ins, tr->object_id, timestamp, tr->class_type, tr->object_txt, tr->K->str);
 
-      LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, tr->query->str);
-      sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
+  LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, tr->query->str);
+  sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
 
-     /* Check for affected rows. One row should be affected . */ 
-      if (sql_err) {
-        tr->error|=ERROR_U_DBS;
-        tr->succeeded=0; 
-        LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
-	die;
-      }
-      else {
-        g_list_foreach((GList *)rpsl_object_get_all_attr(tr->object), each_attribute_process, tr);
-      }
+ /* Check for affected rows. One row should be affected . */ 
+  if (sql_err) {
+    tr->error|=ERROR_U_DBS;
+    tr->succeeded=0; 
+    LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
+    die;
+  }
+  else {
+    g_list_foreach((GList *)rpsl_object_get_all_attr(tr->object), each_attribute_process, tr);
+  }
 
- return(tr->succeeded);  
+  return(tr->succeeded);  
 } /* perform_create() */
 
 /************************************************************
@@ -1765,20 +1789,18 @@ int sql_err;
    /* GET a timestamp */
    timestamp=time(NULL);
 
-
-
   /* process each attribute one by one */
   g_list_foreach((GList *)rpsl_object_get_all_attr(tr->object), each_attribute_process, tr);
 
   /* If we've already failed or this is 2-pass load - just return */
-  if((tr->succeeded == 0) || (tr->load_pass == 1) || (tr->load_pass == 2)) return(tr->succeeded);
+  if ((tr->succeeded == 0) || (tr->load_pass == 1) || (tr->load_pass == 2)) return(tr->succeeded);
 
 /*XXX */
-  if(IS_STANDALONE(tr->mode)){
+  if (IS_STANDALONE(tr->mode)){
       g_string_sprintf(tr->query, "REPLACE last "
                    "SET thread_id=%d, object_id=%ld, sequence_id=%ld, timestamp=%ld, object_type=%d, object='%s', pkey='%s' ",
                    tr->thread_ins, tr->object_id, tr->sequence_id, timestamp, tr->class_type, tr->object_txt, tr->K->str);
-  }else
+  } else
   {
     /* No return: thread_id=0 */
     /* Do it only if previous transactions finished well */
@@ -1789,30 +1811,28 @@ int sql_err;
                   "WHERE object_id=%ld ", tr->thread_ins, tr->object_id);
   }
 
-  
     LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, tr->query->str);
     sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
     
    /* Check for affected rows. One row should be affected . */
     num = SQ_get_affected_rows(tr->sql_connection);
     if (num < 1) {
-         tr->error|=ERROR_U_DBS;
-         tr->succeeded=0;
-         if (sql_err) {
-          sq_error=SQ_error(tr->sql_connection);
-          LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
-	  die;
-         }
-         else {
-	  LG_log(ud_context, LG_ERROR, "0 rows affected [%s]\n", tr->query->str);
-	/* This is to check that this really could happen */  
-	  die;
-         } 
-         return(tr->succeeded);
+       tr->error|=ERROR_U_DBS;
+       tr->succeeded=0;
+       if (sql_err) {
+        sq_error=SQ_error(tr->sql_connection);
+        LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
+	die;
+       }
+       else {
+	LG_log(ud_context, LG_ERROR, "0 rows affected [%s]\n", tr->query->str);
+        /* This is to check that this really could happen */  
+	die;
+       } 
+       return(tr->succeeded);
     }
  
-
-  if(IS_STANDALONE(tr->mode)){
+  if (IS_STANDALONE(tr->mode)){
   /* for pn, mt, rs, as update dummy field */
 
    if((tr->class_type==C_PN)  || (tr->class_type==C_RO)){ 
@@ -1834,7 +1854,7 @@ int sql_err;
   else {
     /* Insert new version into the last */
     
-/* update last for commit/rollback */
+    /* update last for commit/rollback */
 		   
     g_string_sprintf(tr->query, "INSERT last "
                    "SET thread_id=%d, object_id=%ld, sequence_id=%ld, timestamp=%ld, object_type=%d, object='%s', pkey='%s' ",
@@ -1862,8 +1882,7 @@ int sql_err;
     }
   }
 
-  
- return(tr->succeeded);   
+  return(tr->succeeded);   
 } /* perform_update() */
 
 
@@ -1887,190 +1906,187 @@ int res;
 char *nic;
 int commit_now;
 
+    /* for loader we do not perform commits/rollbacks */
+    if (IS_STANDALONE(tr->mode)) commit_now = 1; else commit_now = 0;
 
+    /* create and initialize TR record for crash recovery */
+    TR_create_record(tr);
 
- /* for loader we do not perform commits/rollbacks */
-  if(IS_STANDALONE(tr->mode))commit_now = 1; else commit_now = 0;
-   
-   /* create and initialize TR record for crash recovery */
-   TR_create_record(tr);
-  
-   if(ACT_DELETE(tr->action)){
-	 	LG_log(tr->src_ctx, LG_DEBUG, "%s object: delete", UD_TAG);
-		/* check referential integrity of deletion */
-		UD_check_ref(tr);
-	        /* for person & role - free the nic-handle in the NHR */
-          /* Note: For organisation objects we don't need to free the orgID because
-             we don't want to reuse the orgIDs */
-                if(ACT_UPD_NHR(tr->action) && tr->succeeded && ((tr->class_type==C_PN) || (tr->class_type==C_RO)) && tr->nh ){
-      	         res = NH_free(tr->nh, tr->sql_connection, commit_now);
+    if (ACT_DELETE(tr->action)){
+        LG_log(tr->src_ctx, LG_DEBUG, "%s object: delete", UD_TAG);
+        /* check referential integrity of deletion */
+        UD_check_ref(tr);
+        /* for person & role - free the nic-handle in the NHR */
+        /* Note: For organisation objects we don't need to free the orgID because
+           we don't want to reuse the orgIDs */
+        if (ACT_UPD_NHR(tr->action) && tr->succeeded && ((tr->class_type==C_PN) || (tr->class_type==C_RO)) && tr->nh ){
+          res = NH_free(tr->nh, tr->sql_connection, commit_now);
 
-		 if(res == -1) { 
-		   tr->succeeded=0; 
-		   tr->error |= ERROR_U_DBS;
-                   LG_log(ud_context, LG_SEVERE, "cannot delete nic handle");
-		   die;
-	         }
-		 else if(res == 0) { 
-		   tr->succeeded=0; 
-		   tr->error |= ERROR_U_OBJ;
-                   LG_log(ud_context, LG_SEVERE, "nic handle not found");
-		   die;
-	         }
-	        }
-		/* if everything is Ok we are ready to commit */
-		if (tr->succeeded){
-		 /* update object_id and sequence_id fields */
-                 tr->sequence_id = get_sequence_id(tr);
-                 if(tr->sequence_id==-1) {
-                   tr->error|=ERROR_U_DBS;
-                   tr->succeeded=0;
-                   LG_log(ud_context, LG_SEVERE, "cannot get sequence_id");
-                   die;
-                 } 
- 
-		 TR_update_id(tr);
+          if(res == -1) { 
+            tr->succeeded=0; 
+            tr->error |= ERROR_U_DBS;
+            LG_log(ud_context, LG_SEVERE, "cannot delete nic handle");
+            die;
+          }
+          else if(res == 0) { 
+            tr->succeeded=0; 
+            tr->error |= ERROR_U_OBJ;
+            LG_log(ud_context, LG_SEVERE, "nic handle not found");
+            die;
+          }
+        }
+        /* if everything is Ok we are ready to commit */
+        if (tr->succeeded){
+          /* update object_id and sequence_id fields */
+          tr->sequence_id = get_sequence_id(tr);
+          if(tr->sequence_id==-1) {
+            tr->error|=ERROR_U_DBS;
+            tr->succeeded=0;
+            LG_log(ud_context, LG_SEVERE, "cannot get sequence_id");
+            die;
+          } 
 
-		 /* checkpoint the TR  - we are going to commit*/
-		 CP_COMMIT(tr->action); TR_update_escript(tr); TR_update_status(tr); 	
+          TR_update_id(tr);
 
-		 /* delete the object and checkpoint it*/
-	 	 UD_delete(tr);
-		 UD_update_rx(tr, RX_OPER_DEL);
+          /* checkpoint the TR  - we are going to commit*/
+          CP_COMMIT(tr->action); TR_update_escript(tr); TR_update_status(tr); 	
 
-                 /* we need to update sequence_id because it was changed during update */
-		 CP_DELETE_PASSED(tr->action); TR_update_id(tr); TR_update_status(tr);
+          /* delete the object and checkpoint it*/
+          UD_delete(tr);
+          UD_update_rx(tr, RX_OPER_DEL);
 
-		 /* Commit nic-handle deletion to the repository */
-                 NH_commit(tr->sql_connection);
+          /* we need to update sequence_id because it was changed during update */
+          CP_DELETE_PASSED(tr->action); TR_update_id(tr); TR_update_status(tr);
 
-		 CP_COMMIT_NH_PASSED(tr->action); TR_update_status(tr);
+          /* Commit nic-handle deletion to the repository */
+          NH_commit(tr->sql_connection);
 
-		}
-		/* send an ack */	
-		UD_ack(tr);
-		return(tr->succeeded); /*commit is not needed*/
+          CP_COMMIT_NH_PASSED(tr->action); TR_update_status(tr);
+        }
+        /* send an ack */	
+        UD_ack(tr);
+        return(tr->succeeded); /*commit is not needed*/
     }
     else if(ACT_UPDATE(tr->action)){	 	
-	 	LG_log(tr->src_ctx, LG_DEBUG, "%s object: update\n", UD_TAG);
-	 	perform_update(tr);
+        LG_log(tr->src_ctx, LG_DEBUG, "%s object: update\n", UD_TAG);
+        perform_update(tr);
 
     }
     else if(ACT_CREATE(tr->action)){
-	 	LG_log(tr->src_ctx, LG_DEBUG, "%s object: create", UD_TAG);
-	 	perform_create(tr);
+        LG_log(tr->src_ctx, LG_DEBUG, "%s object: create", UD_TAG);
+        perform_create(tr);
 
-		/* Commit nic-handle allocation (if any) to the repository */
-                if(ACT_UPD_NHR(tr->action) && tr->succeeded && 
-                   ((tr->class_type==C_PN) || (tr->class_type==C_RO) || (tr->class_type==C_OA)) && tr->nh ){
-                  /* convert nh to DB nIC handle before registration */
-                 if(tr->class_type==C_OA){ 
-                   nic = NH_convert_org(tr->nh);
-                 }else{
-                   nic = NH_convert(tr->nh);
-                 }
-      	         
-		 if(nic==NULL){
-		  res=0;
-		  nic="N/A";
-		 }
-		 else {
-       if(tr->class_type==C_OA){
-         res = NH_register_org(tr->nh, tr->sql_connection, commit_now);
-       }else{
-         res = NH_register(tr->nh, tr->sql_connection, commit_now);
-       }
-     }
+        /* Commit nic-handle allocation (if any) to the repository */
+        if (ACT_UPD_NHR(tr->action) && tr->succeeded && 
+           ((tr->class_type==C_PN) || (tr->class_type==C_RO) || (tr->class_type==C_OA)) && tr->nh ){
+          /* convert nh to DB nIC handle before registration */
+          if (tr->class_type==C_OA){ 
+            nic = NH_convert_org(tr->nh);
+          } else {
+            nic = NH_convert(tr->nh);
+          }
 
-		 if(res == -1) { 
-		  tr->succeeded=0; 
-		  tr->error |= ERROR_U_DBS;
-		  LG_log(ud_context, LG_SEVERE, "cannot allocate nic handle");
-		  die;
-	         }
-		 else if(res == 0) { 
-		  tr->succeeded=0; 
-		  tr->error |= ERROR_U_OBJ;
-                  LG_log(tr->src_ctx, LG_INFO, "[%ld] nic handle [%s] wrong or already in use", tr->transaction_id, nic);
-                  if(tr->class_type==C_OA){
-                    g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:nic-handle wrong or already in use\n", ERROR_U_OBJ, A_OA, nic);
-                  }else{
-                    g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:nic-handle wrong or already in use\n", ERROR_U_OBJ, A_NH, nic);
-                  }
-	         }
-	         else { /* copy the NH to the report to return to DBupdate */
+          if (nic==NULL){
+           res=0;
+           nic="N/A";
+          }
+          else {
+            if (tr->class_type==C_OA){
+              res = NH_register_org(tr->nh, tr->sql_connection, commit_now);
+            } else {
+              res = NH_register(tr->nh, tr->sql_connection, commit_now);
+            }
+          }
+
+          if(res == -1) { 
+           tr->succeeded=0; 
+           tr->error |= ERROR_U_DBS;
+           LG_log(ud_context, LG_SEVERE, "cannot allocate nic handle");
+           die;
+          }
+          else if(res == 0) { 
+            tr->succeeded=0; 
+            tr->error |= ERROR_U_OBJ;
+            LG_log(tr->src_ctx, LG_INFO, "[%ld] nic handle [%s] wrong or already in use", tr->transaction_id, nic);
             if(tr->class_type==C_OA){
-	            g_string_sprintfa(tr->error_script,"I[%d][%s]\n", A_OA, nic);
+              g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:nic-handle wrong or already in use\n", ERROR_U_OBJ, A_OA, nic);
             }else{
+              g_string_sprintfa(tr->error_script,"E[%d][%d:%s]:nic-handle wrong or already in use\n", ERROR_U_OBJ, A_NH, nic);
+            }
+          }
+          else { /* copy the NH to the report to return to DBupdate */
+            if(tr->class_type==C_OA){
+              g_string_sprintfa(tr->error_script,"I[%d][%s]\n", A_OA, nic);
+            } else {
               g_string_sprintfa(tr->error_script,"I[%d][%s]\n", A_NH, nic);
             }
-		  UT_free(nic);
-	         }
-                } /* if person/role */
-     else if ( tr->succeeded && (tr->class_type==C_KC) && tr->x509_commit)
-     { /* is a key-cert, we have to update last assigned keycert_id in x509 table */
-            res = NH_register_keycert_id(tr->keycert_id, tr->sql_connection, commit_now);
-            if(res == -1) {
-              tr->succeeded=0;
-              tr->error |= ERROR_U_DBS;
-              LG_log(ud_context, LG_SEVERE, "cannot allocate key");
-              die;
-            }
-            else if(res == 0) { /* this will never happen ?!?!?! */
-                   tr->succeeded=0;
-                   tr->error |= ERROR_U_OBJ;
-                   LG_log(tr->src_ctx, LG_INFO, "[%ld] key [X509-%ld] wrong or already in use", tr->transaction_id, tr->keycert_id);
-                   g_string_sprintfa(tr->error_script,"E[%d][%d:X509-%ld]:key wrong or already in use\n", ERROR_U_OBJ, A_NH, tr->keycert_id);
-                 }
-           else { /* copy the NH to the report to return to DBupdate */
-             g_string_sprintfa(tr->error_script,"I[%d][X509-%ld]\n", A_NH, tr->keycert_id);
-           }
-     }
+            UT_free(nic);
+          }
+        } /* if person/role */
+        else if ( tr->succeeded && (tr->class_type==C_KC) && tr->x509_commit)
+        { 
+          /* is a key-cert, we have to update last assigned keycert_id in x509 table */
+          res = NH_register_keycert_id(tr->keycert_id, tr->sql_connection, commit_now);
+          if (res == -1) {
+            tr->succeeded=0;
+            tr->error |= ERROR_U_DBS;
+            LG_log(ud_context, LG_SEVERE, "cannot allocate key");
+            die;
+          }
+          else if(res == 0) { /* this will never happen ?!?!?! */
+            tr->succeeded=0;
+            tr->error |= ERROR_U_OBJ;
+            LG_log(tr->src_ctx, LG_INFO, "[%ld] key [X509-%ld] wrong or already in use", tr->transaction_id, tr->keycert_id);
+            g_string_sprintfa(tr->error_script,"E[%d][%d:X509-%ld]:key wrong or already in use\n", ERROR_U_OBJ, A_NH, tr->keycert_id);
+          }
+          else { 
+            /* copy the NH to the report to return to DBupdate */
+            g_string_sprintfa(tr->error_script,"I[%d][X509-%ld]\n", A_NH, tr->keycert_id);
+          }
+        }
     }
-     else {
-	 	LG_log(tr->src_ctx, LG_INFO, "[%ld] object: unknown action", tr->transaction_id);
-	 	tr->succeeded=0;
-	 	tr->error|=ERROR_U_BADOP;
-	 	return(tr->succeeded);
-     }	 	
+    else {
+        LG_log(tr->src_ctx, LG_INFO, "[%ld] object: unknown action", tr->transaction_id);
+        tr->succeeded=0;
+        tr->error|=ERROR_U_BADOP;
+        return(tr->succeeded);
+    }	 	
 
-   if(!IS_STANDALONE(tr->mode)) { /* not for loader*/
-      /* update object_id and sequence_id fields */
-      TR_update_id(tr);
+    if (!IS_STANDALONE(tr->mode)) { /* not for loader*/
+        /* update object_id and sequence_id fields */
+        TR_update_id(tr);
 
-      if (tr->succeeded) {
-        /* checkpoint the TR  - we are going to commit*/
-	CP_COMMIT(tr->action); TR_update_escript(tr); TR_update_status(tr);
+        if (tr->succeeded) {
+          /* checkpoint the TR  - we are going to commit*/
+          CP_COMMIT(tr->action); TR_update_escript(tr); TR_update_status(tr);
 
-        /* commit the transaction and checkpoint it */
-        UD_commit(tr);
-	/* Commit nic-handle modifications to the repository */
-        NH_commit(tr->sql_connection);
+          /* commit the transaction and checkpoint it */
+          UD_commit(tr);
+          /* Commit nic-handle modifications to the repository */
+          NH_commit(tr->sql_connection);
 
-  /* Commit keycert id modifications to the repository */
-        NH_commit_keycert_id(tr->sql_connection);
+          /* Commit keycert id modifications to the repository */
+          NH_commit_keycert_id(tr->sql_connection);
 
-	CP_COMMIT_NH_PASSED(tr->action); TR_update_status(tr);
-	/* TR will be marked as clean in UD_create_serial() */
-      }
-      else {
-        UD_rollback(tr);
+          CP_COMMIT_NH_PASSED(tr->action); TR_update_status(tr);
+          /* TR will be marked as clean in UD_create_serial() */
+        }
+        else {
+          UD_rollback(tr);
 
-	CP_ROLLBACK_PASSED(tr->action); TR_update_status(tr);
-	
-	/* rollback nic-handle modifications to the repository */
-        NH_rollback(tr->sql_connection);
+          CP_ROLLBACK_PASSED(tr->action); TR_update_status(tr);
 
-	
-	CP_ROLLBACK_NH_PASSED(tr->action); TR_update_status(tr);
-	/* Delete TR record if in update mode. Next time (if any) DBupdate tries to submit, we'll start from scratch */
-	/* In NRTM mode we create serial anyway, so the record will be deleted  */
-	/* after serial is created TR record will be deleted in */
+          /* rollback nic-handle modifications to the repository */
+          NH_rollback(tr->sql_connection);
 
-      }
+          CP_ROLLBACK_NH_PASSED(tr->action); TR_update_status(tr);
+          /* Delete TR record if in update mode. Next time (if any) DBupdate tries to submit, we'll start from scratch */
+          /* In NRTM mode we create serial anyway, so the record will be deleted  */
+          /* after serial is created TR record will be deleted in */
+        }
     }  
- /* send an ack */	
- UD_ack(tr);
- return(tr->succeeded);   
+    /* send an ack */	
+    UD_ack(tr);
+    return(tr->succeeded);   
 } /* object_process() */
 

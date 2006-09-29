@@ -405,6 +405,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define ca_get_qc_badinput	ca_get_string(CA_QC_BADINPUT)
 #define ca_set_qc_badinput	ca_set_string(CA_QC_BADINPUT)
 
+#define ca_get_qi_badrange	ca_get_string(CA_QI_BADRANGE)
+#define ca_set_qi_badrange	ca_set_string(CA_QI_BADRANGE)
+
 #define ca_get_qc_uselessipflag	ca_get_string(CA_QC_USELESSIPFLAG)
 #define ca_set_qc_uselessipflag	ca_set_string(CA_QC_USELESSIPFLAG)
 

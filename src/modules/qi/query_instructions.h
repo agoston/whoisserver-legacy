@@ -2,7 +2,7 @@
 #define READ_QUERY_INSTRUCTIONS
 
 /***************************************
-  $Revision: 1.3 $
+  $Revision: 1.4 $
 
   Query instruction module (qi)
   config module.
@@ -149,7 +149,7 @@ typedef struct Query_instructions_t {
 
 int QI_execute(ca_dbSource_t *dbhdl, Query_instructions *qis, Query_environ *qe, acc_st *acc_credit, acl_st *acl);
 void QI_free(Query_instructions *qis);
-Query_instructions *QI_new(const Query_command *qc, const Query_environ *qe);
+Query_instructions *QI_new(Query_command *qc, const Query_environ *qe);
 char *QI_queries_to_string(Query_instructions *qis);
 char *QI_fast_output(const char *str);
 void QI_init (LG_context_t *qi_ctx, LG_context_t *sql_ctx);

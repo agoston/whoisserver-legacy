@@ -3,7 +3,7 @@
 <!-- XXX: will want to add core template in the future, to 
           document which fields are mandatory for core (e.g. nic-hdl) -->
 
-<ripe_classes version="$Revision: 1.4.2.2 $" author="$Author: katie $">
+<ripe_classes version="$Revision: 1.5 $" author="$Author: katie $">
 
   <ripe_class name="domain" main_sql_table="domain" code="dn">
     <description>
@@ -576,6 +576,7 @@
     </rollback-tables>
     <affected-tables>
       <table name="ifaddr"/>
+      <table name="interface"/>
       <table name="admin_c"/>
       <table name="tech_c"/>
       <table name="notify"/>
@@ -677,8 +678,7 @@
 
   <ripe_class name="limerick" main_sql_table="limerick" code="li">
     <description>
-      The limerick object represents a humorous poem that has five 
-      lines and the rhyme scheme "aabba".
+      The limerick object is obselete. Use the poem object instead.
     </description>
     <attributes>
       <limerick     choice="mandatory" number="single"   />

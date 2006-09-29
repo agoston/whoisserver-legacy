@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.5 $
 
   rollback(), commit(), delete() - rollback, commit update transaction, delete an object
 
@@ -118,7 +118,7 @@ int ud_build_lock_query(Transaction_t *tr, char **common_tables) {
             g_hash_table_insert(tables_unique, common_tables[i], (gpointer)1);
     }
    
-    /* Add tables defined in ud_comrol.h */
+    /* Add tables defined in .../include/UD_comrol.def */
     for (i=0; tables[tr->class_type][i] != NULL && i < TAB_START; i++)
         g_hash_table_insert(tables_unique, tables[tr->class_type][i], (gpointer)1);
 
@@ -454,8 +454,9 @@ if(ACT_DELETE(tr->action)) return(0);
  transaction_support = ud_transaction_support(tr);
 
 
- /* if our database's table type supports transactions, then we'll use "BEGIN - COMMIT". If not, we have to
-    lock all relevant tables */
+ /* if our database's table type supports transactions, 
+    then we'll use "BEGIN - COMMIT". 
+    If not, we have to lock all relevant tables */
  if(transaction_support == 1)
    g_string_sprintf(tr->query, "BEGIN ");
 

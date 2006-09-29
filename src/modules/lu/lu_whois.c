@@ -5,6 +5,8 @@
 #include <poll.h>
 #include <pthread.h>
 #include <stdio.h>
+
+#include "which_keytypes.h"
 #include "lg.h"
 #include "memwrap.h"
 #include "lu_whois.h"
@@ -449,7 +451,7 @@ GList *p;
   server   - connection information
   objects  - used to return a list of objects, if any
   types    - list of objects types to be returned, e.g. "person", "inetnum", may be NULL
-  key      - lookup key, e.g. "NC123-RIPE" or "193.0.1.0/24AS3333"      
+  key      - lookup key, e.g. "NC123-RIPE" or "193.0.1.0/24AS2.3333"      
   inverse_keys - list of inverse keys to be looked up, NOT NULL
   source   - source, e.g. "RIPE"
 
@@ -645,31 +647,6 @@ has_hierarchical_name (const gchar *class)
   if (strcasecmp(class, "route-set") == 0) return TRUE;
   if (strcasecmp(class, "rtr-set") == 0) return TRUE;
   return FALSE;
-}
-
-/* 
-  determine if the key represents an aut-num
-
-  key      - object key, e.g. "RS-FOO", "AS123"
-
-  return   - TRUE or FALSE
-
-  XXX: possibly bogus to hard-code this.  Use syntax_api?
- */
-static gboolean
-is_aut_num (const gchar *key)
-{
-  char *endptr;
-  long int val;
-
-  if (toupper(key[0]) != 'A') return FALSE;
-  if (toupper(key[1]) != 'S') return FALSE;
-  if (key[2] == '0') return FALSE;
-  val = strtol(key+2, &endptr, 10);
-  if (*endptr != '\0') return FALSE;
-  if (val <= 0) return FALSE;
-  if (val >= 65536) return FALSE;
-  return TRUE;
 }
 
 /* this function converts the ip ranges from two RPSL objects  *
@@ -947,7 +924,7 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
     {
       /* colon, has parent */
       *p = '\0';
-      if (is_aut_num(parent_name))
+      if (WK_is_aut_num((char *)parent_name))
       {
         parent_type = "aut-num";
       }

@@ -2,7 +2,7 @@
 #define READ_WHICH_KEYTYPES
 
 /***************************************
-  $Revision: 1.3 $
+  $Revision: 1.4 $
 
   Which Keytypes module (wk)
 
@@ -29,6 +29,90 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
   ***************************************/
 #include "bitmask.h"
+
+/******************************************* 
+If any IP reg exps change - check whois cgi which has a copy 
+*******************************************/
+
+#define WK_REXP_DOMAINNAME "^[ ]*[a-zA-Z0-9/-]*(\\.[a-zA-Z0-9-]+)*\\.?[ ]*$"
+/* add a constraint: there must be at least one character in the domain name
+   because the TLD must not be composed of digits only */
+#define WK_REXP_DOMAINALPHA  "[a-zA-Z]"
+
+#define WK_REXP_VALIDIP6PREFIX "^[0-9A-F:]*:[0-9A-F:/]*$"     /* at least one colon */
+/* "^[0-9A-F]{1,4}(:[0-9A-F]{1,4}){7}$"*/
+
+/* AS numbers, prepared for 32-bit AS numbers */
+/*#define WK_REXP_ASNUM "^AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))$"*/
+#define WK_REXP_ASNUM "^AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|((0|([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))$"
+
+/* AS numbers, prepared for 32-bit AS numbers */
+/*#define WK_REXP_ASRANGE "^AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))[ ]*([-][ ]*AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))){0,1}$"   /* [ ]*(-[ ]*AS[0-9]+)?   */
+#define WK_REXP_ASRANGE "^AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|((0|([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))[ ]*([-][ ]*AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|((0|([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))){0,1}$"   /* [ ]*(-[ ]*AS[0-9]+)?   */
+
+#define WK_REXP_NETNAME "^[A-Z][A-Z0-9_-]*$"
+
+#define WK_REXP_MAINTAINER "^[A-Z][A-Z0-9_-]*$"
+
+#define WK_REXP_LIMERICK "^LIM-[A-Z0-9_-]+$"
+
+#define WK_REXP_POEM "^POEM-[A-Z0-9][A-Z0-9_-]*$"
+
+#define WK_REXP_POETIC_FORM "^FORM-[A-Z0-9][A-Z0-9_-]*$"
+
+#define WK_REXP_KEYCERT "^(PGPKEY-[0-9A-F]{8})|(X509-[0-9]+)$"
+
+/* made less restrictive to make consistent with other sets ... shane */
+/* made to match what we're actually looking for - shane */
+/*#define WK_REXP_ROUTESETNAME "^RS-[A-Z0-9_:-]*$"*/
+#define WK_REXP_ROUTESETNAME "(^|:)RS-[A-Z0-9_-]*[A-Z0-9](:|$)"
+
+/* made less restrictive to make consistent with other sets ... shane */
+/* made to match what we're actually looking for - shane */
+/*#define WK_REXP_ASSETNAME "^AS-[A-Z0-9_:-]*$"*/
+#define WK_REXP_ASSETNAME "(^|:)AS-[A-Z0-9_-]*[A-Z0-9](:|$)" 
+
+/* #define WK_REXP_AUTONICPREFIXREGULAR "^AUTO-" */
+
+#define WK_REXP_IPRANGE "^[0-9]{1,3}(\\.[0-9]{1,3}){0,3}[ ]*-[ ]*[0-9]{1,3}(\\.[0-9]{1,3}){0,3}$"
+
+#define WK_REXP_IPADDRESS "^[0-9.]+$"
+
+#define WK_REXP_IPPREFIX "^[0-9.]+/[0-9]+$"
+
+/*#define WK_REXP_PEERINGSET "^PRNG-"*/
+#define WK_REXP_PEERINGSET "(^|:)PRNG-[A-Z0-9_-]*[A-Z0-9](:|$)" 
+
+/*#define WK_REXP_FILTERSET  "^FLTR-"*/
+#define WK_REXP_FILTERSET "(^|:)FLTR-[A-Z0-9_-]*[A-Z0-9](:|$)" 
+
+/*#define WK_REXP_RTRSET     "^RTRS-"*/
+#define WK_REXP_RTRSET "(^|:)RTRS-[A-Z0-9_-]*[A-Z0-9](:|$)" 
+
+#define WK_REXP_IRT "^IRT-[A-Z0-9_-]+[A-Z0-9]$"
+
+#define WK_REXP_ORG_ID "^ORG-([A-Z]{2,4}([1-9][0-9]{0,5})?(-[A-Z]([A-Z0-9_-]{0,7}[A-Z0-9])))$"
+
+#define WK_REXP_NICHANDLE "^[A-Z0-9-]+$"
+
+/* We do not want CRYPT-PW or MD5-PWs to be inverse searchable, so only PGPKEY and X509 defined */
+#define WK_REXP_AUTH "^(PGPKEY|X509)-"
+
+/*
+  XXX This seems to be the same as the Perl code.  But I don't see where a " " is allowed for.
+  I.e. Perl -> ^[a-zA-Z][\w\-\.\'\|\`]*$
+  Does \w include [ ;:,?/}{()+*#] ?
+#define WK_REXP_NAME_B "^[a-zA-Z][a-zA-Z_0-9.'|`-]*$"
+*/
+/* #define WK_REXP_NAME_B "^[a-zA-Z][a-zA-Z_0-9.'|`;:,?/}{()+*#&-]*$" */
+
+#define WK_REXP_EMAIL "@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*$"
+
+/* fingerpr: ([A-Z0-9]{4})( [A-Z0-9]{4}){9}*/
+#define WK_REXP_FINGERPR "^(([A-F0-9]{4} ){9}[A-F0-9]{4})|(([A-F0-9]{2} ){15}[A-F0-9]{2})|(([A-F0-9]{2}:){15}[A-F0-9]{2})$"
+
+/* ds-rdata: */
+#define WK_REXP_DS_RDATA "^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])( ([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))( ([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])|RSAMD5|DH|DSA|ECC|RSASHA1|INDIRECT|PRIVATEDNS|PRIVATEOID)([ 0-9a-fA-F]{1,128})$"
 
 /*+ Enumeration of which keytypes: +*/
 typedef enum WK_Type_t {
@@ -106,5 +190,6 @@ char * const Keytypes[] = {
 
 char *WK_to_string(mask_t wk);
 mask_t WK_new(char *key);
+int WK_is_aut_num(char *key);
 
 #endif /* READ_WHICH_KEYTYPES */
