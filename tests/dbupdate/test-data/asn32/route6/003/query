@@ -6,5 +6,5 @@ route6:         ::/16
 descr:          test route
 origin:         AS200.200
 mnt-by:         TEST-MNT
-changed:        dbtest@ripe.net 20060928
+changed:        dbtest@ripe.net 20060101
 source:         DB-TEST
