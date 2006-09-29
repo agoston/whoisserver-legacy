@@ -98,3 +98,4 @@ mnt_routes_reset ()
 }
 
 
+int yywrap() { return 1; }

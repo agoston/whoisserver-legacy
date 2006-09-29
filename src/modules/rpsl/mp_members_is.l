@@ -26,7 +26,7 @@ I presume the the first one is correct, in which case we can perhaps make
   notes:
     Tokens are defined in the associated grammar, mp_members_is.y.
 
-  $Id: mp_members_is.l,v 1.2 2004/12/10 16:37:40 can Exp $
+  $Id: mp_members_is.l,v 1.1 2004/12/27 17:52:39 can Exp $
 */
 
 /******************
@@ -54,12 +54,17 @@ I presume the the first one is correct, in which case we can perhaps make
 
 QUAD           [0-9A-F]{1,4}
 INT            [0-9]+
-ASNO           AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])
 IPV6           {QUAD}(:{QUAD}){7}
 IPV6DC         (({QUAD}:){0,6}{QUAD})?::({QUAD}(:{QUAD}){0,6})?
 IPV4           {INT}(\.{INT}){3}
 RTRSNAME       RTRS-[A-Z0-9_-]*[A-Z0-9]
 DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
+ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
+ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNO           {ASNO32}|{ASNO16}
+ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
+
 
 %{
 #include <string.h>
@@ -69,7 +74,6 @@ DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
 /* tokens defined in the grammar */
 #include "mp_members_is.tab.h"
 
-#define mp_members_iswrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
@@ -79,6 +83,10 @@ void yy_input(char *buf, int *result, int max_size);
 %%
 
 [ \t\n]+    { ; }
+
+{ASNOMIX} {
+    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
+}
 
 (({ASNO}|peeras|{RTRSNAME}):)*{RTRSNAME}(:({ASNO}|peeras|{RTRSNAME}))* {
     return TKN_RTRSNAME;
@@ -180,3 +188,4 @@ mp_members_is_reset ()
     yy_flush_buffer(YY_CURRENT_BUFFER);
 }
 
+int yywrap() { return 1; }

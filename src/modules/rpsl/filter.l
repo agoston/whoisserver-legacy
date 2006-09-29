@@ -11,11 +11,15 @@
   notes:
     Tokens are defined in the associated grammar, filter.y.
 
-  $Id: filter.l,v 1.1 2004/12/27 16:38:45 can Exp $
+  $Id: filter.l,v 1.1 2004/12/27 17:52:38 can Exp $
 */
 %}
 
-ASNO           AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])
+ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
+ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
+ASNO           {ASNO32}|{ASNO16}
 FLTRNAME       FLTR-[A-Z0-9_-]*[A-Z0-9]
 ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 RSNAME         RS-[A-Z0-9_-]*[A-Z0-9]
@@ -25,7 +29,9 @@ INT            [0-9]+
 IPV4           {INT}(\.{INT}){3}
 PRFXV4         {IPV4}\/{INT}
 PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
-COMM_NO        {INT}:{INT}
+COMM_NO32      {INT}.{INT}:{INT}
+COMM_NO16      {INT}:{INT}
+COMM_NO        {COMM_NO32}|{COMM_NO16}
 PROTOCOL_NAME  BGP4|OSPF|RIP|IGRP|IS-IS|STATIC|RIPng|DVMRP|PIM-DM|PIM-SM|CBT|MOSPF
 DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
 
@@ -36,8 +42,6 @@ DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
 
 /* tokens defined in the grammar */
 #include "filter.tab.h"
-
-#define filterwrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
@@ -87,6 +91,9 @@ NOT   { return OP_NOT; }
     return OP_MS;
 }
 
+{ASNOMIX} { 
+    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
+}
 
 ANY     { return KEYW_ANY; }
 PEERAS  { return KEYW_PEERAS; }
@@ -244,3 +251,4 @@ filter_reset ()
 }
 
 
+int yywrap() { return 1; }

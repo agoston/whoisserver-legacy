@@ -11,11 +11,15 @@
   notes:
     Tokens are defined in the associated grammar, aggr_mtd.y.
 
-  $Id: aggr_mtd.l,v 1.1 2004/12/27 16:38:44 can Exp $
+  $Id: aggr_mtd.l,v 1.1 2004/12/27 17:52:37 can Exp $
 */
 %}
 
-ASNO           AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])
+ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
+ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
+ASNO           {ASNO32}|{ASNO16}
 ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 
 %{
@@ -25,7 +29,6 @@ ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 /* tokens defined in the grammar */
 #include "aggr_mtd.tab.h"
 
-#define aggr_mtdwrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
@@ -42,6 +45,10 @@ EXCEPT     { return KEYW_EXCEPT; }
 
 OR    { return OP_OR; }
 AND   { return OP_AND; }
+
+[^ ]*{ASNOMIX}[^ ]* {
+    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
+}
 
 {ASNO} {
     return TKN_ASNO;
@@ -61,4 +68,10 @@ aggr_mtd_reset ()
     yy_flush_buffer(YY_CURRENT_BUFFER);
 }
 
+
+int
+yywrap()
+{
+    return 1;
+}
 

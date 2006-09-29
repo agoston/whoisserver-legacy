@@ -9,7 +9,7 @@
   notes:
     Tokens are defined in the associated grammar, v6_filter.y.
 
-  $Id: v6_filter.l,v 1.2 2004/12/10 16:37:41 can Exp $
+  $Id: v6_filter.l,v 1.1 2004/12/27 17:52:40 can Exp $
 */
 %}
 
@@ -34,7 +34,6 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
   ***************************************/
 
-ASNO           AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])
 FLTRNAME       FLTR-[A-Z0-9_-]*[A-Z0-9]
 ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 RSNAME         RS-[A-Z0-9_-]*[A-Z0-9]
@@ -51,7 +50,15 @@ PRFXV6DC       {IPV6DC}\/{INT}
 PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 PRFXV6RNG      {PRFXV6}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 PRFXV6DCRNG    {PRFXV6DC}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
-COMM_NO        {INT}:{INT}
+COMM_NO32      {INT}.{INT}:{INT}
+COMM_NO16      {INT}:{INT}
+COMM_NO        {COMM_NO32}|{COMM_NO16}
+ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
+ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNO           {ASNO32}|{ASNO16}
+ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
+
 
 
 %{
@@ -62,7 +69,6 @@ COMM_NO        {INT}:{INT}
 /* tokens defined in the grammar */
 #include "v6_filter.tab.h"
 
-#define v6_filterwrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
@@ -147,6 +153,10 @@ COST        { return TKN_COST; }
 \~?\{INT,INT\}  { return ASPATH_POSTFIX; }
 \~?\{INT,\}     { return ASPATH_POSTFIX; }
 
+
+{ASNOMIX} {
+    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
+}
 {ASNO} {
     return TKN_ASNO;
 }
@@ -515,3 +525,4 @@ v6_filter_reset ()
 }
 
 
+int yywrap() { return 1; }

@@ -11,15 +11,20 @@
   notes:
     Tokens are defined in the associated grammar, members_is.y.
 
-  $Id: members_is.l,v 1.1 2004/12/27 16:38:46 can Exp $
+  $Id: members_is.l,v 1.1 2004/12/27 17:52:38 can Exp $
 */
 %}
 
 INT            [0-9]+
-ASNO           AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])
 IPV4           {INT}(\.{INT}){3}
 RTRSNAME       RTRS-[A-Z0-9_-]*[A-Z0-9]
 DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
+ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
+ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNO           {ASNO32}|{ASNO16}
+ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
+
 
 %{
 #include <string.h>
@@ -28,8 +33,6 @@ DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
 
 /* tokens defined in the grammar */
 #include "members_is.tab.h"
-
-#define members_iswrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
@@ -39,6 +42,10 @@ void yy_input(char *buf, int *result, int max_size);
 %%
 
 [ \t\n]+    { ; }
+
+{ASNOMIX} {
+    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
+}
 
 (({ASNO}|peeras|{RTRSNAME}):)*{RTRSNAME}(:({ASNO}|peeras|{RTRSNAME}))* {
     return TKN_RTRSNAME;
@@ -96,3 +103,4 @@ members_is_reset ()
     yy_flush_buffer(YY_CURRENT_BUFFER);
 }
 
+int yywrap() { return 1; }

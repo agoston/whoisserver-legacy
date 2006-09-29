@@ -8,7 +8,7 @@
   notes:
     Tokens are defined in the associated grammar, inet6num.y.
 
-  $Id: inet6num.l,v 1.1 2004/12/27 16:38:45 can Exp $
+  $Id: inet6num.l,v 1.1 2004/12/27 17:52:38 can Exp $
 */
 
 /******************
@@ -46,7 +46,6 @@ IPV6DC         (({QUAD}:){0,6}{QUAD})?::({QUAD}(:{QUAD}){0,6})?\/{BITS}
 /* tokens defined in the grammar */
 #include "inet6num.tab.h"
 
-#define inet6numwrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
@@ -94,3 +93,4 @@ inet6num_reset ()
 }
 
 
+int yywrap() { return 1; }

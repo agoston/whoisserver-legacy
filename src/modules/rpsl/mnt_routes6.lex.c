@@ -9,7 +9,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 31
+#define YY_FLEX_SUBMINOR_VERSION 33
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -31,7 +31,15 @@
 
 /* C99 systems have <inttypes.h>. Non-C99 systems may or may not. */
 
-#if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+#if __STDC_VERSION__ >= 199901L
+
+/* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
+ * if you want the limit (max/min) macros for int types. 
+ */
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS 1
+#endif
+
 #include <inttypes.h>
 typedef int8_t flex_int8_t;
 typedef uint8_t flex_uint8_t;
@@ -134,6 +142,10 @@ typedef unsigned int flex_uint32_t;
 #ifndef YY_BUF_SIZE
 #define YY_BUF_SIZE 16384
 #endif
+
+/* The state buf must be large enough to hold one state per character in the main buffer.
+ */
+#define YY_STATE_BUF_SIZE   ((YY_BUF_SIZE + 2) * sizeof(yy_state_type))
 
 #ifndef YY_TYPEDEF_YY_BUFFER_STATE
 #define YY_TYPEDEF_YY_BUFFER_STATE
@@ -268,7 +280,7 @@ int mnt_routes6leng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = (char *) 0;
-static int yy_init = 1;		/* whether we need to initialize */
+static int yy_init = 0;		/* whether we need to initialize */
 static int yy_start = 0;	/* start state number */
 
 /* Flag which is used to allow mnt_routes6wrap()'s to do buffer switches
@@ -600,12 +612,12 @@ char *mnt_routes6text;
 /* tokens defined in the grammar */
 #include "mnt_routes6.tab.h"
 
-#define mnt_routes6wrap yywrap
+#define mnt_routes6wrap mnt_routes6wrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
 #define YY_INPUT(buf,result,max_size) yy_input(buf,&result,max_size)
-#line 609 "mnt_routes6.lex.c"
+#line 621 "mnt_routes6.lex.c"
 
 #define INITIAL 0
 
@@ -620,6 +632,8 @@ void yy_input(char *buf, int *result, int max_size);
 #ifndef YY_EXTRA_TYPE
 #define YY_EXTRA_TYPE void *
 #endif
+
+static int yy_init_globals (void );
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -759,11 +773,11 @@ YY_DECL
 #line 66 "mnt_routes6.l"
 
 
-#line 763 "mnt_routes6.lex.c"
+#line 777 "mnt_routes6.lex.c"
 
-	if ( (yy_init) )
+	if ( !(yy_init) )
 		{
-		(yy_init) = 0;
+		(yy_init) = 1;
 
 #ifdef YY_USER_INIT
 		YY_USER_INIT;
@@ -1012,7 +1026,7 @@ YY_RULE_SETUP
 #line 205 "mnt_routes6.l"
 ECHO;
 	YY_BREAK
-#line 1016 "mnt_routes6.lex.c"
+#line 1030 "mnt_routes6.lex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1198,7 +1212,7 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			size_t num_to_read =
+			int num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
@@ -1243,7 +1257,7 @@ static int yy_get_next_buffer (void)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			(yy_n_chars), num_to_read );
+			(yy_n_chars), (size_t) num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
 		}
@@ -1744,16 +1758,16 @@ YY_BUFFER_STATE mnt_routes6_scan_buffer  (char * base, yy_size_t  size )
 
 /** Setup the input buffer state to scan a string. The next call to mnt_routes6lex() will
  * scan from a @e copy of @a str.
- * @param str a NUL-terminated string to scan
+ * @param yystr a NUL-terminated string to scan
  * 
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
  *       mnt_routes6_scan_bytes() instead.
  */
-YY_BUFFER_STATE mnt_routes6_scan_string (yyconst char * yy_str )
+YY_BUFFER_STATE mnt_routes6_scan_string (yyconst char * yystr )
 {
     
-	return mnt_routes6_scan_bytes(yy_str,strlen(yy_str) );
+	return mnt_routes6_scan_bytes(yystr,strlen(yystr) );
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to mnt_routes6lex() will
@@ -1763,7 +1777,7 @@ YY_BUFFER_STATE mnt_routes6_scan_string (yyconst char * yy_str )
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE mnt_routes6_scan_bytes  (yyconst char * bytes, int  len )
+YY_BUFFER_STATE mnt_routes6_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
@@ -1771,15 +1785,15 @@ YY_BUFFER_STATE mnt_routes6_scan_bytes  (yyconst char * bytes, int  len )
 	int i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
-	n = len + 2;
+	n = _yybytes_len + 2;
 	buf = (char *) mnt_routes6alloc(n  );
 	if ( ! buf )
 		YY_FATAL_ERROR( "out of dynamic memory in mnt_routes6_scan_bytes()" );
 
-	for ( i = 0; i < len; ++i )
-		buf[i] = bytes[i];
+	for ( i = 0; i < _yybytes_len; ++i )
+		buf[i] = yybytes[i];
 
-	buf[len] = buf[len+1] = YY_END_OF_BUFFER_CHAR;
+	buf[_yybytes_len] = buf[_yybytes_len+1] = YY_END_OF_BUFFER_CHAR;
 
 	b = mnt_routes6_scan_buffer(buf,n );
 	if ( ! b )
@@ -1900,6 +1914,34 @@ void mnt_routes6set_debug (int  bdebug )
         mnt_routes6_flex_debug = bdebug ;
 }
 
+static int yy_init_globals (void)
+{
+        /* Initialization is the same as for the non-reentrant scanner.
+     * This function is called from mnt_routes6lex_destroy(), so don't allocate here.
+     */
+
+    (yy_buffer_stack) = 0;
+    (yy_buffer_stack_top) = 0;
+    (yy_buffer_stack_max) = 0;
+    (yy_c_buf_p) = (char *) 0;
+    (yy_init) = 0;
+    (yy_start) = 0;
+
+/* Defined in main.c */
+#ifdef YY_STDINIT
+    mnt_routes6in = stdin;
+    mnt_routes6out = stdout;
+#else
+    mnt_routes6in = (FILE *) 0;
+    mnt_routes6out = (FILE *) 0;
+#endif
+
+    /* For future reference: Set errno on error, since we are called by
+     * mnt_routes6lex_init()
+     */
+    return 0;
+}
+
 /* mnt_routes6lex_destroy is for both reentrant and non-reentrant scanners. */
 int mnt_routes6lex_destroy  (void)
 {
@@ -1915,6 +1957,10 @@ int mnt_routes6lex_destroy  (void)
 	mnt_routes6free((yy_buffer_stack) );
 	(yy_buffer_stack) = NULL;
 
+    /* Reset the globals. This is important in a non-reentrant scanner so the next time
+     * mnt_routes6lex() is called, initialization will occur. */
+    yy_init_globals( );
+
     return 0;
 }
 
@@ -1926,7 +1972,7 @@ int mnt_routes6lex_destroy  (void)
 static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
 {
 	register int i;
-    	for ( i = 0; i < n; ++i )
+	for ( i = 0; i < n; ++i )
 		s1[i] = s2[i];
 }
 #endif
@@ -1935,7 +1981,7 @@ static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
 static int yy_flex_strlen (yyconst char * s )
 {
 	register int n;
-    	for ( n = 0; s[n]; ++n )
+	for ( n = 0; s[n]; ++n )
 		;
 
 	return n;
@@ -1966,18 +2012,6 @@ void mnt_routes6free (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#undef YY_NEW_FILE
-#undef YY_FLUSH_BUFFER
-#undef yy_set_bol
-#undef yy_new_buffer
-#undef yy_set_interactive
-#undef yytext_ptr
-#undef YY_DO_BEFORE_ACTION
-
-#ifdef YY_DECL_IS_OURS
-#undef YY_DECL_IS_OURS
-#undef YY_DECL
-#endif
 #line 205 "mnt_routes6.l"
 
 
@@ -1989,4 +2023,5 @@ mnt_routes6_reset ()
 }
 
 
+int mnt_routes6wrap() { return 1; }
 

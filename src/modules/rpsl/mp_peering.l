@@ -9,7 +9,7 @@
   notes:
     Tokens are defined in the associated grammar, mp_peering.y.
 
-  $Id: mp_peering.l,v 1.2 2004/12/10 16:37:41 can Exp $
+  $Id: mp_peering.l,v 1.1 2004/12/27 17:52:40 can Exp $
 */
 %}
 
@@ -41,11 +41,16 @@ PRNGNAME       PRNG-[A-Z0-9_-]*[A-Z0-9]
 RTRSNAME       RTRS-[A-Z0-9_-]*[A-Z0-9]
 INT            [0-9]+
 QUAD           [0-9A-F]{1,4}
-ASNO           AS{INT}
 IPV4           {INT}(\.{INT}){3}
 IPV6           {QUAD}(:{QUAD}){7}
 IPV6DC         (({QUAD}:){0,6}{QUAD})?::({QUAD}(:{QUAD}){0,6})?
 DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
+ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
+ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNO           {ASNO32}|{ASNO16}
+ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
+
 
 %{
 #include <string.h>
@@ -55,7 +60,6 @@ DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
 /* tokens defined in the grammar */
 #include "mp_peering.tab.h"
 
-#define mp_peeringwrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
@@ -72,13 +76,11 @@ AND   { return OP_AND; }
 AT          { return KEYW_AT; }
 EXCEPT      { return KEYW_EXCEPT; }
 
+{ASNOMIX} {
+    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
+}
+
 {ASNO} {
-    long int val;
-    char *s;
-    val = strtol(yytext+2, &s, 10);
-    if ((val < 0) || (val > 65535) || (*s != '\0')) {
-        syntax_error("AS number \"%s\" is not between 0 and 65535", yytext);
-    }
     return TKN_ASNO;
 }
 
@@ -185,3 +187,4 @@ mp_peering_reset ()
     yy_flush_buffer(YY_CURRENT_BUFFER);
 }
 
+int yywrap() { return 1; }

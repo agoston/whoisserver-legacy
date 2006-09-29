@@ -8,7 +8,7 @@
   notes:
     Tokens are defined in the associated grammar, nserver.y.
 
-  $Id: nserver.l,v 1.2 2006/08/07 11:20:28 katie Exp $
+  $Id: nserver.l,v 1.3 2006/08/14 15:53:05 katie Exp $
 */
 
 /******************
@@ -134,3 +134,4 @@ nserver_reset ()
 }
 
 
+int yywrap() { return 1; }
