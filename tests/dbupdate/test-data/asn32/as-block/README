@@ -143,3 +143,15 @@
 # RESULT 11: The creation will succeed
 
 
+# CASE 12: We create two as-blocks which are overlapping each other 
+# and try to query one.
+# 32 bit
+# should return only the one queried
+#
+# create as-block objects
+#
+#SUCCESS
+#
+# RESULT 12: The creation will succeed
+
+

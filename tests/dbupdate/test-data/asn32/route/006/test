@@ -1,9 +1,6 @@
-
 # CASE 6: We try to create route object 20.13.0.0/16,AS200
 # origin is asn32
 # this AS doesn't exist in the DB
-%
-% requires initial objects to be loaded
 #
 # create route object 
 #

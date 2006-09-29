@@ -1,8 +1,5 @@
-
 # CASE 7: We try to create route object 20.13.0.0/16,AS200
 # making sure we can't have ipv6 addresses in inject
-%
-% requires initial objects to be loaded
 #
 # create route object 
 #
