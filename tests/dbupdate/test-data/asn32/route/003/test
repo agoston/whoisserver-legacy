@@ -1,9 +1,6 @@
-
-# CASE 3: We try to create route object 20.13.0.0/16,AS200
+# CASE 3: We try to create route object 20.13.0.0/16,AS200.200
 # origin is asn32
 # make query to check that "-i origin AS200.200" works
-%
-% requires initial objects to be loaded
 #
 # create route object 
 #

@@ -1,1 +1,10 @@
-query result
+% This is the MyDB Whois server.
+
+% Information related to '::/16AS200.200'
+
+route6:         ::/16
+descr:          test route
+origin:         AS200.200
+mnt-by:         TEST-MNT
+changed:        dbtest@ripe.net 20060928
+source:         DB-TEST

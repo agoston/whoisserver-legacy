@@ -1,12 +1,9 @@
-
 # CASE 1: We try to create route object 20.13.0.0/16,AS200
 # testing various attributes where community and as number can be present
 # aggr-bndry
 # aggr-mtd
 # components
 # inject
-%
-% requires initial objects to be loaded
 #
 # create route object 
 #
