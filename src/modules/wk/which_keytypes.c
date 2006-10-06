@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5 $
+  $Revision: 1.5.2.1 $
 
   which_keytypes:  Determine which keys to look for.
   
@@ -168,8 +168,10 @@ wk_is_hostname (char *key)
 int
 WK_is_aut_num (char *key)
 {
-
-  if (regexec(&aut_num, key, 0, NULL, 0) == 0) { 
+int errcode;
+  errcode = regcomp(&aut_num, WK_REXP_ASNUM, REG_EXTENDED|REG_NOSUB);
+  dieif(errcode != 0);
+  if (regexec(&aut_num, (const char *)key, 0, NULL, 0) == 0) { 
       return 1;
   }
   return 0;
