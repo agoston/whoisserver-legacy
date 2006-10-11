@@ -121,7 +121,7 @@ descr:        /17 with EARLY-REGISTRATION
 country:      NL
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-status:       EARLY-REGISTRATION
+status:       ALLOCATED UNSPECIFIED
 mnt-by:       END-USER-MNT
 mnt-lower:    END-USER-MNT
 changed:      dbtest@ripe.net 20020101
