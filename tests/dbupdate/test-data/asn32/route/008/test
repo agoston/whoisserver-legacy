@@ -9,6 +9,9 @@
 #FAILURE
 #
 # RESULT 8: The creations will fail.
+#
+# *** TEST WILL FAIL because of bug #201 in software ***
+# non existant route-set in member-of defaults to auth pass
 
 
 route:   20.13.0.0/16
