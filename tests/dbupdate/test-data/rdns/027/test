@@ -19,6 +19,9 @@ nserver:      ns2.1.e164.arpa 2001:610:240:0:53::3
 nserver:      ns3.1.e164.arpa 2001:0610:0240:0:053::3
 nserver:      ns4.1.e164.arpa 2001:0610:0240:0:053:0:0:3
 nserver:      ns3.1.e164.arpa 2001::AbDc
+nserver:      1ns1.test.net
+nserver:      12221.test.net
+nserver:      12221.test.1n1
 mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
