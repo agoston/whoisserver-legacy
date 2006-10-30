@@ -1,0 +1,14 @@
+# CASE 001: IP denial test
+#           set our IP to denied in the ripadmin table,
+#           then issue a simple query.
+#           Also check denial count increase
+#
+# NOTE: Our IP is set to 127.0.0.1, so if you're not running
+#       the test and the whois server at the same machine, this
+#       test will fail!
+#
+#FAILURE
+#
+# RESULT 001: The query will fail.
+$EXEC_BEFORE=$DATADIR/query/acl/001/acl_setup.sh
+$EXEC_AFTER=$DATADIR/query/acl/001/access_check.sh
