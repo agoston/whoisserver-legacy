@@ -5,6 +5,10 @@
 #          and correct password for mnt-lower of 2 parents
 #          and mnt-by of object, invalid password for the 
 #          other 2 parents
+# modified the list of objects in ACK (overlaps)
+# after -c changes it is in different order, but seems fine.
+# if the order changes this test will start failing.
+# see filters.config.
 #
 # create inetnum object 
 #
