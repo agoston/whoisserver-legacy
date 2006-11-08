@@ -97,9 +97,9 @@ descr:        Root inet6num object
 country:      EU
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-mnt-by:       RIPE-NCC-HM-MNT
-mnt-lower:    RIPE-NCC-HM-MNT
-mnt-domains:  RIPE-NCC-HM-MNT
+mnt-by:       RIPE-NCC-HM-DOM-MNT
+mnt-lower:    RIPE-NCC-HM-DOM-MNT
+mnt-domains:  RIPE-NCC-HM-DOM-MNT
 status:       ALLOCATED-BY-RIR
 remarks:      This network in not allocated.
               This object is here for Database
@@ -108,39 +108,39 @@ remarks:      This network in not allocated.
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
-% sample /8 domain object
-
-domain:       193.in-addr.arpa
+domain:       in-addr.arpa
 descr:        Test
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
-nserver:      ns-pri.ripe.net
-nserver:      ns-sec.ripe.net
+nserver:      ns.ripe.net # this is just a placeholder
 mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 
-% sample domain object that doesn't qualify for delchecking
+% sample domain object
 
-domain:       non-reverse.arpa
-descr:        Test
+domain:       1.0.0.2.ip6.arpa
+descr:        Test2222
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
-nserver:      ns-pri.ripe.net
-nserver:      ns-sec.ripe.net
+nserver:      ns.ripe.net
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 
-%
-%      End of Standard Template Objects
-%----------------------------------------------------------------
 
-%  Additional objects required for this test
+domain:       0.1.6.0.1.0.0.2.ip6.arpa
+descr:        Test2222
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns1.surfnet.nl
+nserver:      ns2.surfnet.nl
+nserver:      ns3.surfnet.nl
+mnt-lower:    TEST-DBM-MNT
+changed:      dbtest@ripe.net 20040329
+source:       DB-TEST
 
-% none
-
-% End of loader data file

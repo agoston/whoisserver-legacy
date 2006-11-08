@@ -1,0 +1,27 @@
+# rdns tests
+# CASE 52: create /44 domain object
+# inet6num exists and authorised
+# no override
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 51: creation will fail
+
+
+domain:         0.0.0.0.0.0.0.0.0.a.2.ip6.arpa
+descr:          European Regional Registry
+descr:          2a00::/16 block
+admin-c:        TP1-DB-TEST
+tech-c:         TP1-DB-TEST
+zone-c:         TP1-DB-TEST
+nserver:        noname.blah.test.net
+nserver:        noname.boo.test.net
+mnt-by:         TEST-DBM-MNT
+mnt-lower:      TEST-DBM-MNT
+changed:        katie@ripe.net 20061030
+source:         DB-TEST
+password: host3
+
+
