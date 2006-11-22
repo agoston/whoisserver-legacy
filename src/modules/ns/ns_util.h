@@ -1,5 +1,5 @@
 /*
- * $Id: ns_util.h,v 1.2.8.1 2006/07/31 10:36:20 katie Exp $
+ * $Id: ns_util.h,v 1.3 2006/08/07 11:20:28 katie Exp $
  */
 
 #ifndef NSUTIL_H
@@ -29,7 +29,7 @@ gboolean ns_is_rdns_suffix(au_plugin_callback_info_t *);
 
 gboolean ns_is_e164_arpa(au_plugin_callback_info_t *);
 
-gboolean ns_has_e164_arpa_suffix(gchar *);
+gboolean ns_has_suffix(gchar *, const char *);
 
 AU_ret_t ns_is_parent_ours(au_plugin_callback_info_t *, gchar *);
 

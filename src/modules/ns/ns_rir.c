@@ -1,5 +1,5 @@
 /*
- * $Id: ns_rir.c,v 1.2.8.2 2006/08/02 12:49:02 katie Exp $
+ * $Id: ns_rir.c,v 1.3 2006/08/07 11:20:28 katie Exp $
  */
 
 #include "ns_rir.h"
@@ -251,7 +251,7 @@ gboolean ns_ds_accepted(gchar * domain)
 
   /* e164.arpa -> DS not accepted */
   /* this will have to be changed when e164.arpa is signed. */
-  if (ns_has_e164_arpa_suffix(domain) == TRUE) {
+  if (ns_has_suffix(domain, "e164.arpa") == TRUE) {
     LG_log(au_context, LG_DEBUG, "NOT reading delegations file: domain is e164.arpa related");
     LG_log(au_context, LG_DEBUG, "DS record not allowed.");
     return FALSE;

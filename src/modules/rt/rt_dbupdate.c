@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.11 $
+  $Revision: 1.12 $
 
   Reporting module.
 
@@ -1225,14 +1225,28 @@ void RT_parent_not_exist(RT_context_t* ctx) {
 }
 
 /*+
-  RT_ds_not_accepted - Report that we don't accept DS records for this zone
+  RT_rdns_ds_not_accepted - Report that we don't accept DS records for this zone
 
   RT_context_t* ctx - Context.
   +*/
-void RT_ds_not_accepted(RT_context_t* ctx) {
+void RT_rdns_ds_not_accepted(RT_context_t* ctx) {
   xmlNodePtr node;
 
-  node = xmlNewNode(NULL, (xmlChar*)"ds_not_accepted");
+  node = xmlNewNode(NULL, (xmlChar*)"RDNSds_not_accepted");
+
+  rt_prepare_node(ctx, node);
+}
+
+
+/*+
+  RT_rdns_size_not_accepted - Report that we don't accept this delegation size
+
+  RT_context_t* ctx - Context.
+  +*/
+void RT_rdns_size_not_accepted(RT_context_t* ctx) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"RDNSsize_not_accepted");
 
   rt_prepare_node(ctx, node);
 }
@@ -1882,8 +1896,8 @@ void RT_rdns_threshold(RT_context_t *ctx) {
 }
 
 void RT_rdns_invalid_range(RT_context_t *ctx,gchar *object_str) {
-  xmlNodePtr node;
 
+  xmlNodePtr node;
   node = xmlNewNode(NULL, (xmlChar*)"RDNSinvalidrange");
   rt_xml_node_add_content(node, (xmlChar*)object_str);
   rt_prepare_node(ctx, node);
