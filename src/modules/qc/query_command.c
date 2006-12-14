@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.6 $
+  $Revision: 1.6.2.1 $
 
   Query command module (qc).  This is what the whois query gets stored as in
   memory.
@@ -972,15 +972,12 @@ int QC_fill (const char *query_str,
         char *ptr, *ptr2;
         fixed_lookup = 0;
         if (MA_isset(query_command->keytypes_bitmap, WK_AUTNUM)) {
-fprintf(stderr, "QC_fill: query_command->keys [%s]\n",query_command->keys);
           if ( ptr = strstr(query_command->keys, "AS0.") ) {
             /* fix the format */
             keycopy = UT_strdup(query_command->keys);
 	    /* remove the '0.' from the key */
 	    ptr += 2;  /* move past 'AS' */
-//fprintf(stderr, "QC_fill: ptr [%s]\n",ptr);
 	    ptr2 = ptr + 2;  /* move past '0.' */
-//fprintf(stderr, "QC_fill: ptr2 [%s]\n",ptr2);
 	    while ( *ptr2 != '\0' ) {
 	      *(ptr++) = *(ptr2++);
 	    }
@@ -1004,29 +1001,23 @@ fprintf(stderr, "QC_fill: query_command->keys [%s]\n",query_command->keys);
             /* fix the format */
 	    /* remove the '0.' from the key */
 	    ptr += 2;  /* move past 'AS' */
-//fprintf(stderr, "QC_fill: ptr [%s]\n",ptr);
 	    ptr2 = ptr + 2;  /* move past '0.' */
-//fprintf(stderr, "QC_fill: ptr2 [%s]\n",ptr2);
 	    while ( *ptr2 != '\0' ) {
 	      *(ptr++) = *(ptr2++);
 	    }
 	    *ptr = '\0';
             fixed_lookup = 1;
           }
-fprintf(stderr, "QC_fill: keycopy [%s]\n", keycopy);
           /* now check ASx - ASy for x>y */
           key_tokens = UT_strdup(query_command->keys);
           cursor = key_tokens;
           while( (token = strsep( &cursor, "-" )) != NULL && count < 2) {  
-fprintf(stderr, "QC_fill: token [%s]\n", token);
             /* discard the letters (or leading whitespace), take the (number.)number */
             if ( strchr(token, '.') == NULL ) {
               sscanf(token, "%*[ AS]%d", &lower);
             } 
             else {
-fprintf(stderr, "QC_fill: scanning token with dot\n");
               sscanf(token, "%*[ AS]%d.%d", &upper, &lower);
-fprintf(stderr, "QC_fill: upper [%d] lower [%d]\n", upper, lower);
             }
             if ( count++ == 0 ) {
               begin_asnum = (65536 * upper) + lower;
@@ -1046,7 +1037,6 @@ fprintf(stderr, "QC_fill: upper [%d] lower [%d]\n", upper, lower);
         }
         
         if (fixed_lookup) {
-fprintf(stderr, "QC_fill: keycopy [%s]\n", keycopy);
             /* WARNING:905 */
             char *fmt = ca_get_qc_fmt_fixedlookup;
             query_command->parse_messages = 
@@ -1186,7 +1176,6 @@ Query_command *QC_create(const char *input, Query_environ *qe)
   Query_command *qc;
   const char *s;
   int qt;
-fprintf(stderr, "QC_create: input [%s]\n",input);
 
   qc = (Query_command *)UT_calloc(1, sizeof(Query_command));
   QC_init_struct(qc);

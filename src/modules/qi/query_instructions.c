@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.14 $
+  $Revision: 1.14.2.1 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -347,7 +347,6 @@ static int create_asblock_query(GString *query_str,
 
   while( (token = strsep( &cursor, "-" )) != NULL && count < 2) {  
 
-fprintf(stderr, "token [%s]\n", token);
     /* discard the letters (or leading whitespace), take the (number.)number */
     if ( strchr(token, '.') == NULL ) {
       if( sscanf(token, "%*[ AS]%d", &lower) < 1 ) {
@@ -355,11 +354,9 @@ fprintf(stderr, "token [%s]\n", token);
       }
     } 
     else {
-fprintf(stderr, "scanning token with dot\n");
       if( sscanf(token, "%*[ AS]%d.%d", &upper, &lower) < 1 ) {
         goto error_return; /* error */
       }
-fprintf(stderr, "upper [%d] lower [%d]\n", upper, lower);
     }
     if ( count++ == 0 ) {
       begin_asnum = (65536 * upper) + lower;
@@ -381,7 +378,6 @@ fprintf(stderr, "upper [%d] lower [%d]\n", upper, lower);
     }
   }
   g_string_sprintf(query_str, sql_query, begin_asnum, end_asnum);
-fprintf(stderr, "query_str [%s]\n", query_str->str);
 
   UT_free(keycopy);
   return 0;
@@ -498,7 +494,6 @@ static char *create_query(const Query_t q, Query_command *qc)
 
   if ( (q.query != NULL) 
     && (q.querytype == querytype) ) {
-fprintf(stderr, "q.keytype [%d]\n",q.keytype);
     
     /* addquery = 1; */
     /* if it got here, it should be added, unless.(see asblock)*/
