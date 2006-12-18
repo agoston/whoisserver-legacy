@@ -1,0 +1,14 @@
+# CASE 002: range denial test
+#           set our IP range to denied in the ripadmin table,
+#           then issue a simple query
+#           Also check denial count increase
+#
+# NOTE: Our IP range is set to 127.0.0.1/11, so if you're not running
+#       the test and the whois server at the same machine, this
+#       test will fail!
+#
+#FAILURE
+#
+# RESULT 002: The query will fail.
+$EXEC_BEFORE=$DATADIR/query/acl/002/acl_setup.sh
+$EXEC_AFTER=$DATADIR/query/acl/002/access_check.sh

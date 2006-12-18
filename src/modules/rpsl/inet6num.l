@@ -8,7 +8,7 @@
   notes:
     Tokens are defined in the associated grammar, inet6num.y.
 
-  $Id: inet6num.l,v 1.1 2004/12/27 17:52:38 can Exp $
+  $Id: inet6num.l,v 1.1.14.1 2006/09/29 12:32:29 katie Exp $
 */
 
 /******************

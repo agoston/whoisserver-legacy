@@ -1923,7 +1923,7 @@ char *importtext;
   notes:
     Tokens are defined in the associated grammar, import.y.
 
-  $Id: import.l,v 1.1 2004/12/27 17:52:38 can Exp $
+  $Id: import.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 #line 39 "import.l"
 #include <string.h>

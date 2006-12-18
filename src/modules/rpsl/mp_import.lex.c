@@ -2320,7 +2320,7 @@ char *mp_importtext;
   notes:
     Tokens are defined in the associated grammar, mp_import.y.
 
-  $Id: mp_import.l,v 1.1 2004/12/27 17:52:39 can Exp $
+  $Id: mp_import.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 #line 49 "mp_import.l"
 #include <string.h>

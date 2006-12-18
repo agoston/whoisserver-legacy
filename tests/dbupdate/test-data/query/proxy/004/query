@@ -1,0 +1,7 @@
+% This is the MyDB Whois server.
+
+%ERROR:201: access denied for 1234:5678:9abc::5432
+%
+% Sorry, access from your host has been permanently denied
+% because of a repeated abusive behaviour.
+% Please contact <my-dbm@mydb.net> for unblocking.

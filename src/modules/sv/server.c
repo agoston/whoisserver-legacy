@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.11 $
+  $Revision: 1.12 $
 
   Example code: A server for a client to connect to.
 
@@ -789,10 +789,17 @@ int SV_start(char *pidfile) {
   }
   SV_update_sock[source+1]=-1; /* end of socket array */
 
+  /* Create master thread for config threads */
+  SV_concurrent_server(SV_config_sock, 0, "config", PC_interact);
+
   /* Initialise the radix trees
-     already can allow socket connections, because the trees will
-     be created locked, and will be unlocked when loaded */
+     Don't allow any connections until this is done - there is no use of it
+     as the radix trees are locked and no queries nor updates can succeed,
+     just end up in a connection timeout */
+  fprintf(stderr, "Loading the radix trees...");
   radix_init();
+  radix_load();
+  fprintf(stderr, " done.\n");
 
   /* Now.... accept() calls block until they get a connection
      so to listen on more than one port we need more
@@ -801,14 +808,9 @@ int SV_start(char *pidfile) {
   /* Create master thread for whois threads */
   /* The max number of threads for queries has been increased from 64 to 128 (Engin 20040614) */
   SV_concurrent_server(SV_whois_sock, 128, "whois", PW_interact);
-  /* Create master thread for config threads */
-  SV_concurrent_server(SV_config_sock, 0, "config", PC_interact);
   /* Create master thread for mirror threads */
   SV_concurrent_server(SV_mirror_sock, 0, "mirror", PM_interact);
 
-  /* Load the radix trees - this must be done before the
-     updates are allowed to proceed */
-  radix_load();
 
   /* Walk through the sources and */
   /* run update thread for every source with CANUPD == 'y' */

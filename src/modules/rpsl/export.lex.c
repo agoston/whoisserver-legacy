@@ -1855,7 +1855,7 @@ char *exporttext;
   notes:
     Tokens are defined in the associated grammar, export.y.
 
-  $Id: export.l,v 1.1 2004/12/27 17:52:37 can Exp $
+  $Id: export.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 #line 41 "export.l"
 #include <string.h>

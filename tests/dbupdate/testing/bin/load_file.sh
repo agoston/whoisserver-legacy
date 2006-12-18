@@ -36,7 +36,7 @@ echo "*******************"`date`"******************"
 echo "Creating tables\n" 
 echo "Creating tables\n"
 
-cd $SCRIPTDIR/SQL; ./create.first-stage; cd ..
+cd $SCRIPTDIR/SQL; sh ./create.first-stage; cd ..
 
 # 2 - pass loading 
 

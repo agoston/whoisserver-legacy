@@ -1050,7 +1050,7 @@ char *interfacetext;
   notes:
     Tokens are defined in the associated grammar, interface.y.
 
-  $Id: interface.l,v 1.1 2004/12/27 17:52:38 can Exp $
+  $Id: interface.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 #line 38 "interface.l"
 #include <string.h>

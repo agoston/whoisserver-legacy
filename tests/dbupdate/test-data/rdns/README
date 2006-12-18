@@ -337,4 +337,14 @@
 #FAILURE
 #
 # RESULT 036: modify will fail
+#
+# rdns tests
+# CASE 037:
+#
+# create 1.e164.arpa domain object
+# checking various syntax
+#
+#FAILURE
+#
+# RESULT 037: creation will fail
 

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.6.2.1 $
+  $Revision: 1.6.2.2 $
 
   Query command module (qc).  This is what the whois query gets stored as in
   memory.

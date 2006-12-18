@@ -1,5 +1,5 @@
 /*
- * $Id: ns_auth.c,v 1.3.8.2 2006/08/01 10:35:37 katie Exp $
+ * $Id: ns_auth.c,v 1.4 2006/08/07 11:20:28 katie Exp $
  */
 
 #include "rip.h"
@@ -67,7 +67,7 @@ AU_ret_t rdns_deletion(au_plugin_callback_info_t * info)
     ret_val = au_check_multiple_authentications
                     (CHECK_MNT_BY, old_object, "existing", info);
 
-    if (ns_has_e164_arpa_suffix(domain)) {
+    if (ns_has_suffix(domain, "e164.arpa")) {
       /* do nothing, this is for completeness */
       /* e164.arpa domains do not have any reclaim functionality. */
     } else if (ret_val != AU_AUTHORISED) {
@@ -152,8 +152,15 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
         au_check_multiple_authentications(CHECK_MNT_BY, info->obj,
                                           "existing", info);
   }
-  /* if no conf file, revert to older style */
-  if (delcheck_conf_file != NULL) {
+  /* if no conf file, reject */
+  if (delcheck_conf_file == NULL) {
+    /* REJECT */
+    /* RT message */
+    RT_rdns_size_not_accepted(info->ctx);
+    /* ret_val set */
+    ret_val = AU_UNAUTHORISED_CONT;
+  }
+  else {
     if (ret_val == AU_AUTHORISED) {
       /* check if we're the related party */
       au_check_result = ns_find_rir(info, domain);
@@ -174,7 +181,7 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
             } else {
               
               if (ds_rdata != NULL && ns_ds_accepted(domain) == FALSE) {
-                 RT_ds_not_accepted(info->ctx);
+                 RT_rdns_ds_not_accepted(info->ctx);
                  au_check_result = AU_UNAUTHORISED_CONT;
               }
               else {
@@ -357,17 +364,12 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
   } else {
     LG_log(au_context, LG_DEBUG, "found the object source");
     source = rpsl_attr_get_clean_value(source_attrs->data);
-    if (delcheck_conf_file == NULL) {   /* revert to older style */
-      LG_log(au_context, LG_DEBUG, "reverting to the old style authorisation");
-      if (ns_is_e164_arpa(info)) {
-        /* check flat authorisation */
-        LG_log(au_context, LG_DEBUG, "check flat authorisation");
-        ret_val = ns_flat_creation(info, domain, source);
-      } else {
-        /* Check hierarchical authorization */
-        LG_log(au_context, LG_DEBUG, "check hierarchical authorisation");
-        ret_val = ns_hierarchical_creation(info, domain, source);
-      }
+    if (delcheck_conf_file == NULL) {   
+      /* REJECT */
+      /* RT message */
+      RT_rdns_size_not_accepted(info->ctx);
+      /* ret_val set */
+      ret_val = AU_UNAUTHORISED_CONT;
     } else {
 
       /* Extract the related nservers */
@@ -411,7 +413,7 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
             } else {
 
               if ( ds_rdata != NULL && ns_ds_accepted(domain) == FALSE) {
-                  RT_ds_not_accepted(info->ctx);
+                  RT_rdns_ds_not_accepted(info->ctx);
                   au_check_result = AU_UNAUTHORISED_CONT;
               }
               else {

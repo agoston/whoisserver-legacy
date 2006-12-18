@@ -905,7 +905,7 @@ char *peeringtext;
   notes:
     Tokens are defined in the associated grammar, peering.y.
 
-  $Id: peering.l,v 1.1 2004/12/27 17:52:40 can Exp $
+  $Id: peering.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 #line 37 "peering.l"
 #include <string.h>

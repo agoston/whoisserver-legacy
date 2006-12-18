@@ -581,7 +581,7 @@ char *mnt_routes_antext;
   notes:
     Tokens are defined in the associated grammar, mnt_routes_an.y.
 
-  $Id: mnt_routes_an.l,v 1.3 2005/10/25 08:48:51 katie Exp $
+  $Id: mnt_routes_an.lex.c,v 1.5.10.1 2006/09/29 12:32:29 katie Exp $
 */
 
 /******************

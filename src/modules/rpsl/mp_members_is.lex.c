@@ -1110,7 +1110,7 @@ I presume the the first one is correct, in which case we can perhaps make
   notes:
     Tokens are defined in the associated grammar, mp_members_is.y.
 
-  $Id: mp_members_is.l,v 1.1 2004/12/27 17:52:39 can Exp $
+  $Id: mp_members_is.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 
 /******************

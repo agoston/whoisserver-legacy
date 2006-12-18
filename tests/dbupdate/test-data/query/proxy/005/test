@@ -1,0 +1,13 @@
+# CASE 005: "proxy pass over v6, passed address is accepted" test
+#           set our IP to trustpass=1 in the ripadmin table,
+#           then issue a simple query over v6, passing a nondenied v6 address
+#           Also check addrpass count increase
+#
+# NOTE: This test relies on running on the same machine as the server!
+#
+#SUCCESS
+#
+# RESULT 005: The query will succeed.
+$EXEC_BEFORE=$DATADIR/query/proxy/005/acl_setup.sh
+$EXEC_AFTER=$DATADIR/query/proxy/005/access_check.sh
+$QUERY_AF=INET6

@@ -800,7 +800,7 @@ char *ifaddrtext;
   notes:
     Tokens are defined in the associated grammar, ifaddr.y.
 
-  $Id: ifaddr.l,v 1.1 2004/12/27 17:52:38 can Exp $
+  $Id: ifaddr.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 #line 39 "ifaddr.l"
 #include <string.h>

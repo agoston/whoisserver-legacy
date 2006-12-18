@@ -2,7 +2,7 @@
 #define READ_QUERY_COMMAND
 
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.2.12.1 $
 
   Query command module (qc)
 

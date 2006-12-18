@@ -1707,7 +1707,7 @@ char *components_r6text;
   notes:
     Tokens are defined in the associated grammar, components.l.
 
-  $Id: components_r6.l,v 1.1 2004/12/27 17:52:37 can Exp $
+  $Id: components_r6.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 #line 42 "components_r6.l"
 #include <stdlib.h>

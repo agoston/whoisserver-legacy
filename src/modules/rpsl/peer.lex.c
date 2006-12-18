@@ -944,7 +944,7 @@ char *peertext;
   notes:
     Tokens are defined in the associated grammar, peer.y.
 
-  $Id: peer.l,v 1.1 2004/12/27 17:52:40 can Exp $
+  $Id: peer.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 
 /******************

@@ -1319,7 +1319,7 @@ char *componentstext;
   notes:
     Tokens are defined in the associated grammar, components.y.
 
-  $Id: components.l,v 1.1 2004/12/27 17:52:37 can Exp $
+  $Id: components.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 #line 37 "components.l"
 #include <stdlib.h>

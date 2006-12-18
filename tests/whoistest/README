@@ -1,0 +1,7 @@
+This directory would contain the query, load and ACL tests of whoisserver.
+It's written in java, most of the low-level parts is already done but this
+sub-project is abandoned now.
+
+It's a good start for any java-based whois project anyway.
+
+Agoston, 2006-09-21

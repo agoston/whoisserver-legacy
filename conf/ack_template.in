@@ -99,7 +99,7 @@
 
 <xsl:template match="RDNSremovedtrailingdot">
 
-***Warning: Trailing dot has been removed from l:apply-templates/>.
+***Warning: Trailing dot has been removed from <xsl:apply-templates/>.
 </xsl:template>
 
 <xsl:template match="RDNSparenthasourns">
@@ -125,9 +125,19 @@
           between 0-255 and the first number must be less than the second.
 </xsl:template>
 
-<xsl:template match="ds_not_accepted">
+<xsl:template match="RDNSds_not_accepted">
 
 ***Error: DS records are not accepted for this zone.
+</xsl:template>
+
+<xsl:template match="RDNSsize_not_accepted">
+
+***Error: Delegation of this size is not allowed.
+          The allowed sizes are:
+          IPv4 /8, /16, /24
+          IPv6 /12, /16, /20, /24, /28, /32, /48, /64
+          
+          For delegations less than /24 (IPv4), contact ripe-dbm@ripe.net.
 </xsl:template>
 
   <xsl:template match="syntax_error">

@@ -11,7 +11,7 @@
   notes:
     Tokens are defined in the associated grammar, inject.y.
 
-  $Id: inject.l,v 1.1 2004/12/27 17:52:38 can Exp $
+  $Id: inject.l,v 1.1.14.1 2006/09/29 12:32:29 katie Exp $
 */
 %}
 

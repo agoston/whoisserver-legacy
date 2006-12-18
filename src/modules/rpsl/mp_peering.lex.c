@@ -1147,7 +1147,7 @@ char *mp_peeringtext;
   notes:
     Tokens are defined in the associated grammar, mp_peering.y.
 
-  $Id: mp_peering.l,v 1.1 2004/12/27 17:52:40 can Exp $
+  $Id: mp_peering.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 /******************
   Copyright (c)                                         RIPE NCC

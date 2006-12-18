@@ -1,0 +1,14 @@
+# CASE 005: success/hiararchy traversal test
+#           set a hierarchy of enabled/disabled IP ranges in the ACL table
+#           then query from the most specific inetnum (localhost, namely) over v6
+#           Check whether we get the most specific (enabled) ACL
+#
+# NOTE: Our IP range is set to ::/41, so if you're not running
+#       the test and the whois server at the same machine, this
+#       test will fail!
+#
+#SUCCESS
+#
+# RESULT 005: The query will succeed.
+$EXEC_BEFORE=$DATADIR/query/acl/005/acl_setup.sh
+$QUERY_AF=INET6

@@ -8,7 +8,11 @@
   notes:
     Tokens are defined in the associated grammar, nserver.y.
 
-  $Id: nserver.l,v 1.3 2006/08/14 15:53:05 katie Exp $
+//<<<<<<< nserver.l
+//  $Id: nserver.l,v 1.4 2006/10/17 13:38:15 katie Exp $
+//=======
+  $Id: nserver.l,v 1.3.2.1 2006/09/29 12:32:29 katie Exp $
+//>>>>>>> 1.3.2.1
 */
 
 /******************
@@ -36,6 +40,9 @@
              IPv6: abcd:a0b4:d3a4:0000:0034:2435:2345:2039 (lowercase/uppercase, fully expanded)
              IPv6: abcd:: (lowercase/uppercase, compressed)
              all is converted into the fully expanded by dbupdate.
+             hostname: RFC1123
+                 label may not start with '-'
+                 last label (TLD) must have at least one letter
 */
 %}
 
@@ -44,9 +51,9 @@ IPV4           {INT}(\.{INT}){3}
 QUAD           [0-9a-fA-F]{1,4}
 IPV6           {QUAD}(:{QUAD}){7}
 IPV6DC         (({QUAD}:){0,6}{QUAD})?::({QUAD}(:{QUAD}){0,6})?
-STARTLABEL     [A-Za-z]+([-A-Za-z0-9]*[A-Za-z0-9]+)*
 LABEL          [A-Za-z0-9]+([-A-Za-z0-9]*[A-Za-z0-9]+)*
-HOSTNAME       {STARTLABEL}(\.{LABEL})*(\.)?
+TLD            ({LABEL})*[A-Za-z]({LABEL})*
+HOSTNAME       ({LABEL}\.)*{TLD}(\.)?
 
 %{
 #include <stdlib.h>
@@ -57,7 +64,6 @@ HOSTNAME       {STARTLABEL}(\.{LABEL})*(\.)?
 /* tokens defined in the grammar */
 #include "nserver.tab.h"
 
-#define nserverwrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
@@ -131,6 +137,10 @@ void
 nserver_reset ()
 {
     yy_flush_buffer(YY_CURRENT_BUFFER);
+}
+int yywrap ()
+{
+    return(1);
 }
 
 

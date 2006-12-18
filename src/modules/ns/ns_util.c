@@ -1,5 +1,5 @@
 /*
- * $Id: ns_util.c,v 1.6.8.2 2006/08/01 10:35:37 katie Exp $
+ * $Id: ns_util.c,v 1.7 2006/08/07 11:20:28 katie Exp $
  */
 
 #include "ns_util.h"
@@ -395,7 +395,7 @@ gboolean ns_is_e164_arpa(au_plugin_callback_info_t * info)
   
   domain = rpsl_object_get_key_value(info->obj);
 
-  if (ns_has_e164_arpa_suffix(domain)) {
+  if (ns_has_suffix(domain, "e164.arpa")) {
     return TRUE;
   }
   else {
@@ -403,17 +403,18 @@ gboolean ns_is_e164_arpa(au_plugin_callback_info_t * info)
   }
 
 }
-/* true if ends with e164.arpa */
-gboolean ns_has_e164_arpa_suffix(gchar * domain)
+
+/* domain has suffix */
+gboolean ns_has_suffix(gchar * domain, const char * suffix)
 {
   gchar *p;
 
-  p = stristr (domain, "e164.arpa");
-  if (p != NULL && (strcasecmp(p, "e164.arpa") == 0 )) {
-    LG_log(au_context, LG_DEBUG, "object is e164.arpa related");
+  p = stristr (domain, suffix);
+  if (p != NULL && (strcasecmp(p, suffix) == 0 )) {
+    LG_log(au_context, LG_DEBUG, "object is %s related", suffix);
     return TRUE;
   } else {
-    LG_log(au_context, LG_DEBUG, "object is NOT e164.arpa related");
+    LG_log(au_context, LG_DEBUG, "object is NOT %s related", suffix);
     return FALSE;
   }
 }

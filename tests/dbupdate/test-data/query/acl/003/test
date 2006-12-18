@@ -1,0 +1,15 @@
+# CASE 003: IP denial over v6 test
+#           set our IP to denied in the ripadmin table,
+#           then issue a simple query over v6
+#           Also check denial count increase
+#
+# NOTE: Our IP is set to ::/128, so if you're not running
+#       the test and the whois server at the same machine, this
+#       test will fail!
+#
+#FAILURE
+#
+# RESULT 003: The query will fail.
+$EXEC_BEFORE=$DATADIR/query/acl/003/acl_setup.sh
+$EXEC_AFTER=$DATADIR/query/acl/003/access_check.sh
+$QUERY_AF=INET6

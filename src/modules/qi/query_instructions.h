@@ -2,7 +2,7 @@
 #define READ_QUERY_INSTRUCTIONS
 
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.4.2.1 $
 
   Query instruction module (qi)
   config module.

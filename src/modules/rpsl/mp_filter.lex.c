@@ -1688,7 +1688,7 @@ char *mp_filtertext;
   notes:
     Tokens are defined in the associated grammar, mp_filter.y.
 
-  $Id: mp_filter.l,v 1.1 2004/12/27 17:52:39 can Exp $
+  $Id: mp_filter.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
 */
 /******************
   Copyright (c)                                         RIPE NCC

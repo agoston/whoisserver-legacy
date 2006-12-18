@@ -36,7 +36,7 @@ char *t_dn[] = {
 
 char *t_ir[] = {
   "mntner","person_role","names","organisation",NULL,NULL,
-  "ifaddr", "admin_c", "tech_c", "notify", "mnt_by", "org", NULL
+  "ifaddr", "interface", "admin_c", "tech_c", "notify", "mnt_by", "org", NULL
 };
 
 /* inet6num */

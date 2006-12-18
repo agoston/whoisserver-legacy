@@ -1,0 +1,207 @@
+#!/bin/bash
+# resets the test database, by Agoston, 2006-09-29
+# it is actually an optimized and merged version of the former make_db_test and load_file.sh
+# it's much better than the previous version, but still needs quite a bit of work to be called a good code
+
+# unlike make_db, it has no dependencies on other scripts
+
+# Debug info: uncomment when debugging
+DEBUG="set -x"
+$DEBUG
+
+DATECMD="/bin/date '+%Y-%m-%d %H:%M:%S'"
+TIMECMD="/bin/date '+%H:%M:%S'"
+
+function check_error() {
+if [ $2 -ne 0 ]; then
+	echo "*** ERROR: $1 [$2]. Exiting\n"
+	exit 1
+fi
+}
+
+# log a message, with appropriate timestamp
+log()
+{
+ echo "=" `eval $TIMECMD` $*
+}
+
+# log an error message, with appropriate timestamp
+error()
+{
+ echo "************** ERROR ***************"
+ echo "*** " `eval $TIMECMD` $*
+ echo "************************************"
+ echo
+}
+
+# exit with an error message
+error_exit()
+{
+ error $*
+ exit 1
+}
+
+function issue_command() {
+	echo -e "$@" | nc -q 1 $WHOISHOST $CONFPORT
+}
+
+function issue_command_get_ret() {
+	return `echo -e "$@" | nc -q 1 $WHOISHOST $CONFPORT | sed 's/.*=\([0-9]*\)=.*/\1/g' | tail -1`
+}
+
+loadpass()
+{
+  for object_file in ${LIST}
+  do
+    echo `date` Loading ${object_file}
+    echo Loading by $LOADER -L $1 -p ${PROPERTIES} -s ${SOURCE} ${object_file}
+    test -f ${object_file}
+    check_error "${object_file} not found" $?
+    $LOADER -L $1 -p ${PROPERTIES} -s ${SOURCE} ${object_file}
+    check_error "Loader failure" $?
+  done
+}
+
+
+USAGE="$0 -t topdir -h host -p confport -c <config_file> -s <source> -[0|1|2] -f file \n"
+
+######################
+# Parse arguments
+
+while getopts t:h:p:f:l:c:s:012 a
+do
+case $a in
+h)       WHOISHOST=$OPTARG;;
+p)       CONFPORT=$OPTARG;;
+t)       TOPDIR=$OPTARG;;
+c)       CARG=$OPTARG;;
+s)       SARG=$OPTARG;;
+l)       LOAD_FILE=$OPTARG;;
+f)           LIST=$OPTARG;;
+0)       NPASSES=0;;
+1)       NPASSES=1;;
+2)       NPASSES=2;;
+\?)      echo $USAGE
+         exit 2;;
+esac
+done
+
+shift `expr $OPTIND - 1`
+
+export SOURCE=${SARG:?"<source> is not specified. Usage: $USAGE"}
+export PROPERTIES=${CARG:?"<config_file> is not specified. Usage: $USAGE"}
+export NPASSES=${NPASSES:?" number of passes is not specified. Usage: $USAGE"}
+
+# check whether the configuration file exists
+ls $PROPERTIES >/dev/null 2>&1 || error_exit "cannot find config file $PROPERTIES"
+
+# Directory where the load_file.sh script is located
+export SCRIPTDIR=$TOPDIR/bin
+
+#################### LOCATION OF THE UTILITIES #####################################
+
+# Location of the utility that fetches config variables
+export GETVAR="$TOPDIR/bin/getvar -s $SOURCE -c $PROPERTIES"
+
+# Location of the loader binary
+export LOADER=$TOPDIR/bin/loader
+
+# MySQL setup is taken from the configuration file
+# from the section SOURCE <source_name>
+# where <source_name> is <source>
+
+export HOST=`$GETVAR -p dbhost` || error_exit "unknown source $SOURCE"
+export PORT=`$GETVAR -p dbport` || error_exit "unknown source $SOURCE"
+export USER=`$GETVAR -p dbuser` || error_exit "unknown source $SOURCE"
+export PASSWORD=`$GETVAR -p dbpswd` || error_exit "unknown source $SOURCE"
+export DB=`$GETVAR -p dbname` || error_exit "unknown source $SOURCE"
+
+# Given the $PROPERTIES, let's get RIPADMIN db connection data
+for i in `egrep '^RIPADMIN ' $PROPERTIES | cut -d" " -f2 | tr "," " "`; do
+	if [ -z $RIPADMIN_DBHOST ]; then export RIPADMIN_DBHOST=$i; continue; fi
+	if [ -z $RIPADMIN_DBPORT ]; then export RIPADMIN_DBPORT=$i; continue; fi
+	if [ -z $RIPADMIN_DBUSER ]; then export RIPADMIN_DBUSER=$i; continue; fi
+	if [ -z $RIPADMIN_DBPASS ]; then export RIPADMIN_DBPASS=$i; continue; fi
+	if [ -z $RIPADMIN_DBNAME ]; then export RIPADMIN_DBNAME=$i; continue; fi
+done
+
+# MySQL commands
+# note: the "CMD" versions include appropriate starup options
+export MYSQLBIN=/usr/bin
+export MYSQL=$MYSQLBIN/mysql
+export MYSQLCMD="$MYSQL -h$SQLHOST -P$SQLPORT -u$SQLUSER -p$SQLPSWD"
+export MYSQLADMIN=$MYSQLBIN/mysqladmin
+export MYSQLADMINCMD="$MYSQLADMIN -h$SQLHOST -P$SQLPORT -u$SQLUSER -p$SQLPSWD"
+
+echo host=$HOST port=$PORT user=$USER pwd=$PASSWORD db=$DB
+
+log "Loading database [$DB] (source [$SOURCE]) started"
+
+
+######################### DATABASE CREATION AND LOADING ###############################
+
+#log "Flush tables"
+#$MYSQLADMINCMD flush-tables
+
+cd ${SCRIPTDIR}/SQL
+./resetdata 2>&1
+
+if [ $? -ne 0 ]; then
+  error_exit "Error loading database=$DB for source=${SOURCE}, $0 exiting"
+fi
+cd -
+
+# load data
+if [ $NPASSES -eq 2 ]
+then
+  echo `date`"\n"
+  echo "Loading tables - 1 of 2 pass\n"
+
+  loadpass 1
+  check_error "Pass 1 failed" $?
+
+  echo `date`"\n"
+  echo "Loading tables - 2 of 2 pass\n"
+
+  loadpass 2
+  check_error "Pass 2 failed" $?
+
+elif [ $NPASSES -eq 1 ]
+then
+  echo `date`"\n"
+  echo "Loading tables - 1 of 1 pass\n"
+
+# 0 indicates single pass loading
+  loadpass 0
+  check_error "Pass 1 failed" $?
+fi
+
+
+INITRX="issue_command_get_ret set initrx $SOURCE"
+
+# this is done in the make_db script
+#DYNAMICCHECK="issue_command show dynamic | grep 'whois R\.I\.P\. config>' | sed 's/.*whois R\.I\.P\. config>//'"
+#DYNAMICSTART="issue_command set dynamic start"
+
+#DYNAMIC=`$DYNAMICCHECK`
+#log "dynamic = $DYNAMIC"
+
+#if [ $DYNAMIC -ne 1 ]; then
+#  log "enabling dynamic updates"
+#  $DYNAMICSTART
+#  if [ $? -ne 0 ]; then
+#    error "Error setting dynamic to start"
+#    error_exit "$0 now exiting"
+#  fi
+#fi
+
+$INITRX
+if [ $? -ne 0 ]; then
+    error "Error reloading radix tree, $0 scheduling exit"
+fi
+
+# reset ripadmin data as well
+issue_command "set acl_tree\nset access_tree"
+
+log "Loading database [$SQLDB] (source [$SOURCE]) finished without errors"
+

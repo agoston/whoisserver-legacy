@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.15 2006/08/30 11:08:27 denis Exp $
+$Id: syntax.xml,v 1.15.2.1 2006/09/29 12:31:13 katie Exp $
 
 -->
 
