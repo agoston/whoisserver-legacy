@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.31.2.1 2006/09/29 12:31:13 katie Exp $
+$Id: syntax.xml,v 1.17 2006/12/20 15:33:03 katie Exp $
 
 -->
 
@@ -585,7 +585,7 @@ $Id: syntax.xml,v 1.31.2.1 2006/09/29 12:31:13 katie Exp $
    <attribute_syntax name="org-type">
        <front_end>
            <regex>
-           ^(IANA|RIR|NIR|LIR|NON-REGISTRY)$
+           ^(IANA|RIR|NIR|LIR|OTHER)$
            </regex>
        </front_end>
        <description>
@@ -595,7 +595,7 @@ $Id: syntax.xml,v 1.31.2.1 2006/09/29 12:31:13 katie Exp $
      o RIR
      o NIR (There are no NIRs in the RIPE NCC service region.)
      o LIR
-     o NON-REGISTRY
+     o OTHER
        </description>
    </attribute_syntax>
 

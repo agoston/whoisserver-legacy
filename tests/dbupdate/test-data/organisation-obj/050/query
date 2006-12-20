@@ -4,7 +4,7 @@
 
 organisation:   ORG-LEEE1-DB-TEST
 org-name:       LONGLONGLONGLONGLONGLONGLONGLONGLONGLONGLONGLONGLONGLONGLONGLONGLONGLONGLONGLONG EXAMPLE1 EXAMPLE2 EXAMPLE3
-org-type:       NON-REGISTRY
+org-type:       OTHER
 address:        Address
 e-mail:         dbtest@ripe.net
 admin-c:        TP1-DB-TEST

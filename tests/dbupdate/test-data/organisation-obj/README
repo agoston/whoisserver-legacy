@@ -102,7 +102,7 @@
 
 
 # CASE 9: Create an org object
-#         with "org-type: NON-REGISTRY" but without
+#         with "org-type: OTHER" but without
 #         a mntner in "mnt-by:" which is in ORG_POWER_MNT config
 #         variable. Still should succeed. 
 #

@@ -1,6 +1,6 @@
 organisation:  ORG-PE1-DB-TEST
 org-name:      Person &    EXAMPLE1 EXAMPLE2
-org-type:      NON-REGISTRY
+org-type:      OTHER
 address:       Address
 e-mail:        dbtest@ripe.net
 admin-c:       TP1-DB-TEST

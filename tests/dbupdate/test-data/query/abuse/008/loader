@@ -89,7 +89,7 @@ source:       DB-TEST
 
 organisation:  ORG-TEST1-DB-TEST
 org-name:      EXAMPLE TTTTTT
-org-type:      NON-REGISTRY
+org-type:      OTHER
 address:       Address
 e-mail:        dbtest@ripe.net
 admin-c:       TP1-DB-TEST

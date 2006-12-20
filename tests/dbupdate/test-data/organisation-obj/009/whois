@@ -1,6 +1,6 @@
 organisation:  ORG-Eoof1-DB-TEST
 org-name:      EXAMPLE organisation object for tests
-org-type:      NON-REGISTRY
+org-type:      OTHER
 address:       Address
 e-mail:        dbtest@ripe.net
 admin-c:       TP1-DB-TEST
