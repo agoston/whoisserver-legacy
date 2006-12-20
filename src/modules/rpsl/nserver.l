@@ -8,11 +8,6 @@
   notes:
     Tokens are defined in the associated grammar, nserver.y.
 
-//<<<<<<< nserver.l
-//  $Id: nserver.l,v 1.4 2006/10/17 13:38:15 katie Exp $
-//=======
-  $Id: nserver.l,v 1.3.2.1 2006/09/29 12:32:29 katie Exp $
-//>>>>>>> 1.3.2.1
 */
 
 /******************
@@ -137,10 +132,6 @@ void
 nserver_reset ()
 {
     yy_flush_buffer(YY_CURRENT_BUFFER);
-}
-int yywrap ()
-{
-    return(1);
 }
 
 

@@ -567,11 +567,6 @@ char *nservertext;
   notes:
     Tokens are defined in the associated grammar, nserver.y.
 
-//<<<<<<< nserver.l
-//  $Id: nserver.l,v 1.4 2006/10/17 13:38:15 katie Exp $
-//=======
-  $Id: nserver.l,v 1.3.2.1 2006/09/29 12:32:29 katie Exp $
-//>>>>>>> 1.3.2.1
 */
 
 /******************
@@ -603,7 +598,7 @@ char *nservertext;
                  label may not start with '-'
                  last label (TLD) must have at least one letter
 */
-#line 59 "nserver.l"
+#line 54 "nserver.l"
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
@@ -616,7 +611,7 @@ void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
 #define YY_INPUT(buf,result,max_size) yy_input(buf,&result,max_size)
-#line 620 "nserver.lex.c"
+#line 615 "nserver.lex.c"
 
 #define INITIAL 0
 
@@ -769,10 +764,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 73 "nserver.l"
+#line 68 "nserver.l"
 
 
-#line 776 "nserver.lex.c"
+#line 771 "nserver.lex.c"
 
 	if ( !(yy_init) )
 		{
@@ -858,12 +853,12 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 75 "nserver.l"
+#line 70 "nserver.l"
 { ; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 77 "nserver.l"
+#line 72 "nserver.l"
 { 
 
     ip_addr_t ptr;
@@ -883,7 +878,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 94 "nserver.l"
+#line 89 "nserver.l"
 {
     ip_addr_t ptr;
     int retval;
@@ -901,7 +896,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 109 "nserver.l"
+#line 104 "nserver.l"
 {
     ip_addr_t ptr;
     int retval;
@@ -919,7 +914,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 124 "nserver.l"
+#line 119 "nserver.l"
 {
     if (strlen(nservertext) > 255) 
     {
@@ -930,15 +925,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 132 "nserver.l"
+#line 127 "nserver.l"
 { return nservertext[0]; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 134 "nserver.l"
+#line 129 "nserver.l"
 ECHO;
 	YY_BREAK
-#line 942 "nserver.lex.c"
+#line 937 "nserver.lex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1924,7 +1919,7 @@ void nserverfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 134 "nserver.l"
+#line 129 "nserver.l"
 
 
 
