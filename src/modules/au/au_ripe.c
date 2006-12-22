@@ -448,7 +448,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
       LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: changing to ASSIGNED PA");
 
       parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
-          "ALLOCATED UNSPECIFIED", "ALLOCATED PA", "LIR-PARTITIONED PA", "SUB-ALLOCATED PA", "ASSIGNED PA", NULL);
+          "ALLOCATED UNSPECIFIED", "ALLOCATED PA", "LIR-PARTITIONED PA", "SUB-ALLOCATED PA", "ASSIGNED PA", "EARLY-REGISTRATION", NULL);
 
       if (parent_status_ok)
       {
@@ -467,7 +467,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
       LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: changing to ASSIGNED PI");
 
       parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
-          "ALLOCATED UNSPECIFIED", "ALLOCATED PI", "LIR-PARTITIONED PI", "SUB-ALLOCATED PI", "ASSIGNED PI", NULL);
+          "ALLOCATED UNSPECIFIED", "ALLOCATED PI", "LIR-PARTITIONED PI", "SUB-ALLOCATED PI", "ASSIGNED PI", "EARLY-REGISTRATION", NULL);
 
       if (parent_status_ok)
       {
