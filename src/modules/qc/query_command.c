@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.6.2.2 $
+  $Revision: 1.7 $
 
   Query command module (qc).  This is what the whois query gets stored as in
   memory.
@@ -994,8 +994,8 @@ int QC_fill (const char *query_str,
           int   upper = 0;
           int   lower = 0;
           int   count = 0; /* two possible ASNs in a range */
-          long  begin_asnum = 0;
-          long  end_asnum = 0;
+          unsigned long  begin_asnum = 0;
+          unsigned long  end_asnum = 0;
           keycopy = UT_strdup(query_command->keys);
           while ( ptr = strstr(query_command->keys, "AS0.") ) {
             /* fix the format */
