@@ -339,8 +339,8 @@ static int create_asblock_query(GString *query_str,
 				Query_command *qc) {
   char *keycopy = UT_strdup(qc->keys);
   char *token, *cursor = keycopy;
-  unsigned long  begin_asnum = 0;
-  unsigned long  end_asnum = 0;
+  long  begin_asnum = 0;
+  long  end_asnum = 0;
   int   upper = 0;
   int   lower = 0;
   int   count = 0; /* two possible ASNs in a range */

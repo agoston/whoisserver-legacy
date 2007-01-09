@@ -194,7 +194,7 @@ char *host;
 
 
 /* Convert AS# into integer */
-static int convert_as(const char *as, unsigned long *asnum)
+static int convert_as(const char *as, long *asnum)
 {
 char *ptr;
 int   upper = 0;
@@ -221,7 +221,7 @@ int   lower = 0;
 }
 
 /* Convert AS range (AS4321 - AS5672) into numbers */
-int convert_as_range(const char *as_range, unsigned long *begin, unsigned long *end)
+int convert_as_range(const char *as_range, long *begin, long *end)
 {
 char *range;
 char *token;
@@ -1121,7 +1121,7 @@ unsigned int begin_in, end_in;
 ip_v6word_t  high, low;
 ip_v6word_t high_ipv6, low_ipv6;
 
-unsigned long begin_as, end_as;
+long begin_as, end_as;
 char * set_name;
 char * rf_host; /* needs to be freed after use*/
 int rf_type, rf_port;
@@ -1625,7 +1625,7 @@ Transaction_t *tr = (Transaction_t *)result_ptr;
 const char *query_fmt;
 unsigned int prefix, prefix_length;
 unsigned int begin_in, end_in;
-unsigned long begin_as, end_as;
+long begin_as, end_as;
 ip_prefix_t prefstr;
 ip_range_t  rangstr;
 ip_v6word_t i6_msb, i6_lsb;

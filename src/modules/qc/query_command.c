@@ -994,8 +994,8 @@ int QC_fill (const char *query_str,
           int   upper = 0;
           int   lower = 0;
           int   count = 0; /* two possible ASNs in a range */
-          unsigned long  begin_asnum = 0;
-          unsigned long  end_asnum = 0;
+          long  begin_asnum = 0;
+          long  end_asnum = 0;
           keycopy = UT_strdup(query_command->keys);
           while ( ptr = strstr(query_command->keys, "AS0.") ) {
             /* fix the format */
