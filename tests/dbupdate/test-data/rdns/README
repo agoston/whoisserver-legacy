@@ -347,4 +347,188 @@
 #FAILURE
 #
 # RESULT 037: creation will fail
+# rdns tests
+# CASE 38: create /12 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 38: creation will pass
+# rdns tests
+# CASE 39: Create succeeds - testing decomposition on /24 level.
+# override used to skip dns checks
+#
+# create domain objects
+#
+#SUCCESS
+#
+# RESULT 39: creation will succeed
 
+
+# rdns tests
+# CASE 40: create /16
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 40: creation will pass
+# rdns tests
+# CASE 41: create /20 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 41: creation will pass
+# rdns tests
+# CASE 42: create /24 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 42: creation will pass
+# rdns tests
+# CASE 43: create /28 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 43: creation will pass
+# rdns tests
+# CASE 44: create /32 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 44: creation will pass
+# rdns tests
+# CASE 45: create /48 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 45: creation will pass
+# rdns tests
+# CASE 46: create /64 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 46: creation will pass
+# rdns tests
+# CASE 47: Create /8 domain object ipv4
+# override used to pass dns checks
+#
+# create domain objects
+#
+#SUCCESS
+#
+# RESULT 47: creation will succeed
+# rdns tests
+# CASE 48: Create /16 domain object ipv4
+# override used to pass dns checks
+#
+# create domain objects
+#
+#SUCCESS
+#
+# RESULT 48: creation will succeed
+# rdns tests
+# CASE 49: Create /24 domain object ipv4
+# override used to pass dns checks
+#
+# create domain objects
+#
+#SUCCESS
+#
+# RESULT 49: creation will succeed
+# rdns tests
+# CASE 50: Create /32 domain object ipv4
+# no override
+#
+# create domain objects
+#
+#FAILURE
+#
+# RESULT 50: creation will fail
+# rdns tests
+# CASE 51: create /128 domain object
+# inet6num exists and authorised
+# no override
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 51: creation will fail
+# rdns tests
+# CASE 52: create /44 domain object
+# inet6num exists and authorised
+# no override
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 51: creation will fail
+# rdns tests
+# CASE 53: create /68 domain object
+# inet6num exists and authorised
+# no override
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 53: creation will fail
+# rdns tests
+# CASE 54: create /8 domain object ipv6
+# inet6num exists and authorised
+# no override
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 54: creation will fail
+# rdns tests
+# CASE 55: Create classless ipv4, with a '-' (classless delegation)
+# no override
+#
+# create domain objects
+#
+#FAILURE
+#
+# RESULT 55: creation will fail
+# rdns tests
+# CASE 056: 
+#
+# create 1.e164.arpa domain object
+# making sure we don't accept glue records in ip6.arpa/in-addr.arpa
+#
+#FAILURE
+#
+# RESULT 056: creation will fail

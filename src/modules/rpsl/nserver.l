@@ -79,8 +79,8 @@ void yy_input(char *buf, int *result, int max_size);
     switch (retval) {
       /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
         all the rest is parser error */
-      case IP_OK: return TKN_IPV4;
-                  break;
+      case IP_OK: return TKN_IPV4; 
+                  break; 
       default: syntax_error("IP address \"%s\" contains invalid IP address", yytext);
                   break;
     }
@@ -121,6 +121,7 @@ void yy_input(char *buf, int *result, int max_size);
     {
        syntax_error("Hostname \"%s\" is too long", yytext);
     }
+    nserverlval.sval = strdup(yytext);
     return TKN_HOSTNAME; 
 }
 

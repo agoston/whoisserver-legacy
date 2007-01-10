@@ -869,8 +869,8 @@ YY_RULE_SETUP
     switch (retval) {
       /* we explicitly mention the errors from ip module that cannot be catched by the parser, 
         all the rest is parser error */
-      case IP_OK: return TKN_IPV4;
-                  break;
+      case IP_OK: return TKN_IPV4; 
+                  break; 
       default: syntax_error("IP address \"%s\" contains invalid IP address", nservertext);
                   break;
     }
@@ -920,20 +920,21 @@ YY_RULE_SETUP
     {
        syntax_error("Hostname \"%s\" is too long", nservertext);
     }
+    nserverlval.sval = strdup(nservertext);
     return TKN_HOSTNAME; 
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 127 "nserver.l"
+#line 128 "nserver.l"
 { return nservertext[0]; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 129 "nserver.l"
+#line 130 "nserver.l"
 ECHO;
 	YY_BREAK
-#line 937 "nserver.lex.c"
+#line 938 "nserver.lex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1919,7 +1920,7 @@ void nserverfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 129 "nserver.l"
+#line 130 "nserver.l"
 
 
 

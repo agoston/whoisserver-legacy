@@ -31,27 +31,44 @@
   ***************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 
 int yyerror(const char *s);
 %}
 
+%union {
+  char *sval;
+}
+
+
 %token TKN_IPV6
 %token TKN_IPV6DC
 %token TKN_IPV4
-%token TKN_HOSTNAME
+%token <sval> TKN_HOSTNAME
 
 %%
 
-nserver: TKN_HOSTNAME
-| ipv4_glue
-| ipv6_glue
+nserver: TKN_HOSTNAME {
+}
+| ipv4_glue {
+}
+| ipv6_glue {
+}
 ;
 
-ipv4_glue: TKN_HOSTNAME TKN_IPV4
+ipv4_glue: TKN_HOSTNAME TKN_IPV4 {
+  check_glue($1);
+}
 ;
 
-ipv6_glue: TKN_HOSTNAME TKN_IPV6
-| TKN_HOSTNAME TKN_IPV6DC
+ipv6_glue: TKN_HOSTNAME TKN_IPV6 {
+  check_glue($1);
+}
+| TKN_HOSTNAME TKN_IPV6DC {
+  check_glue($1);
+}
+;
+
 ;
 
 %%
@@ -66,3 +83,32 @@ nservererror (const char *s)
     return 0;
 }
 
+int check_glue (char *hostname) {
+  char *suffix = NULL;
+  char *v4tree = NULL;
+  char *v6tree = NULL;
+  int glue = 0;
+
+  v4tree = (char *) strdup(".in-addr.arpa");
+  v6tree = (char *) strdup(".ip6.arpa");
+
+  if (strlen(hostname) > strlen(v4tree)) {
+    suffix = hostname + strlen (hostname) - strlen(v4tree);
+    if (strcasecmp (suffix, v4tree) == 0) {
+      glue = 1;
+    }
+  }
+  if (strlen(hostname) > strlen(v6tree)) {
+    suffix = hostname + strlen (hostname) - strlen(v6tree);
+    if (strcasecmp (suffix, v6tree) == 0) {
+      glue = 1;
+    }
+  }
+  free(v4tree);
+  free(v6tree);
+
+  if (glue == 1) {
+    syntax_error("Glue records in in-addr.arpa/ip6.arpa are not accepted");
+  }
+  return glue;
+}

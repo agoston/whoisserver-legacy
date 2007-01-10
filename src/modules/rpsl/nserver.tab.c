@@ -111,6 +111,7 @@
   ***************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 
 int yyerror(const char *s);
 
@@ -129,7 +130,12 @@ int yyerror(const char *s);
 #endif
 
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-typedef int YYSTYPE;
+#line 39 "nserver.y"
+typedef union YYSTYPE {
+  char *sval;
+} YYSTYPE;
+/* Line 191 of yacc.c.  */
+#line 139 "nserver.tab.c"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
@@ -141,7 +147,7 @@ typedef int YYSTYPE;
 
 
 /* Line 214 of yacc.c.  */
-#line 145 "nserver.tab.c"
+#line 151 "nserver.tab.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -315,7 +321,7 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned char yyrline[] =
 {
-       0,    45,    45,    46,    47,    50,    53,    54
+       0,    51,    51,    53,    55,    59,    64,    67
 };
 #endif
 
@@ -1008,11 +1014,50 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-      
+        case 2:
+#line 51 "nserver.y"
+    {
+;}
+    break;
+
+  case 3:
+#line 53 "nserver.y"
+    {
+;}
+    break;
+
+  case 4:
+#line 55 "nserver.y"
+    {
+;}
+    break;
+
+  case 5:
+#line 59 "nserver.y"
+    {
+  check_glue(yyvsp[-1].sval);
+;}
+    break;
+
+  case 6:
+#line 64 "nserver.y"
+    {
+  check_glue(yyvsp[-1].sval);
+;}
+    break;
+
+  case 7:
+#line 67 "nserver.y"
+    {
+  check_glue(yyvsp[-1].sval);
+;}
+    break;
+
+
     }
 
 /* Line 1010 of yacc.c.  */
-#line 1016 "nserver.tab.c"
+#line 1061 "nserver.tab.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1237,7 +1282,7 @@ yyreturn:
 }
 
 
-#line 57 "nserver.y"
+#line 74 "nserver.y"
 
 
 #undef nservererror
@@ -1250,4 +1295,33 @@ nservererror (const char *s)
     return 0;
 }
 
+int check_glue (char *hostname) {
+  char *suffix = NULL;
+  char *v4tree = NULL;
+  char *v6tree = NULL;
+  int glue = 0;
+
+  v4tree = (char *) strdup(".in-addr.arpa");
+  v6tree = (char *) strdup(".ip6.arpa");
+
+  if (strlen(hostname) > strlen(v4tree)) {
+    suffix = hostname + strlen (hostname) - strlen(v4tree);
+    if (strcasecmp (suffix, v4tree) == 0) {
+      glue = 1;
+    }
+  }
+  if (strlen(hostname) > strlen(v6tree)) {
+    suffix = hostname + strlen (hostname) - strlen(v6tree);
+    if (strcasecmp (suffix, v6tree) == 0) {
+      glue = 1;
+    }
+  }
+  free(v4tree);
+  free(v6tree);
+
+  if (glue == 1) {
+    syntax_error("Glue records in in-addr.arpa/ip6.arpa are not accepted");
+  }
+  return glue;
+}
 

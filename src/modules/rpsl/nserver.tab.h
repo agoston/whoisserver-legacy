@@ -44,7 +44,12 @@
 
 
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-typedef int YYSTYPE;
+#line 39 "nserver.y"
+typedef union YYSTYPE {
+  char *sval;
+} YYSTYPE;
+/* Line 1285 of yacc.c.  */
+#line 53 "nserver.tab.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
