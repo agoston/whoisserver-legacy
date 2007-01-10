@@ -4,9 +4,9 @@
 #
 # create inetnum object 
 #
-#FAILURE
+#SUCCESS
 #
-# RESULT 9: The creation will fail
+# RESULT 9: The creation will succeed
 
 inetnum:      192.168.200.0 - 192.168.200.255
 netname:      RIPE-NET1
