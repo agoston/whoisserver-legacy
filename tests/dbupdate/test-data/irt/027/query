@@ -19,7 +19,7 @@ address:      Singel 258
 e-mail:       dbtest@ripe.net
 admin-c:      TP22-DB-TEST
 tech-c:       TP22-DB-TEST
-auth:         CRYPT-PW agl7a6gyad/e6   # irt
+auth:         MD5-PW $1$12345678$wza1MMo7nPUnBHNJMOMq3.   # irt
 mnt-by:       TEST-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
@@ -29,7 +29,7 @@ address:      Singel 258
 e-mail:       dbtest@ripe.net
 admin-c:      TP32-DB-TEST
 tech-c:       TP32-DB-TEST
-auth:         CRYPT-PW agl7a6gyad/e6   # irt
+auth:         MD5-PW $1$12345678$wza1MMo7nPUnBHNJMOMq3.   # irt
 mnt-by:       TEST-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST

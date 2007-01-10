@@ -16,7 +16,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  TEST-MNT
-auth:    CRYPT-PW dbOnSHFpKZTBU  # auth
+auth:    MD5-PW $1$12345678$Y5n.GDFOxpXd2S1etuHFa/  # auth
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 delete: reason

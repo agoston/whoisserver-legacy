@@ -22,7 +22,7 @@ mntner:       TEST-DBM-MNT
 descr:        Mntner for RIPE DBM objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-DBM-MNT
 referral-by:  TEST-DBM-MNT
@@ -36,7 +36,7 @@ mntner:       RIPE-NCC-HM-MNT
 descr:        RIPE-NCC Hostmaster Maintainer
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+auth:         MD5-PW $1$12345678$NN4rSWChzZ4bTTjt90C8L.    # hostmaster
 upd-to:       dbtest@ripe.net
 mnt-by:       RIPE-NCC-HM-MNT
 referral-by:  TEST-DBM-MNT
@@ -92,7 +92,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 upd-to:       dbtest@ripe.net
 mnt-nfy:      dbtest@ripe.net
-auth:         CRYPT-PW qw/1tg5lrjsbc   # LIR
+auth:         MD5-PW $1$12345678$ctXe/33SiImj97lXBf4Mw0   # LIR
 notify:       dbtest@ripe.net
 mnt-by:       LIR-MNT
 referral-by:  TEST-DBM-MNT
@@ -106,7 +106,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 upd-to:       dbtest@ripe.net
 mnt-nfy:      dbtest@ripe.net
-auth:         CRYPT-PW zx9oM5YWRGx4Y   # LIR2
+auth:         MD5-PW $1$12345678$D2/aB9pxCgbsMQpLtmVTh0   # LIR2
 notify:       dbtest@ripe.net
 mnt-by:       LIR2-MNT
 referral-by:  TEST-DBM-MNT
@@ -120,7 +120,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 upd-to:       dbtest@ripe.net
 mnt-nfy:      dbtest@ripe.net
-auth:         CRYPT-PW podwrQ7gU8Ly2   # LIR3
+auth:         MD5-PW $1$12345678$Py/4N1lXsAcJBGkqQrk640   # LIR3
 notify:       dbtest@ripe.net
 mnt-by:       LIR3-MNT
 referral-by:  TEST-DBM-MNT

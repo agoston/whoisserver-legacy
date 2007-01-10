@@ -22,7 +22,7 @@ mntner:       TEST-DBM-MNT
 descr:        Mntner for RIPE DBM objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-DBM-MNT
 referral-by:  TEST-DBM-MNT
@@ -36,7 +36,7 @@ mntner:       RIPE-NCC-HM-MNT
 descr:        RIPE-NCC Hostmaster Maintainer
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+auth:         MD5-PW $1$12345678$NN4rSWChzZ4bTTjt90C8L.    # hostmaster
 upd-to:       dbtest@ripe.net
 mnt-by:       RIPE-NCC-HM-MNT
 referral-by:  TEST-DBM-MNT
@@ -94,7 +94,7 @@ mnt-nfy: case016-1@ripe.net
 upd-to:  case016-2@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  TEST1-MNT
-auth:    CRYPT-PW akN18jLcs2Eb.  # notif
+auth:    MD5-PW $1$12345678$SIBQPl5nyxRNyPwpV5rFR1  # notif
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
@@ -105,7 +105,7 @@ mnt-nfy: case016-3@ripe.net
 upd-to:  case016-4@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  TEST2-MNT
-auth:    CRYPT-PW akN18jLcs2Eb.  # notif
+auth:    MD5-PW $1$12345678$SIBQPl5nyxRNyPwpV5rFR1  # notif
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 

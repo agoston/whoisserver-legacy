@@ -22,7 +22,7 @@ mntner:       TEST-DBM-MNT
 descr:        Mntner for RIPE DBM objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-DBM-MNT
 referral-by:  TEST-DBM-MNT
@@ -36,7 +36,7 @@ mntner:       RIPE-NCC-HM-MNT
 descr:        RIPE-NCC Hostmaster Maintainer
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+auth:         MD5-PW $1$12345678$NN4rSWChzZ4bTTjt90C8L.    # hostmaster
 upd-to:       dbtest@ripe.net
 mnt-by:       RIPE-NCC-HM-MNT
 referral-by:  TEST-DBM-MNT
@@ -95,7 +95,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  CHILD-MB-MNT
-auth:    CRYPT-PW mbOJDvQ92mEH6  # mb-child
+auth:    MD5-PW $1$12345678$28Jr/8MuLiKvwiHIYC1C21  # mb-child
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
@@ -105,7 +105,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  PARENT-ROUTE-MB-MNT
-auth:    CRYPT-PW mbJu5ZHnhRD3E  # mbr-parent
+auth:    MD5-PW $1$12345678$C4SV4tvGlNzAZ2WbHlO1h0  # mbr-parent
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
@@ -115,7 +115,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  PARENT-INETNUM-MB-MNT
-auth:    CRYPT-PW mbhkl.cipoP9.  # mbi-parent
+auth:    MD5-PW $1$12345678$gstFsI6qeiN9pwDIth8pr1  # mbi-parent
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
@@ -125,7 +125,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  EXACT-ROUTE-MB-MNT
-auth:    CRYPT-PW mbInfZx5dRb6M  # mbr-exact
+auth:    MD5-PW $1$12345678$5BcosrrSYg6o6dd7Y3Njs.  # mbr-exact
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
@@ -135,7 +135,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  EXACT-INETNUM-MB-MNT
-auth:    CRYPT-PW mb/akeGBA.tag  # mbi-exact
+auth:    MD5-PW $1$12345678$AFX.FXWoEsfqJUYWs4hX8.  # mbi-exact
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 

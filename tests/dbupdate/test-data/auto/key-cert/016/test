@@ -22,7 +22,7 @@ mntner:       TEST-MNT
 descr:        Mntner for DB TEST objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW dbOnSHFpKZTBU  # auth
+auth:         MD5-PW $1$12345678$Y5n.GDFOxpXd2S1etuHFa/  # auth
 auth:         AUTO-2
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-MNT

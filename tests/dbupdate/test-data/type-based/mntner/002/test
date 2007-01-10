@@ -17,7 +17,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 upd-to:       dbtest@ripe.net
 mnt-nfy:      dbtest@ripe.net
-auth:         CRYPT-PW asMa4KAw.CNBs   # test-mnt
+auth:         MD5-PW $1$12345678$DZettN2OiFrUh7nWm5Hu/1   # test-mnt
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       TEST1-MNT

@@ -22,7 +22,7 @@ mntner:       TEST-DBM-MNT
 descr:        Mntner for RIPE DBM objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-DBM-MNT
 referral-by:  TEST-DBM-MNT
@@ -36,7 +36,7 @@ mntner:       RIPE-NCC-HM-MNT
 descr:        RIPE-NCC Hostmaster Maintainer
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+auth:         MD5-PW $1$12345678$NN4rSWChzZ4bTTjt90C8L.    # hostmaster
 upd-to:       dbtest@ripe.net
 mnt-by:       RIPE-NCC-HM-MNT
 referral-by:  TEST-DBM-MNT
@@ -94,7 +94,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  CHILD-MB-MNT
-auth:    CRYPT-PW mbOJDvQ92mEH6  # mb-child
+auth:    MD5-PW $1$12345678$28Jr/8MuLiKvwiHIYC1C21  # mb-child
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
@@ -104,7 +104,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  PARENT-MB-MNT
-auth:    CRYPT-PW mb.rCrpt/0PXk  # mb-parent
+auth:    MD5-PW $1$12345678$G.oSSx.FZsRJWiXhhfDD21  # mb-parent
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
@@ -114,7 +114,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  PARENT-ML-MNT
-auth:    CRYPT-PW mlelX5y0jJcvc  # ml-parent
+auth:    MD5-PW $1$12345678$/iBm2/pCiHFyPqSAiUHyI1  # ml-parent
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
@@ -124,7 +124,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  PARENT-MR-MNT
-auth:    CRYPT-PW mrX0MMmm2FFeY  # mr-parent
+auth:    MD5-PW $1$12345678$9CtqUE3cI5b86PUAhP90p0  # mr-parent
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
@@ -134,7 +134,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  ORIGIN-MB-MNT
-auth:    CRYPT-PW mbJGqE.dpnXD.  # mb-origin
+auth:    MD5-PW $1$12345678$trXVUy8x5HyizFaU0CHT51  # mb-origin
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
@@ -144,7 +144,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  ORIGIN-ML-MNT
-auth:    CRYPT-PW mlDqfTsIv1vB6  # ml-origin
+auth:    MD5-PW $1$12345678$0D0reGeFBPYowpN2PHKDP/  # ml-origin
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
@@ -154,7 +154,7 @@ admin-c: TP1-DB-TEST
 upd-to:  dbtest@ripe.net
 referral-by: TEST-DBM-MNT
 mnt-by:  ORIGIN-MR-MNT
-auth:    CRYPT-PW mr.PcUr9M6rrA  # mr-origin
+auth:    MD5-PW $1$12345678$gKLHiPhaIfaniZB0kSZuB1  # mr-origin
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 

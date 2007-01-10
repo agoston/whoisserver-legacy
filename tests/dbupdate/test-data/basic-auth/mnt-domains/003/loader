@@ -23,7 +23,7 @@ mntner:       TEST-DBM-MNT
 descr:        Mntner for RIPE DBM objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-DBM-MNT
 referral-by:  TEST-DBM-MNT
@@ -37,7 +37,7 @@ mntner:       MNTDOMAINS-DBM-MNT
 descr:        Mntner for RIPE DBM objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 upd-to:       dbtest@ripe.net
 mnt-by:       MNTDOMAINS-DBM-MNT
 referral-by:  MNTDOMAINS-DBM-MNT

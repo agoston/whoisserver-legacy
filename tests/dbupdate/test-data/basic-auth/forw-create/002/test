@@ -16,7 +16,7 @@ mntner:       TEST-MNT
 descr:        Mntner
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW qw7BVMLJG6Q6M   # test
+auth:         MD5-PW $1$12345678$oEitTZYQtRHfNGmsFvTBA/   # test
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-MNT
 referral-by:  TEST-DBM-MNT

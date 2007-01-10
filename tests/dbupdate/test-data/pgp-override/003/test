@@ -11,7 +11,7 @@ descr:        Mntner for RIPE DBM objects.........
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 upd-to:       dbtest@ripe.net
-auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 mnt-by:       TEST-DBM-MNT
 referral-by:  TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
