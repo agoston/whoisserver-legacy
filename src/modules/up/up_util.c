@@ -2053,6 +2053,43 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval = UP_FAIL;
     goto up_process_object_exit;
   }
+  
+	/* crypt-pw deprecation */
+	{
+		GList *attr = rpsl_object_get_attr(object, "auth"); 
+		while (attr) {
+			char *value = rpsl_attr_get_clean_value((rpsl_attr_t *)(attr->data));
+			if (!strncmp(value, "CRYPT-PW", 8)) {	/* if it's crypt-pw */
+				fprintf(stderr, "%s\n", value);
+				
+				// look in the old object
+				GList *old_attr = rpsl_object_get_attr(old_object, "auth");
+				gboolean found = FALSE;
+				while (old_attr) {
+					char *old_value = rpsl_attr_get_clean_value((rpsl_attr_t *)(old_attr->data));
+					if (!strcmp(old_value, value)) {
+						found = TRUE;
+						break;
+					}
+					
+					old_attr = g_list_next(old_attr);
+					free(old_value);
+				}
+			    rpsl_attr_delete_list(old_attr);
+			    
+			    if (!found) {
+				    rpsl_attr_delete_list(attr);
+				    RT_cryptpw_not_allowed(rt_ctx);
+				    retval = UP_FAIL;
+				    goto up_process_object_exit;
+			    }
+			}
+			attr = g_list_next(attr);
+			free(value);
+		}
+	}
+  
+  
   preproc_obj = rpsl_object_copy(object);
 
   /* perform a set of pre-processing operations and checks on the object */

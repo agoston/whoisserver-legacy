@@ -4,15 +4,6 @@
 
 LG_context_t* cr_ctx;
 
-/*
-  This is the credential data structure.
- */
-typedef struct {
-  CR_type type;
-  char* value;
-  gboolean valid;
-} cr_credential_t;
-
 void CR_init(LG_context_t* ctx ) {
   cr_ctx = ctx;
 }
@@ -33,6 +24,7 @@ CR_credential_t* CR_credential_new(CR_type type, const char* value,
   credential->type = type;
   credential->value = g_strchomp(strdup(value));
   credential->valid = valid;
+  credential->deprecated = FALSE;
 
   return (CR_credential_t*) credential;
 }
@@ -102,32 +94,28 @@ gboolean CR_credential_get_validity(CR_credential_t* credential) {
 #include "../au/misc.c" //An hack for now.
 extern char *crypt(const char *key, const char *salt);
 
-gboolean cr_check_crypted(const gchar* plain, const gchar* crypted) {
+gboolean cr_check_crypted(const gchar * plain, const gchar * crypted)
+{
+	gchar *my_crypted;
 
-  gchar* my_crypted;
+	LG_log(cr_ctx, LG_FUNC, ">cr_check_crypted entered plain [%s] crypted [%s]", plain, crypted);
 
-  LG_log(cr_ctx, LG_FUNC, ">cr_check_crypted entered plain [%s] crypted [%s]",
-                                        plain, crypted);
+	if (crypted[0] == '$') {
+		my_crypted = crypt_md5(plain, crypted);
+		if (strcmp(my_crypted, (char *)crypted) == 0) {
+			LG_log(cr_ctx, LG_FUNC, "<cr_check_crypted exiting with TRUE");
+			return TRUE;
+		}
+	} else {
+		my_crypted = crypt(plain, crypted);
+		if (strcmp(my_crypted, crypted) == 0) {
+			LG_log(cr_ctx, LG_FUNC, "<cr_check_crypted exiting with TRUE");
+			return TRUE;
+		}
+	}
 
-  if (crypted[0] == '$') {
-    my_crypted = crypt_md5(plain, crypted);
-    if (strcmp(my_crypted, (char*)crypted) == 0) {
-      LG_log(cr_ctx, LG_FUNC, "<cr_check_crypted exiting with TRUE");
-      return TRUE;
-    }
-  }
-  else {
-    my_crypted = crypt(plain, crypted);
-    if (strcmp(my_crypted, crypted) == 0) {
-      // BUG, no need free(my_crypted);
-      LG_log(cr_ctx, LG_FUNC, "<cr_check_crypted exiting with TRUE");
-      return TRUE;
-    }
-    //free(my_crypted);
-  }
-
-  LG_log(cr_ctx, LG_FUNC, "<cr_check_crypted exiting with FALSE");
-  return FALSE;
+	LG_log(cr_ctx, LG_FUNC, "<cr_check_crypted exiting with FALSE");
+	return FALSE;
 }
 
 /*
@@ -141,36 +129,37 @@ gboolean cr_check_crypted(const gchar* plain, const gchar* crypted) {
 
   return - TRUE if the credential is contained AND valid, FALSE if not
  */
-gboolean CR_credential_list_check(GList* list,
-  CR_type type, const char *value, gboolean include_invalid) {
+gboolean CR_credential_list_check(GList * list, CR_type type, const char *value, gboolean include_invalid)
+{
 
-  cr_credential_t* credential;
-  gboolean retval;
+	cr_credential_t *credential;
+	gboolean retval;
 
-  LG_log(cr_ctx, LG_FUNC, ">CR_credential_list_check entered with type [%s] value [%s]",
-                                CR_type2str(type), value);
+	LG_log(cr_ctx, LG_FUNC, ">CR_credential_list_check entered with type [%s] value [%s]", CR_type2str(type), value);
 
-  if (type != CR_PASSWORD && type != CR_OVERRIDE) {
-    retval = CR_credential_list_has_credential(list, type,
-                                                  value, include_invalid);
-    LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with %s", 
-                                  retval ? "TRUE" : "FALSE");
-    return retval;
-  }
-  while(list) {
-    credential = (cr_credential_t*) list->data;
-    if (credential->type == type &&
-        cr_check_crypted(credential->value, value)) {
-      if (CR_credential_get_validity(credential) || include_invalid) {
-        LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with TRUE");
-        return TRUE;
-      }
-    }
-    list = list->next;
-  }
+	if (type != CR_PASSWORD && type != CR_OVERRIDE) {
+		retval = CR_credential_list_has_credential(list, type, value, include_invalid);
+		LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with %s", retval ? "TRUE" : "FALSE");
+		return retval;
+	}
+	while (list) {
+		credential = (cr_credential_t *) list->data;
+		if (credential->type == type && cr_check_crypted(credential->value, value)) {
+			if (CR_credential_get_validity(credential) || include_invalid) {
+				/* for Crypt-PW deprecation */
+				if (value[0] != '$') {	/* if it's crypt */
+					credential->deprecated = TRUE;
+				} 
+				
+				LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with TRUE");
+				return TRUE;
+			}
+		}
+		list = list->next;
+	}
 
-  LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with FALSE");
-  return FALSE;
+	LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with FALSE");
+	return FALSE;
 }
 
 /*

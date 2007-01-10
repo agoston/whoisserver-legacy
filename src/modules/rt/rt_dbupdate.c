@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.12 $
+  $Revision: 1.13 $
 
   Reporting module.
 
@@ -1187,6 +1187,27 @@ void RT_non_exist_mntner(RT_context_t* ctx, const gchar* mntner) {
 
 
 /*+
+  RT_deprecated_auth - Reports usage of a deprecated authentication method
+  +*/
+void RT_deprecated_auth(RT_context_t* ctx, const gchar* mntner) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"deprecated_auth");
+  rt_xml_node_add_content(node, (xmlChar*)mntner);
+  rt_prepare_node(ctx, node);
+}
+
+/*+
+  RT_deprecated_auth - Reports usage of a deprecated authentication method
+  +*/
+void RT_cryptpw_not_allowed(RT_context_t* ctx) {
+  xmlNodePtr node;
+  node = xmlNewNode(NULL, (xmlChar*)"cryptpw_not_allowed");
+  rt_prepare_node(ctx, node);
+}
+
+
+/*+
   RT_non_exist_irt - Reports a non existent irt
   +*/
 void RT_non_exist_irt(RT_context_t* ctx, gchar* irt) {
@@ -1210,7 +1231,6 @@ void RT_non_exist_org(RT_context_t* ctx, const gchar* org) {
 }
 
 
-
 /*+
   RT_parent_not_exist - Report that object has no parent in the DB
 
@@ -1223,6 +1243,7 @@ void RT_parent_not_exist(RT_context_t* ctx) {
 
   rt_prepare_node(ctx, node);
 }
+
 
 /*+
   RT_rdns_ds_not_accepted - Report that we don't accept DS records for this zone

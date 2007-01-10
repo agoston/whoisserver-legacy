@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.12 $
+  $Revision: 1.13 $
 
   Reporting module.
 
@@ -180,6 +180,8 @@ void RT_RIP_update_ok(RT_context_t* ctx);
   AS, IRT, mnt, org
  */
 void RT_non_exist_mntner(RT_context_t* ctx, const gchar* mntner);
+void RT_deprecated_auth(RT_context_t* ctx, const gchar* mntner);
+void RT_cryptpw_not_allowed(RT_context_t* ctx);
 void RT_parent_not_exist(RT_context_t* ctx);
 void RT_overlap_inetnums(RT_context_t* ctx, GList *overlap);
 void RT_origin_not_exist(RT_context_t* ctx);

@@ -16,6 +16,15 @@ typedef enum {
   CR_FROM
 } CR_type;
 
+/*
+  This is the credential data structure.
+ */
+typedef struct {
+  CR_type type;
+  char* value;
+  gboolean valid, deprecated;
+} cr_credential_t;
+
 /* convert the enum to a printable string */
 #define CR_type2str(r) \
   (((r) == CR_PASSWORD)     ? "CR_PASSWORD" : \
