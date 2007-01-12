@@ -147,7 +147,7 @@ gboolean CR_credential_list_check(GList * list, CR_type type, const char *value,
 		if (credential->type == type && cr_check_crypted(credential->value, value)) {
 			if (CR_credential_get_validity(credential) || include_invalid) {
 				/* for Crypt-PW deprecation */
-				if (value[0] != '$') {	/* if it's crypt */
+				if (type != CR_OVERRIDE && value[0] != '$') {	/* if it's crypt */
 					credential->deprecated = TRUE;
 				} 
 				

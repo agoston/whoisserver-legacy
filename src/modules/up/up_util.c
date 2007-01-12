@@ -2060,22 +2060,24 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 		while (attr) {
 			char *value = rpsl_attr_get_clean_value((rpsl_attr_t *)(attr->data));
 			if (!strncmp(value, "CRYPT-PW", 8)) {	/* if it's crypt-pw */
-				fprintf(stderr, "%s\n", value);
+				//fprintf(stderr, "%s\n", value);
+				gboolean found = FALSE;
 				
 				// look in the old object
-				GList *old_attr = rpsl_object_get_attr(old_object, "auth");
-				gboolean found = FALSE;
-				while (old_attr) {
-					char *old_value = rpsl_attr_get_clean_value((rpsl_attr_t *)(old_attr->data));
-					if (!strcmp(old_value, value)) {
-						found = TRUE;
-						break;
+				if (old_object) {
+					GList *old_attr = rpsl_object_get_attr(old_object, "auth");
+					while (old_attr) {
+						char *old_value = rpsl_attr_get_clean_value((rpsl_attr_t *)(old_attr->data));
+						if (!strcmp(old_value, value)) {
+							found = TRUE;
+							break;
+						}
+						
+						old_attr = g_list_next(old_attr);
+						free(old_value);
 					}
-					
-					old_attr = g_list_next(old_attr);
-					free(old_value);
+				    rpsl_attr_delete_list(old_attr);
 				}
-			    rpsl_attr_delete_list(old_attr);
 			    
 			    if (!found) {
 				    rpsl_attr_delete_list(attr);
@@ -2087,6 +2089,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 			attr = g_list_next(attr);
 			free(value);
 		}
+	    rpsl_attr_delete_list(attr);
 	}
   
   
