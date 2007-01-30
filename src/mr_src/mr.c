@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.7 $
+  $Revision: 1.1 $
 
   Wrapper for NRTM client
 
@@ -65,6 +65,7 @@ int c;
 int errflg=0;
 int pid;
 char *filter_name="./ripe2rpsl";
+char *source_name=NULL;
 LG_context_t *null_ctx;
 
   /* NULL logging for these, since we don't care */
@@ -75,7 +76,7 @@ LG_context_t *null_ctx;
 
      if(argc<4) errflg++;
 
-     while ((c = getopt(argc, argv, "l:h:p:f:?")) != EOF)
+     while ((c = getopt(argc, argv, "l:h:p:f:s:?")) != EOF)
      switch (c) {
       case 'l':
 	listen_port = atoi(optarg);
@@ -89,13 +90,16 @@ LG_context_t *null_ctx;
       case 'f':
         filter_name = optarg;
 	break;	
+      case 's':
+        source_name = optarg;
+  break;
       case '?':
       default :
 	errflg++;
 	break;
      }
      if (errflg) {
-	fprintf(stderr,"usage: mr -l listen_port -h mirror_server -p port [-f convertor]\n");
+	fprintf(stderr,"usage: mr -l listen_port -h mirror_server -p port [-f convertor] [-s alt_source]\n");
 	exit (2);
      }
 
@@ -112,6 +116,16 @@ LG_context_t *null_ctx;
      SK_cd_gets(&client_conn, input, MAX_INPUT_SIZE);
      fprintf(stderr, "input:[%s]\n", input);
 
+     /* replace the source in -g query if alternative source specified */
+     if ((source_name != NULL) && (strstr (input, "-g") != NULL)) {
+       char buf[10];
+       char *rest;
+       fprintf(stderr, "alternative source specified:[%s]\n", source_name);
+       rest = strdup(strstr (input, ":") + 1);
+       sprintf (input, "-g %s:%s", source_name, rest);
+       fprintf(stderr, "input changed to:[%s]\n", input);
+       free(rest);
+     }
 
      /* create socket to connect to the server */
      if ((server_socket=socket(AF_INET, SOCK_STREAM, 0))==-1){
