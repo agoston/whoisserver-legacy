@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5 $
+  $Revision: 1.6 $
 
   Example code: A thread.
 
@@ -47,299 +47,184 @@
 #include <stdio.h>
 #include <strings.h>
 
-//typedef struct th_args {
-//	void *function;
-//	int sock;
-//} th_args;
+/**************************************************
+*                                                 *
+*     Readers/Writers lock that favors READERS    *
+*                (recursive!)                     *
+*                                                 *
+**************************************************/
+void TH_acquire_read_lock(rw_lock_t * prw_lock)
+{
+	pthread_t thread_id = pthread_self();
+
+	pthread_mutex_lock(&prw_lock->rw_mutex);
+
+	/* if we got an rw lock, we can get read lock as well */ 
+	while ((prw_lock->rw_count > 0) && !pthread_equal(prw_lock->thread_id, thread_id)) {
+		pthread_cond_wait(&prw_lock->rw_cond, &prw_lock->rw_mutex);
+	}
+	prw_lock->r_count++;
+
+	pthread_mutex_unlock(&prw_lock->rw_mutex);
+
+}
+
+
+void TH_release_read_lock(rw_lock_t * prw_lock)
+{
+	pthread_mutex_lock(&prw_lock->rw_mutex);
+
+	if (prw_lock->r_count > 0)
+		prw_lock->r_count--;
+
+	pthread_cond_signal(&prw_lock->rw_cond);
+
+	pthread_mutex_unlock(&prw_lock->rw_mutex);
+}
+
+
+void TH_acquire_write_lock(rw_lock_t * prw_lock)
+{
+	pthread_t thread_id = pthread_self();
+
+	pthread_mutex_lock(&prw_lock->rw_mutex);
+
+	while ((prw_lock->r_count > 0) || ((prw_lock->rw_count > 0) && !pthread_equal(prw_lock->thread_id, thread_id))) {
+		pthread_cond_wait(&prw_lock->rw_cond, &prw_lock->rw_mutex);
+	}
+
+	prw_lock->rw_count++;
+	prw_lock->thread_id = thread_id;
+	pthread_mutex_unlock(&prw_lock->rw_mutex);
+}
+
+
+
+void TH_release_write_lock(rw_lock_t * prw_lock)
+{
+	pthread_t thread_id = pthread_self();
+
+	pthread_mutex_lock(&prw_lock->rw_mutex);
+
+	if (pthread_equal(prw_lock->thread_id, thread_id) && (prw_lock->rw_count > 0))
+		prw_lock->rw_count--;
+
+	if (!prw_lock->rw_count) prw_lock->thread_id = 0;
+
+	pthread_cond_broadcast(&prw_lock->rw_cond);
+	pthread_mutex_unlock(&prw_lock->rw_mutex);
+}
+
+
+
+void TH_init_read_write_lock(rw_lock_t * prw_lock)
+{
+	pthread_mutex_init(&prw_lock->rw_mutex, NULL);
+	pthread_cond_init(&prw_lock->rw_cond, NULL);
+	pthread_cond_init(&prw_lock->w_cond, NULL);
+	pthread_cond_init(&prw_lock->r_cond, NULL);
+	prw_lock->rw_count = 0;
+	prw_lock->r_count = 0;
+	prw_lock->thread_id = 0;
+}
 
 /*************************************************
 *                                                *
-*     Readers Writes Locks that favor READERS    *
+*     Readers/Writes Locks that favor WRITERS    *
+*                (recursive!)                    *
 *                                                *
 *************************************************/
-/* TH_acquire_read_lock() */
-/*++++++++++++++++++++++++++++++++++++++
+void TH_acquire_read_lockw(rw_lock_t * prw_lock)
+{
+	pthread_t thread_id = pthread_self();
 
-  Aquire a readers lock.
+	pthread_mutex_lock(&prw_lock->rw_mutex);
 
-  rw_lock_t *prw_lock Readers writers lock.
+	/* if we got an rw lock, we can get read lock as well */
+	while ((prw_lock->rw_count > 0) && !pthread_equal(prw_lock->thread_id, thread_id)) {
+		pthread_cond_wait(&prw_lock->rw_cond, &prw_lock->rw_mutex);
+	}
+	prw_lock->r_count++;
 
-  Reference: "Multithreaded Programming Techniques - Prasad p.192"
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_read_lock(rw_lock_t *prw_lock) {
-  struct timespec to;
+	pthread_mutex_unlock(&prw_lock->rw_mutex);
+}
 
-  to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
-  to.tv_nsec = 0;
-  pthread_mutex_lock(&prw_lock->rw_mutex);
 
-  while (prw_lock->rw_count < 0) {
-    pthread_cond_timedwait(&prw_lock->rw_cond, &prw_lock->rw_mutex, &to);
-  }
 
-  ++prw_lock->rw_count;
-  pthread_mutex_unlock(&prw_lock->rw_mutex);
+void TH_release_read_lockw(rw_lock_t * prw_lock)
+{
+	pthread_mutex_lock(&prw_lock->rw_mutex);
 
-} /* TH_acquire_read_lock() */
+	if (prw_lock->r_count > 0)
+		prw_lock->r_count--;
 
-/* TH_release_read_lock() */
-/*++++++++++++++++++++++++++++++++++++++
+	if ((prw_lock->rw_count > 0) && (prw_lock->r_count == 0))
+		pthread_cond_signal(&prw_lock->r_cond);
 
-  Release a readers lock.
+	pthread_mutex_unlock(&prw_lock->rw_mutex);
+}
 
-  rw_lock_t *prw_lock Readers writers lock.
 
-  Reference: "Multithreaded Programming Techniques - Prasad p.192"
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_read_lock(rw_lock_t *prw_lock) {
-  pthread_mutex_lock(&prw_lock->rw_mutex);
 
-  --prw_lock->rw_count;
+void TH_acquire_write_lockw(rw_lock_t * prw_lock)
+{
+	pthread_t thread_id = pthread_self();
 
-  if (!prw_lock->rw_count) {
-    pthread_cond_signal(&prw_lock->rw_cond);
-  }
+	pthread_mutex_lock(&prw_lock->rw_mutex);
 
-  pthread_mutex_unlock(&prw_lock->rw_mutex);
+	if (pthread_equal(prw_lock->thread_id, thread_id)) {
+		prw_lock->rw_count++;
 
-} /* TH_release_read_lock() */
+	} else {
+		/* check for writers */
+		while (prw_lock->rw_count > 0) {
+			pthread_cond_wait(&prw_lock->w_cond, &prw_lock->rw_mutex);
+		}
 
-/* TH_acquire_write_lock() */
-/*++++++++++++++++++++++++++++++++++++++
+		prw_lock->rw_count++;
+		prw_lock->thread_id = thread_id;
 
-  Aquire a writers lock.
+		/* wait until all readers are gone */
+		while (prw_lock->r_count > 0) {
+			pthread_cond_wait(&prw_lock->r_cond, &prw_lock->rw_mutex);
+		}
+	}
 
-  rw_lock_t *prw_lock Readers writers lock.
+	pthread_mutex_unlock(&prw_lock->rw_mutex);
+}
 
-  Reference: "Multithreaded Programming Techniques - Prasad p.192"
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_write_lock(rw_lock_t *prw_lock) {
-  struct timespec to;
 
-  to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
-  to.tv_nsec = 0;
 
-  pthread_mutex_lock(&prw_lock->rw_mutex);
+void TH_release_write_lockw(rw_lock_t * prw_lock)
+{
+	pthread_mutex_lock(&prw_lock->rw_mutex);
+	
+	if (prw_lock->rw_count > 0)
+		prw_lock->rw_count--;
 
-  while (prw_lock->rw_count != 0) {
-    pthread_cond_timedwait(&prw_lock->rw_cond, &prw_lock->rw_mutex, &to);
-  }
+	if (!prw_lock->rw_count) {
+		prw_lock->thread_id = 0;
+		/* signal to an other thread waiting for write lock first */
+		pthread_cond_signal(&prw_lock->w_cond);
+		/* signal to other threads waiting for read lock */
+		pthread_cond_broadcast(&prw_lock->rw_cond);
+	}		
 
-  prw_lock->rw_count = -1;
-  pthread_mutex_unlock(&prw_lock->rw_mutex);
+	pthread_mutex_unlock(&prw_lock->rw_mutex);
+}
 
-} /* TH_acquire_write_lock() */
 
-/* TH_release_write_lock() */
-/*++++++++++++++++++++++++++++++++++++++
 
-  Release a writers lock.
-
-  rw_lock_t *prw_lock Readers writers lock.
-
-  Reference: "Multithreaded Programming Techniques - Prasad p.192"
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_write_lock(rw_lock_t *prw_lock) {
-  pthread_mutex_lock(&prw_lock->rw_mutex);
-  prw_lock->rw_count = 0;
-  pthread_mutex_unlock(&prw_lock->rw_mutex);
-  pthread_cond_broadcast(&prw_lock->rw_cond);
-
-} /* TH_release_write_lock() */
-
-/* TH_init_read_write_lock() */
-/*++++++++++++++++++++++++++++++++++++++
-
-  Initialize a readers/writers lock.
-
-  rw_lock_t *prw_lock Readers writers lock.
-
-  Side effect: the lock is set to open(?)
-
-  Reference: "Multithreaded Programming Techniques - Prasad p.192"
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-void TH_init_read_write_lock(rw_lock_t *prw_lock) {
-  pthread_mutex_init(&prw_lock->rw_mutex, NULL);
-  pthread_cond_init(&prw_lock->rw_cond, NULL);
-  pthread_cond_init(&prw_lock->w_cond, NULL);
-  prw_lock->rw_count = 0;
-  prw_lock->w_count = 1; /* just in case one uses wrong interface */
-
-} /* TH_init_read_write_lock() */
-
-/*************************************************
-*                                                *
-*     Readers Writes Locks that favor WRITERS    *
-*                                                *
-*************************************************/
-/* TH_acquire_read_lockw() */
-/*++++++++++++++++++++++++++++++++++++++
-
-  Aquire a readers lock.
-
-  rw_lock_t *prw_lock Readers writers lock.
-
-  Reference: "Multithreaded Programming Techniques - Prasad p.192"
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_read_lockw(rw_lock_t *prw_lock) {
-  struct timespec to;
-
-  to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
-  to.tv_nsec = 0;
-
-  pthread_mutex_lock(&prw_lock->rw_mutex);
-
-  while (prw_lock->w_count != 0) {
-    pthread_cond_timedwait(&prw_lock->w_cond, &prw_lock->rw_mutex, &to);
-  }
-
-  ++prw_lock->rw_count;
-  pthread_mutex_unlock(&prw_lock->rw_mutex);
-
-} /* TH_acquire_read_lockw() */
-
-/* TH_release_read_lockw() */
-/*++++++++++++++++++++++++++++++++++++++
-
-  Release a readers lock.
-
-  rw_lock_t *prw_lock Readers writers lock.
-
-  Reference: "Multithreaded Programming Techniques - Prasad p.192"
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_read_lockw(rw_lock_t *prw_lock) {
-  pthread_mutex_lock(&prw_lock->rw_mutex);
-
-  --prw_lock->rw_count;
-
-  if (!prw_lock->rw_count) {
-    pthread_cond_signal(&prw_lock->rw_cond);
-  }
-
-  pthread_mutex_unlock(&prw_lock->rw_mutex);
-
-} /* TH_release_read_lockw() */
-
-/* TH_acquire_write_lockw() */
-/*++++++++++++++++++++++++++++++++++++++
-
-  Aquire a writers lock.
-
-  rw_lock_t *prw_lock Readers writers lock.
-
-  Reference: "Multithreaded Programming Techniques - Prasad p.192"
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-void TH_acquire_write_lockw(rw_lock_t *prw_lock) {
-  struct timespec to;
-
-  to.tv_sec = time(NULL) + CONDWAITTIMEOUT; /* Wait for a second, at most */
-  to.tv_nsec = 0;
-
-  pthread_mutex_lock(&prw_lock->rw_mutex);
-
- /* check for writers */
-  while (prw_lock->w_count != 0) {
-    pthread_cond_timedwait(&prw_lock->w_cond, &prw_lock->rw_mutex, &to);
-  }
-
-  prw_lock->w_count = 1;
-
- /* wait until all readers are gone */
-  while (prw_lock->rw_count != 0) {
-    pthread_cond_timedwait(&prw_lock->rw_cond, &prw_lock->rw_mutex, &to);
-  }
-
-  pthread_mutex_unlock(&prw_lock->rw_mutex);
-
-} /* TH_acquire_write_lockw() */
-
-/* TH_release_write_lockw() */
-/*++++++++++++++++++++++++++++++++++++++
-
-  Release a writers lock.
-
-  rw_lock_t *prw_lock Readers writers lock.
-
-  Reference: "Multithreaded Programming Techniques - Prasad p.192"
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-void TH_release_write_lockw(rw_lock_t *prw_lock) {
-  pthread_mutex_lock(&prw_lock->rw_mutex);
-  prw_lock->w_count = 0;
-  pthread_mutex_unlock(&prw_lock->rw_mutex);
-  pthread_cond_broadcast(&prw_lock->w_cond);
-
-} /* TH_release_write_lockw() */
-
-/* TH_init_read_write_lockw() */
-/*++++++++++++++++++++++++++++++++++++++
-
-  Initialize a readers/writers lock.
-
-  rw_lock_t *prw_lock Readers writers lock.
-
-  Side effect: the lock is set to open(?)
-
-  Reference: "Multithreaded Programming Techniques - Prasad p.192"
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-void TH_init_read_write_lockw(rw_lock_t *prw_lock) {
-  pthread_mutex_init(&prw_lock->rw_mutex, NULL);
-  pthread_cond_init(&prw_lock->rw_cond, NULL);
-  pthread_cond_init(&prw_lock->w_cond, NULL);
-  prw_lock->rw_count = 0;
-  prw_lock->w_count = 0;
-
-} /* TH_init_read_write_lockw() */
-
+void TH_init_read_write_lockw(rw_lock_t * prw_lock)
+{
+	pthread_mutex_init(&prw_lock->rw_mutex, NULL);
+	pthread_cond_init(&prw_lock->rw_cond, NULL);
+	pthread_cond_init(&prw_lock->w_cond, NULL);
+	pthread_cond_init(&prw_lock->r_cond, NULL);
+	prw_lock->rw_count = 0;
+	prw_lock->r_count = 0;
+	prw_lock->thread_id = 0;
+}
 
 
 /*************************************************
@@ -349,7 +234,7 @@ void TH_init_read_write_lockw(rw_lock_t *prw_lock) {
 *************************************************/
 
 
-int TH_get_id(void) {
+inline int TH_get_id(void) {
 
   return (int)pthread_self();
 
@@ -395,7 +280,8 @@ char *TH_to_string(void) {
 	andrei
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-pthread_t TH_create(void *do_function(void *), void *arguments) {
+pthread_t TH_create(void *do_function(void *), void *arguments)
+{
 	pthread_t tid;
 	pthread_attr_t attr;
 	int ret;
@@ -425,7 +311,6 @@ pthread_t TH_create(void *do_function(void *), void *arguments) {
 	pthread_attr_destroy(&attr);
 
 	return tid;
-
 }
 
 /* This function is called for macros 'die' and 'dieif', both defined in stubs.h
@@ -443,19 +328,27 @@ _syscall0(pid_t,gettid)
 pid_t gettid(void);
 #endif
 
+volatile int dying = 0;
+
 void do_nice_die(int line, char *file) {
-	char *command = ca_get_command_on_die;
-	fprintf(stderr,"died: +%d %s\n",line, file);
+	if (!dying) {
+		char *command = ca_get_command_on_die;
+		dying = 1;
+		fprintf(stderr," *** died: +%d %s\n",line, file);
 
 #ifdef __linux__
-	if (command) {
-		char buf[1024];
-		fprintf(stderr, "Backtrace:\n");
-		snprintf(buf, 1024, command, gettid());
-		system(buf);
-	}
+		if (command) {
+			char buf[1024];
+			fprintf(stderr, " *** Backtrace:\n");
+			snprintf(buf, 1024, command, gettid());
+			system(buf);
+		}
 #endif
 
-	/* that's the legacy way to bail out - it generates a segfault, so core can be dumped if needed */
-	*((int*)NULL)=0;
+		/* that's the legacy way to bail out - it generates a segfault, so core can be dumped if needed */
+		//*((int*)NULL)=0;
+	
+		// this is the more 1337 way to dump core
+	}
+	(*orig_segfault_handler)(11);
 }

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.12 $
+  $Revision: 1.13 $
 
   Example code: A server for a client to connect to.
 
@@ -601,247 +601,239 @@ void SV_concurrent_server(int sock, int limit,  char *name,
   +html+ <A HREF=".DBrc">.properties</A>
 
   ++++++++++++++++++++++++++++++++++++++*/
-int SV_start(char *pidfile) {
-  int whois_port = -1;
-  int config_port = -1;
-  int mirror_port = -1;
-  int update_port = -1;
-  int update_mode = 0;
-  int pid_fd;
-  int nwrite;
-  struct timeval tval;
-  char starttime[128];
-  char server_pid[16];
-  ca_dbSource_t *source_hdl;
-  char *source_name;
-  int source;
-  char *db_host, *db_name, *db_user, *db_passwd;
-  int db_port;
-  SQ_connection_t *db_connection;
-  int shutdown_pipe[2];
-  int retval=1;
-  struct rlimit rlim;
-  struct pollfd ufds;
+int SV_start(char *pidfile)
+{
+	int whois_port = -1;
+	int config_port = -1;
+	int mirror_port = -1;
+	int update_port = -1;
+	int update_mode = 0;
+	int pid_fd;
+	int nwrite;
+	struct timeval tval;
+	char starttime[128];
+	char server_pid[16];
+	ca_dbSource_t *source_hdl;
+	char *source_name;
+	int source;
+	char *db_host, *db_name, *db_user, *db_passwd;
+	int db_port;
+	SQ_connection_t *db_connection;
+	int shutdown_pipe[2];
+	int retval = 1;
+	struct rlimit rlim;
+	struct pollfd ufds;
+	struct rlimit myrlimit = { RLIM_INFINITY, RLIM_INFINITY };
 
-  /* Store the starting time */
-  gettimeofday(&tval, NULL);
-  SV_starttime = tval.tv_sec;/* seconds since Jan. 1, 1970 */
+	/* Store the starting time */
+	gettimeofday(&tval, NULL);
+	SV_starttime = tval.tv_sec;	/* seconds since Jan. 1, 1970 */
 
-  /* Log the starting time */
-  ctime_r(&SV_starttime, starttime);
-  LG_log(sv_context, LG_INFO, "Server is started %s", starttime);
+	/* Log the starting time */
+	ctime_r(&SV_starttime, starttime);
+	LG_log(sv_context, LG_INFO, "Server is started %s", starttime);
 
-  /* Create our shutdown pipe */
-  if (pipe(shutdown_pipe) != 0) {
-      LG_log(sv_context, LG_SEVERE,
-                "error %d creating shutdown pipe; %s", errno, strerror(errno));
-      return(-1);
-  }
-  SV_shutdown_send_fd = shutdown_pipe[1];
-  SV_shutdown_recv_fd = shutdown_pipe[0];
+	/* Create our shutdown pipe */
+	if (pipe(shutdown_pipe) != 0) {
+		LG_log(sv_context, LG_SEVERE, "error %d creating shutdown pipe; %s", errno, strerror(errno));
+		return (-1);
+	}
+	SV_shutdown_send_fd = shutdown_pipe[1];
+	SV_shutdown_recv_fd = shutdown_pipe[0];
 
-  /* Store the PID of the process */
-  SV_pidfile = pidfile;
-  /* create the file read-writable by the process owner */
-  if((pid_fd=open(SV_pidfile,  O_CREAT | O_TRUNC | O_WRONLY, 0600))==-1) {
-      LG_log(sv_context, LG_ERROR, "cannot open pid file %s", SV_pidfile);
-      return(-1);
-  }
-  sprintf(server_pid, "%d", (int)getpid());
-  nwrite=write(pid_fd, server_pid, strlen(server_pid) );
-  close(pid_fd);
-  if(nwrite != strlen(server_pid)) {
-      LG_log(sv_context, LG_ERROR, "cannot write to pid file %s", SV_pidfile);
-      return(-1);
-  }
+	/* Store the PID of the process */
+	SV_pidfile = pidfile;
+	/* create the file read-writable by the process owner */
+	if ((pid_fd = open(SV_pidfile, O_CREAT | O_TRUNC | O_WRONLY, 0600)) == -1) {
+		LG_log(sv_context, LG_ERROR, "cannot open pid file %s", SV_pidfile);
+		return (-1);
+	}
+	sprintf(server_pid, "%d", (int)getpid());
+	nwrite = write(pid_fd, server_pid, strlen(server_pid));
+	close(pid_fd);
+	if (nwrite != strlen(server_pid)) {
+		LG_log(sv_context, LG_ERROR, "cannot write to pid file %s", SV_pidfile);
+		return (-1);
+	}
 
+	/* Initialise modules */
+	/* XXX: must be handled previously!!! */
+	/*SK_init(); */
+	/*PW_init(); */
 
-  /* Initialise modules */
-  /* XXX: must be handled previously!!! */
-  /*SK_init();*/
-  /*PW_init();*/
+	/* Initialise the access control list. */
+	AC_build();
+	AC_acc_load();
+	AC_persistence_init();
+	/* explicitly start the decay & persistence threads */
+	TH_create((void *(*)(void *))AC_decay, NULL);
+	TH_create((void *(*)(void *))AC_persistence_daemon, NULL);
 
-  /* Initialise the access control list. */
-  AC_build();
-  AC_acc_load();
-  AC_persistence_init();
-  /* explicitly start the decay & persistence threads */
-  TH_create((void *(*)(void *))AC_decay, NULL);
-  TH_create((void *(*)(void *))AC_persistence_daemon, NULL);
-
-  /* Get port information for each service */
-  whois_port  = ca_get_svwhois_port;
-  LG_log(sv_context, LG_INFO, "whois port is %d", whois_port);
+	/* Get port information for each service */
+	whois_port = ca_get_svwhois_port;
+	LG_log(sv_context, LG_INFO, "whois port is %d", whois_port);
 /*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "whois port is %d", whois_port); */
 
-  config_port = ca_get_svconfig_port;
-  LG_log(sv_context, LG_INFO, "config port is %d", config_port);
+	config_port = ca_get_svconfig_port;
+	LG_log(sv_context, LG_INFO, "config port is %d", config_port);
 /*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "config port is %d", config_port); */
 
-
-  mirror_port = ca_get_svmirror_port;
-  LG_log(sv_context, LG_INFO, "mirror port is %d", mirror_port);
+	mirror_port = ca_get_svmirror_port;
+	LG_log(sv_context, LG_INFO, "mirror port is %d", mirror_port);
 /*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "mirror port is %d", mirror_port);*/
 
+	/* 6. Create a socket on the necessary ports/addresses and bind to them. */
+	/* whois socket */
+	SV_whois_sock = SK_getsock(SOCK_STREAM, whois_port, 128, INADDR_ANY);
+	fprintf(stderr, "Whois  port: %d\n", whois_port);
+	/* config interface socket */
+	SV_config_sock = SK_getsock(SOCK_STREAM, config_port, 5, INADDR_ANY);
+	fprintf(stderr, "Config port: %d\n", config_port);
+	/* nrt socket */
+	SV_mirror_sock = SK_getsock(SOCK_STREAM, mirror_port, 128, INADDR_ANY);
+	fprintf(stderr, "Mirror port: %d\n", mirror_port);
+	/* per source update ports */
+	for (source = 0; (source_hdl = ca_get_SourceHandleByPosition(source)) != NULL; source++) {
+		update_mode = ca_get_srcmode(source_hdl);
+		if (IS_UPDATE(update_mode)) {
+			update_port = ca_get_srcupdateport(source_hdl);
+			SV_update_sock[source] = SK_getsock(SOCK_STREAM, update_port, 128, INADDR_ANY);
+			fprintf(stderr, "Update port: %d for %s\n", update_port, source_hdl);
+		} else {
+			SV_update_sock[source] = 0;
+		}
+	}
 
-  /* 6. Create a socket on the necessary ports/addresses and bind to them. */
-  /* whois socket */
-  SV_whois_sock = SK_getsock(SOCK_STREAM, whois_port, 128, INADDR_ANY);
-  fprintf(stderr,"Whois  port: %d\n",whois_port);
-  /* config interface socket */
-  SV_config_sock = SK_getsock(SOCK_STREAM, config_port, 5, INADDR_ANY);
-  fprintf(stderr,"Config port: %d\n",config_port);
-  /* nrt socket */
-  SV_mirror_sock = SK_getsock(SOCK_STREAM,mirror_port, 128, INADDR_ANY);
-  fprintf(stderr,"Mirror port: %d\n",mirror_port);
-  /* per source update ports */
-  for (source=0;
-       (source_hdl = ca_get_SourceHandleByPosition(source))!=NULL;
-       source++){
-    update_mode = ca_get_srcmode(source_hdl);
-    if(IS_UPDATE(update_mode)) {
-      update_port = ca_get_srcupdateport(source_hdl);
-      SV_update_sock[source] =
-        SK_getsock(SOCK_STREAM, update_port, 128, INADDR_ANY);
-      fprintf(stderr,"Update port: %d for %s\n", update_port, source_hdl);
-    } else {
-      SV_update_sock[source] = 0;
-    }
-  }
+	/* (after 6). Drop root privileges, if any */
+	if (getuid() != 0) {
+		fprintf(stderr, "Not running as root, keeping current uid and gid\n");
+	} else {
+		struct passwd *passwent;
+		char *procuser;
+		int lenproc;
 
-  /* (after 6). Drop root privileges, if any */
-  if (getuid() != 0) {
-    fprintf(stderr,"Not running as root, keeping current uid and gid\n");
-  } else {
-    struct passwd *passwent;
-    char *procuser;
-    int lenproc;
+		fprintf(stderr, "*Running* as root, dropping privileges:\n");
+		procuser = strdup(ca_get_processuser);
 
-    fprintf(stderr,"*Running* as root, dropping privileges:\n");
-    procuser=strdup(ca_get_processuser);
+		/* chop off any trailing newline */
+		lenproc = strlen(procuser);
+		if ((lenproc > 0) && (procuser[lenproc - 1] == '\n')) {
+			procuser[lenproc - 1] = '\0';
+		}
 
-    /* chop off any trailing newline */
-    lenproc = strlen(procuser);
-    if ((lenproc > 0) && (procuser[lenproc-1] == '\n'))
-    {
-      procuser[lenproc-1] = '\0';
-    }
+		passwent = getpwnam(procuser);
+		if (passwent == NULL) {
+			fprintf(stderr, " getpwnam failed for %s - %s\n", procuser, strerror(errno));
+			die;
+		}
+		if ((setgid(passwent->pw_gid)) != 0) {
+			fprintf(stderr, "can't setgid(%d)\n", passwent->pw_gid);
+			die;
+		}
+		fprintf(stderr, "Gid: %d ", passwent->pw_gid);
+		if ((setegid(passwent->pw_gid)) != 0) {
+			fprintf(stderr, "can't setegid(%d)\n", passwent->pw_gid);
+			die;
+		}
+		fprintf(stderr, "Egid: %d ", passwent->pw_gid);
+		if ((setuid(passwent->pw_uid)) != 0) {
+			fprintf(stderr, "can't setuid(%d)\n", passwent->pw_uid);
+			die;
+		}
+		fprintf(stderr, "Uid: %d ", passwent->pw_uid);
+		if ((seteuid(passwent->pw_uid)) != 0) {
+			fprintf(stderr, "can't seteuid(%d)\n", passwent->pw_uid);
+			die;
+		}
+		fprintf(stderr, "Euid: %d ", passwent->pw_uid);
+		fprintf(stderr, ".\n");
+	}
 
-    passwent = getpwnam(procuser);
-    if (passwent == NULL) {
-      fprintf(stderr," getpwnam failed for %s - %s\n",
-        procuser,strerror(errno));
-      die;
-    }
-    if ((setgid(passwent->pw_gid)) != 0) {
-      fprintf(stderr,"can't setgid(%d)\n",passwent->pw_gid);
-      die;
-    }
-    fprintf(stderr,"Gid: %d ",passwent->pw_gid);
-    if ((setegid(passwent->pw_gid)) != 0) {
-      fprintf(stderr,"can't setegid(%d)\n",passwent->pw_gid);
-      die;
-    }
-    fprintf(stderr,"Egid: %d ",passwent->pw_gid);
-    if ((setuid(passwent->pw_uid)) != 0) {
-      fprintf(stderr,"can't setuid(%d)\n",passwent->pw_uid);
-      die;
-    }
-    fprintf(stderr,"Uid: %d ",passwent->pw_uid);
-    if ((seteuid(passwent->pw_uid)) != 0) {
-      fprintf(stderr,"can't seteuid(%d)\n",passwent->pw_uid);
-      die;
-    }
-    fprintf(stderr,"Euid: %d ",passwent->pw_uid);
-    fprintf(stderr,".\n");
-  }
+#ifdef __linux__
+	if (prctl(PR_SET_DUMPABLE, 1) < 0) {
+		perror("prctl(PR_SET_DUMPABLE)");
+	}
+#endif
 
-  /* Set Dumpable flag - Linux specific TODO */
-  /* Removed 20060321 - add it prior to distribution */
-  //if (prctl(PR_SET_DUMPABLE,1,0,0,0)<0) {
-  //  fprintf(stderr,"Warning: Can't set DUMPABLE status\n");
-  //}
+	setrlimit(RLIMIT_CORE, &myrlimit);
 
-/*  SV_whois_sock = SK_getsock(SOCK_STREAM,whois_port,whois_addr); */
+	/* Check every Database and create sockets */
+	/* we need first to create and bind all of them */
+	/* so that in case of failure we do not start any */
+	/* update thread */
+	fprintf(stderr, "Check the DB\n");
+	for (source = 0; (source_hdl = ca_get_SourceHandleByPosition(source)) != NULL; source++) {
+		/* check for crash and recover if needed */
+		/* make a connection to a database */
+		db_host = ca_get_srcdbmachine(source_hdl);
+		db_port = ca_get_srcdbport(source_hdl);
+		db_name = ca_get_srcdbname(source_hdl);
+		db_user = ca_get_srcdbuser(source_hdl);
+		db_passwd = ca_get_srcdbpassword(source_hdl);
+		db_connection = SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
+		/* now check TR record */
+		TR_recover(db_connection, source_hdl, sv_context);
+		/* free resources */
+		SQ_close_connection(db_connection);
+		UT_free(db_host);
+		UT_free(db_name);
+		UT_free(db_user);
+		UT_free(db_passwd);
+	}
+	SV_update_sock[source + 1] = -1;	/* end of socket array */
 
-  /* Check every Database and create sockets */
-  /* we need first to create and bind all of them */
-  /* so that in case of failure we do not start any */
-  /* update thread */
-  fprintf(stderr, "Check the DB\n");
-  for(source=0; (source_hdl = ca_get_SourceHandleByPosition(source))!=NULL ; source++){
-     /* check for crash and recover if needed */
-     /* make a connection to a database */
-     db_host = ca_get_srcdbmachine(source_hdl);
-     db_port = ca_get_srcdbport(source_hdl);
-     db_name = ca_get_srcdbname(source_hdl);
-     db_user = ca_get_srcdbuser(source_hdl);
-     db_passwd = ca_get_srcdbpassword(source_hdl);
-     db_connection=SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
-     /* now check TR record */
-     TR_recover(db_connection, source_hdl, sv_context);
-     /* free resources */
-     SQ_close_connection(db_connection);
-     UT_free(db_host);
-     UT_free(db_name);
-     UT_free(db_user);
-     UT_free(db_passwd);
-  }
-  SV_update_sock[source+1]=-1; /* end of socket array */
+	/* Create master thread for config threads */
+	SV_concurrent_server(SV_config_sock, 0, "config", PC_interact);
 
-  /* Create master thread for config threads */
-  SV_concurrent_server(SV_config_sock, 0, "config", PC_interact);
+	/* Initialise the radix trees
+	   Don't allow any connections until this is done - there is no use of it
+	   as the radix trees are locked and no queries nor updates can succeed,
+	   just end up in a connection timeout */
+	fprintf(stderr, "Loading the radix trees...");
+	radix_init();
+	radix_load();
+	fprintf(stderr, " done.\n");
 
-  /* Initialise the radix trees
-     Don't allow any connections until this is done - there is no use of it
-     as the radix trees are locked and no queries nor updates can succeed,
-     just end up in a connection timeout */
-  fprintf(stderr, "Loading the radix trees...");
-  radix_init();
-  radix_load();
-  fprintf(stderr, " done.\n");
+	/* Now.... accept() calls block until they get a connection
+	   so to listen on more than one port we need more
+	   than one thread */
 
-  /* Now.... accept() calls block until they get a connection
-     so to listen on more than one port we need more
-     than one thread */
+	/* Create master thread for whois threads */
+	/* The max number of threads for queries has been increased from 64 to 128 (Engin 20040614) */
+	SV_concurrent_server(SV_whois_sock, 128, "whois", PW_interact);
+	/* Create master thread for mirror threads */
+	SV_concurrent_server(SV_mirror_sock, 0, "mirror", PM_interact);
 
-  /* Create master thread for whois threads */
-  /* The max number of threads for queries has been increased from 64 to 128 (Engin 20040614) */
-  SV_concurrent_server(SV_whois_sock, 128, "whois", PW_interact);
-  /* Create master thread for mirror threads */
-  SV_concurrent_server(SV_mirror_sock, 0, "mirror", PM_interact);
+	/* Walk through the sources and */
+	/* run update thread for every source with CANUPD == 'y' */
 
+	for (source = 0; (source_hdl = ca_get_SourceHandleByPosition(source)) != NULL; source++) {
+		source_name = ca_get_srcname(source_hdl);
 
-  /* Walk through the sources and */
-  /* run update thread for every source with CANUPD == 'y' */
+		fprintf(stderr, "Source [%s] Mode STATIC\n", source_name);
+		LG_log(sv_context, LG_INFO, "Source [%s] Mode STATIC", source_name);
+		UT_free(source_name);	/* because ca_* functions return copies */
+	}
+	/* terminate the thread */
+	/* XXX not return becase then we terminate the whole process */
 
-   for(source=0; (source_hdl = ca_get_SourceHandleByPosition(source))!=NULL ; source++){
-     source_name= ca_get_srcname(source_hdl);
+	/* Loop until the server goes down */
+	ufds.fd = SV_shutdown_recv_fd;
+	ufds.events = POLLIN | POLLPRI;
+	ufds.revents = 0;
+	while (1) {
 
-     fprintf(stderr,"Source [%s] Mode STATIC\n", source_name);
-     LG_log(sv_context, LG_INFO, "Source [%s] Mode STATIC", source_name);
-     UT_free(source_name); /* because ca_* functions return copies */
-   }
-  /* terminate the thread */
-  /* XXX not return becase then we terminate the whole process */
+		retval = poll(&ufds, 1, 500);
+		if ((retval != 0) && (ufds.revents != 0)) {
+			fprintf(stderr, "Whois server going down.\n");
+			pthread_exit(NULL);
+			return (1);
+		}
+	}
 
-  /* Loop until the server goes down */
-  ufds.fd = SV_shutdown_recv_fd;
-  ufds.events = POLLIN | POLLPRI;
-  ufds.revents = 0;
-  while (1) {
-
-    retval = poll(&ufds, 1, 500);
-    if ((retval != 0)&&(ufds.revents != 0)) {
-      fprintf(stderr,"Whois server going down.\n");
-      pthread_exit(NULL);
-      return(1);
-    }
-  }
-
-  /* we will never reach this point */
-  // return(1);
-} /* SV_start() */
+	/* we will never reach this point */
+	// return(1);
+}								/* SV_start() */
 
 /* SV_switchdynamic() */
 /*++++++++++++++++++++++++++++++++++++++

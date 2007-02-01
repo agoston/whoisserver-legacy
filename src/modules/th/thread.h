@@ -2,7 +2,7 @@
 #define READ_THREAD
 
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   Thread module (th)
 
@@ -29,28 +29,17 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
   ***************************************/
 #include <pthread.h>       /* Posix thread library */
-/*
-typedef struct _rwlock {
-  pthread_mutex_t rw_mutex;
-  pthread_cond_t rw_cond;
-  int rw_count;
-} rw_lock_t;
-*/
+
 /* structure for writers favouring functions */
 typedef struct _rwlock {
-  pthread_mutex_t rw_mutex;
-  pthread_cond_t rw_cond;
-  pthread_cond_t w_cond;
-  int rw_count;
-  int w_count;
+	pthread_mutex_t rw_mutex;	/* lock for accessing this structure */
+	pthread_cond_t rw_cond;		/* general wait condition */
+	pthread_cond_t w_cond;		/* while waiting for writers to finish */
+	pthread_cond_t r_cond;		/* while waiting for readers to finish */
+	int r_count;				/* read locks count */
+	int rw_count;				/* rw locks count */
+	pthread_t thread_id;		/* lock thread's id (if rw_count > 0; contains garbage otherwise) */
 } rw_lock_t;
-
-/*
-typedef struct _wd_args_t {
-  int connected_socket;
-  pthread_t tid;
-} wd_args_t;  
-*/
 
 /* Timeout for locks in seconds */
 #define CONDWAITTIMEOUT 1
@@ -69,15 +58,10 @@ void TH_acquire_write_lockw(rw_lock_t *prw_lock);
 void TH_release_write_lockw(rw_lock_t *prw_lock);
 void TH_init_read_write_lockw(rw_lock_t *prw_lock);
 
-int TH_get_id(void);
+inline int TH_get_id(void);
 char *TH_to_string(void);
 pthread_t TH_create(void *do_function(void *), void *arguments );
 
-/* 	
-void TH_hdl_signal(void);
-void TH_watchdog(wd_args_t *wd_args);
-void TH_run(int sock, void *do_function(void *));
-void TH_run1(int sock, void *do_function(void *));
-void TH_run2(void *function(void *));
-*/ 
+void (*orig_segfault_handler)(int);
+
 #endif /* READ_THREAD */
