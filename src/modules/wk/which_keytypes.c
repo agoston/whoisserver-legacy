@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5.2.2 $
+  $Revision: 1.6 $
 
   which_keytypes:  Determine which keys to look for.
   
@@ -86,8 +86,7 @@ static regex_t domainname;
 static regex_t domainalpha;
 
 /* initialize regular expressions */
-static void 
-wk_regex_init ()
+void wk_regex_init ()
 {
     int i;
     int errcode;
@@ -225,13 +224,8 @@ WK_to_string (mask_t wk)
 mask_t 
 WK_new (char *key) 
 {
-  static pthread_once_t once_control = PTHREAD_ONCE_INIT;
-
   mask_t wk; 
   int i;
-
-  /* initialize our regular expressions on the first call */
-  pthread_once(&once_control, wk_regex_init);
 
   /* empty bitmask */
   wk = MA_new(MA_END);

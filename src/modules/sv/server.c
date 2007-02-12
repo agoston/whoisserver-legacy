@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.13 $
+  $Revision: 1.14 $
 
   Example code: A server for a client to connect to.
 
@@ -660,6 +660,9 @@ int SV_start(char *pidfile)
 	/* XXX: must be handled previously!!! */
 	/*SK_init(); */
 	/*PW_init(); */
+
+	/* compile the regexps in which_keytypes module */
+	wk_regex_init();
 
 	/* Initialise the access control list. */
 	AC_build();

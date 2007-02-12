@@ -2,7 +2,7 @@
 #define READ_WHICH_KEYTYPES
 
 /***************************************
-  $Revision: 1.4.2.1 $
+  $Revision: 1.5 $
 
   Which Keytypes module (wk)
 
@@ -188,6 +188,7 @@ char * const Keytypes[] = {
 
 #endif 
 
+void wk_regex_init();
 char *WK_to_string(mask_t wk);
 mask_t WK_new(char *key);
 int WK_is_aut_num(char *key);
