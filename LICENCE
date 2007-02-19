@@ -11,10 +11,13 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
-You can find a copy of the GNU General Public License at http://www.gnu.org/licenses/gpl.txt or write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+You can find a copy of the GNU General Public License at 
+http://www.gnu.org/licenses/gpl.txt or write to the 
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+Boston, MA  02110-1301, USA.
 
-The RIPE Database Server Software can be obtained in two ways. Extracted from the read only public access to our source code repository 
+The RIPE Database Server Software can be obtained in two ways. 
+Extracted from the read only public access to our source code repository 
 
 http://www.ripe.net/db/cvs-bugzilla.html
 
@@ -22,14 +25,38 @@ or downloaded as a .tar file from our FTP site:
 
 ftp://ftp.ripe.net/ripe/dbase/software/
 
-Users of this software should be aware that the RIPE NCC is not a software vendor. We do not supply software packages that are expected to 'work out of the box'. We do not test our software on multiple platforms. We may, at our discretion, supply limited technical documentation or technical support.
+Users of this software should be aware that the RIPE NCC is not a software 
+vendor. We do not supply software packages that are expected to 'work out 
+of the box'. We do not test our software on multiple platforms. We may, at 
+our discretion, supply limited technical documentation or technical support.
 
-You accept this software on an 'as is' basis and use it at your own risk. The RIPE NCC makes no claims about the suitability of this software for any purpose other than our own use of it to operate the public RIPE Database service. User documentation and support available from our web site (www.ripe.net) and through the Customer Services department of the RIPE NCC is intended to assist users of our implementation of this software for the public services we operate.
+You accept this software on an 'as is' basis and use it at your own risk. 
+The RIPE NCC makes no claims about the suitability of this software for any 
+purpose other than our own use of it to operate the public RIPE Database 
+service. User documentation and support available from our web site 
+(www.ripe.net) and through the Customer Services department of the RIPE NCC 
+is intended to assist users of our implementation of this software for the 
+public services we operate.
 
-In no event will the RIPE NCC, or any other party who may modify and/or redistribute this software, be liable to you for damages, including any general, special, incidental or consequential damages arising out of the use or inability to use this software (including but not limited to loss of data or data being rendered inaccurate or losses sustained by you or third parties or a failure of the software to operate with any other programs), even if you or other party has been advised of the possibility of such damages.
+In no event will the RIPE NCC, or any other party who may modify and/or 
+redistribute this software, be liable to you for damages, including any 
+general, special, incidental or consequential damages arising out of the use 
+or inability to use this software (including but not limited to loss of data 
+or data being rendered inaccurate or losses sustained by you or third parties 
+or a failure of the software to operate with any other programs), even if you 
+or other party has been advised of the possibility of such damages.
 
-Use of our software requires a high level of technical knowledge. The RIPE NCC technical groups will attempt to answer individual technical questions on a 'best effort' basis. This is always subject to our work load and availability of staff. We do not guarantee to provide answers or imply any time frame for when answers may be available.
+Use of our software requires a high level of technical knowledge. The RIPE NCC 
+technical groups will attempt to answer individual technical questions on a 
+'best effort' basis. This is always subject to our work load and availability 
+of staff. We do not guarantee to provide answers or imply any time frame for 
+when answers may be available.
 
-All such questions should be sent to our Customer Services Department who can be contacted at <ripe-dbm@ripe.net>. They will log the requests and forward them to the appropriate technical group. Individual staff members of the RIPE NCC will not respond to direct approaches for support. 
+All such questions should be sent to our Customer Services Department who can 
+be contacted at <ripe-dbm@ripe.net>. They will log the requests and forward 
+them to the appropriate technical group. Individual staff members of the RIPE 
+NCC will not respond to direct approaches for support. 
 
-We always welcome constructive comments and bug reports regarding any aspect of our software in it's use by the RIPE NCC to operate our public services. These should also be sent to our Customer Services Department.
+We always welcome constructive comments and bug reports regarding any aspect 
+of our software in it's use by the RIPE NCC to operate our public services. 
+These should also be sent to our Customer Services Department.
