@@ -86,16 +86,6 @@ au_irt_authenticate(RT_context_t * ctx, const gchar * irt_name, LU_server_t * lu
 			auth_attrs = rpsl_object_get_attr(*irt, "auth");
 			rpsl_attr_split_multiple(&auth_attrs);
 			ret_val = au_check_authentications(auth_attrs, cred);
-
-			/* crypt-pw deprecation */
-			for (p = cred; p != NULL; p = g_list_next(p)) {
-				cr_credential_t *credential = (cr_credential_t *) p->data;
-				if (credential->deprecated) {
-					RT_deprecated_auth(ctx, (char *)irt_name);
-					break;
-				}
-			}
-
 		}
 	}
 

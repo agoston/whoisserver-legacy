@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.13 $
+  $Revision: 1.14 $
 
   Reporting module.
 
@@ -1184,28 +1184,6 @@ void RT_non_exist_mntner(RT_context_t* ctx, const gchar* mntner) {
   rt_xml_node_add_content(node, (xmlChar*)mntner);
   rt_prepare_node(ctx, node);
 }
-
-
-/*+
-  RT_deprecated_auth - Reports usage of a deprecated authentication method
-  +*/
-void RT_deprecated_auth(RT_context_t* ctx, const gchar* mntner) {
-  xmlNodePtr node;
-
-  node = xmlNewNode(NULL, (xmlChar*)"deprecated_auth");
-  rt_xml_node_add_content(node, (xmlChar*)mntner);
-  rt_prepare_node(ctx, node);
-}
-
-/*+
-  RT_deprecated_auth - Reports usage of a deprecated authentication method
-  +*/
-void RT_cryptpw_not_allowed(RT_context_t* ctx) {
-  xmlNodePtr node;
-  node = xmlNewNode(NULL, (xmlChar*)"cryptpw_not_allowed");
-  rt_prepare_node(ctx, node);
-}
-
 
 /*+
   RT_non_exist_irt - Reports a non existent irt

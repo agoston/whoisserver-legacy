@@ -1006,7 +1006,7 @@ syntax_t syntax_tab[] = {
         /* core_parser */
         NULL,
         /* front_end_regex_pattern */
-        "^(CRYPT-PW [A-Z0-9./]{13}|MD5-PW \\$1\\$[A-Z0-9./]{1,8}\\$[A-Z0-9./]{22}|PGPKEY-[A-F0-9]{8}|X509-[1-9][0-9]*|AUTO-[1-9][0-9]*)$",
+        "^(MD5-PW \\$1\\$[A-Z0-9./]{1,8}\\$[A-Z0-9./]{22}|PGPKEY-[A-F0-9]{8}|X509-[1-9][0-9]*|AUTO-[1-9][0-9]*)$",
         /* front_end_regex, set by syntax_init() */
         NULL,
         /* front_end_reserved_regex_pattern */

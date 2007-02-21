@@ -24,7 +24,6 @@ CR_credential_t* CR_credential_new(CR_type type, const char* value,
   credential->type = type;
   credential->value = g_strchomp(strdup(value));
   credential->valid = valid;
-  credential->deprecated = FALSE;
 
   return (CR_credential_t*) credential;
 }
@@ -146,11 +145,6 @@ gboolean CR_credential_list_check(GList * list, CR_type type, const char *value,
 		credential = (cr_credential_t *) list->data;
 		if (credential->type == type && cr_check_crypted(credential->value, value)) {
 			if (CR_credential_get_validity(credential) || include_invalid) {
-				/* for Crypt-PW deprecation */
-				if (type != CR_OVERRIDE && value[0] != '$') {	/* if it's crypt */
-					credential->deprecated = TRUE;
-				} 
-				
 				LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with TRUE");
 				return TRUE;
 			}

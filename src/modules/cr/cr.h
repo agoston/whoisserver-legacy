@@ -22,7 +22,7 @@ typedef enum {
 typedef struct {
   CR_type type;
   char* value;
-  gboolean valid, deprecated;
+  gboolean valid;
 } cr_credential_t;
 
 /* convert the enum to a printable string */
