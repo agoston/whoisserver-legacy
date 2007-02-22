@@ -1,29 +1,33 @@
 ---------------------------------
-RIPE Whois Server version 3 (RIP)
+RIPE Whois Server version 3.x (RIP)
 ---------------------------------
 
-This is the version 3.2 of the server software of the RIPE Whois
+This is the version 3.3 of the server software of the RIPE Whois
 Server, also known as the RPSL Implementation Project (RIP).  In this
 implementation, all the data is handled in RPSL format.  This server
-will take Whois requests from clients and retrieve data from the Whois
-database using SQL queries.
+will take Whois requests from clients and retrieve data from the RIPE
+Database using SQL queries.
 
 
-This package contains the following subdirectories:
-bin/rip	   	   - The server source code
-bin/dbupdate	   - The DB update program 
-bin/load	   - The loader program for the DB
-conf		   - Examples of configuration files
-defs		   - Definitions of objects and attributes in XML
-design	   	   - Design documents and information
-include	   	   - Include files
-modules	   	   - The source code
-utils		   - Utilities
-utils/whois3       - Whois client
-utils/remadmin	   - Remote administration interface
-utils/mr           - Mirror reflector
-utils/text_export  - plaintext export of the DB
-
+This package includes the following subdirectories:
+src                  - The server source code
+src/whois-server_src - The server main program
+src/dbupdate_src     - The DB update main program 
+src/modules          - The source code split into modules
+src/include          - Include files
+src/loader_src       - The loader program for the DB
+src/defs             - Definitions of objects and attributes in XML
+src/SQL              - Database definition files
+src/mr_src           - Mirror handling source code
+src/utils            - Utilities
+src/utils/mr         - Mirror reflector
+src/text_export_src  - plaintext export of the DB
+src/opl-perl         - Stand alone perl RPSL parser
+src/ripupdate_src    - Tool to directly update the database
+conf                 - Examples of configuration files
+tests                - Full regression test suite
+doc                  - Design documents and information
+utils/remadmin       - Remote administration interface
 
 You can find an introduction to the RIPE Database Software in the
 file doc/index.html .
@@ -34,15 +38,17 @@ software.
 The `RELEASE-NOTES' file contain some release notes for the current
 version of the software.
 
-System-specific notes are contained in files named `README.system'.  For
-example, Solaris notes are in `README.solaris'.
+Please read the file `LICENCE' for details of the software Copyright
+and Terms & Conditions of using the software.
 
-Please read the file `COPYING'. It contains the software Copyright.
+Requirements:
+In order to build the whois binaries you need to have available the source 
+code for c-client.
+The build links to libxml2, libxslt1 and glib libraries.
+We use lex and yacc for syntax parsing.
+It also needs JDK.
+You must also have a MySQL server running with InnoDB support.
 
 
-We will appreciate all kinds of comments, feedback, questions, bug
-reporting etc. regarding the RIP software. Please do not hesitate to
-contact the address <dbrip@ripe.net> for these matters.
-
-$Date: 2005/02/02 14:42:20 $
+$Date: 2007/02/19 13:32:19 $
 
