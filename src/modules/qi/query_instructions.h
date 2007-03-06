@@ -2,7 +2,7 @@
 #define READ_QUERY_INSTRUCTIONS
 
 /***************************************
-  $Revision: 1.4.2.1 $
+  $Revision: 1.5 $
 
   Query instruction module (qi)
   config module.
@@ -98,7 +98,7 @@ Ie. Try using a LEFT JOIN to do the "NOT IN"/ "MINUS" equivalent.
 /*#define Q_OBJECTS     "SELECT last.object_id, last.sequence_id, last.object ,last.object_type FROM  %s IDS STRAIGHT_JOIN last,object_order WHERE last.object_id=IDS.id AND last.object_type != 100 AND last.object_type = object_order.object_type ORDER BY recursive, order_code" 
  */
 
-#define Q_OBJECTS "SELECT last.object_id, last.sequence_id, last.object, last.object_type, last.pkey, recursive, gid FROM %s IDS, last, last glast, object_order, object_order gorder WHERE (IDS.gid=glast.object_id AND glast.object_type=gorder.object_type AND glast.object_type != 100) AND (IDS.id=last.object_id AND last.object_type=object_order.object_type AND last.object_type != 100) ORDER BY %s recursive, object_order.order_code" 
+#define Q_OBJECTS "SELECT STRAIGHT_JOIN last.object_id, last.sequence_id, last.object, last.object_type, last.pkey, recursive, gid FROM %s IDS, last, last glast, object_order, object_order gorder WHERE (IDS.gid=glast.object_id AND glast.object_type=gorder.object_type) AND (IDS.id=last.object_id AND last.object_type=object_order.object_type) ORDER BY %s recursive, object_order.order_code" 
 
 /* Query for finding person/role objects recursively (when -r  isn't specified) */
 #define Q_REC         "INSERT IGNORE INTO %s SELECT pe_ro_id,1,object_id FROM %s IDS, %s WHERE object_id = IDS.id"
