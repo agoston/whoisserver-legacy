@@ -8,164 +8,23 @@
 #include <string.h>
 #include <errno.h>
 
+#include "SK.h"
+
 int arg_port;
 char *arg_hostname;
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
 int numlines = 0;
 FILE* infile;
+FILE* logfile;
 char* infilename;
 
-int SK_setsockflags(int socket, int flags) {
-	int old_flags;
-
-	if ((old_flags = fcntl(socket, F_GETFL, 0)) == -1) {
-		return -1;
-	}
-
-	if (fcntl(socket, F_SETFL, old_flags | flags) == -1) {
-		return -1;
-	}
-
-	return socket;
+void log_to_file(char *reason, char *actwork) {
+        pthread_mutex_lock(&log_lock);
+        fprintf(logfile, "%s: %s", reason, actwork);
+        fflush(logfile);
+        pthread_mutex_unlock(&log_lock);
 }
-
-int SK_clearsockflags(int socket, int flags) {
-	int old_flags;
-
-	if ((old_flags = fcntl(socket, F_GETFL, 0)) == -1) {
-		return -1;
-	}
-
-	if (fcntl(socket, F_SETFL, old_flags & ~flags) == -1) {
-		return -1;
-	}
-
-	return socket;
-}
-
-
-int SK_connect_inner(int *retsock, struct addrinfo *res, int timeout, char *hostname, int port) {
-	int sock, flags, sel, gs, er, erlen = sizeof(er);
-	struct timeval ptm;
-	fd_set rset, wset;
-
-	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-	if (sock < 0) {
-		fprintf(stderr, "SK_connect(%s, %d): socket(): %d (%s)", hostname, port,
-				errno, strerror(errno));
-		return -1;
-	}
-
-	if (SK_setsockflags(sock, O_NONBLOCK) < 0) {
-		fprintf(stderr, "SK_connect(%s, %d): setsockflags(): %d (%s)", hostname,
-				port, errno, strerror(errno));
-		close(sock);
-		return -1;
-	}
-
-	if ((connect(sock, res->ai_addr, res->ai_addrlen)) < 0 && errno != EINPROGRESS) {
-		fprintf(stderr, "SK_connect(%s, %d): connect(): %d (%s)", hostname, port,
-				errno, strerror(errno));
-		close(sock);
-		return -1;
-	}
-
-	/*
-	 * waiting for timeout 
-	 */
-	FD_ZERO(&rset);
-	FD_SET(sock, &rset);
-	wset = rset;
-	ptm.tv_usec = 0;
-	ptm.tv_sec = timeout;
-
-	if ((sel = select(sock + 1, &rset, &wset, NULL, &ptm)) == 0) {	/* timeout */
-		//fprintf(stderr, "SK_connect(%s, %d): connect(): timeout", hostname, port);
-		fprintf(stderr, "*");
-		close(sock);
-		return -1;
-	}
-
-	if (sel < 0) {
-		fprintf(stderr, "SK_connect(%s, %d): select(): %d (%s)", hostname, port,
-				errno, strerror(errno));
-		close(sock);
-		return -1;
-	}
-
-	gs = getsockopt(sock, SOL_SOCKET, SO_ERROR, &er, &erlen);
-
-	if (gs < 0 || er) {
-		fprintf(stderr, "SK_connect(%s, %d): select(): %d (%s)", hostname, port, er,
-				strerror(er));
-		close(sock);
-		return -1;
-	}
-
-	if (SK_clearsockflags(sock, O_NONBLOCK) < 0) {
-		fprintf(stderr, "SK_connect(%s, %d): clearsockflags(): %d (%s)", hostname,
-				port, errno, strerror(errno));
-		close(sock);
-		return -1;
-	}
-
-	*retsock = sock;
-	return 0;
-}
-
-
-int SK_connect(char *hostname, unsigned int port, unsigned int timeout) {
-	struct addrinfo hints, *res, *ai_iter;
-	char portbuf[16];
-	int socktemp, *sock = &socktemp, error;
-
-	/*
-	 * Prepare addrinfo struct for getaddrinfo 
-	 */
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-
-	/*
-	 * This should give us values for listening 
-	 */
-	snprintf(portbuf, 16, "%u", port);
-	error = getaddrinfo(hostname, portbuf, &hints, &res);
-	if (error != 0) {
-		fprintf(stderr, "SK_connect(%s, %d): getaddrinfo(): %s", hostname,
-				port, gai_strerror(error));
-		return -1;
-	}
-
-	/*
-	 * connect using v4, then v6 address(es) 
-	 */
-	for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
-		if (ai_iter->ai_family == AF_INET) {
-			if (SK_connect_inner(sock, ai_iter, timeout, hostname, port) == 0) {
-				return socktemp;
-			}
-		}
-	}
-
-	/*
-	 * if no IPv4 addresses found, fall back to IPv6 
-	 */
-	for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
-		if (ai_iter->ai_family == AF_INET6) {
-			if (SK_connect_inner(sock, ai_iter, timeout, hostname, port) == 0) {
-				return socktemp;
-			}
-		}
-	}
-
-	/*
-	 * if not v6 address found either, bail out 
-	 */
-	//fprintf(stderr, "SK_connect(%s, %d): No v6 nor v4 address found", hostname, port);
-	return -1;
-}
-
 
 void *startup(void *arg) {
 	int sock;
@@ -189,9 +48,10 @@ void *startup(void *arg) {
 			fprintf(stderr, ".");fflush(stderr);
 		}
 		pthread_mutex_unlock(&lock);
-
+		
 		sock = SK_connect(arg_hostname, arg_port, 30);
 		if (sock < 0) {
+		        log_to_file("connect", line);
 			sleep(3);
 		} 
 		else 
@@ -205,6 +65,7 @@ void *startup(void *arg) {
 				FD_SET(sock, &rset);
 				if ((sel = select(sock + 1, &rset, NULL, NULL, &ptm)) <= 0) {
 					fprintf(stderr, "!");fflush(stderr);
+					log_to_file("read", line);
 					break;
 				}
 				
@@ -234,6 +95,7 @@ int main(int argc, char **argv) {
 	numthreads = strtol(argv[2], NULL, 10);
 	arg_hostname = argv[3];
 	arg_port = strtol(argv[4], NULL, 10);
+	logfile = fopen("load_test.log", "w+");
 
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
