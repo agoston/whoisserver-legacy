@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.3 $
+  $Revision: 1.4 $
 
   Protocol whois module (pw).  Whois protocol.
 
@@ -758,8 +758,10 @@ void PW_interact(int sock) {
 	          if (acl_eip.deny)	{
 
                 /* passed IP permanently denied */
-                char *rep = ca_get_pw_fmt_acl_permdeny ;
-                SK_cd_printf(&(qe->condat), rep, hostaddress);
+                char *rep = ca_get_pw_fmt_acl_permdeny;
+                char paddress[IP_ADDRSTR_MAX];
+                IP_addr_b2a(&qe->pIP, paddress, IP_ADDRSTR_MAX);
+                SK_cd_printf(&(qe->condat), rep, paddress);
                 UT_free(rep);
 
                 /* increase denial count */
