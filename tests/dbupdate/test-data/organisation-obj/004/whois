@@ -1,6 +1,6 @@
 organisation: ORG-XA1-DB-TEST
 org-name:     XAMPLE @ "*TTTTTT & , ][
-org-type:     NON-REGISTRY
+org-type:     OTHER
 address:      Address
 e-mail:       dbtest@ripe.net
 admin-c:      TP1-DB-TEST

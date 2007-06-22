@@ -90,11 +90,24 @@ org_creation (au_plugin_callback_info_t *info)
   gboolean override;
   GList *org_type_attr;
   char *org_type;
+  char *rir = NULL;
+  char *generic_org_type = NULL;
 
   LG_log(au_context, LG_FUNC, ">org_creation: entering");
 
+  rir = ca_get_rir;
+  UP_remove_EOLs(rir);
+  LG_log(au_context, LG_FUNC, "org_creation: rir: %s", rir);
+  if ( strcasecmp(rir, "AFRINIC") == 0 ) {
+    generic_org_type = g_strdup("NON-REGISTRY");
+  } 
+  else {
+    generic_org_type = g_strdup("OTHER");
+  }
+  LG_log(au_context, LG_FUNC, "org_creation: generic org type: %s", generic_org_type);
+
   /* only the mntner that are listed in POWER_ORG_MNT config variable can
-     create org objects with an "org-type:" other than 'NON-REGISTRY' */
+     create org objects with an "org-type:" other than 'generic_org_type' */
   org_type_check = AU_UNAUTHORISED_CONT;
   org_type_attr = rpsl_object_get_attr(info->obj, "org-type");
   if (org_type_attr == NULL)
@@ -107,10 +120,10 @@ org_creation (au_plugin_callback_info_t *info)
   {
     org_type = rpsl_attr_get_clean_value(org_type_attr->data);
     g_strup(org_type); 
-    if(strncmp(org_type, "NON-REGISTRY", strlen("NON-REGISTRY")) == 0){
+    if(strncmp(org_type, generic_org_type, strlen(generic_org_type)) == 0){
       org_type_check = AU_AUTHORISED;
     }else{
-      /* if the org-type is not 'NON-REGISTRY', then we need to
+      /* if the org-type is not 'generic_org_type', then we need to
          compare the "mnt-by:" attributes to the ORG_POWER_MNT config variable */
       if(au_has_org_power_mnt(info->obj) == TRUE){
         org_type_check = AU_AUTHORISED;
@@ -132,6 +145,8 @@ org_creation (au_plugin_callback_info_t *info)
 
   /* report result */
   RT_org_creation_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);
+
+  UT_free(generic_org_type);
 
   LG_log(au_context, LG_FUNC, "<org_creation: exiting with value [%s]",
          AU_ret2str(ret_val));
@@ -349,9 +364,22 @@ object_modification (au_plugin_callback_info_t *info)
   AU_ret_t org_type_check;
   GList *org_type_attr;
   char *org_type;
+  char *generic_org_type = NULL;
+  char *rir = NULL;
 
 
   LG_log(au_context, LG_FUNC, ">object_modify: entering");
+
+  rir = ca_get_rir;
+  UP_remove_EOLs(rir);
+  LG_log(au_context, LG_FUNC, "org_creation: rir: %s", rir);
+  if ( strcasecmp(rir, "AFRINIC") == 0) {
+    generic_org_type = g_strdup("NON-REGISTRY");
+  }
+  else {
+    generic_org_type = g_strdup("OTHER");
+  } 
+  LG_log(au_context, LG_FUNC, "org_creation: generic org type: %s", generic_org_type);
 
   /* grab key */
   key = rpsl_object_get_key_value(info->obj);
@@ -459,7 +487,7 @@ object_modification (au_plugin_callback_info_t *info)
 
 
   /* only the mntner that are listed in ORG_POWER_MNT config variable can
-     create org objects with an "org-type:" other than 'NON-REGISTRY' */
+     create org objects with an "org-type:" other than 'generic_org_type' */
   if(strncmp(type, "organisation", strlen("organisation")) == 0)
   {
    org_type_check = AU_UNAUTHORISED_CONT;
@@ -474,10 +502,10 @@ object_modification (au_plugin_callback_info_t *info)
    {
      org_type = rpsl_attr_get_clean_value(org_type_attr->data);
      g_strup(org_type); 
-     if(strncmp(org_type, "NON-REGISTRY", strlen("NON-REGISTRY")) == 0){
+     if(strncmp(org_type, generic_org_type, strlen(generic_org_type)) == 0){
        org_type_check = AU_AUTHORISED;
      }else{
-       /* if the org-type is not 'NON-REGISTRY', then we need to
+       /* if the org-type is not 'generic_org-type', then we need to
           compare the "mnt-by:" attributes to the ORG_POWER_MNT config variable */
        if(au_has_org_power_mnt(info->obj) == TRUE){
          org_type_check = AU_AUTHORISED;
@@ -501,6 +529,7 @@ object_modification (au_plugin_callback_info_t *info)
   rpsl_attr_delete_list(org);
   g_hash_table_destroy(old_org_hash);
   UT_free(source);
+  UT_free(generic_org_type);
 
   if (num_error > 0)
   {

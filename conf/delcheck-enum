@@ -1,0 +1,5 @@
+ModuleDiagnosticLevel 0
+ModuleTemplatePath /home/agoston/whoisserver/conf/delcheck-template.xml
+
+ParamMinimumNumberNameservers              2
+ModuleNameserverIgnoreList                 ns.ripe.net

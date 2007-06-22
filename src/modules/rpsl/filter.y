@@ -123,10 +123,6 @@ filter_aspath_range:
 | filter_aspath_range TKN_ASNAME 
 ;
 
-action: rp_attribute ';'
-| action rp_attribute ';'
-;
-
 rp_attribute: pref
 | med
 | dpa

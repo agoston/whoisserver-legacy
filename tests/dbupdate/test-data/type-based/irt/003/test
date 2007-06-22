@@ -18,7 +18,7 @@ signature:           PGPKEY-471DBBEA
 encryption:          PGPKEY-471DBBEA
 admin-c:             TP1-DB-TEST
 tech-c:              TP1-DB-TEST
-auth:                CRYPT-PW agl7a6gyad/e6   # irt
+auth:                MD5-PW $1$12345678$wza1MMo7nPUnBHNJMOMq3.   # irt
 mnt-by:              TEST-MNT
 notify:              dbtest@ripe.net
 changed: dbtest@ripe.net 20021111

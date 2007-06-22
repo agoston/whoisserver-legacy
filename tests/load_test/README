@@ -1,0 +1,21 @@
+This is the load tester for whois server.
+
+It's a simple application which takes a file containing a query each line,
+and feeds it into whoisserver with a definable number of threads. The
+threads work very simply: they take the next line of the query file, connect
+to the whois server, send them the query, read the answer (they don't care
+that it is, it's discarded), then close the connection and start over.
+
+Errors can occur at 2 places: when connecting (connection timeout because of
+high load), and when getting the data (because it takes too long for
+whoisserver to respond). These are marked in the output.
+
+An extract script is also supplied which takes a whoisserver query log file
+as an argument and outputs the queries only on its standard output,
+stripping '-k' flags from queries. The latter is needed as outherwise
+whoisserver wouldn't close the connection (it would wait for more queries
+after serving the first one), resulting in a timeout.
+
+If you have any more questions, check out the source code.
+
+Agoston, 2006-10-25.

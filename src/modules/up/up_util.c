@@ -100,7 +100,7 @@ void UP_internal_error(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* close down the logging */
   LG_ctx_free(lg_ctx);
   /* close the state log file, but do not delete the file */
-  fclose(options->state);
+  close(options->statefd);
 
   /* report abnormal termination to the wrapper */
   exit(20);
@@ -171,16 +171,13 @@ void UP_free_options(options_struct_t *options)
    Returns  string
 */
 
-char *UP_remove_EOLs(char *arg)
-{
-  while ( strlen(arg) > 0 &&
-          (arg[strlen(arg) - 1] == '\n' || 
-           arg[strlen(arg) - 1] == '\r') )
-  {
-    arg[strlen(arg) - 1] = '\0';
-  }
- 
-  return arg;
+char *UP_remove_EOLs(char *arg) {
+	int last = strlen(arg)-1;
+	while (last >= 0 && (arg[last] == '\n' || arg[last] == '\r')) {
+		arg[last--] = 0;
+	}
+
+	return arg;
 }
 
 
@@ -212,7 +209,7 @@ char *UP_get_temp_filename(LG_context_t *lg_ctx, char *type)
   tmpfilename = (char *)malloc(length);
 
   pidlong=pid;
-  snprintf(tmpfilename, length, "%s/dbupdate.%s.%s.%ld.tmp", tmpdir, type, hostname, pidlong );
+  snprintf(tmpfilename, length, "%s/dbupdate.%s.%s.%ld.%ld.tmp", tmpdir, type, hostname, time(NULL), pidlong );
   free(tmpdir);
 
   if ( lg_ctx )
@@ -1453,7 +1450,6 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   char *pos = NULL;
   char *error_str = NULL;
   char **temp = NULL;
-  char *temp_str;
 
   LG_log(lg_ctx, LG_FUNC,">up_interpret_ripudb_result: entered, ripupd_result [%s]", ripupd_result);
 
@@ -1474,6 +1470,7 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 /*                     TEMPORARY CODE TO USE EXISTING RIPUPD                          */
   
     /* According to the error no got from RIPupdate, construct an error string  */
+    char temp_str[1024];
     switch (err)
     {
       case ERROR_U_MEM: 
@@ -1482,12 +1479,10 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       case ERROR_U_COP:
       case ERROR_U_NSUP:
       case ERROR_U_BUG:
-        temp_str = (char *)malloc(1024);
         snprintf(temp_str, 1024, "***Error: Please contact database admin: Error no %i", err);
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
         break; 
       case ERROR_U_OBJ:
-        temp_str = (char *)malloc(1024);
         /* if the object contains refs to unknown objects */
         if (strstr(ripupd_result, "dummy") != NULL || 
               strstr(ripupd_result, "reference cannot be resolved") != NULL )
@@ -1496,10 +1491,15 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
              or a reference that cannot be resolved */
     	  snprintf(temp_str, 1024, "***Error: Unknown object referenced");
         }
-	    else if (strstr(ripupd_result, "key-cert") != NULL)
-	    {
-        /* if the response from RIPupd contains "no key-cert object" string */
-        snprintf(temp_str, 1024, "***Error: Unknown key-cert object referenced"); 
+        else if (strstr(ripupd_result, "key-cert") != NULL)
+        {
+          /* if the response from RIPupd contains "no key-cert object" string */
+          snprintf(temp_str, 1024, "***Error: Unknown key-cert object referenced"); 
+        }
+        else if (strstr(ripupd_result, "wrong prefix specified") != NULL)
+        {
+          /* if the response from RIPupd contains "wrong prefix specified" string */
+          snprintf(temp_str, 1024, "***Error: Invalid prefix specified"); 
         }
         else
         {
@@ -1509,12 +1509,10 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
         break; 
       case ERROR_U_AUT:
-        temp_str = (char *)malloc(1024);
         snprintf(temp_str, 1024, "***Error: Membership authorisation failure");
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
         break; 
       default: 
-        temp_str = (char *)malloc(1024);
         snprintf(temp_str, 1024, "***Error: Please contact database admin: Error no %i", err);
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
         break; 
@@ -1542,8 +1540,8 @@ goto temp_skip;
           /* connection error messages have a different format, eg
              %ERROR:406: not authorized to update the database
              so find the next colon(:) */
-          temp_str = pos+1;
-          pos = strchr(temp_str, ':');
+          char *pos_str = pos+1;
+          pos = strchr(pos_str, ':');
         }
         if ( pos )
         {
@@ -1984,7 +1982,19 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
      */
     retval = up_convert_inetnum_prefix(rt_ctx, lg_ctx, object, &inetnum_key_converted);
   }
- 
+
+  /* Normalise nserver attribute in domain objects: lowercase IP, 
+  *    * remove trailing dot in hostname. */
+  if( object_class != NULL && ! strcasecmp(object_class, "domain") )
+    {
+      /* 
+         The cleanup is performed on the original object submitted.
+         This modified object becomes the 'new original' object.
+         The modified object will be used in all further operations and reporting.
+       */
+      retval = up_normalise_nserver(rt_ctx, lg_ctx, object);
+    }
+  
   if ( retval != UP_OK ) goto up_process_object_exit;
 
   /* find source from object and set current source */
@@ -2036,6 +2046,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval = UP_FAIL;
     goto up_process_object_exit;
   }
+  
   preproc_obj = rpsl_object_copy(object);
 
   /* perform a set of pre-processing operations and checks on the object */

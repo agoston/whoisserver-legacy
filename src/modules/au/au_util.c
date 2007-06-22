@@ -100,7 +100,7 @@ au_check_authentications (GList *auth_attrs, GList *cred)
     {
       /* flag to verify we have a good authentication type */
       known_auth = TRUE;
-
+      
       /* determine the authentication type and data from the attribute */
       if (strncasecmp(auth, "PGPKEY-", 7) == 0)
       {
@@ -166,52 +166,41 @@ au_check_authentications (GList *auth_attrs, GList *cred)
 }
 
 AU_ret_t
-au_mntner_authenticate (RT_context_t *ctx, const gchar *mntner_name, LU_server_t *lu, 
-                        const gchar *source_name, GList *cred, 
-                        rpsl_object_t **mntner)
+au_mntner_authenticate(RT_context_t * ctx, const gchar * mntner_name, LU_server_t * lu,
+	const gchar * source_name, GList * cred, rpsl_object_t ** mntner)
 {
-  AU_ret_t ret_val;
-  GList *auth_attrs;
+	AU_ret_t ret_val;
+	GList *auth_attrs;
+	GList *p;
 
-  LG_log(au_context, LG_FUNC, ">au_mntner_authenticate: entering");
+	LG_log(au_context, LG_FUNC, ">au_mntner_authenticate: entering");
 
-  LG_log(au_context, LG_DEBUG, 
-         "au_mntner_authenticate: checking maintainer %s", mntner_name);
+	LG_log(au_context, LG_DEBUG, "au_mntner_authenticate: checking maintainer %s", mntner_name);
 
-  /* try looking up the maintainer */
-  if (LU_lookup(lu, mntner, "mntner", mntner_name, source_name) == LU_ERROR)
-  {
-    /* lookup failed */
-    *mntner = NULL;
-    LG_log(au_context, LG_WARN, 
-           "au_mntner_authenticate: error looking up mntner %s", mntner_name);
-    ret_val = AU_ERROR;
-  }
-  else
-  {
-    /* lookup worked */
-    if (*mntner == NULL)
-    {
-      /* no such maintainer (how did this get here?!?!?) */
-      LG_log(au_context, LG_WARN,
-             "au_mntner_authenticate: non-existant mntner %s", mntner_name);
-      RT_non_exist_mntner(ctx, (char *)mntner_name);
-      ret_val = AU_UNAUTHORISED_CONT;
-    }
-    else
-    {
-      /* mntner exists - check the "auth:" attributes */
-      auth_attrs = rpsl_object_get_attr(*mntner, "auth");
-      rpsl_attr_split_multiple(&auth_attrs);
-      ret_val = au_check_authentications(auth_attrs, cred);
-    }
-  }
+	/* try looking up the maintainer */
+	if (LU_lookup(lu, mntner, "mntner", mntner_name, source_name) == LU_ERROR) {
+		/* lookup failed */
+		*mntner = NULL;
+		LG_log(au_context, LG_WARN, "au_mntner_authenticate: error looking up mntner %s", mntner_name);
+		ret_val = AU_ERROR;
+	} else {
+		/* lookup worked */
+		if (*mntner == NULL) {
+			/* no such maintainer (how did this get here?!?!?) */
+			LG_log(au_context, LG_WARN, "au_mntner_authenticate: non-existant mntner %s", mntner_name);
+			RT_non_exist_mntner(ctx, (char *)mntner_name);
+			ret_val = AU_UNAUTHORISED_CONT;
+		} else {
+			/* mntner exists - check the "auth:" attributes */
+			auth_attrs = rpsl_object_get_attr(*mntner, "auth");
+			rpsl_attr_split_multiple(&auth_attrs);
+			ret_val = au_check_authentications(auth_attrs, cred);
+		}
+	}
 
-  LG_log(au_context, LG_FUNC, 
-         "<au_mntner_authenticate: exiting with value [%s]",
-         AU_ret2str(ret_val));
+	LG_log(au_context, LG_FUNC, "<au_mntner_authenticate: exiting with value [%s]", AU_ret2str(ret_val));
 
-  return ret_val;
+	return ret_val;
 }
 
 static void au_rpsl_object_delete (gpointer data, gpointer user_data)

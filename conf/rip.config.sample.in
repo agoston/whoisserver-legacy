@@ -199,6 +199,16 @@ SVMIRROR_PORT 43003
 PW_HELP_FILE @docdir@/WHOIS-HELP
 
 
+#
+# Shell command to be executed on die()
+# Will be snprintf()-ed, with the thread's PID as param
+# then executed with system()
+# For source code, see stubs.h:die and thread.c:do_nice_die()
+#
+
+COMMAND_ON_DIE /usr/bin/gdb -q -batch -x @confdir@/gdbcomm --pid=%d 1>&2
+
+
 ###########
 ##
 ## Access control
@@ -313,7 +323,7 @@ PW_ERR_LINETOOLONG %
 PW_ERR_LINETOOLONG % Input exceeds the maximum line length.
 
 #
-# Uncompatible flags
+# Incompatible flags
 
 QC_FMT_UNCOMPFLAG %%ERROR:109: invalid combination of flags passed
 QC_FMT_UNCOMPFLAG %%
@@ -370,6 +380,12 @@ QC_BADINPUT %ERROR:108: bad character in input
 QC_BADINPUT %
 QC_BADINPUT % An invalid character was passed in the query.  Allowed
 QC_BADINPUT % characters are letters, numbers, and these: -_:+=.,@/?'.
+
+# as-block range invalid
+
+QI_BADRANGE %ERROR:110: as-block range invalid
+QI_BADRANGE %
+QI_BADRANGE % The range specified for the as-block is invalid.
 
 #
 # There is no such source
@@ -543,7 +559,7 @@ UPDSOURCE SAMPLE sqlhost,3306,dbuser,dbpsw,SAMPLEDB whois.mydb.net,43001,43004
 
 # valid authentication methods accepted by dbupdate
 
-AUTHMETHOD NONE
+# AUTHMETHOD NONE
 AUTHMETHOD CRYPT-PW
 AUTHMETHOD MD5-PW
 AUTHMETHOD PGPKEY

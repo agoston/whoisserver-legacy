@@ -138,58 +138,47 @@ int show_commands(Command *comm, char *comm_name, GString *output)
                       use it directly instead of storing the output)
 
   ++++++++++++++++++++++++++++++++++++++*/
-int command_execute(Command *comm, char *comm_name,
-		    char *input, GString *output, sk_conn_st *condat) 
-{ 
-  char *name, *next_word, *tmp_input;
-  int index, result=0;
+int command_execute(Command * comm, char *comm_name, char *input, GString * output, sk_conn_st * condat)
+{
+	char *name, *next_word, *tmp_input;
+	int index, result = 0;
 
-  /* find the command in the string - first whitespace delimited word */
-  /* make a copy of the input */
-  tmp_input = UT_strdup(input);
-  next_word = tmp_input;
-  
-  /* find the first word and set the pointer to the rest of the string */
-  name = strsep(&next_word, " \t");
-  
-  if( name != NULL && strlen(name) != 0 ) {
-    index = find_command(name, comm);
-    if( index != -1 ) {
-      if( next_word != NULL ) {
-	/* advance the input pointer to the next word */
-	while(  *next_word != '\0' 
-		&& isspace( *(unsigned char *)next_word) ) {
-	  next_word++;
+	/* find the command in the string - first whitespace delimited word */
+	/* make a copy of the input */
+	tmp_input = UT_strdup(input);
+	next_word = tmp_input;
+
+	/* find the first word and set the pointer to the rest of the string */
+	name = strsep(&next_word, " \t");
+
+	if (name != NULL && strlen(name) != 0) {
+		index = find_command(name, comm);
+		if (index != -1) {
+			if (next_word != NULL) {
+				/* advance the input pointer to the next word */
+				while (*next_word != '\0' && isspace(*(unsigned char *)next_word)) {
+					next_word++;
+				}
+			} else {
+				next_word = "";
+			}
+
+			/* run, Forrest, run... */
+			result = comm[index].function(next_word, output, condat);
+		} else {
+			g_string_sprintfa(output, "invalid %scommand: %s\n", comm_name, name);
+			show_commands(comm, comm_name, output);
+			result = 2;
+		}
+	} else {
+		show_commands(comm, comm_name, output);
+		result = 2;
 	}
-      }
-      else {
-	next_word = "";
-      }
-      
-      /* run, Forrest, run...*/
-      result = comm[index].function(next_word, output, condat);
-    }
-    else {	    
-      g_string_sprintfa(output, "invalid %scommand: %s\n", comm_name, name);
-      show_commands(comm, comm_name, output);
-      result = 2;
-    }
-  }  
-  else {  
-    show_commands(comm, comm_name, output);
-    result = 2;
-  }
-  
-  UT_free(tmp_input);
 
-  return result;
-} /* command_execute() */
+	UT_free(tmp_input);
 
- 
-
-
-
-
+	return result;
+}								/* command_execute() */
 
 /* proces_input() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -328,78 +317,74 @@ char *authenticate_user(sk_conn_st *condat)
   int sock        connected client socket
 
   ++++++++++++++++++++++++++++++++++++++*/
-void PC_interact(int sock) {
-  char input[MAX_INPUT_SIZE];
-  int connected = 1;
-  char *user=NULL;
-  sk_conn_st condat;
+void PC_interact(int sock)
+{
+	char input[MAX_INPUT_SIZE];
+	int connected = 1;
+	char *user = NULL;
+	sk_conn_st condat;
 
-  memset( &condat, 0, sizeof(condat));
-  condat.sock = sock;
-  SK_getpeerip(sock, &(condat.rIP));
-  condat.ip = SK_getpeername(sock); /* XXX *alloc involved */
-  
-  /* Welcome the client */
-  SK_cd_puts(&condat, CO_get_welcome());
+	memset(&condat, 0, sizeof(condat));
+	condat.sock = sock;
+	SK_getpeerip(sock, &(condat.rIP));
+	condat.ip = SK_getpeername(sock);	/* XXX *alloc involved */
 
-  /* Authenticate the user */
-  if (CO_get_authenticate() == 1) {
-    user = authenticate_user(&condat);
+	/* Welcome the client */
+	SK_cd_puts(&condat, CO_get_welcome());
 
-    if (user == NULL) {
-      LG_log(protocol_config_ctx, LG_INFO, 
-             "unsuccesful login attempt from %s", condat.ip );
-    }
-  }
-  else {
-    user="nobody";
-  }
+	/* Authenticate the user */
+	if (CO_get_authenticate() == 1) {
+		user = authenticate_user(&condat);
 
-  if (user != NULL) {    
+		if (user == NULL) {
+			LG_log(protocol_config_ctx, LG_INFO, "unsuccesful login attempt from %s", condat.ip);
+		}
+	} else {
+		user = "nobody";
+	}
 
-    /* Log admin logging on */
-    LG_log(protocol_config_ctx, LG_INFO,
-           "user %s from %s logged on", user, condat.ip );
-    
-    {
-      show_uptime("", NULL, &condat);
-    }
-    
-    SK_cd_printf(&condat, "=0= %s", CO_get_prompt());
+	if (user != NULL) {
 
-    while (condat.rtc==0 && connected) {
-      char *icopy;
-      
-      /* Read input. Quit if no input (socket closed) */
-      if( SK_cd_gets(&condat, input, MAX_INPUT_SIZE) <= 0 ) {
-	break;
-      }
+		/* Log admin logging on */
+		LG_log(protocol_config_ctx, LG_INFO, "user %s from %s logged on", user, condat.ip);
 
-      /* filter junk out: leading/trailing/redundant whitespaces */
-      icopy = ut_string_compress( input );
-      
-      /* set thread accounting */
-      TA_setactivity(icopy);
-      TA_increment();
-      
-      /*      if( strlen(icopy) > 0 ) {*/
-      {
-	LG_log(protocol_config_ctx, LG_DEBUG, "%s", icopy);
-		  
-	connected = process_input(icopy, &condat);
-      }
-      
-      TA_setactivity("");
-      
-      UT_free(icopy);
-    }
-    
-    /* Log admin logging off */
-    LG_log(protocol_config_ctx, LG_INFO,
-           "user %s from %s logged off", user, condat.ip );
-    
-  }
-  
-  UT_free(condat.ip);
-} /* PC_interact() */
+		{
+			show_uptime("", NULL, &condat);
+		}
 
+		SK_cd_printf(&condat, "=0= %s", CO_get_prompt());
+
+		while (condat.rtc == 0 && connected) {
+			char *icopy;
+
+			/* Read input. Quit if no input (socket closed) */
+			if (SK_cd_gets(&condat, input, MAX_INPUT_SIZE) <= 0) {
+				break;
+			}
+
+			/* filter junk out: leading/trailing/redundant whitespaces */
+			icopy = ut_string_compress(input);
+
+			/* set thread accounting */
+			TA_setactivity(icopy);
+			TA_increment();
+
+			/*      if( strlen(icopy) > 0 ) { */
+			{
+				LG_log(protocol_config_ctx, LG_DEBUG, "%s", icopy);
+
+				connected = process_input(icopy, &condat);
+			}
+
+			TA_setactivity("");
+
+			UT_free(icopy);
+		}
+
+		/* Log admin logging off */
+		LG_log(protocol_config_ctx, LG_INFO, "user %s from %s logged off", user, condat.ip);
+
+	}
+
+	UT_free(condat.ip);
+}								/* PC_interact() */

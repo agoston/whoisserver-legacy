@@ -159,100 +159,89 @@ make_sql2pack(SQ_result_set_t *result, SQ_row_t *row,
   return conv;
 }
 
-static
-int
-RP_sql_load_attr_space( rp_attr_t attr, ip_space_t space, 
-			rp_regid_t reg_id, SQ_connection_t *con
-			)
+static int RP_sql_load_attr_space(rp_attr_t attr, ip_space_t space, rp_regid_t reg_id, SQ_connection_t * con)
 {
-  SQ_row_t *row;
-  SQ_result_set_t *result;
-  int objnr=0;
-  rx_tree_t   *mytree;
-  rp_upd_pack_t pack;
-  int colcount;
-  char *v4 = DF_attrcode_radix_load_v4(attr);
-  char *v6 = DF_attrcode_radix_load_v6(attr);
-  char *vu = (space == IP_V4) ? v4 : v6;
-  char *srcnam = ca_get_srcname(reg_id);
-  const char *attr_code;
-  char *activity;
+	SQ_row_t *row;
+	SQ_result_set_t *result;
+	int objnr = 0;
+	rx_tree_t *mytree;
+	rp_upd_pack_t pack;
+	int colcount;
+	char *v4 = DF_attrcode_radix_load_v4(attr);
+	char *v6 = DF_attrcode_radix_load_v6(attr);
+	char *vu = (space == IP_V4) ? v4 : v6;
+	char *srcnam = ca_get_srcname(reg_id);
+	const char *attr_code;
+	char *activity;
 
-  dieif( vu == NULL /* loading query undefined */ );
+	dieif(vu == NULL /* loading query undefined */ );
 #if 0
-  if( attr==A_IN && space==IP_V4 ) {
-    vu = "SELECT  object_id,begin_in,end_in FROM    inetnum WHERE   thread_id = 0 AND begin_in >= 3238002688 AND end_in < 3254779904 ";
-  }
+	if (attr == A_IN && space == IP_V4) {
+		vu = "SELECT  object_id,begin_in,end_in FROM    inetnum WHERE   thread_id = 0 AND begin_in >= 3238002688 AND end_in < 3254779904 ";
+	}
 #endif
 
-  dieif( RP_tree_get ( &mytree, reg_id, space, attr ) != RP_OK );
- 
-  LG_log(rp_context, LG_INFO, "loading using %s", vu);
-  LG_log(rp_context, LG_DEBUG, "size before query = %x", sbrk(0));
-  
-  attr_code = DF_get_attribute_code(attr);
-  activity = UT_malloc(strlen(srcnam) + strlen(attr_code) + 32);
-  sprintf(activity, "%s/%s, query ", srcnam, attr_code);
-  TA_setactivity(activity);
-  TA_increment();
+	dieif(RP_tree_get(&mytree, reg_id, space, attr) != RP_OK);
 
-  if ( SQ_execute_query(con, vu, &result) == -1 ) { 
-    fprintf(stderr, "ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
-    die;
-  }
-  else { 
-    colcount = SQ_get_column_count(result);
-    
-    LG_log(rp_context, LG_DEBUG,
-	      "size after query = %x; columns = %d", sbrk(0), colcount);
-    
-    /* LOCKED when created, so no need to acquire lock here */
-    
-    while ( (row = SQ_row_next(result)) != NULL 
-	    && SQ_errno(con) == 0 ) {
-      
-      dieif( ! NOERR(make_sql2pack(result, row, &pack, attr, space, 
-				   colcount)) );
-      
-      if( ! NOERR(RP_pack_node_l(RX_OPER_CRE, &pack, mytree))) {
-	fprintf(stderr,"%d:\t%ld\n", objnr, pack.key);
-	die;
-      }
-      
-      /* free allocated memory */
-      if( pack.d.origin != NULL ) {
-	UT_free(pack.d.origin);
-	pack.d.origin = NULL;
-      }
-      
-      objnr++;
-      
-      LG_log(rp_context, LG_DEBUG, "size after object %d = %x", 
-		  objnr, sbrk(0));
-      
-      if( objnr % 1000 == 0 ) {
+	LG_log(rp_context, LG_INFO, "loading using %s", vu);
+	LG_log(rp_context, LG_DEBUG, "size before query = %x", sbrk(0));
 
-	  sprintf(activity, "%s/%s, %d done ", 
-		  srcnam, attr_code, objnr);
-	  TA_setactivity(activity);
-      }
-    }
-    /* XXX UNLOCK */
-    TH_release_write_lockw( &(mytree->rwlock) );
-  }
+	attr_code = DF_get_attribute_code(attr);
+	activity = UT_malloc(strlen(srcnam) + strlen(attr_code) + 32);
+	sprintf(activity, "%s/%s, query ", srcnam, attr_code);
+	TA_setactivity(activity);
+	TA_increment();
 
-  if( SQ_errno(con) == 0 ) {
-      SQ_free_result(result);
-  } else {
-      die;
-  }
+	if (SQ_execute_query(con, vu, &result) == -1) {
+		fprintf(stderr, "ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
+		die;
+	} else {
+		colcount = SQ_get_column_count(result);
 
-  LG_log(rp_context, LG_INFO, "loaded %d objects into %s", objnr,
-	    DF_get_attribute_code(attr) );
- 
-  UT_free(activity);
-  UT_free(srcnam);
-  return RP_OK;
+		LG_log(rp_context, LG_DEBUG, "size after query = %x; columns = %d", sbrk(0), colcount);
+
+		/* LOCKED when created, so no need to acquire lock here */
+
+		while ((row = SQ_row_next(result)) != NULL && SQ_errno(con) == 0) {
+
+			dieif(!NOERR(make_sql2pack(result, row, &pack, attr, space, colcount)));
+
+			if (!NOERR(RP_pack_node_l(RX_OPER_CRE, &pack, mytree))) {
+				fprintf(stderr, "%d:\t%ld\n", objnr, pack.key);
+				die;
+			}
+
+			/* free allocated memory */
+			if (pack.d.origin != NULL) {
+				UT_free(pack.d.origin);
+				pack.d.origin = NULL;
+			}
+
+			objnr++;
+
+			LG_log(rp_context, LG_DEBUG, "size after object %d = %x", objnr, sbrk(0));
+
+			if (objnr % 1000 == 0) {
+
+				sprintf(activity, "%s/%s, %d done ", srcnam, attr_code, objnr);
+				TA_setactivity(activity);
+			}
+		}
+		/* XXX UNLOCK */
+		TH_release_write_lockw(&(mytree->rwlock));
+	}
+
+	if (SQ_errno(con) == 0) {
+		SQ_free_result(result);
+	} else {
+		die;
+	}
+
+	LG_log(rp_context, LG_INFO, "loaded %d objects into %s", objnr, DF_get_attribute_code(attr));
+
+	UT_free(activity);
+	UT_free(srcnam);
+	return RP_OK;
 }
 
 int

@@ -1,0 +1,27 @@
+# CASE 11: We create 16-bit as-block
+# query: -r -B AS0.n - AS0.m
+# should return 16-bit block
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 11: The creation will succeed
+
+
+password: hostmaster
+override: password
+
+as-block:     AS100 - AS300
+descr:        Test block
+remarks:      These AS numbers are further assigned by RIPE NCC
+remarks:      to LIRs and end-users in the RIPE NCC region
+remarks:      Please refer to these documents
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20060101
+source:       DB-TEST
+
+

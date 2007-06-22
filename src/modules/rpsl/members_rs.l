@@ -8,7 +8,7 @@
   notes:
     Tokens are defined in the associated grammar, members_rs.y.
 
-  $Id: members_rs.l,v 1.1 2004/12/27 16:38:46 can Exp $
+  $Id: members_rs.l,v 1.1.14.1 2006/09/29 12:32:29 katie Exp $
 */
 
 /******************
@@ -36,10 +36,15 @@
 ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 RSNAME         RS-[A-Z0-9_-]*[A-Z0-9]
 INT            [0-9]+
-ASNO           AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])
 IPV4           {INT}(\.{INT}){3}
 PRFXV4         {IPV4}\/{INT}
 PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
+ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
+ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNO           {ASNO32}|{ASNO16}
+ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
+
 
 %{
 #include <stdlib.h>
@@ -47,8 +52,6 @@ PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 
 /* tokens defined in the grammar */
 #include "members_rs.tab.h"
-
-#define members_rswrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
@@ -92,6 +95,9 @@ void yy_input(char *buf, int *result, int max_size);
 
 {ASNO} { return TKN_ASNO; }
 
+{ASNOMIX} { 
+    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
+}
 
 (({ASNO}|peeras|{RSNAME}):)*{RSNAME}(:({ASNO}|peeras|{RSNAME}))* {
     return TKN_RSNAME;
@@ -176,3 +182,4 @@ members_rs_reset ()
 }
 
 
+int yywrap() { return 1; }

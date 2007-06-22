@@ -1,0 +1,29 @@
+
+# CASE 3: We try to create rtr-set object AS200.200:rtrs-test:AS300.300
+# testing the hierarchical name
+# object AS200.200:rtrs-test exists in the DB
+%
+% requires initial objects to be loaded
+#
+# create rtr-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+
+rtr-set:      AS200.200:rtrs-test:AS300.300
+descr:        TEST router set
+members:      rmws-brln-de07.nw.mediaWays.net
+members:      AS123.234:rtrs-test:AS123.234
+mp-members:      AS123.234:rtrs-test:AS123.234
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+
+password: auth

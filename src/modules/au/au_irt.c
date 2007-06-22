@@ -58,51 +58,40 @@ irt_creation (au_plugin_callback_info_t *info)
 }
 
 static AU_ret_t
-au_irt_authenticate (RT_context_t *ctx, const gchar *irt_name, LU_server_t *lu,
-                     const gchar *source_name, GList *cred,
-                     rpsl_object_t **irt)
+au_irt_authenticate(RT_context_t * ctx, const gchar * irt_name, LU_server_t * lu,
+	const gchar * source_name, GList * cred, rpsl_object_t ** irt)
 {
-  AU_ret_t ret_val;
-  GList *auth_attrs;
+	AU_ret_t ret_val;
+	GList *auth_attrs;
+	GList *p;
 
-  LG_log(au_context, LG_FUNC, ">au_irt_authenticate: entering");
+	LG_log(au_context, LG_FUNC, ">au_irt_authenticate: entering");
 
-  LG_log(au_context, LG_DEBUG,
-         "au_irt_authenticate: checking irt %s", irt_name);
+	LG_log(au_context, LG_DEBUG, "au_irt_authenticate: checking irt %s", irt_name);
 
-  /* try looking up the irt */
-  if (LU_lookup(lu, irt, "irt", irt_name, source_name) == LU_ERROR)
-  {
-    /* lookup failed */
-    LG_log(au_context, LG_WARN,
-           "au_irt_authenticate: error looking up irt %s", irt_name);
-    ret_val = AU_ERROR;
-  }
-  else
-  {
-    /* lookup worked */
-    if (*irt == NULL)
-    {
-      /* no such irt */
-      LG_log(au_context, LG_WARN,
-             "au_irt_authenticate: non-existant irt %s", irt_name);
-      RT_non_exist_irt(ctx, (char *)irt_name);
-      ret_val = AU_UNAUTHORISED_CONT;
-    }
-    else
-    {
-      /* irt exists - check the "auth:" attributes */
-      auth_attrs = rpsl_object_get_attr(*irt, "auth");
-      rpsl_attr_split_multiple(&auth_attrs);
-      ret_val = au_check_authentications(auth_attrs, cred);
-    }
-  }
+	/* try looking up the irt */
+	if (LU_lookup(lu, irt, "irt", irt_name, source_name) == LU_ERROR) {
+		/* lookup failed */
+		LG_log(au_context, LG_WARN, "au_irt_authenticate: error looking up irt %s", irt_name);
+		ret_val = AU_ERROR;
+	} else {
+		/* lookup worked */
+		if (*irt == NULL) {
+			/* no such irt */
+			LG_log(au_context, LG_WARN, "au_irt_authenticate: non-existant irt %s", irt_name);
+			RT_non_exist_irt(ctx, (char *)irt_name);
+			ret_val = AU_UNAUTHORISED_CONT;
+		} else {
+			/* irt exists - check the "auth:" attributes */
+			auth_attrs = rpsl_object_get_attr(*irt, "auth");
+			rpsl_attr_split_multiple(&auth_attrs);
+			ret_val = au_check_authentications(auth_attrs, cred);
+		}
+	}
 
-  LG_log(au_context, LG_FUNC,
-         "<au_irt_authenticate: exiting with value [%s]",
-         AU_ret2str(ret_val));
+	LG_log(au_context, LG_FUNC, "<au_irt_authenticate: exiting with value [%s]", AU_ret2str(ret_val));
 
-  return ret_val;
+	return ret_val;
 }
 
 AU_ret_t

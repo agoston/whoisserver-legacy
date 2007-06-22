@@ -113,7 +113,7 @@ CREATE TABLE as_set (
 CREATE TABLE aut_num (
   thread_id int(11) NOT NULL default '0',
   object_id int(10) unsigned NOT NULL default '0',
-  aut_num char(7) NOT NULL default '',
+  aut_num char(13) NOT NULL default '',
   PRIMARY KEY  (object_id)
 );
 
@@ -287,7 +287,7 @@ CREATE TABLE inet_rtr (
   thread_id int(11) NOT NULL default '0',
   object_id int(10) unsigned NOT NULL default '0',
   inet_rtr varchar(254) NOT NULL default '',
-  local_as varchar(7) NOT NULL default '',
+  local_as varchar(13) NOT NULL default '',
   PRIMARY KEY  (object_id)
 );
 
@@ -648,7 +648,7 @@ CREATE TABLE route (
   object_id int(10) unsigned NOT NULL default '0',
   prefix int(10) unsigned NOT NULL default '0',
   prefix_length tinyint(3) unsigned NOT NULL default '0',
-  origin char(7) NOT NULL default '',
+  origin char(13) NOT NULL default '',
   dummy tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (object_id)
 );
@@ -663,7 +663,7 @@ CREATE TABLE route6 (
   r6_msb varchar(20) NOT NULL default '',
   r6_lsb varchar(20) NOT NULL default '',
   prefix_length tinyint(3) unsigned NOT NULL default '0',
-  origin char(7) NOT NULL default '',
+  origin char(13) NOT NULL default '',
   dummy tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (object_id)
 );

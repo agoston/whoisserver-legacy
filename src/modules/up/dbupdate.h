@@ -103,7 +103,7 @@ typedef struct
   int count_successful;      /* number of objects successfuly processed */
   int count_unsuccessful;    /* number of objects unsuccessfuly processed */
   int count_noop;            /* number of objects processed without change */
-  FILE *state;               /* file pointer to state log file */
+  int statefd;               /* file pointer to state log file */
   mail_hdr_t mail_hdr_data;  /* contains the data from the update mail header */
   GHashTable *AUTO_key_hash;  /* stores details of auto generated keys */
   GHashTable *ntfy_hash;     /* stores email addresses for notification messages */

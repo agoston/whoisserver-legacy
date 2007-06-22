@@ -1,0 +1,69 @@
+==> filter-set/001/test <==
+
+# CASE 1: We try to create filter-set object fltr-customers
+%
+% requires initial objects to be loaded
+#
+# create filter-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+
+==> filter-set/002/test <==
+
+# CASE 2: We try to create filter-set object fltr-customers
+# with mp-filter attribute
+
+%
+% requires initial objects to be loaded
+#
+# create filter-set object 
+#
+#SUCCESS
+#
+# RESULT 2: The creation will succeed.
+
+==> filter-set/003/test <==
+
+# CASE 3: We try to create filter-set object fltr-customers
+# asn32 error
+%
+% requires initial objects to be loaded
+#
+# create filter-set object 
+#
+#FAILURE
+#
+# RESULT 3: The creation will fail.
+
+
+==> filter-set/004/test <==
+
+# CASE 4: We try to create filter-set object AS200.200:fltr-customers:AS300.300
+# object AS200.200:fltr-customers exists in the DB
+%
+% requires initial objects to be loaded
+#
+# create filter-set object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed.
+
+
+==> filter-set/005/test <==
+
+# CASE 5: We try to create filter-set object AS200.200:fltr-customers:AS300.300
+# object AS200.200:fltr-customers DOES NOT exist in the DB
+%
+% requires initial objects to be loaded
+#
+# create filter-set object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed.
+

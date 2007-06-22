@@ -1,8 +1,6 @@
 # inetnum erx status tests
 # CASE 9: We try to create inetnum object
 # with status ASSIGNED PI under EARLY-REGISTRATION 
-%
-% requires initial objects to be loaded
 #
 # create inetnum object 
 #

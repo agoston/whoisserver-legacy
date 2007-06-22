@@ -1,0 +1,15 @@
+# irt tests
+# CASE 19: inetnum 1 + route + irt 1
+#          query for inetnum 1
+#          
+# whois -BGc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 19: inetnum 1 + route + irt 1 returned
+#            person objects for inetnum 1 + route returned
+#            no grouping
+
+
+
+

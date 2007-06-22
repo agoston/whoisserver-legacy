@@ -1,0 +1,26 @@
+# ipv6 status tests
+# CASE 26: modify an inet6num with status ASSIGNED ANYCAST
+#          change status to ASSIGNED
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 26: The modification will fail
+
+
+inet6num:     2001:0600::/25
+netname:      EU-ZZ-2001-0600
+descr:        European Regional Registry
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       LIR-MNT
+mnt-lower:    LIR-MNT
+status:       ASSIGNED
+changed:      dbtest@ripe.net 20060101
+source:       DB-TEST
+
+password: LIR
+password: hostmaster
+

@@ -106,32 +106,98 @@ int command_quit(char *input, GString *output, sk_conn_st *condat) {
   ++++++++++++++++++++++++++++++++++++++*/
 int command_purify(char *input, GString *output, sk_conn_st *condat)
 {
-#if 0
-  purify_new_inuse();
-#else 
-  g_string_append(output, "NOP");
-#endif
+	//dmalloc_shutdown();
+//#if 0
+//  purify_new_inuse();
+//#else 
+//  g_string_append(output, "NOP");
+//#endif
   
   return 0;
 }
 
-int save_access_tree(char *input, GString *output, sk_conn_st *condat) {
-  int ret_err;
+int save_access_tree(char *input, GString * output, sk_conn_st * condat)
+{
+	int ret_err;
 
-  ret_err = AC_persistence_save();
+	ret_err = AC_persistence_save();
 
-  switch (ret_err) {
-  case AC_OK:
-    g_string_append(output, "Save successful");
-    break;
-  case AC_SAVING:
-    g_string_append(output, "Already saving");
-    break;
-  default:
-    g_string_append(output, "Unknown error");
-    return PC_RET_ERR;
-  }
-  return 0;
+	switch (ret_err) {
+	case AC_OK:
+		g_string_append(output, "Save successful");
+		break;
+	case AC_SAVING:
+		g_string_append(output, "Already saving");
+		break;
+	default:
+		g_string_append(output, "Unknown error");
+		return PC_RET_ERR;
+	}
+	return 0;
+}
+
+int save_acl_tree(char *input, GString * output, sk_conn_st * condat)
+{
+	int ret_err;
+
+	g_string_append(output, "No need to save ACL tree. It's always done right after any change "
+		"(which are automatic ban and the 'set acl' console command).");
+	return 0;
+}
+
+/** reload the acl tree */
+int set_acl_tree(char *input, GString * output, sk_conn_st * condat)
+{
+	int i;
+
+	for (i = MIN_IPSPACE_ID; i <= MAX_IPSPACE_ID; i++) {
+		TH_acquire_write_lock(&(act_acl[i]->rwlock));
+		rx_delete_tree(act_acl[i], act_acl[i]->top_ptr, 16777216, 0, 0, NULL);
+	}
+
+	AC_acc_load();
+
+	for (i = MIN_IPSPACE_ID; i <= MAX_IPSPACE_ID; i++) {
+		TH_release_write_lock(&(act_acl[i]->rwlock));
+	}
+
+	g_string_append(output, "ACL tree reload successful\n");
+
+	return 0;
+}
+
+/** reload the access tree */
+int set_access_tree(char *input, GString * output, sk_conn_st * condat)
+{
+	int i;
+
+	for (i = MIN_IPSPACE_ID; i <= MAX_IPSPACE_ID; i++) {
+		TH_acquire_write_lock(&(act_runtime[i]->rwlock));
+		if (act_runtime[i]->top_ptr) {
+			rx_delete_tree(act_runtime[i], act_runtime[i]->top_ptr, 16777216, 0, 0, NULL);
+		}
+	}
+
+	AC_persistence_load();
+
+	for (i = MIN_IPSPACE_ID; i <= MAX_IPSPACE_ID; i++) {
+		TH_release_write_lock(&(act_runtime[i]->rwlock));
+	}
+
+	g_string_append(output, "Access tree reload successful\n");
+
+	return 0;
+}
+
+/** reloads the aaa cache */
+int set_aaa_cache(char *input, GString * output, sk_conn_st * condat)
+{
+	AA_load();
+
+	/* if the server is still up, AA_load() didn't crash, so we're OK */
+	g_string_append(output, "AAA cache reload successful\n");
+
+	return 0;
 }
 
 /*++++++++++++++++++++++++++++++++++++++
@@ -257,12 +323,14 @@ int show_uptime(char *input, GString *output, sk_conn_st *condat)
 {
   char timestring[26];
   extern time_t SV_starttime;
+  time_t uptime = time(NULL) - SV_starttime;
   
   ctime_r(&SV_starttime, timestring); 
   SK_cd_printf( condat, 
-	       "System running since %sUptime in seconds: %ld \n\n",
+	       "System running since %sUptime in seconds: %ld (%.1f days)\n\n",
 	       timestring,		  
-	       time(NULL) - SV_starttime);
+	       uptime,
+	       uptime/86400.0);
   
   return 0;
 } 
@@ -324,6 +392,18 @@ int set_acl(char *input, GString *output, sk_conn_st *condat)
   
   /* first 8 characters ("set acl ") are already skipped */
   if( ! NOERR( AC_asc_acl_command_set( input, "Manual"))) {
+    g_string_append(output, "Error!\n");
+    res = PC_RET_ERR;
+  }
+  return res;
+}
+
+int set_access(char *input, GString *output, sk_conn_st *condat)
+{
+  int res = 0;
+  
+  /* first 8 characters ("set acl ") are already skipped */
+  if( ! NOERR( AC_set_access_command(input))) {
     g_string_append(output, "Error!\n");
     res = PC_RET_ERR;
   }

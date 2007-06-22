@@ -1,0 +1,34 @@
+# rdns tests
+# CASE 056: 
+#
+# create 1.e164.arpa domain object
+# making sure we don't accept glue records in ip6.arpa/in-addr.arpa
+#
+#FAILURE
+#
+# RESULT 056: creation will fail
+
+domain:       193.in-addr.arpa
+descr:        Test
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns1.1.in-addr.arpa 193.0.0.195
+nserver:      ns1.1.in-addr.arpa 193.0.0.196
+nserver:      ns2.1.ip6.arpa 2001:610:240:0:53::3
+nserver:      ns3.1.ip6.arpa 2001:0610:0240:0:053::3
+nserver:      ns4.1.ip6.arpa 2001:0610:0240:0:053:0:0:3
+nserver:      ns3.1.ip6.arpa 2001::AbDc
+nserver:      something.really.long.ns3.1.ip6.arpa 2001::AbDc
+nserver:      ns3.1.in-addr.arpa 2001::AbDc
+nserver:      ns3.1.ip6.arpa 193.0.0.195
+nserver:      ns3.1.ip6.arpa # I am not a glue
+nserver:      ns3.1.in-addr.arpa # I am not a gue
+mnt-by:       TEST-DBM-MNT
+mnt-lower:    TEST-DBM-MNT
+changed:      dbtest@ripe.net 20040329
+source:       DB-TEST
+password: test-dbm
+override: password
+
+

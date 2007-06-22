@@ -1,58 +1,139 @@
-#ifndef BISON_DEFAULT_TAB_H
-# define BISON_DEFAULT_TAB_H
+/* A Bison parser, made by GNU Bison 1.875d.  */
 
-#ifndef YYSTYPE
-typedef union {
+/* Skeleton parser for Yacc-like parsing with Bison,
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
+
+/* As a special exception, when this file is copied by Bison into a
+   Bison output file, you may use that output file without restriction.
+   This special exception was added by the Free Software Foundation
+   in version 1.24 of Bison.  */
+
+/* Tokens.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+   /* Put the tokens into the symbol table, so that GDB and other debuggers
+      know about them.  */
+   enum yytokentype {
+     OP_OR = 258,
+     OP_AND = 259,
+     OP_NOT = 260,
+     OP_MS = 261,
+     OP_EQUAL = 262,
+     OP_APPEND = 263,
+     OP_COMPARE = 264,
+     KEYW_ANY = 265,
+     KEYW_PEERAS = 266,
+     ASPATH_POSTFIX = 267,
+     TKN_FLTRNAME = 268,
+     TKN_ASNO = 269,
+     TKN_RSNAME = 270,
+     TKN_ASNAME = 271,
+     TKN_PRFXV4 = 272,
+     TKN_PRFXV4RNG = 273,
+     TKN_IPV4 = 274,
+     TKN_DNS = 275,
+     TKN_RTRSNAME = 276,
+     TKN_PRNGNAME = 277,
+     KEYW_TO = 278,
+     KEYW_ACTION = 279,
+     KEYW_NETWORKS = 280,
+     KEYW_EXCEPT = 281,
+     TKN_PREF = 282,
+     TKN_MED = 283,
+     TKN_DPA = 284,
+     TKN_ASPATH = 285,
+     TKN_COMMUNITY = 286,
+     TKN_NEXT_HOP = 287,
+     TKN_COST = 288,
+     TKN_COMM_NO = 289,
+     KEYW_IGP_COST = 290,
+     KEYW_SELF = 291,
+     KEYW_PREPEND = 292,
+     KEYW_APPEND = 293,
+     KEYW_DELETE = 294,
+     KEYW_CONTAINS = 295,
+     KEYW_AT = 296,
+     KEYW_INTERNET = 297,
+     KEYW_NO_EXPORT = 298,
+     KEYW_NO_ADVERTISE = 299,
+     TKN_INT = 300
+   };
+#endif
+#define OP_OR 258
+#define OP_AND 259
+#define OP_NOT 260
+#define OP_MS 261
+#define OP_EQUAL 262
+#define OP_APPEND 263
+#define OP_COMPARE 264
+#define KEYW_ANY 265
+#define KEYW_PEERAS 266
+#define ASPATH_POSTFIX 267
+#define TKN_FLTRNAME 268
+#define TKN_ASNO 269
+#define TKN_RSNAME 270
+#define TKN_ASNAME 271
+#define TKN_PRFXV4 272
+#define TKN_PRFXV4RNG 273
+#define TKN_IPV4 274
+#define TKN_DNS 275
+#define TKN_RTRSNAME 276
+#define TKN_PRNGNAME 277
+#define KEYW_TO 278
+#define KEYW_ACTION 279
+#define KEYW_NETWORKS 280
+#define KEYW_EXCEPT 281
+#define TKN_PREF 282
+#define TKN_MED 283
+#define TKN_DPA 284
+#define TKN_ASPATH 285
+#define TKN_COMMUNITY 286
+#define TKN_NEXT_HOP 287
+#define TKN_COST 288
+#define TKN_COMM_NO 289
+#define KEYW_IGP_COST 290
+#define KEYW_SELF 291
+#define KEYW_PREPEND 292
+#define KEYW_APPEND 293
+#define KEYW_DELETE 294
+#define KEYW_CONTAINS 295
+#define KEYW_AT 296
+#define KEYW_INTERNET 297
+#define KEYW_NO_EXPORT 298
+#define KEYW_NO_ADVERTISE 299
+#define TKN_INT 300
+
+
+
+
+#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
+#line 38 "default.y"
+typedef union YYSTYPE {
     char *sval;
-} yystype;
-# define YYSTYPE yystype
+} YYSTYPE;
+/* Line 1285 of yacc.c.  */
+#line 131 "default.tab.h"
+# define yystype YYSTYPE /* obsolescent; will be withdrawn */
+# define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
-# define	OP_OR	257
-# define	OP_AND	258
-# define	OP_NOT	259
-# define	OP_MS	260
-# define	OP_EQUAL	261
-# define	OP_APPEND	262
-# define	OP_COMPARE	263
-# define	KEYW_ANY	264
-# define	KEYW_PEERAS	265
-# define	ASPATH_POSTFIX	266
-# define	TKN_FLTRNAME	267
-# define	TKN_ASNO	268
-# define	TKN_RSNAME	269
-# define	TKN_ASNAME	270
-# define	TKN_PRFXV4	271
-# define	TKN_PRFXV4RNG	272
-# define	TKN_IPV4	273
-# define	TKN_DNS	274
-# define	TKN_RTRSNAME	275
-# define	TKN_PRNGNAME	276
-# define	KEYW_TO	277
-# define	KEYW_ACTION	278
-# define	KEYW_NETWORKS	279
-# define	KEYW_EXCEPT	280
-# define	TKN_PREF	281
-# define	TKN_MED	282
-# define	TKN_DPA	283
-# define	TKN_ASPATH	284
-# define	TKN_COMMUNITY	285
-# define	TKN_NEXT_HOP	286
-# define	TKN_COST	287
-# define	TKN_COMM_NO	288
-# define	KEYW_IGP_COST	289
-# define	KEYW_SELF	290
-# define	KEYW_PREPEND	291
-# define	KEYW_APPEND	292
-# define	KEYW_DELETE	293
-# define	KEYW_CONTAINS	294
-# define	KEYW_AT	295
-# define	KEYW_INTERNET	296
-# define	KEYW_NO_EXPORT	297
-# define	KEYW_NO_ADVERTISE	298
-# define	TKN_INT	299
-
 
 extern YYSTYPE defaultlval;
 
-#endif /* not BISON_DEFAULT_TAB_H */
+
+

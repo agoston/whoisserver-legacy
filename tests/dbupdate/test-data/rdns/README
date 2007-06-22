@@ -202,3 +202,333 @@
 # RESULT 20: update will fail
 
 
+# rdns tests
+# CASE 024: 
+#
+# create 1.e164.arpa domain object
+#
+#FAILURE
+#
+# RESULT 024: creation will fail because there is no parent object
+
+
+# rdns tests
+# CASE 024: 
+#
+# create 1.e164.arpa domain object
+#
+#FAILURE
+#
+# RESULT 024: creation will fail because there is no parent object
+
+# rdns tests
+# CASE 025: 
+#
+# create 1.e164.arpa domain object
+#
+#SUCCESS
+#
+# RESULT 025: creation will succeed
+
+# rdns tests
+# CASE 026: 
+#
+# create 1.1.e164.arpa domain object
+# 1.e164.arpa exists
+#
+#FAILURE
+#
+# RESULT 026: creation will fail
+
+# rdns tests
+# CASE 027: 
+#
+# create 1.e164.arpa domain object
+# checking various syntax 
+#
+#SUCCESS
+#
+# RESULT 027: creation will succeed
+
+# rdns tests
+# CASE 028: 
+#
+# create e164.arpa domain object
+#
+#SUCCESS
+#
+# RESULT 028: creation will succeed
+
+# rdns tests
+# CASE 029: 
+#
+# update e164.arpa domain object
+#
+#SUCCESS
+#
+# RESULT 029: modification will succeed
+
+# rdns tests
+# CASE 030: 
+#
+# update 1.e164.arpa domain object
+#
+#SUCCESS
+#
+# RESULT 030: modification will succeed
+
+# rdns tests
+# CASE 031: 
+#
+# delete 1.e164.arpa domain object
+#
+#SUCCESS
+#
+# RESULT 031: deleiton will succeed
+
+# rdns tests
+# CASE 032: 
+#
+# create 1.e164.arpa domain object
+# to check the bugfix for names line 111in-addr.arpa or 111e164.arpa (suffix not matched correctly).
+#
+#FAILURE
+#
+# RESULT 032: creation will fail
+
+# rdns tests
+# CASE 033:
+#
+# create 1.e164.arpa domain object
+# must fail with rdns errors - no override
+#
+#FAILURE
+#
+# RESULT 033: creation will fail
+
+# rdns tests
+# CASE 034: 
+#
+# create domain object
+# DS=1
+#
+#FAILURE
+#
+# RESULT 034: creation will fail but no "DS rejected" message
+
+# rdns tests
+# CASE 035: 
+#
+# create 1.e164.arpa domain object
+# make sure we can't submit DS record in e164.arpa related object.
+# !!! THIS TEST WILL FAIL AFTER THE CODECHANGE TO ALLOW DS IN E164.ARPA zone.
+
+#
+#FAILURE
+#
+# RESULT 035: creation will succeed
+
+# rdns tests
+# CASE 036: 
+#
+# modify 1.e164.arpa domain object
+# must fail with rdns errors - no override
+#
+#FAILURE
+#
+# RESULT 036: modify will fail
+#
+# rdns tests
+# CASE 037:
+#
+# create 1.e164.arpa domain object
+# checking various syntax
+#
+#FAILURE
+#
+# RESULT 037: creation will fail
+# rdns tests
+# CASE 38: create /12 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 38: creation will pass
+# rdns tests
+# CASE 39: Create succeeds - testing decomposition on /24 level.
+# override used to skip dns checks
+#
+# create domain objects
+#
+#SUCCESS
+#
+# RESULT 39: creation will succeed
+
+
+# rdns tests
+# CASE 40: create /16
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 40: creation will pass
+# rdns tests
+# CASE 41: create /20 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 41: creation will pass
+# rdns tests
+# CASE 42: create /24 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 42: creation will pass
+# rdns tests
+# CASE 43: create /28 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 43: creation will pass
+# rdns tests
+# CASE 44: create /32 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 44: creation will pass
+# rdns tests
+# CASE 45: create /48 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 45: creation will pass
+# rdns tests
+# CASE 46: create /64 domain object
+# inet6num exists and authorised
+# make sure rDNS checks took place 
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 46: creation will pass
+# rdns tests
+# CASE 47: Create /8 domain object ipv4
+# override used to pass dns checks
+#
+# create domain objects
+#
+#SUCCESS
+#
+# RESULT 47: creation will succeed
+# rdns tests
+# CASE 48: Create /16 domain object ipv4
+# override used to pass dns checks
+#
+# create domain objects
+#
+#SUCCESS
+#
+# RESULT 48: creation will succeed
+# rdns tests
+# CASE 49: Create /24 domain object ipv4
+# override used to pass dns checks
+#
+# create domain objects
+#
+#SUCCESS
+#
+# RESULT 49: creation will succeed
+# rdns tests
+# CASE 50: Create /32 domain object ipv4
+# no override
+#
+# create domain objects
+#
+#FAILURE
+#
+# RESULT 50: creation will fail
+# rdns tests
+# CASE 51: create /128 domain object
+# inet6num exists and authorised
+# no override
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 51: creation will fail
+# rdns tests
+# CASE 52: create /44 domain object
+# inet6num exists and authorised
+# no override
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 51: creation will fail
+# rdns tests
+# CASE 53: create /68 domain object
+# inet6num exists and authorised
+# no override
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 53: creation will fail
+# rdns tests
+# CASE 54: create /8 domain object ipv6
+# inet6num exists and authorised
+# no override
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 54: creation will fail
+# rdns tests
+# CASE 55: Create classless ipv4, with a '-' (classless delegation)
+# no override
+#
+# create domain objects
+#
+#FAILURE
+#
+# RESULT 55: creation will fail
+# rdns tests
+# CASE 056: 
+#
+# create 1.e164.arpa domain object
+# making sure we don't accept glue records in ip6.arpa/in-addr.arpa
+#
+#FAILURE
+#
+# RESULT 056: creation will fail

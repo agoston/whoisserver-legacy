@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   Example code: main server code.
 
@@ -79,43 +79,55 @@ void error_init(int argc, char ** argv) {
 
 } /* error_init() */
 
+void segfault_handler(int sig) {
+	// we print a nice message, including sig, to make things absolutely clear
+	fprintf(stderr, " *** Signal %d caught, segfault handler starting\n", sig);
+	die;
+}
 
 void install_signal_handler()
 {
- struct sigaction sig;
- sigset_t sset;
+	struct sigaction sig, oldsig;
+	sigset_t sset;
 
-   memset(&sig, 0, sizeof(struct sigaction));
-   sigemptyset(&sset);
- 
-   sig.sa_flags = 0;
-   sig.sa_handler = SIG_DFL;
+	memset(&sig, 0, sizeof(struct sigaction));
+	sigemptyset(&sset);
 
-   /* change disposition for the signals to handler */
-   /* this is to avoid signal non delivery in case signal is ignored by parent */
+	sig.sa_flags = 0;
+	sig.sa_handler = SIG_DFL;
 
-   /* SIGUSR1 will switch the updates on and off */
-   sigaction(SIGUSR1, &sig, NULL);
-   
-   /* SIGINT and SIGTERM stop all servers by setting do_server to 0 */
-   sigaction(SIGINT, &sig, NULL);
-   sigaction(SIGTERM, &sig, NULL);
-    
-   /* SIGPIPE occurs at uncomfortable times on TCP sockets, so we ignore it.
-      In such a case we still get a -1 from the offending I/O operation, and 
-      the errno of EPIPE. */
-   sig.sa_handler = SIG_IGN;
-   sigaction(SIGPIPE, &sig, NULL);
+	/* change disposition for the signals to handler */
+	/* this is to avoid signal non delivery in case signal is ignored by parent */
 
-   /* now block the delivery of these signals in other threads */
-   /* this will be inherited by other threads */
-   sigemptyset(&sset);
-   sigaddset(&sset, SIGTERM);
-   sigaddset(&sset, SIGINT);
-   sigaddset(&sset, SIGUSR1); 
-   sigaddset(&sset, SIGPIPE);
-   pthread_sigmask(SIG_BLOCK, &sset, NULL);
-  	
+	/* SIGUSR1 will switch the updates on and off */
+	sigaction(SIGUSR1, &sig, NULL);
+
+	/* SIGINT and SIGTERM stop all servers by setting do_server to 0 */
+	sigaction(SIGINT, &sig, NULL);
+	sigaction(SIGTERM, &sig, NULL);
+
+	/* SIGPIPE occurs at uncomfortable times on TCP sockets, so we ignore it.
+	   In such a case we still get a -1 from the offending I/O operation, and 
+	   the errno of EPIPE. */
+	sig.sa_handler = SIG_IGN;
+	sigaction(SIGPIPE, &sig, NULL);
+
+	// set segfault handler
+	memset(&sig, 0, sizeof(struct sigaction));
+	memset(&oldsig, 0, sizeof(struct sigaction));
+	sig.sa_handler = segfault_handler;
+	sigaction(SIGSEGV, &sig, &oldsig);
+	orig_segfault_handler = oldsig.sa_handler;
+	sigaction(SIGABRT, &sig, &oldsig);
+
+	/* now block the delivery of these signals in other threads */
+	/* this will be inherited by other threads */
+	sigemptyset(&sset);
+	sigaddset(&sset, SIGTERM);
+	sigaddset(&sset, SIGINT);
+	sigaddset(&sset, SIGUSR1);
+	sigaddset(&sset, SIGPIPE);
+	pthread_sigmask(SIG_BLOCK, &sset, NULL);
 }
 
 
@@ -152,74 +164,74 @@ static void sv_init_modules(void) {
   SQ_init(sv_prepare_context(ca_get_sqlog, "SQ"));
   SV_init(sv_prepare_context(ca_get_ripsvrlog, "SV"));
   UD_init(sv_prepare_context(ca_get_ripupdlog, "UD"));
-
-
-
-
 }
 
-int main(int argc, char** argv) {
-  extern char *optarg;
-  char *prop_file_name;
-  char *pid_file_name;                       
-  char *result;
-  int c, ret, errflg=0;
-  LG_context_t* boot_ctx;
+int main(int argc, char **argv)
+{
+	extern char *optarg;
+	char *prop_file_name;
+	char *pid_file_name;
+	char *result;
+	int c, ret, errflg = 0;
+	LG_context_t *boot_ctx;
 
-  /* Initialize GLib library to be thread-safe */
-  g_thread_init(NULL); 
+	/* Initialize GLib library to be thread-safe */
+	g_thread_init(NULL);
 
-  /* parse command line options */     
-  prop_file_name = NULL;
-  pid_file_name = NULL;
-  if(argc<5) errflg++;
+	/* parse command line options */
+	prop_file_name = NULL;
+	pid_file_name = NULL;
+	if (argc < 5)
+		errflg++;
 
-     while ((c = getopt(argc, argv, "c:p:?")) != EOF)
-     switch (c) {
-      case 'c':
-        prop_file_name = g_strdup(optarg);
-        break;  
-      case 'p':
-        pid_file_name = g_strdup(optarg);
-        break;
-      case '?':
-      default :
-        errflg++;
-     }
-     if (errflg || (prop_file_name == NULL) || (pid_file_name == NULL)) {
-        fprintf(stderr,"usage: %s -c config -p pid_file\n", argv[0]);
-        exit (2);
-     }
+	while ((c = getopt(argc, argv, "c:p:?")) != EOF)
+		switch (c) {
+		case 'c':
+			prop_file_name = g_strdup(optarg);
+			break;
+		case 'p':
+			pid_file_name = g_strdup(optarg);
+			break;
+		case '?':
+		default:
+			errflg++;
+		}
+	if (errflg || (prop_file_name == NULL) || (pid_file_name == NULL)) {
+		fprintf(stderr, "usage: %s -c config -p pid_file\n", argv[0]);
+		exit(2);
+	}
 
-   install_signal_handler();
+	install_signal_handler();
 
-/* Create signal handling thread and block signals for others */
-   /*   printf("Starting the signal handler\n");*/
-   TH_create((void *(*)(void *))SV_signal_thread, NULL);
-     
-  
- /*  Set the constants. */
-  /* fprintf(stderr,"Constants:\n");  */
-  result=CO_set(); 
-  UT_free(result);
-  fprintf(stderr,"Configuration [%s]:\n", prop_file_name);
-  boot_ctx = LG_ctx_new();  //this is leaking, not serious
-  LG_ctx_add_appender(boot_ctx, LG_app_get_file_info_dump(stderr));
-  UT_init(boot_ctx);
-  ca_init(prop_file_name);
-  g_free(prop_file_name);
+	/* Create signal handling thread and block signals for others */
+	/*   printf("Starting the signal handler\n"); */
+	TH_create((void *(*)(void *))SV_signal_thread, NULL);
 
-  sv_init_modules();
+	/*  Set the constants. */
+	/* fprintf(stderr,"Constants:\n");  */
+	result = CO_set();
+	UT_free(result);
+	fprintf(stderr, "Configuration [%s]:\n", prop_file_name);
+	boot_ctx = LG_ctx_new();	//this is leaking, not serious
+	LG_ctx_add_appender(boot_ctx, LG_app_get_file_info_dump(stderr));
+	UT_init(boot_ctx);
+	ca_init(prop_file_name);
+	g_free(prop_file_name);
 
-  /* fprintf(stderr,"%s\n", ca_get_allriperr); */
-  /* Initialize error handling */
-  error_init(argc, argv);
+	sv_init_modules();
 
-  /*  Start the server */
+	/* fprintf(stderr,"%s\n", ca_get_allriperr); */
+	/* Initialize error handling */
+	error_init(argc, argv);
 
-  ret = SV_start(pid_file_name);
-  
-  if(ret != 0) return(1); else return(0);
+	/*  Start the server */
 
-} /* main() */
+	ret = SV_start(pid_file_name);
+
+	if (ret != 0)
+		return (1);
+	else
+		return (0);
+
+}								/* main() */
 

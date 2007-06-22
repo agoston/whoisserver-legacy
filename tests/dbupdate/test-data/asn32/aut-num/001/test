@@ -1,0 +1,78 @@
+
+# CASE 1: We try to create aut-num object AS123
+# this objects tests various flavors of the attributes:
+# mp-import mp-export mp-default
+# import export default
+# we test 32 AS number on itself
+# we test 32 AS number as a part of the set name
+# we test community value as a part of filter in import/export etc
+%
+% requires initial objects to be loaded
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+aut-num:      AS123
+as-name:      ASTEST
+descr:        TEST TELEKOM
+import:       from AS1 accept {1.2.3.4/24}
+export:       to AS2 announce {1.2.3.4/24}
+import:       from AS1 accept (AS1.30 and not AS3.40 and AS1:as-myset:AS34.245:As-otherset)
+import:       from AS1:as-myset:AS34.245:As-otherset accept community.contains(0.1:65535)
+import:       from AS1:as-myset:AS34.245:As-otherset accept <.* AS23.234 .*>
+import:       from AS1 accept community.contains(65535.65535:65535)
+import:       from AS1 accept community.contains(0.0:0)
+import:       from AS1 accept community.contains(0.1:65535)
+import:       from AS1 accept community.contains(0.1:65535)
+import:       from AS1 accept community.contains(1.0:2)
+import:       from AS1 accept community.contains(1:2)
+import:       from AS1 accept community.contains(1000)
+mp-import:       from AS1 accept (AS1.30 and not AS3.40 and AS1:as-myset:AS34.245:As-otherset)
+mp-import:       from AS1 accept community.contains(0.1:65535)
+mp-import:       from AS1:as-myset:AS34.245:As-otherset accept <.* AS23.234 .*>
+mp-import:       from AS1:as-myset:AS34.245:As-otherset accept community.contains(0.1:65535)
+mp-import:       from AS1 accept community.contains(1.0:2)
+mp-import:       from AS1 accept community.contains(1:2)
+mp-import:       from AS1 accept community.contains(1000)
+export:       to AS1 announce (AS1.30 and not AS3.40 and AS1:as-myset:AS34.245:As-otherset)
+export:       to AS1 announce community.contains(0.1:65535)
+export:       to AS1:as-myset:AS34.245:As-otherset announce <.* AS23.234 .*>
+export:       to AS1:as-myset:AS34.245:As-otherset announce community.contains(0.1:65535)
+export:       to AS1 announce community.contains(1.0:2)
+export:       to AS1 announce community.contains(1:2)
+export:       to AS1 announce community.contains(1000)
+mp-export:       to AS1 announce (AS1.30 and not AS3.40 and AS1:as-myset:AS34.245:As-otherset)
+mp-export:       to AS1 announce community.contains(0.1:65535)
+mp-export:       to AS1:as-myset:AS34.245:As-otherset announce <.* AS23.234 .*>
+mp-export:       to AS1:as-myset:AS34.245:As-otherset announce community.contains(0.1:65535)
+mp-export:       to AS1 announce community.contains(1.0:2)
+mp-export:       to AS1 announce community.contains(1:2)
+mp-export:       to AS1 announce community.contains(1000)
+default:      to AS1 networks (AS1.30 and not AS3.40 and AS1:as-myset:AS34.245:As-otherset)
+default:      to AS1 networks <.* AS23.234 .*>
+default:      to AS1 networks community.contains(0.1:0)
+default:      to AS1:as-myset:AS34.245:As-otherset networks community.contains(0.1:0)
+default:      to AS1 networks community.contains(0.1:65535)
+default:      to AS1 networks community.contains(1.0:2)
+default:      to AS1 networks community.contains(1:2)
+default:      to AS1 networks community.contains(1000)
+mp-default:      to AS1 networks (AS1.30 and not AS3.40 and AS1:as-myset:AS34.245:As-otherset)
+mp-default:      to AS1:as-myset:AS34.245:As-otherset networks community.contains(0.1:0)
+mp-default:      to AS1 networks <.* AS23.234 .*>
+mp-default:      to AS1 networks community.contains(0.1:65535)
+mp-default:      to AS1 networks community.contains(1.0:2)
+mp-default:      to AS1 networks community.contains(1:2)
+mp-default:      to AS1 networks community.contains(1000)
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+password:     hostmaster
+password:     auth

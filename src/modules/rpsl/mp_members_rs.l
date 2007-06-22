@@ -35,7 +35,7 @@
   notes:
     Tokens are defined in the associated grammar, mp_members_rs.y.
 
-  $Id: mp_members_rs.l,v 1.2 2004/12/10 16:37:40 can Exp $
+  $Id: mp_members_rs.l,v 1.1.14.1 2006/09/29 12:32:29 katie Exp $
 */
 
 /******************
@@ -64,7 +64,6 @@ ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 RSNAME         RS-[A-Z0-9_-]*[A-Z0-9]
 INT            [0-9]+
 QUAD           [0-9A-F]{1,4}
-ASNO           AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])
 IPV4           {INT}(\.{INT}){3}
 IPV6           ({QUAD}|{INT})(:({QUAD}|{INT})){7}
 IPV6DC         ((({QUAD}|{INT}):){0,6}({QUAD}|{INT}))?::(({QUAD}|{INT})(:({QUAD}|{INT})){0,6})?
@@ -74,6 +73,12 @@ PRFXV6DC       {IPV6DC}\/{INT}
 PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 PRFXV6RNG      {PRFXV6}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 PRFXV6DCRNG    {PRFXV6DC}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
+ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
+ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNO           {ASNO32}|{ASNO16}
+ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
+
 
 %{
 #include <stdlib.h>
@@ -83,7 +88,6 @@ PRFXV6DCRNG    {PRFXV6DC}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 /* tokens defined in the grammar */
 #include "mp_members_rs.tab.h"
 
-#define mp_members_rswrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
@@ -123,6 +127,10 @@ void yy_input(char *buf, int *result, int max_size);
                      yytext);
     }
     return OP_MS;
+}
+
+{ASNOMIX} {
+    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
 }
 
 {ASNO} { return TKN_ASNO; }
@@ -395,3 +403,4 @@ mp_members_rs_reset ()
 }
 
 
+int yywrap() { return 1; }

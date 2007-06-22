@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.5 $
 
   Functions to process data stream( file, network socket, etc.)
 
@@ -311,6 +311,7 @@ GList *org_name_attrs;
 const GList *p;
 GString *new_obj;
 rpsl_object_t *ret_val;
+rpsl_error_t error;
 C_Type_t class_type;
 int i;
 
@@ -353,6 +354,9 @@ int i;
         g_string_sprintfa(new_obj, "%s:%s\n", rpsl_attr_get_name(p->data), rpsl_attr_get_value(p->data));
     }
   }else{/* else, this is an organisation object */
+
+    /* remove org-name attribute */
+    rpsl_object_remove_attr_name(object, "org-name", &error);
 
     /* We will add the org-name attributes at the end of the object */ 
     old_attrs = rpsl_object_get_all_attr(object);
@@ -748,109 +752,119 @@ int ta_upd_nhr;
 *                                                           * 
 ************************************************************/
 
-static int process_updates(UD_stream_t *ud_stream, Transaction_t *tr, int operation)
+static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int operation)
 {
-int result=0;
-Log_t *log_ptr= &(ud_stream->log);
-int dummy=0;
-ut_timer_t sotime;
-int ta_upd_nhr;
-char *reason;
+	int result = 0;
+	Log_t *log_ptr = &(ud_stream->log);
+	int dummy = 0;
+	ut_timer_t sotime;
+	int ta_upd_nhr;
+	char *reason;
 
-    /* Start timer for statistics */
-    UT_timeget(&sotime);
-    if(IS_NO_NHR(tr->mode))ta_upd_nhr=0; else ta_upd_nhr = TA_UPD_NHR;
+	/* Start timer for statistics */
+	UT_timeget(&sotime);
+	if (IS_NO_NHR(tr->mode))
+		ta_upd_nhr = 0;
+	else
+		ta_upd_nhr = TA_UPD_NHR;
 
-    switch(operation) {
-    /* Compare operations and report an error if they do not match */    
-    case OP_ADD:
-      if(tr->object_id!=0) { /* trying to create, but object exists */
-        tr->succeeded=0; tr->error|=ERROR_U_COP;
-	reason="U:ADD:object already exists";
-        g_string_sprintfa(tr->error_script,"E[%d]:NEW requested but object already exists\n" ,ERROR_U_COP);
-        UD_ack(tr); /* Send a NACK */
-      } else {
-       /* Action: create the object and update NHR */
-        tr->action=(TA_CREATE | ta_upd_nhr);
-	reason="U:ADD";
-        object_process(tr);
-      }
-      break;
-    case OP_UPD:
-      if(tr->object_id==0) { /* trying to update non-existing object*/
-        tr->succeeded=0; tr->error|=ERROR_U_COP;
-	reason="U:UPD:non-existing object";
-        g_string_sprintfa(tr->error_script,"E[%d]:UPD requested but no existing object found\n" ,ERROR_U_COP);
-        UD_ack(tr); /* Send a NACK */
-      } else {
-        tr->action=TA_UPDATE;
-	reason="U:UPD";
-        dummy=isdummy(tr);
-        if(dummy==1) tr->action = TA_UPD_DUMMY;
-        object_process(tr);
-      }
-      break;
+	switch (operation) {
+		/* Compare operations and report an error if they do not match */
+	case OP_ADD:
+		if (tr->object_id != 0) {	/* trying to create, but object exists */
+			tr->succeeded = 0;
+			tr->error |= ERROR_U_COP;
+			reason = "U:ADD:object already exists";
+			g_string_sprintfa(tr->error_script, "E[%d]:NEW requested but object already exists\n", ERROR_U_COP);
+			UD_ack(tr);			/* Send a NACK */
+		} else {
+			/* Action: create the object and update NHR */
+			tr->action = (TA_CREATE | ta_upd_nhr);
+			reason = "U:ADD";
+			object_process(tr);
+		}
+		break;
+		
+	case OP_UPD:
+		if (tr->object_id == 0) {	/* trying to update non-existing object */
+			tr->succeeded = 0;
+			tr->error |= ERROR_U_COP;
+			reason = "U:UPD:non-existing object";
+			g_string_sprintfa(tr->error_script, "E[%d]:UPD requested but no existing object found\n", ERROR_U_COP);
+			UD_ack(tr);			/* Send a NACK */
+		} else {
+			tr->action = TA_UPDATE;
+			reason = "U:UPD";
+			dummy = isdummy(tr);
+			if (dummy == 1)
+				tr->action = TA_UPD_DUMMY;
+			object_process(tr);
+		}
+		break;
 
-    case OP_DEL:        
-      if(tr->object_id==0) { /* trying t delete non-existing object*/
-        tr->succeeded=0; tr->error|=ERROR_U_COP;
-	reason="U:DEL:non-existing object";
-        g_string_sprintfa(tr->error_script,"E[%d]:DEL requested but no existing object found\n" ,ERROR_U_COP);
-	UD_ack(tr);
-      } else {
-        tr->action=(TA_DELETE | ta_upd_nhr);
-	reason="U:DEL";
-        object_process(tr);
-      }
-      break;
-                
-    default:                
-      /* bad operation for this mode if not standalone */
-      if(IS_STANDALONE(tr->mode)) {
-        if(tr->object_id==0){
-	  tr->action=(TA_CREATE | ta_upd_nhr); 
-	  reason="U:ADD";
+	case OP_DEL:
+		if (tr->object_id == 0) {	/* trying t delete non-existing object */
+			tr->succeeded = 0;
+			tr->error |= ERROR_U_COP;
+			reason = "U:DEL:non-existing object";
+			g_string_sprintfa(tr->error_script, "E[%d]:DEL requested but no existing object found\n", ERROR_U_COP);
+			UD_ack(tr);
+		} else {
+			tr->action = (TA_DELETE | ta_upd_nhr);
+			reason = "U:DEL";
+			object_process(tr);
+		}
+		break;
+
+	default:
+		/* bad operation for this mode if not standalone */
+		if (IS_STANDALONE(tr->mode)) {
+			if (tr->object_id == 0) {
+				tr->action = (TA_CREATE | ta_upd_nhr);
+				reason = "U:ADD";
+			} else {
+				tr->action = TA_UPDATE;
+				reason = "U:UPD";
+			}
+			object_process(tr);
+		} else {
+			tr->succeeded = 0;
+			tr->error |= ERROR_U_BADOP;
+			g_string_sprintfa(tr->error_script, "E[%d]:Unknown operation requested\n", ERROR_U_BADOP);
+			reason = "U:bad operation";
+			UD_ack(tr);			/* Send a NACK */
+		}
+		break;
 	}
-	else {
-	  tr->action=TA_UPDATE;
-	  reason="U:UPD";
+	/* If not in standalone mode create serial and copy error transcript */
+	if (!IS_STANDALONE(tr->mode)) {
+		if (tr->succeeded) {
+			/* we don't want to generate DEL serial for dummy replacement */
+			if (dummy == 1) {
+				tr->action = TA_CREATE;
+				tr->sequence_id++;
+			}
+			UD_lock_serial(tr);
+			UD_create_serial(tr);
+			CP_CREATE_S_PASSED(tr->action);
+			TR_update_status(tr);
+			UD_commit_serial(tr);
+			UD_unlock_serial(tr);
+			/* Mark the TR as clean */
+			TR_mark_clean(tr);
+		}
 	}
-        object_process(tr);
-      }
-      else {
-        tr->succeeded=0; 
-        tr->error|=ERROR_U_BADOP;
-        g_string_sprintfa(tr->error_script,"E[%d]:Unknown operation requested\n" ,ERROR_U_BADOP);
-	reason="U:bad operation";
-        UD_ack(tr); /* Send a NACK */ 
-      }
-      break;
-    }
-   /* If not in standalone mode create serial and copy error transcript */ 
-    if(!IS_STANDALONE(tr->mode)) {
-      if(tr->succeeded){
-	      /* we don't want to generate DEL serial for dummy replacement*/
-	      if(dummy==1) { tr->action=TA_CREATE; tr->sequence_id++; }
-              UD_lock_serial(tr);
-	      UD_create_serial(tr); 
-	      CP_CREATE_S_PASSED(tr->action); TR_update_status(tr);
-	      UD_commit_serial(tr);
-	      UD_unlock_serial(tr);
-	      /* Mark the TR as clean */
-              TR_mark_clean(tr);
-      }
-    }  
-   
-   /* Make a report. U stands for update stream. No reason */
-    result=report_transaction(tr, tr->transaction_id, log_ptr, &sotime, reason);
 
-   /* Free resources */   
+	/* Make a report. U stands for update stream. No reason */
+	result = report_transaction(tr, tr->transaction_id, log_ptr, &sotime, reason);
+
+	/* Free resources */
 /*    rpsl_object_delete(tr->object); */
-    transaction_free(tr);
-    
-    return(result);
-        
-} /* process_updates() */
+	transaction_free(tr);
+
+	return (result);
+
+}								/* process_updates() */
 
 
 /************************************************************

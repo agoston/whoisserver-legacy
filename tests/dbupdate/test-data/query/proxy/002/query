@@ -1,0 +1,7 @@
+% This is the MyDB Whois server.
+
+%ERROR:203: address passing not allowed for ::1
+%
+% Sorry, you are not allowed to pass addresses on the query line .
+% Please contact us for such permission. For the moment, continuing
+% this will cause permanent denial of access.

@@ -1,0 +1,27 @@
+# organisation object tests
+# CASE 47: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         and a one-word name
+#         the word is longer than 64 chars.
+#         this will fail: 
+#
+# create organisation object 
+#
+#FAILURE
+#
+# RESULT 47: The creation will fail with syntax error
+
+
+organisation:  AUTO-1
+org-name:      EXAMPLEEXAMPLEEXAMPLEEXAMPLEEXAMPLEEXAMPLEEXAMPLEEXAMPLEEXAMPLEEXAMPLE
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+abuse-mailbox: dbtest@ripe.net
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm

@@ -31,8 +31,19 @@
 
 <xsl:template match="status_check_failed_allocbyrir">
 
-***Error: ALLOCATED-BY-RIR inet6num objects require the administrative
-  maintainer.
+***Error: ALLOCATED-BY-RIR inet6num objects require the administrative maintainer.
+  You probably want "status: ALLOCATED-BY-LIR" or "status: ASSIGNED".
+</xsl:template>
+
+<xsl:template match="status_check_failed_anycast_modify">
+
+***Error: Status ASSIGNED ANYCAST can only be set when an object is created.
+          This status cannot be changed.
+</xsl:template>
+
+<xsl:template match="status_check_failed_anycast_rir">
+
+***Error: Setting status ASSIGNED ANYCAST requires the administrative maintainer.
 </xsl:template>
 
 <xsl:template match="status_check_failed_notset">
@@ -88,12 +99,17 @@
 
 <xsl:template match="RDNSremovedtrailingdot">
 
-***Warning: Trailing dot has been removed from l:apply-templates/>.
+***Warning: Trailing dot has been removed from <xsl:apply-templates/>.
 </xsl:template>
 
 <xsl:template match="RDNSparenthasourns">
 
 ***Info: Parent has RIPE NCC nameservers.
+</xsl:template>
+
+<xsl:template match="RDNSparentisnotenum">
+
+***Error: Parent is not e164.arpa.
 </xsl:template>
 
 <xsl:template match="RDNSoverlap">
@@ -109,9 +125,19 @@
           between 0-255 and the first number must be less than the second.
 </xsl:template>
 
-<xsl:template match="ds_not_accepted">
+<xsl:template match="RDNSds_not_accepted">
 
 ***Error: DS records are not accepted for this zone.
+</xsl:template>
+
+<xsl:template match="RDNSsize_not_accepted">
+
+***Error: Delegation of this size is not allowed.
+          The allowed sizes are:
+          IPv4 /8, /16, /24
+          IPv6 /12, /16, /20, /24, /28, /32, /48, /64
+          
+          For delegations less than /24 (IPv4), contact ripe-dbm@ripe.net.
 </xsl:template>
 
   <xsl:template match="syntax_error">
@@ -443,7 +469,16 @@ No PGP error on object
 ***Error: The maintainer '<xsl:value-of select="text()"/>' was not found in the database
   </xsl:template>
 
-  <xsl:template match="disallow_mntner">
+    <xsl:template match="deprecated_auth">
+  
+***Warning: CRYPT-PW was used during the authentication of 
+            maintainer '<xsl:value-of select="text()"/>'
+            CRYPT-PW is being deprecated from the RIPE Database.
+            For more information, please visit:
+            http://www.ripe.net/db/support/security/crypt-pw_deprecation/
+    </xsl:template>
+    
+    <xsl:template match="disallow_mntner">
 ***Error: The mntner '<xsl:value-of select="mntner/text()"/>' is not allowed.
   </xsl:template>
 
@@ -511,6 +546,13 @@ No PGP error on object
   <xsl:template match="slash_not_allowed">
 
 ***Error: The slash notation is only allowed for object creation.
+  </xsl:template>
+
+  <xsl:template match="cryptpw_not_allowed">
+
+***Error: The creation or modification of CRYPT-PW passwords is not permitted.
+          CRYPT-PW is being deprecated. For more information, please visit:
+          http://www.ripe.net/db/support/security/crypt-pw_deprecation/
   </xsl:template>
 
   <xsl:template match="no_mntners">

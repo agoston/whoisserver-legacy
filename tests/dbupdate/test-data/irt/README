@@ -109,3 +109,241 @@
 # RESULT 10: The modification will succeed
 
 
+# CASE 11: inetnum 1
+#          query for inetnum 1
+#          
+# whois -rB inetnum 1
+#
+#SUCCESS
+#
+# RESULT 11: inetnum 1 returned
+
+
+# CASE 12: inetnum 1 + route
+#          query for inetnum 1
+#          
+# whois -rB inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 12: inetnum 1 + route returned
+
+
+# CASE 13: inetnum 1 
+#          inetnum 2 + route
+#          query for inetnum 1
+#          
+# whois -rB inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 13: inetnum 1 + route returned
+
+
+# CASE 14: inetnum 1 
+#          inetnum 2 + route
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 14: inetnum 1 + route returned
+
+
+# CASE 15: inetnum 1 + irt
+#          query for inetnum 1
+#          
+# whois -rB inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 15: inetnum 1 returned
+
+
+# CASE 16: inetnum 1 + route + irt
+#          query for inetnum 1
+#          
+# whois -rB inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 16: inetnum 1 + route returned
+
+
+# CASE 17: inetnum 1 + route + irt 1
+#          query for inetnum 1
+#          
+# whois -Bc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 17: inetnum 1 + route + irt 1 returned
+#            person objects for inetnum 1 + route returned
+
+
+# CASE 18: inetnum 1 + route + irt 1
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 18: inetnum 1 + route + irt 1 returned
+#            no person objects returned
+
+
+# CASE 19: inetnum 1 + route + irt 1
+#          query for inetnum 1
+#          
+# whois -BGc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 19: inetnum 1 + route + irt 1 returned
+#            person objects for inetnum 1 + route returned
+#            no grouping
+
+
+# CASE 20: inetnum 1 + route + irt 1
+#          query for inetnum 1
+#          
+# whois -Bc -T inetnum   inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 20: inetnum 1 + irt 1 returned
+#            person objects for inetnum 1 returned
+
+
+# CASE 21: inetnum 1 + route + irt 1
+#          query for inetnum 1
+#          
+# whois -Bc -T route inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 21: route returned
+#            person objects for route returned
+
+
+# CASE 22: inetnum 1 + route + irt 1
+#          query for inetnum 1
+#          
+# whois -Bc -T irt inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 22: no objects returned
+
+
+# CASE 23: inetnum 1 + route + 2 x irt
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 23: inetnum 1 + route + 2 x irt returned
+
+
+# CASE 24: inetnum 1 + 2 x route + irt
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 24: inetnum 1 + 2 x route + irt returned
+
+
+# CASE 25: inetnum 1 
+#          inetnum 2 + route + irt 2
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 25: inetnum 1 + route + irt 2 returned
+
+
+# CASE 26: inetnum 1 + route
+#          inetnum 2 + irt 2
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 26: inetnum 1 + route + irt 2 returned
+
+
+# CASE 27: inetnum 1 + route
+#          inetnum 2 + 2 x irt 
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 27: inetnum 1 + route + 2 x irt returned
+
+
+# CASE 28: inetnum 1 + route + irt 1
+#          inetnum 2 + irt 2
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 28: inetnum 1 + route + irt 1 returned
+
+
+# CASE 29: inetnum 1 + irt 1
+#          inetnum 2 + route + irt 2
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 29: inetnum 1 + route + irt 1 returned
+
+
+# CASE 30: inetnum 1
+#          inetnum 2 + route
+#          inetnum 3 + irt 3
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 30: inetnum 1 + route + irt 3 returned
+
+
+# CASE 31: inetnum 1 + irt 1
+#          inetnum 2 + route + irt2
+#          inetnum 3 + irt 3
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 31: inetnum 1 + route + irt 1 returned
+
+
+# CASE 32: inet6num 1 
+#          inet6num 2 + route6 + irt 2
+#          query for inet6num 1
+#          
+# whois -rBc inet6num 1 
+#
+#SUCCESS
+#
+# RESULT 32: inet6num 1 + route6 + irt 2 returned
+
+

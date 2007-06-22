@@ -22,7 +22,7 @@ mntner:       TEST-DBM-MNT
 descr:        Mntner for RIPE DBM objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-DBM-MNT
 referral-by:  TEST-DBM-MNT
@@ -36,7 +36,7 @@ mntner:       RIPE-NCC-HM-MNT
 descr:        RIPE-NCC Hostmaster Maintainer
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+auth:         MD5-PW $1$12345678$NN4rSWChzZ4bTTjt90C8L.    # hostmaster
 upd-to:       dbtest@ripe.net
 mnt-by:       RIPE-NCC-HM-MNT
 referral-by:  TEST-DBM-MNT
@@ -97,7 +97,7 @@ mnt-nfy:      case039-2@ripe.net
 notify:       case039-3@ripe.net
 referral-by:  TEST-DBM-MNT
 mnt-by:       CHILD-MB-MNT
-auth:         CRYPT-PW mbOJDvQ92mEH6  # mb-child
+auth:         MD5-PW $1$12345678$28Jr/8MuLiKvwiHIYC1C21  # mb-child
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
@@ -109,7 +109,7 @@ mnt-nfy:      case039-5@ripe.net
 notify:       case039-6@ripe.net
 referral-by:  TEST-DBM-MNT
 mnt-by:       EXACT-MB-MNT
-auth:         CRYPT-PW mbuY6AWvyQauk  # mb-exact
+auth:         MD5-PW $1$12345678$aSbOhtjqSm2lwyTQ7Bur/.  # mb-exact
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
@@ -121,7 +121,7 @@ mnt-nfy:      case039-8@ripe.net
 notify:       case039-9@ripe.net
 referral-by:  TEST-DBM-MNT
 mnt-by:       CHILD-AS-MB-MNT
-auth:         CRYPT-PW mlj2LIAQ0u2jU  # ml-exact
+auth:         MD5-PW $1$12345678$3Xfx8h0lFJhhi2tnbPXAF0  # ml-exact
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
@@ -133,7 +133,7 @@ mnt-nfy:      case039-11@ripe.net
 notify:       case039-12@ripe.net
 referral-by:  TEST-DBM-MNT
 mnt-by:       EXACT-AS-MB-MNT
-auth:         CRYPT-PW mrLCeXOZdZHew  # mr-exact
+auth:         MD5-PW $1$12345678$rojUwYzu10ruwqO00IKh41  # mr-exact
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 

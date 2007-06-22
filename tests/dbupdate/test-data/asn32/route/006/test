@@ -1,0 +1,19 @@
+# CASE 6: We try to create route object 20.13.0.0/16,AS200
+# origin is asn32
+# this AS doesn't exist in the DB
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail.
+
+
+route:   20.13.0.0/16
+descr:   test route
+origin:  AS200.200
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net
+source:  DB-TEST
+
+password: auth

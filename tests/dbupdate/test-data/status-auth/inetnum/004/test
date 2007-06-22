@@ -1,14 +1,11 @@
 # inetnum status tests
 # CASE 4: We try to create inetnum object
 # with status ASSIGNED PI under LIR-PARTITIONED PA
-%
-% requires initial objects to be loaded
 #
 # create inetnum object 
 #
 #FAILURE
 #
-# ***but will succeed at the moment until checks are tightened***
 # RESULT 4: The creation will fail with Authorisation failed
 
 

@@ -28,7 +28,7 @@ source:        DB-TEST
 
 organisation:  AUTO-1
 org-name:      EXAMPLE TTTTTT
-org-type:      NON-REGISTRY
+org-type:      OTHER
 address:       Address
 e-mail:        dbtest@ripe.net
 admin-c:       AUTO-2
@@ -40,7 +40,7 @@ source:        DB-TEST
 
 organisation:  AUTO-3
 org-name:      EXAMPLE TTTTTT
-org-type:      NON-REGISTRY
+org-type:      OTHER
 address:       Address
 e-mail:        dbtest@ripe.net
 admin-c:       AUTO-2

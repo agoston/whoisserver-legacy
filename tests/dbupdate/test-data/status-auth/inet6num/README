@@ -178,6 +178,7 @@
 # RESULT 18: The creation will fail
 
 
+#############################################################
 # AfriNic tests
 
 # CASE 19: create an inet6num with SUB-ALLOCATED PA
@@ -233,5 +234,87 @@
 #
 # RESULT 23: The creation will fail
 #rir AFRINIC
+
+# end of AfriNIC tests
+#############################################################
+
+
+# CASE 24: create an inet6num with ASSIGNED ANYCAST
+#          with mnt-by: _NOT_ RIPE-NCC-HM-MNT
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 24: The creation will fail with Authorisation failure
+
+
+# CASE 25: create an inet6num with ASSIGNED ANYCAST
+#          with mnt-by: RIPE-NCC-HM-MNT
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 25: The creation will succeed
+
+
+# CASE 26: modify an inet6num with status ASSIGNED ANYCAST
+#          change status to ASSIGNED
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 26: The modification will fail
+
+
+# CASE 27: modify an inet6num with status ASSIGNED
+#          change status to ASSIGNED ANYCAST
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 27: The modification will fail
+
+
+# CASE 28: modify an inet6num with status ASSIGNED ANYCAST
+#          change some other attribute
+#
+# modify inet6num object 
+#
+#SUCCESS
+#
+# RESULT 28: The modification will succeed
+
+
+# CASE 29: delete an inet6num with status ASSIGNED ANYCAST
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 29: The deletion will succeed
+
+
+# CASE 30: create an inet6num with status ASSIGNED ANYCAST
+#          with parent status ALLOCATED-BY-LIR
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 30: The creation will fail
+
+
+# CASE 31: create an inet6num with status ASSIGNED
+#          with parent status ASSIGNED ANYCAST
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 31: The creation will fail
 
 

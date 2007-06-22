@@ -1,0 +1,19 @@
+# CASE 3: We try to create route object 20.13.0.0/16,AS200.200
+# origin is asn32
+# make query to check that "-i origin AS200.200" works
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+
+route:   20.13.0.0/16
+descr:   test route
+origin:  AS200.200
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net 20060101
+source:  DB-TEST
+
+password: auth

@@ -41,6 +41,7 @@ use IPC::Open3;
 use IO::Select;
 use IO::Socket;
 use IO::Handle;
+use IO::Socket::INET6;
 
 # global configuration
 our $CONFIG = { };
@@ -108,6 +109,7 @@ my $name = $_[0];
 my $val = $_[1];
 
   $CONFIG->{$name} = $val;
+  #print " ********************************************** SET: ".$name." = ".$val."\n";
   return(1);
 
 }
@@ -121,6 +123,7 @@ sub delvar($)  {
 my $name = $_[0];
 
   delete $CONFIG->{$name};
+  #print " ********************************************** DEL: ".$name."\n";
   return(1);
 
 }
@@ -950,8 +953,12 @@ my $found = { };
       $run =~ s/^(.*?)[\s]+(.*?),[\s]*(.*?)$/$1 $2/i;
       $run = " -G -B -r -x -T ".$run;
 
-			my $whois = IO::Socket::INET->new(getvar('WHOIS_HOST').":".getvar('SVWHOIS_PORT'))
-			    or error ('E_WHOIS', 'whois', $!);
+        my $whois;
+        if (exists $CONFIG->{'QUERY_AF'} && getvar('QUERY_AF') =~ '.*INET6.*') {
+          $whois = IO::Socket::INET6->new(Domain => AF_INET6, Proto => 'tcp', PeerHost => getvar('WHOIS6_HOST'), PeerPort => getvar('SVWHOIS_PORT')) or error ('E_WHOIS', 'whois', $!);
+        } else { #default is ipv4
+          $whois = IO::Socket::INET->new(getvar('WHOIS_HOST').":".getvar('SVWHOIS_PORT')) or error ('E_WHOIS', 'whois', $!);
+        }
 	 	  $whois->print($run, "\n");
 
 			#print STDERR "DEBUG: query [$run]\n";
@@ -1113,8 +1120,13 @@ my $object;
   my $query_orig = $query;
 	$query =~ s/^[\s]*EXACT[\s]+//i;
 
-	my $whois = IO::Socket::INET->new(getvar('WHOIS_HOST').":".getvar('SVWHOIS_PORT')) 
-		or error ('E_WHOIS', 'whois', $!);
+	my $whois;
+
+        if (exists $CONFIG->{'QUERY_AF'} && getvar('QUERY_AF') =~ /.*INET6.*/) {
+          $whois = IO::Socket::INET6->new(Domain => AF_INET6, Proto => 'tcp', PeerHost => getvar('WHOIS6_HOST'), PeerPort => getvar('SVWHOIS_PORT')) or error ('E_WHOIS', 'whois', $!);
+        } else { #default is ipv4
+          $whois = IO::Socket::INET->new(getvar('WHOIS_HOST').":".getvar('SVWHOIS_PORT')) or error ('E_WHOIS', 'whois', $!);
+        }
 	$whois->print($query, "\n");
 
 #print STDERR "DEBUG: query [$query]\n";
@@ -1166,7 +1178,7 @@ my $object;
 # Remarks: (hopefully) improve configurability!!!
 sub parse_rip_config()	{
 my $configfile = getvar('RIP_CONFIG');
-my @vars = ( qw/ SVWHOIS_PORT SVCONFIG_PORT GPGCMD UPDSOURCE RIR ACKLOG UPDLOG FORWLOG NOTIFLOG TMPDIR/ );
+my @vars = ( qw/ SVWHOIS_PORT SVCONFIG_PORT GPGCMD UPDSOURCE RIR ACKLOG UPDLOG FORWLOG NOTIFLOG TMPDIR RIPADMIN/ );
 
 # format is multiline vars, like
 # VARNAME whitespaces VALUE 
@@ -1192,6 +1204,7 @@ my @vars = ( qw/ SVWHOIS_PORT SVCONFIG_PORT GPGCMD UPDSOURCE RIR ACKLOG UPDLOG F
   for my $key (sort keys %{$CONFIG})      {
     $CONFIG->{$key} =~ s/\$(\w+)/defined($CONFIG->{$1})?$CONFIG->{$1}:"\$$1"/eg; 
     $CONFIG->{$key} =~ s/^[\s]*//o;
+    $ENV{$key} = $CONFIG->{$key};
   }
 
   close(FILE)
@@ -1216,10 +1229,11 @@ my @REQUIRED =  qw/ BASEDIR CONFDIR BINDIR DATADIR LOGDIR DUMPDIR WHOISDIR TEST_
 					FILTERS 
 					DBUPDATE DBUPDATE_GEN 
 					DBUPDATE_TEXT DBUPDATE_MAIL DBUPDATE_NET DBUPDATE_TRACE
-					WHOIS_HOST
+					WHOIS_HOST WHOIS6_HOST
 					MAKE_DB MAKE_DB_FLAGS LOAD_FILE
+					RESET_DB
 					RIP_CONFIG 
-          REPORTLOG SUMMARYLOG STDOUTLOG STDERRLOG
+					REPORTLOG SUMMARYLOG STDOUTLOG STDERRLOG
 					LOADER_FILE DBUPDATE_FILE TEST WHOIS_FILE DEBUG QUERY_FILE
 					FILTERS_LOCAL EXCLUDE
 					/;
@@ -1227,7 +1241,7 @@ my @REQUIRED =  qw/ BASEDIR CONFDIR BINDIR DATADIR LOGDIR DUMPDIR WHOISDIR TEST_
 	open (FILE, "< $configfile") 
     or die "ERROR: cannot open file $configfile : $!";
 	while (<FILE>)	{
-		if (/^([a-z_]+)[\s]*?[=][\s]*(.*?)[\s]*$/io)	{
+		if (/^([0-9a-z_]+)[\s]*?[=][\s]*(.*?)[\s]*$/io)	{
             setvar($1,$2);
 		}		
 	}
@@ -1300,7 +1314,7 @@ my $objects = 0;
   # split the command line into space seperated arguments
   # but keep anything between quotes ("") as one argument
   my @args = ();
-  while ( $commandline =~ /"/ ) {
+  while ( $commandline =~ /\"/ ) {
     $commandline =~ /(.*?)"(.*?)"\s*(.*)$/s;
     my ($bit1, $quoted, $bit3) = ($1, $2, $3);
     $commandline = $bit3;
@@ -1624,6 +1638,8 @@ my $temporary = 0;
 
   $SIG{'CHLD'} = 'DEFAULT';
   my $commandline = "/bin/sh ".getvar('MAKE_DB')."  -s $source ".getvar('MAKE_DB_FLAGS')." $tmpfile 2>&1 |";
+  # dirty hack follows - after the first run, replace make_db with reset_db
+  setvar('MAKE_DB', getvar('RESET_DB'));
  
   my $pid = open(MAKE_DB, $commandline)
     or error ('E_COMMRUN', $commandline, $!);
@@ -1655,6 +1671,12 @@ my $temporary = 0;
       report($_);
     }
     error('E_COMMOBJ', $commandline, $object_expected, $object_real);
+  }
+
+  if (getvar('TRACE_MAKEDB')) {
+    foreach (@status) {
+      report($_);
+    }
   }
 
   # delete pseudo-loader file
@@ -1710,6 +1732,7 @@ my $objects = $_[0];
   # add whois diagnostics to LOGSTRING
   push @diag, "whois";
   push @diag, "query";
+  push @diag, "script";
   my $res = "OK";
   
   foreach my $entry(@{$objects}) {
@@ -1770,7 +1793,7 @@ sub trace()	{
 
     if (getvar('TRACE_TEST')) {
         print ("TEST_TRACE: TEST TRACING START\n");
-        for my $key (keys %{$CONFIG})   {
+        for my $key (sort keys %{$CONFIG})   {
             print("TEST_TRACE: $key = $CONFIG->{$key}\n");
         }
         print ("TEST_TRACE: TEST TRACING END\n");
@@ -1794,7 +1817,7 @@ sub set_test_variables()   {
      if (/^\$([a-z0-9_]+)=(.+)$/i) {
        my $var = uc($1);
        my $val = $2;
-       $thash{$var} ? ($thash{$var} .= $val."\n") : ($thash{$var} = $val."\n") ;
+       $thash{$var} ? ($thash{$var} .= "\n".$val) : ($thash{$var} = $val) ;
      } 
   }
   foreach my $var (keys %thash) {
@@ -1925,7 +1948,9 @@ sub error(@)	{
 
 # Function: run_script()
 # executes external program
-sub run_script() {
+sub run_script($$) {
+my $which = $_[0];
+my $objects = $_[1];
 my $script;
 my $test = getvar('TEST');
 
@@ -1941,11 +1966,14 @@ my $test = getvar('TEST');
   #close (TESTFILE)
   #    or error("E_CLOSE", $test, $!);
 
-  $script = getvar('SCRIPT');
+  $script = getvar($which);
 
   return if (!$script);
 
   $script =~ s/\$(\w+)/defined($CONFIG->{$1})?$CONFIG->{$1}:''/eg;
+  if (getvar('TRACE_MAKEDB')) {
+    print ' >>> '.$which.': '.$script;
+  }
 
   use IPC::Open3;
   use IO::Select;
@@ -1975,12 +2003,18 @@ my $test = getvar('TEST');
         my $string = scalar <HIS_ERR>;
         if ($string) {
           print STDE $string;
+          if (getvar('TRACE_MAKEDB')) {
+            print $string;
+          }
         }
       }
       else {
         my $string = scalar <HIS_OUT>;
         if ($string) {
           print STDO $string;
+          if (getvar('TRACE_MAKEDB')) {
+            print $string;
+          }
         }
       }
       $selector->remove($fh) if eof($fh);
@@ -1995,7 +2029,17 @@ my $test = getvar('TEST');
   # we will set $received_interrupt global var to be able to quit later
   # peacefully
   my $signal = ($? & 127);
-    if ($signal == $signo{'INT'}) {$received_interrupt = 1;}
+  if ($signal == $signo{'INT'}) {
+    $received_interrupt = 1;
+  }
+  
+  if ($? > 0) {		# I know this is kinda stupid, but I couldn't do it any other way
+    foreach my $entry (@{$objects}) {
+      $entry->{"scriptdiag"} = "Errrr";
+      print "ERROR: ".$which." returned non-zero value!";
+      last;
+    } 
+  }
 
   close (HIS_OUT)
     or error ('E_COMMRUN', $script, $!);
@@ -2050,7 +2094,7 @@ sub run_test($)	{
 my $filters = $_[0];
 my $dir = getvar('CURRENT_DIR');
 
-my @vars_cleanup = ('DBUPDATE_FLAGS', 'DBUPDATE_FLAGS_EXT', 'SCRIPT', 'TEST_RIR', 'DBUPDATE_IGNORE_EXIT_CODE');
+my @vars_cleanup = ('DBUPDATE_FLAGS', 'DBUPDATE_FLAGS_EXT', 'EXEC_BEFORE', 'EXEC_AFTER', 'QUERY_AF', 'TEST_RIR', 'DBUPDATE_IGNORE_EXIT_CODE');
 
 # initialize filenames
 init_paths();
@@ -2115,16 +2159,16 @@ my $result = "FAILED";
   # clear revocation list + copy over the "=" file from test dir
   # do_crl();
 
-  # 2.a execute external command - any error is fatal!
-  timeout ('E_TIME',"external script", \&run_script);
 
 	# 3. empty + load database + dbupdate initial run + log cleanup
 
 	timeout('E_TIME','make_db',\&make_db);
 
+	# 4. run script before object
+	timeout ('E_TIME',"external script", \&run_script, "EXEC_BEFORE", $objects);
+	
 	# 5. submit objects
-
-  my $testfile = getvar('TEST');
+	my $testfile = getvar('TEST');
 	timeout('E_TIME','dbupdate',\&run_update, getvar('TEST'), 0);
 
 	# 6. match filters 
@@ -2143,14 +2187,17 @@ my $result = "FAILED";
 	# 7a. match query output with one expected
 	timeout('E_TIME', 'query', \&match_query, $objects, $local_filters);
 
-	# 8. print report
+	# 7b. execute external command - any error is fatal!
+	timeout ('E_TIME',"external script", \&run_script, "EXEC_AFTER", $objects);
 
+        # 8. unset the variables
+        foreach my $var (@vars_cleanup) {
+          delvar ($var);# if (getvar($var));
+        }
+
+	# 9. print report
 	$result = print_report($objects);
 
-  # 9. unset the variables
-  foreach my $var (@vars_cleanup) {
-    delvar ($var) if (getvar($var));
-  }
 
 	# 10. return result
 	return($result);
@@ -2171,6 +2218,8 @@ sub parse_command()	{
                      "t"              => \$CONFIG->{"TRACE_TEST"},
                      "trace_dbupdate" => \$CONFIG->{"TRACE_DBUPDATE"}, 
                      "d"              => \$CONFIG->{"TRACE_DBUPDATE"},
+                     "trace_makedb"   => \$CONFIG->{"TRACE_MAKEDB"}, 
+                     "m"              => \$CONFIG->{"TRACE_MAKEDB"},
                      "output_report"  => \$CONFIG->{"OUTPUT_REPORT"},
                      "o"              => \$CONFIG->{"OUTPUT_REPORT"},
                      "config=s"       => \$CONFIG->{"CONFIG"},
@@ -2200,6 +2249,7 @@ sub parse_command()	{
     usage:
     --trace_test, -t      turn on test tracing
     --trace_dbupdate, -d  turn on dbupdate tracing 
+    --trace_makedb, -m    display output of make_db_test
     --output_report, -o   print report to stdout
     --stderr, -e          print dbupdate stderr to stderrlog
     --stdout, -u          print dbupdate stdout to stdoutlog
@@ -2351,6 +2401,18 @@ my $datadir = getvar ('DATADIR');
         }
 	}
 	my @all = (\@run, \@skipped);
+  
+  if (getvar('TRACE_TEST')) {
+    print ("TEST_TRACE: Tests to run: ", scalar (@run), "\n");
+    foreach my $t (@run) {
+      print ("TEST_TRACE: RUN $t\n");
+    }
+    print ("TEST_TRACE: Tests to skip: ", scalar (@skipped), "\n");
+    foreach my $t (@skipped) {
+      print ("TEST_TRACE: SKIP $t\n");
+    }
+  }
+
 	return(\@all);
 
 }
@@ -2572,8 +2634,12 @@ eval {
   die ('Bad configuration') if (!parse_command());
   die ('Bad configuration') if (!parse_config());
 
+  # spent half day tracking down this - won't allow that happen to anybody again - agoston, 2006  
+  die ('You MUST set -e flag, or some of the tests will fail!') if (!getvar('STDERR'));
+  die ('You MUST set -o flag, or some of the tests will fail!') if (!getvar('STDOUT'));
+
   # set up the log file names - fully qualified
-  sleep (20) if ( strftime ("%H%M%S", localtime) >= 235955);
+  sleep (20) if ( strftime ("%H%M%S", localtime) >= 235945);
   
   my $date = strftime ("%Y%m%d", localtime);
   my @logs = split('[\s]+',getvar('LOGSTRING'));
@@ -2670,8 +2736,8 @@ eval {
     if($received_interrupt){
       print STDERR "\nWe have received INT at some point, so quitting.\n";
       print STDERR "You might need to restart your test whois server,\n";
-      print STDERR "as we might be quitting before issuing \"set resume updates\"\n";
-      print STDERR "and/or \"set resume queries\" in the administrative interface.\n\n";
+      print STDERR "as we might be quitting before issuing \"set updates resume\"\n";
+      print STDERR "and/or \"set queries resume\" in the administrative interface.\n\n";
       last;
     }
 

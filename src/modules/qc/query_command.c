@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.9 $
 
   Query command module (qc).  This is what the whois query gets stored as in
   memory.
@@ -546,7 +546,7 @@ int QC_fill (const char *query_str,
       break;
 
       case 'r':
-        query_command->recursive=0;       /* Unset recursion */
+        query_command->recursive=0;       /* no recursion */
       break;
 
       case 'l':
@@ -675,13 +675,13 @@ int QC_fill (const char *query_str,
       break;
 
       case 'F':
-				query_command->fast=1;
-				query_command->recursive=0; /* implies no recursion */
+        query_command->fast=1;
+        query_command->recursive=0; /* no recursion */
       break;
 
       case 'K':
         query_command->filtered=1;
-				query_command->recursive=0; /* implies no recursion */
+        query_command->recursive=0; /* no recursion */
       break;
 
       case 'L':
@@ -746,11 +746,7 @@ int QC_fill (const char *query_str,
         } else if (version_info[2] == NULL) {
             /* two parameters */
 
-            /* XXX we don't accept IPv6 addresses to appear in -V flag */
-            /*if it contains a ':', then it might be an IPv6 address*/
-            if (index(version_info[1], ':') != NULL ){
-                synerrflg++;
-            } else if (IP_addr_e2b(&(qe->pIP), version_info[1]) != IP_OK) {
+            if (IP_addr_e2b(&(qe->pIP), version_info[1]) != IP_OK) {
                 synerrflg++;
             } else {
                 num_client_ip++;
@@ -766,7 +762,7 @@ int QC_fill (const char *query_str,
         num_flags--;  /* don't count -V flags in our total */
       break;
 
-      /* any other flag, including '?' and ':' errors */
+      /* any other flag, including '?' */
       default:
         synerrflg++;
     }
@@ -828,7 +824,7 @@ int QC_fill (const char *query_str,
         }
     }
 
-		/* check uncompatible flags */
+    /* check incompatible flags */
     if ((query_command->b == 1) && (query_command->filtered == 1)) {
     /* -b -K is error, we need person/role/organisation objects */
     /* ERROR:109 */
@@ -920,7 +916,7 @@ int QC_fill (const char *query_str,
                               ca_get_qc_uselessipflag);
         }
 
-        /* check for "fixed" lookups */
+        /* check for "fixed" lookups on IP addresses */
         fixed_lookup = 0;
         if (MA_isset(query_command->keytypes_bitmap, WK_IPADDRESS)) {
             ip_addr_t addr;
@@ -951,7 +947,7 @@ int QC_fill (const char *query_str,
                 }
             }
         }
-
+        
         if (fixed_lookup) {
             /* WARNING:905 */
             char *fmt = ca_get_qc_fmt_fixedlookup;
@@ -964,6 +960,85 @@ int QC_fill (const char *query_str,
             UT_free(query_command->keys);
             query_command->keys = g_strdup(lookup);
 
+            UT_free(fmt);
+        }
+
+        /* check for "fixed" lookups on AS numbers */
+        char *keycopy;
+        char *ptr, *ptr2;
+        fixed_lookup = 0;
+        if (MA_isset(query_command->keytypes_bitmap, WK_AUTNUM)) {
+          if ( ptr = strstr(query_command->keys, "AS0.") ) {
+            /* fix the format */
+            keycopy = UT_strdup(query_command->keys);
+	    /* remove the '0.' from the key */
+	    ptr += 2;  /* move past 'AS' */
+	    ptr2 = ptr + 2;  /* move past '0.' */
+	    while ( *ptr2 != '\0' ) {
+	      *(ptr++) = *(ptr2++);
+	    }
+	    *ptr = '\0';
+            fixed_lookup = 1;
+          }
+        /* check for "fixed" lookups on as-blocks */
+        /* we fix them to make them consistent with AS numbers
+           even though they don't need to be fixed as they are 
+           internally represented as long integers */
+        } else if (MA_isset(query_command->keytypes_bitmap, WK_ASRANGE)) {
+          char *key_tokens;
+          char *token, *cursor;
+          int   upper = 0;
+          int   lower = 0;
+          int   count = 0; /* two possible ASNs in a range */
+          long  begin_asnum = 0;
+          long  end_asnum = 0;
+          keycopy = UT_strdup(query_command->keys);
+          while ( ptr = strstr(query_command->keys, "AS0.") ) {
+            /* fix the format */
+	    /* remove the '0.' from the key */
+	    ptr += 2;  /* move past 'AS' */
+	    ptr2 = ptr + 2;  /* move past '0.' */
+	    while ( *ptr2 != '\0' ) {
+	      *(ptr++) = *(ptr2++);
+	    }
+	    *ptr = '\0';
+            fixed_lookup = 1;
+          }
+          /* now check ASx - ASy for x>y */
+          key_tokens = UT_strdup(query_command->keys);
+          cursor = key_tokens;
+          while( (token = strsep( &cursor, "-" )) != NULL && count < 2) {  
+            /* discard the letters (or leading whitespace), take the (number.)number */
+            if ( strchr(token, '.') == NULL ) {
+              sscanf(token, "%*[ AS]%d", &lower);
+            } 
+            else {
+              sscanf(token, "%*[ AS]%d.%d", &upper, &lower);
+            }
+            if ( count++ == 0 ) {
+              begin_asnum = (65536 * upper) + lower;
+            }
+            else {
+              end_asnum = (65536 * upper) + lower;
+            }
+          }
+          UT_free(key_tokens);
+          if ( ! fixed_lookup ) UT_free(keycopy);
+          if ( count == 2 && begin_asnum > end_asnum ) {
+            /* ERROR:110 */
+            query_command->parse_messages = 
+                    g_list_append(query_command->parse_messages, ca_get_qi_badrange);
+            badparerr++;
+          }
+        }
+        
+        if (fixed_lookup) {
+            /* WARNING:905 */
+            char *fmt = ca_get_qc_fmt_fixedlookup;
+            query_command->parse_messages = 
+                g_list_append(query_command->parse_messages, 
+                            g_strdup_printf(fmt, keycopy, query_command->keys));
+            UT_free(keycopy);
             UT_free(fmt);
         }
 
@@ -991,8 +1066,8 @@ int QC_fill (const char *query_str,
         if (MA_isset(query_command->keytypes_bitmap, WK_DOMAIN)) {
           char *domain_dot = strrchr(query_command->keys,'.');
           if ((domain_dot != NULL)&&(strcmp(domain_dot,".")==0)) {
-            domain_dot[0] = '\0';
             char *fmt = ca_get_qc_trailingdotindomain;
+            domain_dot[0] = '\0';
             query_command->parse_messages =
               g_list_append(query_command->parse_messages,
                   g_strdup_printf(fmt,query_command->keys));

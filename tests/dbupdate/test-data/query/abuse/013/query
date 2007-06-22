@@ -1,7 +1,11 @@
 % This is the MyDB Whois server.
 
-%ERROR:101: no entries found
-%
-% No entries found in the selected source(s).
+% Note: this output has been filtered.
+
+% Information related to '80.16.151.184 - 80.16.151.191'
+
+inetnum:        80.16.151.184 - 80.16.151.191
+abuse-mailbox:  dbtest-person1@ripe.net
+abuse-mailbox:  dbtest-person2@ripe.net
 
 

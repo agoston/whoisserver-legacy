@@ -7,13 +7,14 @@
 #
 # RESULT 11: creation will pass
 
-domain:       0.0.0.193.in-addr.arpa
+domain:       0.0.193.in-addr.arpa
 descr:        Test
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
 nserver:      ns-pri.ripe.net
-nserver:      ns-sec.ripe.net
+nserver:      sec1.apnic.net
+nserver:      sec3.apnic.net
 mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329

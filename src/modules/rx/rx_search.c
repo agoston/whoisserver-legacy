@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.40 $
+  $Revision: 1.1 $
 
   Radix tree (rx).  rx_search.c - functions to search nodes of the tree
 
@@ -160,14 +160,15 @@ rx_build_stack(rx_nodcpy_t    stack[],
     }
     
     /* make debug info.*/
-   
-    IP_pref_b2a( & curnode->prefix , bbf, IP_PREFSTR_MAX );
-    LG_log(rx_context, LG_DEBUG,
-                "rx_build_stack: %s%d at %s%s (stk len: %d)",
-                quit_now ? "stop/" : "link ",  
-                quit_now ? quit_now : link,
-                bbf, ( curnode->glue ) ? " ++glue++" : "",
-                *maxdepth  );
+
+// disabled this to avoid unnecessary bin->asc conversion for _every_ level on _every_ lookup (again, who did this?)   
+//    IP_pref_b2a( & curnode->prefix , bbf, IP_PREFSTR_MAX );
+//    LG_log(rx_context, LG_DEBUG,
+//                "rx_build_stack: %s%d at %s%s (stk len: %d)",
+//                quit_now ? "stop/" : "link ",  
+//                quit_now ? quit_now : link,
+//                bbf, ( curnode->glue ) ? " ++glue++" : "",
+//                *maxdepth  );
     
     curnode = curnode -> child_ptr[link];
 
@@ -627,96 +628,79 @@ rx_nod_search (
   - but it's the higher level routine that should do the final cut.
 +++++++++++++++*/
 
-int
-RX_bin_search (
-               rx_srch_mt  search_mode,
-               int         par_a,
-               int         par_b,
-               rx_tree_t  *tree,           /* tree ptr*/
-               ip_prefix_t *prefix,         /* binary prefix*/
-               GList       **datleaves,    /* data leaves go here*/
-               int         max_count 
-               )
-   
+int RX_bin_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t * tree,	/* tree ptr */
+	ip_prefix_t * prefix,		/* binary prefix */
+	GList ** datleaves,			/* data leaves go here */
+	int max_count)
 {
-  rx_nodcpy_t  stack[128];
-  unsigned k;
-  int stkcnt, resnum = 0, maxleaves;
-  GList  *nodlist = NULL, *nitem;
-  rx_node_t *curnode;
-  rx_nodcpy_t *curcpy;
-  rx_datref_t *datref;
-  rx_stk_mt     dmode;
+	rx_nodcpy_t stack[128];
+	rx_dataleaf_t *leafptr;
+	int stkcnt, resnum = 0;
+	GList *nodlist = NULL, *nitem, *iitem;
+	rx_node_t *curnode;
+	rx_nodcpy_t *curcpy;
+	rx_datref_t *datref;
+	rx_stk_mt dmode;
 
-  /* more specific node search may start from a glue node, */
-  /* for all others the stack should not contain glues.*/
+	/* more specific node search may start from a glue node, */
+	/* for all others the stack should not contain glues. */
 
-  dmode = ( search_mode == RX_SRCH_MORE 
-            || search_mode == RX_SRCH_DBLS
-            || search_mode == RX_SRCH_RANG ) 
-    ? RX_STK_QUERY_ALLNOD
-    : RX_STK_QUERY_NOGLUE;
-  
-  rx_build_stack(stack, &stkcnt, tree, prefix, dmode);
+	dmode = (search_mode == RX_SRCH_MORE || search_mode == RX_SRCH_DBLS || search_mode == RX_SRCH_RANG)
+		? RX_STK_QUERY_ALLNOD : RX_STK_QUERY_NOGLUE;
 
-  rx_nod_search( search_mode, par_a, par_b, tree, prefix, 
-                 stack, stkcnt, &nodlist, 1000);
-  
-  LG_log(rx_context, LG_DEBUG, "RX_bin_search: processing nodes");
+	rx_build_stack(stack, &stkcnt, tree, prefix, dmode);
 
-  for( nitem = g_list_first(nodlist);
-       nitem != NULL;
-       nitem = g_list_next(nitem)) {    
-    
-    resnum++;
-    curcpy = nitem->data;
-    
-    /*
-      if memory mode includes RAM:
-      * do not expect copies of nodes in the list received from bin_search.
-      * iterate through data leaves with g_list_nth_data.
-      */
-    
-    curnode = curcpy->srcptr;
-    
-    /*    rx_nod_print( curnode, buf, 1024 );*/
-    
-    maxleaves = g_list_length(curnode->leaves_ptr);
-    /*    fprintf(stderr,"###node %d, %d dataleaves attached:", i, maxleaves);*/
+	rx_nod_search(search_mode, par_a, par_b, tree, prefix, stack, stkcnt, &nodlist, 1000);
 
-    /* iterate through dataleafs attached to this node*/
-    for(k=0; k<maxleaves; k++) {
-      rx_dataleaf_t *leafptr = g_list_nth_data(curnode->leaves_ptr, k);
+	LG_log(rx_context, LG_DEBUG, "RX_bin_search: processing nodes");
 
-      /* 
-	 check the conditions to add the leaf:
+	for (nitem = g_list_first(nodlist); nitem != NULL; nitem = g_list_next(nitem)) {
 
-	 XXX never add composed inetnum for exact prefix search
-	 (but do for exact range search...) - must be solved in upper layer.
+		resnum++;
+		curcpy = nitem->data;
 
-      */
+		/*
+		   if memory mode includes RAM:
+		   * do not expect copies of nodes in the list received from bin_search.
+		   * iterate through data leaves with g_list_nth_data.
+		 */
 
- 
-      /* add*/
-      
-      datref = (rx_datref_t *)UT_calloc(1, sizeof(rx_datref_t));
-      datref->leafptr = leafptr;
-      /* srckey and excluded fields are initialised to 0 by calloc */
-      
-      *datleaves = g_list_prepend(*datleaves, datref);
-    }
-  }
+		curnode = curcpy->srcptr;
 
-  wr_clear_list( &nodlist );
+		/*    rx_nod_print( curnode, buf, 1024 ); */
 
-  LG_log(rx_context, LG_DEBUG, 
-            "RX_bin_search: found %d nodes", resnum);
-    
-  
-  /* the LL of answers (*datleaves) contains pointers to answer structs, 
-     that SHOULD BE NORMALIZED HERE (==with no redundant entries)
-  */
+		/*    fprintf(stderr,"###node %d, %d dataleaves attached:", i, maxleaves); */
 
-return RX_OK;
+		/* iterate through dataleafs attached to this node */
+		for (iitem = g_list_first(curnode->leaves_ptr); iitem != NULL; iitem = g_list_next(iitem)) {
+			leafptr = (rx_dataleaf_t *)iitem->data;
+
+			/* 
+			   check the conditions to add the leaf:
+
+			   XXX never add composed inetnum for exact prefix search
+			   (but do for exact range search...) - must be solved in upper layer.
+
+			 */
+
+			/* add */
+
+			datref = (rx_datref_t *) UT_calloc(1, sizeof(rx_datref_t));
+			datref->leafptr = leafptr;
+			/* srckey and excluded fields are initialised to 0 by calloc */
+
+			*datleaves = g_list_prepend(*datleaves, datref);
+		}
+	}
+
+	wr_clear_list(&nodlist);
+
+	LG_log(rx_context, LG_DEBUG, "RX_bin_search: found %d nodes", resnum);
+
+	/* the LL of answers (*datleaves) contains pointers to answer structs, 
+	   that SHOULD BE NORMALIZED HERE (==with no redundant entries)
+	 */
+
+	return RX_OK;
 }
 

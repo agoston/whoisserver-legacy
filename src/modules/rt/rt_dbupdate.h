@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5.2.1 $
+  $Revision: 1.14 $
 
   Reporting module.
 
@@ -182,7 +182,6 @@ void RT_RIP_update_ok(RT_context_t* ctx);
 void RT_non_exist_mntner(RT_context_t* ctx, const gchar* mntner);
 void RT_parent_not_exist(RT_context_t* ctx);
 void RT_overlap_inetnums(RT_context_t* ctx, GList *overlap);
-void RT_ds_not_accepted(RT_context_t* ctx);
 void RT_origin_not_exist(RT_context_t* ctx);
 void RT_slash_not_allowed(RT_context_t* ctx);
 void RT_manual_creation(RT_context_t* ctx);
@@ -260,11 +259,14 @@ void RT_rdns_useotherrir(RT_context_t*,gchar*);
 void RT_rdns_cannotregister(RT_context_t*);
 void RT_rdns_nonservers(RT_context_t*);
 void RT_rdns_parenthasourns(RT_context_t*);
+void RT_rdns_parentisnotenum(RT_context_t*);
 void RT_rdns_notdelegated(RT_context_t*);
 void RT_rdns_delcheckwarning(RT_context_t*,gchar*);
 void RT_rdns_threshold(RT_context_t*);
 void RT_rdns_invalid_range(RT_context_t*,gchar*);
 void RT_rdns_auth_result(RT_context_t* ctx, gboolean result, gboolean override);
+void RT_rdns_ds_not_accepted(RT_context_t* ctx);
+void RT_rdns_size_not_accepted(RT_context_t* ctx);
 
 /* status check related */
 void RT_status_check_failed_parentwithoutstatus(RT_context_t*,gchar*,gchar*);
@@ -273,5 +275,7 @@ void RT_status_check_failed_allocated(RT_context_t*);
 void RT_status_check_failed_earlyregistration(RT_context_t*);
 void RT_status_check_failed_notset(RT_context_t*);
 void RT_status_check_failed_allocbyrir(RT_context_t*);
+void RT_status_check_failed_anycast_modify(RT_context_t*);
+void RT_status_check_failed_anycast_rir(RT_context_t*);
 
 #endif

@@ -1,0 +1,38 @@
+# CASE 1: We try to create as-set object AS-TEST
+#
+# create as-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to create as-set object AS-TEST
+# with a member AS0.1384
+#
+# create as-set object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+
+# CASE 3: We try to create as-set object AS200.200:AS-TEST:AS300.300
+# AS200.200:AS-TEST exists in the database
+#
+# create as-set object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+
+# CASE 4: We try to create as-set object AS200.200:AS-TEST:AS300.300
+# AS200.200:AS-TEST DOES NOT exist in the database
+#
+# create as-set object 
+#
+#FAILURE
+#
+# RESULT 4: The creation will fail.
+

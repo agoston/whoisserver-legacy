@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.5.2.1 $
+  $Revision: 1.14 $
 
   Reporting module.
 
@@ -1185,7 +1185,6 @@ void RT_non_exist_mntner(RT_context_t* ctx, const gchar* mntner) {
   rt_prepare_node(ctx, node);
 }
 
-
 /*+
   RT_non_exist_irt - Reports a non existent irt
   +*/
@@ -1210,7 +1209,6 @@ void RT_non_exist_org(RT_context_t* ctx, const gchar* org) {
 }
 
 
-
 /*+
   RT_parent_not_exist - Report that object has no parent in the DB
 
@@ -1224,15 +1222,30 @@ void RT_parent_not_exist(RT_context_t* ctx) {
   rt_prepare_node(ctx, node);
 }
 
+
 /*+
-  RT_ds_not_accepted - Report that we don't accept DS records for this zone
+  RT_rdns_ds_not_accepted - Report that we don't accept DS records for this zone
 
   RT_context_t* ctx - Context.
   +*/
-void RT_ds_not_accepted(RT_context_t* ctx) {
+void RT_rdns_ds_not_accepted(RT_context_t* ctx) {
   xmlNodePtr node;
 
-  node = xmlNewNode(NULL, (xmlChar*)"ds_not_accepted");
+  node = xmlNewNode(NULL, (xmlChar*)"RDNSds_not_accepted");
+
+  rt_prepare_node(ctx, node);
+}
+
+
+/*+
+  RT_rdns_size_not_accepted - Report that we don't accept this delegation size
+
+  RT_context_t* ctx - Context.
+  +*/
+void RT_rdns_size_not_accepted(RT_context_t* ctx) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"RDNSsize_not_accepted");
 
   rt_prepare_node(ctx, node);
 }
@@ -1866,6 +1879,10 @@ void RT_rdns_parenthasourns(RT_context_t *ctx) {
   RT_rdns_message(ctx,"RDNSparenthasourns","");
 }
 
+void RT_rdns_parentisnotenum(RT_context_t *ctx) {
+  RT_rdns_message(ctx,"RDNSparentisnotenum","");
+}
+
 void RT_rdns_notdelegated(RT_context_t *ctx) {
   RT_rdns_message(ctx,"RDNSnotdelegated","");
 }
@@ -1878,8 +1895,8 @@ void RT_rdns_threshold(RT_context_t *ctx) {
 }
 
 void RT_rdns_invalid_range(RT_context_t *ctx,gchar *object_str) {
-  xmlNodePtr node;
 
+  xmlNodePtr node;
   node = xmlNewNode(NULL, (xmlChar*)"RDNSinvalidrange");
   rt_xml_node_add_content(node, (xmlChar*)object_str);
   rt_prepare_node(ctx, node);
@@ -1920,4 +1937,12 @@ void RT_status_check_failed_allocbyrir(RT_context_t *ctx) {
 
 void RT_status_check_failed_allocated(RT_context_t *ctx) {
   RT_status_check_failed_message(ctx,"status_check_failed_allocated");
+}
+
+void RT_status_check_failed_anycast_modify(RT_context_t *ctx) {
+  RT_status_check_failed_message(ctx,"status_check_failed_anycast_modify");
+}
+
+void RT_status_check_failed_anycast_rir(RT_context_t *ctx) {
+  RT_status_check_failed_message(ctx,"status_check_failed_anycast_rir");
 }

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.2.6.1 $
 
   Access control module (ac) - access control for the query part
 
@@ -56,16 +56,17 @@ extern int getsubopt(char **optionp, char * const *tokens, char **valuep);
 
 /* formats for printing the access control list entries */
 #define ACL_FORMAT        "%10d %10d %10d %10d %10d %10d %10d"
-#define ACL_HEADER  "%-20s %10s %10s %10s %10s %10s %10s %10s\n"
+#define ACL_HEADER  "%-25s %10s %10s %10s %10s %10s %10s %10s\n"
 
 /* formats for printing the accounting entries */
 #define ACC_FORMAT       "%4d %4d %4d %4d %7d %7d %7d %7.2f %7.1f %7d %10.0f"
-#define ACC_HEADER "%-20s %4s %4s %4s %4s %7s %7s %7s %7s %7s %7s %s\n"
+#define ACC_HEADER "%-25s %4s %4s %4s %4s %7s %7s %7s %7s %7s %7s %s\n"
 
 
 typedef struct {
 /*  double decay_factor;*/
   unsigned newtotal;
+  ut_timer_t current_time;
   GList *prunelist;
 } ac_decay_data_t;
 
@@ -115,36 +116,29 @@ char *ac_to_string_header(void)
   returns an allocated string
   ++++++++++++++++++++++++++++++++++++++*/
 static
-char *ac_to_string(GList *leafptr)
+char *ac_to_string(GList * leafptr)
 {
-  char *result_buf;
-  acc_st *a = leafptr->data;
+	char *result_buf;
+	acc_st *a = leafptr->data;
 
-  result_buf = UT_malloc(256);
+	result_buf = UT_malloc(256);
 
-  if( a == NULL )
-  {
-    strcpy(result_buf, "DATA MISSING!");
-  }
-  else
-  {
-    sprintf(result_buf,  ACC_FORMAT,
-            a->connections,
-	    a->addrpasses,
-            a->denials,
-            a->queries,
-	    a->referrals,
-            a->private_objects,
-            a->public_objects,
-            a->private_bonus,
-	    a->public_bonus,
-		a->sim_connections,
-            UT_time_getvalue(&a->timestamp)
-            );
-  }
+	if (a == NULL) {
+		strcpy(result_buf, "DATA MISSING!");
+	} else {
+		sprintf(result_buf, ACC_FORMAT,
+			a->connections,
+			a->addrpasses,
+			a->denials,
+			a->queries,
+			a->referrals,
+			a->private_objects,
+			a->public_objects, a->private_bonus, a->public_bonus, a->sim_connections, UT_time_getvalue(&a->timestamp)
+			);
+	}
 
-  return result_buf;
-} /* ac_to_string() */
+	return result_buf;
+}								/* ac_to_string() */
 
 
 /*++++++++++++++++++++++++++++++++++++++
@@ -246,45 +240,44 @@ char *ac_acl_to_string(GList *leafptr)
   ac_find_acl_l:
 
   find the exact or exact/less specific match for the given prefix in the acl tree.
+  DOES NOT COPY THE RESULT! 
 
   ip_prefix_t *prefix - prefix to look for
-
-  acl_st *store_acl   - pointer to store the output
+  acl_st *store_acl  - pointer to store the acl struct
 
   returns error code from RX or OK
 
   MT-Note: assumes locked acl tree
   ++++++++++++++++++++++++++++++++++++++*/
-static int
-ac_find_acl_l(rx_srch_mt searchmode, ip_prefix_t *prefix, acl_st *store_acl)
+static int ac_find_acl_l(rx_srch_mt searchmode, ip_prefix_t * prefix, acl_st **store_acl)
 {
-  GList       *datlist=NULL;
-  int    ret_err;
-  rx_datref_t *datref;
+	GList *datlist = NULL;
+	int ret_err;
+	rx_datref_t *datref;
+	ip_prefix_t *localpref = IP_truncate_pref_v6(prefix, IPV6_ADDRESS_ACL_BITS);
 
-  /* accept only RX_SRCH_EXLESS | RX_SRCH_EXACT modes */
-  dieif( searchmode != RX_SRCH_EXLESS && searchmode != RX_SRCH_EXACT);
+	/* accept only RX_SRCH_EXLESS | RX_SRCH_EXACT modes */
+	dieif(searchmode != RX_SRCH_EXLESS && searchmode != RX_SRCH_EXACT);
 
-  /* it must work */
-  dieif( (ret_err = RX_bin_search(searchmode, 0, 0, act_acl[prefix->ip.space],
-                               prefix, &datlist, RX_ANS_ALL)
-       ) != RX_OK );
-  /* In exless mode, something must be found or the acl tree is not
-     configured at all !
-     There always must be a catch-all record with defaults */
-  dieif( searchmode == RX_SRCH_EXLESS && g_list_length(datlist) == 0 );
+	/* it must work */
+	dieif((ret_err = RX_bin_search(searchmode, 0, 0, act_acl[localpref->ip.space], localpref, &datlist, RX_ANS_ALL)) != RX_OK);
+	/* In exless mode, something must be found or the acl tree is not configured at all !
+	   There always must be a catch-all record with defaults */
+	dieif(searchmode == RX_SRCH_EXLESS && g_list_length(datlist) == 0);
 
+	datref = (rx_datref_t *) g_list_nth_data(datlist, 0);
 
-  datref = (rx_datref_t *)g_list_nth_data(datlist,0);
+	*store_acl = ((acl_st *) datref->leafptr);
 
-  *store_acl = * ((acl_st *)  datref->leafptr);
+	wr_clear_list(&datlist);
 
-  wr_clear_list( &datlist );
+	/* free malloced area */
+	if (prefix != localpref)
+		free(localpref);
 
-  return ret_err;
+	return ret_err;
 }
 /* ac_find_acl_l */
-
 
 /*+++++++++++++++++++++++++++++++++++++++
   AC_findcreate_acl_l:
@@ -301,40 +294,29 @@ ac_find_acl_l(rx_srch_mt searchmode, ip_prefix_t *prefix, acl_st *store_acl)
 
   MT-Note: assumes locked acl tree
   ++++++++++++++++++++++++++++++++++++++*/
-int AC_findcreate_acl_l(ip_prefix_t * prefix, acl_st ** store_acl) {
+int AC_findcreate_acl_l(ip_prefix_t * prefix, acl_st ** store_acl)
+{
 	GList *datlist = NULL;
 	int ret_err;
-	acl_st *newacl = NULL;
-	acl_st acl_copy;
-	ip_prefix_t *localpref;
+	acl_st *newacl = NULL, *retacl = NULL;
+	ip_prefix_t *localpref = IP_truncate_pref_v6(prefix, IPV6_ADDRESS_ACL_BITS);
 
-	if (prefix->ip.space == IP_V6 && prefix->bits > IPV6_ADDRESS_ACCESS_BITS) {
-		/* make a local copy of the prefix, cut it to 64 bits, and do the same */
-		localpref = (ip_prefix_t *)malloc(sizeof(ip_prefix_t));
-		*localpref = *prefix;
-
-		localpref->bits = IPV6_ADDRESS_ACCESS_BITS;
-		IP_pref_bit_fix(localpref);
-	} else {
-		localpref = prefix;
-	}
-
-	ret_err = RX_bin_search(RX_SRCH_EXACT, 0, 0, act_acl[localpref->ip.space],
-													localpref, &datlist, RX_ANS_ALL);
+	ret_err = RX_bin_search(RX_SRCH_EXACT, 0, 0, act_acl[localpref->ip.space], localpref, &datlist, RX_ANS_ALL);
 
 	if (NOERR(ret_err)) {
 		switch (g_list_length(datlist)) {
 		case 0:
-			newacl = UT_calloc(sizeof(acl_st), 1);
 			/* make the new one inherit all parameters after the old one */
-			ac_find_acl_l(RX_SRCH_EXLESS, localpref, &acl_copy);
-			*newacl = acl_copy;
+			ac_find_acl_l(RX_SRCH_EXLESS, localpref, &retacl);
+			
+			newacl = UT_malloc(sizeof(acl_st));
+			*newacl = *retacl;
+			
 			/* link in */
-			rx_bin_node(RX_OPER_CRE, localpref, act_acl[localpref->ip.space],
-						(rx_dataleaf_t *) newacl);
+			rx_bin_node(RX_OPER_CRE, localpref, act_acl[localpref->ip.space], (rx_dataleaf_t *) newacl);
 			break;
 
-		case 1: {
+		case 1:{
 				/* Uh-oh, the guy is already known ! (or special, in any case) */
 				rx_datref_t *datref = (rx_datref_t *) g_list_nth_data(datlist, 0);
 				newacl = (acl_st *) datref->leafptr;
@@ -346,7 +328,8 @@ int AC_findcreate_acl_l(ip_prefix_t * prefix, acl_st ** store_acl) {
 	}
 
 	/* free malloced area */
-	if (prefix != localpref) free(localpref);
+	if (prefix != localpref)
+		free(localpref);
 
 	/* free search results */
 	wr_clear_list(&datlist);
@@ -373,70 +356,60 @@ int AC_findcreate_acl_l(ip_prefix_t * prefix, acl_st ** store_acl) {
   returns error code from RX or OK
 
   MT-Note: assumes locked accounting tree
+  
+  FIXME: It is called with a write lock on the tree from _EVERYWHERE_. There is no use to do that;
+         a simple read lock is OK, and we only need to fetch a write lock if we create a new node
+         I won't fix this now, as a complete thread+locking optimization is needed anyway - Agoston, 2006
   ++++++++++++++++++++++++++++++++++++++*/
-int
-AC_findcreate_account_l(rx_tree_t *tree, ip_prefix_t *prefix,
-			acc_st **acc_store)
+int AC_findcreate_account_l(rx_tree_t * tree, ip_prefix_t * prefix, acc_st ** acc_store)
 {
 	GList *datlist = NULL;
 	int ret_err;
 	acc_st *recacc = NULL;
-	ip_prefix_t *localpref;
+	ip_prefix_t *localpref = IP_truncate_pref_v6(prefix, IPV6_ADDRESS_ACCESS_BITS);
 
-	if (prefix->ip.space == IP_V6 && prefix->bits > IPV6_ADDRESS_ACCESS_BITS) {
-		/* make a local copy of the prefix, cut it to 64 bits, and do the same */
-		localpref = (ip_prefix_t *)malloc(sizeof(ip_prefix_t));
-		*localpref = *prefix;
+	if ((ret_err = RX_bin_search(RX_SRCH_EXACT, 0, 0, tree, localpref, &datlist, RX_ANS_ALL)) == RX_OK) {
+		switch (g_list_length(datlist)) {
+		case 0:
+			/* need to create a new accounting record */
+			recacc = UT_malloc(sizeof(acc_st));
 
-		localpref->bits = IPV6_ADDRESS_ACCESS_BITS;
-		IP_pref_bit_fix(localpref);
+			/*  counters = init to zeros */
+			memset(recacc, 0, sizeof(acc_st));
+
+			recacc->changed = AC_ACC_NEW;
+
+			/* attach. The recacc is to be treated as a dataleaf
+			   (must use lower levels than RX_asc_*)
+			 */
+			ret_err = rx_bin_node(RX_OPER_CRE, localpref, act_runtime[localpref->ip.space], (rx_dataleaf_t *) recacc);
+			if (ret_err != RX_OK) {
+				LG_log(access_ctx, LG_ERROR, "rx_bin_node() returned %d", ret_err);
+			}
+			break;
+		case 1:
+			{
+				rx_datref_t *datref = (rx_datref_t *) g_list_nth_data(datlist, 0);
+				/* OK, there is a record already */
+				recacc = (acc_st *) datref->leafptr;
+			}
+			break;
+		default:
+			die;				/* there shouldn't be more than 1 entry per IP */
+		}
 	} else {
-		localpref = prefix;
+		LG_log(access_ctx, LG_ERROR, "RX_bin_search() returned %d", ret_err);
 	}
 
-  if( (ret_err = RX_bin_search(RX_SRCH_EXACT, 0, 0, tree,
-                               localpref, &datlist, RX_ANS_ALL)) == RX_OK ) {
-    switch( g_list_length(datlist) ) {
-    case 0:
-      /* need to create a new accounting record */
-      recacc = UT_malloc(sizeof(acc_st));
-
-      /*  counters = init to zeros */
-      memset( recacc, 0, sizeof(acc_st));
-
-      recacc->changed = AC_ACC_NEW;
-
-      /* attach. The recacc is to be treated as a dataleaf
-        (must use lower levels than RX_asc_*)
-      */
-      ret_err = rx_bin_node( RX_OPER_CRE, localpref,
-                             act_runtime[localpref->ip.space], (rx_dataleaf_t *)recacc );
-      if (ret_err != RX_OK) {
-        LG_log(access_ctx, LG_ERROR, "rx_bin_node() returned %d", ret_err);
-      }
-      break;
-    case 1:
-      {
-        rx_datref_t *datref = (rx_datref_t *) g_list_nth_data( datlist,0 );
-        /* OK, there is a record already */
-        recacc = (acc_st *) datref->leafptr;
-
-      }
-      break;
-    default: die; /* there shouldn't be more than 1 entry per IP */
-    }
-  } else {
-    LG_log(access_ctx, LG_ERROR, "RX_bin_search() returned %d", ret_err);
-  }
-
 	/* free malloced area */
-	if (prefix != localpref) free(localpref);
+	if (prefix != localpref)
+		free(localpref);
 
-  wr_clear_list( &datlist );
+	wr_clear_list(&datlist);
 
-  *acc_store = recacc;
+	*acc_store = recacc;
 
-  return ret_err;
+	return ret_err;
 }
 
 
@@ -453,24 +426,24 @@ AC_findcreate_account_l(rx_tree_t *tree, ip_prefix_t *prefix,
 
   MT-Note: locks/unlocks the accounting tree
   ++++++++++++++++++++++++++++++++++++++*/
-int AC_fetch_acc( ip_addr_t *addr, acc_st *acc_store)
+int AC_fetch_acc(ip_addr_t * addr, acc_st * acc_store)
 {
-  int ret_err;
-  ip_prefix_t prefix;
-  acc_st *ac_ptr;
+	int ret_err;
+	ip_prefix_t prefix;
+	acc_st *ac_ptr;
 
-  prefix.ip = *addr;
-  prefix.bits = IP_sizebits(addr->space);
+	prefix.ip = *addr;
+	prefix.bits = IP_sizebits(addr->space);
 
-  TH_acquire_write_lock( &(act_runtime[addr->space]->rwlock) );
+	TH_acquire_write_lock(&(act_runtime[addr->space]->rwlock));
 
-  ret_err = AC_findcreate_account_l(act_runtime[addr->space], &prefix, &ac_ptr);
-  *acc_store = *ac_ptr;
+	ret_err = AC_findcreate_account_l(act_runtime[addr->space], &prefix, &ac_ptr);
+	*acc_store = *ac_ptr;
 
-  TH_release_write_lock( &(act_runtime[addr->space]->rwlock) );
+	TH_release_write_lock(&(act_runtime[addr->space]->rwlock));
 
-  return ret_err;
-}/* AC_fetch_acc() */
+	return ret_err;
+}								/* AC_fetch_acc() */
 
 
 /*++++++++++++++++++++++++++++++++++++++
@@ -498,68 +471,75 @@ int AC_fetch_acc( ip_addr_t *addr, acc_st *acc_store)
 
   MT-Note: locks/unlocks the accounting tree
   ++++++++++++++++++++++++++++++++++++++*/
-int AC_check_acl( ip_addr_t *addr,
-                       acc_st *credit_acc,
-                       acl_st *acl_store
-                       )
+int AC_check_acl(ip_addr_t * addr, acc_st * credit_acc, acl_st * acl_store)
 {
-  ip_prefix_t prefix;
-  int    ret_err = AC_OK;
-  acl_st      acl_record;
-  acc_st      run_acc;
+	ip_prefix_t prefix;
+	int ret_err = AC_OK;
+	acl_st *acl_record;
 
-  AC_fetch_acc( addr, &run_acc );
+	prefix.ip = *addr;
+	prefix.bits = IP_sizebits(addr->space);
 
-  prefix.ip = *addr;
-  prefix.bits = IP_sizebits(addr->space);
+	/* lock the tree accordingly */
+	TH_acquire_read_lock(&(act_acl[addr->space]->rwlock));
 
-  /* lock the tree accordingly */
-  TH_acquire_read_lock( &(act_acl[addr->space]->rwlock) );
+	/* find an applicable record */
+	ac_find_acl_l(RX_SRCH_EXLESS, &prefix, &acl_record);
 
-  /* find an applicable record */
-  ac_find_acl_l(RX_SRCH_EXLESS, &prefix, &acl_record);
+	/* calculate the credit if pointer given */
+	if (credit_acc) {
+		acc_st run_acc;
+		AC_fetch_acc(addr, &run_acc);
 
-  /* calculate the credit if pointer given */
-  if( credit_acc ) {
-    memset( credit_acc, 0, sizeof(acc_st));
+		memset(credit_acc, 0, sizeof(acc_st));
 
-    /* credit = -1 if unlimited, otherwise credit = limit - bonus */
-    credit_acc->public_objects =
-      ( acl_record.maxpublic == -1 )
-      ? -1 /* -1 == unlimited */
-      : (acl_record.maxpublic - run_acc.public_bonus);
+		/* credit = -1 if unlimited, otherwise credit = limit - bonus */
+		credit_acc->public_objects = (acl_record->maxpublic == -1)
+			? -1				/* -1 == unlimited */
+			: (acl_record->maxpublic - run_acc.public_bonus);
 
-    credit_acc->private_objects =
-      ( acl_record.maxprivate == -1 )
-      ? -1 /* -1 == unlimited */
-      : (acl_record.maxprivate - run_acc.private_bonus);
-  }
+		credit_acc->private_objects = (acl_record->maxprivate == -1)
+			? -1				/* -1 == unlimited */
+			: (acl_record->maxprivate - run_acc.private_bonus);
+	}
 
-  /* copy the acl record if asked for it*/
-  if( acl_store ) {
-    *acl_store =  acl_record;
-  }
+	/* copy the acl record if asked for it */
+	if (acl_store) {
+		*acl_store = *acl_record;
+	}
 
-  /* release lock */
-  TH_release_read_lock( &(act_acl[addr->space]->rwlock) );
+	/* release lock */
+	TH_release_read_lock(&(act_acl[addr->space]->rwlock));
 
-
-  return ret_err;
+	return ret_err;
 }
 
+/* the decay factor of
+   f(t) = exp(-a*t)
+   a = -ln(0.5) / t
+   so for T being the half-life period and v being the sampling interval
+   used as the unit of time
+   a = -ln(0.5) / T;
+   f(t+x) = exp(-a(t+x)) = f(t)*f(x) = f(t)*exp(-ax) =
+   = f(t)*exp(ln(0.5)*v/T)
+   so you multiply the previous value by exp(ln(0.5)*v/T)
 
-void AC_decay_leaf_l(acc_st *leaf) {
-  double factor;
-  ut_timer_t current;
-  float time_diff;
+    dec_dat.decay_factor =
+      exp ( -0.693147180559945 * exactinterval / ca_get_ac_decay_halflife) ;
+*/
+inline void AC_decay_leaf_l(acc_st * leaf, ut_timer_t * current)
+{
+	if (UT_time_getvalue(&leaf->timestamp) > 1) {
+		float time_diff;
 
-  UT_timeget(&current);
-  time_diff = UT_timediff(&leaf->timestamp, &current);
-  if (UT_time_getvalue(&leaf->timestamp) > 1 && abs(time_diff) > 0.2) {
-    factor = exp (-0.693147180559945 * time_diff / ca_get_ac_decay_halflife);
-    leaf->private_bonus *= factor;
-    leaf->public_bonus  *= factor;
-  }
+		time_diff = UT_timediff(&leaf->timestamp, current);
+		if (abs(time_diff) > 0.2) {
+			double factor;
+			factor = exp(-0.693147180559945 * time_diff / ca_get_ac_decay_halflife);
+			leaf->private_bonus *= factor;
+			leaf->public_bonus *= factor;
+		}
+	}
 }
 
 /*++++++++++++++++++++++++++++++++++++++
@@ -577,14 +557,13 @@ void AC_decay_leaf_l(acc_st *leaf) {
 void AC_acc_addup(acc_st *a, acc_st *b, int minus)
 {
   int mul = minus ? -1 : 1;
-  time_t current_time;
+  ut_timer_t current_time;
 
-  current_time = time(NULL);
+  UT_timeget(&current_time);
 
-  AC_decay_leaf_l(a);
+  AC_decay_leaf_l(a, &current_time);
 
-
-  UT_timeget(&a->timestamp);
+  a->timestamp = current_time;
 
   /* add all counters from b to those in a */
   a->connections     +=  mul * b->connections;
@@ -599,7 +578,6 @@ void AC_acc_addup(acc_st *a, acc_st *b, int minus)
   a->public_bonus    +=  mul * b->public_bonus;
 
   a->sim_connections +=  mul * b->sim_connections;
-
 
   if (a->changed == AC_ACC_NOT_CHANGED) {
     a->changed = AC_ACC_CHANGED;
@@ -660,28 +638,26 @@ AC_commit_credit_l(rx_tree_t *tree, ip_prefix_t *prefix,
   (rationale: the opening process became a bit bloated and is done twice,
   so I put it into a separate function)
 ++++++++++++++++++++++++++++++++++++++*/
-SQ_connection_t *
-AC_dbopen_admin(void)
+SQ_connection_t *AC_dbopen_admin(void)
 {
-  SQ_connection_t *con=NULL;
-  char *dbhost = ca_get_ripadminhost;
-  char *dbname = ca_get_ripadmintable;
-  char *dbuser = ca_get_ripadminuser;
-  char *dbpass = ca_get_ripadminpassword;
-  unsigned dbport = ca_get_ripadminport;
+	SQ_connection_t *con = NULL;
+	char *dbhost = ca_get_ripadminhost;
+	char *dbname = ca_get_ripadmintable;
+	char *dbuser = ca_get_ripadminuser;
+	char *dbpass = ca_get_ripadminpassword;
+	unsigned dbport = ca_get_ripadminport;
 
-  if( (con = SQ_get_connection(dbhost, dbport, dbname, dbuser, dbpass)
-       ) == NULL ) {
-    fprintf(stderr, "ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
-    die;
-  }
+	if ((con = SQ_get_connection(dbhost, dbport, dbname, dbuser, dbpass)) == NULL) {
+		fprintf(stderr, "ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
+		die;
+	}
 
-  UT_free(dbhost);
-  UT_free(dbname);
-  UT_free(dbuser);
-  UT_free(dbpass);
+	UT_free(dbhost);
+	UT_free(dbname);
+	UT_free(dbuser);
+	UT_free(dbpass);
 
-  return con;
+	return con;
 }
 
 /*++++++++++++++++++++++++++++++++++++++
@@ -700,96 +676,90 @@ AC_dbopen_admin(void)
   implements common error scheme
 
  ++++++++++++++++++++++++++++++++++++++*/
-int
-AC_acl_sql(ip_prefix_t *prefix, acl_st *newacl, char *newcomment )
+int AC_acl_sql(ip_prefix_t * prefix, acl_st * newacl, char *newcomment)
 {
-  SQ_connection_t *sql_connection = NULL;
-  SQ_result_set_t *result;
-  SQ_row_t *row;
-  char *oldcomment;
-  char *query;
-  char querybuf[256];
+	SQ_connection_t *sql_connection = NULL;
+	SQ_result_set_t *result;
+	SQ_row_t *row;
+	char *oldcomment;
+	char *query;
+	char querybuf[256];
+	ip_prefix_t *localpref = IP_truncate_pref_v6(prefix, IPV6_ADDRESS_ACL_BITS);
 
-  sql_connection = AC_dbopen_admin();
+	sql_connection = AC_dbopen_admin();
 
-  /* get the old entry, extend it */
-  switch (prefix->ip.space) {
-  	case IP_V4:
-  		sprintf(querybuf, "SELECT comment FROM acl WHERE "
-											  "prefix = %u AND prefix_length = %d",
-	  										IP_addr_b2v4_addr(&prefix->ip),
-	  										prefix->bits);
-	  	break;
+	/* get the old entry, extend it */
+	switch (localpref->ip.space) {
+	case IP_V4:
+		sprintf(querybuf, "SELECT comment FROM acl WHERE "
+			"prefix = %u AND prefix_length = %d", IP_addr_b2v4_addr(&localpref->ip), localpref->bits);
+		break;
 
-		case IP_V6:
-  		sprintf(querybuf, "SELECT comment FROM acl6 WHERE "
-											  "prefix1 = %u AND prefix2 = %u AND prefix3 = %u "
-											  "AND prefix4 = %u AND prefix_length = %d",
-	  										IP_addr_b2v6_addr(&prefix->ip, 0), IP_addr_b2v6_addr(&prefix->ip, 1),
-	  										IP_addr_b2v6_addr(&prefix->ip, 2), IP_addr_b2v6_addr(&prefix->ip, 3),
-	  										prefix->bits);
-	  	break;
+	case IP_V6:
+		sprintf(querybuf, "SELECT comment FROM acl6 WHERE "
+			"prefix1 = %u AND prefix2 = %u AND prefix3 = %u "
+			"AND prefix4 = %u AND prefix_length = %d",
+			IP_addr_b2v6_addr(&localpref->ip, 0), IP_addr_b2v6_addr(&localpref->ip, 1),
+			IP_addr_b2v6_addr(&localpref->ip, 2), IP_addr_b2v6_addr(&localpref->ip, 3), localpref->bits);
+		break;
 
-	  default:
-	  	die;
-  }
+	default:
+		die;
+	}
 
-  dieif( SQ_execute_query(sql_connection, querybuf, &result) == -1 );
+	dieif(SQ_execute_query(sql_connection, querybuf, &result) == -1);
 
-  if( SQ_num_rows(result) == 1 ) {
-    dieif( (row = SQ_row_next(result)) == NULL);
-    oldcomment = SQ_get_column_string(result, row, 0);
-  }
-  else {
-    oldcomment = UT_strdup("");
-  }
+	if (SQ_num_rows(result) == 1) {
+		dieif((row = SQ_row_next(result)) == NULL);
+		oldcomment = SQ_get_column_string(result, row, 0);
+	} else {
+		oldcomment = UT_strdup("");
+	}
 
-  SQ_free_result(result);
+	SQ_free_result(result);
 
-  /* must hold the thing below (REPLACE..blah blah blah) + text */
-  query = UT_malloc(strlen(oldcomment) + strlen(newcomment) + 256);
+	/* must hold the thing below (REPLACE..blah blah blah) + text */
+	query = UT_malloc(strlen(oldcomment) + strlen(newcomment) + 256);
 
-  /* compose new entry and insert it */
-  switch (prefix->ip.space) {
-  	case IP_V4:
-  		sprintf(query, "REPLACE INTO acl VALUES(%u, %d, %d, %d, %d, %d, %d, %d, %d,"
-	  								"\"%s%s%s\")",
-									  IP_addr_b2v4_addr(&prefix->ip), prefix->bits,
-									  newacl->maxprivate, newacl->maxpublic,
-									  newacl->maxdenials, newacl->deny,
-									  newacl->trustpass, newacl->threshold,
-								    newacl->maxconn, oldcomment,
-									  strlen(oldcomment) > 0 ? "\n" : "",
-									  newcomment);
-			break;
+	/* compose new entry and insert it */
+	switch (localpref->ip.space) {
+	case IP_V4:
+		sprintf(query, "REPLACE INTO acl VALUES(%u, %d, %d, %d, %d, %d, %d, %d, %d,"
+			"\"%s%s%s\")",
+			IP_addr_b2v4_addr(&localpref->ip), localpref->bits,
+			newacl->maxprivate, newacl->maxpublic,
+			newacl->maxdenials, newacl->deny,
+			newacl->trustpass, newacl->threshold, newacl->maxconn, oldcomment, strlen(oldcomment) > 0 ? "\n" : "", newcomment);
+		break;
 
-		case IP_V6:
-  		sprintf(query, "REPLACE INTO acl6 VALUES(%u, %u, %u, %u, %d, %d, %d, %d, %d, %d, %d, %d,"
-	  								"\"%s%s%s\")",
-									  IP_addr_b2v6_addr(&prefix->ip, 0), IP_addr_b2v6_addr(&prefix->ip, 1),
-	  								IP_addr_b2v6_addr(&prefix->ip, 2), IP_addr_b2v6_addr(&prefix->ip, 3),
-									  prefix->bits,
-									  newacl->maxprivate, newacl->maxpublic,
-									  newacl->maxdenials, newacl->deny,
-									  newacl->trustpass, newacl->threshold,
-								    newacl->maxconn, oldcomment,
-									  strlen(oldcomment) > 0 ? "\n" : "",
-									  newcomment);
-			break;
+	case IP_V6:
+		sprintf(query, "REPLACE INTO acl6 VALUES(%u, %u, %u, %u, %d, %d, %d, %d, %d, %d, %d, %d,"
+			"\"%s%s%s\")",
+			IP_addr_b2v6_addr(&localpref->ip, 0), IP_addr_b2v6_addr(&localpref->ip, 1),
+			IP_addr_b2v6_addr(&localpref->ip, 2), IP_addr_b2v6_addr(&localpref->ip, 3),
+			localpref->bits,
+			newacl->maxprivate, newacl->maxpublic,
+			newacl->maxdenials, newacl->deny,
+			newacl->trustpass, newacl->threshold, newacl->maxconn, oldcomment, strlen(oldcomment) > 0 ? "\n" : "", newcomment);
+		break;
 
-		default:
-			die;
-  }
+	default:
+		die;
+	}
 
-  SQ_execute_query(sql_connection, query, NULL);
-  SQ_close_connection(sql_connection);
+	SQ_execute_query(sql_connection, query, NULL);
+	SQ_close_connection(sql_connection);
 
-  UT_free(oldcomment);
-  UT_free(query);
+	UT_free(oldcomment);
+	UT_free(query);
 
-  return AC_OK;
+	/* free malloced area */
+	if (prefix != localpref)
+		free(localpref);
 
-}/* AC_acl_sql */
+	return AC_OK;
+
+}								/* AC_acl_sql */
 
 /*++++++++++++++++++++++++++++++++++++++
   AC_ban_set:
@@ -891,49 +861,62 @@ AC_asc_ban_set(char *addrstr, char *text, int denyflag)
   and then set them according to the array of args.
 
 +*/
-int
-AC_asc_all_set(ip_prefix_t *prefix, char *comment, char * array[])
+int AC_asc_all_set(ip_prefix_t * prefix, char *comment, char *array[])
 {
-  int ret_err;
-  acl_st *treeacl;
-  int i;
+	int ret_err;
+	acl_st *treeacl;
+	int i;
 
-  TH_acquire_write_lock( &(act_acl[prefix->ip.space]->rwlock) );
+	TH_acquire_write_lock(&(act_acl[prefix->ip.space]->rwlock));
 
-  /* find/create a record in the tree */
-  if( NOERR(ret_err = AC_findcreate_acl_l( prefix, &treeacl )) ) {
+	/* find/create a record in the tree */
+	if (NOERR(ret_err = AC_findcreate_acl_l(prefix, &treeacl))) {
 
-    /* update it from the array */
-    for(i=0; i<AC_AR_SIZE; i++) {
-      if(array[i] != NULL) { /* set only those that have been specified */
-	int val,k;
+		/* update it from the array */
+		for (i = 0; i < AC_AR_SIZE; i++) {
+			if (array[i] != NULL) {	/* set only those that have been specified */
+				int val, k;
 
-	if( (k=sscanf( array[i], "%d", &val)) < 1 ) {
-	  ret_err = AC_INVARG;
-	  break; /* quit the for */
+				if ((k = sscanf(array[i], "%d", &val)) < 1) {
+					ret_err = AC_INVARG;
+					break;		/* quit the for */
+				}
+
+				/* otherwise, the value makes sense. Put it in the structure. */
+				switch (i) {
+				case AC_AR_MAXPRIVATE:
+					treeacl->maxprivate = val;
+					break;
+				case AC_AR_MAXPUBLIC:
+					treeacl->maxpublic = val;
+					break;
+				case AC_AR_MAXDENIALS:
+					treeacl->maxdenials = val;
+					break;
+				case AC_AR_DENY:
+					treeacl->deny = val;
+					break;
+				case AC_AR_TRUSTPASS:
+					treeacl->trustpass = val;
+					break;
+				case AC_AR_THRESHOLD:
+					treeacl->threshold = val;
+					break;
+				case AC_AR_MAXCONN:
+					treeacl->maxconn = val;
+					break;
+				}				/* switch */
+			}					/* if array[i] not null */
+		}						/* for each array element */
+
+		if (NOERR(ret_err)) {	/* protect against AC_INVARG */
+			ret_err = AC_acl_sql(prefix, treeacl, comment);
+		}
 	}
+	/* if find/create OK */
+	TH_release_write_lock(&(act_acl[prefix->ip.space]->rwlock));
 
-	/* otherwise, the value makes sense. Put it in the structure. */
-	switch(i) {
-	case AC_AR_MAXPRIVATE: treeacl->maxprivate = val; break;
-	case AC_AR_MAXPUBLIC:  treeacl->maxpublic  = val; break;
-	case AC_AR_MAXDENIALS: treeacl->maxdenials = val; break;
-	case AC_AR_DENY:       treeacl->deny       = val; break;
-	case AC_AR_TRUSTPASS:  treeacl->trustpass  = val; break;
-	case AC_AR_THRESHOLD:  treeacl->threshold  = val; break;
-	case AC_AR_MAXCONN:    treeacl->maxconn    = val; break;
-	} /* switch */
-      } /* if array[i] not null */
-    } /* for each array element */
-
-    if( NOERR(ret_err) ) { /* protect against AC_INVARG */
-      ret_err = AC_acl_sql( prefix, treeacl, comment );
-    }
-  } /* if find/create OK */
-
-  TH_release_write_lock( &(act_acl[prefix->ip.space]->rwlock) );
-
-  return ret_err;
+	return ret_err;
 }
 
 
@@ -955,82 +938,80 @@ AC_asc_acl_command_set:
 
   ++++++++++++++++++++++++++++++++++++++*/
 
-int
-AC_asc_acl_command_set( char *command, char *comment )
+int AC_asc_acl_command_set(char *command, char *comment)
 {
-  ip_prefix_t *prefix = NULL;
-  char *eop, *eoc, *value;
-  char *array[AC_AR_SIZE];
-  int ret_err = AC_OK;
-  GList *preflist = NULL;
-  ip_keytype_t key_type;
+	ip_prefix_t *prefix = NULL;
+	char *eop, *eoc, *value;
+	char *array[AC_AR_SIZE];
+	int ret_err = AC_OK;
+	GList *preflist = NULL;
+	ip_keytype_t key_type;
 
-  char *copy = UT_strdup(command);
-  char *addrstr = copy;
-  eoc = strchr(copy, '\0'); /* points to the end of it */
+	char *copy = UT_strdup(command);
+	char *addrstr = copy;
+	eoc = strchr(copy, '\0');	/* points to the end of it */
 
-  memset(array, 0 ,sizeof(array));
+	memset(array, 0, sizeof(array));
 
-  /* first comes the prefix. Find the space after it
-     and break the string there.
-  */
-  if( (eop = strchr(copy,' ')) == NULL) {
-    ret_err = AC_INVARG;
-  }
-
-  if( NOERR(ret_err) ) {
-    *eop++ = 0;
-
-    /* now eop points to the rest of the string (if any). Take options.
-     */
-    while( eop != eoc && ret_err == AC_OK) {
-      char *sp;
-
-      /* give getsubopt chunks with no spaces */
-      if( (sp = strchr(eop, ' ')) != NULL ) {
-	*sp=0;
-      }
-
-      while( *eop != '\0' ) {
-	int k = getsubopt(&eop, AC_ar_acl, &value);
-	if( k < 0 ) {
-	  ret_err = AC_INVARG;
-	  break;
+	/* first comes the prefix. Find the space after it
+	   and break the string there.
+	 */
+	if ((eop = strchr(copy, ' ')) == NULL) {
+		ret_err = AC_INVARG;
 	}
 
-	array[k] = value;
-      }
+	if (NOERR(ret_err)) {
+		*eop++ = 0;
 
-      if( eop != eoc ) { /*getsubopt finished but did not consume all string*/
-	eop ++;            /* must have been a space. advance one */
-      }
-    }
-  }
+		/* now eop points to the rest of the string (if any). Take options.
+		 */
+		while (eop != eoc && ret_err == AC_OK) {
+			char *sp;
 
-  /* convert the prefix */
-  if(  NOERR(ret_err) ) {
-    ret_err = IP_smart_conv(addrstr, 0, 0, &preflist, IP_PLAIN, &key_type);
+			/* give getsubopt chunks with no spaces */
+			if ((sp = strchr(eop, ' ')) != NULL) {
+				*sp = 0;
+			}
 
-    /* allow only one prefix */
-    /* The argument can be even a range, but must decompose into one prefix */
-    if(  NOERR(ret_err) && g_list_length( preflist ) == 1 ) {
-      prefix = (g_list_first(preflist)->data);
-    }
-    else {
-      ret_err = AC_INVARG;
-    }
-  }
+			while (*eop != '\0') {
+				int k = getsubopt(&eop, AC_ar_acl, &value);
+				if (k < 0) {
+					ret_err = AC_INVARG;
+					break;
+				}
 
-  /* perform changes */
-  if(  NOERR(ret_err) ) {
-    ret_err = AC_asc_all_set(prefix, comment, array);
-  }
+				array[k] = value;
+			}
 
-  wr_clear_list( &preflist );
-  UT_free(copy);
+			if (eop != eoc) {	/*getsubopt finished but did not consume all string */
+				eop++;			/* must have been a space. advance one */
+			}
+		}
+	}
 
-  return ret_err;
-}/* AC_asc_acl_command_set */
+	/* convert the prefix */
+	if (NOERR(ret_err)) {
+		ret_err = IP_smart_conv(addrstr, 0, 0, &preflist, IP_PLAIN, &key_type);
+
+		/* allow only one prefix */
+		/* The argument can be even a range, but must decompose into one prefix */
+		if (NOERR(ret_err) && g_list_length(preflist) == 1) {
+			prefix = (g_list_first(preflist)->data);
+		} else {
+			ret_err = AC_INVARG;
+		}
+	}
+
+	/* perform changes */
+	if (NOERR(ret_err)) {
+		ret_err = AC_asc_all_set(prefix, comment, array);
+	}
+
+	wr_clear_list(&preflist);
+	UT_free(copy);
+
+	return ret_err;
+}								/* AC_asc_acl_command_set */
 
 
 /*++++++++++++++++++++++++++++++++++++++
@@ -1044,29 +1025,178 @@ AC_asc_acl_command_set( char *command, char *comment )
   +++++++++++++++++++++++++++++++++++++++*/
 int AC_asc_set_nodeny(char *ip)
 {
-  ip_prefix_t  prefix;
-  int     ret_err;
-  acc_st *ac_ptr;
+	ip_prefix_t *prefix;
+	int ret_err;
+	acc_st *ac_ptr;
+	GList *preflist = NULL;
+	acl_st *treeacl;
+	ip_keytype_t key_type;
+	
+	/* convert the prefix */
+	ret_err = IP_smart_conv(ip, 0, 0, &preflist, IP_PLAIN, &key_type);
 
-  ret_err = IP_addr_e2b( &(prefix.ip), ip );
+	/* allow only one prefix */
+	/* The argument can be even a range, but must decompose into one prefix */
+	if (NOERR(ret_err) && g_list_length(preflist) == 1) {
+		prefix = (g_list_first(preflist)->data);
+	} else {
+		ret_err = AC_INVARG;
+	}
 
-  if( NOERR(ret_err)) {
-    prefix.bits = IP_sizebits(prefix.ip.space);
+	/* perform changes */
+	if (NOERR(ret_err)) {
+		TH_acquire_write_lock(&(act_runtime[prefix->ip.space]->rwlock));
 
-    TH_acquire_write_lock( &(act_runtime[prefix.ip.space]->rwlock) );
+		ret_err = AC_findcreate_account_l(act_runtime[prefix->ip.space], prefix, &ac_ptr);
+		if (NOERR(ret_err)) {
+			// zero out all values influencing denial of a specific ip
+			ac_ptr->denials = 0;
+			ac_ptr->private_bonus = 0;
+			ac_ptr->public_bonus = 0;
+			UT_timeget(&ac_ptr->timestamp);
+			if (ac_ptr->changed != AC_ACC_NEW)
+				ac_ptr->changed = AC_ACC_CHANGED;
+		}
 
-    ret_err = AC_findcreate_account_l(act_runtime[prefix.ip.space], &prefix, &ac_ptr);
-    if( NOERR(ret_err)) {
-      ac_ptr->denials = 0;
-    }
+		TH_release_write_lock(&(act_runtime[prefix->ip.space]->rwlock));
+	}
 
-    TH_release_write_lock( &(act_runtime[prefix.ip.space]->rwlock) );
-  }
+	if (NOERR(ret_err)) {
+		TH_acquire_read_lock(&(act_acl[prefix->ip.space]->rwlock));
 
-  return ret_err;
+		ret_err = ac_find_acl_l(RX_SRCH_EXACT, prefix, &treeacl);
+		if (NOERR(ret_err)) {
+			treeacl->deny = 0;
+			ret_err = AC_acl_sql(prefix, treeacl, "Manual unban");
+		}
+
+		TH_release_read_lock(&(act_acl[prefix->ip.space]->rwlock));
+	}
+
+	/* cleanup */
+	wr_clear_list(&preflist);
+
+	return ret_err;
 }
 
+/*++++++++++++++++++++++++++++++++++++++
+ *
+ * set an access entry from the console command 'set access' 
+ * 
+ *++++++++++++++++++++++++++++++++++++++*/
+int AC_set_access_command(char *command)
+{
+	ip_prefix_t prefix;
+	char *eop, *eoc, *value;
+	int ret = AC_OK, i;
+	char *array[AC_ACC_SIZE];
+	acc_st *acc;
+	ut_timer_t currtime;
+	
+	UT_timeget(&currtime);
 
+	memset(array, 0, sizeof(array));
+	eoc = strchr(command, '\0');	/* points to the end of it */
+
+	/* first comes the prefix. Find the space after it and break the string there. */
+	if ((eop = strchr(command, ' ')) == NULL) {
+		ret = AC_INVARG;
+	} else {
+
+		*eop++ = 0;
+
+		if (NOERR(ret = IP_addr_t2b(&prefix.ip, command, IP_EXPN))) {
+			/* fix the prefix length */
+			prefix.bits = IP_sizebits(prefix.ip.space);
+			/* if it's a v6 address, truncate to acl length */
+			IP_truncate_pref_v6_inplace(&prefix, IPV6_ADDRESS_ACCESS_BITS);
+
+			/* get params into array */
+			while (eop != eoc && NOERR(ret)) {
+				char *sp;
+
+				/* give getsubopt chunks with no spaces */
+				if ((sp = strchr(eop, ' ')) != NULL) {
+					*sp = 0;
+				}
+
+				while (*eop != '\0') {
+					int k = getsubopt(&eop, AC_set_access_opts_str, &value);
+					if (k < 0) {
+						ret = AC_INVARG;
+						break;
+					}
+
+					array[k] = value;
+				}
+
+				if (eop != eoc) {	/*getsubopt finished but did not consume all string */
+					eop++;		/* must have been a space. advance one */
+				}
+			}
+
+			/* fetch access record */
+			TH_acquire_read_lock(&(act_runtime[prefix.ip.space]->rwlock));
+
+			ret = AC_findcreate_account_l(act_runtime[prefix.ip.space], &prefix, &acc);
+			if (NOERR(ret)) {
+				/* set its status to 'changed' */
+				if (acc->changed == AC_ACC_NOT_CHANGED) acc->changed = AC_ACC_CHANGED;
+				/* we only change timestamp if a decayed field is modified - see below */ 
+				
+				/* update it from the array */
+				for (i = 0; i < AC_ACC_SIZE; i++) {
+					if (array[i] != NULL) {	/* set only those that have been specified */
+						int val, k;
+
+						if ((k = sscanf(array[i], "%d", &val)) < 1) {
+							ret = AC_INVARG;
+							break;	/* quit the for */
+						}
+
+						/* otherwise, the value makes sense. Put it in the structure. */
+						switch (i) {
+						case AC_ACC_CONN:
+							acc->connections = val;
+							break;
+						case AC_ACC_PASS:
+							acc->addrpasses = val;
+							break;
+						case AC_ACC_DENY:
+							acc->denials = val;
+							break;
+						case AC_ACC_REFS:
+							acc->referrals = val;
+							break;
+						case AC_ACC_PRIV_O:
+							acc->private_objects = val;
+							acc->timestamp = currtime;
+							break;
+						case AC_ACC_PUB_O:
+							acc->public_objects = val;
+							acc->timestamp = currtime;
+							break;
+						case AC_ACC_PRIV_B:
+							acc->private_bonus = val;
+							acc->timestamp = currtime;
+							break;
+						case AC_ACC_PUB_B:
+							acc->public_bonus = val;
+							acc->timestamp = currtime;
+							break;
+						case AC_ACC_SIMCONN:
+							acc->sim_connections = val;
+							break;
+						}
+					}
+				}
+			}
+
+			TH_release_read_lock(&(act_runtime[prefix.ip.space]->rwlock));
+		}
+	}
+	return ret;
+}
 
 /*++++++++++++++++++++++++++++++++++++++
   AC_commit:
@@ -1208,48 +1338,39 @@ char AC_prunable(acc_st *leaf) {
 
   returns always OK
 +++++++++++++++++++++++++++++++++++++++*/
-int AC_decay_hook(rx_node_t *node, int level,
-		       int nodecounter, void *con)
+int AC_decay_hook(rx_node_t * node, int level, int nodecounter, void *con)
 {
-  acc_st *a = node->leaves_ptr->data;
-  acc_st clone;
-  ac_decay_data_t *dec_dat_p = (ac_decay_data_t *)con;
+	acc_st *a = node->leaves_ptr->data;
+	acc_st clone;
+	ac_decay_data_t *dec_dat_p = (ac_decay_data_t *) con;
+	clone = *a;
 
-  clone = *a;
+	AC_decay_leaf_l(&clone, &dec_dat_p->current_time);
 
-  AC_decay_leaf_l(&clone);
+	/* XXX pending: if bonus is close to zero and the node did not hit
+	   its limit, and it's not an address-passing node
+	   then add it to the list of nodes for deletion */
 
-  /* XXX pending: if bonus is close to zero and the node did not hit
-     its limit, and it's not an address-passing node
-     then add it to the list of nodes for deletion */
+	if (AC_prunable(&clone)) {
+		dec_dat_p->prunelist = g_list_prepend(dec_dat_p->prunelist, node);
+	}
 
-/*
-  ER_dbg_va( FAC_AC, ASP_AC_PRUNE_DET,
-	     "%5.2f / %5.2f   * %5.2f  -> %5.2f / %5.2f ",
-	     bpr, bpu, factor, a->private_bonus, a->public_bonus);
-*/
+	/* process accounting - add all queries to the total counter */
+	dec_dat_p->newtotal += a->queries;
 
-  if (AC_prunable(&clone)) {
-    dec_dat_p->prunelist = g_list_prepend(dec_dat_p->prunelist, node);
-  }
+	/* change oldest timestamp */
+	if (UT_timediff(&clone.timestamp, &oldest_timestamp[node->prefix.ip.space]) > 0 && clone.addrpasses == 0 && clone.denials == 0) {
+		oldest_timestamp[node->prefix.ip.space] = clone.timestamp;
+	}
 
-  /* process accounting - add all queries to the total counter */
-  dec_dat_p->newtotal += a->queries;
-
-  /* change oldest timestamp*/
-  if (UT_timediff(&clone.timestamp, &oldest_timestamp[node->prefix.ip.space]) > 0 &&
-      clone.addrpasses==0 && clone.denials==0 ) {
-    oldest_timestamp[node->prefix.ip.space] = clone.timestamp;
-  }
-
-  return RX_OK;
-} /* AC_decay_hook() */
-
-
+	return RX_OK;
+}								/* AC_decay_hook() */
 
 /*++++++++++++++++++++++++++++++++++++++
   AC_decay:
 
+  Started as a thread from server.c.
+  
   Every AC_DECAY_TIME goes through the accounting tree(s) and decays the
   bonus values.
 
@@ -1257,99 +1378,86 @@ int AC_decay_hook(rx_node_t *node, int level,
 
   MT-Note  This should be run as a detached thread.
   +++++++++++++++++++++++++++++++++++++++*/
-int AC_decay(void) {
-  int ret_err = AC_OK;
-  ac_decay_data_t dec_dat;
-  ut_timer_t begintime, endtime;
-  unsigned pruned = 0;
-  float elapsed, rate, exactinterval;
-  unsigned oldtotal = 0;
-  unsigned increase;
-  unsigned count = 0;
-  int i;
+int AC_decay(void)
+{
+	int ret_err = AC_OK;
+	ac_decay_data_t dec_dat;
+	ut_timer_t begintime, endtime;
+	unsigned pruned = 0;
+	float elapsed, rate, exactinterval;
+	unsigned oldtotal = 0;
+	unsigned increase;
+	unsigned count = 0;
+	int i;
 
-  TA_add(0, "decay");
+	TA_add(0, "decay");
 
-  UT_timeget( &endtime );
+	UT_timeget(&endtime);
 
-  /* XXX uses CO_get_do_server() to see when to exit the program.
-     this will change */
-  while(CO_get_do_server()) {
+	/* XXX uses CO_get_do_server() to see when to exit the program.
+	   this will change */
+	while (CO_get_do_server()) {
 
-    UT_timeget( &begintime );
-    exactinterval =  UT_timediff( &endtime, &begintime ); /* old endtime */
+		UT_timeget(&begintime);
+		exactinterval = UT_timediff(&endtime, &begintime);	/* old endtime */
 
+		/* those values can be changed in runtime - so recalculate
+		   the decay factor before each pass */
+		dieif(ca_get_ac_decay_halflife == 0);
 
-    /* those values can be changed in runtime - so recalculate
-       the decay factor vefore each pass */
-    dieif( ca_get_ac_decay_halflife == 0 );
+		dec_dat.prunelist = NULL;
+		dec_dat.newtotal = 0;
+		dec_dat.current_time = begintime;
+		for (i = MIN_IPSPACE_ID; i <= MAX_IPSPACE_ID; i++) {
+			TH_acquire_write_lock(&(act_runtime[i]->rwlock));
 
-   	dec_dat.prunelist = NULL;
-    /* the decay factor of
-       f(t) = exp(-a*t)
-       a = -ln(0.5) / t
-       so for T being the half-life period and v being the sampling interval
-       used as the unit of time
-       a = -ln(0.5) / T;
-       f(t+x) = exp(-a(t+x)) = f(t)*f(x) = f(t)*exp(-ax) =
-       = f(t)*exp(ln(0.5)*v/T)
-       so you multiply the previous value by exp(ln(0.5)*v/T)
-    */
-/*
-    dec_dat.decay_factor =
-      exp ( -0.693147180559945 * exactinterval / ca_get_ac_decay_halflife) ;
-*/
-    dec_dat.newtotal = 0;
-    for (i = MIN_IPSPACE_ID; i <= MAX_IPSPACE_ID; i++) {
-    	TH_acquire_write_lock( &(act_runtime[i]->rwlock) );
+			UT_timeget(&oldest_timestamp[i]);
+			if (act_runtime[i]->top_ptr) {
+				count += rx_walk_tree(act_runtime[i]->top_ptr, AC_decay_hook, RX_WALK_SKPGLU,	/* skip glue nodes */
+					255, 0, 0, &dec_dat, &ret_err);
+			}
 
-	    UT_timeget(&oldest_timestamp[i]);
-    	if( act_runtime[i]->top_ptr != NULL ) {
-	      count += rx_walk_tree(act_runtime[i]->top_ptr, AC_decay_hook,
-				   RX_WALK_SKPGLU,  /* skip glue nodes */
-				   255, 0, 0, &dec_dat, &ret_err);
-	    }
+			/* it should also be as smart as to delete nodes that have reached
+			   zero, otherwise the whole of memory will be filled.
+			   Next release :-)
+			 */
 
-	    /* it should also be as smart as to delete nodes that have reached
-	       zero, otherwise the whole of memory will be filled.
-	       Next release :-)
-	    */
-
-	    pruned += AC_prune(dec_dat.prunelist, i);
+			pruned += AC_prune(dec_dat.prunelist, i);
 			g_list_free(dec_dat.prunelist);
-	   	dec_dat.prunelist = NULL;
+			dec_dat.prunelist = NULL;
 
-	    TH_release_write_lock(&(act_runtime[i]->rwlock));
-    }
+			TH_release_write_lock(&(act_runtime[i]->rwlock));
+		}
 
-    UT_timeget(&endtime);
+		UT_timeget(&endtime);
 
-    elapsed = UT_timediff( &begintime, &endtime);
+		elapsed = UT_timediff(&begintime, &endtime);
 
-    LG_log(access_ctx, LG_DEBUG,
-	   "AC_decay: Pruned %d of %d nodes. Took %5.3fs. Runs every %ds.",
-	   pruned, count, elapsed, ca_get_ac_decay_interval);
+		LG_log(access_ctx, LG_DEBUG,
+			"AC_decay: Pruned %d of %d nodes. Took %5.3fs. Runs every %ds.", pruned, count, elapsed, ca_get_ac_decay_interval);
 
-    /* number/rate of queries within the last <interval> */
-    {
-      char actbuf[32];
+		/* number/rate of queries within the last <interval> */
+		{
+			char actbuf[32];
 
-      increase = dec_dat.newtotal - oldtotal;
-      rate = increase / exactinterval;
+			increase = dec_dat.newtotal - oldtotal;
+			rate = increase / exactinterval;
 
-      sprintf(actbuf, "%.2f q/s in %.1fs", rate, exactinterval);
-      TA_setactivity(actbuf);
+			sprintf(actbuf, "%.2f q/s in %.1fs", rate, exactinterval);
+			TA_setactivity(actbuf);
 
-      oldtotal = dec_dat.newtotal;
-    }
+			oldtotal = dec_dat.newtotal;
+		}
 
-    SV_sleep(ca_get_ac_decay_interval);
-  } /* while */
+		SV_sleep(ca_get_ac_decay_interval);
+	}							/* while */
 
-  TA_delete();
+	TA_delete();
 
-  return ret_err;
-} /* AC_decay() */
+	return ret_err;
+}								/* AC_decay() */
+
+
 
 int AC_access_control_get_resultset(SQ_connection_t* sql_conn, int space, SQ_result_set_t **rs) {
   switch (space) {
@@ -1385,53 +1493,53 @@ int AC_access_control_get_resultset(SQ_connection_t* sql_conn, int space, SQ_res
   ++++++++++++++++++++++++++++++++++++++*/
 int AC_acc_load(void)
 {
-  SQ_connection_t *con=NULL;
-  SQ_result_set_t *rs;
-  SQ_row_t *row;
-  int ret_err = RX_OK, ret;
+	SQ_connection_t *con = NULL;
+	SQ_result_set_t *rs;
+	SQ_row_t *row;
+	int ret_err = RX_OK, ret;
 	int i, myint;
 
-  con = AC_dbopen_admin();
+	con = AC_dbopen_admin();
 
 	for (i = MIN_IPSPACE_ID; i <= MAX_IPSPACE_ID; i++) {
-	  if (AC_access_control_get_resultset(con, i, &rs) == -1 ) {
-	      fprintf(stderr, "ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
-	      die;
-	  }
+		if (AC_access_control_get_resultset(con, i, &rs) == -1) {
+			fprintf(stderr, "ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
+			die;
+		}
 
-	  TH_acquire_write_lock( &(act_acl[i]->rwlock) );
+		TH_acquire_write_lock(&(act_acl[i]->rwlock));
 
-	  while ((row = SQ_row_next(rs)) != NULL && ret_err == RX_OK) {
-	    ip_prefix_t mypref;
-	    acl_st *newacl;
+		while ((row = SQ_row_next(rs)) != NULL && ret_err == RX_OK) {
+			ip_prefix_t mypref;
+			acl_st *newacl;
 
-	    newacl = UT_malloc(sizeof(acl_st));
+			newacl = UT_malloc(sizeof(acl_st));
 
-	    /* handle the prefix */
-      switch (i) {
-      	case IP_V4:
-      		ret = IP_pref_f2b_v4(&mypref,
-          		           SQ_get_column_string_nocopy(rs, row, 7),
-              		       SQ_get_column_string_nocopy(rs, row, 8));
-          dieif(ret != IP_OK);
-	       	break;
+			/* handle the prefix */
+			switch (i) {
+			case IP_V4:
+				ret = IP_pref_f2b_v4(&mypref, SQ_get_column_string_nocopy(rs, row, 7), SQ_get_column_string_nocopy(rs, row, 8));
+				dieif(ret != IP_OK);
+				break;
 
-	      case IP_V6:
-      		ret = IP_pref_f2b_v6_32(&mypref,
-          		           SQ_get_column_string_nocopy(rs, row, 7),
-          		           SQ_get_column_string_nocopy(rs, row, 8),
-          		           SQ_get_column_string_nocopy(rs, row, 9),
-          		           SQ_get_column_string_nocopy(rs, row, 10),
-              		       SQ_get_column_string_nocopy(rs, row, 11));
-          dieif(ret != IP_OK);
-          dieif(mypref.ip.space != IP_V6);		/* v4 or v4-mapped address in acl6 table!!! */
-	       	break;
-      }
+			case IP_V6:
+				ret = IP_pref_f2b_v6_32(&mypref,
+					SQ_get_column_string_nocopy(rs, row, 7),
+					SQ_get_column_string_nocopy(rs, row, 8),
+					SQ_get_column_string_nocopy(rs, row, 9),
+					SQ_get_column_string_nocopy(rs, row, 10), SQ_get_column_string_nocopy(rs, row, 11));
+				dieif(ret != IP_OK);
+				dieif(mypref.ip.space != IP_V6);	/* v4 or v4-mapped address in acl6 table!!! */
+				break;
+			}
 
-	    /* acl contents */
-			if (sscanf(SQ_get_column_string_nocopy(rs, row, 0), "%u", &(newacl->maxprivate)) < 1) die;
-			if (sscanf(SQ_get_column_string_nocopy(rs, row, 1), "%u", &(newacl->maxpublic)) < 1) die;
-			if (sscanf(SQ_get_column_string_nocopy(rs, row, 2), "%hd", &(newacl->maxdenials)) < 1) die;
+			/* acl contents */
+			if (sscanf(SQ_get_column_string_nocopy(rs, row, 0), "%u", &(newacl->maxprivate)) < 1)
+				die;
+			if (sscanf(SQ_get_column_string_nocopy(rs, row, 1), "%u", &(newacl->maxpublic)) < 1)
+				die;
+			if (sscanf(SQ_get_column_string_nocopy(rs, row, 2), "%hd", &(newacl->maxdenials)) < 1)
+				die;
 
 			/* these are chars therefore cannot read directly */
 			if (sscanf(SQ_get_column_string_nocopy(rs, row, 3), "%u", &myint) < 1) {
@@ -1446,24 +1554,25 @@ int AC_acc_load(void)
 				newacl->trustpass = myint;
 			}
 
-			if (sscanf(SQ_get_column_string_nocopy(rs, row, 5), "%d", &(newacl->threshold)) < 1) die;
-			if (sscanf(SQ_get_column_string_nocopy(rs, row, 6), "%d", &(newacl->maxconn)) < 1) die;
+			if (sscanf(SQ_get_column_string_nocopy(rs, row, 5), "%d", &(newacl->threshold)) < 1)
+				die;
+			if (sscanf(SQ_get_column_string_nocopy(rs, row, 6), "%d", &(newacl->maxconn)) < 1)
+				die;
 
+			/* now add to the tree */
+			IP_truncate_pref_v6_inplace(&mypref, IPV6_ADDRESS_ACL_BITS);
+			ret_err = rx_bin_node(RX_OPER_CRE, &mypref, act_acl[i], (rx_dataleaf_t *) newacl);
+		}
 
-	    /* now add to the tree */
-	    ret_err = rx_bin_node( RX_OPER_CRE, &mypref,
-	                           act_acl[i], (rx_dataleaf_t *) newacl );
-	  } /* while row */
-
-	  TH_release_write_lock( &(act_acl[i]->rwlock) );
+		TH_release_write_lock(&(act_acl[i]->rwlock));
 	}
 
-  SQ_free_result(rs);
-  /* Close connection */
-  SQ_close_connection(con);
+	SQ_free_result(rs);
+	/* Close connection */
+	SQ_close_connection(con);
 
-  return ret_err;
-} /* AC_acc_load */
+	return ret_err;
+}								/* AC_acc_load */
 
 
 
@@ -1517,15 +1626,15 @@ int ac_rxwalkhook_print(rx_node_t *node,
                              int level, int nodecounter,
                              void *outvoid)
 {
-  char adstr[IP_ADDRSTR_MAX];
+  char adstr[IP_PREFSTR_MAX];
   char *dat;
   GString *output = outvoid;
 
-  dieif( IP_addr_b2a(&(node->prefix.ip), adstr, IP_ADDRSTR_MAX) != IP_OK );
+  dieif( IP_pref_b2a(&(node->prefix), adstr, IP_ADDRSTR_MAX) != IP_OK );
   /* program error. */
 
   dat = ac_to_string( node->leaves_ptr );
-  g_string_sprintfa(output, "%-20s %s\n", adstr, dat );
+  g_string_sprintfa(output, "%-25s %s\n", adstr, dat );
   UT_free(dat);
 
   return RX_OK;
@@ -1596,7 +1705,7 @@ int ac_rxwalkhook_print_acl(rx_node_t *node,
   dieif( IP_pref_b2a(&(node->prefix), prefstr, IP_PREFSTR_MAX) != IP_OK );
 
   dat = ac_acl_to_string( node->leaves_ptr );
-  g_string_sprintfa(output, "%-20s %s\n", prefstr, dat );
+  g_string_sprintfa(output, "%-25s %s\n", prefstr, dat );
   UT_free(dat);
 
   return RX_OK;

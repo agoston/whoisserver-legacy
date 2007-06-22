@@ -2,7 +2,7 @@
 #define READ_ACCESS_CONTROL
 
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.1.6.1 $
 
   Access Control module (ac) - the header file.
 
@@ -82,6 +82,32 @@ char* AC_ar_acl[]  = {
   "threshold",
   "maxconn",
   NULL };
+
+/* order must correspond to the array below */
+typedef enum {
+ 	AC_ACC_CONN = 0,
+    AC_ACC_PASS,
+    AC_ACC_DENY,
+    AC_ACC_REFS,
+    AC_ACC_PRIV_O,
+	AC_ACC_PUB_O,
+    AC_ACC_PRIV_B,
+	AC_ACC_PUB_B,
+	AC_ACC_SIMCONN,
+    AC_ACC_SIZE
+} AC_set_access_opts_enum;
+
+char* AC_set_access_opts_str[]  = {
+  "conn",
+  "pass",
+  "deny",
+  "refs",
+  "priv_o",
+  "pub_o",
+  "priv_b",
+  "pub_b",
+  "simconn",
+  NULL };
 #endif
 
 typedef enum {
@@ -149,6 +175,7 @@ int AC_get_higher_limit(acc_st    *acc_credit, acl_st    *acl);
 
 int AC_asc_acl_command_set( char *command, char *comment );
 int AC_asc_set_nodeny(char *ip);
+int AC_set_access_command(char *command);
 SQ_connection_t *AC_dbopen_admin(void);
 
 #ifdef __cplusplus

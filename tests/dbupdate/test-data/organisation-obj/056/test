@@ -1,0 +1,26 @@
+# organisation object tests
+# CASE 56: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         name has all possible accepted chars in it
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 56: The creation will succeed
+#org-name:      A-Z 0-9 .  _ " * ()@, & :!'`+\/-
+
+
+organisation:  AUTO-1
+org-name:      A-Z 0-9 .  _ " * ()@, & :!'`+\/-
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+abuse-mailbox: dbtest@ripe.net
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm

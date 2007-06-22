@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.4 $
+  $Revision: 1.8 $
 
   IP handling (ip). ip.c  - conversions between ascii and binary forms
                             of IP addresses, prefixes and ranges.
@@ -59,7 +59,7 @@
 
 +*/
 
-unsigned IP_sizebits(ip_space_t spc_id) {
+inline unsigned IP_sizebits(ip_space_t spc_id) {
   switch (spc_id) {
   case IP_V4:
     return 32;
@@ -71,10 +71,8 @@ unsigned IP_sizebits(ip_space_t spc_id) {
   }
 }
 
-static
-int
-ip_rang_validate(ip_range_t *rangptr)
-{
+inline int ip_rang_validate(ip_range_t *rangptr) {
+  
   if( rangptr->begin.space != rangptr->end.space ) {
     /* die;  */ /* incompatible IP spaces */
     return IP_INVRAN;
@@ -99,18 +97,56 @@ ip_rang_validate(ip_range_t *rangptr)
 }
 
 /**************************************************************************/
+/*+ this fixes a prefix by setting insignificant bits to 0 +*/
+inline int IP_pref_bit_fix( ip_prefix_t *prefix ) {
+	int err = IP_OK;
+
+  if (prefix->ip.space == IP_V4) {
+    ip_limb_t mask = 0xffffffff;
+
+    if( prefix->bits < 32 ) {
+      /* if bits outside the prefix length exist - this is an error */
+      if ( prefix->ip.words[0] & (mask >> prefix->bits)) {
+      	err = IP_INVBIT;
+      	/* correct the prefix anyway */
+      	prefix->ip.words[0] &= ~(mask >> prefix->bits);
+      }
+    }
+  } else if (prefix->ip.space == IP_V6) {
+  	if (prefix->bits < 128) {
+		  unsigned div = prefix->bits>>5, andval = (prefix->bits&31);
+
+			if (andval > 0) {
+				/* this expression generates a 32-bit int with andval number of 1s at the beginning */
+				andval = ~((1<<(32-andval))-1);
+				prefix->ip.words[div] &= andval;
+				div++;	// this word has just been taken care of
+			}
+
+			for (;div < 4; div++) {
+				prefix->ip.words[div] = 0;
+			}
+  	}
+  } else {
+  	die;
+  }
+  return err;
+}
+
+/**************************************************************************/
 /* Check for IPv6 mapped IPv4 addresses and convert them to
  * the IPv4 address space
 */
-void IP_convert_mapped(ip_addr_t *in) {
+inline void IP_convert_mapped(ip_addr_t * in)
+{
 	/* only convert ipv6 addresses */
 	if (in->space == IP_V6) {
 		if (in->words[0] == 0 && in->words[1] == 0 && in->words[2] == 0xffff) {
 			in->space = IP_V4;
-	   	in->words[0] = in->words[3];
+			in->words[0] = in->words[3];
 
-	   	/* set remaining limbs to zero */
-	   	in->words[1] = in->words[2] = in->words[3] = 0;
+			/* set remaining limbs to zero */
+			in->words[1] = in->words[2] = in->words[3] = 0;
 		}
 	}
 }
@@ -127,9 +163,10 @@ void IP_convert_mapped(ip_addr_t *in) {
    it's because if some octets are missing, we make the address zero-padded
    (unlike the inet_blabla, which puts zeros in the middle). We also want
    to control the expansion with a flag.
-
    +*/
-int IP_addr_t2b(ip_addr_t * ipptr, const char *addr, ip_exp_t expf) {
+   
+int IP_addr_t2b(ip_addr_t *ipptr, const char *addr, ip_exp_t expf)
+{
 	if (index(addr, ':') == NULL) {
 		/* IPv4 */
 		const char *dot = addr;
@@ -148,7 +185,7 @@ int IP_addr_t2b(ip_addr_t * ipptr, const char *addr, ip_exp_t expf) {
 
 			if ((dot = index(addr, '.')) == NULL) {
 				/* after the ip it can contain lots of junk spaces */
-				while (*olddot != 0 && !isspace(*(unsigned char *) olddot)) {
+				while (*olddot != 0 && !isspace(*(unsigned char *)olddot)) {
 					olddot++;
 				}
 				dot = olddot;
@@ -173,7 +210,6 @@ int IP_addr_t2b(ip_addr_t * ipptr, const char *addr, ip_exp_t expf) {
 				/* handle syntax ERROR - invalid characters found */
 				return IP_INVIP4;
 			}
-
 
 			if (byte > 255) {
 				/* handle syntax ERROR - number between dots too high */
@@ -215,7 +251,7 @@ int IP_addr_t2b(ip_addr_t * ipptr, const char *addr, ip_exp_t expf) {
 		/* get rid of superfluous whitespaces */
 		/* leading... */
 		for (ch = start = addrcpy; *ch != 0; ch++) {
-			if (isspace((int) *ch)) {
+			if (isspace((int)*ch)) {
 				start++;
 			} else {
 				break;
@@ -224,7 +260,7 @@ int IP_addr_t2b(ip_addr_t * ipptr, const char *addr, ip_exp_t expf) {
 
 		/* and trailing */
 		while (*ch != 0) {
-			if (isspace((int) *ch)) {
+			if (isspace((int)*ch)) {
 				*ch = 0;
 				break;
 			}
@@ -240,8 +276,6 @@ int IP_addr_t2b(ip_addr_t * ipptr, const char *addr, ip_exp_t expf) {
 		}
 
 		ipptr->space = IP_V6;
-		/* finally, check for mapped ipv4 addresses */
-		IP_convert_mapped(ipptr);
 
 #undef _IPV6_LENGTH
 	}
@@ -249,69 +283,61 @@ int IP_addr_t2b(ip_addr_t * ipptr, const char *addr, ip_exp_t expf) {
 }
 
 /**************************************************************************/
-/*+ converts a "IP/length" string into a binary prefix +*/
-
-int
-IP_pref_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf)
+/*+ converts a "IP/length" string into a binary prefix                   +*/
+int IP_pref_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf)
 {
-  char ip[256];
-  char *trash;
-  char *slash;
-  unsigned len;
-  int err;
+	char ip[256];
+	char *trash;
+	char *slash;
+	unsigned len;
+	int err;
 
-  if( expf != IP_PLAIN && expf != IP_EXPN ) {
-    return IP_INVARG;
-  }
+	if (expf != IP_PLAIN && expf != IP_EXPN) {
+		return IP_INVARG;
+	}
 
-  if( (slash=index(prefstr, '/')) == NULL ) {
-    /* die;  */ /* error: missing slash in prefix */
-    return    IP_NOSLAS;
-  }
-  else {
-    /* copy the IP part to another string, ERROR if 256 chars not enough */
+	if ((slash = index(prefstr, '/')) == NULL) {
+		/* die;  *//* error: missing slash in prefix */
+		return IP_NOSLAS;
+	} else {
+		/* copy the IP part to another string, ERROR if 256 chars not enough */
 
-    len = slash - prefstr;
-    if( len > 255 ) {
-      /* die;  */ /* ERROR - ip address part of the string too long. */
-      return  IP_ADTOLO;
-    }
-    strncpy(ip, prefstr, len);
-    ip[len]=0;
+		len = slash - prefstr;
+		if (len > 255) {
+			/* die;  *//* ERROR - ip address part of the string too long. */
+			return IP_ADTOLO;
+		}
+		strncpy(ip, prefstr, len);
+		ip[len] = 0;
 
-    if( (err=IP_addr_t2b( &(prefptr->ip), ip, expf)) != IP_OK) {
-      /* die;   */ /* set error flag: incorrect address format */
-      return err;
-    }
+		if ((err = IP_addr_t2b(&(prefptr->ip), ip, expf)) != IP_OK) {
+			/* die;   *//* set error flag: incorrect address format */
+			return err;
+		}
 
-    /* stop at first non-digit */
-    for(trash = slash+1;
-	isdigit(* (unsigned char*) trash);         /* cast for stupid gcc */
-	trash++)
-      ;
-    len = trash - (slash+1) ;
-    if(( len > 4 ) || ( len < 1 )) {
-      /* ERROR - prefix length part of the string too long or too short. */
-      return IP_PRTOLO;
-    }
-    strncpy(ip, slash+1, len);
-    ip[len]=0;
+		/* stop at first non-digit */
+		for (trash = slash + 1; isdigit(*trash); trash++);
+		len = trash - (slash + 1);
+		if ((len > 4) || (len < 1)) {
+			/* ERROR - prefix length part of the string too long or too short. */
+			return IP_PRTOLO;
+		}
+		strncpy(ip, slash + 1, len);
+		ip[len] = 0;
 
-    if( ut_dec_2_uns(ip, &prefptr->bits) < 0
-	|| prefptr->bits > IP_sizebits(prefptr->ip.space))
-      {
-      /*    if( sscanf (slash+1, "%d", &(prefptr->bits)) < 1 ) {
-            die; */ /* handle syntax ERROR invalid characters found */
-      return IP_INVPRF;
-    }
-  }
-  /* sanitify the prefix - maybe some irrelevant bits are set */
-  /* report a warning IP_INVBIT if this was the case */
-  /* never create broken binary prefixes. */
+		if (ut_dec_2_uns(ip, &prefptr->bits) < 0 || prefptr->bits > IP_sizebits(prefptr->ip.space)) {
+			/*    if( sscanf (slash+1, "%d", &(prefptr->bits)) < 1 ) {
+			   die; *//* handle syntax ERROR invalid characters found */
+			return IP_INVPRF;
+		}
+	}
+	/* sanitify the prefix - maybe some irrelevant bits are set */
+	/* report a warning IP_INVBIT if this was the case */
+	/* never create broken binary prefixes. */
 
-  err = IP_pref_bit_fix(prefptr);
+	err = IP_pref_bit_fix(prefptr);
 
-  return err;
+	return err;
 }
 
 /**************************************************************************/
@@ -424,14 +450,7 @@ IP_revd_t2b(ip_prefix_t *prefptr, const char *domstr, ip_exp_t expf)
 
     /* convert using our text-to-binary function */
     err=IP_addr_t2b( &(prefptr->ip), ip, IP_EXPN);
-    if (prefptr->ip.space == IP_V6) {
-    	prefptr->bits = quads*4;
-    } else if (prefptr->ip.space == IP_V4) {	/* ipv6 mapped ipv4 address */
-    	prefptr->bits = (quads*4) - 16;
-    } else {
-    	die;	/* should not happen */
-    }
-
+    prefptr->bits = quads * 4;
     break;
 
   case  IP_V4:
@@ -504,33 +523,29 @@ IP_rang_t2b(ip_range_t *rangptr, const char *rangstr, ip_exp_t expf)
   }
   else {
     unsigned partlen = dash - rangstr;
+	char first[IP_ADDRSTR_MAX+1];
+	char *second;
 
     /* copy the first IP */
-    ips = (char *)UT_calloc(1, partlen+1);
-
-    strncpy(ips, rangstr, partlen);
+    if (partlen > IP_ADDRSTR_MAX) return IP_INVARG;
+    strncpy(first, rangstr, partlen);
+    first[partlen]=0;	// terminate
 
     /* convert the first IP into a binary struct */
-    err=IP_addr_t2b( &(rangptr->begin), ips, expf);
-
-    /* check later */ /* set error flag: incorrect address format */
-
-    UT_free(ips);
+    err=IP_addr_t2b( &(rangptr->begin), first, expf);
 
     if( err != IP_OK ) {
       return err;
     }
 
     /* now find the other ip, skip the space */
-    ips=dash+1;
-/*XXX the bug: tabs are also valid whitespace */
-/*    while( *ips == ' ' ) { */
-    while(isspace((int)*ips)) {
-      ips++;
+    second=dash+1;
+    while(isspace((int)*second)) {
+      second++;
     }
 
     /* convert the second IP into a binary struct */
-    if( (err=IP_addr_t2b( &(rangptr->end), ips, expf)) != IP_OK ) {
+    if( (err=IP_addr_t2b( &(rangptr->end), second, expf)) != IP_OK ) {
       /* die;  */ /* incorrect address format */
       return err;
     }
@@ -675,14 +690,14 @@ ip_v6word_t IP_addr_b2v6_hi(ip_addr_t *addrptr)
 {
   dieif( addrptr->space != IP_V6 );
   return (  (((ip_v6word_t) addrptr->words[0]) << 32)
-          + (((ip_v6word_t) addrptr->words[1]) ));
+	  + (((ip_v6word_t) addrptr->words[1]) ));
 }
 
 ip_v6word_t IP_addr_b2v6_lo(ip_addr_t *addrptr)
 {
   dieif( addrptr->space != IP_V6 );
   return (   (((ip_v6word_t) addrptr->words[2]) << 32)
-           + (((ip_v6word_t) addrptr->words[3]) ));
+	   + (((ip_v6word_t) addrptr->words[3]) ));
 }
 
 inline ip_limb_t IP_addr_b2v6_addr(ip_addr_t *addrptr, int limb) {
@@ -745,38 +760,29 @@ void IP_pref_b2v4(ip_prefix_t *prefptr,
 
 
 void IP_pref_b2v6(ip_prefix_t *prefptr,
-                  ip_v6word_t *high,
-                  ip_v6word_t *low,
-                  unsigned int *prefix_length)
+		  ip_v6word_t *high,
+		  ip_v6word_t *low,
+		  unsigned int *prefix_length)
 {
   *high          = IP_addr_b2v6_hi( &(prefptr->ip));
   *low           = IP_addr_b2v6_lo( &(prefptr->ip));
   *prefix_length = IP_pref_b2v6_len(prefptr);
 }
 
-void IP_addr_b2v6_32(ip_addr_t *addrptr,
-		  ip_limb_t *word1,
-		  ip_limb_t *word2,
-		  ip_limb_t *word3,
-		  ip_limb_t *word4)
+void IP_addr_b2v6_32(ip_addr_t * addrptr, ip_limb_t * word1, ip_limb_t * word2, ip_limb_t * word3, ip_limb_t * word4)
 {
-  *word1 = IP_addr_b2v6_addr(addrptr, 0);
-  *word2 = IP_addr_b2v6_addr(addrptr, 1);
-  *word3 = IP_addr_b2v6_addr(addrptr, 2);
-  *word4 = IP_addr_b2v6_addr(addrptr, 3);
+	*word1 = IP_addr_b2v6_addr(addrptr, 0);
+	*word2 = IP_addr_b2v6_addr(addrptr, 1);
+	*word3 = IP_addr_b2v6_addr(addrptr, 2);
+	*word4 = IP_addr_b2v6_addr(addrptr, 3);
 }
 
-void IP_pref_b2v6_32(ip_prefix_t *prefptr,
-		  ip_limb_t *word1,
-		  ip_limb_t *word2,
-		  ip_limb_t *word3,
-		  ip_limb_t *word4,
-		  unsigned int *prefix_length)
+void IP_pref_b2v6_32(ip_prefix_t * prefptr,
+					 ip_limb_t * word1, ip_limb_t * word2, ip_limb_t * word3, ip_limb_t * word4, unsigned int *prefix_length)
 {
 	IP_addr_b2v6_32(&prefptr->ip, word1, word2, word3, word4);
-  *prefix_length = IP_pref_b2v6_len(prefptr);
+	*prefix_length = IP_pref_b2v6_len(prefptr);
 }
-
 
 void IP_rang_b2v4(ip_range_t *myrang,
 		  unsigned *begin,
@@ -802,12 +808,13 @@ int IP_addr_v4_mk(ip_addr_t *addrptr,
 }
 
 int IP_addr_v6_mk(ip_addr_t *addrptr,
-                       ip_v6word_t high,
-                       ip_v6word_t low) {
+		       ip_v6word_t high,
+		       ip_v6word_t low) {
 
   ip_v6word_t ff = 0xffffffff;
 
   addrptr->space = IP_V6;
+  // network order is big-endian
   (addrptr->words[0]) =  (high >> 32) & ff;
   (addrptr->words[1]) =   high & ff ;
   (addrptr->words[2]) =  (low >> 32) & ff;
@@ -817,18 +824,16 @@ int IP_addr_v6_mk(ip_addr_t *addrptr,
   return IP_OK;
 }
 
-int IP_addr_v6_mk_32(ip_addr_t *addrptr,
-		       ip_limb_t word1, ip_limb_t word2,
-		       ip_limb_t word3, ip_limb_t word4) {
+int IP_addr_v6_mk_32(ip_addr_t * addrptr, ip_limb_t word1, ip_limb_t word2, ip_limb_t word3, ip_limb_t word4)
+{
+	addrptr->space = IP_V6;
+	addrptr->words[0] = word1;
+	addrptr->words[1] = word2;
+	addrptr->words[2] = word3;
+	addrptr->words[3] = word4;
 
-  addrptr->space = IP_V6;
-  addrptr->words[0] = word1;
-  addrptr->words[1] = word2;
-  addrptr->words[2] = word3;
-  addrptr->words[3] = word4;
-
-  /* no real possibility of checking the syntax */
-  return IP_OK;
+	/* no real possibility of checking the syntax */
+	return IP_OK;
 }
 
 /******** prefix **********/
@@ -887,8 +892,8 @@ IP_pref_a2v4(const char *avalue, ip_prefix_t *pref,
 /* ipv6 */
 int
 IP_pref_a2v6(const char *avalue, ip_prefix_t *pref,
-             ip_v6word_t *high, ip_v6word_t  *low,
-             unsigned *prefix_length)
+	     ip_v6word_t *high, ip_v6word_t  *low,
+	     unsigned *prefix_length)
 {
   int ret;
 
@@ -997,38 +1002,6 @@ IP_pref_f2b_v4(ip_prefix_t *prefptr, const char *prefixstr, const char *lengthst
   return IP_OK;
 }
 
-
-int
-IP_addr_f2b_v6_32(ip_addr_t *addrptr, const char *word1str, const char *word2str,
-								const char *word3str, const char *word4str)
-{
-  ip_limb_t word1, word2, word3, word4;
-
-	if (ut_dec_2_uns(word1str, &word1) < 0 ||
-			ut_dec_2_uns(word2str, &word2) < 0 ||
-			ut_dec_2_uns(word3str, &word3) < 0 ||
-			ut_dec_2_uns(word4str, &word4) < 0) {
-	      return IP_INVARG;
-	}
-
-  return IP_addr_v6_mk_32(addrptr, word1, word2, word3, word4);
-}
-
-
-int
-IP_pref_f2b_v6_32(ip_prefix_t *prefptr, const char *word1str, const char *word2str,
-								const char *word3str, const char *word4str, const char *lengthstr)
-{
-  if( IP_addr_f2b_v6_32( &(prefptr->ip), word1str, word2str, word3str, word4str ) != IP_OK
-      || ut_dec_2_uns(lengthstr, &(prefptr->bits) ) < 0
-      || prefptr->bits > IP_sizebits(prefptr->ip.space)) {
-    return IP_INVARG;
-  }
-  IP_pref_bit_fix(prefptr); /* never create broken binary prefixes. */
-  return IP_OK;
-}
-
-
 int
 IP_addr_f2b_v6(ip_addr_t *addrptr, const char *msbstr, const char *lsbstr )
 {
@@ -1055,6 +1028,17 @@ IP_addr_f2b_v6(ip_addr_t *addrptr, const char *msbstr, const char *lsbstr )
   return IP_addr_v6_mk(addrptr, high, low);
 }
 
+int IP_addr_f2b_v6_32(ip_addr_t * addrptr, const char *word1str, const char *word2str, const char *word3str, const char *word4str)
+{
+	ip_limb_t word1, word2, word3, word4;
+
+	if (ut_dec_2_uns(word1str, &word1) < 0 ||
+		ut_dec_2_uns(word2str, &word2) < 0 || ut_dec_2_uns(word3str, &word3) < 0 || ut_dec_2_uns(word4str, &word4) < 0) {
+		return IP_INVARG;
+	}
+
+	return IP_addr_v6_mk_32(addrptr, word1, word2, word3, word4);
+}
 
 int
 IP_pref_f2b_v6(ip_prefix_t *prefptr, const char *msbstr, const char *lsbstr, const char *lengthstr)
@@ -1068,136 +1052,212 @@ IP_pref_f2b_v6(ip_prefix_t *prefptr, const char *msbstr, const char *lsbstr, con
   return IP_OK;
 }
 
+int
+IP_pref_f2b_v6_32(ip_prefix_t * prefptr, const char *word1str, const char *word2str,
+				  const char *word3str, const char *word4str, const char *lengthstr)
+{
+	if (IP_addr_f2b_v6_32(&(prefptr->ip), word1str, word2str, word3str, word4str) != IP_OK
+		|| ut_dec_2_uns(lengthstr, &(prefptr->bits)) < 0 || prefptr->bits > IP_sizebits(prefptr->ip.space)) {
+		return IP_INVARG;
+	}
+	IP_pref_bit_fix(prefptr);	/* never create broken binary prefixes. */
+	return IP_OK;
+}
+
 /**************************************************************************/
 /*+ convert the socket's idea of address into a binary range struct.
 
   space    select the address type (and consequently struct type)
 */
 
-int IP_addr_s2b(ip_addr_t *addrptr, void *addr_in, int addr_len) {
-  if (((struct sockaddr_in *)addr_in)->sin_family == AF_INET ) {
-    addrptr->space = IP_V4;
-    addrptr->words[0] =
-      ntohl( ((struct sockaddr_in*)addr_in)->sin_addr.s_addr);
+int IP_addr_s2b(ip_addr_t * addrptr, void *addr_in, int addr_len)
+{
+	if (((struct sockaddr_in *)addr_in)->sin_family == AF_INET) {
+		addrptr->space = IP_V4;
+		addrptr->words[0] = ntohl(((struct sockaddr_in *)addr_in)->sin_addr.s_addr);
 
-    /* set remaining limbs to zero */
-    addrptr->words[1] = addrptr->words[2] = addrptr->words[3] = 0;
+		/* set remaining limbs to zero */
+		addrptr->words[1] = addrptr->words[2] = addrptr->words[3] = 0;
 
-  } else if (((struct sockaddr_in6 *)addr_in)->sin6_family == AF_INET6) {
-  	struct in6_addr *ia = &(((struct sockaddr_in6 *)addr_in)->sin6_addr);
+	} else if (((struct sockaddr_in6 *)addr_in)->sin6_family == AF_INET6) {
+		struct in6_addr *ia = &(((struct sockaddr_in6 *)addr_in)->sin6_addr);
 		int i = 0;
 
 		addrptr->space = IP_V6;
 
-		/* keep the network order */
 		for (; i < 4; i++) {
 			addrptr->words[i] = ntohl(ia->s6_addr32[i]);
 		}
 
-		/* check for v4 mapped addresses */
-		IP_convert_mapped(addrptr);
-
-  } else { /* unsupported family or invalid struct */
-    die;
-  }
-  return IP_OK;
+	} else {					/* unsupported family or invalid struct */
+		die;
+	}
+	return IP_OK;
 }
 
 /**************************************************************************/
 /*+converts the IP binary address (binaddr) to a string (ascaddr)
    of at most strmax characters. Independent of the result
    (success or failure) it messes up the string.
+    This works only for IPv6; to convert binary address
+    to fully uncompressed lowercase form.
 +*/
-int
-IP_addr_b2a( ip_addr_t *binaddr, char *ascaddr, unsigned strmax )
+int IP_addr_b2a_uncompress(ip_addr_t * binaddr, char *ascaddr, unsigned strmax)
 {
+	if (binaddr->space == IP_V6) {
+		/* IPv6 */
+		unsigned tmpv6[4];
+		int i;
+		int p;
+		char *col = NULL;
+		char *j;
+		char *head = NULL;
+		char *tail = NULL;
+		int head_dots = 0;
+		int tail_dots = 0;
+		GString *tmp;
 
-  if (binaddr->space == IP_V4) {
-    if (snprintf(ascaddr, strmax, "%d.%d.%d.%d",
-		 ((binaddr->words[0]) & ((unsigned)0xff<<24))>>24,
-		 ((binaddr->words[0]) & (0xff<<16))>>16,
-		 ((binaddr->words[0]) & (0xff<<8))>>8,
-		 ((binaddr->words[0]) & (0xff<<0))>>0
-		 ) >= strmax) {
-      /*die;  */ /* string too short */
-      return IP_TOSHRT;
-    }
-  } else if (binaddr->space == IP_V6) {
+		/* inet_* operates on network byte format numbers, so we need
+		   to prepare a tmp. data with it */
 
-    unsigned tmpv6[4];
-    int i;
-
-    /* inet_* operates on network byte format numbers, so we need
-   	to prepare a tmp. data with it */
-
-    for(i=0; i<4; i++) {
+		for (i = 0; i < 4; i++) {
 			tmpv6[i] = htonl(binaddr->words[i]);
-    }
+		}
 
-    if( inet_ntop(AF_INET6, tmpv6, ascaddr, strmax) == NULL ) {
-      return IP_TOSHRT;
-    }
-  }
-  return IP_OK;
+		if (inet_ntop(AF_INET6, tmpv6, ascaddr, strmax) == NULL) {
+			return IP_TOSHRT;
+		}
+
+		/* now put missing octets */
+		tmp = g_string_sized_new(1024);
+
+		col = strstr(ascaddr, "::");
+		if (col != NULL) {
+			head = g_strndup(ascaddr, col - (ascaddr));
+			if (col + 2 < (ascaddr) + strlen(ascaddr)) {
+				tail = g_strndup(col + 2, strlen(col + 2));
+			} else {
+				tail = g_strdup("");
+			}
+			for (j = head; j < (head + strlen(head)); j++) {
+				if (*j == ':') {
+					head_dots++;
+				}
+			}
+			for (j = tail; j < (tail + strlen(tail)); j++) {
+				if (*j == ':') {
+					tail_dots++;
+				}
+			}
+			if (strlen(head) > 0) {
+				g_string_sprintfa(tmp, "%s", head);
+			} else {
+				g_string_sprintfa(tmp, "0");
+			}
+			for (p = 0; p < (6 - head_dots - tail_dots); p++) {
+				g_string_sprintfa(tmp, ":0");
+			}
+			if (strlen(tail) > 0) {
+				g_string_sprintfa(tmp, ":%s", tail);
+			} else {
+				g_string_sprintfa(tmp, ":0");
+			}
+			strncpy(ascaddr, tmp->str, strlen(tmp->str));
+		}
+		ascaddr[strlen(tmp->str)] = 0;
+		g_string_free(tmp, TRUE);
+	}
+	return IP_OK;
+}
+
+
+/**************************************************************************/
+/*+converts the IP binary address (binaddr) to a string (ascaddr)
+   of at most strmax characters. Independent of the result
+   (success or failure) it messes up the string.
++*/
+int IP_addr_b2a(ip_addr_t * binaddr, char *ascaddr, unsigned strmax)
+{
+	if (binaddr->space == IP_V4) {
+		if (snprintf(ascaddr, strmax, "%d.%d.%d.%d",
+					 ((binaddr->words[0]) & ((unsigned)0xff << 24)) >> 24,
+					 ((binaddr->words[0]) & (0xff << 16)) >> 16,
+					 ((binaddr->words[0]) & (0xff << 8)) >> 8, ((binaddr->words[0]) & (0xff << 0)) >> 0) >= strmax) {
+			/*die;  *//* string too short */
+			return IP_TOSHRT;
+		}
+	} else {
+		/* IPv6 */
+		unsigned tmpv6[4];
+		int i;
+
+		/* inet_* operates on network byte format numbers, so we need
+		   to prepare a tmp. data with it */
+
+		for (i = 0; i < 4; i++) {
+			tmpv6[i] = htonl(binaddr->words[i]);
+		}
+
+		if (inet_ntop(AF_INET6, tmpv6, ascaddr, strmax) == NULL) {
+			return IP_TOSHRT;
+		}
+	}
+	return IP_OK;
 }
 
 /**************************************************************************/
-
 /*+ convert a binary prefix back into ascii string at most strmax chars long
-+*/
-int
-IP_pref_b2a(ip_prefix_t *prefptr, char *ascaddr, unsigned strmax)
+*/
+int IP_pref_b2a(ip_prefix_t * prefptr, char *ascaddr, unsigned strmax)
 {
-  int strl;
-  int err;
+	int strl;
+	int err;
 
-  if( (err=IP_addr_b2a (&(prefptr->ip), ascaddr, strmax)) != IP_OK) {
-    /*die;  */ /* what the hell */
-    return err;
-  }
-  strl = strlen(ascaddr);
-  strmax -= strl;
+	if ((err = IP_addr_b2a(&(prefptr->ip), ascaddr, strmax)) != IP_OK) {
+		/*die;  *//* what the hell */
+		return err;
+	}
+	strl = strlen(ascaddr);
+	strmax -= strl;
 
-  /* now strmax holds the space that is left */
+	/* now strmax holds the space that is left */
 
-  if( snprintf(ascaddr+strl, strmax, "/%d", prefptr->bits) >= strmax) {
-    /* die;  */ /* error: string too short */
-    return IP_TOSHRT;
-  }
-  return IP_OK;
+	if (snprintf(ascaddr + strl, strmax, "/%d", prefptr->bits) >= strmax) {
+		/* die;  *//* error: string too short */
+		return IP_TOSHRT;
+	}
+	return IP_OK;
 }
-
 
 
 /**************************************************************************/
 /*+ convert a binary range back into ascii string at most strmax chars long
 +*/
-int
-IP_rang_b2a(ip_range_t *rangptr, char *ascaddr, unsigned strmax)
+int IP_rang_b2a(ip_range_t * rangptr, char *ascaddr, unsigned strmax)
 {
-  int strl=0;
-  unsigned strleft;
-  int err;
+	int strl = 0;
+	unsigned strleft;
+	int err;
 
-  strleft = strmax - strl;
-  if( (err=IP_addr_b2a (&(rangptr->begin), ascaddr, strleft)) != IP_OK) {
-    return err;
-  }
-  strl = strlen(ascaddr);
+	strleft = strmax - strl;
+	if ((err = IP_addr_b2a(&(rangptr->begin), ascaddr, strleft)) != IP_OK) {
+		return err;
+	}
+	strl = strlen(ascaddr);
 
-  strleft = strmax - strl;
-  if( strleft < 5 ) {
-    return IP_TOSHRT;
-  }
-  strcat( ascaddr, " - " );
-  strl += 3;
+	strleft = strmax - strl;
+	if (strleft < 5) {
+		return IP_TOSHRT;
+	}
+	strcat(ascaddr, " - ");
+	strl += 3;
 
-  strleft = strmax - strl;
-  if( (err=IP_addr_b2a (&(rangptr->end), ascaddr+strl, strleft)) != IP_OK) {
-    return err;
-  }
+	strleft = strmax - strl;
+	if ((err = IP_addr_b2a(&(rangptr->end), ascaddr + strl, strleft)) != IP_OK) {
+		return err;
+	}
 
-  return IP_OK;
+	return IP_OK;
 }
 
 /**************************************************************************/
@@ -1219,68 +1279,58 @@ inline int IP_addr_bit_get(ip_addr_t *binaddr, unsigned bitnum) {
    starting with 0 for the *most significant bit*.
    Returns 1 in case the bit was changed and 0 in case no change occured
 +*/
-inline int
-IP_addr_bit_set(ip_addr_t *binaddr, unsigned bitnum, unsigned bitval) {
-  int w,c;
-  int ret = 0;
+inline int IP_addr_bit_set(ip_addr_t * binaddr, unsigned bitnum, unsigned bitval)
+{
+	int w, c, sh;
+	int ret = 0;
 
-  /* avoid unnecessary division */
-  if( binaddr->space == IP_V4 ) {
-    w = 0;
-    c = bitnum;
-  } else {
-    w = bitnum >> 5;
-    c = bitnum & 31;
-  }
+	/* avoid unnecessary division */
+	if (binaddr->space == IP_V4) {
+		w = 0;
+		c = bitnum;
+	} else {
+		w = bitnum >> 5;
+		c = bitnum & 31;
+	}
+	sh = 0x80000000 >> c;
+	if (binaddr->words[w] & sh) ret = 1;
 
-  /* try to set the bit and indicate that bit was set or not */
-  if ( bitval == 1 ) {
-    if (binaddr->words[w] ^ (0x80000000 >> (c))) ret = 1;
-    binaddr->words[w] |= (0x80000000 >> (c));
-  }
-  else {
-    if (binaddr->words[w] & (0x80000000 >> (c))) ret = 1;
-    binaddr->words[w] &=  ~(0x80000000 >> (c));
-  }
-  return(ret);
+	/* try to set the bit and indicate that bit was set or not */
+	if (bitval != 0) {
+		binaddr->words[w] |= sh;
+	} else {
+		binaddr->words[w] &= ~sh;
+	}
+	return (ret);
 }
-/**************************************************************************/
 
-/*+ this fixes a prefix by setting insignificant bits to 0 +*/
-int IP_pref_bit_fix( ip_prefix_t *prefix ) {
-	int err = IP_OK;
+/* truncates the ipv6 prefix to the specified number of bits
+ *
+ * returns the malloc()ed new prefix if it needed to be truncated,
+ * 				 or the original pointer if nothing had to be done
+ */
+inline ip_prefix_t* IP_truncate_pref_v6(ip_prefix_t *prefix, int bits) {
+	if (prefix->ip.space == IP_V6 && prefix->bits > bits) {
+		/* make a local copy of the prefix, cut it to 64 bits, and do the same */
+		ip_prefix_t *localpref = (ip_prefix_t *)malloc(sizeof(ip_prefix_t));;
+		*localpref = *prefix;
 
-  if (prefix->ip.space == IP_V4) {
-    ip_limb_t mask = 0xffffffff;
+		localpref->bits = bits;
+		IP_pref_bit_fix(localpref);
+		return localpref;
+	} else {
+		return prefix;
+	}
+}
 
-    /* shorthand for ipv4 */
-
-    /* Shifting out by 32 bits does NOT turn all bits into 0... */
-    if( prefix->bits < 32 ) {
-      /* if bits outside the prefix length exist - this is an error */
-      if ( prefix->ip.words[0] & (mask >> prefix->bits)) err = IP_INVBIT;
-      /* correct the prefix anyway */
-      prefix->ip.words[0] &= ~(mask >> prefix->bits);
-    }
-  } else if (prefix->ip.space == IP_V6) {
-  	if (prefix->bits < 128) {
-		  unsigned div = prefix->bits>>5, andval = (prefix->bits&31);
-
-			if (andval > 0) {
-				/* this expression generates a 32-bit int with andval number of 1s at the beginning */
-				andval = ~((1<<(32-andval))-1);
-				prefix->ip.words[div] &= andval;
-				div++;	// this word has just been taken care of
-			}
-
-			for (;div < 4; div++) {
-				prefix->ip.words[div] = 0;
-			}
-  	}
-  } else {
-  	die;
-  }
-  return err;
+/* truncates the ipv6 prefix to the specified number of bits
+ * DOES NOT ALLOCATE MEMORY! Modifies given prefix instead.
+ */
+inline void IP_truncate_pref_v6_inplace(ip_prefix_t *prefix, int bits) {
+	if (prefix->ip.space == IP_V6 && prefix->bits > bits) {
+		prefix->bits = bits;
+		IP_pref_bit_fix(prefix);
+	}
 }
 
 
@@ -1329,10 +1379,9 @@ inline int IP_addr_cmp(ip_addr_t *ptra, ip_addr_t *ptrb, unsigned len) {
   It is the responsility of the caller to ensure that both address
   and prefix are from the same IP space.
 +*/
-int
-IP_addr_in_pref(ip_addr_t *ptra, ip_prefix_t *prefix)
+int IP_addr_in_pref(ip_addr_t * ptra, ip_prefix_t * prefix)
 {
-  return (IP_addr_cmp( ptra, & prefix->ip, prefix->bits) == 0);
+	return (IP_addr_cmp(ptra, &prefix->ip, prefix->bits) == 0);
 }
 
 /*+ checks if an IP address is contained within the range
@@ -1359,7 +1408,7 @@ int IP_addr_in_rang(ip_addr_t *ptra, ip_range_t *rangptr)
 }
 
 /**************************************************************************/
-
+// TODO: these functions should be ipv6-compatible
 /*+ calculate the span of a range == size - 1 +*/
 
 ip_rangesize_t
@@ -1565,65 +1614,61 @@ void IP_rang_encomp(ip_range_t *rangptr)
 /***************************************************************************/
 /*+ sets a range equal to a prefix +*/
 
-int
-IP_pref_2_rang( ip_range_t *rangptr, ip_prefix_t *prefptr )
+int IP_pref_2_rang(ip_range_t * rangptr, ip_prefix_t * prefptr)
 {
-  int shift;
-  int i;
+	int shift;
+	int i;
 
-  ad(begin) = ad(end) = prefptr->ip;
+	ad(begin) = ad(end) = prefptr->ip;
 
-  /* IPv6 is a bit more complicated, as four words are involved */
+	/* IPv6 is a bit more complicated, as four words are involved */
+	/* additional problem: shifting right by >=32 is equal to shifting by 0,
+	   so it does not change any bits */
+	/* solution: don't touch those words */
 
-  /* additional problem: shifting right by >=32 is equal to shifting by 0,
-     so it does not change any bits */
-  /* solution: don't touch those words */
+	for (i = 0; i < 4; i++) {
 
-  for(i=0; i<4; i++) {
+		if (prefptr->bits < 32 * (1 + i)) {
+			shift = prefptr->bits <= i * 32 ? 0 : (prefptr->bits % 32);
+			ad(end).words[i] |= (0xffffffffU >> shift);
+		}
 
-    if( prefptr->bits < 32*(1+i) ) {
-      shift = prefptr->bits < 32 + (i-1) * 32
-	? 0 : (prefptr->bits % 32) ;
-      ad(end).words[i] |= (0xffffffffU >> shift);
-    }
-
-    if( prefptr->ip.space == IP_V4) {
-      break; /* do only first word for IPv4 */
-    }
-  }
-  return IP_OK;
+		if (prefptr->ip.space == IP_V4) {
+			break;				/* do only first word for IPv4 */
+		}
+	}
+	return IP_OK;
 }
 
 #undef ad
 
 /* IP_OK assumes a classful range!!! */
-int
-IP_rang_2_pref( ip_range_t *rangptr, ip_prefix_t *prefptr )
+int IP_rang_2_pref(ip_range_t * rangptr, ip_prefix_t * prefptr)
 {
-  /* begin ^ end = inverted mask */
+	/* begin ^ end = inverted mask */
+//
+//	ip_addr_t res;
+//	int i;
+//	int k;
+//	unsigned len = 0;
+//
+//	prefptr->ip = rangptr->begin;
+//
+//	for (i = 3; i >= 0; i--) {
+//		for (k = 31; k >= 0; k--) {
+//			/* check bit number k */
+//			if (((rangptr->begin.words[i] >> k) & 1) ^ ((rangptr->end.words[i] >> k) & 1) == 0) {
+//				len++;
+//			}
+//		}
+//	}
+//
+//	prefptr->bits = len;
+//	return IP_OK;
 
-  ip_addr_t res;
-  int i;
-  int k;
-  unsigned len = 0;
-
-  prefptr->ip = rangptr->begin;
-
-  for (i=3; i >=0; i--)
-  {
-    for (k = 31; k >= 0; k-- )
-    {
-      /* check bit number k */
-      if (((rangptr->begin.words[i] >> k) & 1) ^ ((rangptr->end.words[i] >> k) & 1) == 0)
-      {
-        len ++;
-      }
-    }
-  }
-
-  prefptr->bits = len;
-  return IP_OK;
-
+	/* I decided to deprecate this function as it's unoptimized, unused and buggy - agoston, 2006-09-13 */
+	die;
+	return IP_OK;
 }
 
 /***************************************************************************/
@@ -1798,35 +1843,29 @@ IP_smart_conv(char *key,
 
 
 /* convert whatever comes into a range */
-int
-IP_smart_range(char *key,
-	       ip_range_t *rangptr,
-	       ip_exp_t expf,
-	       ip_keytype_t *keytype
-	       )
+int IP_smart_range(char *key, ip_range_t * rangptr, ip_exp_t expf, ip_keytype_t * keytype)
 {
-  int  err=IP_OK;
-  GList    *preflist = NULL;
+	int err = IP_OK;
+	GList *preflist = NULL;
 
-  /* first : is it a range ? */
+	/* first : is it a range ? */
 
-  if( NOERR(err = IP_rang_t2b(rangptr, key, expf))) {
-      *keytype = IPK_RANGE;
-  }
-  else {
-      /* OK, this must be possible to convert it to prefix and from there
-	 to a range. */
-      if( NOERR(err = IP_smart_conv(key, 0, 0, &preflist, expf, keytype))) {
+	if (NOERR(err = IP_rang_t2b(rangptr, key, expf))) {
+		*keytype = IPK_RANGE;
+	} else {
+		/* OK, this must be possible to convert it to prefix and from there
+		   to a range. */
+		if (NOERR(err = IP_smart_conv(key, 0, 0, &preflist, expf, keytype))) {
 
-	  dieif( g_list_length(preflist) != 1 );
+			dieif(g_list_length(preflist) != 1);
 
-	  dieif(!NOERR(IP_pref_2_rang( rangptr, g_list_first(preflist)->data )));
-      }
-  }
+			dieif(!NOERR(IP_pref_2_rang(rangptr, g_list_first(preflist)->data)));
+		}
+	}
 
-  wr_clear_list( &preflist );
+	wr_clear_list(&preflist);
 
-  return err;
+	return err;
 }
 
 /* determine if the prefix is contained in the prefix range */
@@ -1868,3 +1907,37 @@ int IP_rang_overlap(ip_range_t *range1, ip_range_t *range2)
 
 }
 
+/* Hash function of *ip_addr_t for GLib */
+inline guint ip_addr_t_pointer_hash(gconstpointer key) {
+	ip_addr_t *a = (ip_addr_t*)key;
+
+	switch (a->space) {
+		case IP_V4:
+			return a->words[0];
+
+		case IP_V6:
+			return a->words[0] ^ a->words[1];	// this will be ultra fast & presumably gives a nice spread
+
+		default:
+			die;
+	}
+}
+
+/* Equal function of *ip_addr_t for GLib */
+inline gboolean ip_addr_t_pointer_equals(gconstpointer a, gconstpointer b) {
+	ip_addr_t *aa = (ip_addr_t*)a, *bb = (ip_addr_t*)b;
+
+	if (aa->space == bb->space) {
+		switch (aa->space) {
+			case IP_V4:
+				return aa->words[0] == bb->words[0];
+
+			case IP_V6:
+				return ! IP_addr_cmp(aa, bb, IPV6_ADDRESS_ACL_BITS);
+
+			default:
+				die;
+		}
+	}
+	return FALSE;
+}

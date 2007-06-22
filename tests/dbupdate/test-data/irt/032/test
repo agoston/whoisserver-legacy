@@ -1,0 +1,12 @@
+# irt tests
+# CASE 32: inet6num 1 
+#          inet6num 2 + route6 + irt 2
+#          query for inet6num 1
+#          
+# whois -rBc inet6num 1 
+#
+#SUCCESS
+#
+# RESULT 32: inet6num 1 + route6 + irt 2 returned
+
+

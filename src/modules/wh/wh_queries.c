@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.17 $
+  $Revision: 1.1 $
 
   Whois query (wh) - connects to a whois server and returns result
 
@@ -49,8 +49,7 @@ WH_cd_sock(sk_conn_st *out_cd, char *hostname, unsigned port,
   int s; 
   int lines = 0;
   int err;
-  
-  
+
   *sk_err = SK_connect(&s, hostname, port, timeout);
   if (*sk_err != SK_OK)
   {

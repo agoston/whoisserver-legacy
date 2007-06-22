@@ -85,17 +85,6 @@ NPASSES=${NPASSES:?" number of passes is not specified. Usage: $USAGE"}
 ls $PROPERTIES >/dev/null 2>&1 || error_exit "cannot find config file $PROPERTIES"
 
 ##################### DIRECTORY LAYOUT #############################################
-# Directory layout
-
-# The root of the distribution
-
-MYSQLLIBDIR=/usr/local/mysql/lib/mysql
-GLIBCONFIG=true
-GLIB=`${GLIBCONFIG} --exec-prefix`/lib
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MYSQLLIBDIR:$GLIB; export LD_LIBRARY_PATH
-LD_LIBRARY_PATH=/home/dbase/src/orange/local/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH
-
 # Directory where the object files reside
 # **** Don't forget to download the object files and CURRENTSERIAL file ****
 # I don't care for now.
@@ -136,6 +125,15 @@ SQLPORT=`$GETVAR -p dbport` || error_exit "unknown source $SOURCE"
 SQLUSER=`$GETVAR -p dbuser` || error_exit "unknown source $SOURCE"
 SQLPSWD=`$GETVAR -p dbpswd` || error_exit "unknown source $SOURCE"
 SQLDB=`$GETVAR -p dbname` || error_exit "unknown source $SOURCE"
+
+# Given the $PROPERTIES, let's get RIPADMIN db connection data
+for i in `egrep '^RIPADMIN ' $PROPERTIES | cut -d" " -f2 | tr "," " "`; do
+	if [ -z $RIPADMIN_DBHOST ]; then export RIPADMIN_DBHOST=$i; continue; fi
+	if [ -z $RIPADMIN_DBPORT ]; then export RIPADMIN_DBPORT=$i; continue; fi
+	if [ -z $RIPADMIN_DBUSER ]; then export RIPADMIN_DBUSER=$i; continue; fi
+	if [ -z $RIPADMIN_DBPASS ]; then export RIPADMIN_DBPASS=$i; continue; fi
+	if [ -z $RIPADMIN_DBNAME ]; then export RIPADMIN_DBNAME=$i; continue; fi
+done
 
 # MySQL commands
 # note: the "CMD" versions include appropriate starup options
@@ -186,6 +184,22 @@ RESUMEQUERIES="$REMADMINCMD set queries resume"
 RESUMEUPDATES="$REMADMINCMD set updates resume"
 INITRX="$REMADMINCMD set initrx $SOURCE"
 
+# enable updates
+DYNAMICCHECK="$REMADMINCMD show dynamic"
+DYNAMICSTART="$REMADMINCMD set dynamic start"
+log "checking dynamic updates"
+DYNAMIC=`$DYNAMICCHECK`
+log "dynamic = $DYNAMIC"
+
+if [ $DYNAMIC -ne 1 ]; then
+  log "enabling dynamic updates"
+  $DYNAMICSTART
+  if [ $? -ne 0 ]; then
+    error "Error setting dynamic to start"
+    error_exit "$0 now exiting"
+  fi
+fi
+
 $PAUSEQUERIES
 if [ $? -ne 0 ]; then
    error "Error stopping queries, attempting to resume queries"
@@ -204,6 +218,11 @@ if [ $? -ne 0 ]; then
     error "Error reloading radix tree, $0 scheduling exit"
     ERROR=1
 fi
+
+# we should reset these, too
+$REMADMINCMD set acl_tree
+$REMADMINCMD set access_tree
+
 # at one point, initrx would stop updates - resume them here just in case
 $RESUMEUPDATES
 if [ $? -ne 0 ]; then

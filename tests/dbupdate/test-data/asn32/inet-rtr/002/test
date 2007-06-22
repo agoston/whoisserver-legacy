@@ -1,0 +1,40 @@
+
+# CASE 2: We try to create inet-rtr object kst1-core.swip.net
+# introduce many syntax errors
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+
+inet-rtr:    kst1-core.swip.net
+descr:       test router
+local-as:    AS1257.100
+ifaddr:      146.188.49.14 masklen 30 action community.append(123.45632333:20);
+ifaddr:      146.188.49.14 masklen 30 action community.append(0.456:2030982387);
+ifaddr:      146.188.49.14 masklen 30 action aspath.prepend(AS0.456);
+interface:   146.188.49.14 masklen 30 action aspath.prepend(AS0.456);
+interface:   146.188.49.14 masklen 30 action community.append(123.45632333:20);
+interface:   146.188.49.14 masklen 30 action community.append(0.456:2030982387);
+peer:        BGP4 146.188.49.13 asno(AS0702.234)
+peer:        BGP4 146.188.49.13 asno(AS0.234)
+peer:        BGP4 195.158.247.61 asno(AS01755.234)
+peer:        BGP4 prng-my-test:AS0234.345:prng-test asno (AS0.34)
+peer:        BGP4 rtrs--my-test:AS0.345:rtrs-test asno (AS0.34)
+mp-peer:     BGP4 146.188.49.13 asno(AS702.234)
+mp-peer:     BGP4 146.188.49.13 asno(AS0.234)
+mp-peer:     BGP4 195.158.247.61 asno(AS01755.234)
+mp-peer:     BGP4 prng-my-test:AS0234.345:prng-test asno (AS234.34)
+mp-peer:     BGP4 rtrs--my-test:AS0.345:rtrs-test asno (AS234.34)
+admin-c:     TP1-DB-TEST
+tech-c:      TP1-DB-TEST
+mnt-by:      TEST-MNT
+notify:      dbtest@ripe.net
+changed:     dbtest@ripe.net
+source:      DB-TEST
+
+password: auth

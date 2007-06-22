@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.10 $
+  $Revision: 1.17 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -58,6 +58,18 @@
 /* logging contexts */
 static LG_context_t *qi_context;
 static LG_context_t *sql_context;
+
+
+Ref_queries ref_queries[]=
+{
+  {Q_REC, "author"},
+  {Q_REC, "admin_c"},
+  {Q_REC, "tech_c"},
+  {Q_REC, "zone_c"},
+  {Q_REC_ORG, "org"},
+  {"", ""}
+};
+
 
 /*++++++++++++++++++++++++++++++++++++++
   Function invoked on query cancellation by the watchdog,
@@ -280,7 +292,7 @@ static void qi_create_org_name_query(GString *query_str, const char *sql_query, 
     g_string_sprintfa(where_clause, "N%.2d.name=\"%s\"", 0, words[0]);
 
     for (i=1; (i < MAX_NAMES) && (words[i] != NULL); i++) {
-      g_string_sprintfa(from_clause, ", names N%.2d", i);
+      g_string_sprintfa(from_clause, ", org_name N%.2d", i);
       g_string_sprintfa(where_clause, 
           " AND N%.2d.name=\"%s\" AND N00.object_id = N%.2d.object_id", 
           i, words[i], i);
@@ -300,8 +312,14 @@ static void qi_create_org_name_query(GString *query_str, const char *sql_query, 
   construct a range query for the as_block table
   (a query for an AS block object) given a string like: 
   AS1
+  AS0.1
+  AS3.473
   AS1 - AS10
   AS1-AS10
+  AS2.123 - AS3.456
+  AS0.35 - AS60
+  Whatever the format we convert them to long integers.
+  As long as a <= b it is OK.
 
   int create_asblock_query    Returns 0 on success, -1 on failure 
                              (search term not an AS# nor range)
@@ -318,29 +336,56 @@ static void qi_create_org_name_query(GString *query_str, const char *sql_query, 
   ++++++++++++++++++++++++++++++++++++++*/
 static int create_asblock_query(GString *query_str, 
 				const char *sql_query, 
-				const char *keys) {
-  char *keycopy = UT_strdup(keys);
+				Query_command *qc) {
+  char *keycopy = UT_strdup(qc->keys);
   char *token, *cursor = keycopy;
-  int  asnums[2] = {0,0};
-  int index = 0; /* index into the asnums array */
+  long  begin_asnum = 0;
+  long  end_asnum = 0;
+  int   upper = 0;
+  int   lower = 0;
+  int   count = 0; /* two possible ASNs in a range */
 
+  while( (token = strsep( &cursor, "-" )) != NULL && count < 2) {  
 
-  while( (token = strsep( &cursor, "-" )) != NULL && index < 2) {  
-    /* discard the letters (or leading whitespace), take the number */
-    if( sscanf(token, "%*[ AS]%d", &asnums[index++]) < 1 ) {
-      return -1; /* error */
+    /* discard the letters (or leading whitespace), take the (number.)number */
+    if ( strchr(token, '.') == NULL ) {
+      if( sscanf(token, "%*[ AS]%d", &lower) < 1 ) {
+        goto error_return; /* error */
+      }
+    } 
+    else {
+      if( sscanf(token, "%*[ AS]%d.%d", &upper, &lower) < 1 ) {
+        goto error_return; /* error */
+      }
+    }
+    if ( count++ == 0 ) {
+      begin_asnum = (65536 * upper) + lower;
+    }
+    else {
+      end_asnum = (65536 * upper) + lower;
     }
   }
-  /* if only beginning was supplied, copy it as end */
-  if( index == 1 ) {
-    asnums[1] = asnums[0];
-  }
-  
   /* now construct the query */
-  g_string_sprintf(query_str, sql_query, asnums[0], asnums[1]);
+  /* if only beginning was supplied, use it also as end */
+  if ( count == 1 ) {
+    end_asnum = begin_asnum;
+  }
+  else {
+    if ( end_asnum < begin_asnum ) {
+      qc->parse_messages = g_list_append(qc->parse_messages, 
+                                             ca_get_qi_badrange);
+      goto error_return; /* error */
+    }
+  }
+  g_string_sprintf(query_str, sql_query, begin_asnum, end_asnum);
 
   UT_free(keycopy);
   return 0;
+  
+  error_return:
+  
+  UT_free(keycopy);
+  return -1;
 }
 
 
@@ -419,7 +464,8 @@ static void add_filter(GString *query_str, const Query_command *qc)
 
   WK_Type keytype The matching keytype.
 
-  const Query_command *qc The query command.
+  Query_command *qc The query command.
+  (This is no longer const to allow error messages further down the line)
 
   mask_t *inv_attrs_bitmap The selected inverse attributes.
    
@@ -430,7 +476,7 @@ static void add_filter(GString *query_str, const Query_command *qc)
   +html+ </PRE>
 
   ++++++++++++++++++++++++++++++++++++++*/
-static char *create_query(const Query_t q, const Query_command *qc) 
+static char *create_query(const Query_t q, Query_command *qc) 
 {
   GString *result_buff;
   char *result;
@@ -518,13 +564,43 @@ static char *create_query(const Query_t q, const Query_command *qc)
       addquery = 1;
     }
     else if( q.keytype == WK_ASRANGE ) {   /* as_block range composition */
-      if( create_asblock_query(result_buff, q.query, qc->keys) != 0 ) {
+      if( create_asblock_query(result_buff, q.query, qc) != 0 ) {
 	addquery = 0; /* ... unless it's not correct */
       }
       else {
 	addquery = 1;
       }
     }
+//    else if( q.keytype == WK_AUTNUM ) {   /* as_number check */
+      /* check for 16 bit number in 32 bit format */
+//      char *ptr, *ptr2;
+//fprintf(stderr, "qc->keys [%s]\n",qc->keys);
+//      if ( ptr = strstr(qc->keys, "AS0.") ) {
+//fprintf(stderr, "ptr [%s]\n",ptr);
+
+        /* fix the format */
+//        char *keycopy = UT_strdup(qc->keys);
+	/* remove the '0.' from the key */
+//	ptr += 2;  /* move past 'AS' */
+//fprintf(stderr, "ptr [%s]\n",ptr);
+//	ptr2 = ptr + 2;  /* move past '0.' */
+//fprintf(stderr, "ptr2 [%s]\n",ptr2);
+//	while ( *ptr2 != '\0' ) {
+//	  *(ptr++) = *(ptr2++);
+//	}
+//	*ptr = '\0';
+
+	/* add a warning */
+//        char *fmt = ca_get_qc_fmt_fixedlookup;
+//fprintf(stderr, "fmt [%s]\n",fmt);
+//        qc->parse_messages = g_list_append(qc->parse_messages, 
+//                                g_strdup_printf(fmt, keycopy, qc->keys));
+//        UT_free(fmt);
+//        UT_free(keycopy);
+//      }
+//      g_string_sprintf(result_buff, q.query, qc->keys);
+//      addquery = 1;
+//    }
     else {
       g_string_sprintf(result_buff, q.query, qc->keys);
       addquery = 1;
@@ -896,14 +972,13 @@ char *add_parent(int id, char *str, GList *par_list)
 /*++++++++++++++++++++++++++++++++++++++
   Write the results to the client socket.
 
-  SQ_result_set_t *result The result set returned from the sql query.
-  unsigned filtered       if the objects should go through a filter (-K)
-  unsigned fast           fast output
-  unsigned grouped        grouped output
-  unsigned original       original output
-  unsigned brief 		      brief output
-  sk_conn_st *condat      Connection data for the client    
-
+  SQ_result_set_t *result     The result set returned from the sql query.
+  Query_instructions *qis     query instructions.                          
+  sk_conn_st *condat          Connection data for the client               
+  acc_st *acc_credit          object display credit                        
+  acl_st *acl                 copy of the original acl for this client     
+  GList *par_list             parent list  
+                                  
   More:
   +html+ <PRE>
   Authors:
@@ -913,11 +988,7 @@ char *add_parent(int id, char *str, GList *par_list)
 
   ++++++++++++++++++++++++++++++++++++++*/
 static int write_results(SQ_result_set_t *result, 
-       unsigned filtered,
-       unsigned fast,
-       unsigned grouped,
-       unsigned original,
-       unsigned brief,
+       Query_instructions *qis, 
        sk_conn_st *condat,
        acc_st    *acc_credit,
        acl_st    *acl,
@@ -938,6 +1009,11 @@ static int write_results(SQ_result_set_t *result,
   int type;
   long gid;
   int abuse_attr_exists=0;
+  unsigned int filtered=qis->filtered; /* if the objects should go through a filter(-K) */
+  unsigned int fast=qis->fast;                   /* fast output */
+  unsigned int grouped=qis->qc->G_group_search;  /* grouped output */
+  unsigned int original=qis->qc->B;              /* original output */
+  unsigned int brief=qis->qc->b;                 /* brief output */
 
   /* Get all the results - one at a time */
   if (result != NULL) {
@@ -1173,7 +1249,8 @@ list_has_attr (sk_conn_st *condat,
       else { /* save the gid */
         g_hash_table_insert(*groups, (void *) gid, (int *) 1);
       }
-    }
+    }  
+
 
     SQ_free_result(result_ptr);
     if (g_hash_table_size(*groups) > 0) {
@@ -1192,7 +1269,8 @@ list_has_attr (sk_conn_st *condat,
   sql_connection   connection to the database
   object_id        object_id
   table            table where to search
-  ++++++++++++++++++++++++++++++++++++++*/
+  ++++++++++++++++++++++++++++++++++++++*/  
+
 gboolean
 object_has_attr (sk_conn_st *condat, 
                      SQ_connection_t *sql_connection, 
@@ -1206,7 +1284,7 @@ object_has_attr (sk_conn_st *condat,
     SQ_row_t *row;
     long num_attr_ref;
 
-    /* query database for references from this object to an abuse-mailbox */
+    /* query database "table" for the "object_id" */
     sql_command = g_string_new("");
     g_string_sprintf(sql_command, 
                      "SELECT COUNT(*) FROM %s WHERE object_id=%d", 
@@ -1222,7 +1300,7 @@ object_has_attr (sk_conn_st *condat,
     /* get number of references */
     row = SQ_row_next(result_ptr);
     if (row == NULL) {
-        /* if the object is deleted after we have gotten a reference to it,
+        /* if the object is deleted after we get a reference to it,
            the lookup will fail - in such a case treat it the same as 
            an object without any "attr" attributes */
         num_attr_ref = 0;
@@ -1251,7 +1329,15 @@ object_has_attr (sk_conn_st *condat,
   char *id_table The id of the temporary table (This is a result of the hacky
                   way we've tried to get MySQL to do sub-selects.)
 
-  sk_conn_st *condat  Connection data for the client
+  Query_instructions *qis         query instructions.
+
+  sk_conn_st *condat              Connection data for the client
+
+  acc_st *acc_credit              object display credit 
+				 
+  acl_st *acl                     copy of the original acl for this client 
+
+  GList *par_list                 parent list  
 
   More:
   +html+ <PRE>
@@ -1263,11 +1349,7 @@ object_has_attr (sk_conn_st *condat,
 static int 
 qi_write_objects(SQ_connection_t **sql_connection, 
         char *id_table, 
-        unsigned int filtered, 
-        unsigned int fast, 
-        unsigned int grouped,
-        unsigned int original,
-        unsigned int brief,
+        Query_instructions *qis,
         sk_conn_st *condat,
         acc_st    *acc_credit,
         acl_st    *acl,
@@ -1278,7 +1360,9 @@ qi_write_objects(SQ_connection_t **sql_connection,
   int retrieved_objects=0;
   char sql_command[STR_XL];  
   GHashTable *groups = NULL;
-
+  unsigned int grouped = qis->qc->G_group_search;
+  unsigned int original = qis->qc->B;
+  
   if (grouped == 1) {
     sprintf(sql_command, Q_OBJECTS, id_table, "gorder.order_code, gid, ");
   }
@@ -1295,15 +1379,16 @@ qi_write_objects(SQ_connection_t **sql_connection,
      refer to any existing connection anymore. So we check rtc here.
   */
   
-  if( condat->rtc == 0) {
+  if ( condat->rtc == 0 ) {
 
     if (original == 0) {
       /* check the abuse_mailbox attributes */
       list_has_attr(condat, *sql_connection, id_table, "abuse_mailbox", &groups);
     }
 
-    retrieved_objects = write_results(result, filtered, fast, grouped, original, brief,
-    condat, acc_credit, acl, par_list, groups);
+    retrieved_objects = write_results(result, qis, condat, 
+                                       acc_credit, acl, 
+                                       par_list, groups);
 
     if (groups != NULL) {
       g_hash_table_destroy(groups);
@@ -1322,9 +1407,12 @@ qi_write_objects(SQ_connection_t **sql_connection,
   condat           connection data for the client
   sql_connection   connection to the database
   datlist          list of data from the radix tree (nodes of *rx_datcpy_t)
+  irt_inet_id      returned object_id of inet(6)num referencing irt object
+  irt_gid          returned object_id of the queried inet(6)num object
 
-  Note:  The "-c" query flag specifies that the most specific inetnum or
-         inet6num with an "mnt-irt:" attribute should be returned.  
+  Note:  The "-c" query flag specifies that the irt referenced by the 
+         most specific inetnum or inet6num with an "mnt-irt:" attribute 
+	 should be returned.  
          
          To do this, we get a list of encompassing networks by sending the 
          same options to the RP/RX module that the '-L' query does.  Then
@@ -1333,37 +1421,74 @@ qi_write_objects(SQ_connection_t **sql_connection,
          the "mnt_irt" table in MySQL for a reference (see the 
          object_has_attr() for details).
 
-         If a reference is found, the list is replaced with a list 
-         containing the single entry.  If no reference is found, the list
-         is deleted.
+         If a reference is found, the object_id of that inet(6)num is returned.
+	 
+	 The list is replaced with a list containing the last inet(6)num entry,
+	 which is the inet(6)num in the query and any route objects found.
   ++++++++++++++++++++++++++++++++++++++*/
 void 
 mnt_irt_filter (sk_conn_st *condat, 
                 SQ_connection_t *sql_connection, 
-                GList **datlist)
+                GList **datlist,
+		int *irt_inet_id, int *irt_gid)
 {
     GList *p;
+    GList *p_old;
     GList *new_datlist;
     rx_datcpy_t *rx_data;
     int object_id;
+    int inet_found = 0;
+    int irt_found = 0;
 
     /* empty datlist */
     new_datlist = NULL;
+    *irt_inet_id = 0;
+    *irt_gid = 0;
 
     /* search for node with "mnt-irt:" attribute */
-    for (p=g_list_last(*datlist); p != NULL; p=g_list_previous(p)) {
+    p=g_list_last(*datlist);
+    while ( p != NULL ) {
         /* grab the data for this node */
         rx_data = (rx_datcpy_t *)p->data;
         object_id = rx_data->leafcpy.data_key;
 
         /* see if this is the node we are looking for */
-        if (object_has_attr(condat, sql_connection, object_id, "mnt_irt")) {
-            /* use this entry, and remove from old list */
-            new_datlist = g_list_append(NULL, rx_data);
-            *datlist = g_list_remove_link(*datlist, p);
-            g_list_free_1(p);
-            break;
+        if ( ! irt_found && 
+	      object_has_attr(condat, sql_connection, object_id, "mnt_irt")) {
+            /* save this object_id */
+	    *irt_inet_id = object_id;
+	    irt_found = 1;
         } 
+
+	/* save the first inet(6)num found from the end of the list */
+	if ( ! inet_found && 
+	     (object_has_attr(condat, sql_connection, object_id, "inetnum") ||
+	     object_has_attr(condat, sql_connection, object_id, "inet6num")) ) {
+	    /* This is the object the irt object has to be grouped with
+	       when the objects are displayed in the output */
+	    *irt_gid = object_id;
+            /* move this entry to the new list */
+            new_datlist = g_list_append(new_datlist, rx_data);
+	    p_old = p;
+            p=g_list_previous(p);
+            *datlist = g_list_remove_link(*datlist, p_old);
+	    g_list_free_1(p_old);
+	    inet_found = 1;
+        } 
+	/* save any route(6) found in the list */
+	else if ( object_has_attr(condat, sql_connection, object_id, "route") ||
+	          object_has_attr(condat, sql_connection, object_id, "route6") ) {
+            /* move this entry to the new list */
+            new_datlist = g_list_append(new_datlist, rx_data);
+	    p_old = p;
+            p=g_list_previous(p);
+            *datlist = g_list_remove_link(*datlist, p_old);
+	    g_list_free_1(p_old);
+        } 
+	else {
+	    /* otherwise just move on, this entry will be deleted later */
+            p=g_list_previous(p);
+	}
     }
 
     /* free our old datlist */
@@ -2217,6 +2342,82 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
   return sql_error;
 }
 
+
+
+/* qi_find_refs */ 
+/*++++++++++++++++++++++++++++++++++++++
+  
+  either queries the search_table for references to a single obj_id and writes
+  the results to the id_table, or queries the search_table for references to
+  all obj_ids from id_table and writes the results to the temporary table
+  rec_table
+  Runs queries in watched mode, to be able to cancel them.
+  The 'recursive' column will be used to specify if a row is a result of the main query,
+  or a result of the recursive query.  This is important when we print out the
+  objects to the client (the main results must come first, then the results of
+  recursive query).
+
+  
+  SQ_connection_t **sql_connection  sql connection dedicated to this thread
+                                    (replaced on cancel)
+  
+  Query_environ *qe                 original query environment structure
+  
+  char *query                       format string containing query command
+  
+  char *search_table                string containing sql table to query
+  
+  char *rec_table                   the table to write the query results to
+                                    (maybe null string)
+  
+  char *id_table                    the table with the ID's found
+  
+  int  obj_id                       object_id to search for in search_table
+  
+  int  gid                          group id of object being searched for
+
+++++++++++++++++++++++++++++++++++++++*/
+static
+int
+qi_find_refs(SQ_connection_t **sql_connection,
+              Query_environ *qe,
+              char *query,
+              char *search_table,
+              char *rec_table,
+              char *id_table,
+              int  obj_id,
+	      int  gid
+    )
+{
+    char sql_command[STR_XL];
+    char gid_str[STR_M];
+    int sql_error;
+    
+    if ( obj_id == 0 ) {
+        sprintf(sql_command, query, rec_table, id_table, search_table);
+    }
+    else {
+        /* an object_id has been specified, so only search for this one object */
+        if ( gid ) {
+	    /* a group id has been specified for this object */
+	    sprintf(gid_str, "%d", gid);
+            sprintf(sql_command, query, id_table, gid_str, search_table, obj_id);
+	}
+	else {
+            sprintf(sql_command, query, id_table, "object_id", search_table, obj_id);
+	}
+    }
+    if (sql_execute_watched( &(qe->condat), sql_connection, sql_command, NULL) 
+        == -1)
+    {
+        sql_error = SQ_errno(*sql_connection);
+        report_sql_error(&qe->condat, *sql_connection, sql_command);
+        return -1;
+    }
+    return 0;
+}
+
+
 /* qi_fetch_references */ 
 /*++++++++++++++++++++++++++++++++++++++
   
@@ -2224,8 +2425,8 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
   to person, role and organisation objects. Uses its own temporary SQL table (_R)
   and upon completion transfers the results from it to the main
   temporary table. Runs queries in watched mode, to be able to cancel them.
-  The 'recursive' column will be used to specify if a row is a result of the main query, or
-  a result of the recursive query.  This is important when we print out the
+  The 'recursive' column will be used to specify if a row is a result of the main query,
+  or a result of the recursive query.  This is important when we print out the
   objects to the client (the main results must come first, then the results of
   recursive query).
 
@@ -2236,25 +2437,19 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
   Query_environ *qe                 original query environment structure
   
   char *id_table                    the table with the ID's found
-  
-  acc_st *acc_credit                credit for this client 
-  
-  acl_st *acl                       acl for this client 
 
 ++++++++++++++++++++++++++++++++++++++*/
 static
 int
 qi_fetch_references(SQ_connection_t **sql_connection,
-      Query_environ *qe,
-      char *id_table,
-      acc_st *acc_credit,
-      acl_st *acl,
-      unsigned irt_search
+                     Query_environ *qe,
+                     char *id_table
       )
 {
     char rec_table[64];
     char sql_command[STR_XL];
     int sql_error;
+    int ref_cnt;
 
     /* use sql_error to flag errors */
     sql_error = 0;
@@ -2285,60 +2480,17 @@ qi_fetch_references(SQ_connection_t **sql_connection,
     /* from this point on, we can't just return on error, because 
        we need to insure the table we just created gets dropped */
     
-    /* find the contacts */      
-    sprintf(sql_command, Q_REC, rec_table, id_table, "author");
-    if (sql_execute_watched( &(qe->condat), sql_connection, sql_command, NULL) 
-        == -1)
-    {
-        sql_error = SQ_errno(*sql_connection);
-        report_sql_error(&qe->condat, *sql_connection, sql_command);
-    }
-    
-    if (!sql_error) {
-        sprintf(sql_command, Q_REC, rec_table, id_table, "admin_c");
-        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, NULL) == -1) 
-        {
-            sql_error = SQ_errno(*sql_connection);
-            report_sql_error(&qe->condat, *sql_connection, sql_command);
+    /* find the contacts (ah,ac,tc,zc,org) */
+    ref_cnt = 0;
+    while ( strcmp(ref_queries[ref_cnt].query,"") ) {
+        if ( (sql_error = qi_find_refs(sql_connection, qe, 
+                                        ref_queries[ref_cnt].query, 
+                                        ref_queries[ref_cnt].search_table,
+                                        rec_table, id_table, 0, 0))
+                                   == -1 ) {
+          break;
         }
-    }
-    
-    if (!sql_error) {
-        sprintf(sql_command, Q_REC, rec_table, id_table, "tech_c");
-        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, NULL) == -1) 
-        {
-            sql_error = SQ_errno(*sql_connection);
-            report_sql_error(&qe->condat, *sql_connection, sql_command);
-        }
-    }
-
-    if (!sql_error) {
-        sprintf(sql_command, Q_REC, rec_table, id_table, "zone_c");
-        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, NULL) == -1) 
-        {
-            sql_error = SQ_errno(*sql_connection);
-            report_sql_error(&qe->condat, *sql_connection, sql_command);
-        }
-    }
-
-    /* find the organisation objects */
-    if (!sql_error) {
-        sprintf(sql_command, Q_REC_ORG, rec_table, id_table, "org");
-        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, NULL) == -1) 
-        {
-            sql_error = SQ_errno(*sql_connection);
-            report_sql_error(&qe->condat, *sql_connection, sql_command);
-        }
-    }
-    
-    /* find the irt objects (for -c) */
-    if (!sql_error && (irt_search == 1)) {
-        sprintf(sql_command, Q_REC_IRT, rec_table, id_table, "mnt_irt");
-        if (sql_execute_watched(&(qe->condat), sql_connection, sql_command, NULL) == -1) 
-        {
-            sql_error = SQ_errno(*sql_connection);
-            report_sql_error(&qe->condat, *sql_connection, sql_command);
-        }
+        ref_cnt++;
     }
 
     /* if we've lost connection, don't bother with this extra work */
@@ -2413,6 +2565,8 @@ int QI_execute(ca_dbSource_t *dbhdl,
   GList *par_list=NULL;
   SQ_connection_t *sql_connection=NULL;
   int sql_error;
+  int irt_inet_id;
+  int irt_gid;
 
   sql_connection = SQ_get_connection( dbhost, dbport,
 				      dbname, dbuser, dbpass );
@@ -2460,30 +2614,34 @@ int QI_execute(ca_dbSource_t *dbhdl,
   if (!sql_error) { 
       srcnam = ca_get_srcname(dbhdl);
       sql_error = qi_collect_ids(dbhdl, srcnam, &sql_connection, qis, qe, 
-                                 id_table, &datlist, &par_list, acc_credit, acl);
+                             id_table, &datlist, &par_list, acc_credit, acl);
       UT_free(srcnam);
   }
 
   /* post-processing */
   if (!sql_error && (qis->filtered == 0)) {
       /* start the watchdog just to set the rtc flag */
-      SK_watch_setclear(&(qe->condat));
-      SK_watchstart(&(qe->condat));
+      //SK_watch_setclear(&(qe->condat));
+      //SK_watchstart(&(qe->condat));
 
       /* add radix results (only if -K is not active and still connected) */
       if (qe->condat.rtc == 0) {
 
-          if (qis->qc->c_irt_search) {
-              mnt_irt_filter(&(qe->condat), sql_connection, &datlist);
-          }
+          /* if -c selected, find the referencing inet(6)num and remove
+	     all the less specific inet(6)num object_ids from the list */
+	  if (qis->qc->c_irt_search) {
+	      mnt_irt_filter(&(qe->condat), sql_connection, 
+				 &datlist, &irt_inet_id, &irt_gid);
+	  }
 
-          sql_error = insert_radix_serials(&(qe->condat), 
-                                   sql_connection, 
-                                   id_table, 
-                                   datlist);
+          /* add radix results to the table and destroy the datlist */
+          sql_error = insert_radix_serials( &(qe->condat), 
+                                             sql_connection, 
+                                             id_table, 
+                                             datlist);
       }
 
-      SK_watchstop(&(qe->condat));
+      //SK_watchstop(&(qe->condat));
   }
 
   /* change the idtable */
@@ -2515,14 +2673,18 @@ int QI_execute(ca_dbSource_t *dbhdl,
 
   /* fetch recursive objects (ac,tc,zc,ah,org,irt(if -c)) */
   if (!sql_error && qis->recursive && (qe->condat.rtc == 0)) {
-      sql_error = qi_fetch_references(&sql_connection, 
-                                      qe, 
-                                      id_table, 
-                                      acc_credit, 
-                                      acl,
-                                      qis->qc->c_irt_search
-                                      );
+      sql_error = qi_fetch_references(&sql_connection, qe, id_table );
   } /* if recursive */
+       
+  /* find the irt objects (for -c) */
+  if (!sql_error && (qis->qc->c_irt_search == 1) && irt_inet_id ) {
+
+      sql_error = qi_find_refs(&sql_connection, qe, 
+					Q_REC_IRT, 
+					"mnt_irt",
+					"", id_table, 
+					irt_inet_id, irt_gid);
+  }
   
   /* display */
   /* -K filtering: 
@@ -2536,8 +2698,7 @@ int QI_execute(ca_dbSource_t *dbhdl,
 
   /* display objects from the IDs table */
   if (!sql_error) {
-      sql_error = qi_write_objects( &sql_connection, id_table, qis->filtered,
-                    qis->fast, qis->qc->G_group_search, qis->qc->B, qis->qc->b,
+      sql_error = qi_write_objects( &sql_connection, id_table, qis,
                     &(qe->condat), acc_credit, acl, par_list);
   }
 
@@ -2673,8 +2834,8 @@ static int valid_query(const Query_command *qc, const Query_t q) {
   Create a new set of query_instructions. Returns an allocated structure which
   must be freed after use with QI_free().
 
-  const Query_command *qc The query_command that the instructions are created
-                          from.
+  Query_command *qc The query_command that the instructions are created from.
+  (This is no longer const to allow error messages further down the line)
 
   const Query_environ *qe The environmental variables that they query is being
                           performed under.
@@ -2685,7 +2846,7 @@ static int valid_query(const Query_command *qc, const Query_t q) {
 	marek.
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
-Query_instructions *QI_new(const Query_command *qc, const Query_environ *qe) {
+Query_instructions *QI_new(Query_command *qc, const Query_environ *qe) {
   Query_instructions *qis=NULL;
   Query_instruction *qi=NULL;
   Query_instruction tmp_qi;

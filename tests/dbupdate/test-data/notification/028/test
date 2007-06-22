@@ -18,7 +18,7 @@ signature:    PGPKEY-4EA45E47
 encryption:   PGPKEY-4EA45E47
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW agl7a6gyad/e6   # irt
+auth:         MD5-PW $1$12345678$wza1MMo7nPUnBHNJMOMq3.   # irt
 irt-nfy:      case027-1@ripe.net
 notify:       case027-2@ripe.net
 mnt-by:       TEST-MNT

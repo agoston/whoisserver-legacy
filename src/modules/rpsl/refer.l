@@ -8,7 +8,7 @@
   notes:
     Tokens are defined in the associated grammar, refer.y.
 
-  $Id: refer.l,v 1.5 2003/07/03 07:55:37 engin Exp $
+  $Id: refer.l,v 1.1.14.1 2006/09/29 12:32:29 katie Exp $
 */
 
 /******************
@@ -48,7 +48,6 @@ PORT           {INT}
 /* tokens defined in the grammar */
 #include "refer.tab.h"
 
-#define referwrap yywrap
 void syntax_error(char *fmt, ...);
 void yy_input(char *buf, int *result, int max_size);
 #undef YY_INPUT
@@ -125,3 +124,4 @@ refer_reset ()
 }
 
 
+int yywrap() { return 1; }

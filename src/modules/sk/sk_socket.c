@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1.6.1 $
+  $Revision: 1.1.6.2 $
 
   Socket module - routines facilitating calls to socket library.
 
@@ -38,48 +38,6 @@
 
 /* logging */
 extern LG_context_t *sk_context;
-
-/* SK_atoport() */
-/*++++++++++++++++++++++++++++++++++++++
-   Take a service name, and a service type, and return a port number.  If the
-   service name is not found, it tries it as a decimal number.  The number
-   returned is byte ordered for the network.
-
-  char *service   Service name (or port number).
-
-  char *proto     Protocol (eg "tcp").
-
-  Author:
-        ottrey.
-
-  ++++++++++++++++++++++++++++++++++++++*/
-int SK_atoport(const char *service, const char *proto) {
-  unsigned port;
-  long int lport;
-  struct servent *serv;
-  char *errpos;
-  struct servent result;
-  char buffer[STR_XXL];
-
-  /* First try to read it from /etc/services */
-
-#ifdef __linux__
-  if(getservbyname_r(service, proto, &result, buffer, sizeof(buffer), &serv) < 0) serv = NULL;
-#else
-  serv = getservbyname_r(service, proto, &result, buffer, sizeof(buffer));
-#endif
-
-  if (serv != NULL)
-    port = serv->s_port;
-  else { /* Not in services, maybe a number? */
-    lport = strtol(service,&errpos,0);
-    if ( (errpos[0] != 0) || (lport < 1) || (lport > 65535) )
-      return -1; /* Invalid port address */
-    port = htons(lport);
-  }
-  return port;
-} /* SK_atoport() */
-
 
 /* SK_close() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -162,76 +120,80 @@ int SK_clearsockflags(int socket, int flags) {
 	RETURNS 					socket id
 
   ++++++++++++++++++++++++++++++++++++++*/
-int SK_getsock(const char* node, unsigned port, int socket_type, int backlog) {
-    struct addrinfo hints, *res, *ai_iter;
-    gint error, sock = -1, sock_opt, flags;
-    char portbuf[16], hostnamebuf[256];
+int SK_getsock(const char *node, unsigned port, int socket_type, int backlog)
+{
+	struct addrinfo hints, *res, *ai_iter;
+	gint error, sock = -1, sock_opt, flags;
+	char portbuf[16], hostnamebuf[256];
 
-    /* Prepare addrinfo struct for getaddrinfo */
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = PF_UNSPEC;
-    hints.ai_flags = AI_PASSIVE;
-    hints.ai_socktype = socket_type;
+	/* Prepare addrinfo struct for getaddrinfo */
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_UNSPEC;
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_socktype = socket_type;
 
-    /* This should give us values for listening */
-		snprintf(portbuf, 16, "%u", port);
-    error = getaddrinfo(node, portbuf, &hints, &res);
-    if (error != 0) {
-			LG_log(sk_context, LG_FATAL, "SK_getsock(%s, %d): getaddrinfo(): %s", node, port, gai_strerror(error));
-      die;
-    }
+	/* This should give us values for listening */
+	snprintf(portbuf, 16, "%u", port);
+	error = getaddrinfo(node, portbuf, &hints, &res);
+	if (error != 0) {
+		LG_log(sk_context, LG_FATAL, "SK_getsock(%s, %d): getaddrinfo(): %s", node, port, gai_strerror(error));
+		die;
+	}
 
-		/* is there an IPv6 address? */
+	/* is there an IPv6 address? */
+	for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
+		if (ai_iter->ai_family == AF_INET6) {
+//              inet_ntop(ai_iter->ai_family, &((struct sockaddr_in6*)(ai_iter->ai_addr))->sin6_addr, hostnamebuf, sizeof(hostnamebuf));
+//              fprintf(stderr, "Trying to bind on v6 address '%s' ... ", hostnamebuf);
+			sock = socket(ai_iter->ai_family, ai_iter->ai_socktype, ai_iter->ai_protocol);
+			if (sock >= 0)
+				break;
+//          fprintf(stderr, "failed.\n");
+		}
+	}
+
+	/* if no IPv6 addresses found, fall back to IPv4 */
+	if (sock < 0) {
 		for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
-			if (ai_iter->ai_family == AF_INET6) {
-//				inet_ntop(ai_iter->ai_family, &((struct sockaddr_in6*)(ai_iter->ai_addr))->sin6_addr, hostnamebuf, sizeof(hostnamebuf));
-//				fprintf(stderr, "Trying to bind on v6 address '%s' ... ", hostnamebuf);
-		   	sock = socket(ai_iter->ai_family, ai_iter->ai_socktype, ai_iter->ai_protocol);
-		    if (sock >= 0) break;
-//		    fprintf(stderr, "failed.\n");
+			if (ai_iter->ai_family == AF_INET) {
+//                  inet_ntop(ai_iter->ai_family, &((struct sockaddr_in*)(ai_iter->ai_addr))->sin_addr, hostnamebuf, sizeof(hostnamebuf));
+//                  fprintf(stderr, "Trying to bind on v4 address '%s' ... ", hostnamebuf);
+				sock = socket(ai_iter->ai_family, ai_iter->ai_socktype, ai_iter->ai_protocol);
+				if (sock >= 0)
+					break;
+//              fprintf(stderr, "failed.\n");
 			}
 		}
+	}
 
-		/* if no IPv6 addresses found, fall back to IPv4 */
-		if (sock < 0) {
-			for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
-				if (ai_iter->ai_family == AF_INET) {
-//					inet_ntop(ai_iter->ai_family, &((struct sockaddr_in*)(ai_iter->ai_addr))->sin_addr, hostnamebuf, sizeof(hostnamebuf));
-//					fprintf(stderr, "Trying to bind on v4 address '%s' ... ", hostnamebuf);
-			   	sock = socket(ai_iter->ai_family, ai_iter->ai_socktype, ai_iter->ai_protocol);
-			    if (sock >= 0) break;
-//			    fprintf(stderr, "failed.\n");
-				}
-			}
-		}
+	/* if no v4 address found either, bail out */
+	if (sock < 0) {
+		LG_log(sk_context, LG_FATAL, "SK_getsock(%s, %d): No v6 nor v4 address found or supported", node, port);
+		die;
+	}
 
-		/* if no v4 address found either, bail out */
-		if (sock < 0) {
-			LG_log(sk_context, LG_FATAL, "SK_getsock(%s, %d): No v6 nor v4 address found or supported", node, port);
+	sock_opt = 1;
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&sock_opt, sizeof(sock_opt)) == -1) {
+		LG_log(sk_context, LG_FATAL, "SK_getsock(%s, %d): setsockopt(): %d (%s)", node, port, errno, strerror(errno));
+		die;
+	}
+
+	if ((bind(sock, ai_iter->ai_addr, ai_iter->ai_addrlen)) == -1) {
+		fprintf(stderr, "SK_getsock(%s, %d): bind(): %d (%s)", node, port, errno, strerror(errno));
+		LG_log(sk_context, LG_FATAL, "SK_getsock(%s, %d): bind(): %d (%s)", node, port, errno, strerror(errno));
+		die;
+	}
+
+	if (socket_type == SOCK_STREAM) {
+		if (listen(sock, backlog) == -1) {
+			LG_log(sk_context, LG_FATAL, "SK_getsock(%s, %d): listen(): %d (%s)", node, port, errno, strerror(errno));
 			die;
 		}
+	}
 
-		res = ai_iter;
+	freeaddrinfo(res);
 
-    sock_opt = 1;
-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &sock_opt, sizeof(sock_opt)) == -1) {
-			LG_log(sk_context, LG_FATAL, "SK_getsock(%s, %d): setsockopt(): %d (%s)", node, port, errno, strerror(errno));
-			die;
-    }
-
-	  if ((bind(sock, res->ai_addr, res->ai_addrlen)) == -1) {
-			LG_log(sk_context, LG_FATAL, "SK_getsock(%s, %d): bind(): %d (%s)", node, port, errno, strerror(errno));
-			die;
-	  }
-
-		if (socket_type == SOCK_STREAM) {
-			if (listen(sock, backlog) == -1) {
-				LG_log(sk_context, LG_FATAL, "SK_getsock(%s, %d): listen(): %d (%s)", node, port, errno, strerror(errno));
-				die;
-			}
-		}
-
-    return sock;
+	return sock;
 }
 
 /*++++++++++++++++++++++++++++++++++++++
@@ -243,47 +205,46 @@ int SK_getsock(const char* node, unsigned port, int socket_type, int backlog) {
    RETURNS										The socket for communicating to the client
 
   ++++++++++++++++++++++++++++++++++++++*/
-int SK_accept_connection(int listening_socket) {
-  int connected_socket = -1;
-  int num_errors = 0;
+int SK_accept_connection(int listening_socket)
+{
+	int connected_socket = -1;
+	int num_errors = 0;
 
 #define MAX_ACCEPT_ERRORS 3
 
-  for (;;) {
+	for (;;) {
 
-    LG_log(sk_context, LG_DEBUG,
-	      "Going to accept connections on socket : %d",listening_socket);
+		LG_log(sk_context, LG_DEBUG, "Going to accept connections on socket : %d", listening_socket);
 
 		connected_socket = accept(listening_socket, NULL, NULL);
 
-    if (connected_socket < 0) {
-      /* Either a real error occured, or blocking was interrupted for
-         some reason.  Only abort execution if a real error occured. */
-      switch(errno) {
-      case EINTR:        /* Interrupted system call */
-      case ECONNABORTED: /* Software caused connection abort */
+		if (connected_socket < 0) {
+			/* Either a real error occured, or blocking was interrupted for
+			   some reason.  Only abort execution if a real error occured. */
+			switch (errno) {
+			case EINTR:		/* Interrupted system call */
+			case ECONNABORTED:	/* Software caused connection abort */
 				/* no warning */
-				continue;    /* don't return - do the accept again */
+				continue;		/* don't return - do the accept again */
 
-      default:
+			default:
 				/* special case: shutdown of the server - just return */
-				if( CO_get_do_server() == 0 ) {
-				  return -1;
+				if (CO_get_do_server() == 0) {
+					return -1;
 				} else {		/* real error */
-				  if( ++num_errors < MAX_ACCEPT_ERRORS ) { /* warn */
-	          LG_log(sk_context, LG_WARN, "(%d) %s", errno, strerror(errno));
+					if (num_errors++ < MAX_ACCEPT_ERRORS) {	/* warn */
+						LG_log(sk_context, LG_WARN, "(%d) %s", errno, strerror(errno));
 					} else {	/* crash */
-            LG_log(sk_context, LG_SEVERE,
-	        	"too many accept() errors (maximum is %d)", MAX_ACCEPT_ERRORS);
-	    			die;
-				  }
+						LG_log(sk_context, LG_SEVERE, "too many accept() errors (maximum is %d)", MAX_ACCEPT_ERRORS);
+						die;
+					}
 				}
-      }
-    } else { /* success */
-      LG_log(sk_context, LG_DEBUG, "client connected on socket %d", connected_socket);
-      return connected_socket;
-    }
-  }
+			}
+		} else {				/* success */
+			LG_log(sk_context, LG_DEBUG, "client connected on socket %d", connected_socket);
+			return connected_socket;
+		}
+	}
 }
 
 
@@ -295,48 +256,58 @@ int SK_accept_connection(int listening_socket) {
   char *hostname    host to connect to
   int port          port to connect to
   int timeout       in seconds
+  
+  RETURNS:
+  
+  SK_BADHOST		if there was a problem with the hostname lookup
+  SK_CONNECT		if all the resolved addresses gave a connection refused/timed out
+  SK_OK				if connection succeed. *sock contains a valid filedescriptor.
 
   ++++++++++++++++++++++++++++++++++++++*/
-int SK_connect(int  *sock, char *hostname, unsigned int port, unsigned int timeout) {
-    struct addrinfo hints, *res, *ai_iter;
-    gint error;
-    char portbuf[16];
+int SK_connect(int *sock, char *hostname, unsigned int port, unsigned int timeout)
+{
+	struct addrinfo hints, *res, *ai_iter;
+	gint error;
+	char portbuf[16];
 
-    /* Prepare addrinfo struct for getaddrinfo */
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = PF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
+	/* Prepare addrinfo struct for getaddrinfo */
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
 
-    /* This should give us values for listening */
-		snprintf(portbuf, 16, "%u", port);
-    error = getaddrinfo(hostname, portbuf, &hints, &res);
-    if (error != 0) {
-			LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): getaddrinfo(): %s", hostname, port, gai_strerror(error));
-			return SK_BADHOST;
-    }
+	/* This should give us values for listening */
+	snprintf(portbuf, 16, "%u", port);
+	error = getaddrinfo(hostname, portbuf, &hints, &res);
+	if (error != 0) {
+		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): getaddrinfo(): %s", hostname, port, gai_strerror(error));
+		return SK_BADHOST;
+	}
 
-		/* connect using v4, then v6 address(es) */
-		for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
-			if (ai_iter->ai_family == AF_INET) {
-				if (SK_connect_inner(sock, ai_iter, timeout, hostname, port) == SK_OK) {
-					return SK_OK;
-				}
+	/* connect using v4, then v6 address(es) */
+	for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
+		if (ai_iter->ai_family == AF_INET) {
+			if (SK_connect_inner(sock, ai_iter, timeout, hostname, port) == SK_OK) {
+				freeaddrinfo(res);
+				return SK_OK;
 			}
 		}
+	}
 
-		/* if no IPv4 addresses found, fall back to IPv6 */
-		for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
-			if (ai_iter->ai_family == AF_INET6) {
-				if (SK_connect_inner(sock, ai_iter, timeout, hostname, port) == SK_OK) {
-					return SK_OK;
-				}
+	/* if no IPv4 addresses found, fall back to IPv6 */
+	for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
+		if (ai_iter->ai_family == AF_INET6) {
+			if (SK_connect_inner(sock, ai_iter, timeout, hostname, port) == SK_OK) {
+				freeaddrinfo(res);
+				return SK_OK;
 			}
 		}
+	}
 
-		/* if not v6 address found either, bail out */
-		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): No v6 nor v4 address found", hostname, port);
-		*sock = -1;
-		return SK_CONNECT;
+	/* if not v6 address found either, bail out */
+	LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): No v6 nor v4 address found", hostname, port);
+	*sock = -1;
+	freeaddrinfo(res);
+	return SK_CONNECT;
 }
 
 /* Helper function for SK_connect
@@ -345,64 +316,65 @@ int SK_connect(int  *sock, char *hostname, unsigned int port, unsigned int timeo
  *
  * Returns: SK_* error code, SK_OK if everything went fine,
  * 					in which case it fills *retsock */
-int SK_connect_inner(int *retsock, struct addrinfo *res, int timeout, char *hostname, int port) {
-		int sock, flags, sel, gs, er, erlen=sizeof(er);
-	  struct timeval ptm;
-  	fd_set rset, wset;
+int SK_connect_inner(int *retsock, struct addrinfo *res, int timeout, char *hostname, int port)
+{
+	int sock, flags, sel, gs, er, erlen = sizeof(er);
+	struct timeval ptm;
+	fd_set rset, wset;
 
-   	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-    if (sock < 0) {
-			LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): socket(): %d (%s)", hostname, port, errno, strerror(errno));
-			return SK_SOCKET;
-    }
+	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	if (sock < 0) {
+		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): socket(): %d (%s)", hostname, port, errno, strerror(errno));
+		return SK_SOCKET;
+	}
 
-    if (SK_setsockflags(sock, O_NONBLOCK) < 0) {
-			LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): setsockflags(): %d (%s)", hostname, port, errno, strerror(errno));
-			close(sock);
-			return SK_SOCKET;
-    }
+	if (SK_setsockflags(sock, O_NONBLOCK) < 0) {
+		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): setsockflags(): %d (%s)", hostname, port, errno, strerror(errno));
+		close(sock);
+		return SK_SOCKET;
+	}
 
-	  if ((connect(sock, res->ai_addr, res->ai_addrlen)) < 0 && errno != EINPROGRESS) {
-			LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): connect(): %d (%s)", hostname, port, errno, strerror(errno));
-			close(sock);
-			return SK_CONNECT;
-	  }
+	if ((connect(sock, res->ai_addr, res->ai_addrlen)) < 0 && errno != EINPROGRESS) {
+		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): connect(): %d (%s)", hostname, port, errno, strerror(errno));
+		close(sock);
+		return SK_CONNECT;
+	}
 
-	  /* waiting for timeout */
-	  FD_ZERO( &rset );
-	  FD_SET( sock, &rset );
-	  wset = rset;
-	  ptm.tv_usec = 0;
-	  ptm.tv_sec = timeout;
+	/* waiting for timeout */
+	FD_ZERO(&rset);
+	FD_SET(sock, &rset);
+	wset = rset;
+	ptm.tv_usec = 0;
+	ptm.tv_sec = timeout;
 
-		if ((sel = select(sock + 1, &rset, &wset, NULL, &ptm)) == 0) {	/* timeout */
-			LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): connect(): timeout", hostname, port);
-			close(sock);
-			return SK_TIMEOUT;
-		}
+	if ((sel = select(sock + 1, &rset, &wset, NULL, &ptm)) == 0) {	/* timeout */
+		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): connect(): timeout", hostname, port);
+		close(sock);
+		return SK_TIMEOUT;
+	}
 
-		if (sel < 0) {
-			LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): select(): %d (%s)", hostname, port, errno, strerror(errno));
-			close(sock);
-			return SK_CONNECT;
-		}
+	if (sel < 0) {
+		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): select(): %d (%s)", hostname, port, errno, strerror(errno));
+		close(sock);
+		return SK_CONNECT;
+	}
 
-		gs = getsockopt(sock, SOL_SOCKET, SO_ERROR, &er, &erlen);
+	gs = getsockopt(sock, SOL_SOCKET, SO_ERROR, &er, &erlen);
 
-		if (gs < 0 || er) {
-			LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): select(): %d (%s)", hostname, port, er, strerror(er));
-			close(sock);
-			return SK_CONNECT;
-		}
+	if (gs < 0 || er) {
+		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): select(): %d (%s)", hostname, port, er, strerror(er));
+		close(sock);
+		return SK_CONNECT;
+	}
 
-    if (SK_clearsockflags(sock, O_NONBLOCK) < 0) {
-			LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): clearsockflags(): %d (%s)", hostname, port, errno, strerror(errno));
-			close(sock);
-			return SK_SOCKET;
-    }
+	if (SK_clearsockflags(sock, O_NONBLOCK) < 0) {
+		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): clearsockflags(): %d (%s)", hostname, port, errno, strerror(errno));
+		close(sock);
+		return SK_SOCKET;
+	}
 
-    *retsock = sock;
-    return SK_OK;
+	*retsock = sock;
+	return SK_OK;
 }
 
 
@@ -703,43 +675,16 @@ int SK_getc(int  sockfd) {
 
   int    sockfd            The socket or file descriptor.
 
-  +html+ <PRE>
-  Authors:
-        ottrey,
-	marek (modified error handling, made MT-Safe).
-  +html+ </PRE>
-
   ++++++++++++++++++++++++++++++++++++++*/
-char *SK_getpeername(int  sockfd)
-{
-  char *hostaddress=NULL;
-  struct sockaddr_storage ss;
-  int namelen=sizeof(ss);
+char *SK_getpeername(int  sockfd) {
+  char *hostaddress = (char*)UT_malloc(IP_ADDRSTR_MAX);
+  ip_addr_t localaddr;
 
-  memset(&ss, 0, sizeof(ss));
-
-  if (getpeername(sockfd, (struct sockaddr *)&ss, &namelen) == 0) {
-    hostaddress = (char *)UT_malloc(INET6_ADDRSTRLEN);
-		if (getnameinfo((struct sockaddr *)&ss, namelen, hostaddress, INET6_ADDRSTRLEN, NULL, 0, 0) != 0) {
-			/* Something really-really bad thing happened */
-			LG_log(sk_context, LG_FATAL, "SK_getpeername(): getnameinfo(): %d (%s)", errno, strerror(errno));
-			die;
-		}
-  } else {
-    int er = errno;
-
-    if (er == ENOTSOCK) {
-      hostaddress = UT_strdup("--");
-    } else {
-      /* XXX: hack to avoid crash in the case where peer disconnects */
-      /* To fix this, the socket interface needs to deal with a structure
-         containing not only the file descriptor, but also the address of
-	 the host and the peer.  Other goodies, like the current time,
-	 time of last operation, and last errno could also be included
-	 for good measure. */
-      hostaddress = UT_strdup("127.0.0.1");
-    }
-  }
+	/* this conversion is not optimal; however it makes no sense to
+	 * write the mapping converter function for every representation of
+	 * the ip address */
+  SK_getpeerip(sockfd, &localaddr);
+  IP_addr_b2a(&localaddr, hostaddress, IP_ADDRSTR_MAX);
 
   return hostaddress;
 
@@ -758,37 +703,38 @@ char *SK_getpeername(int  sockfd)
 
   ip_addr_t *ip       Pointer to where the address should be stored.
 
-  +html+ <PRE>
-  Author:
-	marek
-  +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
 
-int SK_getpeerip(int  sockfd, ip_addr_t *ip) {
-  struct sockaddr_storage ss;
-  int namelen=sizeof(ss);
-  int ret=-1;
+int SK_getpeerip(int sockfd, ip_addr_t * ip)
+{
+	struct sockaddr_storage ss;
+	int namelen = sizeof(ss);
+	int ret = -1;
 
-  memset(&ss, 0, sizeof(ss));
+	memset(&ss, 0, sizeof(ss));
 
-  if (getpeername(sockfd, (struct sockaddr *)&ss, &namelen) == 0) {
-    ret=0;
-    IP_addr_s2b(ip, &ss, namelen);
-  } else {
-      /* XXX: hack to avoid crash in the case where peer disconnects */
-      /* To fix this, the socket interface needs to deal with a structure
-         containing not only the file descriptor, but also the address of
-	 the host and the peer.  Other goodies, like the current time,
-	 time of last operation, and last errno could also be included
-	 for good measure. */
-	 		struct sockaddr_in addr_in;
+	if (getpeername(sockfd, (struct sockaddr *)&ss, &namelen) == 0) {
+		ret = 0;
+		IP_addr_s2b(ip, &ss, namelen);
 
-      ret = 0;
-      addr_in.sin_family = AF_INET;
-      addr_in.sin_addr.s_addr = INADDR_LOOPBACK;
-      addr_in.sin_port = 0;
-      IP_addr_s2b(ip, &addr_in, sizeof(addr_in));
-  }
+		/* check for v4 mapped addresses */
+		IP_convert_mapped(ip);
 
-  return ret;
+	} else {
+		/* XXX: hack to avoid crash in the case where peer disconnects */
+		/* To fix this, the socket interface needs to deal with a structure
+		   containing not only the file descriptor, but also the address of
+		   the host and the peer.  Other goodies, like the current time,
+		   time of last operation, and last errno could also be included
+		   for good measure. */
+		struct sockaddr_in addr_in;
+
+		ret = 0;
+		addr_in.sin_family = AF_INET;
+		addr_in.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+		addr_in.sin_port = 0;
+		IP_addr_s2b(ip, &addr_in, sizeof(addr_in));
+	}
+
+	return ret;
 }

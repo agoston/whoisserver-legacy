@@ -402,49 +402,44 @@ returns: error from wr_malloc
 
 +*/
 static
-int
-rp_srch_copyresults(GList *datlist,
-		    GList **finallist,
-		    int maxcount)
+int rp_srch_copyresults(GList * datlist, GList ** finallist, int maxcount)
 {
-  int err;
-  GList    *ditem;
-  GHashTable *uniqhash = g_hash_table_new(NULL, NULL); /* defaults */
-  int count = 0;
+	int err;
+	GList *ditem;
+	GHashTable *uniqhash = g_hash_table_new(NULL, NULL);	/* defaults */
+	int count = 0;
 
-  LG_log(rp_context, LG_DEBUG, "srch_copyresults");
+	LG_log(rp_context, LG_DEBUG, "srch_copyresults");
 
-  /*  copy dataleaves pointed to by entries from the datlist
-      only once (check uniqueness in the hash table) */
-  for(ditem = g_list_first(datlist);
-      ditem != NULL;
-      ditem = g_list_next(ditem)) {
-    rx_datref_t   *refptr = (rx_datref_t *) (ditem->data);
-    rx_dataleaf_t *ansptr = refptr->leafptr;
+	/*  copy dataleaves pointed to by entries from the datlist
+	   only once (check uniqueness in the hash table) */
+	for (ditem = g_list_first(datlist); ditem != NULL; ditem = g_list_next(ditem)) {
+		rx_datref_t *refptr = (rx_datref_t *) (ditem->data);
+		rx_dataleaf_t *ansptr = refptr->leafptr;
 
-    /* search for every ansptr (dataleaf pointer) in uniqhash */
-    if( g_hash_table_lookup(uniqhash, ansptr) == NULL ) {
-      
-      /* it's not known yet. OK: put it in the hash (value==key) */
-      g_hash_table_insert(uniqhash, ansptr, ansptr); 
-      
-      /* and copy the dataleaf */
-      if( !NOERR(err = rp_asc_append_datref(refptr, finallist)) ) {
-	return err;
-      }
-    }
+		/* search for every ansptr (dataleaf pointer) in uniqhash */
+		if (g_hash_table_lookup(uniqhash, ansptr) == NULL) {
 
-    /* check the limit on number of objects if defined ( >0)  */
-    count++;
-    if( maxcount > 0 && count > maxcount ) {
-      break;
-    }
+			/* it's not known yet. OK: put it in the hash (value==key) */
+			g_hash_table_insert(uniqhash, ansptr, ansptr);
 
-  } /*  foreach (datlist) */
-    
-  g_hash_table_destroy(uniqhash); /* elements are still linked to through datlist */
+			/* and copy the dataleaf */
+			if (!NOERR(err = rp_asc_append_datref(refptr, finallist))) {
+				return err;
+			}
+		}
 
-  return RP_OK;
+		/* check the limit on number of objects if defined ( >0)  */
+		count++;
+		if (maxcount > 0 && count > maxcount) {
+			break;
+		}
+
+	}							/*  foreach (datlist) */
+
+	g_hash_table_destroy(uniqhash);	/* elements are still linked to through datlist */
+
+	return RP_OK;
 }
 
 static 
@@ -505,125 +500,105 @@ rp_begend_preselection(GList **datlist, rx_fam_t fam_id, ip_range_t *testrang)
   returns RX_OK or a code from an underlying function
 ++++++++++++*/
 int
-RP_asc_search ( 
-               rx_srch_mt search_mode, 
-               int par_a,
-               int par_b,
-               char *key,     /*+ search term: (string) prefix/range/IP +*/
-               rp_regid_t  reg_id,
-	       rp_attr_t  attr,    /*+ extra tree id (within the same reg/spc/fam +*/
-               GList **finallist,    /*+ answers go here, please +*/
-               int    max_count    /*+ max # of answers. RX_ALLANS == unlimited +*/
-               )
-{ 
-  GList    *preflist = NULL;
-  GList    *datlist = NULL;
-  int   err; 
-  ip_range_t  testrang;
-  int        locked = 0;
-  ip_keytype_t key_type;
-  ip_space_t   spc_id;
-  rx_fam_t   fam_id = RP_attr2fam( attr );
-  rx_tree_t   *mytree;
-  int hits=0;
-  ip_prefix_t beginpref;
-  
+ RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key,	/*+ search term: (string) prefix/range/IP + */
+	rp_regid_t reg_id, rp_attr_t attr,	/*+ extra tree id (within the same reg/spc/fam + */
+	GList ** finallist,			/*+ answers go here, please + */
+	int max_count				/*+ max # of answers. RX_ALLANS == unlimited + */
+	) {
+	GList *preflist = NULL;
+	GList *datlist = NULL;
+	int err;
+	ip_range_t testrang;
+	int locked = 0;
+	ip_keytype_t key_type;
+	ip_space_t spc_id;
+	rx_fam_t fam_id = RP_attr2fam(attr);
+	rx_tree_t *mytree;
+	int hits = 0;
+	ip_prefix_t beginpref;
 
-  /*  abort on error (but unlock the tree) */  
-  LG_log(rp_context, LG_DEBUG, 
-	    "RP_NEW_asc_search:  query %s : mode %d (%s) (par %d) for %s",
-	    DF_get_attribute_name(attr),
-	    search_mode, RX_text_srch_mode(search_mode), par_a, key);
+	/*  abort on error (but unlock the tree) */
+	LG_log(rp_context, LG_DEBUG,
+		"RP_NEW_asc_search:  query %s : mode %d (%s) (par %d) for %s",
+		DF_get_attribute_name(attr), search_mode, RX_text_srch_mode(search_mode), par_a, key);
 
-  
-  /* parse the key into a prefix list */
-  if(!NOERR( err = IP_smart_conv(key, 0, 0,
-			    &preflist, IP_EXPN, &key_type))) {
-    /* operational trouble (UT_*) or invalid key (IP_INVARG)*/
-    return err; 
-  }
+	/* parse the key into a prefix list */
+	if (!NOERR(err = IP_smart_conv(key, 0, 0, &preflist, IP_EXPN, &key_type))) {
+		/* operational trouble (UT_*) or invalid key (IP_INVARG) */
+		return err;
+	}
 
-  /* set the test values */
-  IP_smart_range(key, &testrang, IP_EXPN, &key_type);
-  
-  /* find the tree */
-  /* I took out the surrounding "if" because it is always taken when 
-     we get to this point, and it causes compiler warnings otherwise - shane */
-  /*if( NOERR(err) ) {*/
-    spc_id = IP_pref_b2_space( g_list_first(preflist)->data );
-    if( ! NOERR(err = RP_tree_get( &mytree, reg_id, spc_id, attr ))) {
-      return err;
-    }
-  /*}*/
-  /* the point of no return: now we lock the tree. From here, even if errors
-     occur, we still go through all procedure to unlock the tree at the end */
-  
-  /* lock the tree */
-  TH_acquire_read_lockw( &(mytree->rwlock) );
-  locked = 1;
+	/* set the test values */
+	IP_smart_range(key, &testrang, IP_EXPN, &key_type);
 
-  /* Collection: this procedure is used for some search_modes only */
-  if(    search_mode == RX_SRCH_EXLESS 
-      || search_mode == RX_SRCH_LESS 
-      || search_mode == RX_SRCH_EXACT )  {
+	/* find the tree */
+	/* I took out the surrounding "if" because it is always taken when 
+	   we get to this point, and it causes compiler warnings otherwise - shane */
+	/*if( NOERR(err) ) { */
+	spc_id = IP_pref_b2_space(g_list_first(preflist)->data);
+	if (!NOERR(err = RP_tree_get(&mytree, reg_id, spc_id, attr))) {
+		return err;
+	}
+	/*} */
+	/* the point of no return: now we lock the tree. From here, even if errors
+	   occur, we still go through all procedure to unlock the tree at the end */
 
-    /* 1. compose a /32(/128) prefix for beginning of range */
-    beginpref.ip = testrang.begin;
-    beginpref.bits = IP_sizebits(spc_id);
-    
-    /* 2. dataleaves collection: look up the beginning prefix in LESS(255) mode */
-    if( NOERR(err) ) {
-      err = RX_bin_search( RX_SRCH_LESS, 255, 0, mytree, &beginpref, 
-			   &datlist, RX_ANS_ALL);
-    }
-    
-    /* 3. preselection: exclude those that do not include end of range 
-     */
-    if( NOERR(err) ) {
-      rp_begend_preselection(&datlist, fam_id, &testrang);
-    }
+	/* lock the tree */
+	TH_acquire_read_lockw(&(mytree->rwlock));
+	locked = 1;
 
-  } /* if exless|less|exact */
-  else {
-    /* MORE */
+	/* Collection: this procedure is used for some search_modes only */
+	if (search_mode == RX_SRCH_EXLESS || search_mode == RX_SRCH_LESS || search_mode == RX_SRCH_EXACT) {
 
-    /* standard collection using the traditional method: 
-       repeat the search for all prefixes and join results */
+		/* 1. compose a /32(/128) prefix for beginning of range */
+		beginpref.ip = testrang.begin;
+		beginpref.bits = IP_sizebits(spc_id);
 
-    if( NOERR(err) ) {
-      err = rp_preflist_search ( search_mode, par_a, par_b, 
-				 mytree, &preflist, &datlist);
-    }
-  } /* collection */
+		/* 2. dataleaves collection: look up the beginning prefix in LESS(255) mode */
+		if (NOERR(err)) {
+			err = RX_bin_search(RX_SRCH_LESS, 255, 0, mytree, &beginpref, &datlist, RX_ANS_ALL);
+		}
 
-  LG_log(rp_context, LG_DEBUG, 
-	    "RP_NEW_asc_search: collected %d references ",
-	    g_list_length(datlist));
+		/* 3. preselection: exclude those that do not include end of range 
+		 */
+		if (NOERR(err)) {
+			rp_begend_preselection(&datlist, fam_id, &testrang);
+		}
 
+	} /* if exless|less|exact */
+	else {
+		/* MORE */
 
-  /* 5. processing - using the same processing function */
-  if( NOERR(err) ) {
-    err = rp_asc_process_datlist( search_mode, par_a, fam_id, 
-				  1, /* one occurence is enough */
-				  &datlist,  
-				  &testrang,  &hits );
-  }
-  
-  /* 6. copy results */
-  if( NOERR(err) ) {
-    err = rp_srch_copyresults(datlist, finallist, max_count); /* and uniq */
-  }
+		/* standard collection using the traditional method: 
+		   repeat the search for all prefixes and join results */
 
-  if( locked ) {
-    /* 100. unlock the tree */
-    TH_release_read_lockw( &(mytree->rwlock) );
-  }
+		if (NOERR(err)) {
+			err = rp_preflist_search(search_mode, par_a, par_b, mytree, &preflist, &datlist);
+		}
+	}							/* collection */
 
-  /* clean up */
-  wr_clear_list( &preflist ); 
-  wr_clear_list( &datlist );  
+	LG_log(rp_context, LG_DEBUG, "RP_NEW_asc_search: collected %d references ", g_list_length(datlist));
 
-  /* NOTE if error occured, finallist may be partly filled in. */
-  return err;
+	/* 5. processing - using the same processing function */
+	if (NOERR(err)) {
+		err = rp_asc_process_datlist(search_mode, par_a, fam_id, 1,	/* one occurence is enough */
+			&datlist, &testrang, &hits);
+	}
+
+	/* 6. copy results */
+	if (NOERR(err)) {
+		err = rp_srch_copyresults(datlist, finallist, max_count);	/* and uniq */
+	}
+
+	if (locked) {
+		/* 100. unlock the tree */
+		TH_release_read_lockw(&(mytree->rwlock));
+	}
+
+	/* clean up */
+	wr_clear_list(&preflist);
+	wr_clear_list(&datlist);
+
+	/* NOTE if error occured, finallist may be partly filled in. */
+	return err;
 }
-  

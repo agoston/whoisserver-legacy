@@ -1,0 +1,31 @@
+# CASE 2: We try to create route object 20.13.0.0/16,AS200
+# testing various attributes where community and as number can be present
+# with syntax errs
+# aggr-bndry
+# aggr-mtd
+# components
+# inject
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 2: The creation will fail.
+
+
+route:   20.13.0.0/16
+descr:   test route
+origin:  AS200
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net
+source:  DB-TEST
+aggr-bndry: AS0.234:AS-mytest:AS3:AS-test:AS0.234
+aggr-mtd: outbound AS1.234:AS-mytest:AS3:AS-test:AS0.234
+components: ATOMIC protocol BGP4 community.contains(20.65536:20)
+inject: at rtrs-myset:AS0.2:rtrs-test:AS2.34
+inject: at AS0.234:rtrs-myset:AS2:rtrs-test:AS2.34
+inject: at AS234:rtrs-myset:AS2:rtrs-test:AS02.34
+inject: action community = {20.65536:20};
+
+
+password: auth

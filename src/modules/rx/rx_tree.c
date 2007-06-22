@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.25 $
+  $Revision: 1.1 $
 
   Radix tree (rx).  rx_tree.c - functions to operate on trees
   (creation/deletion/finding).
@@ -160,96 +160,89 @@ void rx_delete_dataleaves(void *element_data, void *result_ptr)
 {
 	rx_dataleaf_t *leafptr = element_data;
 	rx_tree_t *tree = result_ptr;
-	
-	if(tree->family == RX_FAM_IP ) {
-        /* do not look at the leaf if  RX_FAM_IP */
-        /* Just free the payload, there must be one and just one. */
-           UT_free(leafptr);
-        }  
-        else { /* other families */
-          /* if not >composed< then delete dataleaf */
-          if( leafptr->composed == 0 ) {
-             if( leafptr->data_ptr )
-	         UT_free(leafptr->data_ptr);
-             UT_free(leafptr);
-      
-             LG_log(rx_context, LG_DEBUG, "dataleaf refcount = 0, removed");
-      
-          }
-          /* else decrement the reference number ( == number of prefixes 
-             composing the range minus 1 == the >composed< flag */
-          else {
-             leafptr->composed--;
-      
-             LG_log(rx_context, LG_DEBUG, "dataleaf refcount -- to %d ",
-		           leafptr->composed );
-          }  
-        } /* if family != RX_FAM_IP */
+
+	if (tree->family == RX_FAM_IP) {
+		/* do not look at the leaf if  RX_FAM_IP */
+		/* Just free the payload, there must be one and just one. */
+		UT_free(leafptr);
+	} else {					/* other families */
+		/* if not >composed< then delete dataleaf */
+		if (leafptr->composed == 0) {
+			if (leafptr->data_ptr)
+				UT_free(leafptr->data_ptr);
+			UT_free(leafptr);
+
+			LG_log(rx_context, LG_DEBUG, "dataleaf refcount = 0, removed");
+
+		}
+		/* else decrement the reference number ( == number of prefixes 
+		   composing the range minus 1 == the >composed< flag */
+		else {
+			leafptr->composed--;
+
+			LG_log(rx_context, LG_DEBUG, "dataleaf refcount -- to %d ", leafptr->composed);
+		}
+	}							/* if family != RX_FAM_IP */
 }
 
-void rx_delete_treenode(rx_tree_t *tree, rx_node_t *curnode)
+void rx_delete_treenode(rx_tree_t * tree, rx_node_t * curnode)
 {
-     if(curnode->leaves_ptr) {
-         LG_log(rx_context, LG_DEBUG, 
-                "deleting dataleaves of node at %08x", curnode);    
-         g_list_foreach( curnode->leaves_ptr, rx_delete_dataleaves, tree);
-	 /* delete the GList */
-	 g_list_free(curnode->leaves_ptr);
-     }
-     LG_log(rx_context, LG_DEBUG, "node at %08x removed", curnode);
-     UT_free(curnode);
-	
+	if (curnode->leaves_ptr) {
+		LG_log(rx_context, LG_DEBUG, "deleting dataleaves of node at %08x", curnode);
+		g_list_foreach(curnode->leaves_ptr, rx_delete_dataleaves, tree);
+		/* delete the GList */
+		g_list_free(curnode->leaves_ptr);
+	}
+	LG_log(rx_context, LG_DEBUG, "node at %08x removed", curnode);
+	UT_free(curnode);
 }
 
-/* The fuction itself */
-int
-rx_delete_tree(rx_tree_t *tree, rx_node_t *node,
-             int maxlevel, 
-	     int level, 
-	     int nodecounter,
-	     void *userptr)
+/* The fuction itself */ 
+int rx_delete_tree(rx_tree_t * tree, rx_node_t * node, int maxlevel, int level, int nodecounter, void *userptr)
 {
-int i, link;
+	int i, link;
 
- if( node == NULL ) die; /* program error. we expect a valid, checked, node.*/
+	if (node == NULL)
+		die;					/* program error. we expect a valid, checked, node. */
 
- /* check if the level is reached */
- 
- if( level > maxlevel ) {
-   return nodecounter; 
- }
+	/* check if the level is reached */
+	if (level > maxlevel) {
+		return nodecounter;
+	}
 
+	/* process the node appropriately: */
+	/* increase our depth counter */
+	level++;
 
- /* process the node appropriately: */
- /* increase our depth counter */
- level++;
+	/* increase the count of visited nodes */
+	nodecounter++;
 
- /* increase the count of visited nodes */
- nodecounter++;
+	/* process left and right children */
+	for (i = 0; i <= 1; i++) {
+		link = i;
 
+		if (node->child_ptr[link] != NULL) {
+			nodecounter += rx_delete_tree(tree, node->child_ptr[link], maxlevel, level, 0, userptr);
+			/* delete the processed child node */
+			rx_delete_treenode(tree, node->child_ptr[link]);
+		}
+	}
 
- /* process left and right children */
- for(i=0; i<=1; i++) {
-   
-   link = i;
-     
-   if( node->child_ptr[link] != NULL ) {
-     nodecounter += rx_delete_tree(tree, node->child_ptr[link], maxlevel, level, 0, userptr);
-     /* delete the processed child node */
-     rx_delete_treenode(tree, node->child_ptr[link]);
-   }
- }
- 
- /* if this is the top level - delete the top node and the tree*/
- if(node == tree->top_ptr){
-	 rx_delete_treenode(tree, node); 
-	 tree->top_ptr=NULL;
- }
-	 
- /* return count of nodes deleted */
- return nodecounter;
+	/* if this is the top level - delete the top node and the tree */
+	if (node == tree->top_ptr) {
+		rx_delete_treenode(tree, node);
+		tree->top_ptr = NULL;
+		tree->num_nodes = 0;
+		tree->top_key = SQ_NOKEY;
+		tree->parent_tree = NULL;
+		strcpy(tree->data_table.val, "");
+		strcpy(tree->radix_table.val, "");
+		strcpy(tree->leaves_table.val, "");
+	}
+
+	/* return count of nodes deleted */
+	return nodecounter;
 }
-
 
 /***************************************************************************/
 /*++++++

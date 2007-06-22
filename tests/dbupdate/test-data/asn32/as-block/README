@@ -1,0 +1,157 @@
+# asn32/as-block tests
+
+# CASE 1: We try to create as-block object
+# maintained, using override
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed
+
+
+# CASE 2: We try to create as-block objects
+# maintained, using override
+#
+# syntax errors:
+# 0.x anywhere
+# x mixed with x.x
+# 65536 anywhere
+# range x to x-1 <-- this test fails at the moment
+#
+# create as-block objects
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail
+
+# test 2a 0.x - x.x
+# test 2b x.x - 0.x
+# test 2c x.65536 - x.x
+# test 2d 65536.x - x.x
+# test 2e x.x - 65536.x
+# test 2f x.x - x.65536
+# test 2g x - x.x
+# test 2h x.x - x
+# test 2i x.x - x.x-1
+
+
+# CASE 3: We try create 32bit AS object and query it
+# parent as-block object exists
+# as a query result, there should be 1 as-block object and 1 aut-num object
+#
+# create aut-num object
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed
+
+
+# CASE 4: We try create 16bit AS object and query it
+# parent object exist
+# as a query result, there should be 1 as-block object and 1 aut-num object
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed
+
+
+# CASE 5: We try create 16bit AS object and query it as AS0.n (without -r)
+# parent object exist
+# as a query result, there should be 1 16-bit as-block object and 1 aut-num object
+# and maybe some warning that we have converted the query?
+#
+# create aut-num object
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed
+
+
+# CASE 6: We create two as-blocks who are hierarchical to each other and
+# try to query smaller one.
+# 16 bit
+# should return both
+# this test is more to document existing behaviour then test anything 
+# in particular to make sure 16 bit behaves the same as 32 bit
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 6: The creation will succeed
+
+
+# CASE 7: We create two as-blocks who are hierarchical to each other and 
+# try to query bigger one.
+# 16 bit
+# should return only bigger block
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 7: The creation will succeed
+
+
+# CASE 8: We create an AS and try to query this AS.
+# Two hierarchical as-blocks exist.
+# 16 bit
+# currently FAILS: dbupdate dies because it finds two parent as-block objects.
+# 
+# create AS object
+#
+#SUCCESS
+#
+# RESULT 8: The creation will succeed
+
+
+# CASE 9: We create two as-blocks which are hierarchical to each other 
+# and try to query smaller one.
+# 32 bit
+# should return both
+#
+# create as-block objects
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed
+
+
+# CASE 10: We create two as-blocks which are hierarchical to each other
+# and try to query bigger one.
+# 32 bit
+# should return only bigger block
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 10: The creation will succeed
+
+
+# CASE 11: We create 16-bit as-block
+# query: -r -B AS0.n - AS0.m
+# should return 16-bit block
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 11: The creation will succeed
+
+
+# CASE 12: We create two as-blocks which are overlapping each other 
+# and try to query one.
+# 32 bit
+# should return only the one queried
+#
+# create as-block objects
+#
+#SUCCESS
+#
+# RESULT 12: The creation will succeed
+
+

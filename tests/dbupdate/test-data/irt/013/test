@@ -1,0 +1,14 @@
+# irt tests
+# CASE 13: inetnum 1 
+#          inetnum 2 + route
+#          query for inetnum 1
+#          
+# whois -rB inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 13: inetnum 1 + route returned
+
+
+
+

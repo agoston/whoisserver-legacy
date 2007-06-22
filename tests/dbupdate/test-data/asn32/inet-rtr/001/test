@@ -1,0 +1,37 @@
+
+# CASE 1: We try to create inet-rtr object kst1-core.swip.net
+%
+% requires initial objects to be loaded
+#
+# create inet-rtr object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+inet-rtr:    kst1-core.swip.net
+descr:       test router
+local-as:    AS1257.100
+ifaddr:      146.188.49.14 masklen 30 action community.append(123.456:20);
+ifaddr:      146.188.49.14 masklen 30 action community.append(0.456:20);
+ifaddr:      146.188.49.14 masklen 30 action aspath.prepend(AS2.456);
+interface:   146.188.49.14 masklen 30 action aspath.prepend(AS2.456);
+interface:   146.188.49.14 masklen 30 action community.append(123.456:20);
+interface:   146.188.49.14 masklen 30 action community.append(0.456:20);
+peer:        BGP4 146.188.49.13 asno(AS702.234)
+peer:        BGP4 195.158.247.61 asno(AS1755.234)
+peer:        BGP4 prng-my-test:AS234.345:prng-test asno (AS234.34)
+peer:        BGP4 rtrs--my-test:AS234.345:rtrs-test asno (AS234.34)
+mp-peer:     BGP4 146.188.49.13 asno(AS702.234)
+mp-peer:     BGP4 195.158.247.61 asno(AS1755.234)
+mp-peer:     BGP4 prng-my-test:AS234.345:prng-test asno (AS234.34)
+mp-peer:     BGP4 rtrs--my-test:AS234.345:rtrs-test asno (AS234.34)
+admin-c:     TP1-DB-TEST
+tech-c:      TP1-DB-TEST
+mnt-by:      TEST-MNT
+notify:      dbtest@ripe.net
+changed:     dbtest@ripe.net
+source:      DB-TEST
+
+password: auth

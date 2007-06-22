@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.2.6.1 $
 
   IP handling (ip). iproutines.h  - header file for conversions routines.
                                     defines data structures for IP module.
@@ -189,31 +189,29 @@ int IP_pref_rang_t2b(ip_prefix_range_t *prefrangptr, const char *prefrangstr, ip
 #define IP_revd_a2b(a,b) IP_revd_t2b(a,b,IP_EXPN)
 
 /* text fragments to binary */
-int IP_addr_f2b_v4(ip_addr_t *addrptr, const char *adrstr);
-int IP_rang_f2b_v4(ip_range_t *rangptr, const char *beginstr,  const char *endstr);
-int IP_pref_f2b_v4(ip_prefix_t *prefptr, const char *prefixstr,
-			const char *lengthstr);
-int IP_addr_f2b_v6(ip_addr_t *addrptr, const char *msbstr, const char *lsbstr );
-int IP_pref_f2b_v6(ip_prefix_t *prefptr, const char *msbstr, const char *lsbstr,
-                        const char *lengthstr);
-int
-IP_addr_f2b_v6_32(ip_addr_t *addrptr, const char *word1str, const char *word2str,
-								const char *word3str, const char *word4str);
-int
-IP_pref_f2b_v6_32(ip_prefix_t *prefptr, const char *word1str, const char *word2str,
-								const char *word3str, const char *word4str, const char *lengthstr);
+int IP_addr_f2b_v4(ip_addr_t * addrptr, const char *adrstr);
+int IP_rang_f2b_v4(ip_range_t * rangptr, const char *beginstr, const char *endstr);
+int IP_pref_f2b_v4(ip_prefix_t * prefptr, const char *prefixstr, const char *lengthstr);
+int IP_addr_f2b_v6(ip_addr_t * addrptr, const char *msbstr, const char *lsbstr);
+int IP_pref_f2b_v6(ip_prefix_t * prefptr, const char *msbstr, const char *lsbstr, const char *lengthstr);
+int IP_addr_f2b_v6_32(ip_addr_t * addrptr, const char *word1str, const char *word2str, const char *word3str, const char *word4str);
+int IP_pref_f2b_v6_32(ip_prefix_t * prefptr, const char *word1str, const char *word2str, const char *word3str, const char *word4str,
+	const char *lengthstr);
 
-int IP_addr_b2a(ip_addr_t *binaddr, char *ascaddr, unsigned strmax );
-int IP_pref_b2a(ip_prefix_t *prefptr, char *ascaddr, unsigned strmax);
-int IP_rang_b2a(ip_range_t *rangptr, char *ascaddr, unsigned strmax);
-int IP_rang_classful(ip_range_t *rangptr, ip_addr_t *addrptr);
-int IP_pref_2_rang( ip_range_t *rangptr, ip_prefix_t *prefptr );
-int IP_rang_2_pref( ip_range_t *rangptr, ip_prefix_t *prefptr );
+int IP_addr_b2a(ip_addr_t * binaddr, char *ascaddr, unsigned strmax);
+int IP_pref_b2a(ip_prefix_t * prefptr, char *ascaddr, unsigned strmax);
+int IP_rang_b2a(ip_range_t * rangptr, char *ascaddr, unsigned strmax);
+int IP_rang_classful(ip_range_t * rangptr, ip_addr_t * addrptr);
+int IP_pref_2_rang(ip_range_t * rangptr, ip_prefix_t * prefptr);
+int IP_rang_2_pref(ip_range_t * rangptr, ip_prefix_t * prefptr);
+int IP_addr_b2a_uncompress(ip_addr_t * binaddr, char *ascaddr, unsigned strmax);
 
 /* utility functions: testers/converters */
 int  IP_addr_bit_get(ip_addr_t *binaddr, unsigned bitnum);
 int IP_addr_bit_set(ip_addr_t *binaddr, unsigned bitnum, unsigned bitval);
 int  IP_addr_cmp(ip_addr_t *ptra, ip_addr_t *ptrb, unsigned len);
+ip_prefix_t* IP_truncate_pref_v6(ip_prefix_t *prefix, int bits);
+void IP_truncate_pref_v6_inplace(ip_prefix_t *prefix, int bits);
 unsigned  IP_sizebits(ip_space_t spc_id);
 int IP_pref_bit_fix( ip_prefix_t *prefix );
 int IP_addr_in_pref(ip_addr_t *ptra, ip_prefix_t *prefix);
@@ -224,6 +222,7 @@ int IP_smart_range(char *key, ip_range_t *rangptr, ip_exp_t expf,
 			ip_keytype_t *keytype);
 int IP_rang_overlap(ip_range_t *range1, ip_range_t *range2);
 gboolean IP_addr_isnull(ip_addr_t *addrptr);
+void IP_convert_mapped(ip_addr_t *in);
 
 ip_rangesize_t IP_rang_span( ip_range_t *rangptr );
 int IP_addr_s2b(ip_addr_t *addrptr, void *addr_in, int addr_len);
@@ -301,6 +300,11 @@ void IP_rang_encomp(ip_range_t *rangptr);
 unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist);
 int IP_pref_in_prefrang(ip_prefix_t *prefix, ip_prefix_range_t *prefixrange);
 
+/* Hash function of *ip_addr_t for GLib */
+guint ip_addr_t_pointer_hash(gconstpointer key);
+/* Equal function for *ip_addr_t for GLib */
+gboolean ip_addr_t_pointer_equals(gconstpointer a, gconstpointer b);
+
 #ifdef __cplusplus
 }
 #endif
@@ -313,8 +317,6 @@ const ip_addr_t IP_ADDR_UNSPEC={{0,0,0,0},0}; /* unlikely to be real :-)
 					       as there is no space 0
 					       bonus: it's a natural state after
 					       initializing to 0 */
-
-
 
 
 #else

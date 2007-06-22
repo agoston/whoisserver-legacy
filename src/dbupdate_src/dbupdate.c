@@ -1052,8 +1052,6 @@ int get_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   return retval;
 }
 
-
-
 int main(int argc, char **argv)
 {
   int retval = UP_OK;
@@ -1061,16 +1059,15 @@ int main(int argc, char **argv)
   char *filename;
   char *state_file_name;
   time_t cur_time;
-  FILE *state;                        /* file pointer for state log file */
+  int statefd;
   RT_context_t *rt_ctx;               /* context pointer used in all calls to RT module */
   LG_context_t *lg_ctx = NULL;        /* context pointer used by LG module */
   LG_appender_t *app;
   ep_input_structure_t *input = NULL; /* structure containing un-folded data */
 
   mail_hdr_t mail_hdr = { NULL, NULL, NULL, NULL, NULL, NULL, NULL };
-  options_struct_t options = { NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, NULL, { NULL }, NULL, NULL, NULL};
+  options_struct_t options = { NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, { NULL }, NULL, NULL, NULL};
   options.mail_hdr_data = mail_hdr;
-  
 
   /********************* INITIALISE AND CONFIGURE  ***************************/
 
@@ -1119,18 +1116,23 @@ int main(int argc, char **argv)
     exit(13);
   }
 
+//	die;
+
   /* set up a reporting context */
   rt_ctx = RT_start();
 
   /* create state log file */
   state_file_name = UP_get_temp_filename(NULL, "state");
-  state = fopen(state_file_name, "a");
-  dieif( state == NULL ); /* shouold never happen */
-  options.state = state;
+  statefd = open(state_file_name, O_RDWR | O_CREAT, S_IRUSR | S_IRGRP | S_IROTH);		// rights can be revoked by setting umask
+  if (statefd < 0) {
+  	fprintf(stderr, "Could not open/create state file %s: %s\n", state_file_name, strerror(errno));
+  	die;
+  }
+  options.statefd = statefd;
 
   /* initialise logging to state file */
   lg_ctx = LG_ctx_new();
-  app = LG_app_get_file_info_dump(state);
+  app = LG_app_get_filedes_dump(statefd);
   LG_app_set_level(app, LG_ALL);
   LG_app_set_formatter(app, LG_frm_dbupdate_prepared());
   LG_ctx_add_appender(lg_ctx, app);
@@ -1275,7 +1277,7 @@ int main(int argc, char **argv)
   
   /* close down the logging and delete the state log file */
   LG_ctx_free(lg_ctx);
-  fclose(state);
+  close(statefd);
   if ( state_file_name )
   {
     if (options.save == 0)

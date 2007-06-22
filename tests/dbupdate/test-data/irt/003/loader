@@ -22,7 +22,7 @@ mntner:       TEST-DBM-MNT
 descr:        Mntner for RIPE DBM objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-DBM-MNT
 referral-by:  TEST-DBM-MNT
@@ -36,7 +36,7 @@ mntner:       RIPE-NCC-HM-MNT
 descr:        RIPE-NCC Hostmaster Maintainer
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+auth:         MD5-PW $1$12345678$NN4rSWChzZ4bTTjt90C8L.    # hostmaster
 upd-to:       dbtest@ripe.net
 mnt-by:       RIPE-NCC-HM-MNT
 referral-by:  TEST-DBM-MNT
@@ -90,7 +90,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 upd-to:       dbtest@ripe.net
 mnt-nfy:      dbtest@ripe.net
-auth:         CRYPT-PW asMa4KAw.CNBs   # test-mnt
+auth:         MD5-PW $1$12345678$DZettN2OiFrUh7nWm5Hu/1   # test-mnt
 notify:       dbtest@ripe.net
 mnt-by:       TEST-MNT
 referral-by:  TEST-DBM-MNT
@@ -120,7 +120,7 @@ signature:    PGPKEY-4EA45E47
 encryption:   PGPKEY-4EA45E47
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW agl7a6gyad/e6   # irt
+auth:         MD5-PW $1$12345678$wza1MMo7nPUnBHNJMOMq3.   # irt
 irt-nfy:      case003-1@ripe.net
 notify:       case003-2@ripe.net
 mnt-by:       TEST-MNT

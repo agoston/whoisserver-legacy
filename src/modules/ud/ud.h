@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.15 $
+  $Revision: 1.1.14.1 $
 
   Status: NOT REVUED, NOT TESTED
 
@@ -35,7 +35,7 @@
 #define ERROR_U_MEM     0x0001 /* memory allocation error */
 #define ERROR_U_DBS     0x0002 /* database (sql) error */
 #define ERROR_U_OBJ     0x0004 /* referential integrity failure */
-#define ERROR_U_AUT     0x0008 /* membership authirization failure */
+#define ERROR_U_AUT     0x0008 /* membership authorization failure */
 
 #define ERROR_U_BADOP   0x0010 /* unknown operation */
 #define ERROR_U_COP     0x0020 /* conflicting operation (e.g. deletig non-existent object) */

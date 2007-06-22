@@ -1,0 +1,34 @@
+
+# CASE 1: We try to create route6 object for ::/16,AS200
+# testing various attributes where community and as number can be present
+# aggr-bndry
+# aggr-mtd
+# components
+# inject
+%
+% requires initial objects to be loaded
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+route6:  ::/16
+descr:   test route
+origin:  AS200
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net
+source:  DB-TEST
+aggr-bndry: AS1.234:AS-mytest:AS3:AS-test:AS5.234
+aggr-mtd: outbound AS1.234:AS-mytest:AS3:AS-test:AS5.234
+components: ATOMIC protocol BGP4 community.contains(30.65535:2)
+inject: at 193.0.0.1
+inject: at rtrs-myset:AS2:rtrs-test:AS2.34
+inject: at AS2.34:rtrs-myset:AS2:rtrs-test:AS2.34
+inject: action community = {20.2:20};
+inject: upon HAVE-COMPONENTS {::/8}
+
+
+password: auth

@@ -151,23 +151,20 @@ RP_tree_add (
   Returns: RX_OK or RX_NOTREE if no such tree can be found.
 +++++++++++*/
 
-int 
-RP_tree_del ( rx_tree_t *tree )
+int RP_tree_del(rx_tree_t * tree)
 {
-int cnt;
+	int cnt;
 
-  if( tree->top_ptr != NULL ) {
-    cnt = rx_delete_tree(tree, tree->top_ptr, 255, 0, 0, NULL);
-    LG_log(rp_context, LG_INFO,
-               "tree at %08x: %d nodes deleted", tree, cnt);        
-         if (cnt != tree->num_nodes){
-             LG_log(rp_context, LG_ERROR,
-                "tree at %p: %d nodes deleted, should be %d", 
-                tree, cnt, tree->num_nodes);
-             return  RP_NOYETI;
-         }
-  }
-  return RP_OK;
+	if (tree->top_ptr != NULL) {
+		int num_nodes = tree->num_nodes;
+		cnt = rx_delete_tree(tree, tree->top_ptr, 16777256, 0, 0, NULL);
+		LG_log(rp_context, LG_INFO, "tree at %08x: %d nodes deleted", tree, cnt);
+		if (cnt != num_nodes) {
+			LG_log(rp_context, LG_ERROR, "tree at %p: %d nodes deleted, should be %d", tree, cnt, num_nodes);
+			return RP_NOYETI;
+		}
+	}
+	return RP_OK;
 }
 
 

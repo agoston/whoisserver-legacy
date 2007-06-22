@@ -35,8 +35,6 @@
 #include <sys/time.h>
 #include <assert.h>
 
-#undef fclose
-
 /*
 LG_device_t* LG_dev_get_stdout() {
   LG_device_t* dev;
@@ -60,15 +58,43 @@ LG_device_t* LG_dev_get_file(FILE* f) {
   return dev;
 }
 
+LG_device_t* LG_dev_get_filedes(int fd) {
+  LG_device_t* dev;
+
+  dev = g_malloc(sizeof(LG_device_t));
+  dev->destroy_func = NULL;
+  dev->write_func = &LG_dev_vasprintf;
+  dev->data = (void *)fd;
+
+  return dev;
+}
+
+/** this function is only intended to be used with stdout or stderr!!! */
+static pthread_mutex_t LG_dev_vfprintf_lock = PTHREAD_MUTEX_INITIALIZER;
 void LG_dev_vfprintf(LG_device_t* dev, const char* message, va_list ap) {
   FILE* f;
-
   f = (FILE*) dev->data;
-  lockf(fileno(f), F_LOCK, 0);
-  fseek(f, 0, SEEK_END);
+  
+  pthread_mutex_lock(&LG_dev_vfprintf_lock);
   vfprintf(f, message, ap);
   fflush(f);
-  lockf(fileno(f), F_ULOCK, 0);
+  pthread_mutex_unlock(&LG_dev_vfprintf_lock);
+}
+
+/** writes to a file descriptor, using a buffer. Locks the end of the file. */
+void LG_dev_vasprintf(LG_device_t* dev, const char* message, va_list ap) {
+	char *buf;
+	int len;
+	int fd = (int)dev->data;
+	off_t currpos;
+	
+	len = vasprintf(&buf, message, ap);
+	currpos = lseek(fd, 0, SEEK_END);
+	lockf(fd, F_LOCK, 0);
+	write(fd, buf, len);
+	lseek(fd, currpos, SEEK_SET);
+	lockf(fd, F_ULOCK, 0);
+	free(buf);
 }
 
 
@@ -376,7 +402,6 @@ LG_device_t* LG_dev_daily(char* path) {
   */
   clean_path  = g_strdup(path);  //TB removed (maybe)
 
-
   dev = g_malloc(sizeof(LG_device_t));
   dev->destroy_func = LG_dev_daily_destroy;
   dev->write_func = &LG_dev_vfprintf_daily;
@@ -396,6 +421,7 @@ LG_appender_t* LG_app_get_daily_info_dump(gchar* path) {
   return app;
 }
 
+/** You MUSTN'T USE this for anything else than stdout or stderr!!! */ 
 LG_appender_t* LG_app_get_file_info_dump(FILE* f) {
   LG_appender_t* app;
 
@@ -407,4 +433,15 @@ LG_appender_t* LG_app_get_file_info_dump(FILE* f) {
   return app;
 }
 
+/** this is just a normal appender, currently only used by dbupdate */
+LG_appender_t* LG_app_get_filedes_dump(int fd) {
+  LG_appender_t* app;
+
+  app = g_malloc(sizeof(LG_appender_t));
+  app->level = LG_INFO+LG_WARN+LG_ERROR+LG_SEVERE;
+  app->device = LG_dev_get_filedes(fd);
+  app->formatter = LG_frm_get_replicator();
+
+  return app;
+}
 

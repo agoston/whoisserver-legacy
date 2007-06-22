@@ -1,0 +1,37 @@
+% This is the MyDB Whois server.
+
+% Information related to '2001:0658:021A::/128'
+
+inet6num:     2001:0658:021A::/128
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+status:       ALLOCATED-BY-LIR
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+irt:          IRT-TWO
+address:      Singel 258
+e-mail:       dbtest@ripe.net
+admin-c:      TP22-DB-TEST
+tech-c:       TP22-DB-TEST
+auth:         MD5-PW $1$12345678$wza1MMo7nPUnBHNJMOMq3.   # irt
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+% Information related to '2001:0658:021A::/48AS3333'
+
+route6:       2001:0658:021A::/48
+descr:        RIPE-NCC
+origin:       AS3333
+admin-c:      TP1-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+

@@ -2,15 +2,12 @@
 # CASE 22: We try to create inetnum object
 # with status ASSIGNED PI 
 # parent object has status SUB-ALLOCATED PA
-%
-% requires initial objects to be loaded
 #
 # create inetnum object 
 #
 #FAILURE
 #
 # RESULT 22: The creation will fail
-#            *** but succeed at the moment until the checks are tightened
 
 inetnum:      192.168.128.0 - 192.168.255.255
 netname:      RIPE-NET

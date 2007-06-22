@@ -1,0 +1,13 @@
+# CASE 002: proxy denial over v6 test
+#           set our IP to trustpass=0 in the ripadmin table,
+#           then issue a simple query over v6, passing a v4 address
+#           Also check denial count increase
+#
+# NOTE: This test relies on running on the same machine as the server!
+#
+#FAILURE
+#
+# RESULT 002: The query will fail.
+$EXEC_BEFORE=$DATADIR/query/proxy/002/acl_setup.sh
+$EXEC_AFTER=$DATADIR/query/proxy/002/access_check.sh
+$QUERY_AF=INET6

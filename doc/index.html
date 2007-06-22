@@ -20,12 +20,12 @@
 <H3>Introduction</H3>
 
 <P>
-Welcome to Version 3.0 of the RIPE Whois Database Software. This
+Welcome to Version 3.x of the RIPE Database Software. This
 version is completely different from the previous versions
-of the software, i.e. v2.3.2 and below.
+of the software, i.e. v2.x and below.
 
 <P>
-For instance, Version 3.0 of the Software uses <A HREF="#rpsl">RPSL</A>.
+For instance, Version 3.x of the Software uses <A HREF="#rpsl">RPSL</A>.
 The old object syntax, based on 
 <A HREF="http://www.ripe.net/ripe/docs/ripe-181.html">RIPE-181</A>,
 is not supported anymore, except that you can convert RIPE-181 objects
@@ -35,23 +35,24 @@ RIPE-181 to RPSL migration page</A> that the RIPE NCC has prepared
 to ease your transition from RIPE-181 to RPSL.
 
 <P>
-Furthermore, the whole Whois database software has been completely
-rewritten. It now stores the objects in a SQL backend instead than
+Furthermore, the whole RIPE database software was completely
+rewritten. It stores the objects in a SQL backend instead of
 in flat files, thus making it more scalable. Many new features
 have been added, such as:
 
 <UL TYPE=CIRCLE>
-<LI>Dynamic access control and authorization
+<LI>Dynamic access control and authorisation
 <LI>Loading in memory the primary keys of certain types of objects
 (the so-called <EM>radix tree</EM>)
 <LI>A runtime administrative interface 
 <LI>The parsing of MIME messages for database updates
+<LI>Syncronous and web interfaces for updates and queries
 </UL>
 
 to name just a few.
 
 <P>
-The languages used in v3.0 are C/C++ (PERL was used in v2).
+The language used in v3.x is C (PERL was used in v2).
 
 
 <A NAME="compiling">
@@ -59,47 +60,23 @@ The languages used in v3.0 are C/C++ (PERL was used in v2).
 
 <P>
 For detailed instructions about compiling and installing the RIPE
-Whois Database Software, please read the files <A HREF="../README">README</A>
+Database Software, please read the files <A HREF="../README">README</A>
 and <A HREF="../INSTALL">INSTALL</A>, provided with this distribution.
 
 
 <P>
-The software is being developed and tested in the Solaris environment.
-We managed to make it run on Solaris 2.6, 7 and 8 for SPARC, and on
-Solaris 7 for Intel. More effort will be spent on portability in the
-next few months.
-
+The software is being developed and tested in the Linux Debian environment.
+We do not test it on any other platform.
 
 <A NAME="docs">
 <H3>Documentation</H3>
 
 <P>
-This package includes for you to read some 
+This package includes, for you to read, some 
 <A HREF="../design/specs/README.html">design specifications</A>;
 you can also <A HREF="global/index.html">browse</A> through our source code
 or <A HREF="cxref/index.html">view</A> the source files commented using 
 CXREF style.
-
-<P>
-In the not-so-far future, we will include more documentation as to how
-the RIPE Whois Database Software v3.0 works, and some manpages.
-
-
-<A NAME="transition">
-<H3>The transition from RIPE Database v2 to v3</H3>
-
-<P>
-At a certain point in future, the RIPE Database will switch to RPSL format,
-and abandon the RIPE-181 format. This will not happen in a sudden way,
-however. There is a transition plan, described in a "Transition" document
-that you can find linked 
-<A HREF="http://www.ripe.net/ripencc/pub-services/db/rpsl/">here</A>.
-
-<P>
-Please check the 
-<A HREF="http://www.ripe.net/ripencc/pub-services/db/rpsl/transition-v3.pdf">transition</A>
-document for the various phases and timelines of the transition.  The
-transition date for the RIPE Whois server is 23 April 2001.
 
 
 <A NAME="rpsl">
@@ -119,15 +96,9 @@ on RPSL given by the RIPE NCC Database group.
 <H3>Where Can I Get Help?</H3>
 
 <P>
-If you have any comments, questions, requests; or if you find any bug in
-any way you might test this version 3.0, please let us know. You can
-either write to <A HREF="mailto:dbrip@ripe.net">dbrip@ripe.net</A>,
-which is the address for Whoisd v3.0-related issues at the RIPE NCC, or
-you can send it to the 
-<A HREF="mailto:db-beta@ripe.net">db-beta@ripe.net</A> discussion list.
-Please note that only subscribers are allowed to post on this list;
-follow the instructions in the <A HREF="../README">README</A> file for
-how to subscribe.
+If you have any comments, questions, requests, or if you find any bug in
+version 3.x, please let us know. You can contact our Customer Services
+Department at <A HREF="mailto:ripe-dbm@ripe.net">ripe-dbm@ripe.net</A>.
 
 </TD>
 </TR>

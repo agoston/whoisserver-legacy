@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.28 $
+  $Revision: 1.2 $
 
   Semi-internal header file for UD module
 
@@ -184,7 +184,7 @@ void get_rx_data(void *element_data, void *tr_ptr);
 void ud_each_primary_key_select(void *element_data, void *result_ptr);
 
 char *convert_rf(const char *avalue, int *type, int *port);
-int convert_as_range(const char *as_range, int *begin, int *end);
+int convert_as_range(const char *as_range, long *begin, long *end);
 time_t convert_time(const char *asc_time);
 
 int UD_lock_serial(Transaction_t *tr);

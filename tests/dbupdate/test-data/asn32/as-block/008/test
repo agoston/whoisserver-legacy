@@ -1,0 +1,26 @@
+# CASE 8: We create an AS and try to query this AS.
+# Two hierarchical as-blocks exist.
+# 16 bit
+# currently FAILS: dbupdate dies because it finds two parent as-block objects.
+# 
+# create AS object
+#
+#SUCCESS
+#
+# RESULT 8: The creation will succeed
+
+
+password: hostmaster
+override: password
+
+aut-num: AS102
+descr: test
+as-name: myasname
+admin-c: TP1-DB-TEST
+tech-c: TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20060101
+source:       DB-TEST
+
+

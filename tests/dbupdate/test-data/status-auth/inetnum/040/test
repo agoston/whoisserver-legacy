@@ -1,0 +1,26 @@
+# inetnum status tests
+# CASE 40: We try to modify inetnum object
+# with status ASSIGNED ANYCAST and change to ASSIGNED PA
+#
+# create inetnum object 
+#
+#FAILURE
+#
+# RESULT 40: The modify will fail
+
+
+inetnum:      192.168.200.0 - 192.168.200.255
+netname:      RIPE-NET1
+descr:        /24 
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PA
+mnt-by:       END-USER-MNT
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: END-USER
+password: LIR
+

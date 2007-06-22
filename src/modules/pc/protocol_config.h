@@ -2,7 +2,7 @@
 #define READ_PROTOCOL_CONFIG
 
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   Protocol config module (pc).  This is the protocol that the admin uses to
   talk to the server.
@@ -73,7 +73,8 @@ http://cs.wwc.edu/~bellmi/ANSI_escape_codes.html
 #define HELP_HELP         "Print help information."
 #define HELP_QUIT         "Quit the server."
 #define HELP_SAVE         "Save a structure/object."
-#define HELP_SAVE_ACCESS_TREE "Saves the access control tree."
+#define HELP_SAVE_ACCESS_TREE "Saves the access tree to the RIPADMIN database."
+#define HELP_SAVE_ACL_TREE "Saves the ACL tree to the RIPADMIN database."
 #define HELP_SHOW         "Show the values of: (type show for a list)"
 #define HELP_SHOW_ERROR   "Invalid show command: "
 #define HELP_SHOW_CONST   "The values of a constant used in the server."
@@ -97,11 +98,17 @@ http://cs.wwc.edu/~bellmi/ANSI_escape_codes.html
                           "(This is set from values in properties object.)"
 #define HELP_SET_PROPS    "Set the values of properties in the properties file."
 #define HELP_SET_AUTO_SAVE "Sets the auto saving of the access tree to SQL."
-#define HELP_SET_ACL      "Create/modify acl entries[A for a given address or prefix.\n" \
+#define HELP_SET_ACL      "Create/modify acl entries for a given address or prefix.\n" \
 "\tSyntax:  set acl ip[/prefixlength] column=value,column=value...\n" \
 "\tColumn names as in acl display. Unset columns are inherited."
+#define HELP_SET_ACCESS   "Create/modify access entries for a given address.\n" \
+"\tSyntax:  set access ip column=value,column=value...\n" \
+"\tColumn names as in access display. Unset columns are set to 0."
 #define HELP_SET_NODENY   "Set the deny counter in the access tree to 0\n"\
                           "\tSyntax:  set nodeny ip"
+#define HELP_SET_ACCESS_TREE "Loads the access tree from the RIPADMIN database."
+#define HELP_SET_ACL_TREE "Loads the ACL tree from the RIPADMIN database."
+#define HELP_SET_AAA_CACHE "Reloads the AAA cache from the RIPADMIN database."
 #define HELP_STOP         "Stop activities (type stop for a list)"
 #define HELP_STOP_QUERY   "Stop a query thread (arguments are: <socket #> <thread #>)"
 #define HELP_SET_UPDATES  "Pause/resume all update threads: \n"\
@@ -156,8 +163,9 @@ struct _command command[] = {
  * Contains the save commands
 +*/
 struct _command save[] = {
-  {"access_tree", save_access_tree, HELP_SAVE_ACCESS_TREE },
-  {NULL         , NULL            , NULL                  }
+	{"access_tree", save_access_tree, HELP_SAVE_ACCESS_TREE},
+	{"acl_tree", save_acl_tree, HELP_SAVE_ACL_TREE},
+	{NULL, NULL, NULL}
 };
 
 /*+
@@ -183,17 +191,21 @@ struct _command show[] = {
  * Contains the set commands
 +*/
 struct _command set[] = {
-  {"acl"      , set_acl       , HELP_SET_ACL       },
-  {"nodeny"   , set_nodeny    , HELP_SET_NODENY    },
-  {"updates"  , set_updates   , HELP_SET_UPDATES   },
-  {"queries"  , set_queries   , HELP_SET_QUERIES   },
+	{"access_tree", set_access_tree, HELP_SET_ACCESS_TREE},
+	{"acl_tree", set_acl_tree, HELP_SET_ACL_TREE},
+	{"aaa_cache", set_aaa_cache, HELP_SET_AAA_CACHE},
+	{"acl", set_acl, HELP_SET_ACL},
+	{"access", set_access, HELP_SET_ACCESS},
+	{"nodeny", set_nodeny, HELP_SET_NODENY},
+	{"updates", set_updates, HELP_SET_UPDATES},
+	{"queries", set_queries, HELP_SET_QUERIES},
 /*  {"err"      , set_err       , HELP_SET_ERR       },*/
 /*  {"macro"    , set_macro     , HELP_SET_MACRO     }, */
 /*  {"counter", set_counter   , HELP_SET_COUNTER   },*/
-  {"auto_save",  set_auto_save, HELP_SET_AUTO_SAVE },
-  {"initrx"   ,  set_initrx   , HELP_SET_INITRX    },
-  {"dynamic"  ,  set_dynamic  , HELP_SET_DYNAMIC   },
-  {NULL       , NULL          , NULL               }
+	{"auto_save", set_auto_save, HELP_SET_AUTO_SAVE},
+	{"initrx", set_initrx, HELP_SET_INITRX},
+	{"dynamic", set_dynamic, HELP_SET_DYNAMIC},
+	{NULL, NULL, NULL}
 };
 
 struct _command stop[] = {

@@ -23,7 +23,7 @@ Reply-To: ripe-dbm@ripe.net
   <xsl:template match="notification_header_to">To: <xsl:value-of select="to/text()"/>
   </xsl:template>
   <xsl:template match="notification_header_from">
-From: RIPE Database Notifications &lt;unread@ripe.net&gt;</xsl:template>
+From: RIPE Database Notifications &lt;bitbucket@ripe.net&gt;</xsl:template>
   <xsl:template match="notification_header_subject">
 Subject: Requested RIPE database object changes
 Reply-To: ripe-dbm@ripe.net

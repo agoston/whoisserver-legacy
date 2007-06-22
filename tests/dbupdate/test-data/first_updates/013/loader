@@ -23,7 +23,7 @@ mntner:       TEST-DBM-MNT
 descr:        Mntner for RIPE DBM objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW xzSJqgOS7O2ZI   # test-dbm
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-DBM-MNT
 referral-by:  TEST-DBM-MNT
@@ -37,7 +37,7 @@ mntner:       RIPE-NCC-HM-MNT
 descr:        RIPE-NCC Hostmaster Maintainer
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         CRYPT-PW qw9MK.3f3f5k2    # hostmaster
+auth:         MD5-PW $1$12345678$NN4rSWChzZ4bTTjt90C8L.    # hostmaster
 upd-to:       dbtest@ripe.net
 mnt-by:       RIPE-NCC-HM-MNT
 referral-by:  TEST-DBM-MNT
@@ -93,7 +93,7 @@ admin-c:      TP1-DB-TEST
 upd-to:       dbtest@ripe.net
 referral-by:  TEST-DBM-MNT
 mnt-by:       TEST-MNT
-auth:         CRYPT-PW dbOnSHFpKZTBU  # auth
+auth:         MD5-PW $1$12345678$Y5n.GDFOxpXd2S1etuHFa/  # auth
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 

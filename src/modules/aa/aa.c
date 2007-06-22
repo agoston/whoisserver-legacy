@@ -4,15 +4,15 @@
   access authorisation (aa). aa.c - functions to check access rights
   for less frequent clients (ripupdate, networkupdate, mirror).
 
-  Status: NOT REVUED, NOT TESTED,
+  Status: NOT REVUED, NOT TESTED, 
 
   Design and implementation by: Marek Bukowy
 
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
-
+ 
   All Rights Reserved
-
+  
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -20,7 +20,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-
+  
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -31,7 +31,7 @@
 
 #include "rip.h"
 
-/*
+/* 
 > +---------------+---------------------+------+-----+---------+-------+
 > | Field         | Type                | Null | Key | Default | Extra |
 > +---------------+---------------------+------+-----+---------+-------+
@@ -46,121 +46,151 @@
 */
 
 typedef struct {
-  int ripupdate;
-  int netupdate;
-  int mirror;
+	ip_prefix_t pref;
+	char source[32];
+	int ripupdate;
+	int netupdate;
+	int mirror;
 } aa_rights;
 
-void aa_parserow(SQ_result_set_t * result, aa_rights * rights) {
+/** The AAA cache itself */
+GList *aaa[MAX_IPSPACE_ID+1];
+
+/* OPTME: we could have separate lock for each tree, but since this operation will be called
+ * a few times a minute (worst case), I don't care now - agoston, 2006-10-20 */
+pthread_mutex_t aaa_lock = PTHREAD_MUTEX_INITIALIZER;
+
+void aa_compose_query(ip_space_t space, char *buf, unsigned len)
+{
+	switch (space) {
+	case IP_V4:
+		snprintf(buf, len, "SELECT ripupdate, netupdate, mirror, source, prefix_length, prefix FROM aaa");
+		break;
+
+	case IP_V6:
+		snprintf(buf, len, "SELECT ripupdate, netupdate, mirror, source, prefix_length, prefix1, prefix2, prefix3, prefix4  FROM aaa6");
+		break;
+
+	default:
+		die;
+	}
+}
+
+void AA_load() {
+	int i;
+	char buf[1024];
+	SQ_result_set_t *result;
+	SQ_connection_t *con = NULL;
 	SQ_row_t *row;
 
-	/* zero the rights - so if we don't get any results, we have a valid
-	   answer "no rights" */
+	pthread_mutex_lock(&aaa_lock); 
+	 	
+	for (i = MIN_IPSPACE_ID; i <=MAX_IPSPACE_ID; i++) {
+		/* clear the list */
+		wr_clear_list(&aaa[i]);
+		
+		/* get the query */
+		aa_compose_query(i, buf, sizeof(buf));
+		
+		/* open the database */
+		if ((con = AC_dbopen_admin()) == NULL) {
+			fprintf(stderr, "ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
+			die;
+		}
 
-	rights->ripupdate = 0;
-	rights->netupdate = 0;
-	rights->mirror = 0;
+		/* select the most specific entry */
+		if (SQ_execute_query(con, buf, &result) == -1) {
+			fprintf(stderr, "ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
+			die;
+		}
 
-	if ((row = SQ_row_next(result)) != NULL) {
-		/* read in the order of query */
-		if (sscanf(SQ_get_column_string_nocopy(result, row, 0),
-				   "%u", &rights->ripupdate) < 1) {
-			die;
+		/* read in the rights from the resulting rows */
+		while ((row = SQ_row_next(result)) != NULL) {
+			aa_rights *rights = calloc(1, sizeof(aa_rights));
+			
+			dieif (sscanf(SQ_get_column_string_nocopy(result, row, 0), "%u", &rights->ripupdate) < 1);
+			dieif (sscanf(SQ_get_column_string_nocopy(result, row, 1), "%u", &rights->netupdate) < 1);
+			dieif (sscanf(SQ_get_column_string_nocopy(result, row, 2), "%u", &rights->mirror) < 1);
+			dieif (sscanf(SQ_get_column_string_nocopy(result, row, 3), "%s", &rights->source) < 1);
+			
+			/* now comes the prefix */
+			switch (i) {
+			case IP_V4:
+				dieif(IP_pref_f2b_v4(&rights->pref, SQ_get_column_string_nocopy(result, row, 5), SQ_get_column_string_nocopy(result, row, 4)) != IP_OK);
+				break;
+			
+			case IP_V6:
+				dieif(IP_pref_f2b_v6_32(&rights->pref,
+					SQ_get_column_string_nocopy(result, row, 5),
+					SQ_get_column_string_nocopy(result, row, 6),
+					SQ_get_column_string_nocopy(result, row, 7),
+					SQ_get_column_string_nocopy(result, row, 8), SQ_get_column_string_nocopy(result, row, 4)) != IP_OK);
+
+				dieif(rights->pref.ip.space != IP_V6);	/* v4 or v4-mapped address in acl6 table!!! */
+				break;
+			}
+			
+			aaa[i] = g_list_prepend(aaa[i], rights);
 		}
-		if (sscanf(SQ_get_column_string_nocopy(result, row, 1),
-				   "%u", &rights->netupdate) < 1) {
-			die;
-		}
-		if (sscanf(SQ_get_column_string_nocopy(result, row, 2),
-				   "%u", &rights->mirror) < 1) {
-			die;
-		}
+
+		/* release everything */
+		SQ_free_result(result);
+
+		/* Close connection */
+		SQ_close_connection(con);
 	}
+
+	pthread_mutex_unlock(&aaa_lock); 
 }
 
-
-void aa_compose_query(ip_addr_t *address, char *source, char *buf, unsigned len)
-{
-	switch (address->space) {
-		case IP_V4:
-			snprintf(buf,len, "SELECT ripupdate, netupdate, mirror FROM aaa WHERE %u "
-												" BETWEEN prefix AND (prefix+(1<<(32-prefix_length))-1)"
-												" AND source = '%s' "
-												" ORDER BY prefix_length DESC LIMIT 1" /* take the most specific entry */,
-  											IP_addr_b2v4_addr(address), source );
-  		break;
-
-  	case IP_V6:
-			snprintf(buf,len, "SELECT ripupdate, netupdate, mirror FROM aaa6 WHERE "
-												"CASE prefix_length&224 "
-												"WHEN 0 THEN %1$u&(((1<<prefix_length)-1)<<(32-prefix_length)) = prefix1 "
-												"WHEN 32 THEN %1$u = prefix1 AND %2$u&(((1<<(prefix_length-32))-1)<<(64-prefix_length)) = prefix2 "
-												"WHEN 64 THEN %1$u = prefix1 AND %2$u = prefix2 AND %3$u&(((1<<(prefix_length-64))-1)<<(96-prefix_length)) = prefix3 "
-												"WHEN 96 THEN %1$u = prefix1 AND %2$u = prefix2 AND %3$u = prefix3 AND %4$u&(((1<<(prefix_length-96))-1)<<(128-prefix_length)) = prefix4 "
-												"WHEN 128 THEN %1$u = prefix1 AND %2$u = prefix2 AND %3$u = prefix3 AND %4$u = prefix4 "
-												"END AND source = '%5$s' ORDER BY prefix_length DESC LIMIT 1",
-												IP_addr_b2v6_addr(address, 0), IP_addr_b2v6_addr(address, 1),
-												IP_addr_b2v6_addr(address, 2), IP_addr_b2v6_addr(address, 3),
-												source);
-  		break;
-
-  	default:
-  		die;
+void AA_init() {
+	int i;
+	for (i = MIN_IPSPACE_ID; i <=MAX_IPSPACE_ID; i++) {
+		aaa[i] = NULL;
 	}
+	
+	AA_load();
 }
-
 
 
 /* finds and fills in the struct */
-void aa_find(ip_addr_t *address, char *source, aa_rights *rights) {
-	SQ_result_set_t *result;
-	SQ_connection_t *con = NULL;
-	char buf[2048];
-
-	/* get the query */
-	aa_compose_query(address, source, buf, sizeof(buf));
-
-	/* open the database */
-
-	if ((con = AC_dbopen_admin()) == NULL) {
-		fprintf(stderr, "ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
-		die;
+aa_rights *aa_find(ip_addr_t * address, char *source)
+{
+	GList *pitem;
+	aa_rights *ret = NULL;
+	
+	pthread_mutex_lock(&aaa_lock);
+	
+	for (pitem = g_list_first(aaa[address->space]); pitem != NULL; pitem = g_list_next(pitem)) {
+		aa_rights *rights = (aa_rights *) pitem->data;
+		if (!strcmp(source,rights->source) && IP_addr_in_pref(address, &rights->pref)) {
+			ret = rights;
+			break;
+		}
 	}
-
-	/* select the most specific entry */
-	if (SQ_execute_query(con, buf, &result) == -1) {
-		fprintf(stderr, "ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
-		die;
-	}
-
-	/* read in the rights from the resulting row */
-	aa_parserow(result, rights);
-
-	/* release everything */
-	SQ_free_result(result);
-
-	/* Close connection */
-	SQ_close_connection(con);
+	
+	pthread_mutex_unlock(&aaa_lock);
+	return ret;
 }
 
 
 int AA_can_networkupdate( ip_addr_t *address, char *source )
 {
-  aa_rights myrights;
-  aa_find(address, source, &myrights);
-  return (myrights.netupdate != 0);
+  aa_rights *myrights = aa_find(address, source);
+  if (myrights) return (myrights->netupdate != 0);
+  return 0;
 }
 
 int AA_can_ripupdate( ip_addr_t *address, char *source )
 {
-  aa_rights myrights;
-  aa_find(address, source, &myrights);
-  return (myrights.ripupdate != 0);
+  aa_rights *myrights = aa_find(address, source);
+  if (myrights) return (myrights->ripupdate != 0);
+  return 0;
 }
 
 int AA_can_mirror( ip_addr_t *address, char *source )
 {
-  aa_rights myrights;
-  aa_find(address, source, &myrights);
-  return (myrights.mirror != 0);
+  aa_rights *myrights = aa_find(address, source);
+  if (myrights) return (myrights->mirror != 0);
+  return 0;
 }

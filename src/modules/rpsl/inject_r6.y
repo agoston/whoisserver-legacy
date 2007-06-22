@@ -110,10 +110,8 @@ mp_filter_prefix_list: mp_filter_prefix_list_prefix
 | mp_filter_prefix_list ',' mp_filter_prefix_list_prefix 
 ;
 
-mp_filter_prefix_list_prefix: TKN_PRFXV4 
-| TKN_PRFXV6
+mp_filter_prefix_list_prefix: TKN_PRFXV6
 | TKN_PRFXV6DC
-| TKN_PRFXV4RNG 
 | TKN_PRFXV6RNG
 | TKN_PRFXV6DCRNG
 ;

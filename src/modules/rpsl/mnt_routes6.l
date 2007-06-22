@@ -211,3 +211,4 @@ mnt_routes6_reset ()
 }
 
 
+int yywrap() { return 1; }

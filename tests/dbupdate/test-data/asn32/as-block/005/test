@@ -1,0 +1,24 @@
+# CASE 5: We try create 16bit AS object and query it as AS0.n (without -r)
+# parent object exist
+# as a query result, there should be 1 16-bit as-block object and 1 aut-num object
+# and maybe some warning that we have converted the query?
+#
+# create aut-num object
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed
+
+
+password: hostmaster
+
+aut-num:      AS200
+as-name:      ASTEST
+descr:        TEST TELEKOM
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20010101
+source:       DB-TEST
+

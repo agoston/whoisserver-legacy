@@ -6,7 +6,7 @@
 
 organisation:  ORG-TEST1-DB-TEST
 org-name:      EXAMPLE TTTTTT
-org-type:      NON-REGISTRY
+org-type:      OTHER
 address:       Address
 admin-c:       TP1-DB-TEST
 tech-c:        TP1-DB-TEST

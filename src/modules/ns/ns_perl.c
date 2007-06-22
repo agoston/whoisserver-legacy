@@ -1,5 +1,5 @@
 /*
- * $Id: ns_perl.c,v 1.2 2005/10/25 12:30:00 katie Exp $
+ * $Id: ns_perl.c,v 1.4 2006/08/07 11:20:28 katie Exp $
  */
 
 #include <EXTERN.h>             /* from the Perl distribution     */
@@ -167,22 +167,35 @@ gchar *ns_find_delcheck_conf(LG_context_t * lg_context, gchar * domain)
       }
     } else if (dot_count == 4) {        /* slash 24 */
       result = g_strdup_printf("%sipv4-24", prefix);
+    } else if (dot_count == 2) { /* slash 8 */
+      result = g_strdup_printf("%sipv4-8", prefix);
     }
   } else {                      /* ipv6 */
-    if (dot_count == 9) {       /* slash 32 */
+    if ((dot_count == 9) ||  // /32
+        (dot_count == 8) ||  // /28
+        (dot_count == 7) ||  // /24
+        (dot_count == 6) ||  // /20
+        (dot_count == 5) ||  // /16
+        (dot_count == 4) ) { // /12
       result = g_strdup_printf("%sipv6-32", prefix);
-    } else if (dot_count == 10) {       /* slash 36 */
-      result = g_strdup_printf("%sipv6-36", prefix);
-    } else if (dot_count == 13) {       /* slash 48 */
+    } else if ( (dot_count == 13) ||
+                (dot_count == 17) ) { // /48 or /64
       result = g_strdup_printf("%sipv6-48", prefix);
     }
   }
+
+  if (ns_has_suffix(domain,"e164.arpa")) {
+    result = g_strdup_printf("%senum", prefix);
+  }
+  
   if (result == NULL) {
     LG_log(lg_context, LG_DEBUG, "no delchecker configuration found.");
   } else {
     LG_log(lg_context, LG_DEBUG, "delchecker configuration found: %s",
            result);
   }
+
+  // give nice error if this is classless delegation
 
   return result;
 }

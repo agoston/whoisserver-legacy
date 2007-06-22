@@ -47,11 +47,20 @@ Query_t Query[] = {
     },
   {
     R_SQL,
+    Q_INVERSE,
+    WK_RTRSET,
+    A_MO,
+    C_IS,
+    "SELECT member_of.object_id,0           FROM  rtr_set, member_of, mbrs_by_ref           LEFT OUTER JOIN mnt_by ON member_of.object_id = mnt_by.object_id           WHERE (mbrs_by_ref.mnt_id = 0 OR mbrs_by_ref.mnt_id = mnt_by.mnt_id)           AND member_of.set_id = mbrs_by_ref.object_id           AND rtr_set.object_id = member_of.set_id           AND rtr_set = '%s'           AND rtr_set.thread_id = 0",
+    "SQL:is/mo/WK_RTRSET"
+    },
+  {
+    R_SQL,
     Q_LOOKUP,
     WK_ASRANGE,
     A_AK,
     C_AK,
-    "SELECT object_id,0           FROM  as_block           WHERE begin_as <= %u           AND   end_as   >= %u           AND   thread_id = 0",
+    "SELECT object_id,0           FROM  as_block           WHERE begin_as <= %ld           AND   end_as   >= %ld           AND   thread_id = 0",
     "SQL:ak/ak/WK_ASRANGE"
     },
   {

@@ -1,0 +1,14 @@
+# irt tests
+# CASE 25: inetnum 1 
+#          inetnum 2 + route + irt 2
+#          query for inetnum 1
+#          
+# whois -rBc inetnum 1 
+#
+#SUCCESS
+#
+# RESULT 25: inetnum 1 + route + irt 2 returned
+
+
+
+

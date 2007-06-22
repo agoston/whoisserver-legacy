@@ -9,7 +9,7 @@
   notes:
     Tokens are defined in the associated grammar, mnt_routes_an.y.
 
-  $Id: mnt_routes_an.l,v 1.2 2005/06/24 13:03:06 peter Exp $
+  $Id: mnt_routes_an.l,v 1.3.10.1 2006/09/29 12:32:29 katie Exp $
 */
 
 /******************
@@ -212,3 +212,4 @@ mnt_routes_an_reset ()
 }
 
 
+int yywrap() { return 1; }

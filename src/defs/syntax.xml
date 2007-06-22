@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
+$Id: syntax.xml,v 1.35 2007/02/21 15:47:00 agoston Exp $
 
 -->
 
@@ -20,7 +20,7 @@ $Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
        </core>
        <front_end>
           <regex>
-              ^((AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|fltr-[A-Z0-9_-]*[A-Z0-9]):)*fltr-[A-Z0-9_-]*[A-Z0-9](:(AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|fltr-[A-Z0-9_-]*[A-Z0-9]))*$
+              ^((AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|fltr-[A-Z0-9_-]*[A-Z0-9]):)*fltr-[A-Z0-9_-]*[A-Z0-9](:(AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|fltr-[A-Z0-9_-]*[A-Z0-9]))*$
           </regex>
        </front_end>
        <description>
@@ -65,7 +65,7 @@ $Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
        </core>
        <front_end>
            <regex>
-              ^((AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|as-[A-Z0-9_-]*[A-Z0-9]):)*as-[A-Z0-9_-]*[A-Z0-9](:(AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|as-[A-Z0-9_-]*[A-Z0-9]))*$
+              ^((AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|as-[A-Z0-9_-]*[A-Z0-9]):)*as-[A-Z0-9_-]*[A-Z0-9](:(AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|as-[A-Z0-9_-]*[A-Z0-9]))*$
            </regex>
        </front_end>
        <description>
@@ -91,7 +91,7 @@ $Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
        </core>
        <front_end>
            <regex>
-              ^((AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|rs-[A-Z0-9_-]*[A-Z0-9]):)*rs-[A-Z0-9_-]*[A-Z0-9](:(AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|rs-[A-Z0-9_-]*[A-Z0-9]))*$
+              ^((AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|rs-[A-Z0-9_-]*[A-Z0-9]):)*rs-[A-Z0-9_-]*[A-Z0-9](:(AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|rs-[A-Z0-9_-]*[A-Z0-9]))*$
            </regex>
        </front_end>
        <description>
@@ -117,7 +117,7 @@ $Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
        </core>
        <front_end>
           <regex>
-              ^((AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|prng-[A-Z0-9_-]*[A-Z0-9]):)*prng-[A-Z0-9_-]*[A-Z0-9](:(AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|prng-[A-Z0-9_-]*[A-Z0-9]))*$
+              ^((AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|prng-[A-Z0-9_-]*[A-Z0-9]):)*prng-[A-Z0-9_-]*[A-Z0-9](:(AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|prng-[A-Z0-9_-]*[A-Z0-9]))*$
           </regex>
        </front_end>
        <description>
@@ -143,7 +143,7 @@ $Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
        </core>
        <front_end>
           <regex>
-              ^((AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|rtrs-[A-Z0-9_-]*[A-Z0-9]):)*rtrs-[A-Z0-9_-]*[A-Z0-9](:(AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|rtrs-[A-Z0-9_-]*[A-Z0-9]))*$
+              ^((AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|rtrs-[A-Z0-9_-]*[A-Z0-9]):)*rtrs-[A-Z0-9_-]*[A-Z0-9](:(AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|rtrs-[A-Z0-9_-]*[A-Z0-9]))*$
           </regex>
        </front_end>
        <description>
@@ -164,7 +164,7 @@ $Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
    <attribute_syntax name="members-as">
        <front_end>
           <regex>
-^((((AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|as-[A-Z0-9_-]*[A-Z0-9]):)*as-[A-Z0-9_-]*[A-Z0-9](:(AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|as-[A-Z0-9_-]*[A-Z0-9]))*)|AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))$
+              ^((((AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|as-[A-Z0-9_-]*[A-Z0-9]):)*as-[A-Z0-9_-]*[A-Z0-9](:(AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))|as-[A-Z0-9_-]*[A-Z0-9]))*)|AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))))$
           </regex>
        </front_end>
        <description>
@@ -455,9 +455,27 @@ $Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
            </regex>
        </front_end>
        <description>
-     Domain name as specified in RFC 1034 with or without
+     Domain name as specified in RFC 1034 (point 5.2.1.2) with or
+     without trailing dot (".").  The total length should not exceed
+     254 characters (octets).
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="nameserver">
+       <front_end>
+           <parser_name>nserver</parser_name>
+       </front_end>
+       <description>
+     Nameserver name as specified in RFC 1034 with or without
      trailing dot (".").  The total length should not exceed
      254 characters (octets).
+
+     The nameserver name may be optionally followed by IPv4 address
+     in decimal dotted quad form (e.g. 192.0.2.1) or IPv6 address
+     in lowercase canonical form (Section 2.2.1, RFC 4291).
+
+     The nameserver name may be followed by an IP address only when
+     the name is inside of the domain being delegated.
        </description>
    </attribute_syntax>
 
@@ -546,12 +564,14 @@ $Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
        <core>
           <regex>
           <!-- Not more than 12 words <64 char each --> 
-            ^[][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}( [][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}){0,11}$
+            ^[][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}( [][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}){0,29}$
           </regex>
        </core>   
        <front_end>
            <regex>
-           ^[][A-Z0-9"*().@]([][A-Z0-9._"*()@,&amp;:!'`+\/-]+)?([[:space:]]+[][A-Z0-9()&amp;@\/"',.:-]([][A-Z0-9._"*()@,&amp;:!'`+\/-]+)?)*$
+           <!-- ^[][A-Z0-9"*().@]([][A-Z0-9._"*()@,&amp;:!'`+\/-]+)?([[:space:]]+[][A-Z0-9()&amp;@\/"',.:-]([][A-Z0-9._"*()@,&amp;:!'`+\/-]+)?)*$ -->
+           <!-- same as backend -->
+            ^[][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}( [][A-Z0-9._"*()@,&amp;:!'`+\/-]{1,64}){0,29}$
            </regex>
        </front_end>
        <description>
@@ -565,7 +585,7 @@ $Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
    <attribute_syntax name="org-type">
        <front_end>
            <regex>
-           ^(IANA|RIR|NIR|LIR|NON-REGISTRY)$
+           ^(IANA|RIR|NIR|LIR|OTHER)$
            </regex>
        </front_end>
        <description>
@@ -575,7 +595,7 @@ $Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
      o RIR
      o NIR (There are no NIRs in the RIPE NCC service region.)
      o LIR
-     o NON-REGISTRY
+     o OTHER
        </description>
    </attribute_syntax>
 
@@ -602,41 +622,23 @@ $Id: syntax.xml,v 1.21 2005/10/25 12:30:00 katie Exp $
        </core>
        <front_end>
           <regex>
-              ^(CRYPT-PW [A-Z0-9./]{13}|MD5-PW \$1\$[A-Z0-9./]{1,8}\$[A-Z0-9./]{22}|PGPKEY-[A-F0-9]{8}|X509-[1-9][0-9]*|AUTO-[1-9][0-9]*)$
+              ^(MD5-PW \$1\$[A-Z0-9./]{1,8}\$[A-Z0-9./]{22}|PGPKEY-[A-F0-9]{8}|X509-[1-9][0-9]*|AUTO-[1-9][0-9]*)$
           </regex>
        </front_end>
        <description>
 &lt;auth-scheme&gt; &lt;scheme-info&gt;       Description
 
-CRYPT-PW      encrypted           This scheme is our weeakest form
-              password, produced  of authentication.  It is by
-              by UNIX crypt(3)    no means meant to keep out a
-              routine             determined malicious attacker.  The
-                                  crypt function is vulnerable to
-                                  exhaustive search by (lots of) fast
-                                  machines and programs to do the
-                                  searching are widely available. For
-                                  this reason it is strongly
-                                  discouraged to use encrypted
-                                  passwords also used for other
-                                  purposes such as UNIX login accounts
-                                  in this scheme. As you are
-                                  publishing the encrypted password in
-                                  the database, it is open to attack.
-                                  The usual caveats about crypt
-                                  passwords apply, so it is not very
-                                  wise to use words or combinations of
-                                  words found in any dictionary of any
-                                  language.
-
-MD5-PW        encrypted           This scheme is similar to the CRYPT-PW
-              password, produced  scheme, except that it uses an MD5
-              using the FreeBSD   hash rather than DES encryption to
-              crypt_md5           generate the password. The main
-              algorithm           benefit over CRYPT-PW is that pass 
-                                  phrases longer than 8 characters may
-                                  be used. All of the dangers of
-                                  CRYPT-PW also apply to MD5-PW.
+MD5-PW        encrypted           This scheme is the weakest form of 
+              password, produced  authentication. It is by no means 
+              using the FreeBSD   to keep out a determined malicious
+              crypt_md5           attacker. As you are publishing the
+              algorithm           encrypted password in the RIPE 
+                                  database, it is open to attack.
+                                  We strongly advise phrases longer 
+                                  than 8 characters to be used,
+                                  avoiding the use of words or
+                                  combinations of words found in any
+                                  dictionary of any language.
 
 PGPKEY-&lt;id&gt;                       Strong scheme of authentication.
                                   &lt;id&gt; is the PGP key ID to be
@@ -689,7 +691,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
    <attribute_syntax name="status-in">
        <front_end>
            <regex>
-           ^((SUB-ALLOCATED PA)|NOT-SET|EARLY-REGISTRATION|((ALLOCATED (PA|PI|UNSPECIFIED))|((ASSIGNED|LIR-PARTITIONED) (PA|PI))))$
+           ^((SUB-ALLOCATED PA)|NOT-SET|EARLY-REGISTRATION|ASSIGNED ANYCAST|((ALLOCATED (PA|PI|UNSPECIFIED))|((ASSIGNED|LIR-PARTITIONED) (PA|PI))))$
            </regex>
        </front_end>
        <description>
@@ -703,6 +705,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
      o SUB-ALLOCATED PA
      o ASSIGNED PA
      o ASSIGNED PI
+     o ASSIGNED ANYCAST
      o EARLY-REGISTRATION
      o NOT-SET
        </description>
@@ -711,7 +714,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
    <attribute_syntax name="status-i6">
        <front_end>
            <regex>
-               ^(ALLOCATED-BY-RIR|ALLOCATED-BY-LIR|ASSIGNED)$
+               ^(ALLOCATED-BY-RIR|ALLOCATED-BY-LIR|ASSIGNED|ASSIGNED ANYCAST)$
            </regex>
        </front_end>
        <description>
@@ -720,6 +723,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
      o ALLOCATED-BY-RIR
      o ALLOCATED-BY-LIR
      o ASSIGNED
+     o ASSIGNED ANYCAST
        </description>
    </attribute_syntax>
 
@@ -853,23 +857,31 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
 
    <attribute_syntax name="as-number">
        <core>
-           <regex>^.{1,7}$</regex>
+           <regex>^.{1,13}$</regex>
        </core>
        <front_end>
+<!-- 
+AS0 to AS65535 or AS1.0 to AS65535.65535
+-->
            <regex>
-              ^AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])$
+              ^AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))$
            </regex>
        </front_end>
        <description>
-     An "AS" string followed by an integer in the range from 1 to
-     65534
+     An "AS" string followed by an integer in the range from 0 to
+     65535 or an "AS" string followed by an integer in the range 
+     from 1 to 65535 followed by a "." followed by an integer in
+     the range from 0 to 65535. No spaces are allowed.
        </description>
    </attribute_syntax>
 
    <attribute_syntax name="as-block">
        <core>
+<!-- 
+ASx - ASy or ASa.b - ASy.z
+-->
            <regex>
-              ^AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4]) - AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-4])$
+              ^((AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]) - AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))|(AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]) - AS([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))$
            </regex>
        </core>
        <description>
@@ -889,10 +901,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
           </regex>
        </front_end>
        <description>
-     LIM-&lt;string&gt;
 
-     &lt;string&gt; can include alphanumeric characters, and "_" and 
-     "-" characters.
        </description>
    </attribute_syntax>
 
@@ -1149,7 +1158,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
           </regex>
        </front_end>
        <description>
-     POEM-&lt;string&gt;
+     FORM-&lt;string&gt;
 
      &lt;string&gt; can include alphanumeric characters, and "_" and
      "-" characters.
