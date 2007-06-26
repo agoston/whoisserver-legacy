@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.15 $
+  $Revision: 1.16 $
 
   Example code: A server for a client to connect to.
 
@@ -664,6 +664,7 @@ int SV_start(char *pidfile)
 	wk_regex_init();
 
 	/* Initialise the access control list. */
+	AA_init();
 	AC_build();
 	AC_acc_load();
 	AC_persistence_init();
