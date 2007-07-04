@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.13 $
+  $Revision: 1.1 $
 
   Socket module - cd_socket.c - basic read/write socket routines defined
                                 in terms of connection data structures
@@ -153,6 +153,7 @@ int
 sk_fill_rd_buf (sk_conn_st *condat)
 {
     fd_set rset;
+    struct timeval ptm_copy;
     struct timeval *ptm;
     int select_ret;
     int rd_buf_free;
@@ -162,6 +163,9 @@ sk_fill_rd_buf (sk_conn_st *condat)
     /* if timeout is 0, do blocking I/O - bogus, but that's how it is */
     if ((ptm->tv_sec == 0) && (ptm->tv_usec == 0)) {
         ptm = NULL;
+    } else {
+    	ptm_copy = condat->rd_timeout;
+    	ptm = &ptm_copy;
     }
     FD_ZERO(&rset);
     FD_SET(condat->sock, &rset);
