@@ -13,5 +13,3 @@ syntax/001
 type-based/limerick/001
 type-based/limerick/002
 type-based/limerick/003
-query/acl
-query/proxy
