@@ -1,6 +1,6 @@
 <!DOCTYPE ripe_attributes SYSTEM "attributes.dtd">
 
-<ripe_attributes version="$Revision: 1.9 $" author="$Author: denis $">
+<ripe_attributes version="$Revision: 1.10 $" author="$Author: katie $">
 
   <ripe_attribute name="abuse-mailbox" code="am">
     <description>
@@ -1628,8 +1628,7 @@
    This attribute is required in the maintainer object.  It may
    never be altered after the addition of the maintainer.  This
    attribute refers to the maintainer that created this
-   maintainer.  It may be multiple if more than one signature
-   appeared on the transaction creating the object.
+   maintainer.
     </description>
     <syntax>object-name</syntax>
     <representation>
