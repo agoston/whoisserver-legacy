@@ -2,7 +2,7 @@
 #define READ_QUERY_COMMAND
 
 /***************************************
-  $Revision: 1.2.12.1 $
+  $Revision: 1.3 $
 
   Query command module (qc)
 
@@ -82,6 +82,8 @@ typedef struct Query_command_t {
   /* -c: query for the most specific inetnum/inet6num with the "mnt-irt:" 
          attribute set and return the irt object */
   gboolean c_irt_search;
+  /* -C: negates -c */
+  gboolean C;
   /* -G: non-grouped ouput (default - grouped) */
   gboolean G_group_search;
   /* -B: original output (with e-mail, changed and notify attrs */
