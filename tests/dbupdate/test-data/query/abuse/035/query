@@ -1,0 +1,18 @@
+% This is the MyDB Whois server.
+
+% Note: this output has been filtered.
+
+% Information related to '80.16.151.184 - 80.16.151.191'
+
+inetnum:        80.16.151.184 - 80.16.151.191
+netname:        TEST-NET-NAME
+descr:          TEST network
+country:        NL
+status:         ASSIGNED PA
+admin-c:        TP2-DB-TEST
+tech-c:         TP2-DB-TEST
+mnt-by:         RIPE-NCC-HM-MNT
+mnt-irt:				IRT-REQUEST
+source:         DB-TEST
+
+

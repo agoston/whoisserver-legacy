@@ -1,0 +1,12 @@
+
+# CASE 036: -Cc ip
+%
+% requires initial objects to be loaded
+#
+# check that 'duplicated IP flags' message is present
+#
+#SUCCESS
+#
+# RESULT 036: The query will succeed.
+
+

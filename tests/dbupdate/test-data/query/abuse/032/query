@@ -1,0 +1,36 @@
+% This is the MyDB Whois server.
+
+% Note: this output has been filtered.
+
+% Information related to '80.16.151.184 - 80.16.151.191'
+
+inetnum:        80.16.151.184 - 80.16.151.191
+netname:        TEST-NET-NAME
+descr:          TEST network
+country:        NL
+status:         ASSIGNED PA
+admin-c:        TP2-DB-TEST
+tech-c:         TP2-DB-TEST
+mnt-by:         RIPE-NCC-HM-MNT
+mnt-irt:				IRT-REQUEST
+source:         DB-TEST
+
+irt:            IRT-REQUEST
+address:        Singel 258
+                1016 AB  Amsterdam
+                The Netherlands
+admin-c:        TP2-DB-TEST
+tech-c:         TP2-DB-TEST
+auth:           MD5-PW $1$12345678$wza1MMo7nPUnBHNJMOMq3.   # irt
+mnt-by:         TEST-MNT
+source:         DB-TEST
+
+person:         test person
+address:        Singel
+phone:          +0123456789
+nic-hdl:        TP2-DB-TEST
+abuse-mailbox:  dbtest-person1@ripe.net
+abuse-mailbox:  dbtest-person2@ripe.net
+source:         DB-TEST
+
+

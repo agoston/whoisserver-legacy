@@ -1,0 +1,13 @@
+
+# CASE 035: -rC ip
+%
+% requires initial objects to be loaded
+#
+# check that inetnum is present
+# make sure person object AND irt object are not returned
+#
+#SUCCESS
+#
+# RESULT 035: The query will succeed.
+
+

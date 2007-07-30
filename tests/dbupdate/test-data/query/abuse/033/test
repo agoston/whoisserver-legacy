@@ -1,0 +1,13 @@
+
+# CASE 033: -C ip
+%
+% requires initial objects to be loaded
+#
+# check that inetnum, person are present
+# make sure irt object is not returned!
+#
+#SUCCESS
+#
+# RESULT 033: The query will succeed.
+
+
