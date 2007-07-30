@@ -109,8 +109,9 @@ mnt-by: TEST-MNT
 changed: dbtest@ripe.net 20020101
 source: DB-TEST
 
-as-set: as300.300:as-test:AS.400.400
+as-set: as300.300:as-test:AS400.400
 members: AS1
+mbrs-by-ref: RIPE-NCC-HM-MNT
 changed: dbtest@ripe.net
 source: DB-TEST
 
