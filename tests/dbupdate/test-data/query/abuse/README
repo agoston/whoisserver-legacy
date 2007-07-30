@@ -1,0 +1,465 @@
+
+# CASE 1: TP2-DB-TEST with no flags
+% e-mail attribute should be visible
+%
+% requires initial objects to be loaded
+#
+# query person object 
+#
+#SUCCESS
+#
+# RESULT 1: The query will succeed.
+
+
+
+# CASE 2: TP2-DB-TEST with -B flag
+%
+% requires initial objects to be loaded
+#
+# query person object, check that there changed, e-mail and notify attribute
+#
+#SUCCESS
+#
+# RESULT 2: The query will succeed.
+
+
+
+# CASE 3: TP2-DB-TEST with no flags
+# object contains abuse-mailbox attr
+%
+% requires initial objects to be loaded
+#
+# query person object, check that there is no changed, e-mail, notify attrs
+#
+#SUCCESS
+#
+# RESULT 3: The query will succeed.
+
+
+
+# CASE 4: TP2-DB-TEST with -B flag
+# object containa abuse-mailbox attr
+%
+% requires initial objects to be loaded
+#
+# query person object, check that that it is original
+#
+#SUCCESS
+#
+# RESULT 4: The query will succeed.
+
+
+
+# CASE 5: TP2-DB-TEST with no flags
+# object contains abuse-mailbox attr
+# all other email attrs are multiline
+%
+% requires initial objects to be loaded
+#
+# query person object, check that it has abuse-mailbox attr shown
+#
+#SUCCESS
+#
+# RESULT 5: The query will succeed.
+
+
+
+# CASE 6: ROLE-DB-TEST with no flags
+# role object contains abuse-mailbox attr
+%
+% requires initial objects to be loaded
+#
+# query role object, check that it contact attrs are filtered out
+#
+#SUCCESS
+#
+# RESULT 6: The query will succeed.
+
+
+
+# CASE 7: TEST-DBM-MNT with no flags
+# role object contains no abuse-mailbox attr
+%
+% requires initial objects to be loaded
+#
+# query mntner object, check that it contact attrs are filtered out
+#
+#SUCCESS
+#
+# RESULT 7: The query will succeed.
+
+
+
+# CASE 8: ORG-TEST-DB-TEST with no flags
+# organisation object contains abuse-mailbox attr
+%
+% requires initial objects to be loaded
+#
+# query organisation object, check that it contact attrs are filtered out
+#
+#SUCCESS
+#
+# RESULT 8: The query will succeed.
+
+
+
+# CASE 9: IRT-REQUEST with no flags
+# irt object contains abuse-mailbox attr
+%
+% requires initial objects to be loaded
+#
+# query irt object, check that it contact attrs are filtered out
+#
+#SUCCESS
+#
+# RESULT 9: The query will succeed.
+
+
+
+# CASE 010: inverse query for abuse-mailbox attr
+# irt object contains abuse-mailbox attr
+# person object
+# -r query
+%
+% requires initial objects to be loaded
+#
+# query e-mail address, check that 2 objects are returned
+#
+#SUCCESS
+#
+# RESULT 010: The query will succeed.
+
+
+
+# CASE 011: inverse query for trouble attr
+# -r query
+%
+% requires initial objects to be loaded
+#
+# query e-mail address, check that error is returned
+#
+#FAILURE
+#
+# RESULT 011: The query will fail.
+
+
+
+# CASE 012: -b <iprange>
+%
+% requires initial objects to be loaded
+#
+# check that only inetnum and abuse-mailbox attrs are present
+#
+#SUCCESS
+#
+# RESULT 012: The query will succeed.
+
+
+
+# CASE 013: -b <iprange>
+%
+% requires initial objects to be loaded
+#
+# check that no objects are returned (inetnum has no mnt-irt)
+#
+#FAILURE
+#
+# RESULT 013: The query will fail.
+
+
+
+# CASE 014: -b -L <iprange>
+# error test
+%
+% requires initial objects to be loaded
+#
+# check that 'duplicate ip flag passed' error is returned
+#
+#SUCCESS
+#
+# RESULT 014: The query will succeed.
+
+
+
+# CASE 015: -b -r <iprange>
+# error test
+%
+% requires initial objects to be loaded
+#
+# check that 'uncompatible flags passed' error is returned
+#
+#FAILURE
+#
+# RESULT 015: The query will fail.
+
+
+
+# CASE 016: -b -G <iprange>
+# error test
+%
+% requires initial objects to be loaded
+#
+# check that 'uncompatible flags passed' error is returned
+#
+#FAILURE
+#
+# RESULT 016: The query will fail.
+
+
+
+# CASE 017: -b -B <iprange>
+# error test
+%
+% requires initial objects to be loaded
+#
+# check that 'uncompatible flags passed' error is returned
+#
+#FAILURE
+#
+# RESULT 017: The query will fail.
+
+
+
+# CASE 018: -b -F <iprange>
+# error test
+%
+% requires initial objects to be loaded
+#
+# check that 'uncompatible flags passed' error is returned
+#
+#FAILURE
+#
+# RESULT 018: The query will fail.
+
+
+
+# CASE 019: -b -K <iprange>
+# error test
+%
+% requires initial objects to be loaded
+#
+# check that 'uncompatible flags passed' error is returned
+#
+#FAILURE
+#
+# RESULT 019: The query will fail.
+
+
+
+# CASE 020: -b <iprange>
+%
+% requires initial objects to be loaded
+#
+# check that only inetnum attr is present
+#
+#SUCCESS
+#
+# RESULT 020: The query will succeed.
+
+
+
+# CASE 021: -c ip
+%
+% requires initial objects to be loaded
+#
+# check that only inetnum, person, irt are present
+#
+#SUCCESS
+#
+# RESULT 021: The query will succeed.
+
+
+
+# CASE 022: -G -i pn tp1-db-test
+%
+% requires initial objects to be loaded
+#
+# check that no grouping is used but contact data filtered
+#
+#SUCCESS
+#
+# RESULT 022: The query will succeed.
+
+
+
+# CASE 023: -G -i pn tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# make sure email,notify and changed attrs are filtered out in objects
+#
+#SUCCESS
+#
+# RESULT 023: The query will succeed.
+
+
+
+# CASE 024: -G -B -i pn tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# make sure the old output is shown
+#
+#SUCCESS
+#
+# RESULT 024: The query will succeed.
+
+
+
+# CASE 025: -i pn tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# grouping used, attrs filtered out
+#
+#SUCCESS
+#
+# RESULT 025: The query will succeed.
+
+
+
+# CASE 026: -B -i pn tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# grouping used, attrs original
+#
+#SUCCESS
+#
+# RESULT 026: The query will succeed.
+
+
+
+# CASE 027: -B -r -i pn tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# grouping used, attrs original, no recursion
+#
+#SUCCESS
+#
+# RESULT 027: The query will succeed.
+
+
+
+# CASE 028: -r -i pn tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# grouping used, attrs filtered, no recursion
+#
+#SUCCESS
+#
+# RESULT 028: The query will succeed.
+
+
+
+# CASE 029: tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# make sure the source is filtered (end-of-line comment added)
+#
+#SUCCESS
+#
+# RESULT 029: The query will succeed.
+
+
+
+# CASE 030: tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# make sure the source is filtered (end-of-line comment added)
+# source is not the last attribute, multiline attribute 
+#
+#SUCCESS
+#
+# RESULT 030: The query will succeed.
+
+
+
+# CASE 031: tp2-db-test
+%
+% requires initial objects to be loaded
+#
+# this is combined query and update test to test Denis' changes to dbupdate.
+# update should be rejected if Filtered is found in the source attribute
+#
+#FAILURE
+#
+# RESULT 031: The update will fail.
+
+
+person:       test person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+e-mail:       dbtest@ripe.net
+e-mail:       dbtest@ripe.net
+source:       DB-TEST # Filtered
+changed:      dbtest@ripe.net 20020101
+
+
+# CASE 032: ip
+%
+% requires initial objects to be loaded
+#
+# check that inetnum, person, irt are present
+#
+#SUCCESS
+#
+# RESULT 032: The query will succeed.
+
+
+
+# CASE 033: -C ip
+%
+% requires initial objects to be loaded
+#
+# check that inetnum, person are present
+# make sure irt object is not returned!
+#
+#SUCCESS
+#
+# RESULT 033: The query will succeed.
+
+
+
+# CASE 034: -r ip
+%
+% requires initial objects to be loaded
+#
+# check that inetnum is present
+# make sure person object is not returned, but irt object is returned.
+#
+#SUCCESS
+#
+# RESULT 034: The query will succeed.
+
+
+
+# CASE 035: -rC ip
+%
+% requires initial objects to be loaded
+#
+# check that inetnum is present
+# make sure person object AND irt object are not returned
+#
+#SUCCESS
+#
+# RESULT 035: The query will succeed.
+
+
+
+# CASE 036: -Cc ip
+%
+% requires initial objects to be loaded
+#
+# check that 'duplicated IP flags' message is present
+#
+#SUCCESS
+#
+# RESULT 036: The query will succeed.
+
+
