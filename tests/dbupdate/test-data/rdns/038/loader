@@ -124,7 +124,7 @@ descr:        The whole IPv6 address space
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
-nserver:      ns.ripe.net # this is just a placeholder
+nserver:      ns-pri.ripe.net # this is just a placeholder
 mnt-by:       RIPE-NCC-MNT
 mnt-lower:    RIPE-NCC-HM-DOM-MNT
 changed:      hostmaster@ripe.net 20031222
