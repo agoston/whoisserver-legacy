@@ -25,12 +25,6 @@
 ## Please don't forget to also modify your $SOURCEFILE.
 
 #
-# The RIR for configurable options in the code.
-# Values should be one of RIPE ARIN APNIC LACNIC AFRINIC
-
-RIR   RIPE
-
-
 
 ######################
 ###
@@ -646,12 +640,6 @@ UPDATELOCK STOPUPDATES
 # the server's public keyring.
 
 PGPPATH @topdir@/.gnupg
-
-#
-# Location of the file containing the SAW values
-
-SAWFILE @confdir@/saw.config
-
 
 ###########
 ##
