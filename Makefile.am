@@ -87,16 +87,7 @@ EXTRA_DIST = README \
              src/defs/HOWTO \
              src/defs/README \
              src/defs/alltodo \
-             src/defs/variants/AFRINIC/attributes.xml \
-             src/defs/variants/AFRINIC/classes.xml \
-             src/defs/variants/AFRINIC/syntax.xml \
              src/defs/variants/Makefile.syntax \
-             src/defs/variants/APNIC/attributes.xml \
-             src/defs/variants/APNIC/classes.xml \
-             src/defs/variants/APNIC/syntax.xml \
-             src/defs/variants/IETF/attributes.xml \
-             src/defs/variants/IETF/classes.xml \
-             src/defs/variants/IETF/syntax.xml \
              src/defs/variants/RIPE/attributes.xml \
              src/defs/variants/RIPE/classes.xml \
              src/defs/variants/RIPE/syntax.xml \

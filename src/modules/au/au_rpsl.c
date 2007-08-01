@@ -44,12 +44,8 @@ static const au_check_by_type_t rpsl_plugins[] =
 {
   /* 3.1.2 restricted classes */
   { "as-block", restricted_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
-#ifdef AFRINIC
-  { "organisation", restricted_rpsl_create, restricted_rpsl_delete, restricted_rpsl_modify },
-#else
   { "poetic-form", restricted_rpsl_create, restricted_rpsl_delete, restricted_rpsl_modify },
   { "limerick", restricted_rpsl_create, restricted_rpsl_delete, restricted_rpsl_modify },
-#endif
   /* mntner */
   { "mntner", mntner_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
   /* 3.1.3 hierarchical name classes */
@@ -65,19 +61,9 @@ static const au_check_by_type_t rpsl_plugins[] =
   { "inetnum", hierarchical_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
   { "inet6num", hierarchical_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
   /* 3.1.7 route */
-#ifdef AFRINIC
-  { "route", banned_create, banned_delete, banned_modify },
-  /* RPSLng rule */
-  { "route6", banned_create, banned_delete, banned_modify },
-#else
   { "route", route_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
   /* RPSLng rule */
   { "route6", route6_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
-#endif
-#ifdef AFRINIC
-  /* irt */
-  { "irt", banned_create, banned_delete, banned_modify },
-#endif
   /* 3.1.1 simple rules */
   { "*", generic_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
   { NULL }

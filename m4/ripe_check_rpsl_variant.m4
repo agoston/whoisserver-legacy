@@ -5,7 +5,7 @@ dnl
 dnl begin defun
 AC_DEFUN(RIPE_SET_RPSL_VARIANT,[
 AC_ARG_WITH(rpslvariant,
-  AC_HELP_STRING([--with-rpslvariant=VARIANT],[RPSL variant to use, either RIPE, APNIC, AFRINIC or IETF]),
+  AC_HELP_STRING([--with-rpslvariant=VARIANT],[RPSL variant to use: RIPE only]),
   [  if test "x$withval" != xyes; then
        rpslvariant=$withval
      else
@@ -19,15 +19,6 @@ AC_ARG_WITH(rpslvariant,
   case $rpslvariant in
     RIPE )
       AC_DEFINE_UNQUOTED(RIPE,, [RPSL variant])
-      ;;
-    AFRINIC )
-      AC_DEFINE_UNQUOTED(AFRINIC,, [RPSL variant])
-      ;;
-    IETF )
-      AC_DEFINE_UNQUOTED(IETF,, [RPSL variant])
-      ;;
-    APNIC )
-      AC_DEFINE_UNQUOTED(APNIC,, [RPSL variant])
       ;;
     * )
       AC_MSG_ERROR([$rpslvariant is invalid])

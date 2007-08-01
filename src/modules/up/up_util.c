@@ -383,24 +383,6 @@ int UP_strstr_in_attr_list(LG_context_t *lg_ctx, GList *list, const char *substr
   return 0; 
 }
 
-/* Get the rir value from the config 
-   Receives LG context
-            pointer to rir string
-   Returns  none
-*/
-
-char *up_get_rir(LG_context_t *lg_ctx)
-{
-  char *rir = NULL;
-  
-  rir = ca_get_rir;
-  assert(rir != NULL); /* should never fail */
-  rir = UP_remove_EOLs(rir);
-  LG_log(lg_ctx, LG_DEBUG,"up_get_rir: rir [%s]", rir);
-  
-  return rir;
-}
-
 /* Remove generated parent attribute(s) 
    Receives LG context
             pointer to object string
@@ -456,7 +438,6 @@ char *up_clean_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char **object_
 {
   int retval = 0; 
   char *retstr = NULL;
-  char *rir = NULL;
   const char *type = NULL;
   char *value = NULL;
   rpsl_object_t *object = NULL;
@@ -468,22 +449,6 @@ char *up_clean_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char **object_
   /* parse the object string */
   object = rpsl_object_init(*object_str);
 
-  rir = up_get_rir(lg_ctx);
-  if ( ! strcasecmp(rir, "AFRINIC") )
-  {
-    /* AfriNic cleanups */
-    type = rpsl_object_get_class(object);
-    
-    if ( ! strcasecmp(type, "inetnum") || ! strcasecmp(type, "inet6num"))
-    {
-      retval |= up_remove_parent(rt_ctx, lg_ctx, object_str, object);
-      if ( retval )
-      {
-        mess = g_string_append(mess, "\"parent:\" attribute(s) removed, these are generated at query time");
-      }
-    }
-  }
-  
   if ( mess->str ) retstr = strdup(mess->str);
   g_string_free(mess, 1);
   LG_log(lg_ctx, LG_FUNC,"<up_clean_object: exiting with msg [%s] object [\n%s]",
@@ -1068,7 +1033,6 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   char *countries[COUNTRY_LIST_SIZE];
   char **temp_vector;
   char *value;
-  char *rir = NULL;
   KM_context_t key_cert_type;
   KM_key_return_t *key_data = NULL;
   GList *overlap = NULL;
@@ -1210,22 +1174,7 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
   
   /* MAKE THE POLICY CHECK THE LAST ONE IN THIS FUNCTION */
-  rir = ca_get_rir;
-  assert(rir != NULL); /* should never fail */
-  rir = UP_remove_EOLs(rir);
-  LG_log(lg_ctx, LG_DEBUG,"up_pre_process_object: rir [%s]", rir);
-  if ( ! strcasecmp(rir, "AFRINIC") && retval==UP_OK )
-  {
-    /* AfriNic policy checks 
-       Only do these if all other checks succeeded */
-    retval |= UP_check_policy(rt_ctx, lg_ctx, options, operation, 
-                                  preproc_obj, reason, credentials);
-    if ( retval & UP_FWD )
-    {
-      RT_policy_fail(rt_ctx, *reason);
-    }
-  }
-  
+  /* stuff removed */
   /***** ADD ANY NEW CHECKS BEFORE THE POLICY CHECK ABOVE ******/
  
   LG_log(lg_ctx, LG_FUNC,"<up_pre_process_object: exiting");
@@ -2084,8 +2033,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     LG_log(lg_ctx, LG_DEBUG,"up_process_object: check auth returned %s", AU_ret2str(au_retval));
     if ( au_retval == AU_FWD )
     {
-      /* This was an irt (RIPE) or as-block creation request, or an organisation
-         operation (AfriNic), with no override.
+      /* This was an irt (RIPE) or as-block creation request with no override.
          If we are not in test mode and no pre-processing errors were found,
          forward it to <HUMAILBOX>  */
       if ( retval == UP_OK && ! options->test_mode )

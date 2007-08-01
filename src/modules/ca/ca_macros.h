@@ -163,14 +163,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define ca_get_tmpdir	ca_get_dirlist(CA_TMPDIR)
 #define ca_set_tmpdir	ca_set_dirlist(CA_TMPDIR)
 
-#define ca_get_sawfile	ca_get_dirlist(CA_SAWFILE)
-#define ca_set_sawfile	ca_set_dirlist(CA_SAWFILE)
-
 #define ca_get_processuser	ca_get_string(CA_PROCESSUSER)
 #define ca_set_processuser	ca_set_string(CA_PROCESSUSER)
-
-#define ca_get_rir	ca_get_string(CA_RIR)
-#define ca_set_rir	ca_set_string(CA_RIR)
 
 #define ca_get_gpgcmd	ca_get_dirlist(CA_GPGCMD)
 #define ca_set_gpgcmd	ca_set_dirlist(CA_GPGCMD)

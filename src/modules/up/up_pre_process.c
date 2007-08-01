@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.8.2.3 $
+  $Revision: 1.9 $
 
   UP pre process checks
 
@@ -140,7 +140,6 @@ int UP_check_country_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    The inetnums and inet6nums have to have an "org:" attribute if their
    "status:" attribute is ALLOCATED-BY-RIR, ALLOCATED PI,
    ALLOCATED PA or ALLOCATED UNSPECIFIED
-   Also for AfriNic - SUB-ALLOCATED PA
    
    Receives RT context
             LG context
@@ -153,7 +152,6 @@ int UP_check_org_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              rpsl_object_t *preproc_obj)
 {
   int retval = UP_OK; 
-  char *rir = NULL;
   const char *type = NULL;
   char *status_value = NULL;
   GList *status_attrs = NULL;
@@ -164,11 +162,6 @@ int UP_check_org_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   type = rpsl_object_get_class(preproc_obj);
   org_attrs = rpsl_object_get_attr(preproc_obj, "org");
-
-  rir = ca_get_rir;
-  assert(rir != NULL); /* should never fail */
-  rir = UP_remove_EOLs(rir);
-  LG_log(lg_ctx, LG_DEBUG,"UP_check_org_attr: rir [%s]", rir);
 
   if ( strncmp(type,"inetnum", strlen("inetnum")) == 0 )
   {
@@ -185,8 +178,8 @@ int UP_check_org_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
        g_strup(status_value);
        if ( strncmp(status_value, "ALLOCATED PI", strlen("ALLOCATED PI")) == 0 
             || strncmp(status_value, "ALLOCATED PA", strlen("ALLOCATED PA")) == 0 
-            || strncmp(status_value, "ALLOCATED UNSPECIFIED", strlen("ALLOCATED UNSPECIFIED")) == 0
-            || ( ! strcasecmp(rir, "AFRINIC") && strncmp(status_value, "SUB-ALLOCATED PA", strlen("SUB-ALLOCATED PA")) == 0) )
+            || strncmp(status_value, "ALLOCATED UNSPECIFIED", strlen("ALLOCATED UNSPECIFIED")) == 0 )
+
        {
          LG_log(lg_ctx, LG_DEBUG,"UP_check_org_attr: inetnum requires org");
          if(org_attrs == NULL)
@@ -219,8 +212,7 @@ int UP_check_org_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     {
        status_value = rpsl_attr_get_clean_value(status_attrs->data);
        g_strup(status_value);
-       if ( strncmp(status_value, "ALLOCATED-BY-RIR", strlen("ALLOCATED-BY-RIR")) == 0 ||
-             ( ! strcasecmp(rir, "AFRINIC") && strncmp(status_value, "SUB-ALLOCATED PA", strlen("SUB-ALLOCATED PA")) == 0) )
+       if ( strncmp(status_value, "ALLOCATED-BY-RIR", strlen("ALLOCATED-BY-RIR")) == 0 ) 
        {
          if (org_attrs == NULL)
          {
@@ -1299,123 +1291,6 @@ int UP_check_peering_set_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 }
 
 
-/* Gets the Sub Allocation Window size from a lookup file,
-   indexed by LIR organisation name.
-   Receives RT context
-            LG context
-            options structure
-            organisation
-   Returns  saw size if successful
-            -1 otherwise
-*/
-
-int up_get_saw(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
-                 options_struct_t *options, char *organisation)
-{
-  int saw;
-  int size;
-  int found;
-  char *saw_file_name = NULL;
-  char buf[256];
-  char *line = NULL;
-  char *saw_str = NULL;
-  char **list = NULL;
-  FILE *saw_fh;
-
-  LG_log(lg_ctx, LG_FUNC,">up_get_saw: entered with org reference [%s]", organisation);
-  
-  saw_file_name = ca_get_sawfile;
-  assert(saw_file_name != NULL); /* should never fail */
-  if (( saw_fh = fopen(saw_file_name, "r")) == NULL)
-  {
-    LG_log(lg_ctx, LG_FATAL, "up_get_saw: Can't open SAW lookup file [%s]", saw_file_name);
-    UP_internal_error(rt_ctx, lg_ctx, options, "Can't open SAW lookup file\n", 0);
-  }
-
-  found = 0;
-  /* find the organisation in the file */
-  while ( fgets(buf, 255, saw_fh) != NULL ) 
-  {
-    line = strdup(buf);
-    line = UP_remove_EOLs(line);
-    list = ut_g_strsplit_v1(line, ",", 0);
-    if ( list[0] == NULL )
-    {
-      /* ignore any blank lines */
-      free(line);
-      continue; 
-    }
-    if ( ! strcasecmp(organisation, list[0]) )
-    {
-      /* found it, now get the SAW */
-      found = 1;
-      if ( list[1] == NULL )
-      {
-        LG_log(lg_ctx, LG_DEBUG,"up_get_saw: organisation found, but no SAW value");
-      }
-      else
-      {
-        saw_str = strdup(list[1]);
-        LG_log(lg_ctx, LG_DEBUG,"up_get_saw: organisation found, SAW string [%s]", saw_str);
-      }
-      free(line);
-      break;
-    }
-    free(line);
-  }
-  fclose(saw_fh);
-  
-  if ( found && saw_str != NULL )
-  {
-    saw = atoi((const char *)saw_str);
-    LG_log(lg_ctx, LG_DEBUG,"up_get_saw: organisation found, SAW slash size [%d]", saw);
-    free(saw_str);
-    if ( saw > 32 )
-    {
-      LG_log(lg_ctx, LG_DEBUG,"<up_get_saw: SAW value > 32");
-      return -1;
-    }
-  }
-  /* This is the /<size> value,
-     now find the size of this */
-  size = 2<<(32-saw-1);
-
-  LG_log(lg_ctx, LG_FUNC,"<up_get_saw: exiting with saw [%d]", size);
-  return size;
-}
-
-
-/* Gets the size of a range,
-   Receives LG context
-            value - range string
-   Returns  size if successful
-            -1 otherwise
-*/
-
-int up_get_size_from_range(LG_context_t *lg_ctx, char *value)
-{
-  int retval;
-  char **list = NULL;
-  ip_range_t range;
-  ip_rangesize_t  span;
-
-  LG_log(lg_ctx, LG_FUNC,">up_get_size_from_range: entered with range [%s]", value);
-  retval = IP_rang_t2b(&range, (const char *)value, IP_PLAIN);
-  if ( retval != IP_OK )
-  {
-    /* invalid range */
-    LG_log(lg_ctx, LG_DEBUG,"<up_get_size_from_range: IP_rang_t2b returned [%d]", retval);
-    return -1;
-  }
-  LG_log(lg_ctx, LG_DEBUG,"up_get_size_from_range: range.begin [%d]", range.begin.words[0]);
-  LG_log(lg_ctx, LG_DEBUG,"up_get_size_from_range: range.begin [%d]", range.end.words[0]);
-  span = IP_rang_span(&range) +1;
-
-  LG_log(lg_ctx, LG_FUNC,"<up_get_size_from_range: exiting with size [%d]", (int)span);
-  return (int)span;
-}
-
-
 /* Check if override password was supplied.
    Receives LG context
             credentials list
@@ -1446,75 +1321,6 @@ int up_override(LG_context_t *lg_ctx, GList *credentials)
   }
   
   LG_log(lg_ctx, LG_FUNC, "<up_override: exiting with [%s]", UP_ret2str(retval));
-  return retval;
-}
-
-
-/* Applies policy checks to an object.
-   Receives RT context
-            LG context
-            options structure
-            parsed object
-            operation
-            reason pointer to policy check fail string
-   Returns  UP_OK if successful
-            UP_FWD otherwise
-*/
-
-int UP_check_policy(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                     options_struct_t *options, int operation, 
-                     rpsl_object_t *preproc_obj, char **reason,
-                     GList *credentials)
-{
-  int retval = UP_OK;
-  int size;
-  int saw;
-  const char *type = NULL;
-  char *value;
-  GList *attr = NULL;
-
-  LG_log(lg_ctx, LG_FUNC,">UP_check_policy: entered");
-
-  if ( up_override(lg_ctx, credentials) == UP_OK )
-  {
-    /* approved by hostmaster */
-    LG_log(lg_ctx, LG_DEBUG,"UP_check_policy: override used");
-    retval = UP_OK;
-  }
-  else
-  {
-    /* policy checks */
-    /* Check size against the sub allocation window when creating an 
-       inetnum object with a status of SUB-ALLOCATED PA */
-    type = rpsl_object_get_class(preproc_obj);
-    assert(type != NULL); /* should never happen */
-    if ( ( ! strcasecmp(type, "inetnum")) && operation==UP_CREATE  ) 
-    {
-      attr = rpsl_object_get_attr(preproc_obj, "status"); 
-      value = rpsl_attr_get_clean_value((rpsl_attr_t *)(attr->data));
-      if ( ! strcasecmp(value, "SUB-ALLOCATED PA") )
-      {
-        LG_log(lg_ctx, LG_DEBUG,"UP_check_policy: SUB-ALLOCATED PA inetnum creation");
-        attr = rpsl_object_get_attr(preproc_obj, type); 
-        value = rpsl_attr_get_clean_value((rpsl_attr_t *)(attr->data));
-        size = up_get_size_from_range(lg_ctx, value);
-
-        attr = rpsl_object_get_attr(preproc_obj, "org"); 
-        value = rpsl_attr_get_clean_value((rpsl_attr_t *)(attr->data));
-        saw = up_get_saw(rt_ctx, lg_ctx, options, value);
-
-        if ( size > saw )
-        {
-          LG_log(lg_ctx, LG_DEBUG,"UP_check_policy: size > saw");
-          *reason = "Sub allocation size exceeds SAW";
-          retval = UP_FWD;
-        }
-      }
-    }
-  }
-  
-  LG_log(lg_ctx, LG_FUNC,"<UP_check_policy: exiting with return status [%s]",
-                            UP_ret2str(retval));
   return retval;
 }
 

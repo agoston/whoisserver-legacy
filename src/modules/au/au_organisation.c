@@ -90,20 +90,12 @@ org_creation (au_plugin_callback_info_t *info)
   gboolean override;
   GList *org_type_attr;
   char *org_type;
-  char *rir = NULL;
   char *generic_org_type = NULL;
 
   LG_log(au_context, LG_FUNC, ">org_creation: entering");
 
-  rir = ca_get_rir;
-  UP_remove_EOLs(rir);
-  LG_log(au_context, LG_FUNC, "org_creation: rir: %s", rir);
-  if ( strcasecmp(rir, "AFRINIC") == 0 ) {
-    generic_org_type = g_strdup("NON-REGISTRY");
-  } 
-  else {
-    generic_org_type = g_strdup("OTHER");
-  }
+  generic_org_type = g_strdup("OTHER");
+
   LG_log(au_context, LG_FUNC, "org_creation: generic org type: %s", generic_org_type);
 
   /* only the mntner that are listed in POWER_ORG_MNT config variable can
@@ -365,20 +357,12 @@ object_modification (au_plugin_callback_info_t *info)
   GList *org_type_attr;
   char *org_type;
   char *generic_org_type = NULL;
-  char *rir = NULL;
 
 
   LG_log(au_context, LG_FUNC, ">object_modify: entering");
 
-  rir = ca_get_rir;
-  UP_remove_EOLs(rir);
-  LG_log(au_context, LG_FUNC, "org_creation: rir: %s", rir);
-  if ( strcasecmp(rir, "AFRINIC") == 0) {
-    generic_org_type = g_strdup("NON-REGISTRY");
-  }
-  else {
-    generic_org_type = g_strdup("OTHER");
-  } 
+  generic_org_type = g_strdup("OTHER");
+  
   LG_log(au_context, LG_FUNC, "org_creation: generic org type: %s", generic_org_type);
 
   /* grab key */

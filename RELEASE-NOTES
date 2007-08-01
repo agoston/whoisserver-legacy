@@ -238,7 +238,7 @@ o text_export now only produces RPSL output by default.  If you still
 
 Also, this release makes it easier to customise the code for different
 implementations.  There is now a defs/variants/ directory that
-contains definitions of the RIPE, APNIC, and IETF variations of RPSL.
+contains definitions of the RIPE variation of RPSL.
 There is more work to be done making the code fully customisable,
 which will be completed in future releases.
 
@@ -994,4 +994,4 @@ o The update functionality has been integrated.
 o Lots of bugfixes and backend improvements.
 
 
-$Id: RELEASE-NOTES,v 1.4 2005/05/25 10:28:45 can Exp $
+$Id: RELEASE-NOTES,v 1.5 2005/05/25 12:16:51 can Exp $

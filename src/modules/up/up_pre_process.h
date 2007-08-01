@@ -70,11 +70,6 @@ int UP_check_org_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 int UP_check_organisation(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                           rpsl_object_t *preproc_obj, int operation);
 
-int UP_check_policy(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                     options_struct_t *options, int operation, 
-                     rpsl_object_t *preproc_obj, char **reason,
-                     GList *credentials);
-
 int up_normalise_nserver(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *preproc_obj);
 
 #endif

@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.17 $
+  $Revision: 1.18 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -947,27 +947,6 @@ char *filter(const char *str) {
   return result;
 } /* filter() */
 
-/* add_parent adds a "parent:" attributes to inet(6)num object if any */
-
-char *add_parent(int id, char *str, GList *par_list)
-{
-  if (par_list != NULL) {
-    GList    *qitem;
-
-    for( qitem = g_list_first(par_list); qitem != NULL; qitem = g_list_next(qitem))
-    {
-      id_parent_t *item = qitem->data;
-      if (id == item->object_id)
-      {
-        str = (char *) UT_realloc (str, strlen(str) + strlen(item->parent_list) + 2 );
-        strcat (str, item->parent_list);
-        return str;
-      }
-    }
-  }
-  return str;
-} /* add_parent */
-
 /* write_results() */
 /*++++++++++++++++++++++++++++++++++++++
   Write the results to the client socket.
@@ -1068,14 +1047,6 @@ static int write_results(SQ_result_set_t *result,
       
       if ((str = SQ_get_column_string(result, row, 2)) == NULL) { die; } 
       else {
-        char *rir;
-        rir = ca_get_rir;   
-        rir = remove_EOLs(rir);
-        if ((strcasecmp(rir, "AFRINIC") == 0) && (type == C_IN || type == C_I6)) {
-          /* add "parent:" attribute for inet(6)num */
-          str = add_parent(atoi(id), str, par_list);
-        } /* if afrinic */
-        UT_free(rir);
         UT_free(id);
         UT_free(objt);
 
@@ -2232,7 +2203,6 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
      
 
       if( NOERR(err)) {
-        char *rir;
         LG_log(qi_context, LG_DEBUG, 
 		    "%d entries after %s (mode %d par %d reg %d) query for %s",
 		    g_list_length(*datlist),
@@ -2240,82 +2210,6 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
 		    qi->rx_srch_mode, qi->rx_par_a, 
 		    dbhdl,
 		    qi->rx_keys);
-     
-        /* parents */
-        rir = ca_get_rir;   
-        rir = remove_EOLs(rir);
-        if (strcasecmp(rir, "AFRINIC") == 0 ) 
-        {
-           GList    *qitem;
-           for( qitem = g_list_first(*datlist); qitem != NULL; qitem = g_list_next(qitem)) {
-              GList *parents=NULL;
-              GList *parent_item;
-              char *parent_list = strdup("");
-              rx_datcpy_t *datcpy = qitem->data;
-              ip_range_t searchrange = datcpy->leafcpy.iprange;
-              char search_str[IP_RANGSTR_MAX];
-
-              if (IP_rang_b2a(&searchrange, search_str, IP_RANGSTR_MAX) == IP_OK) 
-              {
-                err = RP_asc_search(RX_SRCH_LESS, 1, 0,
-                          search_str, dbhdl,
-                          Query[qi->queryindex].attribute,
-                          &parents, limit);
-
-                if ( NOERR(err)) {
-                for( parent_item = g_list_first(parents); parent_item != NULL; parent_item = g_list_next(parent_item)) 
-                {              
-                  rx_datcpy_t *parentcpy = parent_item->data;
-                  ip_range_t iprange = parentcpy->leafcpy.iprange;
-                  char range_str[IP_RANGSTR_MAX];
-
-                  if (IP_rang_b2a(&iprange, range_str, IP_RANGSTR_MAX) == IP_OK)
-                  { 
-                    /* convert IPv6 range to prefix */
-                    if (iprange.begin.space == IP_V6) {
-                      ip_prefix_t pref;
-                      if (IP_rang_2_pref(&iprange, &pref) == IP_OK) {
-                        if (IP_pref_b2a(&pref, range_str, IP_RANGSTR_MAX) == IP_OK) {
-                          /* we convert IPv6 range to prefix. If any of conversions fail,
-                             we will get a range in "parent:" attribute, But it should never happen
-                             because inet(6)nums are always classful and radix load 
-                             ensures proper range objects.
-                          */
-                        }
-                      }
-                    }
-                    parent_list = (char *) UT_realloc (parent_list, strlen(parent_list)+68); 
-                    strcat (parent_list, "parent:         ");
-                    strcat (parent_list, range_str);
-                    strcat (parent_list, "\n");
-                  } else { 
-                    /* nothing.
-                       if range is not converted, we simply skip the parent generation.
-                    */
-                  }
-                }
-                if (g_list_length(parents) > 0) 
-                {
-                  /* now create a structure and add it to the list */
-                  id_parent_t *id_parent;
-
-                  id_parent = (id_parent_t *)UT_calloc(1, sizeof(id_parent_t));
-                  id_parent->object_id = datcpy->leafcpy.data_key; 
-                  id_parent->parent_list = parent_list;
-  
-                  /* add it to the return list */
-                  *par_list = g_list_append(*par_list, id_parent); 
-                } /* (g_list_length(parents) > 0) */
-              }  /* IP_rang_b2a(&searchrange, search_str, 49) == IP_OK */
-              else {
-                 /* nothing.
-                    if range is not converted, we simply skip the parent generation. 
-                 */
-              }
-           } /* for datlist */ 
-           } /* if NOERR(err) */
-        } /* (strcasecmp(rir, "AFRINIC") == 0 ) */
-        UT_free(rir);
       } /* NOERR */
       else {
         LG_log(qi_context, LG_INFO,

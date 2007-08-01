@@ -1178,7 +1178,7 @@ my $object;
 # Remarks: (hopefully) improve configurability!!!
 sub parse_rip_config()	{
 my $configfile = getvar('RIP_CONFIG');
-my @vars = ( qw/ SVWHOIS_PORT SVCONFIG_PORT GPGCMD UPDSOURCE RIR ACKLOG UPDLOG FORWLOG NOTIFLOG TMPDIR RIPADMIN/ );
+my @vars = ( qw/ SVWHOIS_PORT SVCONFIG_PORT GPGCMD UPDSOURCE ACKLOG UPDLOG FORWLOG NOTIFLOG TMPDIR RIPADMIN/ );
 
 # format is multiline vars, like
 # VARNAME whitespaces VALUE 
@@ -1884,11 +1884,6 @@ my $source = $_[3];
    #  }
    }
    elsif (/^[\s]*$/o) {
-     # AFRINIC pre-processing
-     if ((getvar('RIR') eq 'AFRINIC') && ($object !~ /^\s*$/)) {
-       $object =~ s/^referral-by:.+\n//im;
-       $object =~ s/^mnt-routes:.+\n//im;
-     }
      if (defined $source && ($object =~ /^source:\s*$source\s*/im)) {
        print TEMP $object,"\n\n" ;
        $object = "";
@@ -2103,20 +2098,6 @@ init_paths();
 set_test_variables();
 
 #### check if we need to run the test
-
-my $test_rir = getvar('TEST_RIR');
-my $rir = getvar('RIR');
-
-if ($test_rir && $rir) {
-  if ($test_rir !~ /\b$rir\b/i) {
-		# unset the variables
-		foreach my $var (@vars_cleanup) {
-    	delvar ($var) if (getvar($var));
-		}
-    # don't run the test
-    return "SKIPPED";
-  }
-}
 
 my $result = "FAILED";
 

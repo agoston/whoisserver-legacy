@@ -842,15 +842,6 @@ No PGP error on object
          this request is processesed.
          No further action from your part is required.
 </xsl:if>
-<xsl:if test="(@operation='Forward Policy')>0">
-
-***Info: A policy check failed on this object.
-         It has been forwarded to the AfriNic
-         Database Administration for review.
-         You will receive further notification when 
-         this review is completed.
-         No further action from your part is required.
-</xsl:if>
 
   </xsl:template>
 
