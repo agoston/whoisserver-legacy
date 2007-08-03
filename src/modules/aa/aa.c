@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   access authorisation (aa). aa.c - functions to check access rights
   for less frequent clients (ripupdate, networkupdate, mirror).
@@ -64,11 +64,11 @@ void aa_compose_query(ip_space_t space, char *buf, unsigned len)
 {
 	switch (space) {
 	case IP_V4:
-		snprintf(buf, len, "SELECT ripupdate, netupdate, mirror, source, prefix_length, prefix FROM aaa");
+		snprintf(buf, len, "SELECT ripupdate, netupdate, mirror, source, prefix_length, prefix FROM aaa ORDER BY prefix_length ASC");
 		break;
 
 	case IP_V6:
-		snprintf(buf, len, "SELECT ripupdate, netupdate, mirror, source, prefix_length, prefix1, prefix2, prefix3, prefix4  FROM aaa6");
+		snprintf(buf, len, "SELECT ripupdate, netupdate, mirror, source, prefix_length, prefix1, prefix2, prefix3, prefix4  FROM aaa6 ORDER BY prefix_length ASC");
 		break;
 
 	default:
