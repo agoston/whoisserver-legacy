@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.2 $
 
   SQL module (sq) - this is a MySQL implementation of the SQL module.
 
@@ -45,9 +45,7 @@
 
 static LG_context_t *sq_context;
 
-void
-SQ_init (LG_context_t *ctx)
-{
+void SQ_init (LG_context_t *ctx) {
   sq_context = ctx;
 }
 
