@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.2 $
+  $Revision: 1.3 $
 
   SQL module (sq) - this is a MySQL implementation of the SQL module.
 
@@ -1056,8 +1056,7 @@ int SQ_ping(SQ_connection_t *sql_connection)
 *                                                           *
 *************************************************************/
 
-long sq_get_minmax_id(SQ_connection_t *sql_connection, char *id_name, char *table, int max)
-{
+long sq_get_minmax_id(SQ_connection_t *sql_connection, char *id_name, char *table, int max) {
 GString *query;
 SQ_result_set_t *sql_result;
 SQ_row_t *sql_row;
