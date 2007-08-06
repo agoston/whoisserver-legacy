@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.18 $
+  $Revision: 1.18.2.1 $
 
   Query instructions (qi).  This is where the queries are executed.
 
@@ -956,7 +956,6 @@ char *filter(const char *str) {
   sk_conn_st *condat          Connection data for the client               
   acc_st *acc_credit          object display credit                        
   acl_st *acl                 copy of the original acl for this client     
-  GList *par_list             parent list  
                                   
   More:
   +html+ <PRE>
@@ -971,7 +970,6 @@ static int write_results(SQ_result_set_t *result,
        sk_conn_st *condat,
        acc_st    *acc_credit,
        acl_st    *acl,
-       GList *par_list,
        GHashTable *groups
  ) {
   SQ_row_t *row;
@@ -1308,8 +1306,6 @@ object_has_attr (sk_conn_st *condat,
 				 
   acl_st *acl                     copy of the original acl for this client 
 
-  GList *par_list                 parent list  
-
   More:
   +html+ <PRE>
   Authors:
@@ -1323,8 +1319,7 @@ qi_write_objects(SQ_connection_t **sql_connection,
         Query_instructions *qis,
         sk_conn_st *condat,
         acc_st    *acc_credit,
-        acl_st    *acl,
-        GList *par_list
+        acl_st    *acl
         ) 
 {
   SQ_result_set_t *result = NULL;
@@ -1359,7 +1354,7 @@ qi_write_objects(SQ_connection_t **sql_connection,
 
     retrieved_objects = write_results(result, qis, condat, 
                                        acc_credit, acl, 
-                                       par_list, groups);
+                                       groups);
 
     if (groups != NULL) {
       g_hash_table_destroy(groups);
@@ -2086,7 +2081,6 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
 	       Query_environ *qe,	
 	       char *id_table,
 	       GList **datlist,
-         GList **par_list,
 	       acc_st *acc_credit,
 	       acl_st *acl
 	       )
@@ -2456,7 +2450,6 @@ int QI_execute(ca_dbSource_t *dbhdl,
   char id_table[64];
   char sql_command[STR_XL];
   GList *datlist=NULL;
-  GList *par_list=NULL;
   SQ_connection_t *sql_connection=NULL;
   int sql_error;
   int irt_inet_id;
@@ -2508,7 +2501,7 @@ int QI_execute(ca_dbSource_t *dbhdl,
   if (!sql_error) { 
       srcnam = ca_get_srcname(dbhdl);
       sql_error = qi_collect_ids(dbhdl, srcnam, &sql_connection, qis, qe, 
-                             id_table, &datlist, &par_list, acc_credit, acl);
+                             id_table, &datlist, acc_credit, acl);
       UT_free(srcnam);
   }
 
@@ -2593,7 +2586,7 @@ int QI_execute(ca_dbSource_t *dbhdl,
   /* display objects from the IDs table */
   if (!sql_error) {
       sql_error = qi_write_objects( &sql_connection, id_table, qis,
-                    &(qe->condat), acc_credit, acl, par_list);
+                    &(qe->condat), acc_credit, acl);
   }
 
   /* drop the table */
@@ -2606,17 +2599,6 @@ int QI_execute(ca_dbSource_t *dbhdl,
 
   /* Now disconnect (temporary tables get dropped automatically) */
   SQ_close_connection(sql_connection);  
-
-  /* clean the list of parents */
-  if (par_list != NULL) {
-  GList *p;
-  id_parent_t *t;
-    for (p=par_list; p != NULL; p = g_list_next(p)) {
-        t = (id_parent_t *)p->data;
-        UT_free(t->parent_list);
-    }
-    g_list_free(par_list);
-  }
 
   /* return appropriate value */
   if (sql_error) {

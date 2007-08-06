@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.6 $
+  $Revision: 1.6.2.1 $
 
   rollback(), commit(), delete() - rollback, commit update transaction, delete an object
 

@@ -411,7 +411,7 @@ QC_DUPPROXYIPFLAG % the administrator of the server and report this error.
 # Duplicate IP flags
 QC_FMT_DUPIPFLAG %%WARNING:901: duplicate IP flags passed
 QC_FMT_DUPIPFLAG %%
-QC_FMT_DUPIPFLAG %% More than one IP flag (-l, -L, -m, -M, -x, -b, or -c) passed to the server.
+QC_FMT_DUPIPFLAG %% More than one IP flag (-l, -L, -m, -M, -x, -b, -C or -c) passed to the server.
 QC_FMT_DUPIPFLAG %% Only "-%s" will be used for this query.
 
 #
@@ -419,7 +419,7 @@ QC_FMT_DUPIPFLAG %% Only "-%s" will be used for this query.
 
 QC_USELESSIPFLAG %WARNING:902: useless IP flag passed
 QC_USELESSIPFLAG %
-QC_USELESSIPFLAG % An IP flag (-l, -L, -m, -M, -x, -b, or -c) used without an IP key.
+QC_USELESSIPFLAG % An IP flag (-l, -L, -m, -M, -x, -b, -C or -c) used without an IP key.
 
 #
 # Useless no-referral flag

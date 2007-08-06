@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.1 $
+  $Revision: 1.3 $
 
   access authorisation (aa). aa.c - functions to check access rights
   for less frequent clients (ripupdate, networkupdate, mirror).
@@ -64,11 +64,11 @@ void aa_compose_query(ip_space_t space, char *buf, unsigned len)
 {
 	switch (space) {
 	case IP_V4:
-		snprintf(buf, len, "SELECT ripupdate, netupdate, mirror, source, prefix_length, prefix FROM aaa");
+		snprintf(buf, len, "SELECT ripupdate, netupdate, mirror, source, prefix_length, prefix FROM aaa ORDER BY prefix_length ASC");
 		break;
 
 	case IP_V6:
-		snprintf(buf, len, "SELECT ripupdate, netupdate, mirror, source, prefix_length, prefix1, prefix2, prefix3, prefix4  FROM aaa6");
+		snprintf(buf, len, "SELECT ripupdate, netupdate, mirror, source, prefix_length, prefix1, prefix2, prefix3, prefix4  FROM aaa6 ORDER BY prefix_length ASC");
 		break;
 
 	default:
@@ -161,6 +161,8 @@ aa_rights *aa_find(ip_addr_t * address, char *source)
 	
 	pthread_mutex_lock(&aaa_lock);
 	
+	/* items in aaa are sorted by prefix_length, in descending order, so just walking the list
+	 * gives us the most specific matching prefix, which is what we want */
 	for (pitem = g_list_first(aaa[address->space]); pitem != NULL; pitem = g_list_next(pitem)) {
 		aa_rights *rights = (aa_rights *) pitem->data;
 		if (!strcmp(source,rights->source) && IP_addr_in_pref(address, &rights->pref)) {
