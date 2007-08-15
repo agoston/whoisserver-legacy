@@ -109,10 +109,59 @@ mnt-by: TEST-MNT
 changed: dbtest@ripe.net 20020101
 source: DB-TEST
 
-as-set: as300.300:as-test:AS400.400
-members: AS1
-changed: dbtest@ripe.net
-source: DB-TEST
+aut-num:      AS200
+as-name:      TESTAS
+descr:        TEST TELEKOM
+import:       from AS1 accept {1.2.3.4/24}
+export:       to AS2 announce {1.2.3.4/24}
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
 
+aut-num:      AS200.200
+as-name:      TESTAS
+descr:        TEST TELEKOM
+import:       from AS1 accept {1.2.3.4/24}
+export:       to AS2 announce {1.2.3.4/24}
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+inetnum:      20.13.0.0 - 20.14.255.255
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+status:       ALLOCATED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-routes:   TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+route-set:    AS200.200:rs-test
+descr: AS200.200:rs-test
+tech-c: TP1-DB-TEST
+admin-c: TP1-DB-TEST
+mnt-by: TEST-MNT
+members:      1.2.3.0/24
+mbrs-by-ref:  TEST-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+route:   20.13.0.0/16
+descr:   test route
+origin:  AS200
+mnt-by:  TEST-MNT
+changed: dbtest@ripe.net 20060101
+source:  DB-TEST
+member-of: AS200.200:rs-test
 
 % End of loader data file

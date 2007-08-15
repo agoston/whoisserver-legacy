@@ -1,4 +1,5 @@
-==> route6/001/test <==
+
+>> asn32/route6/001 <<
 
 # CASE 1: We try to create route6 object for ::/16,AS200
 # testing various attributes where community and as number can be present
@@ -6,13 +7,14 @@
 # aggr-mtd
 # components
 # inject
-%
-% requires initial objects to be loaded
 #
 # create route object 
 #
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
 
-==> route6/002/test <==
+>> asn32/route6/002 <<
 
 # CASE 2: We try to create route6 object ::/16,AS200
 # testing various attributes where community and as number can be present
@@ -21,18 +23,19 @@
 # components
 # inject
 # trying to introduce many errors and count them
-%
-% requires initial objects to be loaded
 #
 # create route object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
 
-==> route6/003/test <==
+>> asn32/route6/003 <<
 
 # CASE 3: We try to create route6 object for ::/16,AS200.200
 # origin is 32bit asn
 # also make a query to check that "-i origin AS200.200" works
 #
-% requires initial objects to be loaded
 #
 # create route object 
 #
@@ -40,41 +43,39 @@
 #
 # RESULT 3: The creation will succeed.
 
-==> route6/004/test <==
+>> asn32/route6/004 <<
 
 # CASE 4: We try to create route object ::/16,AS200
 # member-of is an route-set with as32bit-related name
 # which exists in db
 # also make a query to check whether member-of works (-i member-of AS200.200:rs-test)
-%
-% requires initial objects to be loaded
 #
 # create route object 
 #
 #SUCCESS
 #
+# RESULT 4: The creation will succeed.
 
-==> route6/005/test <==
+>> asn32/route6/005 <<
 
 # CASE 5: We try to create route object ::/16,AS200
 # member-of is an route-set with as32bit-related name
 # which exists in db
 # and doesn't have mbrs-by-ref attribute!!!
 # expecting membership authorisation error
-%
-% requires initial objects to be loaded
 #
 # create route object 
 #
 #FAILURE
+#
+# RESULT 5: The creation will fail.
 
-==> route6/006/test <==
+>> asn32/route6/006 <<
 
 # CASE 6: We try to create route6 object for ::/16,AS200.200
 # origin is 32bit asn
 # asn doesn't exist in the DB
 #
-% requires initial objects to be loaded
 #
 # create route object 
 #
@@ -82,12 +83,10 @@
 #
 # RESULT 6: The creation will fail.
 
-==> route6/007/test <==
+>> asn32/route6/007 <<
 
 # CASE 7: We try to create route6 object for ::/16,AS200
 # making sure we can't have ipv4 in inject
-%
-% requires initial objects to be loaded
 #
 # create route object 
 #
@@ -95,3 +94,141 @@
 #
 # RESULT 7: The creation will fail.
 
+>> asn32/route6/008 <<
+
+# CASE 8: We try to delete a referenced route-set
+# failing with a referential integrity error
+#
+# delete route-set object 
+#
+#FAILURE
+#
+# RESULT 8: The deletion will fail.
+
+>> asn32/route6/009 <<
+
+# CASE 9: We try to create a route6 object referencing a non existing
+# route-set
+#
+# create route-set object 
+#
+#FAILURE
+#
+# RESULT 9: The creation will fail.
+
+>> asn32/route6/001 <<
+
+# CASE 1: We try to create route6 object for ::/16,AS200
+# testing various attributes where community and as number can be present
+# aggr-bndry
+# aggr-mtd
+# components
+# inject
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+>> asn32/route6/002 <<
+
+# CASE 2: We try to create route6 object ::/16,AS200
+# testing various attributes where community and as number can be present
+# aggr-bndry
+# aggr-mtd
+# components
+# inject
+# trying to introduce many errors and count them
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 2: The creation will fail.
+
+>> asn32/route6/003 <<
+
+# CASE 3: We try to create route6 object for ::/16,AS200.200
+# origin is 32bit asn
+# also make a query to check that "-i origin AS200.200" works
+#
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed.
+
+>> asn32/route6/004 <<
+
+# CASE 4: We try to create route object ::/16,AS200
+# member-of is an route-set with as32bit-related name
+# which exists in db
+# also make a query to check whether member-of works (-i member-of AS200.200:rs-test)
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed.
+
+>> asn32/route6/005 <<
+
+# CASE 5: We try to create route object ::/16,AS200
+# member-of is an route-set with as32bit-related name
+# which exists in db
+# and doesn't have mbrs-by-ref attribute!!!
+# expecting membership authorisation error
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 5: The creation will fail.
+
+>> asn32/route6/006 <<
+
+# CASE 6: We try to create route6 object for ::/16,AS200.200
+# origin is 32bit asn
+# asn doesn't exist in the DB
+#
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail.
+
+>> asn32/route6/007 <<
+
+# CASE 7: We try to create route6 object for ::/16,AS200
+# making sure we can't have ipv4 in inject
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail.
+
+>> asn32/route6/008 <<
+
+# CASE 8: We try to delete a referenced route-set
+# failing with a referential integrity error
+#
+# delete route-set object 
+#
+#FAILURE
+#
+# RESULT 8: The deletion will fail.
+
+>> asn32/route6/009 <<
+
+# CASE 9: We try to create a route6 object referencing a non existing
+# route-set
+#
+# create route-set object 
+#
+#FAILURE
+#
+# RESULT 9: The creation will fail.

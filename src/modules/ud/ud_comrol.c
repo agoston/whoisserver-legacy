@@ -1,5 +1,5 @@
 /***************************************
-  $Revision: 1.6.2.1 $
+  $Revision: 1.7 $
 
   rollback(), commit(), delete() - rollback, commit update transaction, delete an object
 
@@ -668,6 +668,7 @@ char *sql_str;
         
     case C_RS:
     case C_AS:
+    case C_IS:
         /* Check that this set object is not referenced */
         /* Calculate number of references */
         sql_str= get_field_str(tr->sql_connection, "COUNT(*)", "member_of", "set_id", sobject_id, NULL);
@@ -677,9 +678,9 @@ char *sql_str;
          /* there is no member-of attribute in these objects. */
          /* So no self-reference is possible */
          if(num_rec!=0) {
-           g_string_sprintfa(tr->error_script,"I[%d][%ld]:ref integrity: %s\n" ,ERROR_U_OBJ, num_rec, "member_of");
-	  /* XXX Do not refuse the transaction but change the object to dummy */
-           tr->action |=TA_DUMMY;
+           /* Throw ref integ error whenever we still have references */
+           g_string_sprintfa(tr->error_script,"E[%d][%ld]:ref integrity: %s\n" ,ERROR_U_OBJ, num_rec, "member_of");
+           tr->succeeded=0; tr->error |= ERROR_U_OBJ;
          }
         } else {
          tr->succeeded=0; tr->error |= ERROR_U_DBS;

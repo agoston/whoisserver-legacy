@@ -1,13 +1,13 @@
-# CASE 5: We try to delete as-set object AS-TEST
-# referenced by AS123 as member-of:
+# CASE 11: We try to delete as-set object AS-TEST
+# NOT referenced as member-of:
 #
 % requires initial objects to be loaded
 %
 # delete as-set object
 #
-#FAILURE
+#SUCCESS
 #
-# RESULT 5: The deletion will fail with a referenced error.
+# RESULT 11: The deletion succeed
 
 as-set:       AS-TEST
 descr:        test as-set

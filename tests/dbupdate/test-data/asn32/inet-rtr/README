@@ -1,8 +1,7 @@
-==> inet-rtr/001/test <==
+
+>> asn32/inet-rtr/001 <<
 
 # CASE 1: We try to create inet-rtr object kst1-core.swip.net
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
@@ -10,14 +9,10 @@
 #
 # RESULT 1: The creation will succeed.
 
-
-
-==> inet-rtr/002/test <==
+>> asn32/inet-rtr/002 <<
 
 # CASE 2: We try to create inet-rtr object kst1-core.swip.net
 # introduce many syntax errors
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
@@ -25,115 +20,129 @@
 #
 # RESULT 2: The creation will fail.
 
-
-==> inet-rtr/003/test <==
+>> asn32/inet-rtr/003 <<
 
 # CASE 3: We try to create inet-rtr object kst1-core.swip.net
 # it has member-of: rtrs-my-test:AS200.200:rtrs-my-customers
 # which in turn has mbrs-by-ref: TEST-MNT
 # also make a -i member-of rtrs-my-test:AS200.200:rtrs-my-customers query to see whether it works
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
 #SUCCESS
 #
+# RESULT 3: The creation will succeed.
 
-==> inet-rtr/004/test <==
+>> asn32/inet-rtr/004 <<
 
 # CASE 4: We try to create inet-rtr object kst1-core.swip.net
 # it has member-of: rtrs-my-test:AS200.200:rtrs-my-customers
 # which in turn has NO mbrs-by-ref: TEST-MNT
 # expecting membership authorisation error
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
 #FAILURE
 #
+# RESULT 4: The creation will fail.
 
-==> inet-rtr/005/test <==
+>> asn32/inet-rtr/005 <<
 
 # CASE 5: We try to create inet-rtr object kst1-core.swip.net
 # it has member-of: rtrs-my-test
 # which in turn has mbrs-by-ref: TEST-MNT
 # also make a -i member-of rtrs-my-test query to see whether it works
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
 #SUCCESS
 #
+# RESULT 5: The creation will succeed.
 
-==> inet-rtr/006/test <==
+>> asn32/inet-rtr/006 <<
 
 # CASE 6: We try to create inet-rtr object kst1-core.swip.net
 # it has member-of: rtrs-my-test
 # which in turn has mbrs-by-ref: TEST-MNT
 # also make a -i local-as AS1257.100
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
 #SUCCESS
 #
+# RESULT 6: The creation will succeed.
 
-==> inet-rtr/007/test <==
+>> asn32/inet-rtr/007 <<
 
 # CASE 7: We try to create inet-rtr object kst1-core.swip.net
 # it has member-of: rtrs-my-test
 # which in turn has mbrs-by-ref: TEST-MNT
 # also make a 146.188.49.14 query
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
 #SUCCESS
 #
+# RESULT 7: The creation will succeed.
 
-==> inet-rtr/008/test <==
+>> asn32/inet-rtr/008 <<
 
 # CASE 8: We try to create inet-rtr object kst1-core.swip.net
 # it has member-of: rtrs-my-test
 # which in turn has mbrs-by-ref: TEST-MNT
 # also make a 2001:: query
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
 #SUCCESS
 #
+# RESULT 8: The creation will succeed.
 
-==> inet-rtr/009/test <==
+>> asn32/inet-rtr/009 <<
 
 # CASE 9: We try to create inet-rtr object kst1-core.swip.net
 # it has member-of: rtrs-my-test
 # which in turn has mbrs-by-ref: TEST-MNT
 # also make a 1.2.3.4 query (for interface attr)
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
 #SUCCESS
 #
+# RESULT 9: The creation will succeed.
 
-==> inet-rtr/010/test <==
+>> asn32/inet-rtr/010 <<
 
 # CASE 10: We try to create inet-rtr object kst1-core.swip.net
 # it has member-of: rtrs-my-test
 # which in turn has mbrs-by-ref: TEST-MNT
 # also make a -i local-as AS100
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
 #SUCCESS
 #
+# RESULT 10: The creation will succeed.
+
+>> asn32/inet-rtr/011 <<
+
+# CASE 11: We try to create inet-rtr object kst1-core.swip.net
+# it has member-of: rtrs-my-test which in turn does NOT exists
+#
+# create inet-rtr object 
+#
+#FAILURE
+#
+# RESULT 11: The creation will fail with referential errors.
+
+>> asn32/inet-rtr/012 <<
+
+# CASE 12: Try to delete a rtr-set which is still referenced
+# creating a referential integrity error
+#
+#
+# delete rtr-set object
+#
+#FAILURE
+#
+# RESULT 12: The delete fails with a referential integ error

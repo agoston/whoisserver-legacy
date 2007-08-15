@@ -1,0 +1,27 @@
+
+# CASE 12: Try to delete a rtr-set which is still referenced
+# creating a referential integrity error
+#
+%
+% requires initial objects to be loaded
+#
+# delete rtr-set object
+#
+#FAILURE
+#
+# RESULT 12: The delete fails with a referential integ error
+
+
+rtr-set:      rtrs-my-test
+descr:        TEST router set
+members:      test.net
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+delete: create ref error!
+
+password: auth

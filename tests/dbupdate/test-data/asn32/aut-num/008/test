@@ -1,15 +1,16 @@
 
-# CASE 5: We try to create aut-num object AS200
+# CASE 8: We try to create aut-num object AS200
 # it has member-of: as300.300:as-test:AS400.400
-# which in turn exists and has mbrs-by-ref: RIPE-NCC-HM-MNT
+# which in turn does not exist. This previously
+# generated a dummy object.
 %
 % requires initial objects to be loaded
 #
 # create aut-num object 
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 5: The creation will succeed.
+# RESULT 8: The creation will fail.
 
 
 aut-num:      AS200

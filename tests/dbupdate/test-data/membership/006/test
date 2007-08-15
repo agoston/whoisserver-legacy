@@ -3,6 +3,10 @@
 # THIS TEST ITSELF WILL SUCCEED DUE TO THE BUG, BUT SHOULD FAIL NORMALLY
 # will give Error 32 now
 #
+# This test is faulty to be honest - normally you can't create an
+# member-of: without the as-set existing. This only works because
+# the loader allows you to do so.
+#
 % requires initial objects to be loaded
 %
 # create as-set object

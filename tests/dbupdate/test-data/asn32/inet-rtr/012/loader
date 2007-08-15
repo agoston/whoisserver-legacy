@@ -109,10 +109,28 @@ mnt-by: TEST-MNT
 changed: dbtest@ripe.net 20020101
 source: DB-TEST
 
-as-set: as300.300:as-test:AS400.400
-members: AS1
-changed: dbtest@ripe.net
-source: DB-TEST
+rtr-set:      rtrs-my-test
+descr:        TEST router set
+members:      test.net
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+mnt-lower:    TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
 
+inet-rtr:    kst1-core.swip.net
+descr:       test router
+local-as:    AS1257.100
+ifaddr:      146.188.49.14 masklen 30 action community.append(123.456:20);
+peer:        BGP4 rtrs--my-test:AS234.345:rtrs-test asno (AS234.34)
+admin-c:     TP1-DB-TEST
+tech-c:      TP1-DB-TEST
+mnt-by:      TEST-MNT
+notify:      dbtest@ripe.net
+changed:     dbtest@ripe.net 20060101
+source:      DB-TEST
+member-of:   rtrs-my-test
 
 % End of loader data file

@@ -1,6 +1,6 @@
 /***************************************
   
-  $Revision: 1.5 $
+  $Revision: 1.7 $
 
   Core functions for update lower layer 
 
@@ -744,14 +744,13 @@ const gchar *attribute_value;
   }
  /* for loader we do not perform commits/rollbacks */
  if(IS_STANDALONE(tr->mode))commit_now = 1; else commit_now = 0;
-      
-  /* We allow creating dummy sets in any mode */
-  /* For others attributes return if we are in protected mode */
-  if ((attribute_type!=A_MO) &&  (!IS_DUMMY_ALLOWED(tr->mode))) return(1);
+
+  /* do not allow dummy objects to be created when the mode doesnt permit */
+  if (!IS_DUMMY_ALLOWED(tr->mode)) return(1);
 
 /* Allocate resourses. We cannot use tr->query because it is in use */
   query = g_string_sized_new(STR_XL);
-  
+
   /* Insert dummy in the last table */
   /* Calculate the object_id - should be max+1 */
   dummy_id = SQ_get_max_id(tr->sql_connection, "object_id", "last") +1;
@@ -776,8 +775,8 @@ const gchar *attribute_value;
    LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), query->str);	  
    die;
   }	
-	
-   
+
+
   /* compose the query */
   query_type=DF_get_dummy_query_type(attribute_type);
   switch (query_type) {	
@@ -798,7 +797,7 @@ const gchar *attribute_value;
 	      set_name = get_set_name(tr->class_type);
 	      g_string_sprintf(query, query_fmt, set_name, tr->thread_ins, dummy_id, set_name, attribute_value);	  
 	      break;
-	      
+	
 	 default:
               LG_log(ud_context, LG_SEVERE, "query not defined for this type of attribute[%d]\n", attribute_type);
 	      die;

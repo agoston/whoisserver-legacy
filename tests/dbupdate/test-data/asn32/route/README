@@ -1,3 +1,6 @@
+
+>> asn32/route/001 <<
+
 # CASE 1: We try to create route object 20.13.0.0/16,AS200
 # testing various attributes where community and as number can be present
 # aggr-bndry
@@ -11,6 +14,7 @@
 #
 # RESULT 1: The creation will succeed.
 
+>> asn32/route/002 <<
 
 # CASE 2: We try to create route object 20.13.0.0/16,AS200
 # testing various attributes where community and as number can be present
@@ -26,6 +30,7 @@
 #
 # RESULT 2: The creation will fail.
 
+>> asn32/route/003 <<
 
 # CASE 3: We try to create route object 20.13.0.0/16,AS200.200
 # origin is asn32
@@ -37,6 +42,7 @@
 #
 # RESULT 3: The creation will succeed.
 
+>> asn32/route/004 <<
 
 # CASE 4: We try to create route object 20.13.0.0/16,AS200
 # member-of is an route-set with as32bit-related name
@@ -49,6 +55,7 @@
 #
 # RESULT 4: The creation will succeed.
 
+>> asn32/route/005 <<
 
 # CASE 5: We try to create route object 20.13.0.0/16,AS200
 # member-of is an route-set with as32bit-related name
@@ -62,6 +69,7 @@
 #
 # RESULT 5: The creation will fail.
 
+>> asn32/route/006 <<
 
 # CASE 6: We try to create route object 20.13.0.0/16,AS200
 # origin is asn32
@@ -73,6 +81,7 @@
 #
 # RESULT 6: The creation will fail.
 
+>> asn32/route/007 <<
 
 # CASE 7: We try to create route object 20.13.0.0/16,AS200
 # making sure we can't have ipv6 addresses in inject
@@ -83,15 +92,36 @@
 #
 # RESULT 7: The creation will fail.
 
+>> asn32/route/008 <<
 
-# CASE 8: We try to create route object 20.13.0.0/16,AS200
-# member-of is an route-set with as32bit-related name
-# which does not exist in db
+# CASE 8: We try to create 2 route objects 
+# 20.13.0.0/16,AS200.200 and 20.13.0.0/16,AS200
+# member-of is a route-set with as32bit-related name
+# member-of is a route-set with as16bit-related name
+# which do not exist in db
 #
 # create route object 
 #
 #FAILURE
 #
-# RESULT 8: The creation will fail.
+# RESULT 8: The creations will fail.
+#
+# *** TEST WILL FAIL because of bug #201 in software ***
+# non existant route-set in member-of defaults to auth pass
 
+>> asn32/route/009 <<
 
+# CASE 9: We try to create route object 20.13.0.0/16,AS200
+# member-of is an route-set which does not exists
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed.
+
+>> asn32/route/010 <<
+
+# CASE 10: We try to delete a route-set while still being referenced.
+#
+#FAILURE
+#
+# RESULT 10: The deletion will fail.

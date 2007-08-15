@@ -1,0 +1,24 @@
+
+# CASE 8: We try to delete a referenced route-set
+# failing with a referential integrity error
+%
+% requires initial objects to be loaded
+#
+# delete route-set object 
+#
+#FAILURE
+#
+# RESULT 8: The deletion will fail.
+
+route-set:    AS200.200:rs-test
+members:      1.2.3.0/24
+mbrs-by-ref:  TEST-MNT
+descr:        is missing
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+delete:       create referential integ error :)
+
+password: auth
