@@ -120,4 +120,14 @@ mnt-by:       TEST-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
+% misc tests
+
+route:      1.2.3.0/24
+descr:      route
+origin:     AS100
+member-of:  AS100:RS-CUSTOMERS
+changed:    dbtest@ripe.net 20030101
+mnt-by:     TEST-MNT
+source:     DB-TEST
+
 % End of loader data file
