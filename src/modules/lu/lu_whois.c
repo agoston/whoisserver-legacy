@@ -834,7 +834,7 @@ LU_ret_t LU_get_inetnum_from_domain(LU_server_t *server,gchar *domain,
     ret_val = LU_ERROR;
   } else {
     LG_log(lu_context, LG_FUNC, "inetnum is %s",inetnum_str);
-    query = g_strdup_printf("-G -B -Tinetnum,inet6num -s %s -r %s", source, inetnum_str);
+    query = g_strdup_printf("-C -G -B -Tinetnum,inet6num -s %s -r %s", source, inetnum_str);
     query_ret = lu_whois_query(server->info, query, &query_result);
     g_free(query);
     if (!query_ret) {
