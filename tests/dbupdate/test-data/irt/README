@@ -346,4 +346,16 @@
 #
 # RESULT 32: inet6num 1 + route6 + irt 2 returned
 
+# irt tests
+# CASE 33: testing of new default behaviour
+#          with regards to domain object
+#          inet6num1 covers the domain object
+#          inet6num1 has mnt-rt
+#          try to create domain object, to make sure dbupdate can handle new behaviour right
+#          will fail with rDNS errors, but pass the authorisation properly
+#          
+#
+#FAILURE
+#
+# RESULT 33: FAILURE
 
