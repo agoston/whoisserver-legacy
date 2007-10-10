@@ -27,9 +27,8 @@ extern "C" {
 
 void AA_init();
 void AA_load();
-int AA_can_networkupdate( ip_addr_t *address, char *source );
-int AA_can_ripupdate( ip_addr_t *address, char *source );
-int AA_can_mirror( ip_addr_t *address, char *source );
+int AA_can_ripupdate(ip_addr_t *address, char *source);
+int AA_can_mirror(ip_addr_t *address, char *source);
 
 #ifdef __cplusplus
 }

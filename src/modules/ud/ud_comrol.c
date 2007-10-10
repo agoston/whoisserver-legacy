@@ -76,8 +76,9 @@ int ud_transaction_support(Transaction_t *tr){
 *                                                           *
 ************************************************************/
 
-void _collect_tables(gpointer key, gpointer value, gpointer table_list){
-    g_slist_append(table_list, (gpointer)key);
+void _collect_tables(gpointer key, gpointer value, gpointer table_list) {
+	/* to avoid attribute warn_unused_result */
+	GSList *unused = g_slist_prepend(table_list, (gpointer)key);
 }
 
 /************************************************************

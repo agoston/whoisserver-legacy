@@ -350,7 +350,6 @@ AC_CONFIG_FILES([
   src/defs/makedefsall
   src/defs/Makefile
   src/SQL/aux.index.2
-  src/SQL/create.RIPADMIN.sql.patch
   src/SQL/fingerpr_x509.sql.patch
   src/SQL/create.first-stage
   src/SQL/create.second-stage

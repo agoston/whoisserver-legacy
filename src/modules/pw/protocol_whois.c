@@ -192,137 +192,129 @@ void pw_log_query( Query_environ *qe,
   char *hostaddress      IP address of the query
 
   ++++++++++++++++++++++++++++++++++++++*/
-void PW_process_qc(Query_environ *qe,
-		   Query_command *qc,
-		   acc_st *acc_credit,
-		   acl_st *acl_eip,
-                   char *hostaddress)
-{
-  GList *qitem;
-  Query_instructions *qis=NULL;
-  int err;
+void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_st *acl_eip, char *hostaddress) {
+	GList *qitem;
+	Query_instructions *qis=NULL;
+	int err;
 
-  switch( qc->query_type ) {
-  case QC_PARERR:
-    /* parameter error. relevant error message is already printed */
-    /* force disconnection on error */
-    qe->k = 0;
-    break;
-  case QC_NOKEY:
-    /* no key (this is OK for some operational stuff, like -k) */
-    /* we still need an extra newline to hand control back to the
-       client in the "-k" scenerio */
-    if (qe->k) {
-/* XXX: in the query new code this newline is not necessary! */
-/*        SK_cd_puts(&(qe->condat), "\n");*/
-        break;
-    }
-    /* if not -k, treat as an empty query, and FALLTHROUGH */
-  case QC_EMPTY:
-    /* The user didn't specify a key, so
-       - print moron banner
-       - force disconnection of the user. */
-    {
-      char *rep = ca_get_pw_err_nokey ;
-      SK_cd_printf(&(qe->condat), "%s\n\n", rep);
-      UT_free(rep);
-    }
-    qe->condat.rtc = SK_NOTEXT;
-    break;
-  case QC_HELP:
-  case QC_SYNERR:
-    {
-      char *rep = ca_get_pw_help_file ;
-      display_file( &(qe->condat), rep);
-      UT_free(rep);
-    }
-    break;
-  case QC_TEMPLATE:
-    switch(qc->q) {
-    case QC_Q_SOURCES:
-      /* print source & mirroring info */
-      {
-	GString *srcs = PM_get_nrtm_sources( & qe->condat.rIP, NULL);
-	SK_cd_puts(&(qe->condat), srcs->str);
-	g_string_free (srcs, TRUE);
-      }
-      break;
-    case QC_Q_TYPES:
-      /* print available types */
-      {
-        int i;
-        char * const *class_names = DF_get_class_names();
-        GString *types = g_string_new("");
-        for (i=0; class_names[i] != NULL; i++) {
-            g_string_append(types, class_names[i]);
-            g_string_append_c(types, '\n');
-        }
-        g_string_append_c(types, '\n');
-        SK_cd_puts(&(qe->condat), types->str);
-        g_string_free(types, TRUE);
-      }
-      break;
-    case QC_Q_VERSION:
-      SK_cd_puts(&(qe->condat), "% RIP version " VERSION "\n\n");
-      break;
-    default:
-      /* EMPTY */;
-    } /* -q */
-
-    if (qc->t >= 0) {
-      SK_cd_printf(&(qe->condat), "%s\n", DF_get_class_template(qc->t));
-    }
-    if (qc->v >= 0) {
-      SK_cd_puts(&(qe->condat), DF_get_class_template_v(qc->v));
-      /* no need for newline here, because it's all broken for any */
-      /* automated processor at this point anyway */
-    }
-    break;
-
-  case QC_FILTERED:
-    {
-      char *rep = ca_get_pw_k_filter ;
-      SK_cd_puts(&(qe->condat), rep);
-      UT_free(rep);
-    }
-    /* FALLTROUGH */
-  case QC_REAL:
-    qis = QI_new(qc,qe);
-
-    /* go through all sources,
-       stop if connection broken - further action is meaningless */
-    for( qitem = g_list_first(qe->sources_list);
-	 qitem != NULL && qe->condat.rtc == 0;
-	 qitem = g_list_next(qitem)) {
-
-
-      /* QI will decrement the credit counters */
-      PW_record_query_start();
-      err = QI_execute(qitem->data, qis, qe, acc_credit, acl_eip );
-      PW_record_query_end();
-      if( !NOERR(err) ) {
-	if( err == QI_CANTDB ) {
-	  SK_cd_puts(&(qe->condat), "% WARNING: Failed to make connection to ");
-	  SK_cd_puts(&(qe->condat), (char *)qitem->data);
-	  SK_cd_puts(&(qe->condat), " database.\n\n");
+	switch (qc->query_type) {
+	case QC_PARERR:
+		/* parameter error. relevant error message is already printed */
+		/* force disconnection on error */
+		qe->k = 0;
+		break;
+	case QC_NOKEY:
+		/* no key (this is OK for some operational stuff, like -k) */
+		/* we still need an extra newline to hand control back to the
+		 client in the "-k" scenerio */
+		if (qe->k) {
+			/* XXX: in the query new code this newline is not necessary! */
+			/*        SK_cd_puts(&(qe->condat), "\n");*/
+			break;
+		}
+		/* if not -k, treat as an empty query, and FALLTHROUGH */
+	case QC_EMPTY:
+		/* The user didn't specify a key, so
+		 - print moron banner
+		 - force disconnection of the user. */
+	{
+		char *rep = ca_get_pw_err_nokey;
+		SK_cd_printf(&(qe->condat), "%s\n\n", rep);
+		UT_free(rep);
 	}
-	break; /* quit the loop after any error */
-      }/* if error*/
+		qe->condat.rtc = SK_NOTEXT;
+		break;
+	case QC_HELP:
+	case QC_SYNERR: {
+		char *rep = ca_get_pw_help_file;
+		display_file( &(qe->condat), rep);
+		UT_free(rep);
+	}
+		break;
+	case QC_TEMPLATE:
+		switch (qc->q) {
+		case QC_Q_SOURCES:
+			/* print source & mirroring info */
+		{
+			GString *srcs = PM_get_nrtm_sources( &qe->condat.rIP, NULL);
+			SK_cd_puts(&(qe->condat), srcs->str);
+			g_string_free(srcs, TRUE);
+		}
+			break;
+		case QC_Q_TYPES:
+			/* print available types */
+		{
+			int i;
+			char * const*class_names = DF_get_class_names();
+			GString *types = g_string_new("");
+			for (i=0; class_names[i] != NULL; i++) {
+				g_string_append(types, class_names[i]);
+				g_string_append_c(types, '\n');
+			}
+			g_string_append_c(types, '\n');
+			SK_cd_puts(&(qe->condat), types->str);
+			g_string_free(types, TRUE);
+		}
+			break;
+		case QC_Q_VERSION:
+			SK_cd_puts(&(qe->condat), "% RIP version " VERSION "\n\n");
+			break;
+		default:
+			/* EMPTY */
+			;
+		} /* -q */
 
-    }/* for every source */
+		if (qc->t >= 0) {
+			SK_cd_printf(&(qe->condat), "%s\n", DF_get_class_template(qc->t));
+		}
+		if (qc->v >= 0) {
+			SK_cd_puts(&(qe->condat), DF_get_class_template_v(qc->v));
+			/* no need for newline here, because it's all broken for any */
+			/* automated processor at this point anyway */
+		}
+		break;
 
-    QI_free(qis);
+	case QC_FILTERED: {
+		char *rep = ca_get_pw_k_filter;
+		SK_cd_puts(&(qe->condat), rep);
+		UT_free(rep);
+	}
+		/* FALLTROUGH */
+	case QC_REAL:
+		qis = QI_new(qc, qe);
 
-    if( AC_credit_isdenied(acc_credit) ) {
-      /* host reached the limit of returned contact information */
-      char *rep = ca_get_pw_fmt_limit_reached ;
-      SK_cd_printf(&(qe->condat), rep,hostaddress);
-      UT_free(rep);
-    }
+		/* go through all sources,
+		 stop if connection broken - further action is meaningless */
+		for (qitem = g_list_first(qe->sources_list); qitem != NULL && qe->condat.rtc == 0; qitem = g_list_next(qitem)) {
 
-    break;
-  default: die;
-  }
+			/* QI will decrement the credit counters */
+			PW_record_query_start();
+			err = QI_execute(qitem->data, qis, qe, acc_credit, acl_eip);
+			PW_record_query_end();
+			if ( !NOERR(err) ) {
+				if (err == QI_CANTDB) {
+					SK_cd_puts(&(qe->condat), "% WARNING: Failed to make connection to ");
+					SK_cd_puts(&(qe->condat), (char *)qitem->data);
+					SK_cd_puts(&(qe->condat), " database.\n\n");
+				}
+				break; /* quit the loop after any error */
+			}/* if error*/
+
+		}/* for every source */
+
+		QI_free(qis);
+
+		if (AC_credit_isdenied(acc_credit) ) {
+			/* host reached the limit of returned contact information */
+			char *rep = ca_get_pw_fmt_limit_reached;
+			SK_cd_printf(&(qe->condat), rep, hostaddress);
+			UT_free(rep);
+		}
+
+		break;
+	default:
+		die;
+	}
 } /* PW_process_qc */
 
 /*

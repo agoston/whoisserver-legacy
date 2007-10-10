@@ -209,39 +209,36 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
   +html+ </UL></DL>
 
   ++++++++++++++++++++++++++++++++++++++*/
-int SQ_execute_query(SQ_connection_t *sql_connection, 
-		     const char *query, SQ_result_set_t **result_ptr) 
-{
-  int err;
-  SQ_result_set_t *result;
-  float seconds;
+int SQ_execute_query(SQ_connection_t *sql_connection, const char *query, SQ_result_set_t **result_ptr) {
+	int err;
+	SQ_result_set_t *result;
 
-  ut_timer_t start_time, stop_time; 
-  
-  UT_timeget(&start_time);
+//	there's no need to measure every f***ing query
+//	float seconds;
+//	ut_timer_t start_time, stop_time;
+//	UT_timeget(&start_time);
 
-  err = mysql_query(sql_connection, query);
+	err = mysql_query(sql_connection, query);
 
-  /* log the time and result of the query */
-  if (err == 0) {
-    result = mysql_store_result(sql_connection);
-    
-    UT_timeget(&stop_time);      
-    seconds = UT_timediff( &start_time, &stop_time );
-  
-    LG_log(sq_context, LG_DEBUG,
-		"spent %.2f sec; got %d rows from [%s: %s]", 
-		seconds, 
-		SQ_get_affected_rows(sql_connection),
-		sql_connection->db, 
-		query);
-    
-    if(result_ptr) *result_ptr=result;
-    else if(result) mysql_free_result(result);
-    return(0);
-  }
-  else return(-1);  
-  
+	/* log the time and result of the query */
+	if (err == 0) {
+		result = mysql_store_result(sql_connection);
+
+//	there's no need to measure every f***ing query
+//		UT_timeget(&stop_time);
+//		seconds = UT_timediff( &start_time, &stop_time);
+//
+//		LG_log(sq_context, LG_DEBUG, "spent %.2f sec; got %d rows from [%s: %s]", seconds,
+//		        SQ_get_affected_rows(sql_connection), sql_connection->db, query);
+
+		if (result_ptr)
+			*result_ptr=result;
+		else if (result)
+			mysql_free_result(result);
+		return (0);
+	} else
+		return (-1);
+
 } /* SQ_execute_query() */
 
 /* 
@@ -297,12 +294,7 @@ SQ_execute_query_nostore(SQ_connection_t *sql_connection,
 
   ++++++++++++++++++++++++++++++++++++++*/
 int SQ_get_column_count(SQ_result_set_t *result) {
-  int cols;
-
-  cols = mysql_num_fields(result);
-
-  return cols;
-
+	return mysql_num_fields(result);
 } /* SQ_get_column_count() */
 
 /* SQ_get_table_size() */
@@ -495,49 +487,43 @@ SQ_row_t *SQ_row_next(SQ_result_set_t *result) {
 
 /* SQ_get_column_string() */
 /*++++++++++++++++++++++++++++++++++++++
-  Get the column string.
+ Get the column string.
 
-  SQ_row_t *current_row The current row (obtained from a SQ_row_next() ).
-  
-  unsigned int column The column index.
+ SQ_row_t *current_row The current row (obtained from a SQ_row_next() ).
+ 
+ unsigned int column The column index.
 
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+ </UL></DL>
+ More:
+ +html+ <PRE>
+ Authors:
+ ottrey
+ +html+ </PRE><DL COMPACT>
+ +html+ <DT>Online References:
+ +html+ <DD><UL>
+ +html+ </UL></DL>
 
-  ++++++++++++++++++++++++++++++++++++++*/
+ ++++++++++++++++++++++++++++++++++++++*/
 char *SQ_get_column_string(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column) {
-  char *str=NULL;
-  unsigned length = mysql_fetch_lengths(result)[column];
-  
-  if (current_row != NULL && current_row[column] != NULL) {
-    str = (char *)UT_malloc(length + 1);
-    memcpy(str, current_row[column], length );
-    str[length] = '\0';
-  }
+	char *str=NULL;
+	unsigned length = mysql_fetch_lengths(result)[column];
 
-  return str;
-  
+	if (current_row != NULL && current_row[column] != NULL) {
+		str = (char *)UT_malloc(length + 1);
+		memcpy(str, current_row[column], length);
+		str[length] = '\0';
+	}
+
+	return str;
 } /* SQ_get_column_string() */
 
 /* SQ_get_column_string_nocopy - return pointer to the column string
-   without making a copy of it */
-char *SQ_get_column_string_nocopy(SQ_result_set_t *result, 
-				  SQ_row_t *current_row, 
-				  unsigned int column) 
-{
-  if (current_row != NULL && current_row[column] != NULL) {
-    return (char *)current_row[column];
-  }
-  return NULL;
+ without making a copy of it */
+char *SQ_get_column_string_nocopy(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column) {
+	if (current_row != NULL && current_row[column] != NULL) {
+		return (char *)current_row[column];
+	}
+	return NULL;
 }/* SQ_get_column_string_nocopy */
-
-
 
 /* SQ_get_column_strings() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -612,32 +598,32 @@ char *SQ_get_column_strings(SQ_result_set_t *result, unsigned int column) {
   +html+ </UL></DL>
 
   ++++++++++++++++++++++++++++++++++++++*/
-int SQ_get_column_int(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long  *resultptr) {
-  int ret_val;
-  long col_val;
-  char *endptr;
+int SQ_get_column_int(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long *resultptr) {
+	int ret_val;
+	long col_val;
+	char *endptr;
 
-  if (current_row[column] != NULL) {
-      col_val = strtol((char *)current_row[column], &endptr, 10);
+	if (current_row[column] != NULL) {
+		col_val = strtol((char *)current_row[column], &endptr, 10);
 
-      /* under- or over-flow */
-      if (((col_val==LONG_MIN) || (col_val==LONG_MAX)) && (errno==ERANGE)) {
-	ret_val = -1;
+		/* under- or over-flow */
+		if (((col_val==LONG_MIN) || (col_val==LONG_MAX)) && (errno==ERANGE)) {
+			ret_val = -1;
 
-      /* unrecognized characters in string */
-      } else if (*endptr != '\0') {
-	ret_val = -1;
+			/* unrecognized characters in string */
+		} else if (*endptr != '\0') {
+			ret_val = -1;
 
-      /* good parse */
-      } else {
-	*resultptr = col_val;
-	ret_val = 0;
-      }
-  } else {
-      ret_val = -1;
-  }
-  return ret_val;
-  
+			/* good parse */
+		} else {
+			*resultptr = col_val;
+			ret_val = 0;
+		}
+	} else {
+		ret_val = -1;
+	}
+	return ret_val;
+
 } /* SQ_get_column_int() */
 
 
@@ -772,9 +758,7 @@ void SQ_free_result(SQ_result_set_t *result) {
 
   ++++++++++++++++++++++++++++++++++++++*/
 void SQ_close_connection(SQ_connection_t *sql_connection) {
-
-  mysql_close(sql_connection);
-
+	mysql_close(sql_connection);
 }
 
 /* SQ_num_rows() */
@@ -795,13 +779,7 @@ void SQ_close_connection(SQ_connection_t *sql_connection) {
 
   ++++++++++++++++++++++++++++++++++++++*/
 int SQ_num_rows(SQ_result_set_t *result) {
-  int rows=-1;
-
-  if (result != NULL) {
-    rows = mysql_num_rows(result);
-  }
-
-  return rows;
+	if (result != NULL) return mysql_num_rows(result);
 }
 
 /* SQ_info_to_string() */
@@ -908,9 +886,7 @@ char *SQ_info_to_string(SQ_connection_t *sql_connection) {
 
   ++++++++++++++++++++++++++++++++++++++*/
 char *SQ_error(SQ_connection_t *sql_connection) {
-
-  return (char*)mysql_error(sql_connection);
-
+	return (char*)mysql_error(sql_connection);
 } /* SQ_error() */
 
 /* SQ_errno() */
@@ -935,6 +911,72 @@ int SQ_errno(SQ_connection_t *sql_connection) {
   return mysql_errno(sql_connection);
 
 } /* SQ_errno() */
+
+/************************************************************
+ * get_minmax_id()                                           *
+ *                                                           *
+ * Returns the min or max ID of the table                    *
+ *                                                           *
+ * Returns:                                                  *
+ *  min (max=0) or max (max=1) ID                            *
+ *  -1 in case of an error                                   *
+ *************************************************************/
+long sq_get_minmax_id(SQ_connection_t *sql_connection, char *id_name, char *table, int max) {
+	GString *query;
+	SQ_result_set_t *sql_result;
+	SQ_row_t *sql_row;
+	char *sql_str;
+	long id;
+	char *minmax;
+	int sql_err;
+
+	query = g_string_sized_new(STR_M);
+
+	if (max==1)
+		minmax="max";
+	else
+		minmax="min";
+
+	g_string_sprintf(query, "SELECT %s(%s) FROM %s ", minmax, id_name, table);
+
+	sql_err = SQ_execute_query(sql_connection, query->str, &sql_result);
+
+	if (sql_err) {
+		LG_log(sq_context, LG_SEVERE, "%s[%s]\n", SQ_error(sql_connection), query->str);
+		die;
+	}
+
+	if ((sql_row = SQ_row_next(sql_result)) != NULL) {
+		sql_str = SQ_get_column_string(sql_result, sql_row, 0);
+
+		/* We must process all the rows of the result,*/
+		/* otherwise we'll have them as part of the next qry */
+		while ( (sql_row = SQ_row_next(sql_result)) != NULL) {
+			LG_log(sq_context, LG_SEVERE, "duplicate max [%s]\n", query->str);
+			die;
+		}
+	} else
+		sql_str=NULL;
+
+	if (sql_result) {
+		SQ_free_result(sql_result);
+		sql_result=NULL;
+	}
+
+	if (sql_str) {
+		id = atol(sql_str);
+		UT_free(sql_str);
+	}
+	/* table is empty, max_id=min_id=0 */
+	else
+		id=0;
+
+	/* free temporary space used for query */
+	g_string_free(query, TRUE);
+
+	return (id);
+}
+
 
 /* SQ_get_info() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -1044,70 +1086,6 @@ int SQ_ping(SQ_connection_t *sql_connection)
 	return(mysql_ping(sql_connection));
 }
 
-/************************************************************
-* get_minmax_id()                                           *
-*                                                           *
-* Returns the min or max ID of the table                    *
-*                                                           *
-* Returns:                                                  *
-*  min (max=0) or max (max=1) ID                            *
-*  -1 in case of an error                                   *
-*                                                           *
-*                                                           *
-*************************************************************/
-
-long sq_get_minmax_id(SQ_connection_t *sql_connection, char *id_name, char *table, int max) {
-GString *query;
-SQ_result_set_t *sql_result;
-SQ_row_t *sql_row;
-char *sql_str;
-long id;
-char *minmax;
-int sql_err;
-
-query = g_string_sized_new(STR_M);
-
-if(max==1)minmax="max"; else minmax="min";
-
- g_string_sprintf(query, "SELECT %s(%s) FROM %s ", minmax, id_name, table);
-
- sql_err = SQ_execute_query(sql_connection, query->str, &sql_result);
- 
- if(sql_err) {
-    LG_log(sq_context, LG_SEVERE, "%s[%s]\n", SQ_error(sql_connection), 
-              query->str);
-    die;
- }
-        
-	 
- if ((sql_row = SQ_row_next(sql_result)) != NULL) {
-	sql_str = SQ_get_column_string(sql_result, sql_row, 0);
-
-     /* We must process all the rows of the result,*/
-     /* otherwise we'll have them as part of the next qry */
-	while ( (sql_row = SQ_row_next(sql_result)) != NULL) {
-          LG_log(sq_context, LG_SEVERE, "duplicate max [%s]\n", query->str);
-	  die;
-	}
- }
- else sql_str=NULL;
- 
- if(sql_result){ SQ_free_result(sql_result); sql_result=NULL; }
- 
- if(sql_str) {
-  id = atol(sql_str);
-  UT_free(sql_str);
- }
- /* table is empty, max_id=min_id=0 */
- else id=0;
-
- /* free temporary space used for query */
- g_string_free(query, TRUE);
- 
- return(id);
- 
-}
-
 /* SQ_escape_string() */
 /*++++++++++++++++++++++++++++++++++++++
   Returns a copy of the string passed that has been escaped so it
@@ -1128,14 +1106,13 @@ if(max==1)minmax="max"; else minmax="min";
 
   ++++++++++++++++++++++++++++++++++++++*/
 
-char *SQ_escape_string(SQ_connection_t *sql_connection, char *str)
-{
-    char *new_str;
-    int length;
+char *SQ_escape_string(SQ_connection_t *sql_connection, char *str) {
+	char *new_str;
+	int length;
 
-    length = strlen(str);
-    new_str = (char *)UT_malloc((length * 2) + 1);
-    mysql_real_escape_string(sql_connection, new_str, str, length);
-    return new_str;
+	length = strlen(str);
+	new_str = (char *)UT_malloc((length * 2) + 1);
+	mysql_real_escape_string(sql_connection, new_str, str, length);
+	return new_str;
 }
 

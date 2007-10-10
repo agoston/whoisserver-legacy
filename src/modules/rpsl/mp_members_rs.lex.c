@@ -1371,7 +1371,7 @@ char *mp_members_rstext;
   notes:
     Tokens are defined in the associated grammar, mp_members_rs.y.
 
-  $Id: mp_members_rs.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
+  $Id: mp_members_rs.l,v 1.1.14.1 2006/09/29 12:32:29 katie Exp $
 */
 
 /******************

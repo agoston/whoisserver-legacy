@@ -2150,7 +2150,7 @@ char *mp_defaulttext;
   notes:
     Tokens are defined in the associated grammar, mp_default.y.
 
-  $Id: mp_default.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
+  $Id: mp_default.l,v 1.1.14.1 2006/09/29 12:32:29 katie Exp $
 */
 
 #line 50 "mp_default.l"

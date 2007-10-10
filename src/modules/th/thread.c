@@ -1,3 +1,11 @@
+/* THIS MODULE IS OBSOLETE
+ * 
+ * There is pthread_rwlock support in libc, there is absolutely no need
+ * to simulate those using pthread_mutex calls
+ * 
+ * for example on pthread_rwlock, see aa.c
+ */ 
+
 /***************************************
   $Revision: 1.7 $
 
@@ -344,11 +352,10 @@ void do_nice_die(int line, char *file) {
 			system(buf);
 		}
 #endif
-
-		/* that's the legacy way to bail out - it generates a segfault, so core can be dumped if needed */
-		//*((int*)NULL)=0;
-	
-		// this is the more 1337 way to dump core
 	}
+	/* that's the legacy way to bail out - it generates a segfault, so core can be dumped if needed */
+	//*((int*)NULL)=0;
+
+	// this is the more 1337 way to dump core
 	(*orig_segfault_handler)(11);
 }

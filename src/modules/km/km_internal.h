@@ -36,6 +36,7 @@
 #include "km.h"
 #include "lu.h"
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
   gchar* key_id;

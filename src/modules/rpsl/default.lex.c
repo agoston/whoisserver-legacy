@@ -1784,7 +1784,7 @@ char *defaulttext;
   notes:
     Tokens are defined in the associated grammar, default.y.
 
-  $Id: default.lex.c,v 1.2.12.1 2006/09/29 12:32:29 katie Exp $
+  $Id: default.l,v 1.1.14.1 2006/09/29 12:32:29 katie Exp $
 */
 
 #line 40 "default.l"

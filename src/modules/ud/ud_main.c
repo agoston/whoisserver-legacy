@@ -325,7 +325,7 @@ void UD_do_nrtm(void *arg)
 			}
 
 			/* get current serial */
-			nrtm->current_serial = PM_get_current_serial(ud_stream.db_connection);
+			nrtm->current_serial = SQ_get_max_id(ud_stream.db_connection, "serial_id", "serials");
 
 			if (nrtm->current_serial == -1) {
 				LG_log(ud_context, LG_SEVERE, "cannot obtain current serial: %ld", nrtm->current_serial);

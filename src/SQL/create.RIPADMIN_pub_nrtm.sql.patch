@@ -1,0 +1,2 @@
+ALTER TABLE aaa DROP COLUMN netupdate;
+ALTER TABLE aaa6 DROP COLUMN netupdate;

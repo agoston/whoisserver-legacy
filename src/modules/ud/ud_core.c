@@ -441,6 +441,85 @@ char *result;
 } 
 
 /************************************************************
+ * Executes a query and returns the first row as an integer array
+ * caller must preallocate buffer
+ * dies on sql errors
+ *************************************************************/
+void get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_query, long *sql_res) {
+	SQ_result_set_t *sql_result;
+	SQ_row_t *sql_row;
+	char *sql_str;
+	int sql_err;
+	int ret_size, i;
+
+	sql_err = SQ_execute_query(sql_connection, sql_query, &sql_result);
+
+	if (sql_err) {
+		LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(sql_connection), sql_query);
+		die;
+	}
+
+	if ((sql_row = SQ_row_next(sql_result)) != NULL) {
+		ret_size = SQ_get_column_count(sql_result);
+		for (i=0; i < ret_size; i++) {
+			if (SQ_get_column_int(sql_result, sql_row, i, &sql_res[i])) {
+				LG_log(ud_context, LG_SEVERE, "Error during SQ_get_column_int(%d) [%s]", i, sql_query);
+				die;
+			}
+		}
+	}
+
+	if (sql_result) {
+		SQ_free_result(sql_result);
+		sql_result=NULL;
+	}
+}
+
+/************************************************************
+ * Executes a query and returns the first row as a long array
+ * dies on sql errors
+ * 
+ * Returns:
+ * long* pointing to the integer array, to be freed by caller
+ *  
+ *************************************************************/
+long *get_fields_int(SQ_connection_t *sql_connection, const char *sql_query) {
+	SQ_result_set_t *sql_result;
+	SQ_row_t *sql_row;
+	char *sql_str;
+	int sql_err;
+	int ret_size, i;
+	long *ret;
+
+	sql_err = SQ_execute_query(sql_connection, sql_query, &sql_result);
+
+	if (sql_err) {
+		LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(sql_connection), sql_query);
+		die;
+	}
+
+	if ((sql_row = SQ_row_next(sql_result)) != NULL) {
+		ret_size = SQ_get_column_count(sql_result);
+		if (ret_size) {
+			ret = malloc(sizeof(long)*ret_size);
+			for (i=0; i < ret_size; i++) {
+				if (SQ_get_column_int(sql_result, sql_row, i, &ret[i])) {
+					LG_log(ud_context, LG_SEVERE, "Error during SQ_get_column_int(%d) [%s]", i, sql_query);
+					die;
+				}
+			}
+		}
+	}
+
+	if (sql_result) {
+		SQ_free_result(sql_result);
+		sql_result=NULL;
+	}
+
+	return ret;
+} 
+
+/************************************************************
 * long get_sequence_id(Transaction_t *tr)
 * >0 - success
 * -1 - sql error
