@@ -18,19 +18,23 @@
   AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
   ***************************************/
+#ifndef AA_H
+#define AA_H
 
 #include "iproutines.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* DENY = can't get nrtm stream
+ * PUBLIC = can get public nrtm stream (person, role, mntner, org, irt objects removed)
+ * FULL = can get full nrtm stream */
+typedef enum {
+	AA_MIRROR_DENY,
+	AA_MIRROR_PUBLIC,
+	AA_MIRROR_FULL
+} aa_mirror_right;
 
 void AA_init();
 void AA_load();
 int AA_can_ripupdate(ip_addr_t *address, char *source);
-int AA_can_mirror(ip_addr_t *address, char *source);
+aa_mirror_right AA_can_mirror(ip_addr_t *address, char *source);
 
-#ifdef __cplusplus
-}
 #endif
-

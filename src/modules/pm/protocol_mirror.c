@@ -31,9 +31,6 @@
 
 #include "rip.h"
 
-#include <stdio.h>
-#include <glib.h>
-
 #define MIN_ARG_LENGTH  6
 #define NRTM_DELIM "-:"
 
@@ -48,6 +45,9 @@
 #define IS_PERSISTENT(a)       ((a)&K_QUERY)
 
 LG_context_t *pm_context;
+
+/* object types considered private, in order: mntner, person, role, irt, organisation */
+const int PM_PRIVATE_OBJECT_TYPES[] = {9, 10, 11, 17, 18};
 
 void PM_init(LG_context_t *ctx) {
 	pm_context = ctx;
@@ -217,6 +217,8 @@ void PM_interact(int sock) {
 	nrtm_q_t nrtm_q;
 	long current_serial;
 	long oldest_serial;
+	long object_type;
+	aa_mirror_right mirror_perm;
 
 	char *object;
 	int operation;
@@ -321,7 +323,7 @@ void PM_interact(int sock) {
 
 	/* check if the client is authorized to mirror */
 	SK_getpeerip(sock, &address);
-	if (!AA_can_mirror(&address, nrtm_q.source)) {
+	if (!(mirror_perm = AA_can_mirror(&address, nrtm_q.source))) {
 		LG_log(pm_context, LG_DEBUG, "[%s] --  Not authorized to mirror the source %s", hostaddress, nrtm_q.source);
 		sprintf(buff, "\n%%ERROR:402: not authorized to mirror the database\n\n\n");
 		SK_cd_puts(&condat, buff);
@@ -373,7 +375,7 @@ void PM_interact(int sock) {
 	UT_free(db_pswd);
 
 	/* Not to consume the last serial which may cause crash */
-	PM_get_minmax_serial(sql_connection, &current_serial, &oldest_serial);
+	PM_get_minmax_serial(sql_connection, &oldest_serial, &current_serial);
 	current_serial -= SAFE_BACKLOG;
 
 	if ((current_serial==-1) || (oldest_serial==-1)) {
@@ -431,36 +433,50 @@ void PM_interact(int sock) {
 	/* make a record for thread accounting */
 	TA_setactivity(buff);
 
+	/* FIXME: This is crap, but we will redo nrtm completely after the radix tree removal anyway.
+	 * It will do until then... */ 
 	/*************************** MAIN LOOP ****************************/
 	/* now start feeding client with data */
 	do {
 
 		/************ ACTUAL PROCESSING IS HERE ***********/
 		/* this call will block if queries are paused */
-		object=PM_get_serial_object(sql_connection, current_serial, &operation);
+		object=PM_get_serial_object(sql_connection, current_serial, &object_type, &operation);
 
 		/* there is a probability that mirroring interferes with HS cleanup */
-		/* in such case serial may be deleted before it is read by mirrir client */
+		/* in such case serial may be deleted before it is read by mirror client */
 		/* null object will be returned in this case and we need to break the loop */
 		if (object==NULL)
 			break;
-		
+
+		/* filter private object types if it is not authorized */
+		if (mirror_perm == AA_MIRROR_PUBLIC) {
+			int i = 0;
+			for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
+				if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
+					/* don't process this one */
+					operation = OP_NOOP;
+					break;
+				}
+			}
+		}
+
+		/* FIXME: OP_UPD is a defined operation, but not used in serials table - left unhandled here, too */
 		switch (operation) {
-		case OP_NOOP:
-			continue;
-			
 		case OP_ADD:
 			SK_cd_puts(&condat, "ADD\n\n");
+			SK_cd_puts(&condat, object);
+			SK_cd_puts(&condat, "\n");
 			break;
 		
 		case OP_DEL:
-		default:
 			SK_cd_puts(&condat, "DEL\n\n");
+			SK_cd_puts(&condat, object);
+			SK_cd_puts(&condat, "\n");
+			break;
+
+		case OP_NOOP:
 		}
-
-		SK_cd_puts(&condat, object);
-
-		SK_cd_puts(&condat, "\n");
 
 		UT_free(object);
 		current_serial++;

@@ -169,11 +169,8 @@ int AA_can_ripupdate(ip_addr_t *address, char *source) {
 	return 0;
 }
 
-/* returns the mirror field of the most specific aaa record for the given ip address and source 
- * 0 = can't get nrtm stream
- * 1 = can get public nrtm stream (person, role, mntner, org, irt objects removed)
- * 2 = can get private nrtm stream */
-int AA_can_mirror(ip_addr_t *address, char *source) {
+/* returns the mirror field of the most specific aaa record for the given ip address and source */ 
+aa_mirror_right AA_can_mirror(ip_addr_t *address, char *source) {
 	aa_rights *myrights = aa_find(address, source);
 	if (myrights)
 		return myrights->mirror;

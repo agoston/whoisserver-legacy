@@ -99,7 +99,7 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
  * Note:
  *  returned string should be freed by the caller
  *************************************************************/
-char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, int *operation) {
+char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, long *object_type, int *operation) {
 	char *table;
 	SQ_result_set_t * sql_result;
 	SQ_row_t *sql_row;
@@ -113,7 +113,7 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 	/* which means access to the database is allowed */
 	PW_record_query_start();
 
-	sprintf(query, "SELECT atlast,operation FROM serials WHERE serial_id = %s", serial_number);
+	sprintf(query, "SELECT atlast,operation FROM serials WHERE serial_id = %d", serial_number);
 	get_fields_int_noalloc(sql_connection, query, locop);
 	location = locop[0];
 	*operation = locop[1];
@@ -132,10 +132,12 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 		return (NULL);
 	}
 
+	/* FIXME: failed_transaction is always empty when running on innodb - I'll leave this in place, 
+	 * just in case, but I don't handle the privacy bit of mirroring - agoston, 2007-10-09 */
 	if (location == 2)
 		sprintf(query, "SELECT object FROM failed_transaction WHERE serial_id=%ld ", serial_number);
 	else
-		sprintf(query, "SELECT %1$s.object FROM %1$s, serials "
+		sprintf(query, "SELECT %1$s.object, %1$s.object_type FROM %1$s, serials "
 			"WHERE serials.serial_id=%2$ld "
 			"AND serials.object_id=%1$s.object_id "
 			"AND serials.sequence_id=%1$s.sequence_id ", table, serial_number);
@@ -149,6 +151,10 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 
 	if ((sql_row = SQ_row_next(sql_result)) != NULL) {
 		sql_str = SQ_get_column_string(sql_result, sql_row, 0);
+		if (SQ_get_column_int(sql_result, sql_row, 1, object_type)) {
+			LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+			die;
+		}
 	} else
 		sql_str=NULL;
 

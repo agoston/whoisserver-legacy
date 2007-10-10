@@ -65,7 +65,7 @@ typedef struct _nrtm_q_t {
 } nrtm_q_t;
 
 void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max);
-char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, int *operation);
+char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, long *object_type, int *operation);
 GString *PM_get_nrtm_sources(ip_addr_t *client_address, char *source);
 
 void PM_interact(int sock);
