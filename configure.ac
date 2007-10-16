@@ -381,7 +381,8 @@ AC_CONFIG_FILES([
   src/utils/make_db
   src/utils/load_all.sh
   src/utils/whoisd.server
-  src/utils/whoisd_start])
+  src/utils/whoisd_start
+  tests/dbupdate/testing/conf/dataset.conf])
 AC_CONFIG_COMMANDS([permissions],[
   chmod u+x src/defs/makedefsall; \
   chmod u+x src/utils/remadmin.pl; \

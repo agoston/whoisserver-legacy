@@ -53,7 +53,6 @@ EXTRA_DIST = README \
 	     src/utils/whoisd_start.in \
 	     src/SQL/aux.index.2.in \
 	     src/SQL/create.RIPADMIN.sql.in \
-	     src/SQL/create.RIPADMIN.sql.patch.in \
 	     src/SQL/create.first-stage.in \
 	     src/SQL/create.irt-tables.sql.patch.in \
 	     src/SQL/create.last-history-indexes.sql.patch.in \
