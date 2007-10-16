@@ -29,6 +29,11 @@
  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ***************************************/
 
+/* FIXME: NRTM protocol is basically undocumented and unspecified.
+ * The only doc I could find googling 'site:ripe.net' is this proposal email:
+ * http://ripe.net/ripe/maillists/archives/db-wg/2000/msg00201.html
+ * agoston, 2007-10-10 */
+
 #include "rip.h"
 
 #define MIN_ARG_LENGTH  6
@@ -427,7 +432,8 @@ void PM_interact(int sock) {
 		SK_cd_puts(&condat, "\n");
 	}
 
-	sprintf(buff, "%%START Version: %d %s %ld-%ld\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last);
+	sprintf(buff, "%%START Version: %d %s %ld-%ld%s\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last,
+			(mirror_perm < AA_MIRROR_FULL)?"FILTERED":"");
 	SK_cd_puts(&condat, buff);
 
 	/* make a record for thread accounting */
@@ -463,19 +469,19 @@ void PM_interact(int sock) {
 
 		/* FIXME: OP_UPD is a defined operation, but not used in serials table - left unhandled here, too */
 		switch (operation) {
-		case OP_ADD:
-			SK_cd_puts(&condat, "ADD\n\n");
-			SK_cd_puts(&condat, object);
-			SK_cd_puts(&condat, "\n");
-			break;
-		
-		case OP_DEL:
-			SK_cd_puts(&condat, "DEL\n\n");
-			SK_cd_puts(&condat, object);
-			SK_cd_puts(&condat, "\n");
-			break;
+			case OP_ADD:
+				SK_cd_puts(&condat, "ADD\n\n");
+				SK_cd_puts(&condat, object);
+				SK_cd_puts(&condat, "\n");
+				break;
 
-		case OP_NOOP:
+			case OP_DEL:
+				SK_cd_puts(&condat, "DEL\n\n");
+				SK_cd_puts(&condat, object);
+				SK_cd_puts(&condat, "\n");
+				break;
+
+			case OP_NOOP:
 		}
 
 		UT_free(object);

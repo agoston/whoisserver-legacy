@@ -205,10 +205,18 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
 		can_mirror='N';
 		min_serial=0;
 	} else {
-		if (AA_can_mirror(client_address, source))
-			can_mirror='Y';
-		else
-			can_mirror='N';
+		switch (AA_can_mirror(client_address, source)) {
+			default:
+			case AA_MIRROR_DENY:
+				can_mirror='N';
+				break;
+			case AA_MIRROR_PUBLIC:
+				can_mirror='X';
+				break;
+			case AA_MIRROR_FULL:
+				can_mirror='Y';
+				break;
+		}
 	}
 	g_string_sprintfa(gbuff, "%s:%d:%c:%lu-%lu\n", source, version, can_mirror, min_serial, max_serial);
 
