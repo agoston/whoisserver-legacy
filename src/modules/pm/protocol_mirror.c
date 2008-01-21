@@ -480,8 +480,6 @@ void PM_interact(int sock) {
 				SK_cd_puts(&condat, object);
 				SK_cd_puts(&condat, "\n");
 				break;
-
-			case OP_NOOP:
 		}
 
 		UT_free(object);

@@ -1,0 +1,3 @@
+-DCREATEPROTO=unixproto -DEMPTYPROTO=unixproto -DMAILSPOOL="/var/spool/mail" -DANONYMOUSHOME="/var/spool/mail/anonymous" -DACTIVEFILE="/var/lib/news/active" -DNEWSSPOOL="/var/spool/news" -DRSHPATH="/usr/bin/rsh" -DLOCKPGM="/usr/sbin/mlock"
+-DMD5ENABLE="/etc/cram-md5.pwd"
+-I/usr/include/openssl -I/usr/include/openssl/openssl -DSSL_CERT_DIRECTORY="/etc/ssl/certs" -DSSL_KEY_DIRECTORY="/etc/ssl/private"
