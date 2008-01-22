@@ -33,8 +33,8 @@ extern "C" {
 #endif
 
 void UT_init(LG_context_t *ctx);
-void UT_sendmail(const char *to, const char *subject, const char *body);
-void UT_alarm_operator(const char *title, const char *description);
+void UT_sendmail(const char *to, const char *subject, const char *body, ...);
+void UT_alarm_operator(const char *title, const char *description, ...);
 
 #ifdef __cplusplus
 }
