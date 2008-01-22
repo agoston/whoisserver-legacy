@@ -66,6 +66,13 @@ RIPADMIN sqlhost,3306,dbuser,dbpsw,RIPADMIN
 
 SOURCEFILE @confdir@/sources.config.sample
 
+#
+# Email address where warning/error emails are going to be sent.   
+# It is going to be passed as an argument to /usr/bin/mail, so if 
+# it supports multiple addresses, you can set multiple addresses
+# here as well.
+# To disable this feature, simply comment the line out.
+#OPEREMAIL unread@ripe.net
 
 ######################
 ###

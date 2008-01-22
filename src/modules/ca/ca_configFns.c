@@ -33,6 +33,10 @@ AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ***************************************/
 
+/* FIXME: This is a horrible piece of code. There is no sense of even trying to optimize or fix it - it's fubar.
+ * Should be thrown out as it is.
+ * agoston, 2007-11-16 */
+
 #define DICT_INIT
 #include "rip.h"
 

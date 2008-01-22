@@ -91,7 +91,6 @@ static void dummify_init() {
 		g_hash_table_foreach(actclass->attr_hash, collect_mandatory_attribs_callback, NULL);
 	}
 	
-	
 	/* parse dummify config options
 	 * it is required during the full lifespan of the whoisserver process, so there is no mechanism to
 	 * free() the structures allocated here - agoston, 2007-10-31 */
@@ -624,8 +623,10 @@ void PM_interact(int sock) {
 	/* make a record for thread accounting */
 	TA_setactivity(buff);
 
-	/* FIXME: This is crap, but we will redo nrtm completely after the radix tree removal anyway.
-	 * It will do until then... */
+	/* FIXME: This is the most basic solution possible (i.e. crap). There's a lot of room for optimization.
+	 * Let's see how it works in real world first. If we would encounter performance problems, this is the
+	 * entry point for nrtm optimizations.
+	 * agoston, 2007-11-15 */
 	/*************************** MAIN LOOP ****************************/
 	/* now start feeding client with data */
 	do {
