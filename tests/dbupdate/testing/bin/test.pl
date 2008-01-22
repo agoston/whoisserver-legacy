@@ -1178,7 +1178,7 @@ my $object;
 # Remarks: (hopefully) improve configurability!!!
 sub parse_rip_config()	{
 my $configfile = getvar('RIP_CONFIG');
-my @vars = ( qw/ SVWHOIS_PORT SVCONFIG_PORT GPGCMD UPDSOURCE ACKLOG UPDLOG FORWLOG NOTIFLOG TMPDIR RIPADMIN/ );
+my @vars = ( qw/ SVWHOIS_PORT SVCONFIG_PORT SVMIRROR_PORT GPGCMD UPDSOURCE ACKLOG UPDLOG FORWLOG NOTIFLOG TMPDIR RIPADMIN/ );
 
 # format is multiline vars, like
 # VARNAME whitespaces VALUE 
