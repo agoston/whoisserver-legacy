@@ -1603,15 +1603,9 @@ rpsl_object_get_text (const rpsl_object_t *object, guint data_column)
         }
     }
 
-    /* copy value to return */
-    retval = (gchar *)malloc(s->len + 1);
-    if (retval != NULL) {
-        strcpy(retval, s->str);
-    }
-
-    /* free string */
-    g_string_free(s, TRUE);
-
+    if (retval) retval = s->str;
+    g_string_free(s, FALSE);
+    
     /* return result (returns NULL if memory allocation failed) */
     return retval;
 }
