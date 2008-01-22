@@ -37,107 +37,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* m4 macro */
 
-
 #ifndef CA_DICTIONARY
 #define CA_DICTIONARY
 
 #define CAP_W 0x000001
 #define CAP_U 0x000002
-
-
-
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-  
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
 
 typedef enum
 {
@@ -233,6 +137,8 @@ typedef enum
   CA_NS_DELCHECKCONF,
   CA_DISALLOWMNT,
   CA_COMMAND_ON_DIE,
+  CA_DUMMY_ATTR,
+  CA_DUMMY_ADD_ATTR,
 
   CA_NUMBEROFSYMBOLS
 
@@ -334,7 +240,9 @@ dict_t dictionary[] =
  {"NS_NSERVERS", "CA_NS_NSERVERS",  "CA_STRING", CA_NS_NSERVERS, 1},
  {"NS_DELCHECKCONF", "CA_NS_DELCHECKCONF",  "CA_STRING", CA_NS_DELCHECKCONF, 1},
  {"DISALLOWMNT", "CA_DISALLOWMNT",  "CA_STRING", CA_DISALLOWMNT, 1},
- {"COMMAND_ON_DIE", "CA_COMMAND_ON_DIE",  "CA_STRING", CA_COMMAND_ON_DIE, 1},
+ {"COMMAND_ON_DIE", "CA_COMMAND_ON_DIE", "CA_STRING", CA_COMMAND_ON_DIE, 1},
+ {"DUMMY_ATTR", "CA_DUMMY_ATTR", "CA_STRING", CA_DUMMY_ATTR, 1},
+ {"DUMMY_ADD_ATTR", "CA_DUMMY_ADD_ATTR", "CA_STRING", CA_DUMMY_ADD_ATTR, 1},
 
  {"", "", "", CA_NUMBEROFSYMBOLS, 1}
 };

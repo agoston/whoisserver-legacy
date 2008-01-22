@@ -52,10 +52,44 @@
 LG_context_t *pm_context;
 
 /* object types considered private, in order: mntner, person, role, irt, organisation */
-const int PM_PRIVATE_OBJECT_TYPES[] = {9, 10, 11, 17, 18};
+const int PM_PRIVATE_OBJECT_TYPES[] = { 9, 10, 11, 17, 18 };
+
+gchar **PM_DUMMY_ADD_ATTR;
+GHashTable *PM_DUMMY_ATTR;
+
+/* initializes variables to use in dummify_object()
+ * need to be executed before any calls to dummify_object() are made
+ * agoston, 2007-10-31 */
+static void dummify_init() {
+	gchar **lines, *actline, *equal;
+	char *dummy_attr = ca_get_dummy_attr;
+	char *dummy_add_attr = ca_get_dummy_add_attr;
+
+	/* parse dummify config options
+	 * it is required during the full lifespan of the whoisserver process, so there is no mechanism to
+	 * free() it whatsoever - agoston, 2007-10-31 */
+	PM_DUMMY_ADD_ATTR = g_strsplit(dummy_add_attr, "\n", 0);
+	PM_DUMMY_ATTR = g_hash_table_new(g_str_hash, g_str_equal);
+
+	lines = g_strsplit(ca_get_dummy_attr, "\n", 0);
+	for (actline = *lines; actline; actline++) {
+		equal = strchr(actline, '=');
+		if (!equal) {
+			/* No = sign found in one of the DUMMY_ATTR lines in the rip.config file */
+			die;
+		}
+
+		*equal = 0;
+		g_hash_table_insert(PM_DUMMY_ATTR, actline, equal+1);
+	}
+
+	free(dummy_attr);
+	free(dummy_add_attr);
+}
 
 void PM_init(LG_context_t *ctx) {
 	pm_context = ctx;
+	dummify_init();
 }
 
 /*
@@ -86,79 +120,81 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 
 	while ((c = mg_getopt(opt_argc, opt_argv, "kq:g:", gst)) != EOF) {
 		switch (c) {
-		case 'k':
-			res |= K_QUERY; /* persistent connection */
-			break;
+			case 'k':
+				res |= K_QUERY; /* persistent connection */
+				break;
 
-		case 'q':
-			if (gst->optarg != NULL) {
-				char *token, *cursor = gst->optarg;
+			case 'q':
+				if (gst->optarg != NULL) {
+					char *token, *cursor = gst->optarg;
 
-				res |= Q_QUERY;
-				err=strncmp(cursor, "sources", 7);
-				if (err!=0)
-					break;
-				cursor+=7;
-				g_strchug(cursor);
-				token=cursor;
-				/* if no sourses are specified - put NULL in nrtm_q->source and list them all */
-				if ((*token=='\0') || (*token=='\n')|| ((int)*token==13))
-					nrtm_q->source=NULL;
-				else {
-					cursor=index(token, ' ');
-					if (cursor)
-						nrtm_q->source=g_strndup(token, (cursor-token));
+					res |= Q_QUERY;
+					err=strncmp(cursor, "sources", 7);
+					if (err!=0)
+						break;
+					cursor+=7;
+					g_strchug(cursor);
+					token=cursor;
+					/* if no sourses are specified - put NULL in nrtm_q->source and list them all */
+					if ((*token=='\0') || (*token=='\n')|| ((int)*token==13))
+						nrtm_q->source=NULL;
 					else {
-						cursor=index(token, 13); /* search for ctrl-M - telnet loves this */
+						cursor=index(token, ' ');
 						if (cursor)
 							nrtm_q->source=g_strndup(token, (cursor-token));
 						else {
-							cursor=index(token, '\n');
+							cursor=index(token, 13); /* search for ctrl-M - telnet loves this */
 							if (cursor)
 								nrtm_q->source=g_strndup(token, (cursor-token));
-							else
-								nrtm_q->source=g_strdup(token);
+							else {
+								cursor=index(token, '\n');
+								if (cursor)
+									nrtm_q->source=g_strndup(token, (cursor-token));
+								else
+									nrtm_q->source=g_strdup(token);
+							}
 						}
 					}
-				}
-				/* if source was specified - convert it to an upper case */
-				if (nrtm_q->source)
-					g_strup(nrtm_q->source);
-			} else
-				err=1;
-			break;
-
-		case 'g':
-			if (gst->optarg != NULL) {
-				char *cursor = gst->optarg;
-				char **tokens;
-
-				res |= G_QUERY;
-				g_strdelimit(cursor, NRTM_DELIM, ':');
-				tokens=g_strsplit(cursor, ":", 5);
-				if (tokens==NULL) {
+					/* if source was specified - convert it to an upper case */
+					if (nrtm_q->source)
+						g_strup(nrtm_q->source);
+				} else
 					err=1;
-					break;
-				}
+				break;
 
-				if (tokens[0]) {
-					/* first token is source name */
-					nrtm_q->source=g_strdup(tokens[0]);
-					/* convert it to an upper case */
-					g_strup(nrtm_q->source);
-					if (tokens[1]) {
-						/* second token is version number */
-						nrtm_q->version=atoi(tokens[1]);
-						if (tokens[2]) {
-							/* this is first serial */
-							nrtm_q->first=atol(tokens[2]);
-							if (nrtm_q->first>0) {
-								if (tokens[3]) {
-									/* this is last serial */
-									nrtm_q->last=atol(tokens[3]);
-									if (nrtm_q->last==0)
-										if (strncasecmp(tokens[3], "LAST", 4)!=0)
-											err=1;
+			case 'g':
+				if (gst->optarg != NULL) {
+					char *cursor = gst->optarg;
+					char **tokens;
+
+					res |= G_QUERY;
+					g_strdelimit(cursor, NRTM_DELIM, ':');
+					tokens=g_strsplit(cursor, ":", 5);
+					if (tokens==NULL) {
+						err=1;
+						break;
+					}
+
+					if (tokens[0]) {
+						/* first token is source name */
+						nrtm_q->source=g_strdup(tokens[0]);
+						/* convert it to an upper case */
+						g_strup(nrtm_q->source);
+						if (tokens[1]) {
+							/* second token is version number */
+							nrtm_q->version=atoi(tokens[1]);
+							if (tokens[2]) {
+								/* this is first serial */
+								nrtm_q->first=atol(tokens[2]);
+								if (nrtm_q->first>0) {
+									if (tokens[3]) {
+										/* this is last serial */
+										nrtm_q->last=atol(tokens[3]);
+										if (nrtm_q->last==0)
+											if (strncasecmp(tokens[3], "LAST", 4)!=0)
+												err=1;
+									} else
+										err=1;
 								} else
 									err=1;
 							} else
@@ -167,17 +203,15 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 							err=1;
 					} else
 						err=1;
+					g_strfreev(tokens);
+
 				} else
 					err=1;
-				g_strfreev(tokens);
 
-			} else
+				break;
+			default:
 				err=1;
-
-			break;
-		default:
-			err=1;
-			break;
+				break;
 		} /* switch */
 	} /* while there are arguments */
 
@@ -189,6 +223,117 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 	else
 		return (res);
 
+}
+
+/* PUBLIC NRTM STREAM DESIGN
+ * 
+ * Instead of simply dropping private objects from the public nrtm stream, we decided to send dummified objects.
+ * It has the following adventages:
+ * - We can add a nice 'this is a dummy object, for the real stuff, use whois.ripe.net blabla' message to each
+ *   dummified object, thus spare us *a lot* of support trouble
+ * - There will be no gaps in serials
+ * - 3rd party software interpreting the nrtm streams do not need modification to handle special cases
+ * - We won't create a special case which will bite into our asses when we do some change
+ * - All referential integrity will be maintained
+ * 
+ * We do the dummification in a generic way. For each object, we first parse it using the RPSL module. This sucks
+ * big time performance-wise, as it does a lot of surplus processing and error checking, however, we are more flexible
+ * about future changes, handling outdated/erronous objects in the database, and also, we handle corner cases like 
+ * line continuation out of the box, error-free.
+ * 
+ * This also means that objects which have been stuffed into the database earlier, not passing the current syntax
+ * rules will produce an error. On such rpsl parser errors, we return NULL, which marks that the object could not 
+ * be dummified. In this case, the NRTM server will return operation NOOP from the main loop.
+ * This will normally not be a problem as we also don't want to give object history through public NRTM stream. Any
+ * attempt to try to go back more than a week into the past should give an error.
+ * 
+ * After having the processed object structure, we iterate through the attributes. We discard any non-mandatory
+ * attributes. From the mandatory ones, we keep the ones which maintain referential integrity. The remaining
+ * attributes are dummified based on the corresponding entries in the rip.config file (read comments there).
+ * 
+ * After finishing the dummification, we return the flat object for the nrtm server to send to the client or NULL
+ * on dummification error.
+ * 
+ * Note that dummify_init() must be called before any calls are made to dummify_object(). 
+ * 
+ * agoston, 2007-10-18   
+ * */
+static char *dummify_object(char *object) {
+	GList *errors = NULL;
+	gboolean quit = FALSE;
+	rpsl_attr_t *first_attr = NULL;
+	rpsl_object_t *obj = NULL;
+	rpsl_error_t *error = NULL;
+	int i, actoff;
+	GList *gli = NULL;
+	gchar *prim_val = NULL;
+
+	/* parse the object */
+	obj = rpsl_object_init(object);
+
+	/* FIXME: re-casting to get rid of const qualifier - this is braindead, but there is no other way to 
+	 * free() the errors GList allocated during rpsl_object_init... - agoston, 2007-10-29 */
+	errors = (GList *)rpsl_object_errors(obj);
+	first_attr = (rpsl_attr_t *)obj->attributes->data;
+
+	for (; errors; errors = errors->next) {
+		rpsl_error_t *acterr = (rpsl_error_t *)errors->data;
+		if (acterr->level >= RPSL_ERRLVL_ERROR) {
+			LG_log(pm_context, LG_ERROR, "[%s: %s] rpsl_object_init failed: %s (at attribute %d)",
+			        first_attr->lcase_name, first_attr->value, acterr->descr, acterr->attr_num);
+			quit = TRUE;
+		}
+	}
+
+	wr_clear_list(&errors);
+
+	/* if there's a serious error, we skip this object */
+	if (quit) {
+		goto dummify_abort;
+	}
+
+	/* the primary key is not necessarily the first attribute of the object, e.g. person */ 
+	prim_val = rpsl_object_get_key_value(obj);
+
+	/* iterate through the attributes */
+	actoff = 0;
+	for (gli = g_list_first(obj->attributes); gli; gli = g_list_next(gli)) {
+		rpsl_attr_t *act_attr = (rpsl_attr_t *)gli->data;
+		if (rpsl_attr_is_required(obj, act_attr->lcase_name)) {
+			gchar *dummy_attr;
+			if (rpsl_attr_is_key(obj, act_attr->lcase_name)) {
+				continue; /* primary keys are left untouched */
+			}
+
+			dummy_attr = g_hash_table_lookup(PM_DUMMY_ATTR, act_attr->lcase_name);
+			if (dummy_attr) {
+				if (*dummy_attr) {
+					char buf[STR_L];
+					snprintf(buf, dummy_attr, STR_L, prim_val);
+					rpsl_attr_replace_value(act_attr, buf);
+				}
+			} else {
+				/* mandatory attribute is not listed in config file - we should die() here, but that
+				 * would also take down a lot of other services :( */
+				goto dummify_abort;
+			}
+		} else {
+			/* We use the _internal call as the normal one does some extra, and, in this case, surplus 
+			 * checking.
+			 * 
+			 * During call, the only possible error is trying to remove a mandatory attribute - but since
+			 * we already checked that, we don't care about errors here. - agoston, 2007-10-29 */
+			rpsl_object_remove_attr_internal(obj, actoff, NULL);
+		}
+	}
+
+	dummify_abort:
+
+	if (prim_val)
+		free(prim_val);
+	if (obj)
+		rpsl_object_delete(obj);
+	return NULL;
 }
 
 /* PM_interact() */
@@ -340,20 +485,6 @@ void PM_interact(int sock) {
 	/* get protocol version of the source */
 	protocol_version = ca_get_srcnrtmprotocolvers(source_hdl);
 
-	/* XXX this is compatibility mode where we don't care about the protocol version */
-#if 0
-	/* compare to the version requested */
-	if(nrtm_q.version != protocol_version) {
-		ER_inf_va(FAC_PM, ASP_PM_ERESP,"[%s] --  Source does not support requested protocol %d", hostaddress, nrtm_q.version);
-		sprintf(buff, "\n%%ERROR:404: version %d of protocol is not supported\n\n\n", nrtm_q.version);
-		SK_cd_puts(&condat, buff);
-		free(hostaddress);
-		free(nrtm_q.source);
-		/*     SK_cd_close(&(condat)); */
-		return;
-	}
-#endif
-
 	/* get database */
 	db_name = ca_get_srcdbname(source_hdl);
 	/* get database host*/
@@ -433,14 +564,14 @@ void PM_interact(int sock) {
 	}
 
 	sprintf(buff, "%%START Version: %d %s %ld-%ld%s\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last,
-			(mirror_perm < AA_MIRROR_FULL)?"FILTERED":"");
+	        (mirror_perm < AA_MIRROR_FULL) ? "FILTERED" : "");
 	SK_cd_puts(&condat, buff);
 
 	/* make a record for thread accounting */
 	TA_setactivity(buff);
 
 	/* FIXME: This is crap, but we will redo nrtm completely after the radix tree removal anyway.
-	 * It will do until then... */ 
+	 * It will do until then... */
 	/*************************** MAIN LOOP ****************************/
 	/* now start feeding client with data */
 	do {
@@ -460,8 +591,8 @@ void PM_interact(int sock) {
 			int i = 0;
 			for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
 				if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
-					/* don't process this one */
-					operation = OP_NOOP;
+					/* dummify this one */
+					object = dummify_object(object);
 					break;
 				}
 			}
@@ -481,7 +612,7 @@ void PM_interact(int sock) {
 				SK_cd_puts(&condat, "\n");
 				break;
 
-			case OP_NOOP:
+				/*case OP_NOOP:*/
 		}
 
 		UT_free(object);

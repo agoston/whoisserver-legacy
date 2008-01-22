@@ -47,7 +47,7 @@ void aa_compose_query(ip_space_t space, char *buf, unsigned len) {
 
 	case IP_V6:
 		snprintf(buf, len, "SELECT ripupdate, mirror, source, prefix_length, "
-			"prefix1, prefix2, prefix3, prefix4  FROM aaa6 "
+			"prefix1, prefix2, prefix3, prefix4 FROM aaa6 "
 			"ORDER BY prefix_length ASC");
 		break;
 

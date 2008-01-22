@@ -543,7 +543,6 @@ rpsl_attr_init (const gchar *s, const gchar *class)
         retval->lcase_name = g_strdup("");
         retval->value = g_strdup("");
         goto exit_rpsl_attr_init;
-        
     }
     attr_val = g_strsplit(s, ":", 2);
     assert(attr_val[0] != NULL);
@@ -1322,7 +1321,9 @@ rpsl_object_delete (rpsl_object_t *object)
     rpsl_error_t *err;
 
     chk_obj(object);
-  
+
+    if (!object) return;
+    
     /* free the attributes */
     for (p=object->attributes; p != NULL; p = g_list_next(p)) {
         rpsl_attr_delete(p->data);
@@ -1976,7 +1977,6 @@ rpsl_object_remove_attr_internal (rpsl_object_t *object, gint ofs, rpsl_error_t 
         err = err_list->data;
         if (err->attr_num == ofs) { 
             /* remove errors from this attribute */
-            /* XXX: is this safe? should I just scan from the beginning? */
             tmp_err_list = g_list_next(err_list);
             object->errors = g_list_remove_link(object->errors, err_list);
             g_free(err->descr);
@@ -2213,6 +2213,15 @@ rpsl_get_classes ()
 static GHashTable *class_name_to_template = NULL;
 static pthread_mutex_t class_name_to_template_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+/* FIXME: this implementation is nonsense - this should be initialized from an rpsl_init() function on startup.
+ * But I can't fix this quickly as this function is part of librpsl and is referenced from the RPSL:: perl lib
+ * as well, so changing requires a lot of work with the API change. :(
+ * Mutex locks are a killer of parallelism (which we aim for), and they are not needed here. - agoston, 2007-10-25  
+ *
+ * Same problem can be observed in class.c as well - they use pthread_once() there to do initial initialization.
+ * This is braindead as init will indeed be executed only once, but if 2 or more threads start executing that
+ * function, the second one will jump over the pthread_once and crash the server because the initialization is
+ * not yet done. - agoston, 2007-10-26 */
 const rpsl_template_t* const *
 rpsl_get_template (const gchar *class)
 {
@@ -2255,7 +2264,6 @@ rpsl_get_template (const gchar *class)
             g_hash_table_insert(class_name_to_template, (void *)class, ret_val);
         }
     }
-
 
     pthread_mutex_unlock(&class_name_to_template_mutex);
 

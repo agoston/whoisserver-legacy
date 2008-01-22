@@ -1,53 +1,53 @@
 /***************************************
-  $Revision: 1.1 $
+ $Revision: 1.1 $
 
-  NIC handle manipulation module.
+ NIC handle manipulation module.
 
-  Status: NOT REVUED, NOT TESTED
+ Status: NOT REVUED, NOT TESTED
 
-  Author(s):       Andrei Robachevsky
+ Author(s):       Andrei Robachevsky
 
-  ******************/ /******************
-  Modification History:
-        andrei (10/04/2000) Created.
-  ******************/ /******************
-  Copyright (c) 2000,2001,2002,2003               RIPE NCC
+ ******************//******************
+ Modification History:
+ andrei (10/04/2000) Created.
+ ******************//******************
+ Copyright (c) 2000,2001,2002,2003               RIPE NCC
  
-  All Rights Reserved
-  
-  Permission to use, copy, modify, and distribute this software and its
-  documentation for any purpose and without fee is hereby granted,
-  provided that the above copyright notice appear in all copies and that
-  both that copyright notice and this permission notice appear in
-  supporting documentation, and that the name of the author not be
-  used in advertising or publicity pertaining to distribution of the
-  software without specific, written prior permission.
-  
-  THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
-  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
-  AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
-  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
-  AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ All Rights Reserved
+ 
+ Permission to use, copy, modify, and distribute this software and its
+ documentation for any purpose and without fee is hereby granted,
+ provided that the above copyright notice appear in all copies and that
+ both that copyright notice and this permission notice appear in
+ supporting documentation, and that the name of the author not be
+ used in advertising or publicity pertaining to distribution of the
+ software without specific, written prior permission.
+ 
+ THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+ ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
+ AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+ DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+ AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ***************************************/
 #ifndef _NH_H
 #define _NH_H
 
 /************************************************************
-*                                                           *
-* NHR is capable of handling nic-handles __ONLY__           *
-* of the following format:                                  *
-*                                                           *
-* Acceptable format is:                                     *
-* [A-Z][A-Z]*[1-9][0-9]*(-[A-Z][A-Z]*)?                     *
-*                                                           *
-************************************************************/
+ *                                                           *
+ * NHR is capable of handling nic-handles __ONLY__           *
+ * of the following format:                                  *
+ *                                                           *
+ * Acceptable format is:                                     *
+ * [A-Z][A-Z]*[1-9][0-9]*(-[A-Z][A-Z]*)?                     *
+ *                                                           *
+ ************************************************************/
 #include <mysql_driver.h>
 
 #define MAX_NH_LENGTH  64
 #define MAX_NH_SPACE_LENGTH 4
 #define MAX_NH_SOURCE_LENGTH 10
- 
+
 #define MAX_NIC_ID  999999
 #define NULL_NIC_ID (0)
 #define AUTO_NIC_ID (-1)
@@ -57,19 +57,19 @@
 
 #define NH_DELETE 1000
 #define NH_INSERT 2000 
-   
+
 typedef struct _range_t {
-  long start;
-  long end;
-  char *space;
-  char *source;
+	long start;
+	long end;
+	char *space;
+	char *source;
 } range_t;
 
 /* structure to save nic handle data */
 typedef struct _nic_handle_t {
-  long nic_id;
-  char *space;
-  char *source;
+	long nic_id;
+	char *space;
+	char *source;
 } nic_handle_t;
 
 int NH_check(nic_handle_t *pnh, SQ_connection_t *sql_connection);

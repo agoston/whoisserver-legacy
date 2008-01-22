@@ -92,6 +92,9 @@ class_init()
 
 static pthread_once_t init_control = PTHREAD_ONCE_INIT;
 
+/* FIXME: This is buggy as init_control will indeed be executed only once, but if 2 or more threads start executing that
+ * function, the second one will jump over the pthread_once and crash the server because the initialization is
+ * not yet done. - agoston, 2007-10-26 */
 const char* const *
 get_class_names ()
 {

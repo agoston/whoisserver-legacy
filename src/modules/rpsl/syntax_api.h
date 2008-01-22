@@ -83,6 +83,12 @@ at function descriptions never can.
 
 ************************************************************************/
 
+/* FIXME: This should be an object. All this is a horrible c-ish hack to achieve that.
+ *  
+ * FIXME: The data structure should better accomodate the below function's needs (so that they could
+ * avoid iterating through the attribute list, for example), as well as locking and init should be
+ * redesigned (see comments about this scattered throughout the code) - agoston, 2007-11-02  */
+
 /* typedefs allow for forward references within structure definitions */
 typedef struct rpsl_object rpsl_object_t;
 typedef struct rpsl_attr rpsl_attr_t;
@@ -247,6 +253,7 @@ extern gboolean rpsl_attr_is_multivalued(const rpsl_object_t *object,
                                          const gchar *attr);
 extern gboolean rpsl_attr_is_lookup(const rpsl_object_t *object,
                                     const gchar *attr);
+/* checks if attr is a primary key */
 extern gboolean rpsl_attr_is_key(const rpsl_object_t *object,
                                  const gchar *attr);
 extern gboolean rpsl_attr_is_generated(const rpsl_object_t *object,
