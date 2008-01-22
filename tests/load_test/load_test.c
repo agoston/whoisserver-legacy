@@ -48,13 +48,7 @@ void *startup(void *arg) {
 			fprintf(stderr, ".");fflush(stderr);
 		}
 		pthread_mutex_unlock(&lock);
-<<<<<<< load_test.c
-		
-		sock = SK_connect(arg_hostname, arg_port, 10);
-=======
-		
 		sock = SK_connect(arg_hostname, arg_port, 30);
->>>>>>> 1.2
 		if (sock < 0) {
 		        log_to_file("connect", line);
 			sleep(3);
