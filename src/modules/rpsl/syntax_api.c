@@ -1636,7 +1636,7 @@ rpsl_object_get_text (const rpsl_object_t *object, guint data_column)
         }
     }
 
-    if (retval) retval = s->str;
+    retval = s->str;
     g_string_free(s, FALSE);
     
     /* return result (returns NULL if memory allocation failed) */
