@@ -30,6 +30,14 @@
   ***************************************/
 #include <pthread.h>       /* Posix thread library */
 
+/* THIS MODULE IS OBSOLETE
+ * 
+ * There is pthread_rwlock support in libc, there is absolutely no need
+ * to simulate those using pthread_mutex calls
+ * 
+ * for example on pthread_rwlock, see aa.c
+ */ 
+
 /* structure for writers favouring functions */
 typedef struct _rwlock {
 	pthread_mutex_t rw_mutex;	/* lock for accessing this structure */
