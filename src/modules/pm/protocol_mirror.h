@@ -54,8 +54,10 @@
 /*+ Maximum size of input that can be recieved from the client. +*/
 #define MAX_PM_INPUT_SIZE  256
 
+/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial 
+ * agoston, 2007-12-21 */
 /* server needs to yield one serial less just in case the last one causes the crash */
-#define SAFE_BACKLOG 1
+/* #define SAFE_BACKLOG 1 */
 
 typedef struct _nrtm_q_t {
 	char *source;

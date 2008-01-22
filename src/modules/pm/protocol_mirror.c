@@ -206,8 +206,7 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 					char **tokens;
 
 					res |= G_QUERY;
-					g_strdelimit(cursor, NRTM_DELIM, ':');
-					tokens=g_strsplit(cursor, ":", 5);
+					tokens=g_strsplit(cursor, ":", 3);
 					if (tokens==NULL) {
 						err=1;
 						break;
@@ -222,19 +221,21 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 							/* second token is version number */
 							nrtm_q->version=atoi(tokens[1]);
 							if (tokens[2]) {
-								/* this is first serial */
-								nrtm_q->first=atol(tokens[2]);
+								/* this is the serial */
+								char **serial_tokens = g_strsplit(tokens[2], "-", 2);
+								nrtm_q->first=atol(serial_tokens[0]);
 								if (nrtm_q->first>0) {
-									if (tokens[3]) {
+									if (serial_tokens[1]) {
 										/* this is last serial */
-										nrtm_q->last=atol(tokens[3]);
+										nrtm_q->last=atol(serial_tokens[1]);
 										if (nrtm_q->last==0)
-											if (strncasecmp(tokens[3], "LAST", 4)!=0)
+											if (strncasecmp(serial_tokens[1], "LAST", 4)!=0)
 												err=1;
 									} else
 										err=1;
 								} else
 									err=1;
+								g_strfreev(serial_tokens);
 							} else
 								err=1;
 						} else
@@ -517,7 +518,7 @@ void PM_interact(int sock) {
 	source_hdl = ca_get_SourceHandleByName(nrtm_q.source);
 	if (source_hdl == NULL) {
 		LG_log(pm_context, LG_DEBUG, "[%s] --  Unknown source %s", hostaddress, nrtm_q.source);
-		sprintf(buff, "\n%%ERROR:403: unknown source\n\n\n");
+		sprintf(buff, "\n%%ERROR:403: unknown source %s\n\n\n", nrtm_q.source);
 		SK_cd_puts(&condat, buff);
 		UT_free(hostaddress);
 		UT_free(nrtm_q.source);
@@ -565,7 +566,9 @@ void PM_interact(int sock) {
 
 	/* Not to consume the last serial which may cause crash */
 	PM_get_minmax_serial(sql_connection, &oldest_serial, &current_serial);
-	current_serial -= SAFE_BACKLOG;
+	/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial 
+	 * agoston, 2007-12-21 */
+	/*current_serial -= SAFE_BACKLOG; */
 
 	if ((current_serial==-1) || (oldest_serial==-1)) {
 		LG_log(pm_context, LG_ERROR, " database='%s' [%d] %s", db_name, SQ_errno(sql_connection),
@@ -692,7 +695,7 @@ void PM_interact(int sock) {
 
 		/* for real-time mirroring we need some piece of code */
 		if (persistent_connection && (condat.rtc == 0)) {
-			while (((nrtm_q.last = SQ_get_max_id(sql_connection, "serial_id", "serials") - SAFE_BACKLOG)<current_serial)
+			while (((nrtm_q.last = SQ_get_max_id(sql_connection, "serial_id", "serials") /*- SAFE_BACKLOG*/)<current_serial)
 			        && (CO_get_do_server()==1))
 				sleep(1);
 		}
