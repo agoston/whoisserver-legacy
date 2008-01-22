@@ -368,6 +368,9 @@ ripe_list_split (const char *val)
     return generic_list_split(val, " ");
 }
 
+/* FIXME: this is potentially a memleak as error->descr is an allocated memory, and there is no
+ * function provided to free() an rpsl_error_t, making callers believe that there is no need for one.
+ * agoston, 2007-11-07 */
 static void
 rpsl_error_assign (rpsl_error_t *error, 
                    gint level, 
@@ -402,6 +405,26 @@ rpsl_error_add (GList **errors, gint level, gint code, gint attr_num,
     va_end(args);
     error->attr_num = attr_num;
     *errors = g_list_append(*errors, error);
+}
+
+/* free()s an error structure altogether
+ * agoston, 2007-11-07 */
+void rpsl_error_free(rpsl_error_t *error) {
+	if (error) {
+		free(error->descr);
+		free(error);
+	}
+}
+
+/* frees the whole error list returned by some rpsl functions
+ * there should be rpsl_error_t types inside the GList
+ * agoston, 2007-11-07 */
+void rpsl_error_list_free(GList *errors) {
+	GList *gli = errors;
+	for (; gli; gli=gli->next) {
+		rpsl_error_free((rpsl_error_t *)gli->data);
+	}
+	g_list_free(errors);
 }
 
 /* returns TRUE if okay, else FALSE */
@@ -480,6 +503,9 @@ exit_rpsl_syntax:
     }
 }
 
+/* FIXME: Another beautiful example of great engineering: we have to create a string rpsl attrib line 
+ * in order to create the attribute structure. There is no function call which created the attrib
+ * structure from the proper arguments - agoston, 2007-11-05 */
 /* 
    returns NULL on *coding errors*
       non-existant class specified
@@ -487,9 +513,8 @@ exit_rpsl_syntax:
       attribute without class in ambiguous
    returns a structure otherwise
       on *syntax errors* errors are in the rpsl_attr_t structure
- */
 
-/* XXX: there should be a way to preserve the original text, so 
+   XXX: there should be a way to preserve the original text, so 
         that garbage attributes still retain meaning
  */
 rpsl_attr_t *

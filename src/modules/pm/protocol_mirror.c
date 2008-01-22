@@ -61,7 +61,7 @@ GHashTable *PM_DUMMY_ATTR;
  * need to be executed before any calls to dummify_object() are made
  * agoston, 2007-10-31 */
 static void dummify_init() {
-	gchar **lines, *actline, *equal;
+	gchar **lines, **actline, *equal;
 	char *dummy_attr = ca_get_dummy_attr;
 	char *dummy_add_attr = ca_get_dummy_add_attr;
 
@@ -72,15 +72,16 @@ static void dummify_init() {
 	PM_DUMMY_ATTR = g_hash_table_new(g_str_hash, g_str_equal);
 
 	lines = g_strsplit(ca_get_dummy_attr, "\n", 0);
-	for (actline = *lines; actline; actline++) {
-		equal = strchr(actline, '=');
+	for (actline = lines; *actline && **actline; actline++) {
+		equal = strchr(*actline, '=');
 		if (!equal) {
-			/* No = sign found in one of the DUMMY_ATTR lines in the rip.config file */
+			fprintf(stderr, "No = sign found in one of the DUMMY_ATTR lines in the rip.config file");
+			LG_log(pm_context, LG_FATAL, "No = sign found in one of the DUMMY_ATTR lines in the rip.config file");
 			die;
 		}
 
 		*equal = 0;
-		g_hash_table_insert(PM_DUMMY_ATTR, actline, equal+1);
+		g_hash_table_insert(PM_DUMMY_ATTR, *actline, equal+1);
 	}
 
 	free(dummy_attr);
@@ -239,7 +240,8 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  * We do the dummification in a generic way. For each object, we first parse it using the RPSL module. This sucks
  * big time performance-wise, as it does a lot of surplus processing and error checking, however, we are more flexible
  * about future changes, handling outdated/erronous objects in the database, and also, we handle corner cases like 
- * line continuation out of the box, error-free.
+ * line continuation out of the box, error-free. Note however that the RPSL library's API is horrible, but there
+ * was also no point in re-implementing one from scratch (I'd very much liked that, though).
  * 
  * This also means that objects which have been stuffed into the database earlier, not passing the current syntax
  * rules will produce an error. On such rpsl parser errors, we return NULL, which marks that the object could not 
@@ -262,11 +264,13 @@ static char *dummify_object(char *object) {
 	GList *errors = NULL;
 	gboolean quit = FALSE;
 	rpsl_attr_t *first_attr = NULL;
+	rpsl_error_t error;
 	rpsl_object_t *obj = NULL;
-	rpsl_error_t *error = NULL;
 	int i, actoff;
 	GList *gli = NULL;
 	gchar *prim_val = NULL;
+	char **actline;
+	char *ret = NULL;
 
 	/* parse the object */
 	obj = rpsl_object_init(object);
@@ -285,19 +289,17 @@ static char *dummify_object(char *object) {
 		}
 	}
 
-	wr_clear_list(&errors);
-
 	/* if there's a serious error, we skip this object */
 	if (quit) {
 		goto dummify_abort;
 	}
 
-	/* the primary key is not necessarily the first attribute of the object, e.g. person */ 
+	/* the primary key is not necessarily the first attribute of the object, e.g. person */
 	prim_val = rpsl_object_get_key_value(obj);
 
 	/* iterate through the attributes */
 	actoff = 0;
-	for (gli = g_list_first(obj->attributes); gli; gli = g_list_next(gli)) {
+	for (gli = g_list_first(obj->attributes); gli; actoff++, gli = g_list_next(gli)) {
 		rpsl_attr_t *act_attr = (rpsl_attr_t *)gli->data;
 		if (rpsl_attr_is_required(obj, act_attr->lcase_name)) {
 			gchar *dummy_attr;
@@ -309,12 +311,18 @@ static char *dummify_object(char *object) {
 			if (dummy_attr) {
 				if (*dummy_attr) {
 					char buf[STR_L];
-					snprintf(buf, dummy_attr, STR_L, prim_val);
+					snprintf(buf, STR_L, dummy_attr, prim_val);
 					rpsl_attr_replace_value(act_attr, buf);
 				}
+				/* if dummy_attr is empty, we leave the rpsl attrib alone */
 			} else {
-				/* mandatory attribute is not listed in config file - we should die() here, but that
-				 * would also take down a lot of other services :( */
+				/* mandatory attribute is not listed in config file - serious error
+				 * 
+				 * FIXME: we should die() here, but that would take down the whole of whoisserver :( 
+				 * agoston, 2007-11-02 */
+				fprintf(stderr, "Mandatory attribute %s not found in rip.config file", act_attr->lcase_name);
+				LG_log(pm_context, LG_FATAL, "Mandatory attribute %s not found in rip.config file",
+				        act_attr->lcase_name);
 				goto dummify_abort;
 			}
 		} else {
@@ -323,9 +331,28 @@ static char *dummify_object(char *object) {
 			 * 
 			 * During call, the only possible error is trying to remove a mandatory attribute - but since
 			 * we already checked that, we don't care about errors here. - agoston, 2007-10-29 */
+			gli = gli->prev;
 			rpsl_object_remove_attr_internal(obj, actoff, NULL);
+			actoff--;
 		}
 	}
+
+	/* append the additional attributes */
+	for (actline = PM_DUMMY_ADD_ATTR; *actline && **actline; actline++) {
+		rpsl_attr_t *newattr;
+		char buf[STR_L];
+
+		snprintf(buf, STR_L, "remarks: %s", *actline);
+		newattr = rpsl_attr_init(buf, NULL);
+		if (!rpsl_object_append_attr(obj, newattr, &error)) {
+			fprintf(stderr, "Error in dummify_object()::rpsl_object_append_attr(): %s", error.descr);
+			LG_log(pm_context, LG_FATAL, "Error in dummify_object()::rpsl_object_append_attr(): %s", error.descr);
+			free(error.descr);
+			goto dummify_abort;
+		}
+	}
+
+	ret = rpsl_object_get_text(obj, RPSL_STD_COLUMN);
 
 	dummify_abort:
 
@@ -333,7 +360,7 @@ static char *dummify_object(char *object) {
 		free(prim_val);
 	if (obj)
 		rpsl_object_delete(obj);
-	return NULL;
+	return ret;
 }
 
 /* PM_interact() */
@@ -564,7 +591,7 @@ void PM_interact(int sock) {
 	}
 
 	sprintf(buff, "%%START Version: %d %s %ld-%ld%s\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last,
-	        (mirror_perm < AA_MIRROR_FULL) ? "FILTERED" : "");
+	        (mirror_perm < AA_MIRROR_FULL) ? " FILTERED" : "");
 	SK_cd_puts(&condat, buff);
 
 	/* make a record for thread accounting */
@@ -591,8 +618,18 @@ void PM_interact(int sock) {
 			int i = 0;
 			for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
 				if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
-					/* dummify this one */
-					object = dummify_object(object);
+					char *newobj;
+
+					newobj = dummify_object(object);
+					free(object);
+
+					if (newobj) {
+						object = newobj;
+					} else {
+						object = NULL;
+						operation = OP_NOOP;
+					}
+
 					break;
 				}
 			}
@@ -611,11 +648,10 @@ void PM_interact(int sock) {
 				SK_cd_puts(&condat, object);
 				SK_cd_puts(&condat, "\n");
 				break;
-
-				/*case OP_NOOP:*/
 		}
 
-		UT_free(object);
+		if (object)
+			free(object);
 		current_serial++;
 
 		/* for real-time mirroring we need some piece of code */
