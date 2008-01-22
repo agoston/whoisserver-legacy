@@ -6,7 +6,6 @@
 #
 # RESULT 001: The query will succeed.
 $EXEC_AFTER=$DATADIR/nrtm/history_limit/001/nrtm_check.sh
-$EXEC_BEFORE=$DATADIR/nrtm/history_limit/001/nrtm_setup.sh
 
 password: test-dbm
 password: hostmaster

@@ -660,7 +660,7 @@ void PM_interact(int sock) {
 				
 				/* check if timestamp is within the limits set in rip.config */
 				if (check_history_limit && (time(NULL) - timestamp > history_access_limit)) {
-					sprintf(buff, "%% Your request has been denied to protect private data.\n%% (serials older than %d days will be rejected)\n", history_access_limit/86400);
+					sprintf(buff, "%% Your request has been denied to protect private data.\n%% (Requesting serials older than %d days will be rejected)\n", history_access_limit/86400);
 					SK_cd_puts(&condat, buff);
 					free(object);
 					break;

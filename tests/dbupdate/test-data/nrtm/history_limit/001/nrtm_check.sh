@@ -2,6 +2,17 @@
 
 . $DATADIR/nrtm/history_limit/functions.sh
 
+# date to update timestamps to
+TIMESTAMP=`date +%s`
+TIMESTAMP=$[TIMESTAMP-5184000]
+
+# update timestamps to be older than 'now'
+# this is a safe operation as timestamps are read from DB and are not cached
+mysql -h$RIPE_DBHOST -P$RIPE_DBPORT -u$RIPE_DBUSER -p$RIPE_DBPASS $RIPE_DBNAME <<EOM
+UPDATE last SET timestamp = $TIMESTAMP;
+UPDATE history SET timestamp = $TIMESTAMP;
+EOM
+
 # check the access rights
 ACCESS=`get_nrtm '-q sources' | grep DB-TEST | cut -d: -f3`
 if [ $ACCESS != X ]; then

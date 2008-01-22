@@ -5,7 +5,7 @@
 %START Version: 0 DB-TEST 1-6 FILTERED
 
 % Your request has been denied to protect private data.
-% (serials older than 14 days will be rejected)
+% (Requesting serials older than 14 days will be rejected)
 %END DB-TEST
 
 

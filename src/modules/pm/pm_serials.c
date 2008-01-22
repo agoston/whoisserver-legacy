@@ -156,7 +156,7 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
 				die;
 			}
-			if (timestamp && SQ_get_column_unsigned(sql_result, sql_row, 1, timestamp)) {
+			if (timestamp && SQ_get_column_unsigned(sql_result, sql_row, 2, timestamp)) {
 				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
 				die;
 			}
