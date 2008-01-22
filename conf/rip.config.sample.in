@@ -574,7 +574,12 @@ DUMMY_ADD_ATTR * Please note that this object has all its personal data removed,
 DUMMY_ADD_ATTR * To get the original object, please query the RIPE Database.
 DUMMY_ADD_ATTR ****************************
 
+# After this many seconds have passed since the object was put in the database,
+# it is not allowed to be accessed by public nrtm clients (clients with full rights
+# may still access it without any restrictions).
+# Default is 2 weeks (=1209600 seconds).
 
+NRTM_HISTORY_ACCESS_LIMIT 1209600
 
 ######################
 ###

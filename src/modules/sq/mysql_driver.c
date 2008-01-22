@@ -573,58 +573,81 @@ char *SQ_get_column_strings(SQ_result_set_t *result, unsigned int column) {
 
 } /* SQ_get_column_strings() */
 
-/* SQ_get_column_int() */
-/*++++++++++++++++++++++++++++++++++++++
-  Get an integer from the column.
-
-  SQ_result_set_t *result The results.
-  
-  SQ_row_t *current_row The current row.
-
-  unsigned int column The column index.
-
-  long *resultptr     pointer where the result should be stored
-
-  returns -1 if error occurs, 0 otherwise.
-  Note - it never says what error occured....
-
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+ </UL></DL>
-
-  ++++++++++++++++++++++++++++++++++++++*/
+/* Get an integer from the column.
+ * SQ_result_set_t *result        the sql resultset
+ * SQ_row_t *current_row          the current row
+ * unsigned int column            the column index
+ * long *resultptr                pointer where the result should be stored
+ * 
+ * Returns -1 if error occurs, 0 otherwise
+ * 
+ * FIXME: this function returns a long* instead of int* for legacy reasons.
+ *        should be fixed, but there are just too many darn references to it.
+ *        agoston, 2008-01-18
+ * 
+ */
 int SQ_get_column_int(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long *resultptr) {
-	int ret_val;
-	long col_val;
+	long long int res;
+	
+	if (SQ_get_column_llint(result, current_row, column, &res) < 0 || res <  INT_MIN || res > INT_MAX) {
+		return -1;
+	}
+	
+	*resultptr = (long)res;
+	return 0;
+}
+
+/* Get an integer from the column.
+ * SQ_result_set_t *result        the sql resultset
+ * SQ_row_t *current_row          the current row
+ * unsigned int column            the column index
+ * long *resultptr                pointer where the result should be stored
+ * 
+ * Returns -1 if error occurs, 0 otherwise
+ */
+int SQ_get_column_unsigned(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, unsigned *resultptr) {
+	long long int res;
+	
+	if (SQ_get_column_llint(result, current_row, column, &res) < 0 || res < 0 || res > UINT_MAX) {
+		return -1;
+	}
+	
+	*resultptr = (unsigned)res;
+	return 0;
+}
+
+
+/* Get a long long int from the column.
+ * SQ_result_set_t *result        the sql resultset
+ * SQ_row_t *current_row          the current row
+ * unsigned int column            the column index
+ * long long int *resultptr       pointer where the result should be stored
+ * 
+ * Returns -1 if error occurs, 0 otherwise
+ */
+int SQ_get_column_llint(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long long int *resultptr) {
+	long long int col_val;
 	char *endptr;
 
-	if (current_row[column] != NULL) {
-		col_val = strtol((char *)current_row[column], &endptr, 10);
+	if (current_row[column] == NULL)
+		return -1;
 
-		/* under- or over-flow */
-		if (((col_val==LONG_MIN) || (col_val==LONG_MAX)) && (errno==ERANGE)) {
-			ret_val = -1;
+	col_val = strtol((char *)current_row[column], &endptr, 10);
 
-			/* unrecognized characters in string */
-		} else if (*endptr != '\0') {
-			ret_val = -1;
+	/* under- or over-flow */
+	if (((col_val==LONG_MIN) || (col_val==LONG_MAX)) && (errno==ERANGE)) {
+		return -1;
 
-			/* good parse */
-		} else {
-			*resultptr = col_val;
-			ret_val = 0;
-		}
+	/* unrecognized characters in string */
+	} else if (*endptr != '\0') {
+		return -1;
+
+	/* good parse */
 	} else {
-		ret_val = -1;
+		*resultptr = col_val;
+		return 0;
 	}
-	return ret_val;
-
-} /* SQ_get_column_int() */
+}
 
 
 /* SQ_result_to_string() */

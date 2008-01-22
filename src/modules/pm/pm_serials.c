@@ -95,11 +95,13 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
  * Returns:
  *  operation (ADD/DEL) and text object
  *  NULL in case of an error
+ * 
+ * Fills *object_type, *operation, *timestamp if not NULL
  *
  * Note:
  *  returned string should be freed by the caller
  *************************************************************/
-char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, long *object_type, int *operation) {
+char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, long *object_type, unsigned *timestamp, int *operation) {
 	char *table;
 	SQ_result_set_t * sql_result;
 	SQ_row_t *sql_row;
@@ -116,7 +118,7 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 	sprintf(query, "SELECT atlast,operation FROM serials WHERE serial_id = %d", serial_number);
 	get_fields_int_noalloc(sql_connection, query, locop);
 	location = locop[0];
-	*operation = locop[1];
+	if (operation) *operation = locop[1];
 
 	switch (location) {
 	case 0:
@@ -149,7 +151,11 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 
 	if ((sql_row = SQ_row_next(sql_result)) != NULL) {
 		sql_str = SQ_get_column_string(sql_result, sql_row, 0);
-		if (SQ_get_column_int(sql_result, sql_row, 1, object_type)) {
+		if (object_type && SQ_get_column_int(sql_result, sql_row, 1, object_type)) {
+			LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+			die;
+		}
+		if (timestamp && SQ_get_column_unsigned(sql_result, sql_row, 1, timestamp)) {
 			LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
 			die;
 		}

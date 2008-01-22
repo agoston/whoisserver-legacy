@@ -71,6 +71,8 @@ char *SQ_get_column_string_nocopy(SQ_result_set_t *result,
 				  unsigned int column);
 char *SQ_get_column_strings(SQ_result_set_t *result, unsigned int column);
 int SQ_get_column_int(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long  *resultptr);
+int SQ_get_column_unsigned(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, unsigned *resultptr);
+int SQ_get_column_llint(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long long int *resultptr);
 char *SQ_result_to_string(SQ_result_set_t *result);
 void SQ_free_result(SQ_result_set_t *result);
 void SQ_close_connection(SQ_connection_t *sql_connection);

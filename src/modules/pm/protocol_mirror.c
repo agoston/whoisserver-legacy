@@ -52,6 +52,9 @@
 
 LG_context_t *pm_context;
 
+/* CA_NRTM_HISTORY_ACCESS_LIMIT */
+unsigned history_access_limit;
+
 /* object types considered private, in order: mntner, person, role, irt, organisation */
 const int PM_PRIVATE_OBJECT_TYPES[] = { 9, 10, 11, 17, 18 };
 
@@ -123,6 +126,8 @@ static void dummify_init() {
 	free(dummy_attr);
 	free(dummy_add_attr);
 	g_hash_table_destroy(mandatory_attribs);
+
+	history_access_limit = ca_get_nrtm_history_access_limit;
 }
 
 void PM_init(LG_context_t *ctx) {
@@ -422,7 +427,9 @@ void PM_interact(int sock) {
 	long current_serial;
 	long oldest_serial;
 	long object_type;
+	unsigned timestamp;
 	aa_mirror_right mirror_perm;
+	time_t connection_time;
 
 	char *object;
 	int operation;
@@ -618,6 +625,9 @@ void PM_interact(int sock) {
 		UT_free(resp_header);
 		SK_cd_puts(&condat, "\n");
 	}
+	
+	/* init connection time */
+	connection_time = time(NULL);
 
 	sprintf(buff, "%%START Version: %d %s %ld-%ld%s\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last,
 	        (mirror_perm < AA_MIRROR_FULL) ? " FILTERED" : "");
@@ -636,7 +646,7 @@ void PM_interact(int sock) {
 
 		/************ ACTUAL PROCESSING IS HERE ***********/
 		/* this call will block if queries are paused */
-		object=PM_get_serial_object(sql_connection, current_serial, &object_type, &operation);
+		object=PM_get_serial_object(sql_connection, current_serial, &object_type, &timestamp, &operation);
 
 		/* there is a probability that mirroring interferes with HS cleanup */
 		/* in such case serial may be deleted before it is read by mirror client */
@@ -651,6 +661,15 @@ void PM_interact(int sock) {
 			/* filter private object types if it is not authorized */
 			if (mirror_perm == AA_MIRROR_PUBLIC) {
 				int i = 0;
+				
+				/* check if timestamp is within the limits set in rip.config */
+				if (connection_time - timestamp > history_access_limit) {
+					sprintf(buff, "%% Your request has been denied to protect private data.\n%% (serials older than %d days will be rejected)\n", history_access_limit/86400);
+					SK_cd_puts(&condat, buff);
+					free(object);
+					break;
+				}
+				
 				for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
 					if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
 						char *newobj;
