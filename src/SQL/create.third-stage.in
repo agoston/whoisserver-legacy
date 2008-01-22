@@ -4,7 +4,11 @@ echo `date` " creating indexes for aux tables"
 $MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB <aux.index.2
 echo `date` " creating indexes for leaf tables"
 $MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB <leaf.index.2
-echo `date` " saving CURRENTSERIAL=${CURRENTSERIAL}"
-$MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB <<EOM
-INSERT serials SET serial_id=${CURRENTSERIAL}, object_id=0
-EOM
+
+# We only need this if we want to set the starting serial
+# otherwise it just adds an invalid entry to the serials table
+# agoston, 2008-01-15
+#echo `date` " saving CURRENTSERIAL=${CURRENTSERIAL}"
+#$MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB <<EOM
+#INSERT serials SET serial_id=${CURRENTSERIAL}, object_id=0
+#EOM
