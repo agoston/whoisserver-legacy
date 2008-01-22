@@ -1,0 +1,90 @@
+
+% Rights restricted by copyright.
+% See http://www.mydb.net/db/copyright.html
+
+%START Version: 0 DB-TEST 1-6 FILTERED
+
+ADD
+
+organisation:   ORG-ET1-DB-TEST
+org-name:       Dummy organisation name for ORG-ET1-DB-TEST
+org-type:       OTHER
+address:        Dummy address for ORG-ET1-DB-TEST
+e-mail:         unread@ripe.net
+mnt-ref:        TEST-DBM-MNT
+mnt-by:         TEST-DBM-MNT
+changed:        unread@ripe.net 20000101
+source:         DB-TEST
+remarks:        ****************************
+remarks:        * THIS OBJECT IS NOT VALID
+remarks:        * Please note that this object has all its personal data removed, and acts as a stub only.
+remarks:        * To get the original object, please query the RIPE Database.
+remarks:        ****************************
+
+ADD
+
+person:         Dummy name for TP1-DB-TEST
+address:        Dummy address for TP1-DB-TEST
+phone:          +31205354444
+nic-hdl:        TP1-DB-TEST
+changed:        unread@ripe.net 20000101
+source:         DB-TEST
+remarks:        ****************************
+remarks:        * THIS OBJECT IS NOT VALID
+remarks:        * Please note that this object has all its personal data removed, and acts as a stub only.
+remarks:        * To get the original object, please query the RIPE Database.
+remarks:        ****************************
+
+ADD
+
+mntner:         TEST-DBM-MNT
+descr:          Dummy description for TEST-DBM-MNT
+admin-c:        TP1-DB-TEST
+upd-to:         unread@ripe.net
+auth:           MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/
+mnt-by:         TEST-DBM-MNT
+referral-by:    TEST-DBM-MNT
+changed:        unread@ripe.net 20000101
+source:         DB-TEST
+remarks:        ****************************
+remarks:        * THIS OBJECT IS NOT VALID
+remarks:        * Please note that this object has all its personal data removed, and acts as a stub only.
+remarks:        * To get the original object, please query the RIPE Database.
+remarks:        ****************************
+
+ADD
+
+role:           Dummy role for TR1-DB-TEST
+address:        Dummy address for TR1-DB-TEST
+e-mail:         unread@ripe.net
+admin-c:        TP1-DB-TEST
+tech-c:         TP1-DB-TEST
+nic-hdl:        TR1-DB-TEST
+changed:        unread@ripe.net 20000101
+source:         DB-TEST
+remarks:        ****************************
+remarks:        * THIS OBJECT IS NOT VALID
+remarks:        * Please note that this object has all its personal data removed, and acts as a stub only.
+remarks:        * To get the original object, please query the RIPE Database.
+remarks:        ****************************
+
+ADD
+
+irt:            IRT-TEST
+address:        Dummy address for IRT-TEST
+e-mail:         unread@ripe.net
+admin-c:        TP1-DB-TEST
+tech-c:         TP1-DB-TEST
+auth:           MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/
+mnt-by:         TEST-DBM-MNT
+changed:        unread@ripe.net 20000101
+source:         DB-TEST
+remarks:        ****************************
+remarks:        * THIS OBJECT IS NOT VALID
+remarks:        * Please note that this object has all its personal data removed, and acts as a stub only.
+remarks:        * To get the original object, please query the RIPE Database.
+remarks:        ****************************
+
+%END DB-TEST
+
+
