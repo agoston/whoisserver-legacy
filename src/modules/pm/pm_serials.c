@@ -137,10 +137,10 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 	if (location == 2)
 		sprintf(query, "SELECT object FROM failed_transaction WHERE serial_id=%ld ", serial_number);
 	else
-		sprintf(query, "SELECT %1$s.object, %1$s.object_type FROM %1$s, serials "
+		sprintf(query, "SELECT %1$s.object, %1$s.object_type, %1$s.timestamp FROM %1$s, serials "
 			"WHERE serials.serial_id=%2$ld "
 			"AND serials.object_id=%1$s.object_id "
-			"AND serials.sequence_id=%1$s.sequence_id ", table, serial_number);
+			"AND serials.sequence_id=%1$s.sequence_id", table, serial_number);
 
 	sql_err = SQ_execute_query(sql_connection, query, &sql_result);
 
@@ -151,13 +151,15 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 
 	if ((sql_row = SQ_row_next(sql_result)) != NULL) {
 		sql_str = SQ_get_column_string(sql_result, sql_row, 0);
-		if (object_type && SQ_get_column_int(sql_result, sql_row, 1, object_type)) {
-			LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
-			die;
-		}
-		if (timestamp && SQ_get_column_unsigned(sql_result, sql_row, 1, timestamp)) {
-			LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
-			die;
+		if (location < 2) {
+			if (object_type && SQ_get_column_int(sql_result, sql_row, 1, object_type)) {
+				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+				die;
+			}
+			if (timestamp && SQ_get_column_unsigned(sql_result, sql_row, 1, timestamp)) {
+				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+				die;
+			}
 		}
 	} else
 		sql_str=NULL;

@@ -429,7 +429,7 @@ void PM_interact(int sock) {
 	long object_type;
 	unsigned timestamp;
 	aa_mirror_right mirror_perm;
-	time_t connection_time;
+	int check_history_limit = 1;
 
 	char *object;
 	int operation;
@@ -571,7 +571,6 @@ void PM_interact(int sock) {
 	UT_free(db_user);
 	UT_free(db_pswd);
 
-	/* Not to consume the last serial which may cause crash */
 	PM_get_minmax_serial(sql_connection, &oldest_serial, &current_serial);
 	/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial 
 	 * agoston, 2007-12-21 */
@@ -626,9 +625,6 @@ void PM_interact(int sock) {
 		SK_cd_puts(&condat, "\n");
 	}
 	
-	/* init connection time */
-	connection_time = time(NULL);
-
 	sprintf(buff, "%%START Version: %d %s %ld-%ld%s\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last,
 	        (mirror_perm < AA_MIRROR_FULL) ? " FILTERED" : "");
 	SK_cd_puts(&condat, buff);
@@ -663,11 +659,18 @@ void PM_interact(int sock) {
 				int i = 0;
 				
 				/* check if timestamp is within the limits set in rip.config */
-				if (connection_time - timestamp > history_access_limit) {
+				if (check_history_limit && (time(NULL) - timestamp > history_access_limit)) {
 					sprintf(buff, "%% Your request has been denied to protect private data.\n%% (serials older than %d days will be rejected)\n", history_access_limit/86400);
 					SK_cd_puts(&condat, buff);
 					free(object);
 					break;
+				} else {
+					/* we don't want to let user start the nrtm stream, and then, at some point (because of a buggy
+					 * timestamp for example) deny him a few of the objects, making the slave database completely
+					 * out of sync. The decision to (dis)allow the user should be consistent throughout the nrtm
+					 * connection.
+					 * agoston, 2008-01-21 */
+					check_history_limit = 0;
 				}
 				
 				for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
@@ -705,9 +708,17 @@ void PM_interact(int sock) {
 				break;
 			
 			case OP_NOOP:
-				/* don't do anything - this serial shouldn't be even asked for */
+				/* In this case, don't do anything. 
+				 * The reason is that the first serial, which is used to set the auto_increment pkey
+				 * in mysql has an opcode of 4 (OP_NOOP). We don't send anything for this serial,
+				 * as this has no data-holding functionality.
+				 * 
+				 * If a client starts nrtm stream, that means it's starting serial is already
+				 * set up, so not sending this one will make sure that the serials will be the same.
+				 * agoston, 2008-01-21 */
 				break;
 
+			default:
 			case -1:
 				SK_cd_puts(&condat, "%% INTERNAL ERROR. TERMINATING NRTM CONNECTION.\n");
 				sprintf(buff, "%% SOURCE: %s; SERIAL: %d; PERMISSION: %d; IP: %s; TIME: %d\n\n", nrtm_q.source,
