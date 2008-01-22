@@ -132,8 +132,6 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 		return (NULL);
 	}
 
-	/* FIXME: failed_transaction is always empty when running on innodb - I'll leave this in place, 
-	 * just in case, but I don't handle the privacy bit of mirroring - agoston, 2007-10-09 */
 	if (location == 2)
 		sprintf(query, "SELECT object FROM failed_transaction WHERE serial_id=%ld ", serial_number);
 	else

@@ -35,6 +35,7 @@
  * agoston, 2007-10-10 */
 
 #include "rip.h"
+#include "class.h"
 
 #define MIN_ARG_LENGTH  6
 #define NRTM_DELIM "-:"
@@ -57,35 +58,72 @@ const int PM_PRIVATE_OBJECT_TYPES[] = { 9, 10, 11, 17, 18 };
 gchar **PM_DUMMY_ADD_ATTR;
 GHashTable *PM_DUMMY_ATTR;
 
-/* initializes variables to use in dummify_object()
- * need to be executed before any calls to dummify_object() are made
+/* Initializes variables to use in dummify_object().
+ * Need to be executed before any calls to dummify_object() are made.
+ * 
+ * Also checks if all private object's mandatory attributes are covered in the rip.config file DUMMY_ATTR options
+ * (and only those).
+ * 
  * agoston, 2007-10-31 */
 static void dummify_init() {
-	gchar **lines, **actline, *equal;
+	gchar **lines, **actline;
 	char *dummy_attr = ca_get_dummy_attr;
 	char *dummy_add_attr = ca_get_dummy_add_attr;
+	GHashTable *mandatory_attribs;
+	int i;
 
+	void collect_mandatory_attribs_callback(gpointer key, gpointer value, gpointer data) {
+		class_attr_t *actattr = (class_attr_t *)value;
+		if (actattr->choice == ATTR_MANDATORY) {
+			g_hash_table_insert(mandatory_attribs, key, value);
+		}
+	}
+	
+	void log_leftover_mandatory_attribs_callback(gpointer key, gpointer value, gpointer data) {
+		fprintf(stderr, "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!\n", key);
+		LG_log(pm_context, LG_FATAL, "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!", key);
+	}
+	
+	/* collect all mandatory options of private objects to perform sanity check during config parsing */
+	mandatory_attribs = g_hash_table_new(g_str_hash, g_str_equal);
+	for (i = 0; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
+		const class_t *actclass = class_lookup_id(PM_PRIVATE_OBJECT_TYPES[i]);
+		g_hash_table_foreach(actclass->attr_hash, collect_mandatory_attribs_callback, NULL);
+	}
+	
+	
 	/* parse dummify config options
 	 * it is required during the full lifespan of the whoisserver process, so there is no mechanism to
-	 * free() it whatsoever - agoston, 2007-10-31 */
+	 * free() the structures allocated here - agoston, 2007-10-31 */
 	PM_DUMMY_ADD_ATTR = g_strsplit(dummy_add_attr, "\n", 0);
 	PM_DUMMY_ATTR = g_hash_table_new(g_str_hash, g_str_equal);
 
 	lines = g_strsplit(ca_get_dummy_attr, "\n", 0);
 	for (actline = lines; *actline && **actline; actline++) {
-		equal = strchr(*actline, '=');
+		gchar *equal = strchr(*actline, '=');
 		if (!equal) {
-			fprintf(stderr, "No = sign found in one of the DUMMY_ATTR lines in the rip.config file");
+			fprintf(stderr, "No = sign found in one of the DUMMY_ATTR lines in the rip.config file\n");
 			LG_log(pm_context, LG_FATAL, "No = sign found in one of the DUMMY_ATTR lines in the rip.config file");
 			die;
 		}
 
 		*equal = 0;
+		if (!g_hash_table_remove(mandatory_attribs, *actline)) {
+			fprintf(stderr, "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!\n", *actline);
+			LG_log(pm_context, LG_FATAL, "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!", *actline);
+			die;
+		}
 		g_hash_table_insert(PM_DUMMY_ATTR, *actline, equal+1);
 	}
 
+	if (g_hash_table_size(mandatory_attribs) > 0) {
+		g_hash_table_foreach(mandatory_attribs, log_leftover_mandatory_attribs_callback, NULL);
+		die;
+	}
+	
 	free(dummy_attr);
 	free(dummy_add_attr);
+	g_hash_table_destroy(mandatory_attribs);
 }
 
 void PM_init(LG_context_t *ctx) {
@@ -261,7 +299,7 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  * agoston, 2007-10-18   
  * */
 static char *dummify_object(char *object) {
-	GList *errors = NULL;
+	const GList *errors = NULL;
 	gboolean quit = FALSE;
 	rpsl_attr_t *first_attr = NULL;
 	rpsl_error_t error;
@@ -274,10 +312,7 @@ static char *dummify_object(char *object) {
 
 	/* parse the object */
 	obj = rpsl_object_init(object);
-
-	/* FIXME: re-casting to get rid of const qualifier - this is braindead, but there is no other way to 
-	 * free() the errors GList allocated during rpsl_object_init... - agoston, 2007-10-29 */
-	errors = (GList *)rpsl_object_errors(obj);
+	errors = rpsl_object_errors(obj);
 	first_attr = (rpsl_attr_t *)obj->attributes->data;
 
 	for (; errors; errors = errors->next) {
@@ -301,13 +336,10 @@ static char *dummify_object(char *object) {
 	actoff = 0;
 	for (gli = g_list_first(obj->attributes); gli; actoff++, gli = g_list_next(gli)) {
 		rpsl_attr_t *act_attr = (rpsl_attr_t *)gli->data;
-		if (rpsl_attr_is_required(obj, act_attr->lcase_name)) {
-			gchar *dummy_attr;
-			if (rpsl_attr_is_key(obj, act_attr->lcase_name)) {
-				continue; /* primary keys are left untouched */
-			}
 
-			dummy_attr = g_hash_table_lookup(PM_DUMMY_ATTR, act_attr->lcase_name);
+		if (rpsl_attr_is_required(obj, act_attr->lcase_name)) {
+			gchar *dummy_attr = g_hash_table_lookup(PM_DUMMY_ATTR, act_attr->lcase_name);;
+
 			if (dummy_attr) {
 				if (*dummy_attr) {
 					char buf[STR_L];
@@ -316,14 +348,9 @@ static char *dummify_object(char *object) {
 				}
 				/* if dummy_attr is empty, we leave the rpsl attrib alone */
 			} else {
-				/* mandatory attribute is not listed in config file - serious error
-				 * 
-				 * FIXME: we should die() here, but that would take down the whole of whoisserver :( 
-				 * agoston, 2007-11-02 */
-				fprintf(stderr, "Mandatory attribute %s not found in rip.config file", act_attr->lcase_name);
-				LG_log(pm_context, LG_FATAL, "Mandatory attribute %s not found in rip.config file",
-				        act_attr->lcase_name);
-				goto dummify_abort;
+				/* mandatory attribute is not listed in config file - this is already checked in the
+				 * init routine, so we die here */
+				die;
 			}
 		} else {
 			/* We use the _internal call as the normal one does some extra, and, in this case, surplus 
@@ -345,9 +372,9 @@ static char *dummify_object(char *object) {
 		snprintf(buf, STR_L, "remarks: %s", *actline);
 		newattr = rpsl_attr_init(buf, NULL);
 		if (!rpsl_object_append_attr(obj, newattr, &error)) {
-			fprintf(stderr, "Error in dummify_object()::rpsl_object_append_attr(): %s", error.descr);
+			fprintf(stderr, "Error in dummify_object()::rpsl_object_append_attr(): %s\n", error.descr);
 			LG_log(pm_context, LG_FATAL, "Error in dummify_object()::rpsl_object_append_attr(): %s", error.descr);
-			free(error.descr);
+			rpsl_error_free(&error);
 			goto dummify_abort;
 		}
 	}
@@ -627,7 +654,7 @@ void PM_interact(int sock) {
 						object = newobj;
 					} else {
 						object = NULL;
-						operation = OP_NOOP;
+						operation = -1;
 					}
 
 					break;
@@ -648,6 +675,14 @@ void PM_interact(int sock) {
 				SK_cd_puts(&condat, object);
 				SK_cd_puts(&condat, "\n");
 				break;
+
+			case -1:
+				SK_cd_puts(&condat, "%% INTERNAL ERROR. TERMINATING NRTM CONNECTION.\n");
+				SK_cd_puts(&condat, "%% PLEASE REPORT THIS MESSAGE TO ripe-dbm@ripe.net, INCLUDING THE NEXT LINE!");
+				sprintf(buff, "%% SOURCE: %s; SERIAL: %d; PERMISSION: %d; IP: %s; TIME: %d\n\n", nrtm_q.source,
+				        current_serial, mirror_perm, hostaddress, time(NULL));
+				SK_cd_puts(&condat, buff);
+				condat.rtc = SK_NOTEXT;
 		}
 
 		if (object)
@@ -667,6 +702,7 @@ void PM_interact(int sock) {
 
 	sprintf(buff, "%%END %s\n\n\n", nrtm_q.source);
 	SK_cd_puts(&condat, buff);
+	SK_cd_close(&condat);
 
 	LG_log(pm_context, LG_INFO, "[%s] -- <%s:%ld-%ld (%ld)> ", hostaddress, nrtm_q.source, nrtm_q.first, nrtm_q.last,
 	        nrtm_q.last-nrtm_q.first+1);

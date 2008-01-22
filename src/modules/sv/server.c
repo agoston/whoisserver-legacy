@@ -782,7 +782,7 @@ int SV_start(char *pidfile) {
 	/* The max number of threads for queries has been increased from 64 to 128 (Engin 20040614) */
 	SV_concurrent_server(SV_whois_sock, 128, "whois", PW_interact);
 	/* Create master thread for mirror threads */
-	SV_concurrent_server(SV_mirror_sock, 0, "mirror", PM_interact);
+	SV_concurrent_server(SV_mirror_sock, 128, "mirror", PM_interact);
 
 	/* Walk through the sources and */
 	/* run update thread for every source with CANUPD == 'y' */

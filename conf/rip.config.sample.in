@@ -526,8 +526,6 @@ QI_FILTER_BANNER % Note: this output has been filtered.
 # If you leave a value for an attribute empty, it will not be modified at all.
 # This feature can be used for referential attributes, which do not contain personal
 # data, just reference other objects.
-# NOTE: the primary attribute of any object is automatically kept as it is (for
-# keeping referential integrity).
 #
 # The first word is the attribute name (lowercase), then comes an = as a     
 # separator, and the rest of the string until the end of line is passed to   
@@ -546,6 +544,10 @@ DUMMY_ATTR mnt-ref=
 DUMMY_ATTR referral-by=
 DUMMY_ATTR source=  
 DUMMY_ATTR org-type=
+DUMMY_ATTR irt=
+DUMMY_ATTR mntner=
+DUMMY_ATTR organisation=
+DUMMY_ATTR nic-hdl=
 DUMMY_ATTR person=Dummy name for %s
 DUMMY_ATTR role=Dummy role for %s  
 DUMMY_ATTR address=Dummy address for %s

@@ -35,7 +35,11 @@ typedef enum {
     ATTR_MULTIPLE
 } attr_number_t;
 
-/* info about attributes used by this class */
+/* info about attributes used by this class
+ *  
+ * FIXME: if we got into this structure by class_attr_t attr, we have no easy way to find out
+ * the name of the attribute :(
+ * agoston, 2007-11-12 */
 typedef struct {
     int offset;
     attr_choice_t choice;
@@ -58,6 +62,7 @@ typedef struct {
 /* functions */
 const char* const *get_class_names();
 const class_t *class_lookup(const char *name);
+const class_t *class_lookup_id(const int id);
 const class_attr_t *class_attr_lookup(const class_t *class, 
                                       const char *attr_name);
 

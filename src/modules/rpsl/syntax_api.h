@@ -92,7 +92,8 @@ at function descriptions never can.
  * each routine using only those.
  *  
  * FIXME: The data structure should better accomodate the below function's needs (so that they could
- * avoid iterating through the attribute list, for example), as well as locking and init should be
+ * avoid iterating through the attribute list, for example - imagine dbupdate iterating through the attributes
+ * of a 3 megabyte object, resulting O(n^2) time operation, brrr), as well as locking and init should be
  * redesigned (see FIXMEs about this scattered throughout the code) - agoston, 2007-11-02  */
 
 /* typedefs allow for forward references within structure definitions */
@@ -270,6 +271,7 @@ extern gboolean rpsl_attr_has_error(const rpsl_attr_t *attr, int error_level);
 extern gboolean rpsl_object_has_error(const rpsl_object_t *object, 
                                       int error_level);
 extern void rpsl_error_free(rpsl_error_t *error);
+extern void rpsl_error_all_free(rpsl_error_t *error);
 extern void rpsl_error_list_free(GList *errors);
 
 gint rpsl_get_attr_id(const gchar *attr_name);

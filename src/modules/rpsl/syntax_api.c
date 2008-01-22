@@ -407,9 +407,17 @@ rpsl_error_add (GList **errors, gint level, gint code, gint attr_num,
     *errors = g_list_append(*errors, error);
 }
 
-/* free()s an error structure altogether
+/* free()s the data members of an rpsl_error_t
  * agoston, 2007-11-07 */
 void rpsl_error_free(rpsl_error_t *error) {
+	if (error) {
+		free(error->descr);
+	}
+}
+
+/* free()s an rpsl_error_t* altogether (including rpsl_error_t)
+ * agoston, 2007-11-07 */
+void rpsl_error_all_free(rpsl_error_t *error) {
 	if (error) {
 		free(error->descr);
 		free(error);
@@ -422,7 +430,7 @@ void rpsl_error_free(rpsl_error_t *error) {
 void rpsl_error_list_free(GList *errors) {
 	GList *gli = errors;
 	for (; gli; gli=gli->next) {
-		rpsl_error_free((rpsl_error_t *)gli->data);
+		rpsl_error_all_free((rpsl_error_t *)gli->data);
 	}
 	g_list_free(errors);
 }
