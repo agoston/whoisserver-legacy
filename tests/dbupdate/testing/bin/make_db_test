@@ -222,6 +222,7 @@ fi
 # we should reset these, too
 $REMADMINCMD set acl_tree
 $REMADMINCMD set access_tree
+$REMADMINCMD set aaa_cache
 
 # at one point, initrx would stop updates - resume them here just in case
 $RESUMEUPDATES

@@ -201,7 +201,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # reset ripadmin data as well
-issue_command "set acl_tree\nset access_tree"
+issue_command "set acl_tree\nset access_tree\nset aaa_cache"
 
 log "Loading database [$SQLDB] (source [$SOURCE]) finished without errors"
 
