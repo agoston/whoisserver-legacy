@@ -641,32 +641,37 @@ void PM_interact(int sock) {
 		/* there is a probability that mirroring interferes with HS cleanup */
 		/* in such case serial may be deleted before it is read by mirror client */
 		/* null object will be returned in this case and we need to break the loop */
-		if (object==NULL)
-			break;
+		if (object==NULL) {
+			/* The first serial, being only present so that the serials table is not empty, is set to
+			 * OP_NOOP, as it serves no information - agoston, 2008-01-17 */
+			if (operation != OP_NOOP) break;
 
-		/* filter private object types if it is not authorized */
-		if (mirror_perm == AA_MIRROR_PUBLIC) {
-			int i = 0;
-			for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
-				if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
-					char *newobj;
-
-					newobj = dummify_object(object);
-					free(object);
-
-					if (newobj) {
-						object = newobj;
-					} else {
-						object = NULL;
-						operation = -1;
+		} else {
+	
+			/* filter private object types if it is not authorized */
+			if (mirror_perm == AA_MIRROR_PUBLIC) {
+				int i = 0;
+				for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
+					if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
+						char *newobj;
+	
+						newobj = dummify_object(object);
+						free(object);
+	
+						if (newobj) {
+							object = newobj;
+						} else {
+							object = NULL;
+							operation = -1;
+						}
+	
+						break;
 					}
-
-					break;
 				}
 			}
 		}
 
-		/* FIXME: OP_UPD is a defined operation, but not used in serials table - left unhandled here, too */
+		/* OP_UPD is a defined operation, but not used in serials table - left unhandled here, too */
 		switch (operation) {
 			case OP_ADD:
 				SK_cd_puts(&condat, "ADD\n\n");
@@ -679,10 +684,13 @@ void PM_interact(int sock) {
 				SK_cd_puts(&condat, object);
 				SK_cd_puts(&condat, "\n");
 				break;
+			
+			case OP_NOOP:
+				/* don't do anything - this serial shouldn't be even asked for */
+				break;
 
 			case -1:
 				SK_cd_puts(&condat, "%% INTERNAL ERROR. TERMINATING NRTM CONNECTION.\n");
-				SK_cd_puts(&condat, "%% PLEASE REPORT THIS MESSAGE TO ripe-dbm@ripe.net, INCLUDING THE NEXT LINE!");
 				sprintf(buff, "%% SOURCE: %s; SERIAL: %d; PERMISSION: %d; IP: %s; TIME: %d\n\n", nrtm_q.source,
 				        current_serial, mirror_perm, hostaddress, time(NULL));
 				SK_cd_puts(&condat, buff);
@@ -695,7 +703,7 @@ void PM_interact(int sock) {
 
 		/* for real-time mirroring we need some piece of code */
 		if (persistent_connection && (condat.rtc == 0)) {
-			while (((nrtm_q.last = SQ_get_max_id(sql_connection, "serial_id", "serials") /*- SAFE_BACKLOG*/)<current_serial)
+			while (((nrtm_q.last = SQ_get_max_id(sql_connection, "serial_id", "serials")) < current_serial)
 			        && (CO_get_do_server()==1))
 				sleep(1);
 		}
