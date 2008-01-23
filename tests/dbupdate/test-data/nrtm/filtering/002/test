@@ -20,6 +20,8 @@ org-type:      OTHER
 descr:         ZOH
 remarks:       ZOH (again, I know! :)
 address:       Address
+address:       2nd address line
+address:       3rd address line
 phone:         +0123456789
 fax-no:        +0123456789
 e-mail:        dbtest@ripe.net
@@ -27,6 +29,7 @@ admin-c:       TP1-DB-TEST
 tech-c:        TP1-DB-TEST
 ref-nfy:       bitbucket@ripe.net
 mnt-ref:       TEST-DBM-MNT
+notify:        bitbucket@ripe.net
 notify:        bitbucket@ripe.net
 mnt-by:        TEST-DBM-MNT
 abuse-mailbox: dbtest@ripe.net
