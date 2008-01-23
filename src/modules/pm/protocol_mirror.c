@@ -81,19 +81,26 @@ static void dummify_init() {
 			g_hash_table_insert(mandatory_attribs, key, value);
 		}
 	}
-	
+
 	void log_leftover_mandatory_attribs_callback(gpointer key, gpointer value, gpointer data) {
-		fprintf(stderr, "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!\n", key);
-		LG_log(pm_context, LG_FATAL, "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!", key);
+		fprintf(
+		        stderr,
+		        "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!\n",
+		        key);
+		LG_log(
+		        pm_context,
+		        LG_FATAL,
+		        "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!",
+		        key);
 	}
-	
+
 	/* collect all mandatory options of private objects to perform sanity check during config parsing */
 	mandatory_attribs = g_hash_table_new(g_str_hash, g_str_equal);
 	for (i = 0; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
 		const class_t *actclass = class_lookup_id(PM_PRIVATE_OBJECT_TYPES[i]);
 		g_hash_table_foreach(actclass->attr_hash, collect_mandatory_attribs_callback, NULL);
 	}
-	
+
 	/* parse dummify config options
 	 * it is required during the full lifespan of the whoisserver process, so there is no mechanism to
 	 * free() the structures allocated here - agoston, 2007-10-31 */
@@ -111,8 +118,15 @@ static void dummify_init() {
 
 		*equal = 0;
 		if (!g_hash_table_remove(mandatory_attribs, *actline)) {
-			fprintf(stderr, "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!\n", *actline);
-			LG_log(pm_context, LG_FATAL, "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!", *actline);
+			fprintf(
+			        stderr,
+			        "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!\n",
+			        *actline);
+			LG_log(
+			        pm_context,
+			        LG_FATAL,
+			        "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!",
+			        *actline);
 			die;
 		}
 		g_hash_table_insert(PM_DUMMY_ATTR, *actline, equal+1);
@@ -122,7 +136,7 @@ static void dummify_init() {
 		g_hash_table_foreach(mandatory_attribs, log_leftover_mandatory_attribs_callback, NULL);
 		die;
 	}
-	
+
 	free(dummy_attr);
 	free(dummy_add_attr);
 	g_hash_table_destroy(mandatory_attribs);
@@ -288,9 +302,9 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  * 
  * This also means that objects which have been stuffed into the database earlier, not passing the current syntax
  * rules will produce an error. On such rpsl parser errors, we return NULL, which marks that the object could not 
- * be dummified. In this case, the NRTM server will return operation NOOP from the main loop.
+ * be dummified. In this case, the NRTM server will return an error message with all the necessary debug info.
  * This will normally not be a problem as we also don't want to give object history through public NRTM stream. Any
- * attempt to try to go back more than a week into the past should give an error.
+ * attempt to try to go back more than two weeks into the past should give an error.
  * 
  * After having the processed object structure, we iterate through the attributes. We discard any non-mandatory
  * attributes. From the mandatory ones, we keep the ones which maintain referential integrity. The remaining
@@ -314,6 +328,7 @@ static char *dummify_object(char *object) {
 	gchar *prim_val = NULL;
 	char **actline;
 	char *ret = NULL;
+	GHashTable *dummified_attribs = NULL;
 
 	/* parse the object */
 	obj = rpsl_object_init(object);
@@ -334,6 +349,10 @@ static char *dummify_object(char *object) {
 		goto dummify_abort;
 	}
 
+	/* init hash containing the already dummified attribs (so we don't have
+	 * hundreds of the same changed: lines, for example */
+	dummified_attribs = g_hash_table_new(g_str_hash, g_str_equal);
+
 	/* the primary key is not necessarily the first attribute of the object, e.g. person */
 	prim_val = rpsl_object_get_key_value(obj);
 
@@ -342,14 +361,15 @@ static char *dummify_object(char *object) {
 	for (gli = g_list_first(obj->attributes); gli; actoff++, gli = g_list_next(gli)) {
 		rpsl_attr_t *act_attr = (rpsl_attr_t *)gli->data;
 
-		if (rpsl_attr_is_required(obj, act_attr->lcase_name)) {
-			gchar *dummy_attr = g_hash_table_lookup(PM_DUMMY_ATTR, act_attr->lcase_name);;
+		if (g_hash_table_lookup(dummified_attribs, act_attr->lcase_name) || rpsl_attr_is_required(obj, act_attr->lcase_name)) {
+			gchar *dummy_attr = g_hash_table_lookup(PM_DUMMY_ATTR, act_attr->lcase_name);
 
-			if (dummy_attr) {
-				if (*dummy_attr) {
+			if (dummy_attr) { /* exists in hash table */
+				if (*dummy_attr) { /* is not empty */
 					char buf[STR_L];
 					snprintf(buf, STR_L, dummy_attr, prim_val);
 					rpsl_attr_replace_value(act_attr, buf);
+					g_hash_table_insert(dummified_attribs, act_attr->lcase_name, act_attr);		/* don't mind the value */
 				}
 				/* if dummy_attr is empty, we leave the rpsl attrib alone */
 			} else {
@@ -388,6 +408,8 @@ static char *dummify_object(char *object) {
 
 	dummify_abort:
 
+	if (dummified_attribs)
+		g_hash_table_destroy(dummified_attribs);
 	if (prim_val)
 		free(prim_val);
 	if (obj)
@@ -624,7 +646,7 @@ void PM_interact(int sock) {
 		UT_free(resp_header);
 		SK_cd_puts(&condat, "\n");
 	}
-	
+
 	sprintf(buff, "%%START Version: %d %s %ld-%ld%s\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last,
 	        (mirror_perm < AA_MIRROR_FULL) ? " FILTERED" : "");
 	SK_cd_puts(&condat, buff);
@@ -650,17 +672,19 @@ void PM_interact(int sock) {
 		if (object==NULL) {
 			/* The first serial, being only present so that the serials table is not empty, is set to
 			 * OP_NOOP, as it serves no information - agoston, 2008-01-17 */
-			if (operation != OP_NOOP) break;
+			if (operation != OP_NOOP)
+				break;
 
 		} else {
-	
+
 			/* filter private object types if it is not authorized */
 			if (mirror_perm == AA_MIRROR_PUBLIC) {
 				int i = 0;
-				
+
 				/* check if timestamp is within the limits set in rip.config */
-				if (check_history_limit && (time(NULL) - timestamp > history_access_limit)) {
-					sprintf(buff, "%% Your request has been denied to protect private data.\n%% (Requesting serials older than %d days will be rejected)\n", history_access_limit/86400);
+				if (check_history_limit && history_access_limit && (time(NULL) - timestamp > history_access_limit)) {
+					sprintf(buff, "%% Your request has been denied to protect private data.\n"
+						"%% (Requesting serials older than %d days will be rejected)\n", history_access_limit/86400);
 					SK_cd_puts(&condat, buff);
 					free(object);
 					break;
@@ -672,21 +696,21 @@ void PM_interact(int sock) {
 					 * agoston, 2008-01-21 */
 					check_history_limit = 0;
 				}
-				
+
 				for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
 					if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
 						char *newobj;
-	
+
 						newobj = dummify_object(object);
 						free(object);
-	
+
 						if (newobj) {
 							object = newobj;
 						} else {
 							object = NULL;
 							operation = -1;
 						}
-	
+
 						break;
 					}
 				}
@@ -706,14 +730,14 @@ void PM_interact(int sock) {
 				SK_cd_puts(&condat, object);
 				SK_cd_puts(&condat, "\n");
 				break;
-			
+
 			case OP_NOOP:
 				/* In this case, don't do anything. 
 				 * The reason is that the first serial, which is used to set the auto_increment pkey
 				 * in mysql has an opcode of 4 (OP_NOOP). We don't send anything for this serial,
 				 * as this has no data-holding functionality.
 				 * 
-				 * If a client starts nrtm stream, that means it's starting serial is already
+				 * More importantly, if a client requests an nrtm stream, that means it's starting serial is already
 				 * set up, so not sending this one will make sure that the serials will be the same.
 				 * agoston, 2008-01-21 */
 				break;

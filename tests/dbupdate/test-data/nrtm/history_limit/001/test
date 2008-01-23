@@ -2,6 +2,9 @@
 #           check if we get denied as expected, also if the serials are right
 #           In this test, we have filtered nrtm access rights
 #
+# WARNING: if NRTM_HISTORY_ACCESS_LIMIT is disabled or set to more than 60 days in your rip.config
+#          file, this test will fail!
+#
 #SUCCESS
 #
 # RESULT 001: The query will succeed.

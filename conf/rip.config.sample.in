@@ -577,7 +577,7 @@ DUMMY_ADD_ATTR ****************************
 # After this many seconds have passed since the object was put in the database,
 # it is not allowed to be accessed by public nrtm clients (clients with full rights
 # may still access it without any restrictions).
-# Default is 2 weeks (=1209600 seconds).
+# Default is 2 weeks (=1209600 seconds). Value of 0 disables this feature.
 
 NRTM_HISTORY_ACCESS_LIMIT 1209600
 

@@ -4,6 +4,8 @@
  * to simulate those using pthread_mutex calls
  * 
  * for example on pthread_rwlock, see aa.c
+ * 
+ * agoston, 2008-01-22
  */ 
 
 /***************************************
