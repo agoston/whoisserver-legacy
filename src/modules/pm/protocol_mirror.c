@@ -361,11 +361,11 @@ static char *dummify_object(char *object) {
 	for (gli = g_list_first(obj->attributes); gli; actoff++, gli = g_list_next(gli)) {
 		rpsl_attr_t *act_attr = (rpsl_attr_t *)gli->data;
 
-		if (g_hash_table_lookup(dummified_attribs, act_attr->lcase_name) || rpsl_attr_is_required(obj, act_attr->lcase_name)) {
+		if (!g_hash_table_lookup(dummified_attribs, act_attr->lcase_name) && rpsl_attr_is_required(obj, act_attr->lcase_name)) {
 			gchar *dummy_attr = g_hash_table_lookup(PM_DUMMY_ATTR, act_attr->lcase_name);
 
 			if (dummy_attr) { /* exists in hash table */
-				if (*dummy_attr) { /* is not empty */
+				if (*dummy_attr) { /* value is not empty */
 					char buf[STR_L];
 					snprintf(buf, STR_L, dummy_attr, prim_val);
 					rpsl_attr_replace_value(act_attr, buf);
