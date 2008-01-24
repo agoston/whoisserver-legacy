@@ -77,8 +77,8 @@ int ud_transaction_support(Transaction_t *tr){
 ************************************************************/
 
 void _collect_tables(gpointer key, gpointer value, gpointer table_list) {
-	/* to avoid attribute warn_unused_result */
-	GSList *unused = g_slist_prepend(table_list, (gpointer)key);
+	GSList **ret = (GSList **)table_list;
+	*ret = g_slist_prepend(*ret, (gpointer)key);
 }
 
 /************************************************************
@@ -102,67 +102,55 @@ void _collect_tables(gpointer key, gpointer value, gpointer table_list) {
 
 int ud_build_lock_query(Transaction_t *tr, char **common_tables) {
 
-    int i, ntables;
-    GSList      *lock_tables;
-    GSList      *cur_table;
-    GHashTable  *tables_unique;
+	int i;
+	GSList *lock_tables;
+	GSList *cur_table;
+	GHashTable *tables_unique;
 
-    /* Initialize hash -- this will be used to drop duplicate table names */
-    tables_unique = g_hash_table_new(g_str_hash, g_str_equal);
+	/* Initialize hash -- this will be used to drop duplicate table names */
+	tables_unique = g_hash_table_new(g_str_hash, g_str_equal);
 
-    /* The base table for this class should always be locked */
-    g_hash_table_insert(tables_unique, DF_get_class_sql_table(tr->class_type), (gpointer)1);
+	/* The base table for this class should always be locked */
+	g_hash_table_insert(tables_unique, DF_get_class_sql_table(tr->class_type), (gpointer)1);
 
-    /* If we got extra tables to be locked, put them on the list */
-    if(common_tables != NULL){
-        for(i = 0; common_tables[i] != NULL; i++)
-            g_hash_table_insert(tables_unique, common_tables[i], (gpointer)1);
-    }
-   
-    /* Add tables defined in .../include/UD_comrol.def */
-    for (i=0; tables[tr->class_type][i] != NULL && i < TAB_START; i++)
-        g_hash_table_insert(tables_unique, tables[tr->class_type][i], (gpointer)1);
+	/* If we got extra tables to be locked, put them on the list */
+	if (common_tables != NULL) {
+		for (i = 0; common_tables[i] != NULL; i++)
+			g_hash_table_insert(tables_unique, common_tables[i], (gpointer)1);
+	}
 
-    for (i=TAB_START; tables[tr->class_type][i] != NULL; i++)
-        g_hash_table_insert(tables_unique, tables[tr->class_type][i], (gpointer)1);
+	/* Add tables defined in .../include/UD_comrol.def */
+	for (i=0; tables[tr->class_type][i] != NULL && i < TAB_START; i++)
+		g_hash_table_insert(tables_unique, tables[tr->class_type][i], (gpointer)1);
 
-    /* Initialize a linked list which we're going to traverse when actually
-       get to build up the query */
-    lock_tables = g_slist_alloc();
+	for (i=TAB_START; tables[tr->class_type][i] != NULL; i++)
+		g_hash_table_insert(tables_unique, tables[tr->class_type][i], (gpointer)1);
 
-    /* Copy all table names from the hash to this list */
-    g_hash_table_foreach(tables_unique, _collect_tables, lock_tables);
+	/* No tables to lock -> nothing to do.
+	 * Should this be an error condition?  I'm not sure. */
+	if (!g_hash_table_size(tables_unique))
+		return 1;
 
-    /* How many tables do we have? */
-    ntables = g_hash_table_size(tables_unique);
+	/* Initialize a linked list which we're going to traverse when actually
+	 get to build up the query */
+	lock_tables = NULL;
 
-    /* No tables to lock -> nothing to do.
-     * Should this be an error condition?  I'm not sure. */
-    
-    if( ! ntables)
-        return 1;
+	/* Copy all table names from the hash to this list */
+	g_hash_table_foreach(tables_unique, _collect_tables, &lock_tables);
 
-    /* Start building the query */
-    g_string_sprintf(tr->query, "LOCK TABLES");
-    
-    cur_table = g_slist_next(lock_tables);
+	/* Start building the query */
+	g_string_sprintf(tr->query, "LOCK TABLES %s WRITE", lock_tables->data);
 
-    /* Add all tables on our list to the query */
-    for(i = 0; cur_table != NULL && i < ntables; i++){
+	/* Add all tables on our list to the query */
+	for (cur_table = g_slist_next(lock_tables); cur_table != NULL; cur_table = g_slist_next(cur_table)) {
+		g_string_sprintfa(tr->query, ", %s WRITE", (char *)cur_table->data);
+	}
+	
+	/* free the temp list and hash */
+	g_slist_free(lock_tables);
+	g_hash_table_destroy(tables_unique);
 
-        g_string_sprintfa(tr->query, " %s WRITE", (char *)cur_table->data);
-
-        if(i < (ntables - 1))
-            g_string_sprintfa(tr->query, ",");
-
-        cur_table = g_slist_next(cur_table);
-    }
-
-    /* free the temp list and hash */
-    g_slist_free(lock_tables);
-    g_hash_table_destroy(tables_unique);
-
-    return (0);
+	return (0);
 }
 
 
