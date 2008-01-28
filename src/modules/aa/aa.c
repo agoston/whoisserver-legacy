@@ -31,11 +31,10 @@ typedef struct {
 	int mirror;
 } aa_rights;
 
-/** The AAA cache itself - if it would get big, we should introduce a sql-tree instead */
+/** The AAA cache itself - if it would get big, we should introduce an sql-tree instead */
 GList *aaa[MAX_IPSPACE_ID+1];
 
 pthread_rwlock_t aaa_lock;
-pthread_rwlockattr_t aaa_lock_attr;
 
 void aa_compose_query(ip_space_t space, char *buf, unsigned len) {
 	switch (space) {
@@ -47,7 +46,7 @@ void aa_compose_query(ip_space_t space, char *buf, unsigned len) {
 
 	case IP_V6:
 		snprintf(buf, len, "SELECT ripupdate, mirror, source, prefix_length, "
-			"prefix1, prefix2, prefix3, prefix4  FROM aaa6 "
+			"prefix1, prefix2, prefix3, prefix4 FROM aaa6 "
 			"ORDER BY prefix_length ASC");
 		break;
 
@@ -125,7 +124,9 @@ void AA_load() {
 }
 
 void AA_init() {
+	pthread_rwlockattr_t aaa_lock_attr;
 	int i;
+	
 	for (i = MIN_IPSPACE_ID; i <=MAX_IPSPACE_ID; i++) {
 		aaa[i] = NULL;
 	}

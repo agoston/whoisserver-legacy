@@ -66,6 +66,13 @@ RIPADMIN sqlhost,3306,dbuser,dbpsw,RIPADMIN
 
 SOURCEFILE @confdir@/sources.config.sample
 
+#
+# Email address where warning/error emails are going to be sent.   
+# It is going to be passed as an argument to /usr/bin/mail, so if 
+# it supports multiple addresses, you can set multiple addresses
+# here as well.
+# To disable this feature, simply comment the line out.
+#OPEREMAIL unread@ripe.net
 
 ######################
 ###
@@ -512,7 +519,67 @@ QI_FMT_GROUP_BANNER %% Information related to '%s'
 QI_FILTER_BANNER % Note: this output has been filtered.
 
 
+###########
+##
+## Dummification config
+##
 
+# A list of attributes which are mandatory RPSL attributes, but contain    
+# personal data and thus should be replaced with a generated value. The    
+# values are going to be fed to a sprintf(), with the primary key of the   
+# object as an argument. This can be used to give more meaningful dummified
+# attributes.
+#
+# If you leave a value for an attribute empty, it will not be modified at all.
+# This feature can be used for referential attributes, which do not contain personal
+# data, just reference other objects.
+#
+# The first word is the attribute name (lowercase), then comes an = as a     
+# separator, and the rest of the string until the end of line is passed to   
+# sprintf(). Note that neither keys nor values are chomped anywhere, so don't
+# leave whitespaces around.
+#
+# FIXME: This should go to the syntax.xml if we wanted to implement it correctly.   
+# That would involve a major change, however, so this task should be done during the
+# refactorisation of the rpsl module. - agoston, 2007-10-31
+#
+
+DUMMY_ATTR admin-c=
+DUMMY_ATTR tech-c= 
+DUMMY_ATTR mnt-by= 
+DUMMY_ATTR mnt-ref=
+DUMMY_ATTR referral-by=
+DUMMY_ATTR source=  
+DUMMY_ATTR org-type=
+DUMMY_ATTR irt=
+DUMMY_ATTR mntner=
+DUMMY_ATTR organisation=
+DUMMY_ATTR nic-hdl=
+DUMMY_ATTR person=Dummy name for %s
+DUMMY_ATTR role=Dummy role for %s  
+DUMMY_ATTR address=Dummy address for %s
+DUMMY_ATTR changed=unread@ripe.net 20000101
+DUMMY_ATTR phone=+31205354444
+DUMMY_ATTR e-mail=unread@ripe.net
+DUMMY_ATTR upd-to=unread@ripe.net
+DUMMY_ATTR descr=Dummy description for %s
+DUMMY_ATTR auth=MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/
+DUMMY_ATTR org-name=Dummy organisation name for %s
+
+# Additional remarks to be added to the end of the dummified object.
+
+DUMMY_ADD_ATTR ****************************
+DUMMY_ADD_ATTR * THIS OBJECT IS NOT VALID 
+DUMMY_ADD_ATTR * Please note that this object has all its personal data removed, and acts as a stub only.
+DUMMY_ADD_ATTR * To get the original object, please query the RIPE Database.
+DUMMY_ADD_ATTR ****************************
+
+# After this many seconds have passed since the object was put in the database,
+# it is not allowed to be accessed by public nrtm clients (clients with full rights
+# may still access it without any restrictions).
+# Default is 2 weeks (=1209600 seconds). Value of 0 disables this feature.
+
+NRTM_HISTORY_ACCESS_LIMIT 1209600
 
 ######################
 ###

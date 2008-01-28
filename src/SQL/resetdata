@@ -9,5 +9,5 @@ $MYSQL -h$RIPADMIN_DBHOST -P$RIPADMIN_DBPORT -u$RIPADMIN_DBUSER -p$RIPADMIN_DBPA
 
 echo "resetting CURRENTSERIAL to 1"
 $MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB <<EOM
-INSERT serials SET serial_id=1, object_id=0
+INSERT serials SET serial_id=1, object_id=0, operation=4
 EOM

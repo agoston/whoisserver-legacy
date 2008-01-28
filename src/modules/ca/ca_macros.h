@@ -465,5 +465,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define ca_get_command_on_die	ca_get_string(CA_COMMAND_ON_DIE)
 #define ca_set_command_on_die	ca_set_string(CA_COMMAND_ON_DIE)
 
+#define ca_get_dummy_attr ca_get_string(CA_DUMMY_ATTR)
+#define ca_set_dummy_attr ca_set_string(CA_DUMMY_ATTR)
+
+#define ca_get_dummy_add_attr ca_get_string(CA_DUMMY_ADD_ATTR)
+#define ca_set_dummy_add_attr ca_set_string(CA_DUMMY_ADD_ATTR)
+
+#define ca_get_operemail ca_get_string(CA_OPEREMAIL)
+#define ca_set_operemail ca_set_string(CA_OPEREMAIL)
+
+#define ca_get_nrtm_history_access_limit ca_get_int(CA_NRTM_HISTORY_ACCESS_LIMIT)
+#define ca_set_nrtm_history_access_limit ca_set_int(CA_NRTM_HISTORY_ACCESS_LIMIT)
+
 #endif	/* CA_MACROS */
 

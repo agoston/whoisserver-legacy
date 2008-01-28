@@ -83,6 +83,19 @@ at function descriptions never can.
 
 ************************************************************************/
 
+/* FIXME: This should be an object. All this is a horrible c-ish hack to achieve that. The drawback
+ * of this is that every function call has to check its input (which includes the object/attrib structures)
+ * before proceeding. Apart from being very slow right where speed would be most important, it also
+ * results in a lot of code duplication/repeat, which is very bad again.
+ * A possible emulation of OO would be to add a 'dontcheck' flag to each structure (obj, attrib, ...) to
+ * mark that it was already validated by rpsl code, and put the checking routines in dedicated functions,
+ * each routine using only those.
+ *  
+ * FIXME: The data structure should better accomodate the below function's needs (so that they could
+ * avoid iterating through the attribute list, for example - imagine dbupdate iterating through the attributes
+ * of a 3 megabyte object, resulting O(n^2) time operation, brrr), as well as locking and init should be
+ * redesigned (see FIXMEs about this scattered throughout the code) - agoston, 2007-11-02  */
+
 /* typedefs allow for forward references within structure definitions */
 typedef struct rpsl_object rpsl_object_t;
 typedef struct rpsl_attr rpsl_attr_t;
@@ -247,6 +260,7 @@ extern gboolean rpsl_attr_is_multivalued(const rpsl_object_t *object,
                                          const gchar *attr);
 extern gboolean rpsl_attr_is_lookup(const rpsl_object_t *object,
                                     const gchar *attr);
+/* checks if attr is a primary key */
 extern gboolean rpsl_attr_is_key(const rpsl_object_t *object,
                                  const gchar *attr);
 extern gboolean rpsl_attr_is_generated(const rpsl_object_t *object,
@@ -256,6 +270,9 @@ extern gboolean rpsl_object_is_deleted(const rpsl_object_t *object);
 extern gboolean rpsl_attr_has_error(const rpsl_attr_t *attr, int error_level);
 extern gboolean rpsl_object_has_error(const rpsl_object_t *object, 
                                       int error_level);
+extern void rpsl_error_free(rpsl_error_t *error);
+extern void rpsl_error_all_free(rpsl_error_t *error);
+extern void rpsl_error_list_free(GList *errors);
 
 gint rpsl_get_attr_id(const gchar *attr_name);
 gint rpsl_get_class_id(const gchar *class_name);

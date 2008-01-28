@@ -1,0 +1,105 @@
+# CASE 001: create 3, modify 2 objects, and then query for the private object types through NRTM
+#           check if we get denied as expected, also if the serials are right
+#           In this test, we have filtered nrtm access rights
+#
+# WARNING: if NRTM_HISTORY_ACCESS_LIMIT is disabled or set to more than 60 days in your rip.config
+#          file, this test will fail!
+#
+#SUCCESS
+#
+# RESULT 001: The query will succeed.
+$EXEC_AFTER=$DATADIR/nrtm/history_limit/001/nrtm_check.sh
+
+password: test-dbm
+password: hostmaster
+
+% organisation
+organisation:  AUTO-1
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+descr:         ZOH
+remarks:       ZOH (again, I know! :)
+address:       Address
+phone:         +0123456789
+fax-no:        +0123456789
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+ref-nfy:       bitbucket@ripe.net
+mnt-ref:       TEST-DBM-MNT
+notify:        bitbucket@ripe.net
+mnt-by:        TEST-DBM-MNT
+abuse-mailbox: dbtest@ripe.net
+changed:       dbtest@ripe.net 20070102
+source:        DB-TEST
+
+person:       test person
+address:      Singel
+phone:        +0123456789
+e-mail:       bitbucket@ripe.net
+org:          AUTO-1
+fax-no:       +0123456789
+nic-hdl:      TP1-DB-TEST
+remarks:      ZOH
+notify:       bitbucket@ripe.net
+abuse-mailbox: bitbucket@ripe.net
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net 20070101
+source:       DB-TEST
+
+% referral-by maintainer
+
+mntner:       TEST-DBM-MNT
+descr:        Mntner for RIPE DBM objects.
+org:          AUTO-1
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+upd-to:       bitbucket@ripe.net
+mnt-nfy:      bitbucket@ripe.net
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
+remarks:      ZOH
+notify:       bitbucket@ripe.net
+abuse-mailbox: bitbucket@ripe.net
+mnt-by:       TEST-DBM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20070101
+source:       DB-TEST
+
+% example role
+
+role:         Little Gnome
+address:      Address
+phone:        +0123456789
+fax-no:       +0123456789
+e-mail:       bitbucket@ripe.net
+org:          AUTO-1
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+nic-hdl:      TR1-DB-TEST
+remarks:      ZOH
+notify:       bitbucket@ripe.net
+abuse-mailbox: bitbucket@ripe.net
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net 20070505
+source:       DB-TEST
+
+% example IRT
+
+irt:          IRT-TEST
+address:      Address
+phone:        +123456789
+fax-no:       +0123456789
+e-mail:       bitbucket@ripe.net
+abuse-mailbox: bitbucket@ripe.net
+signature:    PGPKEY-AABBCCDD
+encryption:   PGPKEY-AABBCCDD
+org:          AUTO-1
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
+remarks:      ZOH
+irt-nfy:      bitbucket@ripe.net
+notify:       bitbucket@ripe.net
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net 20070505
+source:       DB-TEST

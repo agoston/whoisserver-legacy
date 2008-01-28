@@ -714,13 +714,15 @@ int SK_getpeerip(int sockfd, ip_addr_t * ip)
 	memset(&ss, 0, sizeof(ss));
 
 	if (getpeername(sockfd, (struct sockaddr *)&ss, &namelen) == 0) {
-		ret = 0;
-		IP_addr_s2b(ip, &ss, namelen);
+		if (IP_addr_s2b(ip, &ss, namelen) == IP_OK) {
+			ret = 0;
 
-		/* check for v4 mapped addresses */
-		IP_convert_mapped(ip);
-
-	} else {
+			/* check for v4 mapped addresses */
+			IP_convert_mapped(ip);
+		}
+	}
+	
+	if (ret == -1) {
 		/* XXX: hack to avoid crash in the case where peer disconnects */
 		/* To fix this, the socket interface needs to deal with a structure
 		   containing not only the file descriptor, but also the address of

@@ -4,14 +4,13 @@ CREATE TABLE aaa (
   prefix_length tinyint(3) unsigned NOT NULL default '0',
   source varchar(32) NOT NULL default '',
   ripupdate tinyint(3) NOT NULL default '0',
-  netupdate tinyint(3) NOT NULL default '0',
   mirror tinyint(3) NOT NULL default '0',
   comment longblob,
   PRIMARY KEY  (prefix,prefix_length,source)
 );
 
-INSERT INTO aaa VALUES (0, 0, 'DB-TEST', 1, 1, 1, 'Default IPv4 access');
-INSERT INTO aaa VALUES (0, 0, 'RIPE', 1, 1, 1, 'Default IPv4 access');
+INSERT INTO aaa VALUES (0, 0, 'DB-TEST', 1, 1, 'Default IPv4 access');
+INSERT INTO aaa VALUES (0, 0, 'RIPE', 1, 1, 'Default IPv4 access');
 
 DROP TABLE IF EXISTS aaa6;
 CREATE TABLE aaa6 (
@@ -22,14 +21,13 @@ CREATE TABLE aaa6 (
   prefix_length tinyint(3) unsigned NOT NULL default '0',
   source varchar(32) NOT NULL default '',
   ripupdate tinyint(3) unsigned NOT NULL default '0',
-  netupdate tinyint(3) unsigned NOT NULL default '0',
   mirror tinyint(3) unsigned NOT NULL default '0',
   comment longblob,
   PRIMARY KEY  (prefix1,prefix2,prefix3,prefix4,prefix_length,source)
 );
 
-INSERT INTO aaa6 VALUES (0, 0, 0, 0, 0, 'DB-TEST', 1, 1, 1, 'Default IPv6 access');
-INSERT INTO aaa6 VALUES (0, 0, 0, 0, 0, 'RIPE', 1, 1, 1, 'Default IPv6 access');
+INSERT INTO aaa6 VALUES (0, 0, 0, 0, 0, 'DB-TEST', 1, 1, 'Default IPv6 access');
+INSERT INTO aaa6 VALUES (0, 0, 0, 0, 0, 'RIPE', 1, 1, 'Default IPv6 access');
 
 
 DROP TABLE IF EXISTS access;

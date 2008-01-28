@@ -35,6 +35,7 @@
  * agoston, 2007-10-10 */
 
 #include "rip.h"
+#include "class.h"
 
 #define MIN_ARG_LENGTH  6
 #define NRTM_DELIM "-:"
@@ -51,11 +52,101 @@
 
 LG_context_t *pm_context;
 
+/* CA_NRTM_HISTORY_ACCESS_LIMIT */
+unsigned history_access_limit;
+
 /* object types considered private, in order: mntner, person, role, irt, organisation */
-const int PM_PRIVATE_OBJECT_TYPES[] = {9, 10, 11, 17, 18};
+const int PM_PRIVATE_OBJECT_TYPES[] = { 9, 10, 11, 17, 18 };
+
+gchar **PM_DUMMY_ADD_ATTR;
+GHashTable *PM_DUMMY_ATTR;
+
+/* Initializes variables to use in dummify_object().
+ * Need to be executed before any calls to dummify_object() are made.
+ * 
+ * Also checks if all private object's mandatory attributes are covered in the rip.config file DUMMY_ATTR options
+ * (and only those).
+ * 
+ * agoston, 2007-10-31 */
+static void dummify_init() {
+	gchar **lines, **actline;
+	char *dummy_attr = ca_get_dummy_attr;
+	char *dummy_add_attr = ca_get_dummy_add_attr;
+	GHashTable *mandatory_attribs;
+	int i;
+
+	void collect_mandatory_attribs_callback(gpointer key, gpointer value, gpointer data) {
+		class_attr_t *actattr = (class_attr_t *)value;
+		if (actattr->choice == ATTR_MANDATORY) {
+			g_hash_table_insert(mandatory_attribs, key, value);
+		}
+	}
+
+	void log_leftover_mandatory_attribs_callback(gpointer key, gpointer value, gpointer data) {
+		fprintf(
+		        stderr,
+		        "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!\n",
+		        key);
+		LG_log(
+		        pm_context,
+		        LG_FATAL,
+		        "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!",
+		        key);
+	}
+
+	/* collect all mandatory options of private objects to perform sanity check during config parsing */
+	mandatory_attribs = g_hash_table_new(g_str_hash, g_str_equal);
+	for (i = 0; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
+		const class_t *actclass = class_lookup_id(PM_PRIVATE_OBJECT_TYPES[i]);
+		g_hash_table_foreach(actclass->attr_hash, collect_mandatory_attribs_callback, NULL);
+	}
+
+	/* parse dummify config options
+	 * it is required during the full lifespan of the whoisserver process, so there is no mechanism to
+	 * free() the structures allocated here - agoston, 2007-10-31 */
+	PM_DUMMY_ADD_ATTR = g_strsplit(dummy_add_attr, "\n", 0);
+	PM_DUMMY_ATTR = g_hash_table_new(g_str_hash, g_str_equal);
+
+	lines = g_strsplit(ca_get_dummy_attr, "\n", 0);
+	for (actline = lines; *actline && **actline; actline++) {
+		gchar *equal = strchr(*actline, '=');
+		if (!equal) {
+			fprintf(stderr, "No = sign found in one of the DUMMY_ATTR lines in the rip.config file\n");
+			LG_log(pm_context, LG_FATAL, "No = sign found in one of the DUMMY_ATTR lines in the rip.config file");
+			die;
+		}
+
+		*equal = 0;
+		if (!g_hash_table_remove(mandatory_attribs, *actline)) {
+			fprintf(
+			        stderr,
+			        "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!\n",
+			        *actline);
+			LG_log(
+			        pm_context,
+			        LG_FATAL,
+			        "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!",
+			        *actline);
+			die;
+		}
+		g_hash_table_insert(PM_DUMMY_ATTR, *actline, equal+1);
+	}
+
+	if (g_hash_table_size(mandatory_attribs) > 0) {
+		g_hash_table_foreach(mandatory_attribs, log_leftover_mandatory_attribs_callback, NULL);
+		die;
+	}
+
+	free(dummy_attr);
+	free(dummy_add_attr);
+	g_hash_table_destroy(mandatory_attribs);
+
+	history_access_limit = ca_get_nrtm_history_access_limit;
+}
 
 void PM_init(LG_context_t *ctx) {
 	pm_context = ctx;
+	dummify_init();
 }
 
 /*
@@ -86,98 +177,99 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 
 	while ((c = mg_getopt(opt_argc, opt_argv, "kq:g:", gst)) != EOF) {
 		switch (c) {
-		case 'k':
-			res |= K_QUERY; /* persistent connection */
-			break;
+			case 'k':
+				res |= K_QUERY; /* persistent connection */
+				break;
 
-		case 'q':
-			if (gst->optarg != NULL) {
-				char *token, *cursor = gst->optarg;
+			case 'q':
+				if (gst->optarg != NULL) {
+					char *token, *cursor = gst->optarg;
 
-				res |= Q_QUERY;
-				err=strncmp(cursor, "sources", 7);
-				if (err!=0)
-					break;
-				cursor+=7;
-				g_strchug(cursor);
-				token=cursor;
-				/* if no sourses are specified - put NULL in nrtm_q->source and list them all */
-				if ((*token=='\0') || (*token=='\n')|| ((int)*token==13))
-					nrtm_q->source=NULL;
-				else {
-					cursor=index(token, ' ');
-					if (cursor)
-						nrtm_q->source=g_strndup(token, (cursor-token));
+					res |= Q_QUERY;
+					err=strncmp(cursor, "sources", 7);
+					if (err!=0)
+						break;
+					cursor+=7;
+					g_strchug(cursor);
+					token=cursor;
+					/* if no sourses are specified - put NULL in nrtm_q->source and list them all */
+					if ((*token=='\0') || (*token=='\n')|| ((int)*token==13))
+						nrtm_q->source=NULL;
 					else {
-						cursor=index(token, 13); /* search for ctrl-M - telnet loves this */
+						cursor=index(token, ' ');
 						if (cursor)
 							nrtm_q->source=g_strndup(token, (cursor-token));
 						else {
-							cursor=index(token, '\n');
+							cursor=index(token, 13); /* search for ctrl-M - telnet loves this */
 							if (cursor)
 								nrtm_q->source=g_strndup(token, (cursor-token));
-							else
-								nrtm_q->source=g_strdup(token);
+							else {
+								cursor=index(token, '\n');
+								if (cursor)
+									nrtm_q->source=g_strndup(token, (cursor-token));
+								else
+									nrtm_q->source=g_strdup(token);
+							}
 						}
 					}
-				}
-				/* if source was specified - convert it to an upper case */
-				if (nrtm_q->source)
-					g_strup(nrtm_q->source);
-			} else
-				err=1;
-			break;
-
-		case 'g':
-			if (gst->optarg != NULL) {
-				char *cursor = gst->optarg;
-				char **tokens;
-
-				res |= G_QUERY;
-				g_strdelimit(cursor, NRTM_DELIM, ':');
-				tokens=g_strsplit(cursor, ":", 5);
-				if (tokens==NULL) {
+					/* if source was specified - convert it to an upper case */
+					if (nrtm_q->source)
+						g_strup(nrtm_q->source);
+				} else
 					err=1;
-					break;
-				}
+				break;
 
-				if (tokens[0]) {
-					/* first token is source name */
-					nrtm_q->source=g_strdup(tokens[0]);
-					/* convert it to an upper case */
-					g_strup(nrtm_q->source);
-					if (tokens[1]) {
-						/* second token is version number */
-						nrtm_q->version=atoi(tokens[1]);
-						if (tokens[2]) {
-							/* this is first serial */
-							nrtm_q->first=atol(tokens[2]);
-							if (nrtm_q->first>0) {
-								if (tokens[3]) {
-									/* this is last serial */
-									nrtm_q->last=atol(tokens[3]);
-									if (nrtm_q->last==0)
-										if (strncasecmp(tokens[3], "LAST", 4)!=0)
-											err=1;
+			case 'g':
+				if (gst->optarg != NULL) {
+					char *cursor = gst->optarg;
+					char **tokens;
+
+					res |= G_QUERY;
+					tokens=g_strsplit(cursor, ":", 3);
+					if (tokens==NULL) {
+						err=1;
+						break;
+					}
+
+					if (tokens[0]) {
+						/* first token is source name */
+						nrtm_q->source=g_strdup(tokens[0]);
+						/* convert it to an upper case */
+						g_strup(nrtm_q->source);
+						if (tokens[1]) {
+							/* second token is version number */
+							nrtm_q->version=atoi(tokens[1]);
+							if (tokens[2]) {
+								/* this is the serial */
+								char **serial_tokens = g_strsplit(tokens[2], "-", 2);
+								nrtm_q->first=atol(serial_tokens[0]);
+								if (nrtm_q->first>0) {
+									if (serial_tokens[1]) {
+										/* this is last serial */
+										nrtm_q->last=atol(serial_tokens[1]);
+										if (nrtm_q->last==0)
+											if (strncasecmp(serial_tokens[1], "LAST", 4)!=0)
+												err=1;
+									} else
+										err=1;
 								} else
 									err=1;
+								g_strfreev(serial_tokens);
 							} else
 								err=1;
 						} else
 							err=1;
 					} else
 						err=1;
+					g_strfreev(tokens);
+
 				} else
 					err=1;
-				g_strfreev(tokens);
 
-			} else
+				break;
+			default:
 				err=1;
-
-			break;
-		default:
-			err=1;
-			break;
+				break;
 		} /* switch */
 	} /* while there are arguments */
 
@@ -189,6 +281,140 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 	else
 		return (res);
 
+}
+
+/* PUBLIC NRTM STREAM DESIGN
+ * 
+ * Instead of simply dropping private objects from the public nrtm stream, we decided to send dummified objects.
+ * It has the following adventages:
+ * - We can add a nice 'this is a dummy object, for the real stuff, use whois.ripe.net blabla' message to each
+ *   dummified object, thus spare us *a lot* of support trouble
+ * - There will be no gaps in serials
+ * - 3rd party software interpreting the nrtm streams do not need modification to handle special cases
+ * - We won't create a special case which will bite into our asses when we do some change
+ * - All referential integrity will be maintained
+ * 
+ * We do the dummification in a generic way. For each object, we first parse it using the RPSL module. This sucks
+ * big time performance-wise, as it does a lot of surplus processing and error checking, however, we are more flexible
+ * about future changes, handling outdated/erronous objects in the database, and also, we handle corner cases like 
+ * line continuation out of the box, error-free. Note however that the RPSL library's API is horrible, but there
+ * was also no point in re-implementing one from scratch (I'd very much liked that, though).
+ * 
+ * This also means that objects which have been stuffed into the database earlier, not passing the current syntax
+ * rules will produce an error. On such rpsl parser errors, we return NULL, which marks that the object could not 
+ * be dummified. In this case, the NRTM server will return an error message with all the necessary debug info.
+ * This will normally not be a problem as we also don't want to give object history through public NRTM stream. Any
+ * attempt to try to go back more than two weeks into the past should give an error.
+ * 
+ * After having the processed object structure, we iterate through the attributes. We discard any non-mandatory
+ * attributes. From the mandatory ones, we keep the ones which maintain referential integrity. The remaining
+ * attributes are dummified based on the corresponding entries in the rip.config file (read comments there).
+ * 
+ * After finishing the dummification, we return the flat object for the nrtm server to send to the client or NULL
+ * on dummification error.
+ * 
+ * Note that dummify_init() must be called before any calls are made to dummify_object(). 
+ * 
+ * agoston, 2007-10-18   
+ * */
+static char *dummify_object(char *object) {
+	const GList *errors = NULL;
+	gboolean quit = FALSE;
+	rpsl_attr_t *first_attr = NULL;
+	rpsl_error_t error;
+	rpsl_object_t *obj = NULL;
+	int i, actoff;
+	GList *gli = NULL;
+	gchar *prim_val = NULL;
+	char **actline;
+	char *ret = NULL;
+	GHashTable *dummified_attribs = NULL;
+
+	/* parse the object */
+	obj = rpsl_object_init(object);
+	errors = rpsl_object_errors(obj);
+	first_attr = (rpsl_attr_t *)obj->attributes->data;
+
+	for (; errors; errors = errors->next) {
+		rpsl_error_t *acterr = (rpsl_error_t *)errors->data;
+		if (acterr->level >= RPSL_ERRLVL_ERROR) {
+			LG_log(pm_context, LG_ERROR, "[%s: %s] rpsl_object_init failed: %s (at attribute %d)",
+			        first_attr->lcase_name, first_attr->value, acterr->descr, acterr->attr_num);
+			quit = TRUE;
+		}
+	}
+
+	/* if there's a serious error, we skip this object */
+	if (quit) {
+		goto dummify_abort;
+	}
+
+	/* init hash containing the already dummified attribs (so we don't have
+	 * hundreds of the same changed: lines, for example */
+	dummified_attribs = g_hash_table_new(g_str_hash, g_str_equal);
+
+	/* the primary key is not necessarily the first attribute of the object, e.g. person */
+	prim_val = rpsl_object_get_key_value(obj);
+
+	/* iterate through the attributes */
+	actoff = 0;
+	for (gli = g_list_first(obj->attributes); gli; actoff++, gli = g_list_next(gli)) {
+		rpsl_attr_t *act_attr = (rpsl_attr_t *)gli->data;
+
+		if (!g_hash_table_lookup(dummified_attribs, act_attr->lcase_name) && rpsl_attr_is_required(obj, act_attr->lcase_name)) {
+			gchar *dummy_attr = g_hash_table_lookup(PM_DUMMY_ATTR, act_attr->lcase_name);
+
+			if (dummy_attr) { /* exists in hash table */
+				if (*dummy_attr) { /* value is not empty */
+					char buf[STR_L];
+					snprintf(buf, STR_L, dummy_attr, prim_val);
+					rpsl_attr_replace_value(act_attr, buf);
+					g_hash_table_insert(dummified_attribs, act_attr->lcase_name, act_attr);		/* don't mind the value */
+				}
+				/* if dummy_attr is empty, we leave the rpsl attrib alone */
+			} else {
+				/* mandatory attribute is not listed in config file - this is already checked in the
+				 * init routine, so we die here */
+				die;
+			}
+		} else {
+			/* We use the _internal call as the normal one does some extra, and, in this case, surplus 
+			 * checking.
+			 * 
+			 * During call, the only possible error is trying to remove a mandatory attribute - but since
+			 * we already checked that, we don't care about errors here. - agoston, 2007-10-29 */
+			gli = gli->prev;
+			rpsl_object_remove_attr_internal(obj, actoff, NULL);
+			actoff--;
+		}
+	}
+
+	/* append the additional attributes */
+	for (actline = PM_DUMMY_ADD_ATTR; *actline && **actline; actline++) {
+		rpsl_attr_t *newattr;
+		char buf[STR_L];
+
+		snprintf(buf, STR_L, "remarks: %s", *actline);
+		newattr = rpsl_attr_init(buf, NULL);
+		if (!rpsl_object_append_attr(obj, newattr, &error)) {
+			fprintf(stderr, "Error in dummify_object()::rpsl_object_append_attr(): %s\n", error.descr);
+			LG_log(pm_context, LG_FATAL, "Error in dummify_object()::rpsl_object_append_attr(): %s", error.descr);
+			rpsl_error_free(&error);
+			goto dummify_abort;
+		}
+	}
+
+	ret = rpsl_object_get_text(obj, RPSL_STD_COLUMN);
+
+	dummify_abort:
+
+	if (dummified_attribs)
+		g_hash_table_destroy(dummified_attribs);
+	if (prim_val)
+		free(prim_val);
+	if (obj)
+		rpsl_object_delete(obj);
+	return ret;
 }
 
 /* PM_interact() */
@@ -223,7 +449,9 @@ void PM_interact(int sock) {
 	long current_serial;
 	long oldest_serial;
 	long object_type;
+	unsigned timestamp;
 	aa_mirror_right mirror_perm;
+	int check_history_limit = 1;
 
 	char *object;
 	int operation;
@@ -319,7 +547,7 @@ void PM_interact(int sock) {
 	source_hdl = ca_get_SourceHandleByName(nrtm_q.source);
 	if (source_hdl == NULL) {
 		LG_log(pm_context, LG_DEBUG, "[%s] --  Unknown source %s", hostaddress, nrtm_q.source);
-		sprintf(buff, "\n%%ERROR:403: unknown source\n\n\n");
+		sprintf(buff, "\n%%ERROR:403: unknown source %s\n\n\n", nrtm_q.source);
 		SK_cd_puts(&condat, buff);
 		UT_free(hostaddress);
 		UT_free(nrtm_q.source);
@@ -339,20 +567,6 @@ void PM_interact(int sock) {
 
 	/* get protocol version of the source */
 	protocol_version = ca_get_srcnrtmprotocolvers(source_hdl);
-
-	/* XXX this is compatibility mode where we don't care about the protocol version */
-#if 0
-	/* compare to the version requested */
-	if(nrtm_q.version != protocol_version) {
-		ER_inf_va(FAC_PM, ASP_PM_ERESP,"[%s] --  Source does not support requested protocol %d", hostaddress, nrtm_q.version);
-		sprintf(buff, "\n%%ERROR:404: version %d of protocol is not supported\n\n\n", nrtm_q.version);
-		SK_cd_puts(&condat, buff);
-		free(hostaddress);
-		free(nrtm_q.source);
-		/*     SK_cd_close(&(condat)); */
-		return;
-	}
-#endif
 
 	/* get database */
 	db_name = ca_get_srcdbname(source_hdl);
@@ -379,9 +593,10 @@ void PM_interact(int sock) {
 	UT_free(db_user);
 	UT_free(db_pswd);
 
-	/* Not to consume the last serial which may cause crash */
 	PM_get_minmax_serial(sql_connection, &oldest_serial, &current_serial);
-	current_serial -= SAFE_BACKLOG;
+	/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial 
+	 * agoston, 2007-12-21 */
+	/*current_serial -= SAFE_BACKLOG; */
 
 	if ((current_serial==-1) || (oldest_serial==-1)) {
 		LG_log(pm_context, LG_ERROR, " database='%s' [%d] %s", db_name, SQ_errno(sql_connection),
@@ -433,41 +648,76 @@ void PM_interact(int sock) {
 	}
 
 	sprintf(buff, "%%START Version: %d %s %ld-%ld%s\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last,
-			(mirror_perm < AA_MIRROR_FULL)?"FILTERED":"");
+	        (mirror_perm < AA_MIRROR_FULL) ? " FILTERED" : "");
 	SK_cd_puts(&condat, buff);
 
 	/* make a record for thread accounting */
 	TA_setactivity(buff);
 
-	/* FIXME: This is crap, but we will redo nrtm completely after the radix tree removal anyway.
-	 * It will do until then... */ 
+	/* FIXME: This is the most basic solution possible (i.e. crap). There's a lot of room for optimization.
+	 * Let's see how it works in real world first. If we would encounter performance problems, this is the
+	 * entry point for nrtm optimizations.
+	 * agoston, 2007-11-15 */
 	/*************************** MAIN LOOP ****************************/
 	/* now start feeding client with data */
 	do {
 
 		/************ ACTUAL PROCESSING IS HERE ***********/
 		/* this call will block if queries are paused */
-		object=PM_get_serial_object(sql_connection, current_serial, &object_type, &operation);
+		object=PM_get_serial_object(sql_connection, current_serial, &object_type, &timestamp, &operation);
 
 		/* there is a probability that mirroring interferes with HS cleanup */
 		/* in such case serial may be deleted before it is read by mirror client */
 		/* null object will be returned in this case and we need to break the loop */
-		if (object==NULL)
-			break;
+		if (object==NULL) {
+			/* The first serial, being only present so that the serials table is not empty, is set to
+			 * OP_NOOP, as it serves no information - agoston, 2008-01-17 */
+			if (operation != OP_NOOP)
+				break;
 
-		/* filter private object types if it is not authorized */
-		if (mirror_perm == AA_MIRROR_PUBLIC) {
-			int i = 0;
-			for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
-				if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
-					/* don't process this one */
-					operation = OP_NOOP;
+		} else {
+
+			/* filter private object types if it is not authorized */
+			if (mirror_perm == AA_MIRROR_PUBLIC) {
+				int i = 0;
+
+				/* check if timestamp is within the limits set in rip.config */
+				if (check_history_limit && history_access_limit && (time(NULL) - timestamp > history_access_limit)) {
+					sprintf(buff, "%% Your request has been denied to protect private data.\n"
+						"%% (Requesting serials older than %d days will be rejected)\n", history_access_limit/86400);
+					SK_cd_puts(&condat, buff);
+					free(object);
 					break;
+				} else {
+					/* we don't want to let user start the nrtm stream, and then, at some point (because of a buggy
+					 * timestamp for example) deny him a few of the objects, making the slave database completely
+					 * out of sync. The decision to (dis)allow the user should be consistent throughout the nrtm
+					 * connection.
+					 * agoston, 2008-01-21 */
+					check_history_limit = 0;
+				}
+
+				for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
+					if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
+						char *newobj;
+
+						newobj = dummify_object(object);
+						free(object);
+
+						if (newobj) {
+							object = newobj;
+						} else {
+							object = NULL;
+							operation = -1;
+						}
+
+						break;
+					}
 				}
 			}
 		}
 
-		/* FIXME: OP_UPD is a defined operation, but not used in serials table - left unhandled here, too */
+		/* OP_UPD is a defined operation, but not used in serials table - left unhandled here, too */
 		switch (operation) {
 			case OP_ADD:
 				SK_cd_puts(&condat, "ADD\n\n");
@@ -480,14 +730,32 @@ void PM_interact(int sock) {
 				SK_cd_puts(&condat, object);
 				SK_cd_puts(&condat, "\n");
 				break;
+				/* In this case, don't do anything. 
+				 * The reason is that the first serial, which is used to set the auto_increment pkey
+				 * in mysql has an opcode of 4 (OP_NOOP). We don't send anything for this serial,
+				 * as this has no data-holding functionality.
+				 * 
+				 * More importantly, if a client requests an nrtm stream, that means it's starting serial is already
+				 * set up, so not sending this one will make sure that the serials will be the same.
+				 * agoston, 2008-01-21 */
+				break;
+
+			default:
+			case -1:
+				SK_cd_puts(&condat, "%% INTERNAL ERROR. TERMINATING NRTM CONNECTION.\n");
+				sprintf(buff, "%% SOURCE: %s; SERIAL: %d; PERMISSION: %d; IP: %s; TIME: %d\n\n", nrtm_q.source,
+				        current_serial, mirror_perm, hostaddress, time(NULL));
+				SK_cd_puts(&condat, buff);
+				condat.rtc = SK_NOTEXT;
 		}
 
-		UT_free(object);
+		if (object)
+			free(object);
 		current_serial++;
 
 		/* for real-time mirroring we need some piece of code */
 		if (persistent_connection && (condat.rtc == 0)) {
-			while (((nrtm_q.last = SQ_get_max_id(sql_connection, "serial_id", "serials") - SAFE_BACKLOG)<current_serial)
+			while (((nrtm_q.last = SQ_get_max_id(sql_connection, "serial_id", "serials")) < current_serial)
 			        && (CO_get_do_server()==1))
 				sleep(1);
 		}
@@ -498,6 +766,7 @@ void PM_interact(int sock) {
 
 	sprintf(buff, "%%END %s\n\n\n", nrtm_q.source);
 	SK_cd_puts(&condat, buff);
+	SK_cd_close(&condat);
 
 	LG_log(pm_context, LG_INFO, "[%s] -- <%s:%ld-%ld (%ld)> ", hostaddress, nrtm_q.source, nrtm_q.first, nrtm_q.last,
 	        nrtm_q.last-nrtm_q.first+1);

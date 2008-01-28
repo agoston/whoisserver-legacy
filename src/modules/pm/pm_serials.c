@@ -95,12 +95,15 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
  * Returns:
  *  operation (ADD/DEL) and text object
  *  NULL in case of an error
+ * 
+ * Fills *object_type, *operation, *timestamp if not NULL
  *
  * Note:
  *  returned string should be freed by the caller
  *************************************************************/
-char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, long *object_type, int *operation) {
-	char *table;
+char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, long *object_type, unsigned *timestamp,
+        int *operation) {
+	
 	SQ_result_set_t * sql_result;
 	SQ_row_t *sql_row;
 	char *sql_str;
@@ -116,31 +119,56 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 	sprintf(query, "SELECT atlast,operation FROM serials WHERE serial_id = %d", serial_number);
 	get_fields_int_noalloc(sql_connection, query, locop);
 	location = locop[0];
-	*operation = locop[1];
+	if (operation)
+		*operation = locop[1];
 
 	switch (location) {
-	case 0:
-		table="history";
-		break;
-	case 1:
-		table="last";
-		break;
-	case 2:
-		table="failed_transaction";
-		break;
-	default:
-		return (NULL);
-	}
+		/* history */
+		case 0:
+			/* if the operation is delete, and we need to get the timestamps, a little bit different strategy is
+			 * needed because of the bad database design. In this case, there are two entries with the same
+			 * sequence_id and object_id in the serials table, both with atlast=0. The referred entry in the
+			 * history table is the object as it was created/updated, and the timestamp there reflects the 
+			 * creation/update time, not the deletion time.
+			 * Deletion time can be digged from the last table, looking up object_id with sequence_id = 0.
+			 * Following some twisted logic, this is how deletions are done in the RIPE DB.
+			 * FIXME: Weird, bad design. Should be fixed.
+			 * 
+			 * agoston, 2008-01-22 */
+			if ((locop[1] == OP_DEL) && timestamp) {
+				sprintf(query, "SELECT history.object, history.object_type, last.timestamp FROM serials "
+					"JOIN last ON serials.object_id = last.object_id AND last.sequence_id = 0 "
+					"JOIN history ON serials.object_id = history.object_id AND serials.sequence_id = history.sequence_id "
+					"WHERE serials.serial_id=%ld", serial_number);
 
-	/* FIXME: failed_transaction is always empty when running on innodb - I'll leave this in place, 
-	 * just in case, but I don't handle the privacy bit of mirroring - agoston, 2007-10-09 */
-	if (location == 2)
-		sprintf(query, "SELECT object FROM failed_transaction WHERE serial_id=%ld ", serial_number);
-	else
-		sprintf(query, "SELECT %1$s.object, %1$s.object_type FROM %1$s, serials "
-			"WHERE serials.serial_id=%2$ld "
-			"AND serials.object_id=%1$s.object_id "
-			"AND serials.sequence_id=%1$s.sequence_id ", table, serial_number);
+			} else {
+
+				sprintf(query, "SELECT history.object, history.object_type, history.timestamp FROM history, serials "
+					"WHERE serials.serial_id=%ld "
+					"AND serials.object_id=history.object_id "
+					"AND serials.sequence_id=history.sequence_id", serial_number);
+				
+			}
+			break;
+			
+		/* last */
+		case 1:
+			sprintf(query, "SELECT last.object, last.object_type, last.timestamp FROM last, serials "
+				"WHERE serials.serial_id=%ld "
+				"AND serials.object_id=last.object_id "
+				"AND serials.sequence_id=last.sequence_id", serial_number);
+			break;
+			
+		/* failed_transaction */	
+		case 2:
+			sprintf(query, "SELECT object FROM failed_transaction WHERE serial_id=%ld ", serial_number);
+			/* return some meaningful value - in this case, UINT_MAX */
+			if (timestamp) *timestamp = -1;
+			break;
+
+		default:
+			return (NULL);
+	}
 
 	sql_err = SQ_execute_query(sql_connection, query, &sql_result);
 
@@ -151,9 +179,15 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 
 	if ((sql_row = SQ_row_next(sql_result)) != NULL) {
 		sql_str = SQ_get_column_string(sql_result, sql_row, 0);
-		if (SQ_get_column_int(sql_result, sql_row, 1, object_type)) {
-			LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
-			die;
+		if (location < 2) {
+			if (object_type && SQ_get_column_int(sql_result, sql_row, 1, object_type)) {
+				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+				die;
+			}
+			if (timestamp && SQ_get_column_unsigned(sql_result, sql_row, 2, timestamp)) {
+				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+				die;
+			}
 		}
 	} else
 		sql_str=NULL;
@@ -196,7 +230,9 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
 	/* Connect to the database */
 	db_connection=SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
 	PM_get_minmax_serial(db_connection, &min_serial, &max_serial);
-	max_serial -= SAFE_BACKLOG;
+	/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial 
+	 * agoston, 2007-12-21 */
+	/* max_serial -= SAFE_BACKLOG; */
 
 	/* If it cannot be mirrored at all - N, but range starts with 0 */
 	/* If the client is allowed to mirror - Y         */

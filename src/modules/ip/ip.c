@@ -1090,7 +1090,7 @@ int IP_addr_s2b(ip_addr_t * addrptr, void *addr_in, int addr_len)
 		}
 
 	} else {					/* unsupported family or invalid struct */
-		die;
+		return IP_INVARG;
 	}
 	return IP_OK;
 }

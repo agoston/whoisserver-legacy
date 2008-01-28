@@ -1,38 +1,38 @@
 /***************************************
-  $Revision: 1.16 $
+ $Revision: 1.16 $
 
-  Example code: A server for a client to connect to.
+ Example code: A server for a client to connect to.
 
-  Status: NOT REVUED, NOT TESTED
+ Status: NOT REVUED, NOT TESTED
 
-  Authors:       Chris Ottrey, Joao Damas,
-                 heavy rewrite by Andrei Robachevsky, Marek Bukowy
+ Authors:       Chris Ottrey, Joao Damas,
+ heavy rewrite by Andrei Robachevsky, Marek Bukowy
 
 
-  ******************/ /******************
-  Modification History:
-        ottrey (02/03/1999) Created.
-        ottrey (08/03/1999) Modified.
-        joao   (22/06/1999) Modified.
-  ******************/ /******************
-  Copyright (c) 1999                              RIPE NCC
+ ******************//******************
+ Modification History:
+ ottrey (02/03/1999) Created.
+ ottrey (08/03/1999) Modified.
+ joao   (22/06/1999) Modified.
+ ******************//******************
+ Copyright (c) 1999                              RIPE NCC
 
-  All Rights Reserved
+ All Rights Reserved
 
-  Permission to use, copy, modify, and distribute this software and its
-  documentation for any purpose and without fee is hereby granted,
-  provided that the above copyright notice appear in all copies and that
-  both that copyright notice and this permission notice appear in
-  supporting documentation, and that the name of the author not be
-  used in advertising or publicity pertaining to distribution of the
-  software without specific, written prior permission.
+ Permission to use, copy, modify, and distribute this software and its
+ documentation for any purpose and without fee is hereby granted,
+ provided that the above copyright notice appear in all copies and that
+ both that copyright notice and this permission notice appear in
+ supporting documentation, and that the name of the author not be
+ used in advertising or publicity pertaining to distribution of the
+ software without specific, written prior permission.
 
-  THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
-  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
-  AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
-  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
-  AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+ ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
+ AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+ DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+ AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ***************************************/
 
 #include "rip.h"
@@ -66,7 +66,7 @@ int SV_update_sock[MAX_SOURCES];
 int SV_shutdown_send_fd = -1;
 
 /* server threads should check this file descriptor, and terminate
-   as soon as possible if data becomes available on it */
+ as soon as possible if data becomes available on it */
 int SV_shutdown_recv_fd = -1;
 
 /*+ Server starting time +*/
@@ -76,208 +76,192 @@ char *SV_pidfile;
 
 static LG_context_t *sv_context;
 
-void
-SV_init (LG_context_t *ctx)
-{
-  sv_context = ctx;
+void SV_init(LG_context_t *ctx) {
+	sv_context = ctx;
 }
 
 /* Logging results */
 static void log_print(const char *arg) {
-  fprintf(stderr,arg);
+	fprintf(stderr,arg);
 } /* log_print() */
-
 
 /* counters - by marek */
 typedef struct {
-  int count;
-  pthread_mutex_t lock; /*+ Mutex lock.Used for synchronizing changes.+*/
-  pthread_cond_t  cond; /*+ condition variable +*/
+	int count;
+	pthread_mutex_t lock; /*+ Mutex lock.Used for synchronizing changes.+*/
+	pthread_cond_t cond; /*+ condition variable +*/
 } svr_counter_t;
-
 
 /* structure passed to every running server */
 typedef struct {
-  void (*function)(int);
-  int conn_sock;
-  ip_addr_t *conn_ip;			/* ip of the actual client */
-  int accept_sock;
-  int limit;         /* limit for the number of concurrent connections */
-  svr_counter_t *counter; /* number of active clients */
-  GHashTable *conn_ipnum;		/* how many times each IP has connected */
-  pthread_mutex_t *conn_lock;	/* for synchronizing hashtable accesses */
-  char *name;
+	void (*function)(int);
+	int conn_sock;
+	ip_addr_t *conn_ip; /* ip of the actual client */
+	int accept_sock;
+	int limit; /* limit for the number of concurrent connections */
+	svr_counter_t *counter; /* number of active clients */
+	GHashTable *conn_ipnum; /* how many times each IP has connected */
+	pthread_mutex_t *conn_lock; /* for synchronizing hashtable accesses */
+	char *name;
 } svr_args;
 
-
 /*++++++++++++++++++++++++++++++++++++++
-  function to operate on the counter structures -
-  takes the increment (can be negative), changes the value
-  using the locks and everything,
+ function to operate on the counter structures -
+ takes the increment (can be negative), changes the value
+ using the locks and everything,
 
-  int
-  counter_add            returns the new value.
+ int
+ counter_add            returns the new value.
 
-  svr_counter_t *cst     counter structure
+ svr_counter_t *cst     counter structure
 
-  int incval             increment value (can be negative)
+ int incval             increment value (can be negative)
 
-  Author:
-    marek
-  ++++++++++++++++++++++++++++++++++++++*/
+ Author:
+ marek
+ ++++++++++++++++++++++++++++++++++++++*/
 static
-int
-counter_add( svr_counter_t *cst, int incval )
-{
-    int newval;
+int counter_add(svr_counter_t *cst, int incval) {
+	int newval;
 
-    /* add under mutex */
-    pthread_mutex_lock( &(cst->lock) );
-    cst->count += incval;
-    newval = cst->count;
-    pthread_mutex_unlock(&(cst->lock) );
+	/* add under mutex */
+	pthread_mutex_lock( &(cst->lock));
+	cst->count += incval;
+	newval = cst->count;
+	pthread_mutex_unlock(&(cst->lock));
 
-    /* now - signal the change of value to the waiting thread */
-    pthread_cond_broadcast( &(cst->cond) );
+	/* now - signal the change of value to the waiting thread */
+	pthread_cond_broadcast( &(cst->cond));
 
-    return newval;
+	return newval;
 }
-
 
 /*++++++++++++++++++++++++++++++++++++++
 
-  int
-  counter_state         returns the current value of a counter
+ int
+ counter_state         returns the current value of a counter
 
-  svr_counter_t *cst    counter
+ svr_counter_t *cst    counter
 
-  Author:
-    marek
+ Author:
+ marek
 
-  ++++++++++++++++++++++++++++++++++++++*/
+ ++++++++++++++++++++++++++++++++++++++*/
 static
-int
-counter_state( svr_counter_t *cst )
-{
-  return counter_add( cst, 0 );
+int counter_state(svr_counter_t *cst) {
+	return counter_add(cst, 0);
 }
 
-
 /*++++++++++++++++++++++++++++++++++++++
-  waits until the counter is in the range [0-limit].
-  unless the limit is 0, in which case the check is disabled.
+ waits until the counter is in the range [0-limit].
+ unless the limit is 0, in which case the check is disabled.
 
-  int counter_wait      returns the new value of the counter after wait
+ int counter_wait      returns the new value of the counter after wait
 
-  svr_counter_t *cst    counter
+ svr_counter_t *cst    counter
 
-  int limit             limit / range, or 0 to disable the check
+ int limit             limit / range, or 0 to disable the check
 
-  Author:
-    marek
-  ++++++++++++++++++++++++++++++++++++++*/
+ Author:
+ marek
+ ++++++++++++++++++++++++++++++++++++++*/
 static
-int counter_wait(svr_counter_t *cst, int limit )
-{
-  int newval;
+int counter_wait(svr_counter_t *cst, int limit) {
+	int newval;
 
-  pthread_mutex_lock( &(cst->lock) );
+	pthread_mutex_lock( &(cst->lock));
 
-  if( limit != 0 ) {
-    while( cst->count >= limit ) {
-      pthread_cond_wait( &(cst->cond), &(cst->lock));
-    }
-  }
+	if (limit != 0) {
+		while (cst->count >= limit) {
+			pthread_cond_wait( &(cst->cond), &(cst->lock));
+		}
+	}
 
-  newval = cst->count;
-  pthread_mutex_unlock(&(cst->lock) );
+	newval = cst->count;
+	pthread_mutex_unlock(&(cst->lock));
 
-  return newval;
+	return newval;
 }
 
 /*++++++++++++++++++++++++++++++++++++++
 
-  Initialize the radix tree - all trees are added to the forest in
-  a locked state.  As each tree finishes loading (from radix_load()),
-  it is unlocked.
+ Initialize the radix tree - all trees are added to the forest in
+ a locked state.  As each tree finishes loading (from radix_load()),
+ it is unlocked.
 
-  ++++++++++++++++++++++++++++++++++++++*/
-static void
-radix_init(void)
-{
-    int i;
-    ca_dbSource_t *source_hdl;
+ ++++++++++++++++++++++++++++++++++++++*/
+static void radix_init(void) {
+	int i;
+	ca_dbSource_t *source_hdl;
 
-    TH_init_read_write_lockw(&rx_forest_rwlock);
-    for(i=0; (source_hdl = ca_get_SourceHandleByPosition(i))!=NULL ; i++){
-        dieif( RP_init_trees( source_hdl ) != RP_OK );
-    }
+	TH_init_read_write_lockw(&rx_forest_rwlock);
+	for (i=0; (source_hdl = ca_get_SourceHandleByPosition(i))!=NULL; i++) {
+		dieif(RP_init_trees(source_hdl) != RP_OK);
+	}
 }
 
 /*++++++++++++++++++++++++++++++++++++++
 
-  Load the radix tree - all trees are initialized from the appropriate
-  SQL tables.  As each tree finishes loading (from radix_load()), it is
-  unlocked.  They must be created by the radix_init() function.
+ Load the radix tree - all trees are initialized from the appropriate
+ SQL tables.  As each tree finishes loading (from radix_load()), it is
+ unlocked.  They must be created by the radix_init() function.
 
-  ++++++++++++++++++++++++++++++++++++++*/
-static void
-radix_load(void)
-{
-    int i;
-    ca_dbSource_t *source_hdl;
+ ++++++++++++++++++++++++++++++++++++++*/
+static void radix_load(void) {
+	int i;
+	ca_dbSource_t *source_hdl;
 
-    for(i=0; CO_get_do_server() && (source_hdl = ca_get_SourceHandleByPosition(i))!=NULL ; i++){
-        dieif( RP_sql_load_reg( source_hdl ) != RP_OK );
-    }
+	for (i=0; CO_get_do_server() && (source_hdl = ca_get_SourceHandleByPosition(i))!=NULL; i++) {
+		dieif(RP_sql_load_reg(source_hdl) != RP_OK);
+	}
 }
-
 
 /************************************************************
-*  int SV_sleep()                                           *
-*                                                           *
-* sleeps till shutdown request comes                        *
-* but at most <delay> seconds                               *
-*                                                           *
-* Returns:                                                  *
-* 0 - timeout                                               *
-* 1 - shutdown                                              *
-*                                                           *
-************************************************************/
+ *  int SV_sleep()                                           *
+ *                                                           *
+ * sleeps till shutdown request comes                        *
+ * but at most <delay> seconds                               *
+ *                                                           *
+ * Returns:                                                  *
+ * 0 - timeout                                               *
+ * 1 - shutdown                                              *
+ *                                                           *
+ ************************************************************/
 
-int SV_sleep(int delay)
-{
- int do_server;
- int elapsed_time=0;
+int SV_sleep(int delay) {
+	int do_server;
+	int elapsed_time=0;
 
- while((do_server=CO_get_do_server()) && (elapsed_time<delay))
- {
-  sleep(TIME_SLICE);
-  elapsed_time+=TIME_SLICE;
- }
- if(do_server)return(0); else return(1);
+	while ((do_server=CO_get_do_server()) && (elapsed_time<delay)) {
+		sleep(TIME_SLICE);
+		elapsed_time+=TIME_SLICE;
+	}
+	if (do_server)
+		return (0);
+	else
+		return (1);
 }
 
 /*++++++++++++++++++++++++++++++++++++++
 
-  Handle signals.
+ Handle signals.
 
-  Changes the flags:
-  	do_nrtm
-  	do_update
-  	do_whoisd
+ Changes the flags:
+ do_nrtm
+ do_update
+ do_whoisd
 
-  More:
-  +html+ <PRE>
-  Author:
-        andrei
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
+ More:
+ +html+ <PRE>
+ Author:
+ andrei
+ +html+ </PRE>
+ ++++++++++++++++++++++++++++++++++++++*/
 void *SV_signal_thread() {
-char print_buf[STR_M];
-sigset_t sset;
-int sigReceived;
-int do_update;
+	char print_buf[STR_M];
+	sigset_t sset;
+	int sigReceived;
+	int do_update;
 
 	sigemptyset(&sset);
 	/* SIGTERM and SIGINT are used to shutdown the server */
@@ -294,83 +278,81 @@ int do_update;
 	/* block them in other threads in install_signal_handler() in whois_rip.c */
 	pthread_sigmask(SIG_BLOCK, &sset, NULL);
 
-	for(;;)
-	{
+	for (;;) {
 #ifdef HAVE_THR_SIGWAIT
-         _thr_sigwait(&sset, &sigReceived);
+		_thr_sigwait(&sset, &sigReceived);
 #else
-         sigwait(&sset, &sigReceived);
+		sigwait(&sset, &sigReceived);
 #endif
-	 sprintf(print_buf, "Signal received [%d]\n", sigReceived);
-	 log_print(print_buf); strcpy(print_buf, "");
-	 /*	 fprintf(stderr, "Signal received [%d]\n", sigReceived); */
-	 switch (sigReceived)
-	 {
-	   case SIGINT:
-	   case SIGTERM:
-	   /* SIGINT and SIGTERM stop all servers */
-	        SV_shutdown();
-                pthread_exit((void *)0);
-  	        break;
+		sprintf(print_buf, "Signal received [%d]\n", sigReceived);
+		log_print(print_buf);
+		strcpy(print_buf, "");
+		/*	 fprintf(stderr, "Signal received [%d]\n", sigReceived); */
+		switch (sigReceived) {
+			case SIGINT:
+			case SIGTERM:
+				/* SIGINT and SIGTERM stop all servers */
+				SV_shutdown();
+				pthread_exit((void *)0);
+				break;
 
-  	   case SIGUSR1:
-  	   /* SIGUSR1 will switch the updates on and off */
-  	        do_update=CO_get_do_update();
-  	        if(do_update)do_update=0; else do_update=1;
-  	   	sprintf(print_buf, "%d", do_update);
-		CO_set_const("UD.do_update", print_buf);
-		if(do_update)
-		  sprintf(print_buf, "Starting updates\n");
-		else
-		  sprintf(print_buf, "Stopping updates\n");
-		log_print(print_buf); strcpy(print_buf, "");
-		/*		fprintf(stderr, "Stopping updates (SIGTERM received)\n"); */
-  	   	break;
-  	 }
-  	}
+			case SIGUSR1:
+				/* SIGUSR1 will switch the updates on and off */
+				do_update=CO_get_do_update();
+				if (do_update)
+					do_update=0;
+				else
+					do_update=1;
+				sprintf(print_buf, "%d", do_update);
+				CO_set_const("UD.do_update", print_buf);
+				if (do_update)
+					sprintf(print_buf, "Starting updates\n");
+				else
+					sprintf(print_buf, "Stopping updates\n");
+				log_print(print_buf);
+				strcpy(print_buf, "");
+				/*		fprintf(stderr, "Stopping updates (SIGTERM received)\n"); */
+				break;
+		}
+	}
 } /* SV_signal_thread() */
-
 
 /* SV_do_child() */
 /*++++++++++++++++++++++++++++++++++++++
 
-  Handle whois/config/mirror connections. Takes a pointer to the
-  service description structure, containing a connected socket, limit
-  of active threads, pointer to the counter of them. Does not stop to
-  obey the limits, assumes this to be checked and assumes that it is
-  already counted.  Decrements the counter on exit.
+ Handle whois/config/mirror connections. Takes a pointer to the
+ service description structure, containing a connected socket, limit
+ of active threads, pointer to the counter of them. Does not stop to
+ obey the limits, assumes this to be checked and assumes that it is
+ already counted.  Decrements the counter on exit.
 
-  Precondition: the counter must be incremented before this function is called.
+ Precondition: the counter must be incremented before this function is called.
 
-  void *SV_do_child     Actually, does not return anything useful. Just NULL.
+ void *SV_do_child     Actually, does not return anything useful. Just NULL.
 
-  void *varg            service description structure.
+ void *varg            service description structure.
 
-  Author:
-    marek
-  ++++++++++++++++++++++++++++++++++++++*/
-void *SV_do_child(void *varg)
-{
-  svr_args *args = (svr_args *) varg;
-  int sock = args->conn_sock;
-  int curclients;
+ Author:
+ marek
+ ++++++++++++++++++++++++++++++++++++++*/
+void *SV_do_child(void *varg) {
+	svr_args *args = (svr_args *) varg;
+	int sock = args->conn_sock;
+	int curclients;
 
-  LG_log(sv_context, LG_DEBUG,
-	    "%s: Child thread [%d]: Socket number = %d",
-	    args->name, pthread_self(), sock);
+	LG_log(sv_context, LG_DEBUG, "%s: Child thread [%d]: Socket number = %d", args->name, pthread_self(), sock);
 
-  curclients = counter_state( args->counter ); /* already added */
-  LG_log(sv_context, LG_DEBUG,
-	    "%s threads++ = %d", args->name, curclients);
+	curclients = counter_state(args->counter); /* already added */
+	LG_log(sv_context, LG_DEBUG, "%s threads++ = %d", args->name, curclients);
 
-  TA_add(sock, args->name);
+	TA_add(sock, args->name);
 
-  args->function(sock);
+	args->function(sock);
 
-  /* TA_delete must come first - otherwise the server would crash
-     when trying to report address of a closed socket */
-  TA_delete();
-  SK_close(sock);
+	/* TA_delete must come first - otherwise the server would crash
+	 when trying to report address of a closed socket */
+	TA_delete();
+	SK_close(sock);
 
 	/* decrement the simultaneous connection counter */
 	if (args->limit > 0) {
@@ -381,11 +363,11 @@ void *SV_do_child(void *varg)
 		g_hash_table_lookup_extended(args->conn_ipnum, args->conn_ip, &orig_key, &client_conn_num);
 		i = (int)client_conn_num;
 
-		if (i == 1) {	/* remove the key from the hashtable & free memory */
+		if (i == 1) { /* remove the key from the hashtable & free memory */
 			g_hash_table_remove(args->conn_ipnum, args->conn_ip);
 			UT_free(orig_key);
 
-		} else {	/* decrease the num_conn */
+		} else { /* decrease the num_conn */
 
 			client_conn_num = (void*)(i-1);
 			g_hash_table_insert(args->conn_ipnum, args->conn_ip, client_conn_num);
@@ -393,40 +375,37 @@ void *SV_do_child(void *varg)
 		pthread_mutex_unlock(args->conn_lock);
 	}
 
-  /* update the global thread counter. */
-  curclients = counter_add( args->counter, -1);
-  LG_log(sv_context, LG_DEBUG,
-	    "%s threads-- = %d", args->name, curclients);
+	/* update the global thread counter. */
+	curclients = counter_add(args->counter, -1);
+	LG_log(sv_context, LG_DEBUG, "%s threads-- = %d", args->name, curclients);
 
-  UT_free(args);
+	UT_free(args);
 
-  return NULL; /* exit the thread */
+	return NULL; /* exit the thread */
 } /* SV_do_child */
-
 
 /* main_loop() */
 /*++++++++++++++++++++++++++++++++++++++
 
-  Waits for an incoming connection on the and spawns a new thread to
-  handle it.  Takes a pointer to the service description structure
-  containing the number of the listening socket, limit of active
-  threads, pointer to the counter of them, and the function to call
-  with a connected socket.  Increments the counter before starting
-  a client thread to run SV_do_child().
+ Waits for an incoming connection on the and spawns a new thread to
+ handle it.  Takes a pointer to the service description structure
+ containing the number of the listening socket, limit of active
+ threads, pointer to the counter of them, and the function to call
+ with a connected socket.  Increments the counter before starting
+ a client thread to run SV_do_child().
 
-  void *arg      pointer to the service description structure.
+ void *arg      pointer to the service description structure.
 
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-	joao
-	andrei (do_server)
-	marek (rewritten/simplified/added limits)
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-static void *main_loop(void *arg)
-{
+ More:
+ +html+ <PRE>
+ Author:
+ ottrey
+ joao
+ andrei (do_server)
+ marek (rewritten/simplified/added limits)
+ +html+ </PRE>
+ ++++++++++++++++++++++++++++++++++++++*/
+static void *main_loop(void *arg) {
 	svr_args *args = (svr_args *) arg;
 	svr_args *argcopy;
 	char loopname[32];
@@ -436,7 +415,7 @@ static void *main_loop(void *arg)
 	ip_addr_t *clientip;
 	acl_st clientacl;
 
-	clientip = UT_malloc(sizeof(ip_addr_t));	/* always keep an instance allocated */
+	clientip = UT_malloc(sizeof(ip_addr_t)); /* always keep an instance allocated */
 
 	snprintf(loopname, 32, "s-%s", args->name);
 	TA_add(0, loopname);
@@ -450,7 +429,7 @@ static void *main_loop(void *arg)
 		/* check the number of clients, do not proceed until it's below limit */
 		children = counter_wait(args->counter, args->limit);
 		snprintf(chnum, 16, "%d", children);
-		TA_setactivity(chnum);	/* display the current number of children */
+		TA_setactivity(chnum); /* display the current number of children */
 
 		/* check for input */
 		if (poll(pfd, 2, -1) == -1) {
@@ -495,7 +474,7 @@ static void *main_loop(void *arg)
 				client_conn_num = (void *)(i + 1);
 			} else {
 				args->conn_ip = clientip;
-				clientip = UT_malloc(sizeof(ip_addr_t));	/* always keep an instance allocated */
+				clientip = UT_malloc(sizeof(ip_addr_t)); /* always keep an instance allocated */
 				client_conn_num = (void *)1;
 			}
 
@@ -506,23 +485,23 @@ static void *main_loop(void *arg)
 		LG_log(sv_context, LG_DEBUG, "%s: starting a new child thread", loopname);
 		TA_increment();
 		/* incrementing argset->counter here - to avoid race condition and
-		   ensure a _more_correct_ value of current clients also for unlimited
-		   or infrequent connections. Does not really matter otherwise.
+		 ensure a _more_correct_ value of current clients also for unlimited
+		 or infrequent connections. Does not really matter otherwise.
 
-		   NOTE: this architecture implies that higher values can be
-		   displayed for infrequent threads, because there's no way
-		   to change it when threads are exiting while this thread is
-		   blocked in call to accept(). If this call was in the child thread,
-		   the number would be an underestimation instead. I prefer over-e.
+		 NOTE: this architecture implies that higher values can be
+		 displayed for infrequent threads, because there's no way
+		 to change it when threads are exiting while this thread is
+		 blocked in call to accept(). If this call was in the child thread,
+		 the number would be an underestimation instead. I prefer over-e.
 		 */
 		counter_add(args->counter, 1);
 
 		/* Start a new thread. will decrement counter when exiting */
 
 		/* now. There's a race condition - argset must be copied in SV_do_child
-		   and can be reused here only afterwards. To avoid it, we make a copy
-		   and expect SV_do_child to free it after use.
-		   Caveat: the counter remains where it was, we just copy the pointer.
+		 and can be reused here only afterwards. To avoid it, we make a copy
+		 and expect SV_do_child to free it after use.
+		 Caveat: the counter remains where it was, we just copy the pointer.
 		 */
 		argcopy = UT_malloc(sizeof(svr_args));
 		memcpy(argcopy, args, sizeof(svr_args));
@@ -533,29 +512,28 @@ static void *main_loop(void *arg)
 	LG_log(sv_context, LG_DEBUG, "Exiting from the main loop");
 
 	return NULL;
-}								/* main_loop() */
+} /* main_loop() */
 
 /* SV_concurrent_server() */
 /*++++++++++++++++++++++++++++++++++++++
 
-  This is the routine that creates the main threads.
+ This is the routine that creates the main threads.
 
-  int     sock        The socket to connect to.
+ int     sock        The socket to connect to.
 
-  int     limit       Limit of active clients (0 == no limit)
+ int     limit       Limit of active clients (0 == no limit)
 
-  void *  do_function The function to call for each type of service
+ void *  do_function The function to call for each type of service
 
-  More:
-  +html+ <PRE>
-  Author:
-        ottrey
-	joao
-	marek
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-static void SV_concurrent_server(int sock, int limit, char *name, void do_function(int))
-{
+ More:
+ +html+ <PRE>
+ Author:
+ ottrey
+ joao
+ marek
+ +html+ </PRE>
+ ++++++++++++++++++++++++++++++++++++++*/
+static void SV_concurrent_server(int sock, int limit, char *name, void do_function(int)) {
 	svr_args *args;
 
 	args = (svr_args *) UT_calloc(1, sizeof(svr_args));
@@ -566,7 +544,7 @@ static void SV_concurrent_server(int sock, int limit, char *name, void do_functi
 	args->function = do_function;
 	args->counter = (svr_counter_t *) UT_calloc(1, sizeof(svr_counter_t));
 
-	if (limit > 0) {			/* should we enforce total and per-source limits? */
+	if (limit > 0) { /* should we enforce total and per-source limits? */
 		args->conn_ipnum = g_hash_table_new_full(ip_addr_t_pointer_hash, ip_addr_t_pointer_equals, NULL, NULL);
 		args->conn_lock = UT_malloc(sizeof(pthread_mutex_t));
 		pthread_mutex_init(args->conn_lock, NULL);
@@ -579,29 +557,28 @@ static void SV_concurrent_server(int sock, int limit, char *name, void do_functi
 	/* Start a new thread. */
 	TH_create(main_loop, (void *)args);
 
-}								/* SV_concurrent_server() */
+} /* SV_concurrent_server() */
 
 /* SV_start() */
 /*++++++++++++++++++++++++++++++++++++++
 
-  Start the server.
+ Start the server.
 
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-        joao
-  +html+ </PRE>
-  +html+ Starts up the server.
-  +html+ <OL>
-  +html+   <LI> Create sockets on the necessary ports (whois, config and mirror)
-  +html+   <LI> Start new threads for each service.
-  +html+ </OL>
-  +html+ <A HREF=".DBrc">.properties</A>
+ More:
+ +html+ <PRE>
+ Authors:
+ ottrey
+ joao
+ +html+ </PRE>
+ +html+ Starts up the server.
+ +html+ <OL>
+ +html+   <LI> Create sockets on the necessary ports (whois, config and mirror)
+ +html+   <LI> Start new threads for each service.
+ +html+ </OL>
+ +html+ <A HREF=".DBrc">.properties</A>
 
-  ++++++++++++++++++++++++++++++++++++++*/
-int SV_start(char *pidfile)
-{
+ ++++++++++++++++++++++++++++++++++++++*/
+int SV_start(char *pidfile) {
 	int whois_port = -1;
 	int config_port = -1;
 	int mirror_port = -1;
@@ -626,7 +603,7 @@ int SV_start(char *pidfile)
 
 	/* Store the starting time */
 	gettimeofday(&tval, NULL);
-	SV_starttime = tval.tv_sec;	/* seconds since Jan. 1, 1970 */
+	SV_starttime = tval.tv_sec; /* seconds since Jan. 1, 1970 */
 
 	/* Log the starting time */
 	ctime_r(&SV_starttime, starttime);
@@ -675,15 +652,15 @@ int SV_start(char *pidfile)
 	/* Get port information for each service */
 	whois_port = ca_get_svwhois_port;
 	LG_log(sv_context, LG_INFO, "whois port is %d", whois_port);
-/*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "whois port is %d", whois_port); */
+	/*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "whois port is %d", whois_port); */
 
 	config_port = ca_get_svconfig_port;
 	LG_log(sv_context, LG_INFO, "config port is %d", config_port);
-/*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "config port is %d", config_port); */
+	/*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "config port is %d", config_port); */
 
 	mirror_port = ca_get_svmirror_port;
 	LG_log(sv_context, LG_INFO, "mirror port is %d", mirror_port);
-/*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "mirror port is %d", mirror_port);*/
+	/*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "mirror port is %d", mirror_port);*/
 
 	/* 6. Create a socket on the necessary ports/addresses and bind to them. */
 	/* whois socket */
@@ -783,29 +760,29 @@ int SV_start(char *pidfile)
 		UT_free(db_user);
 		UT_free(db_passwd);
 	}
-	SV_update_sock[source + 1] = -1;	/* end of socket array */
+	SV_update_sock[source + 1] = -1; /* end of socket array */
 
 	/* Create master thread for config threads */
 	SV_concurrent_server(SV_config_sock, 0, "config", PC_interact);
 
 	/* Initialise the radix trees
-	   Don't allow any connections until this is done - there is no use of it
-	   as the radix trees are locked and no queries nor updates can succeed,
-	   just end up in a connection timeout */
+	 Don't allow any connections until this is done - there is no use of it
+	 as the radix trees are locked and no queries nor updates can succeed,
+	 just end up in a connection timeout */
 	fprintf(stderr, "Loading the radix trees...");
 	radix_init();
 	radix_load();
 	fprintf(stderr, " done.\n");
 
 	/* Now.... accept() calls block until they get a connection
-	   so to listen on more than one port we need more
-	   than one thread */
+	 so to listen on more than one port we need more
+	 than one thread */
 
 	/* Create master thread for whois threads */
 	/* The max number of threads for queries has been increased from 64 to 128 (Engin 20040614) */
 	SV_concurrent_server(SV_whois_sock, 128, "whois", PW_interact);
 	/* Create master thread for mirror threads */
-	SV_concurrent_server(SV_mirror_sock, 0, "mirror", PM_interact);
+	SV_concurrent_server(SV_mirror_sock, 128, "mirror", PM_interact);
 
 	/* Walk through the sources and */
 	/* run update thread for every source with CANUPD == 'y' */
@@ -815,7 +792,7 @@ int SV_start(char *pidfile)
 
 		fprintf(stderr, "Source [%s] Mode STATIC\n", source_name);
 		LG_log(sv_context, LG_INFO, "Source [%s] Mode STATIC", source_name);
-		UT_free(source_name);	/* because ca_* functions return copies */
+		UT_free(source_name); /* because ca_* functions return copies */
 	}
 	/* terminate the thread */
 	/* XXX not return becase then we terminate the whole process */
@@ -836,78 +813,73 @@ int SV_start(char *pidfile)
 
 	/* we will never reach this point */
 	// return(1);
-}								/* SV_start() */
+} /* SV_start() */
 
 /* SV_switchdynamic() */
 /*++++++++++++++++++++++++++++++++++++++
 
-  Turn on dynamic updates
+ Turn on dynamic updates
 
-  ++++++++++++++++++++++++++++++++++++++*/
+ ++++++++++++++++++++++++++++++++++++++*/
 void SV_switchdynamic() {
-  int dynamic_status = CO_get_dynamic();
-  static int already_set = 0;
-  int source;
-  ca_dbSource_t *source_hdl;
-  char *source_name;
-  int update_mode = 0;
+	int dynamic_status = CO_get_dynamic();
+	static int already_set = 0;
+	int source;
+	ca_dbSource_t *source_hdl;
+	char *source_name;
+	int update_mode = 0;
 
-  if (dynamic_status == 1) {
-    /* switch update and nrtm modes on */
-    for(source=0;
-        (source_hdl = ca_get_SourceHandleByPosition(source))!=NULL ;
-        source++) {
-      update_mode = ca_get_srcmode(source_hdl);
-      source_name= ca_get_srcname(source_hdl);
-      if(IS_UPDATE(update_mode)) {
-        /* run RIPupdate thread */
-        fprintf(stderr,"Source [%s] Mode UPDATE [port=%d]\n",
-            source_name, ca_get_srcupdateport(source_hdl));
-        LG_log(sv_context, LG_INFO, "Source [%s] Mode UPDATE [port=%d]",
-            source_name, ca_get_srcupdateport(source_hdl));
-        TH_create((void *(*)(void *))UD_do_updates, (void *)source);
-      } else if (IS_NRTM_CLNT(update_mode)) {
-        /* start NRTM client */
-        fprintf(stderr,"Source [%s] Mode NRTM\n", source_name);
-        LG_log(sv_context, LG_INFO, "Source [%s] Mode NRTM", source_name);
-        TH_create((void *(*)(void *))UD_do_nrtm, (void *)source);
-      } else {
-        /* notify STATIC sources */
-        fprintf(stderr,"Source [%s] Mode already STATIC\n", source_name);
-        LG_log(sv_context, LG_INFO, "Source [%s] Mode already STATIC",
-            source_name);
-      }
-    }
-    already_set = 1;
-  } else {
-    if (already_set == 1) {
-      fprintf(stderr,"Cannot revert to static mode from dynamic mode\n");
-      LG_log(sv_context, LG_INFO,
-          "Cannot revert to static mode from dynamic mode");
-    }
-  }
+	if (dynamic_status == 1) {
+		/* switch update and nrtm modes on */
+		for (source=0; (source_hdl = ca_get_SourceHandleByPosition(source))!=NULL; source++) {
+			update_mode = ca_get_srcmode(source_hdl);
+			source_name= ca_get_srcname(source_hdl);
+			if (IS_UPDATE(update_mode)) {
+				/* run RIPupdate thread */
+				fprintf(stderr,"Source [%s] Mode UPDATE [port=%d]\n",
+				source_name, ca_get_srcupdateport(source_hdl));
+				LG_log(sv_context, LG_INFO, "Source [%s] Mode UPDATE [port=%d]", source_name,
+				        ca_get_srcupdateport(source_hdl));
+				TH_create((void *(*)(void *))UD_do_updates, (void *)source);
+			} else if (IS_NRTM_CLNT(update_mode)) {
+				/* start NRTM client */
+				fprintf(stderr,"Source [%s] Mode NRTM\n", source_name);
+				LG_log(sv_context, LG_INFO, "Source [%s] Mode NRTM", source_name);
+				TH_create((void *(*)(void *))UD_do_nrtm, (void *)source);
+			} else {
+				/* notify STATIC sources */
+				fprintf(stderr,"Source [%s] Mode already STATIC\n", source_name);
+				LG_log(sv_context, LG_INFO, "Source [%s] Mode already STATIC", source_name);
+			}
+		}
+		already_set = 1;
+	} else {
+		if (already_set == 1) {
+			fprintf(stderr,"Cannot revert to static mode from dynamic mode\n");
+			LG_log(sv_context, LG_INFO, "Cannot revert to static mode from dynamic mode");
+		}
+	}
 } /* SV_switchdynamic() */
 
 /* SV_shutdown() */
 /*++++++++++++++++++++++++++++++++++++++
 
-  Shutdown the server.
+ Shutdown the server.
 
-  More:
-  +html+ <PRE>
-  Authors:
-        andrei
-  +html+ </PRE>
-  +html+ Stops the server.
-  +html+ <OL>
-  +html+   <LI> Close listening sockets (whois, config, mirror and updates)
-  +html+   <LI> Stop all threads by triggering do_server variable.
-  +html+ </OL>
-  +html+ <A HREF=".DBrc">.properties</A>
+ More:
+ +html+ <PRE>
+ Authors:
+ andrei
+ +html+ </PRE>
+ +html+ Stops the server.
+ +html+ <OL>
+ +html+   <LI> Close listening sockets (whois, config, mirror and updates)
+ +html+   <LI> Stop all threads by triggering do_server variable.
+ +html+ </OL>
+ +html+ <A HREF=".DBrc">.properties</A>
 
-  ++++++++++++++++++++++++++++++++++++++*/
-void SV_shutdown()
-{
+ ++++++++++++++++++++++++++++++++++++++*/
+void SV_shutdown() {
 	char print_buf[STR_M];
 	time_t shutdowntime;
 	struct timeval tval;
@@ -933,7 +905,7 @@ void SV_shutdown()
 
 	/* Store the shutdown time */
 	gettimeofday(&tval, NULL);
-	shutdowntime = tval.tv_sec;	/* seconds since Jan. 1, 1970 */
+	shutdowntime = tval.tv_sec; /* seconds since Jan. 1, 1970 */
 
 	/* Log the shutdown time */
 	ctime_r(&shutdowntime, shuttime);
@@ -952,15 +924,15 @@ void SV_shutdown()
 		LG_log(sv_context, LG_ERROR, "error %d writing to shutdown pipe; %s", errno, strerror(errno));
 	}
 
-/* don't do this, it's not polite  ;) */
+	/* don't do this, it's not polite  ;) */
 #if 0
 	/* CLose all listening sockets, so accept call exits */
 	close(SV_whois_sock);
 	close(SV_config_sock);
 	close(SV_mirror_sock);
 	for (source = 0; SV_update_sock[source] != -1; source++)
-		if (SV_update_sock[source] != 0)
-			close(SV_update_sock[source]);
+	if (SV_update_sock[source] != 0)
+	close(SV_update_sock[source]);
 #endif							/* 0 */
 
-}								/* SV_shutdown() */
+} /* SV_shutdown() */

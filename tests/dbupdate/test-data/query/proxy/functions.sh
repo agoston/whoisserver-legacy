@@ -15,5 +15,5 @@ function issue_command() {
 }
 
 function issue_command_get_ret() {
-        return `echo "$@" | nc -q 1 $WHOISHOST $CONFPORT | sed 's/.*=\([0-9]*\)=.*/\1/g' | tail -1`
+        return `echo "$@" | nc -q 1 $WHOISHOST $SVCONFIG_PORT | sed 's/.*=\([0-9]*\)=.*/\1/g' | tail -1`
 }
