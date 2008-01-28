@@ -1,1 +1,0 @@
-ckp_pam.c

@@ -1,2 +1,0 @@
--lpam -ldl
--L/usr/lib -lssl -lcrypto
