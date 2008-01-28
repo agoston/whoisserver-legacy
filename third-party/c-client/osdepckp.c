@@ -1,5 +1,5 @@
 /*
- * Program:	Pluggable Authentication Modules login services
+ * Program:	POSIX check password
  *
  * Author:	Mark Crispin
  *		Networks and Distributed Computing
@@ -10,117 +10,84 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 August 1988
- * Last Edited:	21 June 2004
+ * Last Edited:	4 April 2001
  * 
  * The IMAP toolkit provided in this Distribution is
- * Copyright 1988-2004 University of Washington.
+ * Copyright 2001 University of Washington.
  * The full text of our legal notices is contained in the file called
  * CPYRIGHT, included with this Distribution.
  */
-
-
-#ifdef MAC_OSX_KLUDGE		/* why can't Apple be compatible? */
-#include <pam/pam_appl.h>
-#else
-#include <security/pam_appl.h>
-#endif
-
-struct checkpw_cred {
-  char *uname;			/* user name */
-  char *pass;			/* password */
-};
 
-/* PAM conversation function
- * Accepts: number of messages
- *	    vector of messages
- *	    pointer to response return
- *	    application data
- * Returns: PAM_SUCCESS if OK, response vector filled in, else PAM_CONV_ERR
- */
-
-static int checkpw_conv (int num_msg,const struct pam_message **msg,
-			 struct pam_response **resp,void *appdata_ptr)
-{
-  int i;
-  struct checkpw_cred *cred = (struct checkpw_cred *) appdata_ptr;
-  struct pam_response *reply = fs_get (sizeof (struct pam_response) * num_msg);
-  for (i = 0; i < num_msg; i++) switch (msg[i]->msg_style) {
-  case PAM_PROMPT_ECHO_ON:	/* assume want user name */
-    reply[i].resp_retcode = PAM_SUCCESS;
-    reply[i].resp = cpystr (cred->uname);
-    break;
-  case PAM_PROMPT_ECHO_OFF:	/* assume want password */
-    reply[i].resp_retcode = PAM_SUCCESS;
-    reply[i].resp = cpystr (cred->pass);
-    break;
-  case PAM_TEXT_INFO:
-  case PAM_ERROR_MSG:
-    reply[i].resp_retcode = PAM_SUCCESS;
-    reply[i].resp = NULL;
-    break;
-  default:			/* unknown message style */
-    fs_give ((void **) &reply);
-    return PAM_CONV_ERR;
-  }
-  *resp = reply;
-  return PAM_SUCCESS;
-}
-
-
-/* PAM cleanup
- * Accepts: handle
- */
-
-static void checkpw_cleanup (pam_handle_t *hdl)
-{
-#if 0	/* see checkpw() for why this is #if 0 */
-  pam_close_session (hdl,NIL);	/* close session [uw]tmp */
-#endif
-  pam_setcred (hdl,PAM_DELETE_CRED);
-  pam_end (hdl,PAM_SUCCESS);
-}
-
-/* Server log in
- * Accepts: user name string
+/* Check password
+ * Accepts: login passwd struct
  *	    password string
- * Returns: T if password validated, NIL otherwise
+ *	    argument count
+ *	    argument vector
+ * Returns: passwd struct if password validated, NIL otherwise
  */
 
 struct passwd *checkpw (struct passwd *pw,char *pass,int argc,char *argv[])
 {
-  pam_handle_t *hdl;
-  struct pam_conv conv;
-  struct checkpw_cred cred;
-  conv.conv = &checkpw_conv;
-  conv.appdata_ptr = &cred;
-  cred.uname = pw->pw_name;
-  cred.pass = pass;
-  if ((pam_start ((char *) mail_parameters (NIL,GET_SERVICENAME,NIL),
-		  pw->pw_name,&conv,&hdl) != PAM_SUCCESS) ||
-      (pam_set_item (hdl,PAM_RHOST,tcp_clientaddr ()) != PAM_SUCCESS) ||
-      (pam_authenticate (hdl,NIL) != PAM_SUCCESS) ||
-      (pam_acct_mgmt (hdl,NIL) != PAM_SUCCESS) ||
-      (pam_setcred (hdl,PAM_ESTABLISH_CRED) != PAM_SUCCESS)) {
-				/* clean up */
-    pam_setcred (hdl,PAM_DELETE_CRED);
-    pam_end (hdl,PAM_AUTH_ERR);	/* failed */
-    return NIL;
+  char tmp[MAILTMPLEN];
+  struct spwd *sp = NIL;
+  time_t left;
+  time_t now = time (0);
+  struct tm *t = gmtime (&now);
+  int zone = t->tm_hour * 60 + t->tm_min;
+  int julian = t->tm_yday;
+  t = localtime (&now);		/* get local time now */
+				/* minus UTC minutes since midnight */
+  zone = t->tm_hour * 60 + t->tm_min - zone;
+  /* julian can be one of:
+   *  36x  local time is December 31, UTC is January 1, offset -24 hours
+   *    1  local time is 1 day ahead of UTC, offset +24 hours
+   *    0  local time is same day as UTC, no offset
+   *   -1  local time is 1 day behind UTC, offset -24 hours
+   * -36x  local time is January 1, UTC is December 31, offset +24 hours
+   */
+  if (julian = t->tm_yday -julian)
+    zone += ((julian < 0) == (abs (julian) == 1)) ? -24*60 : 24*60;
+				/* days since 1/1/1970 local time */
+  now = ((now /60) + zone) / (60*24);
+				/* non-shadow authentication */
+  if (!pw->pw_passwd || !pw->pw_passwd[0] || !pw->pw_passwd[1] ||
+      strcmp (pw->pw_passwd,(char *) crypt (pass,pw->pw_passwd))) {
+    /* As far as I've been able to determine, here is how the expiration
+     * fields in the shadow authentication data work:
+     *  lstchg	last password change date if non-negative.  If zero, the
+     *		user can not log in without changing password.
+     *  max	number of days a password is valid if positive
+     *  warn	number of days of password expiration warning
+     *  expire	date account expires if positive
+     *  inact	number of days an accout can be inactive (not checked!)
+     * The expiration day is the *last* day that the password or account
+     * is valid.
+     */
+				/* shadow authentication */
+    if ((sp = getspnam (pw->pw_name)) && sp->sp_lstchg &&
+	((sp->sp_lstchg < 0) || (sp->sp_max <= 0) ||
+	 ((sp->sp_lstchg + sp->sp_max) >= now)) &&
+	((sp->sp_expire <= 0) || (sp->sp_expire >= now)) &&
+	sp->sp_pwdp && sp->sp_pwdp[0] && sp->sp_pwdp[1] &&
+	!strcmp (sp->sp_pwdp,(char *) crypt (pass,sp->sp_pwdp))) {
+      if ((sp->sp_lstchg > 0) && (sp->sp_max > 0) &&
+	  ((left = (sp->sp_lstchg + sp->sp_max) - now) <= sp->sp_warn)) {
+	if (left) {
+	  sprintf (tmp,"[ALERT] Password expires in %ld day(s)",(long) left);
+	  mm_notify (NIL,tmp,NIL);
+	}
+	else mm_notify (NIL,"[ALERT] Password expires today!",WARN);
+      }
+      if ((sp->sp_expire > 0) && ((left = sp->sp_expire - now) < 28)) {
+	if (left) {
+	  sprintf (tmp,"[ALERT] Account expires in %ld day(s)",(long) left);
+	  mm_notify (NIL,tmp,NIL);
+	}
+	else mm_notify (NIL,"[ALERT] Account expires today!",WARN);
+      }
+      endspent ();		/* don't need shadow password data any more */
+    }
+    else pw = NIL;		/* password failed */
   }
-#if 0
-  /*
-   * Some people have reported that this causes a SEGV in strncpy() from
-   * pam_unix.so.1
-   */
-  /*
-   * This pam_open_session() call is inconsistant with how we handle other
-   * platforms, where we don't write [uw]tmp records.  However, unlike our
-   * code on other platforms, pam_acct_mgmt() will check those records for
-   * inactivity and deny the authentication.
-   */
-  pam_open_session (hdl,NIL);	/* make sure account doesn't go inactive */
-#endif
-				/* arm hook to delete credentials */
-  mail_parameters (NIL,SET_LOGOUTHOOK,(void *) checkpw_cleanup);
-  mail_parameters (NIL,SET_LOGOUTDATA,(void *) hdl);
   return pw;
 }
