@@ -1,2 +1,0 @@
--DCREATEPROTO=unixproto -DEMPTYPROTO=unixproto -DMAILSPOOL="/var/spool/mail" -DANONYMOUSHOME="/var/spool/mail/anonymous" -DACTIVEFILE="/var/lib/news/active" -DNEWSSPOOL="/var/spool/news" -DRSHPATH="/usr/bin/rsh" -DLOCKPGM="/etc/mlock"
--DMD5ENABLE="/etc/cram-md5.pwd"
