@@ -265,7 +265,7 @@ if( $Install or $All ) {
 
     ### install the RPSL perl bindings into our project dir
     {   local $ENV{'PERL_MM_OPT'} = "PREFIX=$DbPrefix/perl";
-        _system('cd src; make opl-perl-install;');
+        _system('cd src; make opl-perl-test && make opl-perl-install;');
     }
 }
 
@@ -292,7 +292,9 @@ if( $SetupTests or $All ) {
 {   my $pid_dir = $UseTempDir ? $DbTempDir : $Cwd;
     my $cmd = qq[src/whois-server -p $pid_dir/whoisd.pid -c conf/rip.config];
 
-    print "\nYou can now start the whoisserver using:\n\n    $cmd\n\n";
+
+    print '=' x 70;
+    print "\n\nYou can now start the whoisserver using:\n\n    $cmd\n\n";
 
     my $test_cmd = q[./tests/dbupdate/testing/bin/test.pl -e -o -u -c ].
                    q[tests/dbupdate/testing/conf/dataset.config -r ].
@@ -300,7 +302,7 @@ if( $SetupTests or $All ) {
 
     print "\nYou can then run the test suite using:\n\n    $test_cmd\n\n";
     print q[
-The test program writes it's output to the following directories:
+The test program writes its output to the following directories:
     
     tests/dbupdate/testing/log
     tests/dbupdate/testing/dump
@@ -315,6 +317,11 @@ And at the prompt type:
     =0= whois R.I.P. config> set dynamic start
 
     \n\n];
+
+    print '=' x 70;
+    print $/.$/;
+
+
 
     _system( $cmd ) if $StartDaemon;
 }
