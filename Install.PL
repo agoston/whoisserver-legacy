@@ -16,14 +16,11 @@ use File::Basename  qw[dirname basename];
 
 ### Set up defaults firsts
 my $Cwd         = cwd();
-my $DbPrefix    = File::Spec->catdir( $ENV{'HOME'}, 'projects', basename( $Cwd ) );
-my $DbPass      = $ENV{'RIPE_DBPASS'} || 'ri:Abpw'; # XXX don't hardcode me?
-my $DbPort      = $< . 0;    
-my $User        = scalar getpwuid($<);
+
 my $DevelMode   = 0;
 my $Verbose     = 0;
 my $Debug       = 0;
-
+my $Help        = 0;
 
 my $SetupDb         = 0;
 my $RunConfigure    = 0;
@@ -33,6 +30,12 @@ my $UseTempDir      = 0;
 my $SetupTests      = 0;
 my $StartDaemon     = 0;
 my $All             = 1;
+
+my $DbPrefix    = File::Spec->catdir( $ENV{'HOME'}, 'projects', basename( $Cwd ) );
+my $DbPass      = $ENV{'RIPE_DBPASS'} || 'ri:Abpw'; # XXX don't hardcode me?
+my $DbPort      = $< . 0;    
+my $User        = scalar getpwuid($<);
+
 
 ### All options passed;
 GetOptions( 
@@ -50,8 +53,70 @@ GetOptions(
     'setup-tests!'      => \$SetupTests,
     'start-daemon!'     => \$StartDaemon,
     'all!'              => \$All,
-);
+    'help!'             => \$Help,
+) or die usage();
 
+die usage() if $Help;
+
+### documented here so it's close to the original options
+sub usage {
+    my $me = basename($0);
+
+    return qq[
+Usage: $0 --verbose --all --start-daemon    
+
+Sets up and installs a whoisserver from a clean checkout or tarball.
+Most stages can be individually run. See the options below for details.
+
+Options:
+
+  ### flags
+  --help                Print this message
+  --verbose             Print diagnostic messages (recommended)
+  --debug               Print output from all childprocesses (recommended for developers)
+  --for-development     Compile the whoisserver with debug symbols.
+    
+  ### configuration options
+  --prefix=%s           Installation prefix to use. Ie, /usr/local/whoisserver. Defaults
+                        to \$HOME/projects/`basename pwd`
+  --dbpass=%s           Password to use to connect to your MySQL server. Defaults to
+                        \$ENV{RIPE_DBPASS}
+  --dbport=%d           Starting number of port range to use for this server instance.
+                        Needs 5 consecutive port numbers. Defaults to `id`0.
+
+  ### build/configure/install options
+  --all                 Do all of the below operations. Can be negated by --no-all.
+                        Defaults to true.
+  --configure           Run ./autogen.sh and ./configure with the right arguments.
+                        --all implies --configure
+  --setup-db            Set up the MySQL databases needed by the whoisserver. This
+                        defaults to ripe_\$UserName and ripadmin_\$UserName. 
+                        --all implies --setup-db
+  --setup-config        Munge the configuration files used by the whoisserver and
+                        its test suite: conf/rip.config, conf/sources.config,
+                        tests/dbupdate/testing/conf/dataset.config and conf/delcheck-*
+                        --all implies --setup-config
+  --install             Runs make, make install and copies the config and sql files
+                        to your installation directory. --all implies --install
+  --setup-tests         Run a sample test case to setup the skeleton database.
+                        --all implies --setup-tests
+                        
+  ### additional actions
+  --use-tempdir         All temp, var and log dirs are written under /tmp for
+                        added performance. This is recommended if your main
+                        files are on a network volume.
+  --start-daemon        At the end of the process, start the whoisserver
+        
+Examples:
+
+  ### setup a whoisserver from a clean checkout, suited for developers:
+  \$ $me --verbose --debug --for-development --use-tempdir --all --start-daemon
+
+  ### just (re)start the whoisserver
+  \$ $me --no-all --start-daemon
+
+    \n];
+}
 
 ### option post-processing
 my $DbTempDir;
@@ -84,8 +149,13 @@ if( $RunConfigure or $All ) {
 
 if( $SetupDb or $All ) {
     ### set up the databases to use. Replaces $USER with your username
+    _system( qq[echo "drop database ripe_$User"       | mysql -u dbint -p$DbPass] );
     _system( qq[echo "create database ripe_$User"     | mysql -u dbint -p$DbPass] );
+
+    _system( qq[echo "drop database ripadmin_$User"   | mysql -u dbint -p$DbPass] );
     _system( qq[echo "create database ripadmin_$User" | mysql -u dbint -p$DbPass] );
+
+    ### XXX can't we setup ripe db like this?
     _system( qq[mysql -u dbint -p$DbPass ripadmin_$User < src/SQL/create.RIPADMIN.sql] ); 
 }
 
@@ -97,39 +167,39 @@ if( $SetupConfig or $All ) {
     
     ### the test framework has a config file it uses, which needs to point
     ### at the to-be installed location (same as your --prefix)
-    _replace( q[(WHOISDIR\s+=\s+)] => q[${1}${DbPrefix}], 
-              q[tests/dbupdate/testing/conf/dataset.config] );
+    _replace( q[^WHOISDIR\s+=\s+.*$] => qq[WHOISDIR = $DbPrefix], 
+              q[tests/dbupdate/testing/conf/dataset.config] => 'm' );
     
     ### change the delcheck configs to point to your installation path
     ### XXX these should probably be replaced with .sample files, and then
     ### copied and THEN edited
-    for my $file ( map { chomp; $_ }`ls conf/delcheck-* | grep -v xml` ) {
-        _replace( q[/.*/] =>  q[$DbPprefix/conf/], $file );
+    for my $file ( map { chomp; $_ } `ls conf/delcheck-* | grep -v xml | grep -v bak\$` ) {
+        _replace( q[/.*/] =>  qq[$DbPrefix/conf/], $file );
     }
     
     ### rip.config needs some changes done to it's configuration:
     for my $aref(   
         ### all the port numbers for the server
-        [ q[^(SVWHOIS_PORT ).*]     => q[$1] . $DbPort+1 ],
-        [ q[^(SVCONFIG_PORT ).*]    => q[$1] . $DbPort+2 ],
-        [ q[^(SVMIRROR_PORT ).*]    => q[$1] . $DbPort+3 ],
-        [ q[(^UPDSOURCE).*]         => q[$1  DB-TEST localhost,3306,dbint,].
-                                       qq[$DbPass,ripe_$User localhost,] .
-                                       ($DbPort+1).q[,],($DbPort+4) ],
+        [ q[^SVWHOIS_PORT .*]     => q[SVWHOIS_PORT ]  . ($DbPort+1) ],
+        [ q[^SVCONFIG_PORT .*]    => q[SVCONFIG_PORT ] . ($DbPort+2) ],
+        [ q[^SVMIRROR_PORT .*]    => q[SVMIRROR_PORT ] . ($DbPort+3) ],
+        [ q[^UPDSOURCE .*]        => q[UPDSOURCE DB-TEST localhost,3306,dbint,].
+                                     qq[$DbPass,ripe_$User localhost,] .
+                                     ($DbPort+1).q[,].($DbPort+4) ],
     
         ### access to the ripadmin db
-        [ q[^(RIPADMIN).*]          => q[$1 localhost,3306,dbint,] .
-                                       qq[$DbPass,ripadmin_$User]   ], 
+        [ q[^RIPADMIN.*]          => q[RIPADMIN localhost,3306,dbint,] .
+                                     qq[$DbPass,ripadmin_$User]   ], 
         
         ### path to the config file
-        [ q[(^SOURCEFILE).*]        => q[$1 $DbPrefix/conf/sources.config] ],
+        [ q[^SOURCEFILE .*]       => q[SOURCEFILE $DbPrefix/conf/sources.config] ],
                                      
         ### rdns suffix change
-        [ q[^(NS_SUFFIX)\s*ip6.int] => q[$1 e164.arpa] ],
+        [ q[^NS_SUFFIX\s*ip6.int] => q[NS_SUFFIX e164.arpa] ],
     ) {
-    
+
         my($to,$from) = @$aref;
-        _replace( $to => $from, 'conf/rip.config' );
+        _replace( $to => $from, 'conf/rip.config' => 'm' );
     }
     
     ### sources.config has a few entries that need changing as well
@@ -148,7 +218,7 @@ password:    $DbPass
     ] ],
         
         ### comment out the NRTM section, as we dont use NRTM in our tests
-        [ q[\nNRTM\s+.*?/NRTM|] => q[
+        [ q[\nNRTM\s+.*?/NRTM] => q[
 #
 #NRTM    SAMPLEM
 #host:   master.server.net                                                                         
@@ -195,7 +265,7 @@ if( $UseTempDir ) {
     _system( qq[mkdir -p $DbTempDir] ) unless -d $DbTempDir;
     _system( qq[mv $DbPrefix/log $DbTempDir && ln -s $DbTempDir/log $DbPrefix] );
     _system( qq[mv $DbPrefix/var $DbTempDir && ln -s $DbTempDir/var $DbPrefix] );
-    _system( qq[mkdir $$DbTempDir/tmp && ln -s $$DbTempDir/tmp tests/dbupdate/testing] );
+    _system( qq[mkdir $DbTempDir/tmp && ln -s $DbTempDir/tmp tests/dbupdate/testing] );
 }
 
 if( $SetupTests or $All ) {
@@ -213,13 +283,13 @@ if( $SetupTests or $All ) {
 {   my $pid_dir = $UseTempDir ? $DbTempDir : $Cwd;
     my $cmd = qq[src/whois-server -p $pid_dir/whoisd.pid -c conf/rip.config];
 
-    print "\nYou can now start the whoisserver using:\n\n\t$cmd\n\n";
+    print "\nYou can now start the whoisserver using:\n\n    $cmd\n\n";
 
     my $test_cmd = q[./tests/dbupdate/testing/bin/test.pl -e -o -u -c ].
                    q[tests/dbupdate/testing/conf/dataset.config -r ].
                    qq[$Cwd/tests/dbupdate/test-data/];
 
-    print "\nYou can then run the test suite using:\n\n\t$test_cmd\n\n";
+    print "\nYou can then run the test suite using:\n\n    $test_cmd\n\n";
     print q[
 The test program writes it's output to the following directories:
     
@@ -243,7 +313,7 @@ And at the prompt type:
 ### run a system call
 sub _system {
     my $cmd = shift;
-    $cmd .= ' /dev/null 2>&1' unless $Verbose;
+    $cmd .= ' > /dev/null 2>&1' unless $Debug;
 
     print "Running '$cmd'"  if $Verbose;
     system( $cmd ) and die $?;
@@ -253,6 +323,7 @@ sub _system {
 }
 
 ### do a search & replace on a file
+### XXX using $1 and friends in the replacement section doesn't currently work
 sub _replace {
     my $from = shift;
     my $to   = shift;
@@ -267,14 +338,18 @@ sub _replace {
     my $contents = do { open my $fh, $file or die "Could not open $file: $!"; 
                         local $/; <$fh> 
                     };
+
+    print "Replacing $from in $file";
+    my $re = qq[s|(?$mods:$from)|$to|];
     
-    my $eval = qq[s|$from|$to|$mods];
-    $contents =~ eval $eval or die "Failed to apply '$eval' to $file";
+    eval qq[\$contents =~ $re] or die qq[Failed to apply $re to $file];
     
     {   open my $fh, ">$file" or die "Could not open $file for writing: $!";
-        print $fh, $contents;
+        print $fh $contents;
         close $fh;
     }        
+    print "....done\n";
+    
     
     return 1;
 }
