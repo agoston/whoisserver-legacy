@@ -167,14 +167,18 @@ if( $SetupConfig or $All ) {
     
     ### the test framework has a config file it uses, which needs to point
     ### at the to-be installed location (same as your --prefix)
+    ### This file is generated, so needs no .sample entry
     _replace( q[^WHOISDIR\s+=\s+.*$] => qq[WHOISDIR = $DbPrefix], 
               q[tests/dbupdate/testing/conf/dataset.config] => 'm' );
     
     ### change the delcheck configs to point to your installation path
-    ### XXX these should probably be replaced with .sample files, and then
-    ### copied and THEN edited
-    for my $file ( map { chomp; $_ } `ls conf/delcheck-* | grep -v xml | grep -v bak\$` ) {
-        _replace( q[/.*/] =>  qq[$DbPrefix/conf/], $file );
+    ### copy the sample to the real file, then edit it
+    for my $file ( map { chomp; $_ } `ls conf/delcheck-*.sample | grep -v xml` ) {
+        my $new = $file;
+        $new =~ s/\.sample$//;
+       
+        _system( qq[cp $file $new] );
+        _replace( q[/.*/] =>  qq[$DbPrefix/conf/], $new );
     }
     
     ### rip.config needs some changes done to it's configuration:
