@@ -214,7 +214,8 @@ void output_object(char *object, struct class *c, int num_classes) {
 					free(dummy);
 				} else {
 					fprintf(stderr, "%s: The following object failed to dummify:\n\n%s\n", Program_Name, object);
-					UT_alarm_operator("ERROR: text_export failed objects", "The following object failed to dummify:\n\n%s\n", Program_Name, object);
+					/*UT_alarm_operator("ERROR: text_export failed objects", "The following object failed to dummify:\n\n%s\n", Program_Name, object); */
+
 					/* omit object if dummification failed
 					 * the idea is that we should still produce the dumps, it's critical, but at the same time,
 					 * spam the operator so that the object will get fixed at some point
