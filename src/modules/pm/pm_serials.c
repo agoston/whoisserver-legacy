@@ -107,7 +107,7 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 	SQ_result_set_t * sql_result;
 	SQ_row_t *sql_row;
 	char *sql_str;
-	char query[STR_M];
+	char query[STR_L];
 	int sql_err;
 	int location;
 	long locop[2]; // array to hold location and operation
@@ -121,6 +121,8 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 	location = locop[0];
 	if (operation)
 		*operation = locop[1];
+	/* reset timestamp */
+	if (timestamp) *timestamp = 0;
 
 	switch (location) {
 		/* history */
@@ -133,12 +135,24 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 			 * Deletion time can be digged from the last table, looking up object_id with sequence_id = 0.
 			 * Following some twisted logic, this is how deletions are done in the RIPE DB.
 			 * FIXME: Weird, bad design. Should be fixed.
+			 * agoston, 2008-01-22
 			 * 
-			 * agoston, 2008-01-22 */
+			 * FIXME: real-world unearthed even more shit. NRTM updates database in a different way: when
+			 * recreating a previously deleted pkey, it simply keeps the object_id, and updates (deletes)
+			 * the sequence_id=0 record in the last table to the following sequence_id, puts the object
+			 * in there, etc..., so it basically overwrites the deletion placeholder record in the last table,
+			 * keeping the old object_id.
+			 * It's funny as this proves that NRTM is NOT a proper replication - luckily this bug keeps the
+			 * serials the same, but the sql DB itself is vastly different.
+			 * As a workaround, I've changed the inner joins to left join. Of course this will result in
+			 * timestamp being NULL in NRTM delete+re-create cases, but that data is lost anyway (as the 
+			 * placeholder last record is overwritten).
+			 * 
+			 * agoston, 2008-01-30 */
 			if ((locop[1] == OP_DEL) && timestamp) {
 				sprintf(query, "SELECT history.object, history.object_type, last.timestamp FROM serials "
-					"JOIN last ON serials.object_id = last.object_id AND last.sequence_id = 0 "
-					"JOIN history ON serials.object_id = history.object_id AND serials.sequence_id = history.sequence_id "
+					"LEFT JOIN last ON serials.object_id = last.object_id AND last.sequence_id = 0 "
+					"LEFT JOIN history ON serials.object_id = history.object_id AND serials.sequence_id = history.sequence_id "
 					"WHERE serials.serial_id=%ld", serial_number);
 
 			} else {
@@ -184,7 +198,8 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
 				die;
 			}
-			if (timestamp && SQ_get_column_unsigned(sql_result, sql_row, 2, timestamp)) {
+			/* (*timestamp) is left at zero if timestamp is NULL */ 
+			if (timestamp && (SQ_get_column_unsigned(sql_result, sql_row, 2, timestamp) < -1)) {
 				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
 				die;
 			}
@@ -200,7 +215,7 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 	/* release the lock */
 	PW_record_query_end();
 
-	return (sql_str);
+	return sql_str;
 }
 
 /************************************************************

@@ -54,11 +54,6 @@
 /*+ Maximum size of input that can be recieved from the client. +*/
 #define MAX_PM_INPUT_SIZE  256
 
-/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial 
- * agoston, 2007-12-21 */
-/* server needs to yield one serial less just in case the last one causes the crash */
-/* #define SAFE_BACKLOG 1 */
-
 typedef struct _nrtm_q_t {
 	char *source;
 	int version;
@@ -69,6 +64,7 @@ typedef struct _nrtm_q_t {
 void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max);
 char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, long *object_type, unsigned *timestamp, int *operation);
 GString *PM_get_nrtm_sources(ip_addr_t *client_address, char *source);
+char *PM_dummify_object(char *object);
 
 void PM_interact(int sock);
 void PM_init(LG_context_t *ctx);
