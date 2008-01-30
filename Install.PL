@@ -256,12 +256,17 @@ if( $Install or $All ) {
     ### config set up, run make & install
     _system('make');
     _system('make install');
-    
+
     ### make install doesn't copy all relevant config files :(
     _system( qq[cp -R conf/* $DbPrefix/conf] );
 
     ### make install also doesn't install all files from bin/SQL
     _system( qq[cp -R src/SQL/* $DbPrefix/bin/SQL] );
+
+    ### install the RPSL perl bindings into our project dir
+    {   local $ENV{'PERL_MM_OPT'} = "PREFIX=$DbPrefix/perl";
+        _system('cd src; make opl-perl-install;');
+    }
 }
 
 if( $UseTempDir ) {
