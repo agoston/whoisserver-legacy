@@ -1,1 +1,0 @@
-/home/agoston/imap-2004g/src/charset/jis_0212.c
