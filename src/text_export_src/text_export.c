@@ -56,13 +56,14 @@ struct database_info {
 struct class {
 	char *name;
 	FILE *fp;
-	FILE *dummy_fp;
+	char *short_name;
+	FILE *short_fp;
 };
 
 /* output functions which track amount of data written */
-inline void dump_putc(char c, FILE* stream) {
-	Amt_Dumped++;
-	putc(c, stream);
+#define dump_putc(c,stream)  (Amt_Dumped++, putc((c),(stream)))
+void dump_fputs(const char *s, FILE *stream) {
+	Amt_Dumped += fputs(s, stream);
 }
 
 inline void dump_fputs(const char *s, FILE *stream) {
@@ -87,11 +88,13 @@ void get_program_name(int argc, char **argv) {
 }
 
 void syntax() {
-	fprintf(stderr, "Syntax: %s -c rip.config [-t] [-v] [-h hostname] [-P port] [-u user] [-p password] database\n", Program_Name);
+	fprintf(stderr,
+	"Syntax: %s [-t] [-v] [-h hostname] [-P port] [-u user] [-p password] [-s]"
+	"database\n", Program_Name);
 }
 
 /* exits on error */
-void parse_options(int argc, char **argv, struct database_info *db, char **rip_conf) {
+void parse_options(int argc, char **argv, struct database_info *db, int *dump_short) {
 	int opt;
 
 	/* defaults */
@@ -99,9 +102,10 @@ void parse_options(int argc, char **argv, struct database_info *db, char **rip_c
 	db->port = 0;
 	db->user = "";
 	db->password = "";
+	*dump_short = 0;
 
 	/* parse command line arguments with the ever-handy getopt() */
-	while ((opt = getopt(argc, argv, "tvh:u:p:P:c:")) != -1) {
+	while ((opt = getopt(argc, argv, "tvh:u:p:P:s")) != -1) {
 		switch (opt) {
 			case 't':
 				Use_Transactions = 1;
@@ -121,8 +125,8 @@ void parse_options(int argc, char **argv, struct database_info *db, char **rip_c
 			case 'p':
 				db->password = optarg;
 				break;
-			case 'c':
-				*rip_conf = optarg;
+			case 's':
+				*dump_short = 1;
 				break;
 			case '?':
 				syntax();
@@ -146,42 +150,43 @@ int load_classes(struct class **c) {
 	char* const*class_names;
 	int num_classes;
 	struct class *tmp;
-	int i,j;
-	char fname[256];
+	int i;
+	char fname[64];
 
 	class_names = DF_get_class_names();
-	for (num_classes = 0; class_names[num_classes] != NULL; num_classes++); 
-
-	tmp = calloc(num_classes, sizeof(struct class));
+	num_classes = 0;
+	while (class_names[num_classes] != NULL) {
+		num_classes++;
+	}
+	tmp = UT_malloc(sizeof(struct class) * num_classes);
 
 	for (i=0; i<num_classes; i++) {
 		tmp[i].name = class_names[i];
 
-		assert(strlen(tmp[i].name) < 200);
+		assert(strlen(tmp[i].name) < 60);
 		strcpy(fname, "db.");
 		strcat(fname, tmp[i].name);
 		tmp[i].fp = fopen(fname, "w+");
 		if (tmp[i].fp == NULL) {
-			fprintf(stderr, "%s: error opening file \"%s\": %s\n", Program_Name, fname, strerror(errno));
+			fprintf(stderr, "%s: error opening file \"%s\"\n",
+			Program_Name, fname);
 			exit(1);
 		}
-		num_files++;
 
-		/* this is kinda crap, but it's init, so performance doesn't matter,
-		 * and we should not rely on the order DF_get_class_names() returns class names
-		 * agoston, 2008-01-28 */
-		const class_t *actclass = class_lookup(class_names[i]);
-		for (j = 0; j < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); j++) {
-			if (PM_PRIVATE_OBJECT_TYPES[j] == actclass->id) {
-				strcpy(fname, "dummy.");
-				strcat(fname, tmp[i].name);
-				tmp[i].dummy_fp = fopen(fname, "w+");
-				if (tmp[i].dummy_fp == NULL) {
-					fprintf(stderr, "%s: error opening file \"%s\": %s\n", Program_Name, fname, strerror(errno));
-					exit(1);
-				}
-				num_files++;
+		if (Dump_Short) {
+			tmp[i].short_name = DF_get_class_code(DF_class_name2type(class_names[i]));
+			assert(strlen(tmp[i].short_name) < 60);
+			strcpy(fname, "db.");
+			strcat(fname, tmp[i].short_name);
+			tmp[i].short_fp = fopen(fname, "w+");
+			if (tmp[i].short_fp == NULL) {
+				fprintf(stderr, "%s: error opening file \"%s\"\n",
+				Program_Name, fname);
+				exit(1);
 			}
+		} else {
+			tmp[i].short_name = NULL;
+			tmp[i].short_fp = NULL;
 		}
 	}
 
@@ -196,7 +201,9 @@ void output_object(char *object, struct class *c, int num_classes) {
 
 	p = strchr(object, ':');
 	if (p == NULL) {
-		fprintf(stderr, "%s: format error in database; no colon in object, \"%s\"\n", Program_Name, object);
+		fprintf(stderr,
+		"%s: format error in database; no colon in object, \"%s\"\n",
+		Program_Name, object);
 		exit(1);
 	}
 	*p = '\0';
@@ -206,28 +213,18 @@ void output_object(char *object, struct class *c, int num_classes) {
 			*p = ':';
 			dump_fputs(object, c[i].fp);
 			dump_putc('\n', c[i].fp);
-			if (c[i].dummy_fp) {
-				char *dummy = PM_dummify_object(object);
-				if (dummy) {
-					dump_fputs(dummy, c[i].dummy_fp);
-					dump_putc('\n', c[i].dummy_fp);
-					free(dummy);
-				} else {
-					fprintf(stderr, "%s: The following object failed to dummify:\n\n%s\n", Program_Name, object);
-					/*UT_alarm_operator("ERROR: text_export failed objects", "The following object failed to dummify:\n\n%s\n", Program_Name, object); */
-
-					/* omit object if dummification failed
-					 * the idea is that we should still produce the dumps, it's critical, but at the same time,
-					 * spam the operator so that the object will get fixed at some point
-					 * agoston, 2008-01-29 */
-					/* exit(1) */
-				}
+			if (Dump_Short) {
+				p = QI_fast_output(object);
+				dump_fputs(p, c[i].short_fp);
+				free(p);
+				dump_putc('\n', c[i].short_fp);
 			}
 			return;
 		}
 	}
 
-	fprintf(stderr, "%s: unknown class of object found, \"%s\"\n", Program_Name, object);
+	fprintf(stderr, "%s: unknown class of object found, \"%s\"\n",
+	Program_Name, object);
 	exit(1);
 }
 
@@ -242,7 +239,6 @@ void seperate_time_t(int n, int *hours, int *minutes, int *seconds) {
 /* program entry point */
 int main(int argc, char **argv) {
 	struct database_info db;
-	char *rip_conf = NULL;
 	int ret;
 	SQ_connection_t *sql;
 	int num_classes;
@@ -258,11 +254,20 @@ int main(int argc, char **argv) {
 	double runtime;
 	int h, m, s;
 
+	/* initialise SQ to log */
+	LG_context_t *ctx;
+	ctx = LG_ctx_new();
+	LG_ctx_add_appender(ctx, LG_app_get_file_info_dump(stdout));
+	SQ_init(ctx);
+
+	/* turn off output buffering (why isn't this the default?) */
+	setbuf(stdout, NULL);
+
 	/* record our program's name for any future use */
 	get_program_name(argc, argv);
 
 	/* parse our command line */
-	parse_options(argc, argv, &db, &rip_conf);
+	parse_options(argc, argv, &db, &Dump_Short);
 	if (Verbose) {
 		printf("\n");
 		printf("Command line options\n");
@@ -275,23 +280,12 @@ int main(int argc, char **argv) {
 		}
 		printf("       user: %s\n", (*db.user == '\0') ? "<default>" : db.user);
 		printf("   password: <hidden>\n");
+		printf(" dump short: %s\n", Dump_Short ? "yes" : "no");
 		printf("use transactions: %s\n", Use_Transactions ? "yes" : "no");
-		printf(" rip.config: %s\n", rip_conf);
 	}
-	
-	/* initialise required modules: LG, SQ, UT, CA, PM */
-	LG_context_t *ctx;
-	ctx = LG_ctx_new();
-	LG_ctx_add_appender(ctx, LG_app_get_file_info_dump(stdout));
-	SQ_init(ctx);
-	UT_init(ctx);
-	ca_init(rip_conf);
-	PM_init(ctx);
-
-	/* turn off stdout buffering */
-	setbuf(stdout, NULL);
 
 	/* connect to the server */
+
 	if (Verbose) {
 		printf("\n");
 		printf("Connecting to server...\n");
@@ -347,7 +341,7 @@ int main(int argc, char **argv) {
 	if (Verbose) {
 		printf("\n");
 		printf("Loaded %d classes\n", num_classes);
-		printf("Created %d output files\n", num_files);
+		printf("Created %d output files\n", Dump_Short ? (num_classes * 2) : num_classes);
 		printf("\n");
 		now = localtime(&start);
 		strftime(tmp, sizeof(tmp), "Dump starting... %Y-%m-%d %H:%M:%S %Z", now);

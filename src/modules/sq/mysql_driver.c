@@ -579,10 +579,7 @@ char *SQ_get_column_strings(SQ_result_set_t *result, unsigned int column) {
  * unsigned int column            the column index
  * long *resultptr                pointer where the result should be stored
  * 
- * Returns <0 if error occurs, 0 otherwise
- *         -1 if NULL
- *         -2 if out of bounds
- *         -3 if not a number
+ * Returns -1 if error occurs, 0 otherwise
  * 
  * FIXME: this function returns a long* instead of int* for legacy reasons.
  *        should be fixed, but there are just too many darn references to it.
@@ -591,13 +588,9 @@ char *SQ_get_column_strings(SQ_result_set_t *result, unsigned int column) {
  */
 int SQ_get_column_int(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long *resultptr) {
 	long long int res;
-	int ret = SQ_get_column_llint(result, current_row, column, &res); 
 	
-	if (ret < 0)
-		return ret;
-
-	if (res <  INT_MIN || res > INT_MAX) {
-		return -2;
+	if (SQ_get_column_llint(result, current_row, column, &res) < 0 || res <  INT_MIN || res > INT_MAX) {
+		return -1;
 	}
 	
 	*resultptr = (long)res;
@@ -610,20 +603,13 @@ int SQ_get_column_int(SQ_result_set_t *result, SQ_row_t *current_row, unsigned i
  * unsigned int column            the column index
  * long *resultptr                pointer where the result should be stored
  * 
- * Returns <0 if error occurs, 0 otherwise
- *         -1 if NULL
- *         -2 if out of bounds
- *         -3 if not a number
+ * Returns -1 if error occurs, 0 otherwise
  */
 int SQ_get_column_unsigned(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, unsigned *resultptr) {
 	long long int res;
-	int ret = SQ_get_column_llint(result, current_row, column, &res); 
 	
-	if (ret < 0)
-		return ret;
-
-	if (res < 0 || res > UINT_MAX) {
-		return -2;
+	if (SQ_get_column_llint(result, current_row, column, &res) < 0 || res < 0 || res > UINT_MAX) {
+		return -1;
 	}
 	
 	*resultptr = (unsigned)res;
@@ -637,10 +623,7 @@ int SQ_get_column_unsigned(SQ_result_set_t *result, SQ_row_t *current_row, unsig
  * unsigned int column            the column index
  * long long int *resultptr       pointer where the result should be stored
  * 
- * Returns <0 if error occurs, 0 otherwise
- *         -1 if NULL
- *         -2 if out of bounds
- *         -3 if not a number
+ * Returns -1 if error occurs, 0 otherwise
  */
 int SQ_get_column_llint(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long long int *resultptr) {
 	long long int col_val;
@@ -653,11 +636,11 @@ int SQ_get_column_llint(SQ_result_set_t *result, SQ_row_t *current_row, unsigned
 
 	/* under- or over-flow */
 	if (((col_val==LONG_MIN) || (col_val==LONG_MAX)) && (errno==ERANGE)) {
-		return -2;
+		return -1;
 
 	/* unrecognized characters in string */
 	} else if (*endptr != '\0') {
-		return -3;
+		return -1;
 
 	/* good parse */
 	} else {
