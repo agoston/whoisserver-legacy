@@ -15,5 +15,3 @@
   auth_link (&auth_md5);		/* link in the md5 authenticator */
   auth_link (&auth_pla);		/* link in the pla authenticator */
   auth_link (&auth_log);		/* link in the log authenticator */
-  ssl_onceonlyinit ();
-  mail_parameters (NIL,SET_DISABLEPLAINTEXT,(void *) 2);

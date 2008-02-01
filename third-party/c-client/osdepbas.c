@@ -1,5 +1,5 @@
 /*
- * Program:	Operating-system dependent routines -- Linux version
+ * Program:	Operating-system dependent routines -- Secure Linux version
  *
  * Author:	Mark Crispin
  *		Networks and Distributed Computing
@@ -10,10 +10,10 @@
  *		Internet: MRC@CAC.Washington.EDU
  *
  * Date:	1 August 1993
- * Last Edited:	20 April 2005
+ * Last Edited:	24 October 2000
  * 
  * The IMAP toolkit provided in this Distribution is
- * Copyright 1988-2005 University of Washington.
+ * Copyright 2000 University of Washington.
  * The full text of our legal notices is contained in the file called
  * CPYRIGHT, included with this Distribution.
  */
@@ -32,6 +32,7 @@
 #include <errno.h>
 extern int errno;		/* just in case */
 #include <pwd.h>
+#include <shadow.h>
 #include "misc.h"
 
 
@@ -43,4 +44,3 @@ extern int errno;		/* just in case */
 #include "tcp_unix.c"
 #include "gr_waitp.c"
 #include "tz_sv4.c"
-#include "flocklnx.c"
