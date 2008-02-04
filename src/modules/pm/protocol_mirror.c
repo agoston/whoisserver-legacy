@@ -52,14 +52,15 @@
 
 LG_context_t *pm_context;
 
+/* object types considered private, in order: mntner, person, role, irt, organisation
+ * This is extern'd from text_export as well, watch out if you change this! */
+const int PM_PRIVATE_OBJECT_TYPES[5] = { 9, 10, 11, 17, 18 };
+
 /* CA_NRTM_HISTORY_ACCESS_LIMIT */
-unsigned history_access_limit;
+unsigned history_access_limit = 0;
 
-/* object types considered private, in order: mntner, person, role, irt, organisation */
-const int PM_PRIVATE_OBJECT_TYPES[] = { 9, 10, 11, 17, 18 };
-
-gchar **PM_DUMMY_ADD_ATTR;
-GHashTable *PM_DUMMY_ATTR;
+gchar **PM_DUMMY_ADD_ATTR = NULL;
+GHashTable *PM_DUMMY_ATTR = NULL;
 
 /* Initializes variables to use in dummify_object().
  * Need to be executed before any calls to dummify_object() are made.
@@ -83,15 +84,8 @@ static void dummify_init() {
 	}
 
 	void log_leftover_mandatory_attribs_callback(gpointer key, gpointer value, gpointer data) {
-		fprintf(
-		        stderr,
-		        "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!\n",
-		        key);
-		LG_log(
-		        pm_context,
-		        LG_FATAL,
-		        "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!",
-		        key);
+		fprintf(stderr, "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!\n", key);
+		LG_log(pm_context, LG_FATAL, "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!", key);
 	}
 
 	/* collect all mandatory options of private objects to perform sanity check during config parsing */
@@ -118,15 +112,8 @@ static void dummify_init() {
 
 		*equal = 0;
 		if (!g_hash_table_remove(mandatory_attribs, *actline)) {
-			fprintf(
-			        stderr,
-			        "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!\n",
-			        *actline);
-			LG_log(
-			        pm_context,
-			        LG_FATAL,
-			        "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!",
-			        *actline);
+			fprintf(stderr, "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!\n", *actline);
+			LG_log(pm_context, LG_FATAL, "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!", *actline);
 			die;
 		}
 		g_hash_table_insert(PM_DUMMY_ATTR, *actline, equal+1);
@@ -317,10 +304,9 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  * 
  * agoston, 2007-10-18   
  * */
-static char *dummify_object(char *object) {
+char *PM_dummify_object(char *object) {
 	const GList *errors = NULL;
 	gboolean quit = FALSE;
-	rpsl_attr_t *first_attr = NULL;
 	rpsl_error_t error;
 	rpsl_object_t *obj = NULL;
 	int i, actoff;
@@ -333,20 +319,22 @@ static char *dummify_object(char *object) {
 	/* parse the object */
 	obj = rpsl_object_init(object);
 	errors = rpsl_object_errors(obj);
-	first_attr = (rpsl_attr_t *)obj->attributes->data;
 
 	for (; errors; errors = errors->next) {
 		rpsl_error_t *acterr = (rpsl_error_t *)errors->data;
 		if (acterr->level >= RPSL_ERRLVL_ERROR) {
-			LG_log(pm_context, LG_ERROR, "[%s: %s] rpsl_object_init failed: %s (at attribute %d)",
-			        first_attr->lcase_name, first_attr->value, acterr->descr, acterr->attr_num);
+			LG_log(pm_context, LG_ERROR, "rpsl_object_init failed: %s (at attribute %d)", acterr->descr, acterr->attr_num);
 			quit = TRUE;
 		}
 	}
-
+	
+	/* if there *was* an rpsl error, but not major (meaning the data structures are still filled),
+	 * let's continue running. 
 	/* if there's a serious error, we skip this object */
-	if (quit) {
+	if (quit && !(obj && obj->attributes && obj->attributes->data)) {
 		goto dummify_abort;
+	} else {
+		quit = FALSE;
 	}
 
 	/* init hash containing the already dummified attribs (so we don't have
@@ -670,11 +658,20 @@ void PM_interact(int sock) {
 		/* there is a probability that mirroring interferes with HS cleanup */
 		/* in such case serial may be deleted before it is read by mirror client */
 		/* null object will be returned in this case and we need to break the loop */
+		
+		/* whatever the reason was for this, it's left here as if there indeed was a problem
+		 * getting an object from the DB, we shouldn't continue, as it would pollute the DB or screw
+		 * up the serials - agoston, 2008-01-30 */
 		if (object==NULL) {
 			/* The first serial, being only present so that the serials table is not empty, is set to
 			 * OP_NOOP, as it serves no information - agoston, 2008-01-17 */
-			if (operation != OP_NOOP)
+			if (operation != OP_NOOP) {
+				SK_cd_puts(&condat, "%% INTERNAL ERROR. TERMINATING NRTM CONNECTION.\n");
+				sprintf(buff, "%% SOURCE: %s; SERIAL: %d; PERMISSION: %d; IP: %s; TIME: %d\n\n", nrtm_q.source,
+				        current_serial, mirror_perm, hostaddress, time(NULL));
+				SK_cd_puts(&condat, buff);
 				break;
+			}
 
 		} else {
 
@@ -682,27 +679,34 @@ void PM_interact(int sock) {
 			if (mirror_perm == AA_MIRROR_PUBLIC) {
 				int i = 0;
 
-				/* check if timestamp is within the limits set in rip.config */
-				if (check_history_limit && history_access_limit && (time(NULL) - timestamp > history_access_limit)) {
-					sprintf(buff, "%% Your request has been denied to protect private data.\n"
-						"%% (Requesting serials older than %d days will be rejected)\n", history_access_limit/86400);
-					SK_cd_puts(&condat, buff);
-					free(object);
-					break;
-				} else {
-					/* we don't want to let user start the nrtm stream, and then, at some point (because of a buggy
-					 * timestamp for example) deny him a few of the objects, making the slave database completely
-					 * out of sync. The decision to (dis)allow the user should be consistent throughout the nrtm
-					 * connection.
-					 * agoston, 2008-01-21 */
-					check_history_limit = 0;
+				/* check access history limit only if we actually been able to get a timestamp from the DB
+				 * for DBs filled by NRTM, timestamp of delete operation is lost due to a bug, check 
+				 * PM_get_serial_object() for more info
+				 * agoston, 2008-01-30 */
+				if (timestamp) {
+					/* check if timestamp is within the limits set in rip.config */
+					if (check_history_limit && history_access_limit && (time(NULL) - timestamp > history_access_limit)) {
+						sprintf(buff, "%% Your request has been denied to protect private data.\n"
+							"%% (Requesting serials older than %d days will be rejected)\n", history_access_limit/86400);
+						SK_cd_puts(&condat, buff);
+						free(object);
+						break;
+					} else {
+						/* we don't want to let user start the nrtm stream, and then, at some point (because of a buggy
+						 * timestamp for example) deny him a few of the objects, making the slave database completely
+						 * out of sync. The decision to (dis)allow the user should be consistent throughout the nrtm
+						 * connection.
+						 * agoston, 2008-01-21 */
+						check_history_limit = 0;
+					}
 				}
 
+				/* dummify private objects */
 				for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
 					if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
 						char *newobj;
 
-						newobj = dummify_object(object);
+						newobj = PM_dummify_object(object);
 						free(object);
 
 						if (newobj) {

@@ -50,4 +50,3 @@ TemplateAttribute/Makefile.PL
 TemplateAttribute/TemplateAttribute.pm
 TemplateAttribute/t/01object.t
 t/20storable.t
-META.yml                                 Module meta-data (added by MakeMaker)

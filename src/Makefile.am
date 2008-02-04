@@ -58,6 +58,11 @@ opl-perl: opl
 	$(OPLMAKE) ; \
 	cd ..
 
+opl-perl-test: opl-perl opl-install
+	cd opl-perl; \
+	$(OPLMAKE) test; \
+	cd ..
+
 opl-perl-install: opl-perl opl-install
 	cd opl-perl; \
 	$(OPLMAKE) install; \
