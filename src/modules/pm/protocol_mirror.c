@@ -735,6 +735,8 @@ void PM_interact(int sock) {
 				SK_cd_puts(&condat, object);
 				SK_cd_puts(&condat, "\n");
 				break;
+
+			case OP_NOOP:
 				/* In this case, don't do anything. 
 				 * The reason is that the first serial, which is used to set the auto_increment pkey
 				 * in mysql has an opcode of 4 (OP_NOOP). We don't send anything for this serial,
