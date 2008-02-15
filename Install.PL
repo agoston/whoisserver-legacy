@@ -254,9 +254,16 @@ deflook:  y
 
 if( $Install or $All ) {
     ### config set up, run make & install
-    _system('make');
-    _system('make install');
+    ### add gcov flags to the compiler flags for profiling
+    ### XXX don't set globally, as the perl bindings below will fail
+    ### builing properly with error: RPSL.so: undefined symbol: __gcov_init at 
+    ### /usr/lib/perl/5.8/DynaLoader.pm line 225.
+    {   local $ENV{'CFLAGS'} .= ' -fprofile-arcs -ftest-coverage' if $DevelMode;
 
+        _system('make');
+        _system('make install');
+    }
+    
     ### make install doesn't copy all relevant config files :(
     _system( qq[cp -R conf/* $DbPrefix/conf] );
 
