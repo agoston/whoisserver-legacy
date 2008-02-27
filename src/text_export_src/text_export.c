@@ -39,7 +39,6 @@ extern const int PM_PRIVATE_OBJECT_TYPES[5];
 /* global variables */
 char *Program_Name;
 int Verbose = 0;
-int Use_Transactions = 0;
 long long Amt_Dumped = 0;
 int num_files = 0;
 
@@ -87,7 +86,7 @@ void get_program_name(int argc, char **argv) {
 }
 
 void syntax() {
-	fprintf(stderr, "Syntax: %s -c rip.config [-t] [-v] [-h hostname] [-P port] [-u user] [-p password] database\n", Program_Name);
+	fprintf(stderr, "Syntax: %s -c rip.config [-v] [-h hostname] [-P port] [-u user] [-p password] database\n", Program_Name);
 }
 
 /* exits on error */
@@ -101,11 +100,8 @@ void parse_options(int argc, char **argv, struct database_info *db, char **rip_c
 	db->password = "";
 
 	/* parse command line arguments with the ever-handy getopt() */
-	while ((opt = getopt(argc, argv, "tvh:u:p:P:c:")) != -1) {
+	while ((opt = getopt(argc, argv, "vh:u:p:P:c:")) != -1) {
 		switch (opt) {
-			case 't':
-				Use_Transactions = 1;
-				break;
 			case 'v':
 				Verbose++;
 				break;
@@ -244,21 +240,21 @@ int main(int argc, char **argv) {
 	struct database_info db;
 	char *rip_conf = NULL;
 	int ret;
-	SQ_connection_t *sql;
+	SQ_connection_t *sql = NULL, *sql2 = NULL;
+	SQ_result_set_t *rs = NULL, *rs2 = NULL;
+	SQ_row_t *row = NULL, *row2 = NULL;
 	int num_classes;
 	struct class *classes;
-	SQ_result_set_t *rs;
-	SQ_result_set_t *rs_begin; /* only for BEGIN statement  */
-	SQ_result_set_t *rs_commit; /* only for COMMIT statement */
-	SQ_row_t *row;
-	int num_object;
+	int num_object = 0, num_queries = 0;
 	time_t start, end;
 	const struct tm *now;
 	char buf[1024];
 	double runtime;
 	int h, m, s;
-	long last_serialid = -1;
-
+	long first_serial, qlast, last_serial;
+	FILE *serial_file;
+	LG_context_t *ctx, *null_ctx;
+	
 	/* record our program's name for any future use */
 	get_program_name(argc, argv);
 
@@ -276,18 +272,21 @@ int main(int argc, char **argv) {
 		}
 		printf("       user: %s\n", (*db.user == '\0') ? "<default>" : db.user);
 		printf("   password: <hidden>\n");
-		printf("use transactions: %s\n", Use_Transactions ? "yes" : "no");
 		printf(" rip.config: %s\n", rip_conf);
 	}
-	
-	/* initialise required modules: LG, SQ, UT, CA, PM */
-	LG_context_t *ctx;
+
+	/* init logging. we also create a null_ctx as we don't need log output on stdout from the
+	 * dummify_object() call */
 	ctx = LG_ctx_new();
 	LG_ctx_add_appender(ctx, LG_app_get_file_info_dump(stdout));
+
+	null_ctx = LG_ctx_new();
+	
+	/* initialise required modules */
 	SQ_init(ctx);
 	UT_init(ctx);
 	ca_init(rip_conf);
-	PM_init(ctx);
+	PM_init(null_ctx);
 
 	/* turn off stdout buffering */
 	setbuf(stdout, NULL);
@@ -298,46 +297,22 @@ int main(int argc, char **argv) {
 		printf("Connecting to server...\n");
 	}
 
-	ret = SQ_try_connection(&sql, db.hostname, db.port, db.database, db.user, db.password);
-	if (!NOERR(ret)) {
-		fprintf(stderr, "%s: error connecting to database; %s\n", Program_Name,
-		SQ_error(sql));
+	/* Open 2 connections: one for going through the last table, and one to query serial_ids
+	 * This is required as joining serials table would result in a shared-mode row-level lock on serials,
+	 * which is also locked by a LOCK TABLES command by dbupdate, thus stalling dbupdate processes for the
+	 * period of the dump, which is unacceptable - agoston, 2008-02-18 */
+	if (SQ_try_connection(&sql, db.hostname, db.port, db.database, db.user, db.password)) {
+		fprintf(stderr, "%s: error connecting to database; %s\n", Program_Name, SQ_error(sql));
+		exit(1);
+	}
+
+	if (SQ_try_connection(&sql2, db.hostname, db.port, db.database, db.user, db.password)) {
+		fprintf(stderr, "%s: error connecting to database; %s\n", Program_Name, SQ_error(sql));
 		exit(1);
 	}
 
 	if (Verbose) {
 		printf("Connected.\n");
-	}
-
-	if (Use_Transactions) {
-		if (Verbose) {
-			printf("\n");
-			printf("BEGINning transaction...\n");
-		}
-		if (SQ_execute_query(sql, "BEGIN", &rs_begin) != 0) {
-			fprintf(stderr, "%s: error with BEGIN transaction; %s\n", Program_Name,
-			SQ_error(sql));
-			exit(1);
-
-		}
-	}
-
-	/* submit our query */
-	if (Verbose) {
-		printf("\n");
-		printf("Submitting query...\n");
-	}
-
-	if (SQ_execute_query_nostore(sql, "SELECT last.object, serials.serial_id FROM last "
-			"JOIN serials on serials.object_id = last.object_id AND serials.sequence_id = last.sequence_id "
-			"WHERE last.thread_id=0 AND last.object_type<>100 AND last.object<>\"\"", &rs) != 0) {
-		fprintf(stderr, "%s: error with query; %s\n", Program_Name,
-		SQ_error(sql));
-		exit(1);
-	}
-
-	if (Verbose) {
-		printf("Submitted.\n");
 	}
 
 	/* initialize our class information (also creates output files) */
@@ -356,54 +331,110 @@ int main(int argc, char **argv) {
 		puts(buf);
 	}
 
-	/* read our MySQL data */
-	num_object = 0;
-	while ((row = SQ_row_next(rs)) != NULL) {
-		long act_serialid;
-		char *object = SQ_get_column_string_nocopy(rs, row, 0);
-		if (!object) {
-			fprintf(stderr, "Error: NULL object returned (#%d)\n", num_object);
-			exit(1);
-		}
-		if (SQ_get_column_int(rs, row, 1, &act_serialid)) {
-			fprintf(stderr, "Error: error querying serials.serial_id (#%d)\n", num_object);
-			exit(1);
-		}
-		if (last_serialid < act_serialid) last_serialid = act_serialid;
-		output_object(object, classes, num_classes);
-		num_object++;
-	}
+	/* Collect the serials we are going to dump - at this point, we close today's serials, any new
+	 * update will make its way into tomorrow's dump */
+	PM_get_minmax_serial(sql, &first_serial, &last_serial);
 	
-	/* get the last serial id based on the last_objectid+last_sequenceid */
-	if ((num_object > 0) && (last_serialid > 0)) {
-		FILE *f = fopen("CURRENTSERIAL", "w+");
-		if (!f) {
-			perror("Error opening CURRENTSERIAL");
-			exit(1);
-		}
-		
-		fprintf(f, "%d\n", last_serialid);
-		fclose(f);
-		
-		if (Verbose) {
-			printf("Dumped last serial value (%d)\n", last_serialid);
-		}
-	} else {
-		fprintf(stderr, "Error: serial_id is wrong!");
+	if (Verbose) {
+		printf("Min serial: %d\nMax serial:%d\n\n", first_serial, last_serial);
+		printf("Dumping objects (each . marks 10000 object dumped):\n");
+	}
+
+	/* Outer query, crawling through the last table */
+	sprintf(buf, "SELECT last.object, last.object_id, last.sequence_id FROM last "
+		"WHERE last.thread_id=0 AND last.object_type<>100 AND last.object<>\"\"");
+	
+	if (SQ_execute_query_nostore(sql, buf, &rs) != 0) {
+		fprintf(stderr, "%s: error with query; %s\n", Program_Name, SQ_error(sql));
 		exit(1);
 	}
 
-	if (Use_Transactions) {
-		if (Verbose) {
-			printf("\n");
-			printf("COMMITting transaction...\n\n");
-		}
-		if (SQ_execute_query(sql, "COMMIT", &rs_commit) != 0) {
-			fprintf(stderr, "%s: error with COMMIT transaction; %s\n", Program_Name,
-			SQ_error(sql));
+	/* For each row, look up entry in serials table using the second sql connection,
+	 * and do a ROLLBACK to release all shared-mode locks put on by the queries */
+	while ((row = SQ_row_next(rs)) != NULL) {
+		long object_id, sequence_id;
+		char *object;
+		int skip = 1;
+		
+		if (!(object = SQ_get_column_string_nocopy(rs, row, 0))) {
+			fprintf(stderr, "Error: NULL object returned (#%d): %s\n", num_object, SQ_error(sql));
 			exit(1);
-
 		}
+		
+		if (SQ_get_column_int(rs, row, 1, &object_id) || SQ_get_column_int(rs, row, 2, &sequence_id)) {
+			fprintf(stderr, "Error: Couldn't read object_id and sequence_id: %s\n", num_object, SQ_error(sql));
+			exit(1);
+		}
+		
+		/* lookup serial_id */
+		sprintf(buf, "SELECT serial_id FROM serials WHERE object_id = %d AND sequence_id = %d", object_id, sequence_id);
+		if (SQ_execute_query(sql2, buf, &rs2) != 0) {
+			fprintf(stderr, "%s: error executing internal query; %s\n", Program_Name, SQ_error(sql));
+			exit(1);
+		}
+
+		/* decide if we want to skip this object */
+		if (row2 = SQ_row_next(rs2)) {
+			long serial_id;
+			if (SQ_get_column_int(rs2, row2, 0, &serial_id)) {
+				fprintf(stderr, "%s: error getting serial_id; %s\n", Program_Name, SQ_error(sql));
+				exit(1);
+			}
+
+			skip = (serial_id > last_serial);
+			
+		} else {	/* zero serials - buggy DB, emit object */
+			skip = 0;
+		}
+
+		if (rs2) SQ_free_result(rs2);
+		rs2 = NULL;
+
+		/* emit object if no skip */
+		if (!skip) {
+			output_object(object, classes, num_classes);
+			num_object++;
+			
+			if (Verbose && !(num_object % 10000)) {
+				printf(".");
+			}
+		}
+
+		/* rollback */
+		num_queries++;
+		if (num_queries > 200) {
+			num_queries = 0;
+			
+			/* release locks */
+			if (SQ_execute_query(sql2, "ROLLBACK", NULL)) {
+				fprintf(stderr, "%s: error executing ROLLBACK; %s\n", Program_Name, SQ_error(sql));
+				exit(1);
+			}
+		}
+	
+	}
+
+	if (rs) SQ_free_result(rs);
+	rs = NULL;
+	
+	/* close SQL connections, releasing locks on server side */
+	SQ_close_connection(sql);
+	SQ_close_connection(sql2);
+	
+	if (Verbose) printf("\n\n");
+	
+	/* create last serial file */
+	serial_file = fopen("CURRENTSERIAL", "w+");
+	if (!serial_file) {
+		perror("Error opening CURRENTSERIAL");
+		exit(1);
+	}
+	
+	fprintf(serial_file, "%d\n", last_serial);
+	fclose(serial_file);
+	
+	if (Verbose) {
+		printf("Dumped last serial value (%d)\n", last_serial);
 	}
 
 	/* close up shop */
