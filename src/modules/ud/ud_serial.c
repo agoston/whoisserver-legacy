@@ -46,6 +46,11 @@ extern LG_context_t *ud_context;
 * Non-zero if error occured (XXX dies now)                  *
 *                                                           *
 ************************************************************/
+/* FIXME: this is surplus locking, should be removed. With innodb,
+ * there is no reason to lock those tables. Not even with myisam:
+ * the auto_increment pkey would take care of this.
+ * On the other hand, it kills any sort of parallelism, which we aim for.
+ * agoston, 2008-02-06 */
 int UD_lock_serial(Transaction_t *tr)
 {
 int sql_err;
