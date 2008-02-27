@@ -1636,10 +1636,12 @@ rpsl_object_get_text (const rpsl_object_t *object, guint data_column)
         }
     }
 
-    retval = s->str;
-    g_string_free(s, FALSE);
-    
-    /* return result (returns NULL if memory allocation failed) */
+    /* FIXME: this is a surplus copy, but we have to do this, as glib's memory allocator is different
+     * from libc's, and the return value could not be freed using free() otherwise.
+     * Maybe we shouldn't use GString* here...
+     * agoston, 2008-02-20 */
+    retval = strdup(s->str);
+    g_string_free(s, TRUE);
     return retval;
 }
 
@@ -1749,6 +1751,10 @@ rpsl_object_get_key_value (const rpsl_object_t *object)
         }
     }
 
+    /* FIXME: this is a surplus copy, but we have to do this, as glib's memory allocator is different
+     * from libc's, and the return value could not be freed using free() otherwise.
+     * Maybe we shouldn't use GString* here...
+     * agoston, 2008-02-20 */
     ret_val = strdup(key->str);
     g_string_free(key, TRUE);
     return ret_val;
@@ -1916,6 +1922,7 @@ rpsl_object_add_attr_internal (rpsl_object_t *object,
   return add_attr_to_object(object, attr, ofs, error);
 }
 
+/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */ 
 rpsl_attr_t *
 rpsl_object_remove_attr (rpsl_object_t *object, gint ofs, rpsl_error_t *error)
 {
@@ -1935,6 +1942,7 @@ rpsl_object_remove_attr (rpsl_object_t *object, gint ofs, rpsl_error_t *error)
   return rpsl_object_remove_attr_internal(object, ofs, error);
 }
 
+/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */ 
 rpsl_attr_t *
 rpsl_object_remove_first_attr (rpsl_object_t *object, rpsl_error_t *error)
 {
@@ -1942,6 +1950,7 @@ rpsl_object_remove_first_attr (rpsl_object_t *object, rpsl_error_t *error)
 
 }
 
+/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */ 
 rpsl_attr_t *
 rpsl_object_remove_attr_internal (rpsl_object_t *object, gint ofs, rpsl_error_t *error)
 {
@@ -2026,6 +2035,7 @@ rpsl_object_remove_attr_internal (rpsl_object_t *object, gint ofs, rpsl_error_t 
     return attr;
 }
 
+/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */ 
 rpsl_attr_t *
 rpsl_object_remove_attr_name (rpsl_object_t *object,
                               const gchar *name,
