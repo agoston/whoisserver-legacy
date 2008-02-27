@@ -254,9 +254,10 @@ int main(int argc, char **argv) {
 	int num_object;
 	time_t start, end;
 	const struct tm *now;
-	char tmp[64];
+	char buf[1024];
 	double runtime;
 	int h, m, s;
+	long last_serialid = -1;
 
 	/* record our program's name for any future use */
 	get_program_name(argc, argv);
@@ -327,8 +328,9 @@ int main(int argc, char **argv) {
 		printf("Submitting query...\n");
 	}
 
-	if (SQ_execute_query_nostore(sql, "SELECT object FROM last "
-		"WHERE (thread_id=0) AND (object_type<>100) AND (object<>\"\")", &rs) != 0) {
+	if (SQ_execute_query_nostore(sql, "SELECT last.object, serials.serial_id FROM last "
+			"JOIN serials on serials.object_id = last.object_id AND serials.sequence_id = last.sequence_id "
+			"WHERE last.thread_id=0 AND last.object_type<>100 AND last.object<>\"\"", &rs) != 0) {
 		fprintf(stderr, "%s: error with query; %s\n", Program_Name,
 		SQ_error(sql));
 		exit(1);
@@ -350,16 +352,45 @@ int main(int argc, char **argv) {
 		printf("Created %d output files\n", num_files);
 		printf("\n");
 		now = localtime(&start);
-		strftime(tmp, sizeof(tmp), "Dump starting... %Y-%m-%d %H:%M:%S %Z", now);
-		puts(tmp);
+		strftime(buf, sizeof(buf), "Dump starting... %Y-%m-%d %H:%M:%S %Z", now);
+		puts(buf);
 	}
 
 	/* read our MySQL data */
 	num_object = 0;
 	while ((row = SQ_row_next(rs)) != NULL) {
+		long act_serialid;
 		char *object = SQ_get_column_string_nocopy(rs, row, 0);
+		if (!object) {
+			fprintf(stderr, "Error: NULL object returned (#%d)\n", num_object);
+			exit(1);
+		}
+		if (SQ_get_column_int(rs, row, 1, &act_serialid)) {
+			fprintf(stderr, "Error: error querying serials.serial_id (#%d)\n", num_object);
+			exit(1);
+		}
+		if (last_serialid < act_serialid) last_serialid = act_serialid;
 		output_object(object, classes, num_classes);
 		num_object++;
+	}
+	
+	/* get the last serial id based on the last_objectid+last_sequenceid */
+	if ((num_object > 0) && (last_serialid > 0)) {
+		FILE *f = fopen("CURRENTSERIAL", "w+");
+		if (!f) {
+			perror("Error opening CURRENTSERIAL");
+			exit(1);
+		}
+		
+		fprintf(f, "%d\n", last_serialid);
+		fclose(f);
+		
+		if (Verbose) {
+			printf("Dumped last serial value (%d)\n", last_serialid);
+		}
+	} else {
+		fprintf(stderr, "Error: serial_id is wrong!");
+		exit(1);
 	}
 
 	if (Use_Transactions) {
@@ -381,8 +412,8 @@ int main(int argc, char **argv) {
 	/* output final results, if any */
 	if (Verbose) {
 		now = localtime(&end);
-		strftime(tmp, sizeof(tmp), "Dump finished... %Y-%m-%d %H:%M:%S %Z", now);
-		puts(tmp);
+		strftime(buf, sizeof(buf), "Dump finished... %Y-%m-%d %H:%M:%S %Z", now);
+		puts(buf);
 		runtime = difftime(end, start);
 		if (runtime <= 0.0)
 			runtime = 1.0;
