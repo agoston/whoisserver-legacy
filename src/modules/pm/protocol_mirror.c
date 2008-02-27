@@ -372,7 +372,7 @@ char *PM_dummify_object(char *object) {
 			 * During call, the only possible error is trying to remove a mandatory attribute - but since
 			 * we already checked that, we don't care about errors here. - agoston, 2007-10-29 */
 			gli = gli->prev;
-			rpsl_object_remove_attr_internal(obj, actoff, NULL);
+			rpsl_attr_delete(rpsl_object_remove_attr_internal(obj, actoff, NULL));
 			actoff--;
 		}
 	}
@@ -398,10 +398,13 @@ char *PM_dummify_object(char *object) {
 
 	if (dummified_attribs)
 		g_hash_table_destroy(dummified_attribs);
+	
 	if (prim_val)
 		free(prim_val);
+	
 	if (obj)
 		rpsl_object_delete(obj);
+	
 	return ret;
 }
 
