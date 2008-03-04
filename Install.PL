@@ -10,6 +10,7 @@ use strict;
 use warnings;
 
 use Cwd             qw[cwd];
+use Config;
 use File::Spec;
 use Getopt::Long;
 use File::Basename  qw[dirname basename];
@@ -113,10 +114,10 @@ Options:
 Examples:
 
   ### setup a whoisserver from a clean checkout, suited for developers:
-  \$ $me --verbose --debug --for-development --use-tempdir --all --start-daemon
+  \$ $^X $me --verbose --debug --for-development --use-tempdir --all --start-daemon
 
   ### just (re)start the whoisserver
-  \$ $me --no-all --start-daemon
+  \$ $^X $me --no-all --start-daemon
 
     \n];
 }
@@ -277,6 +278,14 @@ if( $Install or $All ) {
     {   local $ENV{'PERL_MM_OPT'} = "PREFIX=$DbPrefix/perl";
         _system('cd src; make opl-perl-test && make opl-perl-install;');
     }
+
+    print qq[
+You can now use the Net::Whois::RIPE::RPSL module using:
+
+   $^X -I $DbPrefix/perl/lib/perl/$Config{version} -MNet::Whois::RIPE::RPSL -e'...'
+
+   \n];
+
 }
 
 if( $UseTempDir ) {
@@ -382,126 +391,4 @@ sub _replace {
     return 1;
 }
     
-
-
-
-
-
-__END__
-
-### INSTALLATION SECTION ######################################
-
-### Run autogen first:
-$ ./autogen.sh
-
-### configure it to install into $HOME/projects/$name_of_branch
-$ ./configure --with-rdns --prefix=$DBPREFIX --with-cclientinc=`pwd`/third-party/c-client --with-cclientlib=`pwd`/third-party/c-client
-
-### set up the databases to use. Replaces $USER with your username
-$ echo "create database ripe_$USER"     | mysql -u dbint -p$DBPASS
-$ echo "create database ripadmin_$USER" | mysql -u dbint -p$DBPASS
-$ mysql -u dbint -p$DBPASS ripadmin_$USER < src/SQL/create.RIPADMIN.sql 
-
-### the test framework has a config file it uses, which needs to point
-### at the to-be installed location (same as your --prefix)
-$ perl -i.bak -pe's|(WHOISDIR\s+=\s+)/.*$|${1}$ENV{DBPREFIX}|' tests/dbupdate/testing/conf/dataset.config
-
-### whoisserver comes with a few sample configs
-$ cp conf/rip.config.sample      conf/rip.config
-$ cp conf/sources.config.sample  conf/sources.config  
-$ cp conf/delegations.txt.sample conf/delegations.txt
-
-### change the delcheck config to point to your installation path
-$ perl -i -pe's|/.*/|$ENV{DBPREFIX}/conf/|' `ls conf/delcheck-* | grep -v xml`
-
-### rip.config needs some changes done to it's configuration:
-### access to the RIPADMIN DB
-$ perl -i.bak -pe's|^(RIPADMIN).*|$1 localhost,3306,dbint,$ENV{DBPASS},ripadmin_$ENV{USER}|' conf/rip.config
-
-$ perl -i.bak -pe's|^(SVWHOIS_PORT ).*|$1.($ENV{DBPORT}+1)|e' conf/rip.config
-$ perl -i.bak -pe's|^(SVCONFIG_PORT ).*|$1.($ENV{DBPORT}+2)|e' conf/rip.config
-$ perl -i.bak -pe's|^(SVMIRROR_PORT ).*|$1.($ENV{DBPORT}+3)|e' conf/rip.config
-
-### path to the config file
-$ perl -i.bak -pe's|(^SOURCEFILE).*|$1 $ENV{DBPREFIX}/conf/sources.config|' conf/rip.config
-
-### rdns suffix change
-$ perl -i.bak -pe's|^(NS_SUFFIX)\s*ip6.int|$1 e164.arpa|' conf/rip.config
-
-### access to the update port
-$ perl -i.bak -pe's|(^UPDSOURCE).*|"$1 DB-TEST localhost,3306,dbint,$ENV{DBPASS},ripe_$ENV{USER} localhost,".($ENV{DBPORT}+1).q[,].($ENV{DBPORT}+4)|e' conf/rip.config
-
-### fix the entries in sources.config. Finish every command with ^D
-### this changes blocks of sample configuration with actual working ones
-$ perl -0777 -i.bak -pe's|\nDATABASE\s+.*?/DATABASE|`cat`|se' conf/sources.config <<EOT
-#
-DATABASE     ripe_$USER
-host:        localhost
-port:        3306
-trx_support: y
-user:        dbint
-password:    $DBPASS
-/DATABASE
-
-### comment out the NRTM section, as we dont use NRTM in our tests
-$ perl -0777 -i.bak -pe's|\nNRTM\s+.*?/NRTM|`cat`|se' conf/sources.config <<EOT
-#
-#NRTM    SAMPLEM
-#host:   master.server.net                                                                         
-#port:   4444                                                                                      
-#delay:  60                                                                                        
-#protocolVersion: 1                                                                                
-#/NRTM
-
-$ perl -0777 -i.bak -pe's|\nSOURCE\s+.*?/SOURCE|$x=`cat`;$x|se;s|__DBU|$ENV{DBPORT}+4|es' conf/sources.config <<EOT
-#
-SOURCE    DB-TEST
-database: ripe_$USER
-opMode:   2                                                                                        
-updPort:  __DBU
-canupd:   y                                                                                        
-deflook:  y                                                                                        
-#nrtm:     SAMPLEM                                                                                 
-/SOURCE
-
-### config set up, run make & install
-$ make
-$ make install
-
-### make install doesn't copy all relevant config files :(
-$ cp -R conf/* $DBPREFIX/conf
-
-### make install also doesn't install all files from bin/SQL
-$ cp -R src/SQL/* $DBPREFIX/bin/SQL
-
-### OPTIONAL - writes over NFS can be slow/lock, so write logs to local drive ####
-$ mkdir -p $DBTEMPDIR
-$ mv $DBPREFIX/log $DBTEMPDIR && ln -s $DBTEMPDIR/log $DBPREFIX
-$ mv $DBPREFIX/var $DBTEMPDIR && ln -s $DBTEMPDIR/var $DBPREFIX
-$ mkdir $DBTEMPDIR/tmp && ln -s $DBTEMPDIR/tmp tests/dbupdate/testing
-
-
-### RUN THE TESTS ################################################################
-
-### run a single test to set up & populate the db
-### this test will fail, but the db skeleton will have been created. 
-### Move on to the nex step
-$ ./tests/dbupdate/testing/bin/test.pl -m -d -e -o -u -c tests/dbupdate/testing/conf/dataset.config -r `pwd`/tests/dbupdate/test-data/misc/021
-
-### start the whoisserver, in a seperate terminal
-$ src/whois-server -p $DBTEMPDIR/whoisd.pid -c conf/rip.config
-
-### run the test suite:
-./tests/dbupdate/testing/bin/test.pl -e -o -u -c tests/dbupdate/testing/conf/dataset.config -r `pwd`/tests/dbupdate/test-data/
-
-### TROUBLESHOOTING ###############################################################
-
-# if the test hangs, set the server to dynamic mode
-# you can tell if the whoisserver doesn't show 'Mode of operation:' when you run the test suite
-$ telnet localhost 43002
-=0= whois R.I.P. config> set dynamic start
-
-# the interesting log files are written in these directories:
-$ ls -l tests/dbupdate/testing/log
-$ ls -l tests/dbupdate/testing/dump
 
