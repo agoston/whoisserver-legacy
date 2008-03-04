@@ -33,6 +33,7 @@ my $All             = 1;
 
 my $DbPrefix    = File::Spec->catdir( $ENV{'HOME'}, 'projects', basename( $Cwd ) );
 my $DbPass      = $ENV{'RIPE_DBPASS'} || 'ri:Abpw'; # XXX don't hardcode me?
+my $DbUser      = 'dbint';
 my $DbPort      = $< . 0;    
 my $User        = scalar getpwuid($<);
 
@@ -42,6 +43,7 @@ GetOptions(
     'verbose!'          => \$Verbose,
     'debug!'            => \$Debug,
     'prefix=s'          => \$DbPrefix,
+    'dbuser=s'          => \$DbUser,
     'dbpass=s'          => \$DbPass,
     'dbport=s'          => \$DbPort,
     'for-development!'  => \$DevelMode,
@@ -79,6 +81,7 @@ Options:
   ### configuration options
   --prefix=%s           Installation prefix to use. Ie, /usr/local/whoisserver. Defaults
                         to \$HOME/projects/`basename pwd`
+  --dbuser=%s           Username to use to connect to your MySQL server. Defautls to 'dbint'
   --dbpass=%s           Password to use to connect to your MySQL server. Defaults to
                         \$ENV{RIPE_DBPASS}
   --dbport=%d           Starting number of port range to use for this server instance.
@@ -149,14 +152,14 @@ if( $RunConfigure or $All ) {
 
 if( $SetupDb or $All ) {
     ### set up the databases to use. Replaces $USER with your username
-    _system( qq[echo "drop database ripe_$User"       | mysql -u dbint -p$DbPass] );
-    _system( qq[echo "create database ripe_$User"     | mysql -u dbint -p$DbPass] );
+    _system( qq[echo "drop database ripe_$User"       | mysql -u $DbUser -p$DbPass], 1 );
+    _system( qq[echo "create database ripe_$User"     | mysql -u $DbUser -p$DbPass] );
 
-    _system( qq[echo "drop database ripadmin_$User"   | mysql -u dbint -p$DbPass] );
-    _system( qq[echo "create database ripadmin_$User" | mysql -u dbint -p$DbPass] );
+    _system( qq[echo "drop database ripadmin_$User"   | mysql -u $DbUser -p$DbPass] );
+    _system( qq[echo "create database ripadmin_$User" | mysql -u $DbUser -p$DbPass] );
 
     ### XXX can't we setup ripe db like this?
-    _system( qq[mysql -u dbint -p$DbPass ripadmin_$User < src/SQL/create.RIPADMIN.sql] ); 
+    _system( qq[mysql -u $DbUser -p$DbPass ripadmin_$User < src/SQL/create.RIPADMIN.sql] ); 
 }
 
 if( $SetupConfig or $All ) {
@@ -187,12 +190,12 @@ if( $SetupConfig or $All ) {
         [ q[^SVWHOIS_PORT .*]     => q[SVWHOIS_PORT ]  . ($DbPort+1) ],
         [ q[^SVCONFIG_PORT .*]    => q[SVCONFIG_PORT ] . ($DbPort+2) ],
         [ q[^SVMIRROR_PORT .*]    => q[SVMIRROR_PORT ] . ($DbPort+3) ],
-        [ q[^UPDSOURCE .*]        => q[UPDSOURCE DB-TEST localhost,3306,dbint,].
+        [ q[^UPDSOURCE .*]        => q[UPDSOURCE DB-TEST localhost,3306,$DbUser,].
                                      qq[$DbPass,ripe_$User localhost,] .
                                      ($DbPort+1).q[,].($DbPort+4) ],
     
         ### access to the ripadmin db
-        [ q[^RIPADMIN.*]          => q[RIPADMIN localhost,3306,dbint,] .
+        [ q[^RIPADMIN.*]          => q[RIPADMIN localhost,3306,$DbUser,] .
                                      qq[$DbPass,ripadmin_$User]   ], 
         
         ### path to the config file
@@ -216,7 +219,7 @@ DATABASE     ripe_$User
 host:        localhost
 port:        3306
 trx_support: y
-user:        dbint
+user:        $DbUser
 password:    $DbPass
 /DATABASE
     ] ],
@@ -335,11 +338,13 @@ And at the prompt type:
 
 ### run a system call
 sub _system {
-    my $cmd = shift;
+    my $cmd  = shift;
+    my $warn = shift;
+    
     $cmd .= ' > /dev/null 2>&1' unless $Debug;
 
     print "Running '$cmd'"  if $Verbose;
-    system( $cmd ) and die $?;
+    system( $cmd ) and do { $warn ? warn $? : die $? };
     print "....done\n"      if $Verbose;
     
     return 1;
