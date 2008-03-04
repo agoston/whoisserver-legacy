@@ -161,9 +161,9 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
       
       /* if we've tried enough, exit with error */
       if (try >= 3) {
-        LG_log(sq_context, LG_SEVERE, " %s; %s", db, 
-		  sql_connection ? SQ_error(sql_connection) : "-?");
-        die;
+    	  fprintf(stderr, " %s; %s", db, sql_connection ? SQ_error(sql_connection) : "-?");
+    	  LG_log(sq_context, LG_SEVERE, " %s; %s", db, sql_connection ? SQ_error(sql_connection) : "-?");
+    	  die;
       }
 
       /* otherwise, prepare to try again */
