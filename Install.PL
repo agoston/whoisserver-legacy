@@ -82,7 +82,7 @@ Options:
   ### configuration options
   --prefix=%s           Installation prefix to use. Ie, /usr/local/whoisserver. Defaults
                         to \$HOME/projects/`basename pwd`
-  --dbuser=%s           Username to use to connect to your MySQL server. Defautls to 'dbint'
+  --dbuser=%s           Username to use to connect to your MySQL server. Defaults to 'dbint'
   --dbpass=%s           Password to use to connect to your MySQL server. Defaults to
                         \$ENV{RIPE_DBPASS}
   --dbport=%d           Starting number of port range to use for this server instance.
