@@ -115,7 +115,6 @@ sub setvar($$) {
     my $val  = $_[1];
 
     $CONFIG->{$name} = $val;
-
 #print " ********************************************** SET: ".$name." = ".$val."\n";
     return (1);
 
@@ -130,7 +129,6 @@ sub delvar($) {
     my $name = $_[0];
 
     delete $CONFIG->{$name};
-
     #print " ********************************************** DEL: ".$name."\n";
     return (1);
 
@@ -172,7 +170,6 @@ sub parse_generic($$$) {
     while ( $string && ( $string !~ /^[\s]*$/o ) ) {
 
         if ( $string =~ /^(#)|(%)/o ) {
-
             # eat up comments inside the object
             $string = <$FILE>;
             next;
@@ -196,7 +193,6 @@ sub parse_generic($$$) {
                     $val .= " " . $2 if ($2);
                 }
             }
-
             # objects names are single
             if ( !exists $generic->{$attr} ) {
                 $generic->{$attr} = $val;
@@ -218,7 +214,6 @@ sub parse_generic($$$) {
         else {
             push @{ $generic->{$attr} }, $val;
         }
-
         # read next line
         $string = <$FILE>;
     }
@@ -250,7 +245,6 @@ sub syntax_check($$) {
     if ( scalar( keys %{$entry} ) < 2 ) {
         error('E_SMALLOBJ');
     }
-
     # default
     if ( ( exists $entry->{'object'} ) && ( !exists $entry->{'lines'} ) ) {
         $entry->{'lines'} = 'multiple';
@@ -272,16 +266,13 @@ sub syntax_check($$) {
 # Output: maybe some error messages
 # Remarks:
 sub reference_check($$) {
-
     # ref to array
     my $objects = $_[0];
-
     # ref to hash
     my $filters = $_[1];
     my $entry;
 
     foreach $entry ( @{$objects} ) {
-
         # $entry is a object hash
         my %hash = %{$entry};
         for my $key ( keys %hash ) {
@@ -339,7 +330,6 @@ sub parse_filters($) {
     while (<FILTER_FILE>) {
         my $str = $_;
         if (/^[a-z0-9-\$]+:/) {
-
             # ref to hash
             my $entry
                 = parse_generic( *FILTER_FILE, $str, getvar('LOGSTRING') );
@@ -360,12 +350,10 @@ sub parse_filters($) {
             }
         }
         elsif (/^(%.*)?[\s]?$/og) {
-
             # skip comments/blank lines
             next;
         }
         elsif (/^#/o) {
-
             # these comments go into reportfile
             report($_);
         }
@@ -418,7 +406,6 @@ sub check_dbupdate($) {
     my $tmpfile = shift;
 
     unless ( -e $tmpfile ) {
-
         #report ("NO FILE [$tmpfile]\n");
         return;
     }
@@ -474,7 +461,6 @@ sub make_positive($) {
 # Function find_output()
 sub find_output(@) {
     my ( $entry, $logfile, $lines ) = @_;
-
 # $entry  - reference to the entry in object hash
 # $logfile  - name of the file to look at.
 # we assume that the file exists if we got there.
@@ -486,7 +472,6 @@ sub find_output(@) {
     my $key2;
 
     my %patterns = (
-
         # to find the relevant output. format:
         # type of log   => start pattern, end pattern
         'acklog'    => [ '^---[\s]*$', '^(---[\s]*)|([~]+[\s]*)$' ],
@@ -497,7 +482,6 @@ sub find_output(@) {
         'stdoutlog' => [ '.*',         '.*' ]
     );
     my %ident = (
-
         # how to match type/key1/[key2] pair in the block
         # type of log => "string"
         'acklog' => [
@@ -532,7 +516,6 @@ sub find_output(@) {
         undef $lines;
         return (undef);
     }
-
     # expand
     foreach ( @{ $ident{$pat} } ) {
         s/\$class/$class/g;
@@ -550,13 +533,11 @@ sub find_output(@) {
     while ( defined $string ) {
         $curpos = tell(LOGFILE);
         my $path = getvar('CURRENT_DIR');
-
         #print STDERR "DEBUG: logfile is [$logfile]\n";
         #print STDERR "DEBUG: path is [$path]\n";
         #print STDERR "DEBUG: string is [$string]\n";
 
         if ( $string =~ /$path/i ) {
-
             # skip the string with 'test stamp'
             $oldpos = $curpos;
             $string = <LOGFILE>;
@@ -564,11 +545,9 @@ sub find_output(@) {
         }
 
         if ( $string !~ /@{$patterns{$pat}}[0]/ ) {
-
             # skip
         }
         else {
-
             #         print "LINE IN BLOCK: $string";
             push @{$lines}, $string;
             $string = <LOGFILE>;
@@ -577,12 +556,10 @@ sub find_output(@) {
             {
                 $curpos = tell(LOGFILE);
                 push @{$lines}, $string;
-
                 #           print "LINE IN BLOCK: $string";
                 $oldpos = $curpos;
                 $string = <LOGFILE>;
             }
-
             # we exited because of EOF or match
             # now, check the keys
             # perform "rollback 1 string"
@@ -598,7 +575,6 @@ sub find_output(@) {
                     $found_key = 1;
                 }
             }
-
             #         print "KEY FOUND FOR THIS FRAGMENT $class $key1\n";
             return $lines if ( $found_key > 0 );
             undef( @{$lines} );    # otherwise
@@ -634,7 +610,6 @@ sub match_lines(@) {
     foreach my $string ( @{$lines} ) {
         $line_count++;
         foreach my $regex ( @{$regexps} ) {
-
             #     print "matching reg ", $regex,"\n";
             eval { $regex =~ /$regex/; };
             if ($@) {
@@ -642,7 +617,6 @@ sub match_lines(@) {
                 next;
             }
             unless ( exists $matches->{$regex} ) {
-
                 # match against current string if not used before
                 if ( is_negative($regex) ) {    # negative
                     my $temp = make_positive($regex);
@@ -687,7 +661,6 @@ sub match_lines(@) {
     }
 
 }
-
 # this function checks if there are any conflicting regexps for the same type of file.
 # for example:
 # notif: !
@@ -706,12 +679,10 @@ sub check_conflicts($) {
     }
 
     if ( $empty_found && $normal_found ) {
-
         #unacceptable
         return (undef);
     }
     else {
-
         # no conflicts
         return (1);
     }
@@ -737,7 +708,6 @@ sub check_conflicts($) {
 # Remarks: adds "diag: <failed_regexp> <line number if known>" to object if any errors found
 sub match_filter(@) {
     my ( $objects, $filters, $type, $logfile ) = @_;
-
     # $objects  - reference to the array of objects
     # $filters  - reference to a hash of filters
     # $type     - type of the logfile: ack, notif, forw
@@ -751,7 +721,6 @@ sub match_filter(@) {
 
         # array of filter names
         my $filter_names = $entry->{"body"};
-
         # array of regexps to match for this object
         my $regexps = [];
         my $lines   = [];
@@ -807,32 +776,27 @@ sub match_filter(@) {
 
         # check possible conflicts within regexps of the same file type
         if ( !check_conflicts($regexps) ) {
-
             # all regexp become failed
             foreach ( @{$regexps} ) {
                 push @{ $entry->{ $type . "diag" } }, "$_ \t<<< CONFLICT";
             }
-
             # go to the next entry
             next;
         }
 
         # now we work with regexps of the same type (empty or non-empty)
         unless ( -e $logfile ) {
-
 # all regexps for this type FAILED if file doesn't exist, except from EMPTY (!)
             foreach ( @{$regexps} ) {
                 push @{ $entry->{ $type . "diag" } }, "$_"
                     if ( !is_empty($_) );
             }
-
             # go to the next entry
             next;
         }
 
         # find object type and relevant output
         if ( $entry->{'object'} eq 'all' ) {
-
             # read the file into $lines
             open( LOGFILE, "< $logfile" )
                 or error( 'E_FOPEN', $logfile, $! );
@@ -870,7 +834,6 @@ sub match_filter(@) {
 
         # otherwise do normal pattern-matching
         if ( $entry->{'lines'} eq 'single' ) {
-
             # make it an array with one string
             my $tmp = join( '', @{$lines} );
             undef @{$lines};
@@ -902,15 +865,12 @@ sub gather_objects($$) {
     my $list = $_[1];
 
     while (<$FILE>) {
-
         #	  print STDERR "string [$_]\n";
         my $string = $_;
         if ( $string =~ /^[a-z-]+/oi ) {
             my $object = "";
-
             #while ($string && ($string =~ /^[a-z0-9-]+/oi) ) {
             while ( $string && ( $string !~ /^$/oi ) ) {
-
                 #				print STDERR "string [$string]\n";
                 #enter object parsing mode
                 #$string =~ /^(.*?):[\s]*(.*?)[\s]*$/i;
@@ -918,7 +878,6 @@ sub gather_objects($$) {
                 $object = $object . $string;
                 $string = <$FILE>;
             }
-
             #print STDERR "OBJECT [$object]\n";
             # object in $object;
             my $tmp = $object;
@@ -941,7 +900,6 @@ sub gather_objects($$) {
                 $name = $1 . " " . $2;
             }
             $name =~ s/\s+/ /g;
-
             #print STDERR "NAME [$name]\n";
             #print STDERR "OBJECT [$tmp]\n";
             $list->{$name} = $tmp;
@@ -975,7 +933,6 @@ sub gather_objects_whois($$) {
         elsif ( $object =~ /^(.+?):[\s]*(.+?)[\n]/iom ) {
             $name = $1 . " " . $2;
         }
-
         #print STDERR "\nname  [$name]\n\n";
         #print STDERR "\nobject  [$tmp]\n\n";
         $list->{$name} = $tmp;
@@ -1046,12 +1003,9 @@ sub match_whois($$) {
             if ( exists $CONFIG->{'QUERY_AF'}
                 && getvar('QUERY_AF') =~ '.*INET6.*' )
             {
-                $whois = IO::Socket::INET6->new(
-                    Domain   => AF_INET6,
-                    Proto    => 'tcp',
-                    PeerHost => getvar('WHOIS6_HOST'),
-                    PeerPort => getvar('SVWHOIS_PORT')
-                    )
+                $whois = IO::Socket::INET6->new( Domain => AF_INET6,
+                    Proto => 'tcp', PeerHost => getvar('WHOIS6_HOST'),
+                    PeerPort => getvar('SVWHOIS_PORT') )
                     or error( 'E_WHOIS', 'whois', $! );
             }
             else {    #default is ipv4
@@ -1093,11 +1047,9 @@ sub match_whois($$) {
 
             # change the dates
             if ( $query =~ /DATE_ON/io ) {
-
                 # put today's date in expected.
                 my $date = strftime( "%Y%m%d", localtime );
                 if ( exists $expected->{$obj} ) {
-
                     # add the date if it is not there
                     unless (
                         $expected->{$obj} =~ /changed:(.*?)[\s]+[\d]+[\s]*/ )
@@ -1108,7 +1060,6 @@ sub match_whois($$) {
                 }
             }
             elsif ( $query =~ /DATE_OFF/io ) {
-
                 # filter dates out in found object & expected object
                 if ( exists $found->{$obj} ) {
                     $found->{$obj}
@@ -1119,7 +1070,6 @@ sub match_whois($$) {
             }
 
             if ( $query !~ /EXACT/io ) {
-
         # if no exact matching, cut out the spaces between attribute and value
                 if ( exists $expected->{$obj} ) {
                     $expected->{$obj} =~ s/^(\S+):\s+/$1:/mgi;
@@ -1139,7 +1089,6 @@ sub match_whois($$) {
                 $expected_tmp = $expected->{$obj};
                 $expected_tmp =~ s/\n$//s;
             }
-
             #$found->{$obj} =~ s/\n/]\n/gm;
             #$expected_tmp =~ s/\n/]\n/gm;
             #print STDERR "\nfound\n\n[$found->{$obj}] with name [$obj]\n\n";
@@ -1150,15 +1099,12 @@ sub match_whois($$) {
                 && $expected_tmp
                 && ( $expected_tmp eq $found->{$obj} ) )
             {
-
                 #OK;
             }
             elsif ( is_negative($tmp) && !exists $found->{$obj} ) {
-
                 #OK;
             }
             else {
-
                 # FAILURE
                 push @{ $entry->{"whoisdiag"} }, $tmp;
                 if ( $expected_tmp && exists $found->{$obj} ) {
@@ -1228,7 +1174,6 @@ sub match_query($$) {
     }
 
     if ( $query !~ /^!/io ) {
-
         # require query file
         open( QUERY_FILE, "< $objectfile" )
             or error( 'E_FOPEN', $objectfile, $! );
@@ -1244,12 +1189,9 @@ sub match_query($$) {
     my $whois;
 
     if ( exists $CONFIG->{'QUERY_AF'} && getvar('QUERY_AF') =~ /.*INET6.*/ ) {
-        $whois = IO::Socket::INET6->new(
-            Domain   => AF_INET6,
-            Proto    => 'tcp',
+        $whois = IO::Socket::INET6->new( Domain => AF_INET6, Proto => 'tcp',
             PeerHost => getvar('WHOIS6_HOST'),
-            PeerPort => getvar('SVWHOIS_PORT')
-            )
+            PeerPort => getvar('SVWHOIS_PORT') )
             or error( 'E_WHOIS', 'whois', $! );
     }
     else {    #default is ipv4
@@ -1268,7 +1210,6 @@ sub match_query($$) {
     } while ($line);
 
     if ( $query_orig !~ /EXACT/io ) {
-
         # if no exact matching, cut out the spaces between attribute and value
         # cut out the end-of-line comment from source attribute if any
         foreach (@received_lines) {
@@ -1331,7 +1272,6 @@ sub parse_rip_config() {
                     setvar( $1, $2 );
                 }
                 else {
-
                     # if multiline, split by "\n"
                     my $tmp = getvar($1);
                     $tmp .= "\n$2";
@@ -1409,14 +1349,12 @@ sub parse_config() {
 
     # check vars
     if ( %{$CONFIG} ) {
-
         #foreach (sort @REQUIRED)	{
         # if (! getvar($_))	{
         #    die "$ERR->{'E_CONFVAR'} $_\n";
         # }
         #}
         for ( keys %{$CONFIG} ) {
-
 # add types of logs to $CONFIG as a string which will be used by other functions:
             if (/^([A-Z]+)LOG$/io) {
                 $logstring = $logstring . lc($1) . " ";
@@ -1471,7 +1409,6 @@ sub exec_dbupdate($) {
 
     my $command = splice( @args, 0, 1 );
     my $pid = open3( *HIS_IN, *HIS_OUT, *HIS_ERR, $command, @args );
-
     # not checking the open3 because it is useless, we're using shell :(
     # this needed to be reimplemented by using fork-exec mechanism! :-E
     # we just check if dbupdate exists and is executable
@@ -1541,7 +1478,6 @@ sub exec_dbupdate($) {
     if ( $signal == $signo{'INT'} ) { $received_interrupt = 1; }
     my $return_code  = ( $? >> 8 );
     my $defined_code = getvar('DBUPDATE_IGNORE_EXIT_CODE');
-
     # if nothing was set, set expected exit code to 0
     unless ( defined $defined_code ) {
         setvar( 'DBUPDATE_IGNORE_EXIT_CODE', 0 );
@@ -1616,7 +1552,6 @@ sub run_update(@) {
 
     # expand configured flags to their real values
     $flags =~ s/\$(\w+)/defined($CONFIG->{$1})?$CONFIG->{$1}:''/mseg;
-
     # in case if one of reserved filenames is mentioned
     $flags =~ s/$updatefile/$tempfile/ms;
     chomp($flags);
@@ -1645,7 +1580,6 @@ sub run_update(@) {
     if ( $force == 1 ) {
         $object_expected = count_objects($tempfile);
     }
-
     # run dbupdate, to read the output with pipe.
     # return number of objects which were OK. or undef if something failed
 
@@ -1676,7 +1610,6 @@ sub remove_tmp() {
     my @files = glob("$tmpdir/*.$$");
     push @files, glob("$tmpdir/*.$$.gpg");
     foreach (@files) {
-
         #unlink $_;
     }
 }
@@ -1728,7 +1661,6 @@ sub rotate_logs($) {
                 or die "Cannot close $logname_dump: $!";
             close(LOG)
                 or die "Cannot close $logname: $!";
-
             # delete the log
             unlink($logname);
         }
@@ -1784,7 +1716,6 @@ sub run_loader($$) {
     my $temporary = 0;
 
     unless ( -e $file ) {
-
         # load empty file if no loader file
         open( TMP, "> $file" )
             or error( 'E_FCLOSE', $file, $! );
@@ -1810,7 +1741,6 @@ sub run_loader($$) {
         . "  -s $source "
         . getvar('MAKE_DB_FLAGS')
         . " $tmpfile 2>&1 |";
-
     # dirty hack follows - after the first run, replace make_db with reset_db
     setvar( 'MAKE_DB', getvar('RESET_DB') );
 
@@ -1821,19 +1751,15 @@ sub run_loader($$) {
     my $object_real = 0;
 
     while (<MAKE_DB>) {
-
         # gather status for error reporting
         push @status, $_;
-
         # exception if conn.refused
         error( 'E_REFUSE', $commandline ) if (/Connection refused/);
-
         # get number of objects
         $object_real = $1 if (/[\s]+([0-9]+)[\s]+objects[\s]+OK/o);
     }
 
     unless ( close(MAKE_DB) ) {
-
         # report the whole make_db output if something goes wrong
         foreach (@status) {
             s/%/%%/;
@@ -1843,7 +1769,6 @@ sub run_loader($$) {
     }
 
     if ( $object_expected != $object_real ) {
-
         # print diagnostics if something wrong
         foreach (@status) {
             report($_);
@@ -1907,7 +1832,6 @@ sub print_report($) {
     my $objects = $_[0];
 
     my @diag = split( '[\s]+', getvar('LOGSTRING') );
-
     # add whois diagnostics to LOGSTRING
     push @diag, "whois";
     push @diag, "query";
@@ -1919,7 +1843,6 @@ sub print_report($) {
         foreach my $diag_type (@diag) {
             if ( exists $entry->{ $diag_type . "diag" } ) {
                 $flag = 1;
-
                 # now if something failed, we can exit the loop
                 last;
             }
@@ -1929,7 +1852,6 @@ sub print_report($) {
         }
         else {
             $entry->{"result"} = "FAILED";
-
             # this is particular test's result
             $res = "FAILED";
         }
@@ -2007,7 +1929,6 @@ sub set_test_variables() {
     }
     foreach my $var ( keys %thash ) {
         setvar( $var, $thash{$var} );
-
         #    report ("DEBUG: setting [$var] to [$thash{$var}]\n");
     }
     close(FILE);
@@ -2044,27 +1965,22 @@ sub filter($$$$) {
     my $object = "";
     while (<FILE>) {
         if (/^#/o) {
-
             # save comments for report
             push @{$ret}, $_;
         }
         elsif (/^%/o) {
-
             # skip comments
             next;
         }
         elsif (/^\?([-]?[0-9]+)/o) {
-
             # setvar('DBUPDATE_IGNORE_EXIT_CODE',$1);
             next;
         }
         elsif (/^@/o) {
-
             # skip script line @
             next;
         }
         elsif (/^\$/o) {
-
             # save dbupdate flags for update
             #  if ($flags =~ /^$/) {
             #    $flags = $_;
@@ -2080,7 +1996,6 @@ sub filter($$$$) {
                 $object = "";
             }
             else {
-
                 # just copy the blank line
                 print TEMP "\n";
             }
@@ -2094,7 +2009,6 @@ sub filter($$$$) {
             }
         }
     }
-
     # just in case
     print TEMP "\n";
 
@@ -2120,7 +2034,6 @@ sub error(@) {
 
     # report the error
     report(@_);
-
     # die with this error message
     my $error = $_[0];
     $error =~ s/^(E_.*)$/$ERR->{$1}/;
@@ -2242,7 +2155,6 @@ sub run_script($$) {
 # Function clean_logs()
 sub clean_logs() {
     my $logstring = uc( getvar('LOGSTRING') );
-
     # exclude summary which should not be deleted after every test inone batch
     $logstring =~ s/summary//i;
     my @logs = split( '[\s]+', $logstring );
@@ -2264,10 +2176,8 @@ sub init_paths() {
 
     foreach (qw/ TEST DBUPDATE_FILE FILTERS_LOCAL LOADER_FILE /) {
         my $tmp = getvar($_);
-
         # save the template if 1st time
         setvar( $_ . "_TEMPLATE", $tmp ) if ( !getvar( $_ . "_TEMPLATE" ) );
-
         # set new var
         setvar( $_, "$dir/" . getvar( $_ . "_TEMPLATE" ) );
     }
@@ -2285,16 +2195,12 @@ sub run_test($) {
     my $filters = $_[0];
     my $dir     = getvar('CURRENT_DIR');
 
-    my @vars_cleanup = (
-        'DBUPDATE_FLAGS', 'DBUPDATE_FLAGS_EXT',
-        'EXEC_BEFORE',    'EXEC_AFTER',
-        'QUERY_AF',       'TEST_RIR',
-        'DBUPDATE_IGNORE_EXIT_CODE'
-    );
+    my @vars_cleanup
+        = ( 'DBUPDATE_FLAGS', 'DBUPDATE_FLAGS_EXT', 'EXEC_BEFORE',
+        'EXEC_AFTER', 'QUERY_AF', 'TEST_RIR', 'DBUPDATE_IGNORE_EXIT_CODE' );
 
     # initialize filenames
     init_paths();
-
     # get and set the per-test variables from the 'test' file
 
     set_test_variables();
@@ -2347,8 +2253,8 @@ sub run_test($) {
     timeout( 'E_TIME', 'make_db', \&make_db );
 
     # 4. run script before object
-    timeout( 'E_TIME', "external script",
-        \&run_script, "EXEC_BEFORE", $objects );
+    timeout( 'E_TIME', "external script", \&run_script, "EXEC_BEFORE",
+        $objects );
 
     # 5. submit objects
     my $testfile = getvar('TEST');
@@ -2358,10 +2264,8 @@ sub run_test($) {
     my @logs = split( '[\s]+', getvar('LOGSTRING') );
     foreach my $log_type (@logs) {
         my $logname = getvar( uc($log_type) . "LOG" );
-
         # catch fatal errors and return immediately if any
         match_filter( $objects, $local_filters, $log_type, $logname );
-
         # if it fails with particular log type, we should go further.
         #match_filter_exp($objects, $local_filters, $log_type, $logname);
     }
@@ -2373,8 +2277,8 @@ sub run_test($) {
     timeout( 'E_TIME', 'query', \&match_query, $objects, $local_filters );
 
     # 7b. execute external command - any error is fatal!
-    timeout( 'E_TIME', "external script",
-        \&run_script, "EXEC_AFTER", $objects );
+    timeout( 'E_TIME', "external script", \&run_script, "EXEC_AFTER",
+        $objects );
 
     # 8. unset the variables
     foreach my $var (@vars_cleanup) {
@@ -2477,7 +2381,6 @@ sub report(@) {
 }
 
 sub stamp_test($) {
-
     # to 'dir-stamp' the test output in a log file
 
     my $dir       = $_[0];
@@ -2495,7 +2398,6 @@ sub stamp_test($) {
             or die "Can't open file $tolog: $!";
 
         print LOG "<<< TEST RUN $dir >>>\n";
-
         #print STDOUT "DEBUG <<< printing to $tolog >>>\n";
 
         close(LOG)
@@ -2505,7 +2407,6 @@ sub stamp_test($) {
 }
 
 sub is_ignored ($) {
-
     # returns true if dir should be ignored, and false otherwise
     my @ignore_dirs = (qw /CVS doc README/);
     my $dir         = $_[0];
@@ -2559,7 +2460,6 @@ sub get_test_dirs() {
         }
     }
     else {
-
         # DEFAULT - all
         my $datadir = getvar('DATADIR');
         my @dirs    = glob("$datadir/*");
@@ -2581,7 +2481,6 @@ sub get_test_dirs() {
             }
         }
         if ( is_ignored($dir) ) {
-
             # ignore if needed
         }
         elsif ( !$flag ) {
@@ -2672,7 +2571,6 @@ sub print_summary($) {
     print SUMMARY "% TESTS SKIPPED: ", scalar( @{$skip_dirs} ), "\n";
     print SUMMARY "% TESTS OK:      $ok\n";
     print SUMMARY "% TESTS FAILED:  $failed\n\n";
-
     if ( $failed != 0 ) {
         for ( sort ( keys %results ) ) {
             print SUMMARY "% FAILED: $_\n" if ( $results{$_} eq "FAILED" );
@@ -2727,7 +2625,6 @@ sub timeout(@) {
         }
         else {
             alarm(0);
-
             #error already reported
             die;
         }
@@ -2842,7 +2739,6 @@ sub get_signal_numbers {
             $log_type = uc($log_type);
             my $logfile = getvar($log_type) . ".$date";
             setvar( $log_type, $logfile );
-
             # dumping
             my $varname = "DUMP" . $log_type;
             $log_type = lc($log_type);
@@ -2886,7 +2782,6 @@ sub get_signal_numbers {
         print SUMMARY "% Started: ";
         print SUMMARY `date`;
         close(SUMMARY);
-
         #
         rotate_logs(2);
 
@@ -2909,16 +2804,13 @@ sub get_signal_numbers {
             remove_tmp();
             if ($@) {
                 $res = "FAILED";
-
                 #fatal errors
                 report("<<< End of Test Run >>\n");
                 if ( $@ =~ /timeout|limit|counter/i ) {
-
                     # exit abnormally
                     die $@;
                 }
             }
-
             # check if any other error occured
             $res = "FAILED" if ( !defined($res) );
             $results{$dir} = $res;

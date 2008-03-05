@@ -11,7 +11,12 @@
 -bt=1   # Medium brace tightness
 -sbt=1  # Medium square bracket tightness
 -bbt=1  # Medium block brace tightness
+--noblanks-before-blocks
+--noblanks-before-comments
 -nsfs   # No space before semicolons
 -nolq   # Don't outdent long quoted strings
 -wbb="% + - * / x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= && += -= /= |= >>= ||= .= %= ^= x="
         # Break before all operators
+
+--break-at-old-comma-breakpoints
+-lbl=0
