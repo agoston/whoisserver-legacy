@@ -128,6 +128,7 @@
   ***************************************/
 
 #include <stdlib.h>
+#include <string.h>
 
 int yyerror(const char *s);
 
@@ -146,12 +147,12 @@ int yyerror(const char *s);
 #endif
 
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-#line 39 "mp_peer.y"
+#line 40 "mp_peer.y"
 typedef union YYSTYPE {
     char *sval;
 } YYSTYPE;
 /* Line 191 of yacc.c.  */
-#line 155 "mp_peer.tab.c"
+#line 156 "mp_peer.tab.c"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
@@ -163,7 +164,7 @@ typedef union YYSTYPE {
 
 
 /* Line 214 of yacc.c.  */
-#line 167 "mp_peer.tab.c"
+#line 168 "mp_peer.tab.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -346,9 +347,9 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned char yyrline[] =
 {
-       0,    52,    52,    53,    54,    55,    60,    61,    62,    63,
-      64,    65,    70,    71,    74,    75,    78,    79,    80,    83,
-      84
+       0,    53,    53,    54,    55,    56,    61,    62,    63,    64,
+      65,    66,    71,    72,    75,    76,    79,    80,    81,    84,
+      85
 };
 #endif
 
@@ -1075,7 +1076,7 @@ yyreduce:
   switch (yyn)
     {
         case 5:
-#line 55 "mp_peer.y"
+#line 56 "mp_peer.y"
     {
     if (strlen(yyvsp[0].sval) > 255) {
         syntax_error("Domain name \"%s\" is longer than 255 characters", yyvsp[0].sval);
@@ -1084,7 +1085,7 @@ yyreduce:
     break;
 
   case 11:
-#line 65 "mp_peer.y"
+#line 66 "mp_peer.y"
     {
     if (strlen(yyvsp[-1].sval) > 255) {
         syntax_error("Domain name \"%s\" is longer than 255 characters", yyvsp[-1].sval);
@@ -1096,7 +1097,7 @@ yyreduce:
     }
 
 /* Line 1010 of yacc.c.  */
-#line 1100 "mp_peer.tab.c"
+#line 1101 "mp_peer.tab.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1321,7 +1322,7 @@ yyreturn:
 }
 
 
-#line 93 "mp_peer.y"
+#line 94 "mp_peer.y"
 
 
 #undef mp_peererror

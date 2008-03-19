@@ -123,6 +123,7 @@
   ***************************************/
 
 #include <stdlib.h>
+#include <string.h>
 
 int yyerror(const char *s);
 
@@ -141,12 +142,12 @@ int yyerror(const char *s);
 #endif
 
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-#line 38 "peer.y"
+#line 39 "peer.y"
 typedef union YYSTYPE {
     char *sval;
 } YYSTYPE;
 /* Line 191 of yacc.c.  */
-#line 150 "peer.tab.c"
+#line 151 "peer.tab.c"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
@@ -158,7 +159,7 @@ typedef union YYSTYPE {
 
 
 /* Line 214 of yacc.c.  */
-#line 162 "peer.tab.c"
+#line 163 "peer.tab.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -339,8 +340,8 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned char yyrline[] =
 {
-       0,    51,    51,    52,    57,    58,    59,    60,    65,    66,
-      69,    70,    73,    74,    75,    78,    79
+       0,    52,    52,    53,    58,    59,    60,    61,    66,    67,
+      70,    71,    74,    75,    76,    79,    80
 };
 #endif
 
@@ -1059,7 +1060,7 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 52 "peer.y"
+#line 53 "peer.y"
     {
     if (strlen(yyvsp[0].sval) > 255) {
         syntax_error("Domain name \"%s\" is longer than 255 characters", yyvsp[0].sval);
@@ -1068,7 +1069,7 @@ yyreduce:
     break;
 
   case 7:
-#line 60 "peer.y"
+#line 61 "peer.y"
     {
     if (strlen(yyvsp[-1].sval) > 255) {
         syntax_error("Domain name \"%s\" is longer than 255 characters", yyvsp[-1].sval);
@@ -1080,7 +1081,7 @@ yyreduce:
     }
 
 /* Line 1010 of yacc.c.  */
-#line 1084 "peer.tab.c"
+#line 1085 "peer.tab.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1305,7 +1306,7 @@ yyreturn:
 }
 
 
-#line 88 "peer.y"
+#line 89 "peer.y"
 
 
 #undef peererror

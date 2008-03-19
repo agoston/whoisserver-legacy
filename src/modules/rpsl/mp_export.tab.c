@@ -230,13 +230,14 @@ typedef union YYSTYPE {
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 void syntax_error(char *fmt, ...);
 
 
 
 /* Line 214 of yacc.c.  */
-#line 240 "mp_export.tab.c"
+#line 241 "mp_export.tab.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -474,22 +475,22 @@ static const short int yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned short int yyrline[] =
 {
-       0,    47,    47,    48,    49,    52,    53,    56,    57,    60,
-      61,    64,    65,    66,    67,    70,    71,    72,    73,    74,
-      75,    76,    77,    80,    81,    84,    85,    88,    89,    92,
-      95,    96,    99,   100,   103,   104,   107,   108,   111,   112,
-     113,   116,   117,   120,   121,   124,   125,   128,   129,   132,
-     133,   136,   137,   138,   141,   142,   145,   146,   147,   148,
-     153,   156,   157,   160,   161,   164,   165,   166,   167,   168,
-     169,   170,   173,   184,   193,   196,   207,   210,   211,   214,
-     215,   216,   217,   218,   219,   220,   223,   226,   227,   230,
-     231,   232,   233,   243,   246,   247,   248,   249,   252,   263,
-     264,   265,   268,   269,   272,   273,   274,   277,   278,   279,
-     280,   281,   284,   285,   288,   289,   290,   291,   292,   295,
-     296,   299,   300,   303,   304,   305,   306,   307,   308,   311,
-     312,   315,   316,   319,   320,   321,   322,   323,   326,   327,
-     328,   329,   332,   333,   334,   335,   336,   337,   340,   341,
-     342,   343,   344,   345
+       0,    48,    48,    49,    50,    53,    54,    57,    58,    61,
+      62,    65,    66,    67,    68,    71,    72,    73,    74,    75,
+      76,    77,    78,    81,    82,    85,    86,    89,    90,    93,
+      96,    97,   100,   101,   104,   105,   108,   109,   112,   113,
+     114,   117,   118,   121,   122,   125,   126,   129,   130,   133,
+     134,   137,   138,   139,   142,   143,   146,   147,   148,   149,
+     154,   157,   158,   161,   162,   165,   166,   167,   168,   169,
+     170,   171,   174,   185,   194,   197,   208,   211,   212,   215,
+     216,   217,   218,   219,   220,   221,   224,   227,   228,   231,
+     232,   233,   234,   244,   247,   248,   249,   250,   253,   264,
+     265,   266,   269,   270,   273,   274,   275,   278,   279,   280,
+     281,   282,   285,   286,   289,   290,   291,   292,   293,   296,
+     297,   300,   301,   304,   305,   306,   307,   308,   309,   312,
+     313,   316,   317,   320,   321,   322,   323,   324,   327,   328,
+     329,   330,   333,   334,   335,   336,   337,   338,   341,   342,
+     343,   344,   345,   346
 };
 #endif
 
@@ -1383,7 +1384,7 @@ yyreduce:
   switch (yyn)
     {
         case 59:
-#line 148 "mp_export.y"
+#line 149 "mp_export.y"
     {
     if (strlen(yyvsp[0].sval) > 255) {
         syntax_error("Domain name \"%s\" is longer than 255 characters", yyvsp[0].sval);
@@ -1392,7 +1393,7 @@ yyreduce:
     break;
 
   case 72:
-#line 173 "mp_export.y"
+#line 174 "mp_export.y"
     {
       long int val;
       char *s, *p;
@@ -1405,7 +1406,7 @@ yyreduce:
     break;
 
   case 73:
-#line 184 "mp_export.y"
+#line 185 "mp_export.y"
     {
       long int val;
       char *s, *p;
@@ -1418,7 +1419,7 @@ yyreduce:
     break;
 
   case 75:
-#line 196 "mp_export.y"
+#line 197 "mp_export.y"
     {
       long int val;
       char *s, *p;
@@ -1431,7 +1432,7 @@ yyreduce:
     break;
 
   case 92:
-#line 233 "mp_export.y"
+#line 234 "mp_export.y"
     {
       unsigned long int val;
       char *s, *p;
@@ -1445,7 +1446,7 @@ yyreduce:
     break;
 
   case 98:
-#line 252 "mp_export.y"
+#line 253 "mp_export.y"
     {
       long int val;
       char *s, *p;
@@ -1461,7 +1462,7 @@ yyreduce:
     }
 
 /* Line 1010 of yacc.c.  */
-#line 1465 "mp_export.tab.c"
+#line 1466 "mp_export.tab.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1686,7 +1687,7 @@ yyreturn:
 }
 
 
-#line 348 "mp_export.y"
+#line 349 "mp_export.y"
 
 
 #undef mp_exporterror

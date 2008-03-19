@@ -249,12 +249,11 @@ gboolean ns_ds_accepted(gchar * domain)
   GTree *ds_tree;              /* ds tree */
   gchar *ds_val;               /* ds value in the tree */
 
-  /* e164.arpa -> DS not accepted */
-  /* this will have to be changed when e164.arpa is signed. */
-  if (ns_has_suffix(domain, "e164.arpa") == FALSE) {
+  /* e164.arpa -> DS always accepted */
+  if (ns_has_suffix(domain, "e164.arpa") == TRUE) {
     LG_log(au_context, LG_DEBUG, "NOT reading delegations file: domain is e164.arpa related");
-    LG_log(au_context, LG_DEBUG, "DS record not allowed.");
-    return FALSE;
+    LG_log(au_context, LG_DEBUG, "DS record is always allowed.");
+    return TRUE;
   }
 
   LG_log(au_context, LG_DEBUG, "reading delegations file for ds");

@@ -16,7 +16,7 @@ admin-c:        TP1-DB-TEST
 tech-c:         TP1-DB-TEST
 zone-c:         TP1-DB-TEST
 nserver:        ns-pri.ripe.net
-nserver:        noname.blah.test.net
+nserver:        ns1.noname
 nserver:        ns.lacnic.net
 nserver:        sec1.apnic.net
 nserver:        sec3.apnic.net

@@ -138,6 +138,7 @@ typedef union YYSTYPE {
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 int yyerror(const char *s);
 void syntax_error(char *fmt, ...);
@@ -145,7 +146,7 @@ void syntax_error(char *fmt, ...);
 
 
 /* Line 214 of yacc.c.  */
-#line 149 "peering.tab.c"
+#line 150 "peering.tab.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -327,9 +328,9 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned char yyrline[] =
 {
-       0,    41,    41,    42,    45,    46,    49,    50,    51,    54,
-      55,    58,    59,    62,    63,    66,    67,    70,    71,    74,
-      75,    76,    79,    80,    83,    84,    89,    92,    93
+       0,    42,    42,    43,    46,    47,    50,    51,    52,    55,
+      56,    59,    60,    63,    64,    67,    68,    71,    72,    75,
+      76,    77,    80,    81,    84,    85,    90,    93,    94
 };
 #endif
 
@@ -1053,7 +1054,7 @@ yyreduce:
   switch (yyn)
     {
         case 25:
-#line 84 "peering.y"
+#line 85 "peering.y"
     {
     if (strlen(yyvsp[0].sval) > 255) {
         syntax_error("Domain name \"%s\" is longer than 255 characters", yyvsp[0].sval);
@@ -1065,7 +1066,7 @@ yyreduce:
     }
 
 /* Line 1010 of yacc.c.  */
-#line 1069 "peering.tab.c"
+#line 1070 "peering.tab.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1290,7 +1291,7 @@ yyreturn:
 }
 
 
-#line 96 "peering.y"
+#line 97 "peering.y"
 
 
 #undef peeringerror

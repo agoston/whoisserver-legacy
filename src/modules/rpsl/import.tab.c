@@ -212,6 +212,7 @@ typedef union YYSTYPE {
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 int yyerror(const char *s);
 void syntax_error(char *fmt, ...);
@@ -219,7 +220,7 @@ void syntax_error(char *fmt, ...);
 
 
 /* Line 214 of yacc.c.  */
-#line 223 "import.tab.c"
+#line 224 "import.tab.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -447,20 +448,20 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned short int yyrline[] =
 {
-       0,    48,    48,    49,    52,    53,    56,    57,    60,    61,
-      62,    65,    66,    69,    70,    73,    76,    77,    80,    81,
-      84,    85,    88,    89,    92,    93,    94,    97,    98,   101,
-     102,   105,   106,   109,   110,   113,   114,   117,   118,   119,
-     122,   123,   126,   127,   132,   135,   136,   139,   140,   143,
-     144,   145,   146,   147,   148,   149,   152,   163,   172,   175,
-     186,   189,   190,   193,   194,   195,   196,   197,   198,   199,
-     202,   205,   206,   209,   210,   211,   212,   222,   225,   226,
-     229,   240,   241,   242,   245,   246,   249,   250,   251,   254,
-     255,   256,   257,   258,   261,   262,   265,   266,   267,   268,
-     269,   272,   273,   276,   277,   280,   281,   284,   285,   288,
-     289,   292,   293,   294,   295,   296,   299,   300,   301,   302,
-     305,   306,   307,   308,   309,   310,   313,   314,   315,   316,
-     317,   318
+       0,    49,    49,    50,    53,    54,    57,    58,    61,    62,
+      63,    66,    67,    70,    71,    74,    77,    78,    81,    82,
+      85,    86,    89,    90,    93,    94,    95,    98,    99,   102,
+     103,   106,   107,   110,   111,   114,   115,   118,   119,   120,
+     123,   124,   127,   128,   133,   136,   137,   140,   141,   144,
+     145,   146,   147,   148,   149,   150,   153,   164,   173,   176,
+     187,   190,   191,   194,   195,   196,   197,   198,   199,   200,
+     203,   206,   207,   210,   211,   212,   213,   223,   226,   227,
+     230,   241,   242,   243,   246,   247,   250,   251,   252,   255,
+     256,   257,   258,   259,   262,   263,   266,   267,   268,   269,
+     270,   273,   274,   277,   278,   281,   282,   285,   286,   289,
+     290,   293,   294,   295,   296,   297,   300,   301,   302,   303,
+     306,   307,   308,   309,   310,   311,   314,   315,   316,   317,
+     318,   319
 };
 #endif
 
@@ -1324,7 +1325,7 @@ yyreduce:
   switch (yyn)
     {
         case 43:
-#line 127 "import.y"
+#line 128 "import.y"
     {
     if (strlen(yyvsp[0].sval) > 255) {
         syntax_error("Domain name \"%s\" is longer than 255 characters", yyvsp[0].sval);
@@ -1333,7 +1334,7 @@ yyreduce:
     break;
 
   case 56:
-#line 152 "import.y"
+#line 153 "import.y"
     {
       long int val;
       char *s, *p;
@@ -1346,7 +1347,7 @@ yyreduce:
     break;
 
   case 57:
-#line 163 "import.y"
+#line 164 "import.y"
     {
       long int val;
       char *s, *p;
@@ -1359,7 +1360,7 @@ yyreduce:
     break;
 
   case 59:
-#line 175 "import.y"
+#line 176 "import.y"
     {
       long int val;
       char *s, *p;
@@ -1372,7 +1373,7 @@ yyreduce:
     break;
 
   case 76:
-#line 212 "import.y"
+#line 213 "import.y"
     {
       unsigned long int val;
       char *s, *p;
@@ -1386,7 +1387,7 @@ yyreduce:
     break;
 
   case 80:
-#line 229 "import.y"
+#line 230 "import.y"
     {
       long int val;
       char *s, *p;
@@ -1402,7 +1403,7 @@ yyreduce:
     }
 
 /* Line 1010 of yacc.c.  */
-#line 1406 "import.tab.c"
+#line 1407 "import.tab.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1627,7 +1628,7 @@ yyreturn:
 }
 
 
-#line 321 "import.y"
+#line 322 "import.y"
 
 
 #undef importerror

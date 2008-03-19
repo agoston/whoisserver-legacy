@@ -206,6 +206,7 @@ typedef union YYSTYPE {
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 int yyerror(const char *s);
 void syntax_error(char *fmt, ...);
@@ -213,7 +214,7 @@ void syntax_error(char *fmt, ...);
 
 
 /* Line 214 of yacc.c.  */
-#line 217 "inject_r6.tab.c"
+#line 218 "inject_r6.tab.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -420,14 +421,14 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned char yyrline[] =
 {
-       0,    45,    45,    48,    49,    52,    53,    56,    57,    58,
-      61,    62,    65,    66,    67,    68,    73,    76,    77,    80,
-      81,    84,    85,    88,    89,    92,    93,    96,    97,   100,
-     101,   102,   105,   106,   109,   110,   113,   114,   115,   116,
-     119,   120,   123,   124,   125,   126,   127,   128,   129,   132,
-     143,   152,   155,   166,   169,   170,   173,   174,   175,   176,
-     177,   178,   179,   182,   185,   186,   189,   190,   191,   192,
-     202,   205,   206,   207,   208,   211
+       0,    46,    46,    49,    50,    53,    54,    57,    58,    59,
+      62,    63,    66,    67,    68,    69,    74,    77,    78,    81,
+      82,    85,    86,    89,    90,    93,    94,    97,    98,   101,
+     102,   103,   106,   107,   110,   111,   114,   115,   116,   117,
+     120,   121,   124,   125,   126,   127,   128,   129,   130,   133,
+     144,   153,   156,   167,   170,   171,   174,   175,   176,   177,
+     178,   179,   180,   183,   186,   187,   190,   191,   192,   193,
+     203,   206,   207,   208,   209,   212
 };
 #endif
 
@@ -1222,7 +1223,7 @@ yyreduce:
   switch (yyn)
     {
         case 15:
-#line 68 "inject_r6.y"
+#line 69 "inject_r6.y"
     {
     if (strlen(yyvsp[0].sval) > 255) {
         syntax_error("Domain name \"%s\" is longer than 255 characters", yyvsp[0].sval);
@@ -1231,7 +1232,7 @@ yyreduce:
     break;
 
   case 49:
-#line 132 "inject_r6.y"
+#line 133 "inject_r6.y"
     {
       long int val;
       char *s, *p;
@@ -1244,7 +1245,7 @@ yyreduce:
     break;
 
   case 50:
-#line 143 "inject_r6.y"
+#line 144 "inject_r6.y"
     {
       long int val;
       char *s, *p;
@@ -1257,7 +1258,7 @@ yyreduce:
     break;
 
   case 52:
-#line 155 "inject_r6.y"
+#line 156 "inject_r6.y"
     {
       long int val;
       char *s, *p;
@@ -1270,7 +1271,7 @@ yyreduce:
     break;
 
   case 69:
-#line 192 "inject_r6.y"
+#line 193 "inject_r6.y"
     {
       unsigned long int val;
       char *s, *p;
@@ -1284,7 +1285,7 @@ yyreduce:
     break;
 
   case 75:
-#line 211 "inject_r6.y"
+#line 212 "inject_r6.y"
     {
       long int val;
       char *s, *p;
@@ -1300,7 +1301,7 @@ yyreduce:
     }
 
 /* Line 1010 of yacc.c.  */
-#line 1304 "inject_r6.tab.c"
+#line 1305 "inject_r6.tab.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1525,7 +1526,7 @@ yyreturn:
 }
 
 
-#line 222 "inject_r6.y"
+#line 223 "inject_r6.y"
 
 
 #undef inject_r6error

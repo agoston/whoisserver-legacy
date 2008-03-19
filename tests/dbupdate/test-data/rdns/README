@@ -320,8 +320,7 @@
 # CASE 035: 
 #
 # create 1.e164.arpa domain object
-# make sure we can't submit DS record in e164.arpa related object.
-# !!! THIS TEST WILL FAIL AFTER THE CODECHANGE TO ALLOW DS IN E164.ARPA zone.
+# make sure we CAN submit DS record in e164.arpa related object.
 
 #
 #FAILURE
@@ -532,3 +531,15 @@
 #FAILURE
 #
 # RESULT 056: creation will fail
+#
+# rdns tests
+# CASE 057: 
+#
+# create 1.e164.arpa domain object
+# make sure we CAN submit DS record in e164.arpa related object.
+# update itself will fail because dnssec setup is wrong, but should be no 'no ds accepted' message.
+#
+#FAILURE
+#
+# RESULT 057: creation will fail
+

@@ -60,7 +60,7 @@
 
 
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-#line 39 "mp_peer.y"
+#line 40 "mp_peer.y"
 typedef union YYSTYPE {
     char *sval;
 } YYSTYPE;

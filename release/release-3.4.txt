@@ -1,0 +1,13 @@
+20080319 - VERSION 3.4
+
+Changed:
+- Allow signed enum domains
+- updated rip.config.sample for correct ALLOCMNT, ORG-POWER-MNT and DISALLOW-MNT.
+- update a couple of test cases
+- created delcheck-ipv4-8 config.
+
+OTHER PREVIOUS CHANGES ARE OMITTED IN THIS LIST BECAUSE THE RELEASES TOOK PLACE OUTSIDE THE CURRENT PROCEDURE.
+
+Merged:
+-whoisserver-feature-erikbroes-signed-enum
+

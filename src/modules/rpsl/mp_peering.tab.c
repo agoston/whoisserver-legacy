@@ -140,6 +140,7 @@ typedef union YYSTYPE {
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 int yyerror(const char *s);
 void syntax_error(char *fmt, ...);
@@ -147,7 +148,7 @@ void syntax_error(char *fmt, ...);
 
 
 /* Line 214 of yacc.c.  */
-#line 151 "mp_peering.tab.c"
+#line 152 "mp_peering.tab.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -335,11 +336,11 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned char yyrline[] =
 {
-       0,    60,    60,    61,    62,    65,    66,    69,    70,    71,
-      74,    75,    78,    79,    82,    83,    86,    87,    90,    91,
-      94,    95,    98,    99,   102,   103,   106,   107,   108,   111,
-     112,   113,   116,   117,   120,   121,   124,   125,   130,   133,
-     134,   135,   140,   143,   144
+       0,    61,    61,    62,    63,    66,    67,    70,    71,    72,
+      75,    76,    79,    80,    83,    84,    87,    88,    91,    92,
+      95,    96,    99,   100,   103,   104,   107,   108,   109,   112,
+     113,   114,   117,   118,   121,   122,   125,   126,   131,   134,
+     135,   136,   141,   144,   145
 };
 #endif
 
@@ -1084,22 +1085,22 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 60 "mp_peering.y"
-    {;}
-    break;
-
-  case 3:
 #line 61 "mp_peering.y"
     {;}
     break;
 
-  case 4:
+  case 3:
 #line 62 "mp_peering.y"
     {;}
     break;
 
+  case 4:
+#line 63 "mp_peering.y"
+    {;}
+    break;
+
   case 37:
-#line 125 "mp_peering.y"
+#line 126 "mp_peering.y"
     {
     if (strlen(yyvsp[0].sval) > 255) {
         syntax_error("Domain name \"%s\" is longer than 255 characters", yyvsp[0].sval);
@@ -1108,7 +1109,7 @@ yyreduce:
     break;
 
   case 41:
-#line 135 "mp_peering.y"
+#line 136 "mp_peering.y"
     {
     if (strlen(yyvsp[0].sval) > 255) {
         syntax_error("Domain name \"%s\" is longer than 255 characters", yyvsp[0].sval);
@@ -1120,7 +1121,7 @@ yyreduce:
     }
 
 /* Line 1010 of yacc.c.  */
-#line 1124 "mp_peering.tab.c"
+#line 1125 "mp_peering.tab.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1345,7 +1346,7 @@ yyreturn:
 }
 
 
-#line 147 "mp_peering.y"
+#line 148 "mp_peering.y"
 
 
 #undef mp_peeringerror

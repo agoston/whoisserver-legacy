@@ -1,2 +1,0 @@
-Changed:
-- Allow signed enum domains
