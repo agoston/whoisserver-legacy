@@ -39,7 +39,7 @@ constant(sv,arg)
 
 Net::Whois::RIPE::RPSL::Error *
 rpsl_error_alloc()
-	CODE:
+    CODE:
 		rpsl_error_t * err;
 		if (( err = (rpsl_error_t *) calloc ( 1, sizeof( rpsl_error_t )))
 			== (rpsl_error_t *) NULL ) 
@@ -553,7 +553,7 @@ level(THIS)
 gint
 code(THIS)
 	rpsl_error_t * THIS
-	CODE:
+    CODE:
     /* code for the error */
 	RETVAL = THIS->code;
     OUTPUT:
@@ -611,7 +611,7 @@ level(THIS, __level = NO_INIT)
 	Net::Whois::RIPE::RPSL::Error * THIS
 	gint __level
     PROTOTYPE: $;$
-	CODE:
+    CODE:
 	/* level of the error (enum above) */
 	if (items > 1)
 	    THIS->level = __level;
@@ -624,7 +624,7 @@ code(THIS, __code = NO_INIT)
 	Net::Whois::RIPE::RPSL::Error * THIS
 	gint __code
     PROTOTYPE: $;$
-	CODE:
+    CODE:
     /* code for the error */
 	if (items > 1)
 	    THIS->code = __code;
@@ -651,7 +651,7 @@ attr_num(THIS, __attr_num = NO_INIT)
 	Net::Whois::RIPE::RPSL::Error * THIS
 	gint __attr_num
     PROTOTYPE: $;$
-	CODE:
+    CODE:
     /* offset of attribute with this error, or  -1 if none */
 	if (items > 1)
 	    THIS->attr_num = __attr_num;
