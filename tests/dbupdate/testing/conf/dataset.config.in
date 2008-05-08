@@ -54,7 +54,7 @@ FILTERS = $CONFDIR/filters.config
 EXCLUDE = $CONFDIR/EXCLUDE
 
 # path to dbupdate
-DBUPDATE = $WHOISDIR/bin/dbupdate
+DBUPDATE = $WHOIS_SRC/src/dbupdate
 
 # dbupdate flags: -r to redirect notifications sending, -T to allow mntner creation
 DBUPDATE_GEN = -s -r -c $RIP_CONFIG
