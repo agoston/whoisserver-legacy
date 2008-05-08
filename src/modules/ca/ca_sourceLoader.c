@@ -65,7 +65,7 @@ void ca_readSources(const char *sourcesDefFile, values_t confVars[])
  *******************************************************************/
 {
     FILE *sourcesFilePtr; /* Pointer to Source file. */
-    char line[80]; /* The current line of input. */
+    char line[STR_M]; /* The current line of input. */
     const char *comment = "#"; /* Declared as a string. */
 #ifdef DEBUG
     char name[STRLENGTH_M]; /* The name of the config variable */
@@ -88,10 +88,10 @@ void ca_readSources(const char *sourcesDefFile, values_t confVars[])
     /* N. B.  This is not the same as the */
     /* updPort in the UPDSOURCE variables. */
 #endif	/* DEBUG */
-    char source[16]; /* The name of a source. */
-    char database[16]; /* The name of a database. */
-    char mirror[16]; /* The name of a mirror. */
-    char varName[16]; /* Temporary variable */
+    char source[STR_M]; /* The name of a source. */
+    char database[STR_M]; /* The name of a database. */
+    char mirror[STR_M]; /* The name of a mirror. */
+    char varName[STR_M]; /* Temporary variable */
 
     ca_database_t *newDbPtr= NULL; /* A pointer to a new instance of */
     /* ca_database_t.                 */
@@ -132,7 +132,7 @@ void ca_readSources(const char *sourcesDefFile, values_t confVars[])
      * Open the sources file for reading .....
      */
     if ((sourcesFilePtr = fopen(sourcesDefFile, "r")) == NULL) {
-        printf("Error: the file %s could not be opened.\n", sourcesDefFile);
+        fprintf(stderr, "Error: the file %s could not be opened.\n", sourcesDefFile);
         die;
     }
 
@@ -574,8 +574,8 @@ void ca_parseDbLine(char *lineStr, ca_database_t * dbStructPtr)
  *                                            *
  *******************************************************************/
 {
-    char dbComp[64]; /* Component of a database. */
-    char varName[16]; /* The name of the variable. */
+    char dbComp[STR_M]; /* Component of a database. */
+    char varName[STR_M]; /* The name of the variable. */
 
     gchar **tokens; /* Pointer to an array of strings. */
 
@@ -638,8 +638,8 @@ void ca_parseNrtmLine(char *lineStr, ca_mirror_t * mrStructPtr)
 /*
  * */
 {
-    char nrtmComp[64]; /* Component of a NRTM. */
-    char varName[16]; /* The name of the variable. */
+    char nrtmComp[STR_M]; /* Component of a NRTM. */
+    char varName[STR_M]; /* The name of the variable. */
 
     gchar **tokens; /* Pointer to an array of strings. */
 
@@ -700,8 +700,8 @@ void ca_parseSrcLine(char *lineStr, ca_dbSource_t * srcStructPtr)
  * ca_parseSrcLine() function.
  */
 {
-    char srcComp[64]; /* Component of a database. */
-    char varName[16]; /* The name of the variable. */
+    char srcComp[STR_M]; /* Component of a database. */
+    char varName[STR_M]; /* The name of the variable. */
 
     gchar **tokens; /* Pointer to an array of strings. */
 
