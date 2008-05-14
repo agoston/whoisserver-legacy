@@ -98,15 +98,13 @@ syntax_error(const char *fmt, ...)
 {
     va_list args;
     guint len;
-    gchar *buf;
+    char *buf;
 
     va_start(args, fmt);
-    len = g_printf_string_upper_bound(fmt, args);
-    buf = g_new(char, len+1);
-    vsnprintf(buf, len+1, fmt, args);
+    vasprintf(&buf, fmt, args);
     va_end(args);
     yyerror(buf);
-    g_free(buf);
+    free(buf);
 }
 
 /* taken from _lex & yacc_ p.157, by Levine, Mason, & Brown (corrected) */
