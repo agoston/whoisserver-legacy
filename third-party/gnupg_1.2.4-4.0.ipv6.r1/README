@@ -1,0 +1,11 @@
+The .deb package here is the one we found installed & working on cello.
+It is in production now.
+
+I did a search based on the package name, and found the debian repository
+called debian-ipv6. However, I couldn't get the sources found in there to
+compile - looks like the package is broken in some way.
+
+I'll include them here anyway. According to google, only 2 debian-ipv6
+repositories exist on the net, so it's probably a good idea to keep this.
+
+Agoston, 2008-05-14
