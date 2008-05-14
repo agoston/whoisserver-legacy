@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/flstring.c
+../src/c-client/flstring.c

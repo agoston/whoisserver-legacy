@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/charset/ibm.c
+../src/charset/ibm.c

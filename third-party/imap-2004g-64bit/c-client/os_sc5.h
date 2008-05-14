@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/os_sc5.h
+../src/osdep/unix/os_sc5.h

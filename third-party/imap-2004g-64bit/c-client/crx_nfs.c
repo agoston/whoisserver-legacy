@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/crx_nfs.c
+../src/osdep/unix/crx_nfs.c

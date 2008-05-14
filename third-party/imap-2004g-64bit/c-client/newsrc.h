@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/newsrc.h
+../src/c-client/newsrc.h

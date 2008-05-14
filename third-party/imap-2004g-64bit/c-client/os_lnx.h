@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/os_lnx.h
+../src/osdep/unix/os_lnx.h

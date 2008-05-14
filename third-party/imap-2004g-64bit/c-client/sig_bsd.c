@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/sig_bsd.c
+../src/osdep/unix/sig_bsd.c

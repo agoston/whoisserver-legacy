@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/os_aux.h
+../src/osdep/unix/os_aux.h

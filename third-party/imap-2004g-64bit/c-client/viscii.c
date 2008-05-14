@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/charset/viscii.c
+../src/charset/viscii.c

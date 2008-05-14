@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/ftl.h
+../src/c-client/ftl.h

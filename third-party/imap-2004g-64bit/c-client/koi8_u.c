@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/charset/koi8_u.c
+../src/charset/koi8_u.c

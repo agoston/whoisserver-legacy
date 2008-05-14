@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/os_pyr.c
+../src/osdep/unix/os_pyr.c

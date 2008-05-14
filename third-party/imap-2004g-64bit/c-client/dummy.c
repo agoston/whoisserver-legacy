@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/dummy.c
+../src/osdep/unix/dummy.c

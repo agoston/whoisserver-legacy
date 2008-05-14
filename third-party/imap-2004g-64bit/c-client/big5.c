@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/charset/big5.c
+../src/charset/big5.c

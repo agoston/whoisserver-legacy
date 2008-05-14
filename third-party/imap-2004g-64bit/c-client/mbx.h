@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/mbx.h
+../src/osdep/unix/mbx.h

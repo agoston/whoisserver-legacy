@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/ansilib/memmove.c
+../src/ansilib/memmove.c

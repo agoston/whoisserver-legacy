@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/mail.c
+../src/c-client/mail.c

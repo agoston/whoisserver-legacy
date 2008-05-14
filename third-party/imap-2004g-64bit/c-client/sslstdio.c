@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/sslstdio.c
+../src/osdep/unix/sslstdio.c

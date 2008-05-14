@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/mmdf.c
+../src/osdep/unix/mmdf.c

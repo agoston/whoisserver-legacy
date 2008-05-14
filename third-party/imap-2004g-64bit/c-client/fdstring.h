@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/fdstring.h
+../src/osdep/unix/fdstring.h

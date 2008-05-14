@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/charset/iso_8859.c
+../src/charset/iso_8859.c

@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/os_sco.c
+../src/osdep/unix/os_sco.c

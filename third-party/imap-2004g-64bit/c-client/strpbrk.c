@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/ansilib/strpbrk.c
+../src/ansilib/strpbrk.c

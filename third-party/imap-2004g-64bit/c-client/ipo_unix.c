@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/ipo_unix.c
+../src/osdep/unix/ipo_unix.c

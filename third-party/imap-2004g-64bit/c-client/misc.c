@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/misc.c
+../src/c-client/misc.c

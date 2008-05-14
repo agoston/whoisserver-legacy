@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/rename.c
+../src/osdep/unix/rename.c

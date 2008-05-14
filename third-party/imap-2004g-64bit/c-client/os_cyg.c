@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/os_cyg.c
+../src/osdep/unix/os_cyg.c

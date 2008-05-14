@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/pseudo.c
+../src/osdep/unix/pseudo.c

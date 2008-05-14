@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/netmsg.c
+../src/c-client/netmsg.c

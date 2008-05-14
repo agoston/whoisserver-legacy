@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/ckp_dce.c
+../src/osdep/unix/ckp_dce.c

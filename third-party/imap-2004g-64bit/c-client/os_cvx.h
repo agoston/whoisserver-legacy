@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/os_cvx.h
+../src/osdep/unix/os_cvx.h

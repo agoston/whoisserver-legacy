@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/ansilib/memset.c
+../src/ansilib/memset.c

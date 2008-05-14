@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/scandir.c
+../src/osdep/unix/scandir.c

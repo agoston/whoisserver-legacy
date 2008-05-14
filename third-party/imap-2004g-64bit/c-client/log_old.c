@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/log_old.c
+../src/osdep/unix/log_old.c

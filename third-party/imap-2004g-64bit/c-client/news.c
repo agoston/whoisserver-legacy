@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/news.c
+../src/osdep/unix/news.c

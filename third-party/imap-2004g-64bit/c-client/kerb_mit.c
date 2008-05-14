@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/kerb_mit.c
+../src/osdep/unix/kerb_mit.c

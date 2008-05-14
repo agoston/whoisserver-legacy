@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/ssl_none.c
+../src/osdep/unix/ssl_none.c

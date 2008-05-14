@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/ansilib/strtok.c
+../src/ansilib/strtok.c

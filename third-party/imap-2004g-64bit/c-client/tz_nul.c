@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/tz_nul.c
+../src/osdep/unix/tz_nul.c

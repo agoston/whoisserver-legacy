@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/write.c
+../src/osdep/unix/write.c

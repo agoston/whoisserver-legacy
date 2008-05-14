@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/charset/gb_2312.c
+../src/charset/gb_2312.c

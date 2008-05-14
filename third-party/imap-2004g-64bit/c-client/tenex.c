@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/tenex.c
+../src/osdep/unix/tenex.c

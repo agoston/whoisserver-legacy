@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/os_art.c
+../src/osdep/unix/os_art.c

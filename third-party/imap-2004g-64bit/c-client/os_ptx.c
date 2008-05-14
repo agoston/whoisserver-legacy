@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/os_ptx.c
+../src/osdep/unix/os_ptx.c

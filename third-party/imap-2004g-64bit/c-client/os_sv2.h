@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/os_sv2.h
+../src/osdep/unix/os_sv2.h

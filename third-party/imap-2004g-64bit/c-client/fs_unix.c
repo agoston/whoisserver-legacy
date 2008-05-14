@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/fs_unix.c
+../src/osdep/unix/fs_unix.c

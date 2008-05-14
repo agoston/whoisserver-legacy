@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/nntp.h
+../src/c-client/nntp.h

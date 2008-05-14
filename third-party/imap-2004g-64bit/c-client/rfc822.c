@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/rfc822.c
+../src/c-client/rfc822.c

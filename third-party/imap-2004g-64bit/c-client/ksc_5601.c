@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/charset/ksc_5601.c
+../src/charset/ksc_5601.c

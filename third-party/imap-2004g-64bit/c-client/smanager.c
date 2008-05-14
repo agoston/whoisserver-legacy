@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/smanager.c
+../src/c-client/smanager.c

@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/env.h
+../src/c-client/env.h

@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/ckp_1st.c
+../src/osdep/unix/ckp_1st.c

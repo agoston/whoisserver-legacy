@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/charset/tis_620.c
+../src/charset/tis_620.c

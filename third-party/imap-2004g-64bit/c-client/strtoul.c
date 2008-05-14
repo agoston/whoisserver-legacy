@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/ansilib/strtoul.c
+../src/ansilib/strtoul.c

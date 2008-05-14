@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/tz_bsd.c
+../src/osdep/unix/tz_bsd.c

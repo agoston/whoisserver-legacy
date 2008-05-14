@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/fsync.c
+../src/osdep/unix/fsync.c

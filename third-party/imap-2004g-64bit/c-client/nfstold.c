@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/nfstold.c
+../src/osdep/unix/nfstold.c

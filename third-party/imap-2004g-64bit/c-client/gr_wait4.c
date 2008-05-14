@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/gr_wait4.c
+../src/osdep/unix/gr_wait4.c

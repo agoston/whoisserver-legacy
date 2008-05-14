@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/ftl_unix.c
+../src/osdep/unix/ftl_unix.c

@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/mh.c
+../src/osdep/unix/mh.c

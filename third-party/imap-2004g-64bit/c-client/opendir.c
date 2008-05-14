@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/opendir.c
+../src/osdep/unix/opendir.c

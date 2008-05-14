@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/auth_log.c
+../src/c-client/auth_log.c

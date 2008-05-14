@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/ip6_unix.c
+../src/osdep/unix/ip6_unix.c

@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/gethstid.c
+../src/osdep/unix/gethstid.c

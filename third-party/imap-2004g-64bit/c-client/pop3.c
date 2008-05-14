@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/pop3.c
+../src/c-client/pop3.c

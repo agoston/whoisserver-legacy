@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/tcp_unix.c
+../src/osdep/unix/tcp_unix.c

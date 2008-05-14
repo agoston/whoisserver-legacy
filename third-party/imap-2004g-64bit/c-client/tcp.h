@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/c-client/tcp.h
+../src/c-client/tcp.h

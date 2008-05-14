@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/flocksim.c
+../src/osdep/unix/flocksim.c

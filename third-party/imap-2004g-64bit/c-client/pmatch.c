@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/osdep/unix/pmatch.c
+../src/osdep/unix/pmatch.c

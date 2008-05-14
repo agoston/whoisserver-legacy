@@ -1,1 +1,1 @@
-/home/agoston/imap-2004g/src/charset/windows.c
+../src/charset/windows.c
