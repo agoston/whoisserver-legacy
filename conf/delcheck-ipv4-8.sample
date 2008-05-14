@@ -1,8 +1,7 @@
 ModuleDiagnosticLevel 0
 ModuleTemplatePath /home/agoston/workspace/whoisserver/conf/delcheck-template.xml
 
-ParamMinimumNumberNameservers              2
+ParamMinimumNumberNameservers              3
+ParamRequiredNameserverList                ns.ripe.net
+ParamProhibitedNameserverList              ns-v6.ripe.net
 ModuleNameserverIgnoreList                 ns.ripe.net
-
-ModuleQueryRemoteUDPTimeout 5
-ModuleQueryLocalUDPTimeout 3
