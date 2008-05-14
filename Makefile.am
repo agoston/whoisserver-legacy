@@ -341,7 +341,6 @@ EXTRA_DIST = README \
              src/modules/ep/ep_internal.h \
              src/modules/ep/mm.h \
              src/modules/ep/mm_internal.h \
-             src/modules/ip/inet6def.h \
              src/modules/ip/iproutines.h \
              src/modules/km/km.h \
              src/modules/km/BUGS \
