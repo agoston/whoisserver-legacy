@@ -1,36 +1,36 @@
 /***************************************
-  $Revision: 
+ $Revision: 
 
-  CA module: function prototypes.
+ CA module: function prototypes.
 
-  Status: NOT REVIEWED, NOT TESTED
+ Status: NOT REVIEWED, NOT TESTED
 
-  Author(s):       Ambrose Magee
+ Author(s):       Ambrose Magee
 
-******************/ /******************
-Modification History:
-******************/
+ ******************//******************
+ Modification History:
+ ******************/
 
 /************************************
  Copyright (c) 2000                              RIPE NCC
 
-All Rights Reserved
+ All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its
-documentation for any purpose and without fee is hereby granted,
-provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in
-supporting documentation, and that the name of the author not be
-used in advertising or publicity pertaining to distribution of the
-software without specific, written prior permission.
+ Permission to use, copy, modify, and distribute this software and its
+ documentation for any purpose and without fee is hereby granted,
+ provided that the above copyright notice appear in all copies and that
+ both that copyright notice and this permission notice appear in
+ supporting documentation, and that the name of the author not be
+ used in advertising or publicity pertaining to distribution of the
+ software without specific, written prior permission.
 
-THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
-ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
-AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
-DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
-AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-***************************************/
+ THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+ ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
+ AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+ DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+ AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ ***************************************/
 
 #ifndef CA_CONFIGFNS_H
 #define CA_CONFIGFNS_H 
@@ -38,11 +38,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "ca_defs.h"
 #include <memwrap.h>
 
-
 /**********************************************************************
-	* This file contains the all the functions prototypes.					*
+ * This file contains the all the functions prototypes.					*
  **********************************************************************/
-																								
 
 void stringPack(char *, const char *);
 
@@ -59,7 +57,7 @@ void opSplitsen(FILE *, gchar **);
  * 
  * Parameters
  *    woordenbook[] -- an array of dictionary structures.
-   *  size -- the size of the array.
+ *  size -- the size of the array.
  *
  * Returns
  *  Nothing.
@@ -92,7 +90,7 @@ int ca_get_boolean(int symbol);
 
 /*
  * The set functions.
-	*/
+ */
 void ca_set_int(int);
 void ca_set_dirlist(int);
 void ca_set_string(int);
@@ -113,22 +111,21 @@ void ca_getAllSources(GSList *);
 void ca_getDictionary(dict_t [], int);
 
 /*
-	* The get function for the string elements of the
+ * The get function for the string elements of the
  * the configuration structure.       
  */
 void ca_getConfig(values_t [], int);
 
 /*
-	* A function that walks through the linked list of sources
+ * A function that walks through the linked list of sources
  * and compares the name of each source with a user-supplied
  * name.  If it finds the name of the source, it prints the 
  * details of the source.
  */
 void ca_getAsource(char *, GSList *);
 
-
 /*
-	* A function that walks through the linked list of sources
+ * A function that walks through the linked list of sources
  * and compares the name of each source with a user-supplied
  * name.  If it finds the name of the source, it returns a
  * pointer to the structure that represents the source.
@@ -136,28 +133,28 @@ void ca_getAsource(char *, GSList *);
 ca_dbSource_t *ca_getSourceDetails(char *, GSList *);
 
 /*
-	* A function that returns a handle to a Source, 
+ * A function that returns a handle to a Source, 
  * given its position in the linked-list of sources.
  *
  */
 ca_SrcHdl_t *ca_get_SourceHandleByPosition(int);
 
 /* ca_get_SourceHandleByName(char *);
-	*
-	* A function that returns a handle to a Source, 
+ *
+ * A function that returns a handle to a Source, 
  * given its name in the linked-list of sources.
  *
  */
 ca_SrcHdl_t *ca_get_SourceHandleByName(char *);
 
 /*
-	* Given a source-handle and an attribute, returns a
+ * Given a source-handle and an attribute, returns a
  * pointer to a character variable.
  */
-char *ca_srchandle2Strelement(ca_SrcHdl_t *, int );
+char *ca_srchandle2Strelement(ca_SrcHdl_t *, int);
 
 /*
-	* Given a source-handle and an attribute, returns an
+ * Given a source-handle and an attribute, returns an
  * integer.
  */
 int ca_srchandle2Intelement(ca_SrcHdl_t *ah, int srcAttrib);
@@ -168,7 +165,7 @@ int ca_srchandle2Intelement(ca_SrcHdl_t *ah, int srcAttrib);
 char *ca_get_adminStrElement(int symbol, int adminAttrib);
 
 /*
-	* Returns an int element of the admin db structure.
+ * Returns an int element of the admin db structure.
  */
 int ca_get_adminIntElement(int symbol, int adminAttrib);
 
@@ -179,24 +176,24 @@ int ca_get_adminIntElement(int symbol, int adminAttrib);
 int ca_writeNewValue(int, char *);
 
 /*
-	* Given a symbol from the list of symbols of variable types,
-	* this returns a handle (pointer) to the Update Sources array.
+ * Given a symbol from the list of symbols of variable types,
+ * this returns a handle (pointer) to the Update Sources array.
  */
-ca_updDbSource_t **ca_get_UpdSourceHandle(int );
+ca_updDbSource_t **ca_get_UpdSourceHandle(int);
 
 int ca_get_UpdSourceNum();
 
 /*
-	* Given a pointer to the Update Source and a symbol from the list
+ * Given a pointer to the Update Source and a symbol from the list
  * of symbols of attributes, this returns a copy of a string
  * attribute of the Update Source variable.
  */
 char *ca_UpdSrcHandle2StrElement(ca_updDbSource_t *, int);
 
 /*
-	* Given a pointer to the Update Source and a symbol from the list
-	* of symbols of attributes, this returns the value of an integer
-	* attribute of the Update Source variable.
+ * Given a pointer to the Update Source and a symbol from the list
+ * of symbols of attributes, this returns the value of an integer
+ * attribute of the Update Source variable.
  */
 int ca_UpdSrcHandle2IntElement(ca_updDbSource_t *, int);
 
@@ -208,23 +205,22 @@ int ca_UpdSrcHandle2IntElement(ca_updDbSource_t *, int);
 void ca_readSources(const char *, values_t []);
 
 /*
-	* Given a pointer to the linked list of databases,
+ * Given a pointer to the linked list of databases,
  * this function returns the details of every database 
  * in the list.
  */
 void ca_getAllDatabases(GSList *);
 
-
 /*
-	* Given a pointer to the linked list of mirrors,
+ * Given a pointer to the linked list of mirrors,
  * this function returns the details of every mirror
  * in the list.
  */
 void ca_getAllMirrors(GSList *);
 
 /* ca_get_DbHandleByName(char *);
-	*
-	* A function that returns a handle to a Database
+ *
+ * A function that returns a handle to a Database
  * given its name in the linked-list of databases.
  *
  */
@@ -233,7 +229,7 @@ ca_SrcHdl_t *ca_get_SourceHandleByName(char *);
 ca_mirror_t *ca_getNrtmHandleByName(char *);
 
 /*
-	* ca_sanityChk()
+ * ca_sanityChk()
  * 	-- Checks if all variables in the dictionary have been defined 
  * 		in the configuration file.
  *
@@ -241,21 +237,17 @@ ca_mirror_t *ca_getNrtmHandleByName(char *);
 int ca_sanityChk(values_t []);
 int ca_sanityCheck(values_t []);
 
-
 /*
-	* ca_mandVarChk()
-	* - checks if all the mandatory variables in the dictionary have 
+ * ca_mandVarChk()
+ * - checks if all the mandatory variables in the dictionary have 
  *   been defined in the configuration file.
  */
 int ca_mandVarChk();
 
-
 /*
-	* ca_conifigCheck()
-	* 	- wrapper for the ca_sanityCheck() function.
+ * ca_conifigCheck()
+ * 	- wrapper for the ca_sanityCheck() function.
  */
 int ca_conifigCheck();
-
-
 
 #endif
