@@ -332,10 +332,14 @@ pthread_t TH_create(void *do_function(void *), void *arguments)
  * gettid() is linux-specific.
  */
 
-#ifdef __linux__
-#include <linux/unistd.h>
-_syscall0(pid_t,gettid)
-pid_t gettid(void);
+#if defined(__linux__) && !defined(__NR_gettid)
+#include <asm/unistd.h>
+#endif
+
+#if defined(__linux__) && defined(__NR_gettid)
+#define GETTID() syscall(__NR_gettid)
+#else
+#define GETTID() getpid()
 #endif
 
 volatile int dying = 0;
@@ -346,14 +350,12 @@ void do_nice_die(int line, char *file) {
 		char *command = ca_get_command_on_die;
 		fprintf(stderr," *** died: +%d %s\n",line, file);
 
-#ifdef __linux__
 		if (command) {
 			char buf[1024];
 			fprintf(stderr, " *** Backtrace:\n");
-			snprintf(buf, 1024, command, gettid());
+			snprintf(buf, 1024, command, GETTID());
 			system(buf);
 		}
-#endif
 	}
 	/* that's the legacy way to bail out - it generates a segfault, so core can be dumped if needed */
 	//*((int*)NULL)=0;
