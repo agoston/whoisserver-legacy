@@ -3,7 +3,9 @@ It is in production now.
 
 I did a search based on the package name, and found the debian repository
 called debian-ipv6. However, I couldn't get the sources found in there to
-compile - looks like the package is broken in some way.
+compile - looks like the package is broken in some way. The binary package
+however is the exact same as dpkg-repack produced from cello's gnupg
+version.
 
 I'll include them here anyway. According to google, only 2 debian-ipv6
 repositories exist on the net, so it's probably a good idea to keep this.
