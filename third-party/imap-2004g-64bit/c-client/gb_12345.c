@@ -1,0 +1,1 @@
+/home/agoston/imap-2004g/src/charset/gb_12345.c
