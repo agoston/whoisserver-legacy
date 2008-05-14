@@ -36,9 +36,8 @@
 /* NOTE: some #include calls are further down in the file */
 
 #include <sys/types.h>
+#include <inttypes.h>
 #include <glib.h>
-
-#include <inet6def.h>
 
 /* errors */
 #define IP_OK      0
