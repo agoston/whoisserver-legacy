@@ -8,6 +8,9 @@
 #include <string.h>
 #include <errno.h>
 #include <netinet/in.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+                     
 
 /*
 struct {
@@ -182,7 +185,8 @@ int SK_accept_connection(int listening_socket)
 
 
 int SK_connect_inner(int *retsock, struct addrinfo *res, int timeout, char *hostname, int port) {
-	int sock, flags, sel, gs, er, erlen = sizeof(er);
+	int sock, flags, sel, gs, er;
+	socklen_t erlen = sizeof(er);
 	struct timeval ptm;
 	fd_set rset, wset;
 
