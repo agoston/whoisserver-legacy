@@ -92,7 +92,12 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
-	infilename = argv[1];
+        infilename = argv[1];
+        if (!strcmp(infilename, "-")) {
+                infile = stdin;
+        } else {
+                infile = fopen(infilename, "r");
+        }
 	infile = fopen(infilename, "r");
 	numthreads = strtol(argv[2], NULL, 10);
 	arg_hostname = argv[3];
