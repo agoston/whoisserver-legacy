@@ -1,11 +1,5 @@
 #!/bin/bash
-# Extracts queries from a query log file, stripping -k flags (well, most of them)
+# strips the queries from a qry log file (read from STDIN), strips -k flags, and emits queries on STDOUT
+# agoston, 2008-05-14
 
-if [ $# -eq 0 ]; then
-	echo "usage: $0 qrylogfile"
-	echo ""
-	echo "$0 will read whoisserver's query log file, extract queries from it, strip the -k flag and put the result on the standard output."
-	exit 1
-fi
-
-sed 's/.*--  //g' <"$1" | sed 's/^-k //; s/ -k / /; s/^-k\([a-zA-Z0-9]\)/-\1/' | grep -xv -- -k | grep -vx ''
+sed 's/.*--  //g' | sed 's/^-k //g; s/ -k / /g' | sed 's/-\([a-zA-Z]*\)k\([a-zA-Z]*\)/-\1\2/g' | grep -vx ''
