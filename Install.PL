@@ -84,7 +84,7 @@ Options:
   ### configuration options
   --prefix=%s           Installation prefix to use. Ie, /usr/local/whoisserver. Defaults
                         to \$HOME/projects/`basename pwd`
-  --dbuser=%s           Username to use to connect to your MySQL server. Defaults to 'dbint'
+  --dbuser=%s           Username to use to connect to your MySQL server. Defautls to 'dbint'
   --dbpass=%s           Password to use to connect to your MySQL server. Defaults to
                         \$ENV{RIPE_DBPASS}
   --dbport=%d           Starting number of port range to use for this server instance.
@@ -155,14 +155,14 @@ if( $RunConfigure or $All ) {
 
 if( $SetupDb or $All ) {
     ### set up the databases to use. Replaces $USER with your username
-    _system( qq[echo "drop database $DbName"       | mysql -u $DbUser -p$DbPass], 1 );
-    _system( qq[echo "create database $DbName"     | mysql -u $DbUser -p$DbPass] );
+    _system( qq[echo "drop database ripe_$User"       | mysql -u $DbUser -p$DbPass], 1 );
+    _system( qq[echo "create database ripe_$User"     | mysql -u $DbUser -p$DbPass] );
 
-    _system( qq[echo "drop database $DbAdminName"   | mysql -u $DbUser -p$DbPass], 1 );
-    _system( qq[echo "create database $DbAdminName" | mysql -u $DbUser -p$DbPass] );
+    _system( qq[echo "drop database ripadmin_$User"   | mysql -u $DbUser -p$DbPass] );
+    _system( qq[echo "create database ripadmin_$User" | mysql -u $DbUser -p$DbPass] );
 
     ### XXX can't we setup ripe db like this?
-    _system( qq[mysql -u $DbUser -p$DbPass $DbAdminName < src/SQL/create.RIPADMIN.sql] ); 
+    _system( qq[mysql -u $DbUser -p$DbPass ripadmin_$User < src/SQL/create.RIPADMIN.sql] ); 
 }
 
 if( $SetupConfig or $All ) {
@@ -194,12 +194,12 @@ if( $SetupConfig or $All ) {
         [ q[^SVCONFIG_PORT .*]    => q[SVCONFIG_PORT ] . ($DbPort+2) ],
         [ q[^SVMIRROR_PORT .*]    => q[SVMIRROR_PORT ] . ($DbPort+3) ],
         [ q[^UPDSOURCE .*]        => q[UPDSOURCE DB-TEST localhost,3306,$DbUser,].
-                                     qq[$DbPass,$DbName localhost,] .
+                                     qq[$DbPass,ripe_$User localhost,] .
                                      ($DbPort+1).q[,].($DbPort+4) ],
     
         ### access to the ripadmin db
         [ q[^RIPADMIN.*]          => q[RIPADMIN localhost,3306,$DbUser,] .
-                                     qq[$DbPass,$DbAdminName]   ], 
+                                     qq[$DbPass,ripadmin_$User]   ], 
         
         ### path to the config file
         [ q[^SOURCEFILE .*]       => q[SOURCEFILE $DbPrefix/conf/sources.config] ],
