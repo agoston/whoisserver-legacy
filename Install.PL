@@ -34,7 +34,7 @@ my $StartDaemon     = 0;
 my $All             = 1;
 
 my $DbPrefix    = File::Spec->catdir( $ENV{'HOME'}, 'projects', basename( $Cwd ) );
-my $DbPass      = $ENV{'RIPE_DBPASS'} || 'ri:Abpw'; # XXX don't hardcode me?
+my $DbPass      = $ENV{'RIPE_DBPASS'} || die 'Need db password. You can also set it via $ENV{RIPE_DBPASS}'.$/;
 my $DbUser      = 'dbint';
 my $DbPort      = $< . 0;    
 my $User        = scalar getpwuid($<);
