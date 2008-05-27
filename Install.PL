@@ -158,7 +158,7 @@ if( $SetupDb or $All ) {
     _system( qq[echo "drop database ripe_$User"       | mysql -u $DbUser -p$DbPass], 1 );
     _system( qq[echo "create database ripe_$User"     | mysql -u $DbUser -p$DbPass] );
 
-    _system( qq[echo "drop database ripadmin_$User"   | mysql -u $DbUser -p$DbPass] );
+    _system( qq[echo "drop database ripadmin_$User"   | mysql -u $DbUser -p$DbPass], 1 );
     _system( qq[echo "create database ripadmin_$User" | mysql -u $DbUser -p$DbPass] );
 
     ### XXX can't we setup ripe db like this?
