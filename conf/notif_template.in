@@ -24,10 +24,10 @@ Precedence: bulk
   <xsl:template match="notification_header_to">To: <xsl:value-of select="to/text()"/>
   </xsl:template>
   <xsl:template match="notification_header_from">
-From: RIPE Database Notifications &lt;bitbucket@ripe.net&gt;</xsl:template>
+From: RIPE Database Notifications &lt;unread@ripe.net&gt;</xsl:template>
   <xsl:template match="notification_header_subject">
 Subject: Notification of RIPE Database changes
-Reply-To: ripe-dbm@ripe.net
+Reply-To: unread@ripe.net
 Precedence: bulk
 Auto-Submitted: auto-generated
   </xsl:template>
@@ -74,12 +74,12 @@ The update causing these changes had the following IP address:
 
 </xsl:text>
 
-     <xsl:apply-templates select="mail_origin_of_request" />
-     <xsl:apply-templates select="ip_origin_of_request" />
-
 <xsl:call-template name="contact"/><xsl:text>
 
 </xsl:text>
+
+     <xsl:apply-templates select="mail_origin_of_request" />
+     <xsl:apply-templates select="ip_origin_of_request" />
 
 
 <xsl:apply-templates select="notif_message" />
