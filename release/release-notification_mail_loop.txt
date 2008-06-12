@@ -1,0 +1,10 @@
+changes:
+ - changed template files in conf dir:
+   notif_template.in
+   notif_text.in
+
+Affected stakeholders:
+ - Any user who parses the text in the notification message
+   The changes are only to the e-mail addresses and the information text at the start of the notification.
+   Any user who parses the notification sensibly to find information about what has changed
+   will not be affected.
