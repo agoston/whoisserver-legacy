@@ -1,4 +1,0 @@
-changes:
- - changed some syntax xml files for the white pages implementation
- - added new organisation tests for the white pages organisation type
-

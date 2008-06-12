@@ -1,7 +1,14 @@
-changes:
- - changed template files in conf dir:
-   notif_template.in
-   notif_text.in
+20080612 - version 3.5
+
+Changes:
+- Implemented white pages
+- Changed sender of notification emails to unread@ripe.net
+
+
+Merged:
+- feature-denis-notification_mail_loop
+- feature-denis-white_pages_only
+
 
 Affected stakeholders:
  - Any user who parses the text in the notification message
