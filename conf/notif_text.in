@@ -10,7 +10,11 @@
 
   <xsl:template name="contact">
 
-For assistance or clarification please contact:
+This message is auto-generated.
+Please DO NOT reply to this message.
+
+If you do not understand why we sent you this message,
+or for assistance or clarification please contact:
 RIPE Database Administration &lt;ripe-dbm@ripe.net&gt;
   </xsl:template>
 
