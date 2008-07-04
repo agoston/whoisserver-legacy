@@ -1,4 +1,9 @@
 #!/bin/bash
+# builds third-party libraries and runs configure.
+# prerequisites: run autogen.sh
+# postrequisites: run make
+#
+# agoston, 2008-07-04
 
 # bail out if anything went wrong
 set -e
