@@ -1,2 +1,0 @@
--lcrypt
--L/usr/lib -lssl -lcrypto

@@ -1,1 +1,0 @@
-../src/charset/tis_620.c

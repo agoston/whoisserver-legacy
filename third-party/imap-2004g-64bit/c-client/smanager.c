@@ -1,1 +1,0 @@
-../src/c-client/smanager.c

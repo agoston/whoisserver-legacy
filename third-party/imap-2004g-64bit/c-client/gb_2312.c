@@ -1,1 +1,0 @@
-../src/charset/gb_2312.c

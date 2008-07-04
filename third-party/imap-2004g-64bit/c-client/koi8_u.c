@@ -1,1 +1,0 @@
-../src/charset/koi8_u.c

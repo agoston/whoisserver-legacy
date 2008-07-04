@@ -1,1 +1,0 @@
-../src/charset/ksc_5601.c

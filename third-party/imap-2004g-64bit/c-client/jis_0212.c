@@ -1,1 +1,0 @@
-../src/charset/jis_0212.c

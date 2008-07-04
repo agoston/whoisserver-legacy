@@ -1,1 +1,0 @@
-../src/c-client/newsrc.h

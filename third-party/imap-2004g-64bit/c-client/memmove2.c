@@ -1,1 +1,0 @@
-../src/ansilib/memmove2.c
