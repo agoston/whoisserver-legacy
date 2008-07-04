@@ -10,14 +10,13 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
-                     
 
 /*
-struct {
-        int l_onoff;
-        int l_linger;
-} linger_struct = {1, 3};
-*/
+ struct {
+ int l_onoff;
+ int l_linger;
+ } linger_struct = {1, 3};
+ */
 
 int SK_setsockflags(int socket, int flags) {
 	int old_flags;
@@ -47,8 +46,7 @@ int SK_clearsockflags(int socket, int flags) {
 	return socket;
 }
 
-int SK_getsock(const char *node, unsigned port, int socket_type, int backlog)
-{
+int SK_getsock(const char *node, unsigned port, int socket_type, int backlog) {
 	struct addrinfo hints, *res, *ai_iter;
 	int error, sock = -1, sock_opt, flags;
 	char portbuf[16], hostnamebuf[256];
@@ -70,14 +68,14 @@ int SK_getsock(const char *node, unsigned port, int socket_type, int backlog)
 	/* is there an IPv6 address? */
 	for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
 		if (ai_iter->ai_family == AF_INET6) {
-		        inet_ntop(ai_iter->ai_family, &((struct sockaddr_in6*)(ai_iter->ai_addr))->sin6_addr, hostnamebuf, sizeof(hostnamebuf));
-                        fprintf(stderr, "Trying to bind on v6 address '%s' ... ", hostnamebuf);
+			inet_ntop(ai_iter->ai_family, &((struct sockaddr_in6*)(ai_iter->ai_addr))->sin6_addr, hostnamebuf, sizeof(hostnamebuf));
+			fprintf(stderr, "Trying to bind on v6 address '%s' ... ", hostnamebuf);
 			sock = socket(ai_iter->ai_family, ai_iter->ai_socktype, ai_iter->ai_protocol);
 			if (sock >= 0) {
-		                fprintf(stderr, "succeed.\n");
+				fprintf(stderr, "succeed.\n");
 				break;
-                        }
-                        fprintf(stderr, "failed.\n");
+			}
+			fprintf(stderr, "failed.\n");
 		}
 	}
 
@@ -85,14 +83,14 @@ int SK_getsock(const char *node, unsigned port, int socket_type, int backlog)
 	if (sock < 0) {
 		for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
 			if (ai_iter->ai_family == AF_INET) {
-			        inet_ntop(ai_iter->ai_family, &((struct sockaddr_in*)(ai_iter->ai_addr))->sin_addr, hostnamebuf, sizeof(hostnamebuf));
-			        fprintf(stderr, "Trying to bind on v4 address '%s' ... ", hostnamebuf);
-			        sock = socket(ai_iter->ai_family, ai_iter->ai_socktype, ai_iter->ai_protocol);
-			        if (sock >= 0) {
-			                fprintf(stderr, "succeed.\n");
-				        break;
-                                }
-                                fprintf(stderr, "failed.\n");
+				inet_ntop(ai_iter->ai_family, &((struct sockaddr_in*)(ai_iter->ai_addr))->sin_addr, hostnamebuf, sizeof(hostnamebuf));
+				fprintf(stderr, "Trying to bind on v4 address '%s' ... ", hostnamebuf);
+				sock = socket(ai_iter->ai_family, ai_iter->ai_socktype, ai_iter->ai_protocol);
+				if (sock >= 0) {
+					fprintf(stderr, "succeed.\n");
+					break;
+				}
+				fprintf(stderr, "failed.\n");
 			}
 		}
 	}
@@ -108,14 +106,14 @@ int SK_getsock(const char *node, unsigned port, int socket_type, int backlog)
 		fprintf(stderr, "SK_getsock(%s, %d): setsockopt(): %d (%s)", node, port, errno, strerror(errno));
 		return -1;
 	}
-/*
-	if (setsockopt(sock, SOL_SOCKET, SO_LINGER, (void *)&linger_struct, sizeof(linger_struct)) == -1) {
-		fprintf(stderr, "SK_getsock(%s, %d): setsockopt(): %d (%s)", node, port, errno, strerror(errno));
-		return -1;
-	}
-*/	
+	/*
+	 if (setsockopt(sock, SOL_SOCKET, SO_LINGER, (void *)&linger_struct, sizeof(linger_struct)) == -1) {
+	 fprintf(stderr, "SK_getsock(%s, %d): setsockopt(): %d (%s)", node, port, errno, strerror(errno));
+	 return -1;
+	 }
+	 */
 
-        //fprintf(stderr, "Fuckme: %d, %d\n", ((struct sockaddr_in6 *)ai_iter->ai_addr)->sin6_flowinfo, ((struct sockaddr_in6 *)ai_iter->ai_addr)->sin6_scope_id);
+	//fprintf(stderr, "Fuckme: %d, %d\n", ((struct sockaddr_in6 *)ai_iter->ai_addr)->sin6_flowinfo, ((struct sockaddr_in6 *)ai_iter->ai_addr)->sin6_scope_id);
 	if ((bind(sock, ai_iter->ai_addr, ai_iter->ai_addrlen)) == -1) {
 		fprintf(stderr, "SK_getsock(%s, %d): bind(): %d (%s)", node, port, errno, strerror(errno));
 		return -1;
@@ -135,15 +133,14 @@ int SK_getsock(const char *node, unsigned port, int socket_type, int backlog)
 
 /*++++++++++++++++++++++++++++++++++++++
 
-   Wait for an incoming connection on the specified socket
+ Wait for an incoming connection on the specified socket
 
-   int  listening_socket      The socket that the server is bound to
+ int  listening_socket      The socket that the server is bound to
 
-   RETURNS										The socket for communicating to the client
+ RETURNS										The socket for communicating to the client
 
-  ++++++++++++++++++++++++++++++++++++++*/
-int SK_accept_connection(int listening_socket)
-{
+ ++++++++++++++++++++++++++++++++++++++*/
+int SK_accept_connection(int listening_socket) {
 	int connected_socket = -1;
 	int num_errors = 0;
 
@@ -155,34 +152,33 @@ int SK_accept_connection(int listening_socket)
 
 		if (connected_socket < 0) {
 			/* Either a real error occured, or blocking was interrupted for
-			   some reason.  Only abort execution if a real error occured. */
+			 some reason.  Only abort execution if a real error occured. */
 			switch (errno) {
-			case EINTR:		/* Interrupted system call */
-			case ECONNABORTED:	/* Software caused connection abort */
-				fprintf(stderr, "(%d) %s\n", errno, strerror(errno));
-				/* no warning */
-				continue;		/* don't return - do the accept again */
-
-			default:
-				if (num_errors++ < MAX_ACCEPT_ERRORS) {	/* warn */
+				case EINTR: /* Interrupted system call */
+				case ECONNABORTED: /* Software caused connection abort */
 					fprintf(stderr, "(%d) %s\n", errno, strerror(errno));
-				} else {	/* crash */
-					fprintf(stderr, "too many accept() errors (maximum is %d)", MAX_ACCEPT_ERRORS);
-					return -1;
-				}
+					/* no warning */
+					continue; /* don't return - do the accept again */
+
+				default:
+					if (num_errors++ < MAX_ACCEPT_ERRORS) { /* warn */
+						fprintf(stderr, "(%d) %s\n", errno, strerror(errno));
+					} else { /* crash */
+						fprintf(stderr, "too many accept() errors (maximum is %d)", MAX_ACCEPT_ERRORS);
+						return -1;
+					}
 			}
-		} else {				/* success */
-/*
-                	if (setsockopt(connected_socket, SOL_SOCKET, SO_LINGER, (void *)&linger_struct, sizeof(linger_struct)) == -1) {
-                		fprintf(stderr, "SK_accept_connection: setsockopt(): %d (%s)", errno, strerror(errno));
-                		return -1;
-                	}
-*/
+		} else { /* success */
+			/*
+			 if (setsockopt(connected_socket, SOL_SOCKET, SO_LINGER, (void *)&linger_struct, sizeof(linger_struct)) == -1) {
+			 fprintf(stderr, "SK_accept_connection: setsockopt(): %d (%s)", errno, strerror(errno));
+			 return -1;
+			 }
+			 */
 			return connected_socket;
 		}
 	}
 }
-
 
 int SK_connect_inner(int *retsock, struct addrinfo *res, int timeout, char *hostname, int port) {
 	int sock, flags, sel, gs, er;
@@ -193,31 +189,31 @@ int SK_connect_inner(int *retsock, struct addrinfo *res, int timeout, char *host
 	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (sock < 0) {
 		fprintf(stderr, "SK_connect(%s, %d): socket(): %d (%s)\n", hostname, port,
-				errno, strerror(errno));
+		errno, strerror(errno));
 		return -1;
 	}
 
 	if (SK_setsockflags(sock, O_NONBLOCK) < 0) {
 		fprintf(stderr, "SK_connect(%s, %d): setsockflags(): %d (%s)\n", hostname,
-				port, errno, strerror(errno));
+		port, errno, strerror(errno));
 		close(sock);
 		return -1;
 	}
 
 	if ((connect(sock, res->ai_addr, res->ai_addrlen)) < 0 && errno != EINPROGRESS) {
 		fprintf(stderr, "SK_connect(%s, %d): connect(): %d (%s)\n", hostname, port,
-				errno, strerror(errno));
+		errno, strerror(errno));
 		close(sock);
 		return -1;
 	}
 
 	FD_ZERO(&rset);
-	FD_SET(sock, &rset);
-	wset = rset;
+FD_SET(sock, &rset);
+		wset = rset;
 	ptm.tv_usec = 0;
 	ptm.tv_sec = timeout;
 
-	if ((sel = select(sock + 1, &rset, &wset, NULL, &ptm)) == 0) {	// timeout
+	if ((sel = select(sock + 1, &rset, &wset, NULL, &ptm)) == 0) { // timeout
 		//fprintf(stderr, "SK_connect(%s, %d): connect(): timeout", hostname, port);
 		fprintf(stderr, "*");
 		close(sock);
@@ -226,7 +222,7 @@ int SK_connect_inner(int *retsock, struct addrinfo *res, int timeout, char *host
 
 	if (sel < 0) {
 		fprintf(stderr, "SK_connect(%s, %d): select(): %d (%s)\n", hostname, port,
-				errno, strerror(errno));
+		errno, strerror(errno));
 		close(sock);
 		return -1;
 	}
@@ -235,27 +231,26 @@ int SK_connect_inner(int *retsock, struct addrinfo *res, int timeout, char *host
 
 	if (gs < 0 || er) {
 		fprintf(stderr, "SK_connect(%s, %d): select(): %d (%s)\n", hostname, port, er,
-				strerror(er));
+		strerror(er));
 		close(sock);
 		return -1;
 	}
 
 	if (SK_clearsockflags(sock, O_NONBLOCK) < 0) {
 		fprintf(stderr, "SK_connect(%s, %d): clearsockflags(): %d (%s)\n", hostname,
-				port, errno, strerror(errno));
+		port, errno, strerror(errno));
 		close(sock);
 		return -1;
 	}
-/*
-        if (setsockopt(sock, SOL_SOCKET, SO_LINGER, (void *)&linger_struct, sizeof(linger_struct)) == -1) {
-                fprintf(stderr, "SK_accept_connection: setsockopt(): %d (%s)", errno, strerror(errno));
-                return -1;
-        }
-*/
+	/*
+	 if (setsockopt(sock, SOL_SOCKET, SO_LINGER, (void *)&linger_struct, sizeof(linger_struct)) == -1) {
+	 fprintf(stderr, "SK_accept_connection: setsockopt(): %d (%s)", errno, strerror(errno));
+	 return -1;
+	 }
+	 */
 	*retsock = sock;
 	return 0;
 }
-
 
 int SK_connect(char *hostname, unsigned int port, unsigned int timeout) {
 	struct addrinfo hints, *res, *ai_iter;
@@ -276,7 +271,7 @@ int SK_connect(char *hostname, unsigned int port, unsigned int timeout) {
 	error = getaddrinfo(hostname, portbuf, &hints, &res);
 	if (error != 0) {
 		fprintf(stderr, "SK_connect(%s, %d): getaddrinfo(): %s", hostname,
-				port, gai_strerror(error));
+		port, gai_strerror(error));
 		return -1;
 	}
 
@@ -286,7 +281,7 @@ int SK_connect(char *hostname, unsigned int port, unsigned int timeout) {
 	for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
 		if (ai_iter->ai_family == AF_INET) {
 			if (SK_connect_inner(sock, ai_iter, timeout, hostname, port) == 0) {
-                                freeaddrinfo(res);
+				freeaddrinfo(res);
 				return socktemp;
 			}
 		}
@@ -298,7 +293,7 @@ int SK_connect(char *hostname, unsigned int port, unsigned int timeout) {
 	for (ai_iter = res; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
 		if (ai_iter->ai_family == AF_INET6) {
 			if (SK_connect_inner(sock, ai_iter, timeout, hostname, port) == 0) {
-                                freeaddrinfo(res);
+				freeaddrinfo(res);
 				return socktemp;
 			}
 		}
