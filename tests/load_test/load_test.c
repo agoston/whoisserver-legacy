@@ -98,7 +98,6 @@ int main(int argc, char **argv) {
         } else {
                 infile = fopen(infilename, "r");
         }
-	infile = fopen(infilename, "r");
 	numthreads = strtol(argv[2], NULL, 10);
 	arg_hostname = argv[3];
 	arg_port = strtol(argv[4], NULL, 10);
