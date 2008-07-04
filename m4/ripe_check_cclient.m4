@@ -4,8 +4,7 @@ dnl
 
 AC_DEFUN(RIPE_CHECK_CCLIENT,[
 AC_ARG_WITH(cclientinc,
-    [  --with-cclientinc=DIR
-     DIR=path of c-client include dir[$ac_default_prefix/build/imap/c-client]],
+    [  --with-cclientinc=DIR   path of c-client include dir],
         if test [ x$withval != x ] -a [ -d $withval ]; then
           cclientinc=$withval
         else
@@ -16,11 +15,11 @@ AC_ARG_WITH(cclientinc,
         fi ,
         if test x$cclientinc = x
         then
-          cclientinc=$ac_default_prefix/build/imap/c-client
+          cclientinc=$RIP/third-party/imap-2004g/c-client
         fi)
 
 AC_ARG_WITH(cclientlib,
-    [  --with-cclientlib=DIR      DIR=path of c-client library dir[$ac_default_prefix/build/imap/c-client]],
+    [  --with-cclientlib=DIR   path of c-client library dir],
         if test [ x$withval != x ] -a [ -d $withval ]; then
           cclientlib=$withval
         else
@@ -31,7 +30,7 @@ AC_ARG_WITH(cclientlib,
         fi ,
         if test x$cclientlib = x
         then
-          cclientlib=$ac_default_prefix/build/imap/c-client
+          cclientlib=$RIP/third-party/imap-2004g/c-client
         fi)
 
 AC_CHECK_FILE($cclientinc/mail.h, ,

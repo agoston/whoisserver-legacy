@@ -12,7 +12,7 @@ LDRIPNOMYSQL =  @abs_top_builddir@/src/librip.a $(GLIB_LIBS)
 LDRIP = $(LDRIPNOMYSQL) $(MYSQL_LIBS)
 LDRIPFULL = @abs_top_builddir@/src/librip.a $(cclientlib)/c-client.a \
 	    $(GLIB_LIBS) $(MYSQL_LIBS) \
-	    $(XML_LIBS) $(XSLT_LIBS) \
+	    $(XSLT_LIBS) $(XML_LIBS) \
             $(RDNSLDFLAGS)
 LDHISTORY = libsq.a liblg.a libut.a \
 	    $(GLIB_LIBS) $(MYSQL_LIBS)
