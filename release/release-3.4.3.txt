@@ -1,0 +1,46 @@
+20080702 - version 3.4.3
+
+Changes:
+- bug fixes
+
+*invalid as-block range (test - asn32/as-block/002)
+*multiple as-block parents (test - asn32/as-block/008)
+*better error reporting
+  + unreferenced object - includes object (test - syntax/001)
+  + no mbrs-by-ref: attribute - includes referencing object (test - membership/009 & 010
+                        asn32/aut-num/006 asn32/inet-rtr/004 asn32/route/005 asn32/route6/005)
+*wrong logic in pgp-override auth (test - pgp-override/001)
+
+- test case fixes
+
+asn32/route/008
+basic-auth/forw-create/008
+basic-auth/forw-create/009
+basic-auth/inetnum/017
+notification/036 
+notification/041 
+query/abuse/014
+query/abuse/036
+type-based/limerick/001
+type-based/limerick/002
+type-based/limerick/003
+
+- new tests
+
+organisation-obj/057
+organisation-obj/058
+organisation-obj/059
+
+
+
+Includes previous changes for white pages and notification mail loop.
+
+Merged:
+- feature-denis-white_pages
+
+
+Affected stakeholders:
+ - The improved error reporting will benefit all users.
+ - The pgp-override changes will allow a new override to be implemented
+ - as-block changes only benefit RIPE NCC staff as only we can create these objects.
+ - test case fixes drops number of failed tests from 23 to 7
