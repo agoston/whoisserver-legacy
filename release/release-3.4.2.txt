@@ -1,0 +1,23 @@
+20080626 - version 3.4.2
+
+Changes:
+- Changed sender of forward emails to unread@ripe.net
+- Removed Reply-to: field from notification and forward messages
+- Some tidying up of the text in notification and forward messages
+- Some compressing of excessive blank lines between paragraphs in
+  these messages.
+
+Merged:
+- feature-denis-notification_mail_loop2
+
+
+Affected stakeholders:
+ - Any user who parses the text in the notification or forward message.
+   (Note the user does not see these as different message types. To the user they are both 
+   notification messages.)
+   The changes are only to the e-mail addresses and the information text at the start of the 
+   notification.
+   Any user who parses the notification text sensibly to find information about what has
+   changed will not be affected.
+   Internally and externally, anyone who filters e-mail on the From: field.
+
