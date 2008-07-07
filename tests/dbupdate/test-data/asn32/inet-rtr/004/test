@@ -13,7 +13,7 @@
 # RESULT 4: The creation will fail.
 
 
-inet-rtr:    kst1-core.swip.net
+inet-rtr:    kst1-core.here.net
 descr:       test router
 local-as:    AS1257.100
 ifaddr:      146.188.49.14 masklen 30 action community.append(123.456:20);
