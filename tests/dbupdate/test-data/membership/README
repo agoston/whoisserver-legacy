@@ -102,14 +102,16 @@
 >> membership/009 <<
 
 # CASE 9: We try to create aut-num object AS123 with member-of: AS-TEST
-# AS-TEST exists and is protected by RIPE-NCC-HM-MNT
-# with NO mbrs-by-ref: attribute
+# and member-of: AS-TEST2
+# AS-TEST and AS-TEST2 exists and are protected by RIPE-NCC-HM-MNT
+# with NO mbrs-by-ref: attribute in  AS-TEST
+# with mbrs-by-ref: attribute in  AS-TEST2
 #
 # create aut-num object
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 9: The creation will succeed.
+# RESULT 9: The creation will fail.
 
 >> membership/010 <<
 
@@ -119,9 +121,9 @@
 #
 # create route object
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 10: The creation will succeed.
+# RESULT 10: The creation will fail.
 
 >> membership/011 <<
 

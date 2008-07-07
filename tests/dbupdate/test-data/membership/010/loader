@@ -126,7 +126,6 @@ export:       to AS2 announce {1.2.3.4/24}
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 notify:       dbtest@ripe.net
-member-of:    AS-TEST
 mnt-by:       TEST-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST

@@ -1490,7 +1490,22 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
         break; 
       case ERROR_U_AUT:
-        snprintf(temp_str, 1024, "***Error: Membership authorisation failure");
+        if (strstr(ripupd_result, "membership not allowed") != NULL  )
+        {
+          /* find the referenced set */
+          pos2 = NULL;
+          if ( pos1 = strstr(ripupd_result, "[8][") )
+          {
+            pos1+=4;
+            if ( pos1 = strchr(ripupd_result, ':') )
+            {
+              pos1++;
+              if ( pos2 = strchr(pos1, ']') )
+              { *pos2 = '\0'; }
+            }
+          }
+          snprintf(temp_str, 1024, "***Error: Membership claim is not supported by mbrs-by-ref:\n          attribute of the referenced set %s", pos2 ? pos1 : "");
+        }
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
         break; 
       default: 
