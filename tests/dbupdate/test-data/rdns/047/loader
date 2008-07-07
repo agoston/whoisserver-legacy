@@ -28,33 +28,6 @@ referral-by:  TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
-
-% mnt-lower maintainer
-
-mntner:       RIPE-NCC-HM-LOW-MNT
-descr:        RIPE-NCC Hostmaster Maintainer
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-auth:         MD5-PW $1$12345678$VSFejqqZYGC9blDcZWEwS.    # host2
-upd-to:       dbtest@ripe.net
-mnt-by:       RIPE-NCC-HM-MNT
-referral-by:  TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101 
-source:       DB-TEST
-
-% mnt-domains maintainer
-
-mntner:       RIPE-NCC-HM-DOM-MNT
-descr:        RIPE-NCC Hostmaster Maintainer
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-auth:         MD5-PW $1$12345678$QdQScgKoWL4lfEn/IkAUP1    # host3
-upd-to:       dbtest@ripe.net
-mnt-by:       RIPE-NCC-HM-MNT
-referral-by:  TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101 
-source:       DB-TEST
-
 % allocation maintainer
 
 mntner:       RIPE-NCC-HM-MNT
@@ -106,6 +79,37 @@ remarks:      This network in not allocated.
               consistency and to allow hierarchical
               authorisation checks.
 changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+%      End of Standard Template Objects
+%----------------------------------------------------------------
+
+%  Additional objects required for this test
+
+% mnt-lower maintainer
+
+mntner:       RIPE-NCC-HM-LOW-MNT
+descr:        RIPE-NCC Hostmaster Maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         MD5-PW $1$12345678$VSFejqqZYGC9blDcZWEwS.    # host2
+upd-to:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
+source:       DB-TEST
+
+% mnt-domains maintainer
+
+mntner:       RIPE-NCC-HM-DOM-MNT
+descr:        RIPE-NCC Hostmaster Maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         MD5-PW $1$12345678$QdQScgKoWL4lfEn/IkAUP1    # host3
+upd-to:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
 source:       DB-TEST
 
 domain:       in-addr.arpa
