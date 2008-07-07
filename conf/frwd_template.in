@@ -23,14 +23,12 @@ Reply-To: ripe-dbm@ripe.net
   <xsl:template match="notification_header_to">To: <xsl:value-of select="to/text()"/>
   </xsl:template>
   <xsl:template match="notification_header_from">
-From: RIPE Database Notifications &lt;bitbucket@ripe.net&gt;</xsl:template>
+From: RIPE Database Notifications &lt;unread@ripe.net&gt;</xsl:template>
   <xsl:template match="notification_header_subject">
 Subject: Requested RIPE database object changes
-Reply-To: ripe-dbm@ripe.net
 Precedence: bulk
 Auto-Submitted: auto-generated
 <xsl:text>
-
 </xsl:text>
 </xsl:template>
 
@@ -44,7 +42,6 @@ The mail message causing these failures had the following mail headers:
 > Reply-To: <xsl:value-of select="reply_to/text()"/>
 > MsgId:    <xsl:value-of select="msgid/text()"/>
 <xsl:text>
-
 </xsl:text>
   </xsl:template>
 
@@ -56,7 +53,6 @@ The update causing these changes had the following IP address:
   </xsl:template>
 
   <xsl:template match="notif_message"><xsl:text>
-  
 </xsl:text>
 <xsl:value-of select="message/text()"/>
   </xsl:template>
@@ -78,14 +74,11 @@ The update causing these changes had the following IP address:
      <xsl:call-template name="intro"/><xsl:text>
 </xsl:text>
 
-     <xsl:call-template name="mail_from_msg"/><xsl:text>
+<xsl:call-template name="contact"/><xsl:text>
 </xsl:text>
+
 <xsl:apply-templates select="mail_origin_of_request" />
 <xsl:apply-templates select="ip_origin_of_request" />
-
-<xsl:call-template name="contact"/><xsl:text>
-
-</xsl:text>
 
      <xsl:apply-templates select="notif_message"/>
   </xsl:template>
