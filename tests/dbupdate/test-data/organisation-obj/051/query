@@ -1,9 +1,9 @@
 % This is the MyDB Whois server.
 
-% Information related to 'ORG-PE1-DB-TEST'
+% Information related to 'ORG-pE1-DB-TEST'
 
-organisation:   ORG-PE1-DB-TEST
-org-name:       Person EXAMPLE1
+organisation:   ORG-pE1-DB-TEST
+org-name:       person EXAMPLE1
 org-type:       OTHER
 address:        Address
 e-mail:         dbtest@ripe.net

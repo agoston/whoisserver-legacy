@@ -446,90 +446,6 @@
 #
 # RESULT 37: Three creations will succeed, one will fail. 
 
-
-#Afrinic tests
-
-# CASE 38: Create an org object
-#          with an AUTO-1 nic-hdl (orgID)
-#          no override
-#
-# create organisation object 
-#
-#NOOP
-#
-# RESULT 38: The creation will be forwarded to hostmaster
-# rir AFRINIC
-
-
-# CASE 39: Modify an org object
-#          no override
-#
-# modify organisation object 
-#
-#NOOP
-#
-# RESULT 39: The modification will be forwarded to hostmaster
-# rir AFRINIC
-
-
-# CASE 40: Delete an org object
-#          no override
-#
-# delete organisation object 
-#
-#NOOP
-#
-# RESULT 40: The deletion will be forwarded to hostmaster
-# rir AFRINIC
-
-
-# CASE 41: Create an org object
-#          with an AUTO-1 nic-hdl (orgID)
-#          with override
-#
-# create organisation object 
-#
-#SUCCESS
-#
-# RESULT 41: The creation will succeed
-# rir AFRINIC
-
-
-# CASE 42: Modify an org object
-#          with override
-#
-# modify organisation object 
-#
-#SUCCESS
-#
-# RESULT 42: The modification will succeed
-# rir AFRINIC
-
-
-# CASE 43: Delete an org object
-#          with override
-#
-# delete organisation object 
-#
-#SUCCESS
-#
-# RESULT 43: The deletion will succeed
-# rir AFRINIC
-
-
-# CASE 44: Create an org object
-#          with an AUTO-1 nic-hdl (orgID)
-#          with override override
-#          no country: attribute
-#
-# create organisation object 
-#
-#FAILED
-#
-# RESULT 44: The creation will fail
-# rir AFRINIC
-
-# organisation object tests
 # CASE 45: Create an org object
 #         with an AUTO-1 nic-hdl (orgID)
 #
@@ -538,4 +454,160 @@
 #SUCCESS
 #
 # RESULT 45: The creation will succeed
+
+# CASE 46: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         and a one-word name
+#         the word is shorted than 64 chars.
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 46: The creation will succeed
+
+# CASE 47: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         and a one-word name
+#         the word is longer than 64 chars.
+#         this will fail: 
+#
+# create organisation object 
+#
+#FAILURE
+#
+# RESULT 47: The creation will fail with syntax error
+
+# CASE 48: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         and a two-word name
+#         every word is shorter than 64 chars.
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 48: The creation will succeed
+
+# CASE 49: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         and a three-word name
+#         every word is shorter than 64 chars.
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 49: The creation will succeed
+
+# CASE 50: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         and a n-word name
+#         there are > 30 words in the org-name
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 50: The creation will succeed
+
+# CASE 51: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         and a n-word name
+#         same word is present in person object's name
+#         this is to check the name query
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 51: The creation will succeed
+
+# CASE 52: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         and a n-word name
+#         same word is present in person object's name
+#         this is to check the -T organisation <name> query
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 52: The creation will succeed
+
+# CASE 53: update an org object
+#         with multiple contiguous spaces in the name
+#
+# update organisation object 
+#
+#SUCCESS
+#
+# RESULT 53: The modificationwill succeed
+
+# CASE 54: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         name has tabs and spaces in it
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 54: The creation will succeed
+
+# CASE 55: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         name has 30 words 64 chars each
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 55: The creation will succeed
+
+# CASE 56: Create an org object
+#         with an AUTO-1 nic-hdl (orgID)
+#         name has all possible accepted chars in it
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 56: The creation will succeed
+#org-name:      A-Z 0-9 .  _ " * ()@, & :!'`+\/-
+
+# CASE 57: Create an org object
+#          with "org-type: WHITEPAGES" with
+#          a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#          variable.
+#
+% make sure that TEST-DBM-MNT is in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 57: The creation will succeed
+
+# CASE 58: Create an org object
+#          with "org-type: LIR" but without
+#          a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#          variable.  
+#
+% make sure that NON-ORG-POWER-MNT is NOT in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#FAILURE
+#
+# RESULT 58: The creation will fail
+
+# CASE 59: Modify a person object adding an "org:" attribute, 
+#          but using the password for organisation mnt-by:
+#          instead of mnt-ref
+#
+# modify person object
+#
+#FAILURE
+#
+# RESULT 59: The modify will fail
 

@@ -1,0 +1,22 @@
+# organisation object tests
+# CASE 59: Modify a person object adding an "org:" attribute, 
+#          but using the password for organisation mnt-by:
+#          instead of mnt-ref
+#
+# modify person object
+#
+#FAILURE
+#
+# RESULT 59: The modify will fail
+
+person:       test person2
+org:          ORG-EOOF1-DB-TEST
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       PERSON-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+password: hostmaster
+password: person

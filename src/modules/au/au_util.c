@@ -23,6 +23,7 @@ au_override (AU_ret_t *ret_val, gboolean *override, au_plugin_callback_info_t *i
   char *override_pwd;
   gchar **override_pgp_keys,**override_pgp_key;
   size_t len;
+  gboolean cr_retval;
 
   LG_log(au_context, LG_FUNC, ">au_override: entering");
 
@@ -39,7 +40,7 @@ au_override (AU_ret_t *ret_val, gboolean *override, au_plugin_callback_info_t *i
     {
       override_pwd[len-1] = '\0';
     }
-    if (CR_credential_list_check(info->cred, CR_OVERRIDE, override_pwd, FALSE))
+    if ( cr_retval=CR_credential_list_check(info->cred, CR_OVERRIDE, override_pwd, FALSE) )
     {
       *ret_val = AU_AUTHORISED;
       *override = TRUE;
@@ -47,10 +48,10 @@ au_override (AU_ret_t *ret_val, gboolean *override, au_plugin_callback_info_t *i
     else
     {
       *override = FALSE;
-    }
-    if ((*override==FALSE)&&(CR_credential_list_check(info->cred, CR_OVERRIDE, override_pwd, FALSE))) { /* check for PGP override if password override fails */
+      /* password override failed, check for PGP override */
       override_pgp_keys=ut_g_strsplit_v1(ca_get_overridepgp,"\n",-1);
       override_pgp_key=override_pgp_keys;
+      LG_log(au_context, LG_DEBUG, "au_override: override_pgp_key [%s]",(override_pgp_key && *override_pgp_key) ? *override_pgp_key : "Not set");
       *override=FALSE;
       while ((*override==FALSE) && override_pgp_key && *override_pgp_key) {
         if (CR_credential_list_check(info->cred,CR_PGP,*override_pgp_key,FALSE)) {

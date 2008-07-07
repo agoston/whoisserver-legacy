@@ -1625,7 +1625,7 @@ void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 
 
-/* Forwards the as-block and irt creation requests to <HUMAILBOX>
+/* Forwards the as-block creation requests to <HUMAILBOX>
    Receives RT context
             LG context
             options structure

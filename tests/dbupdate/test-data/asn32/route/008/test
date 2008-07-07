@@ -10,8 +10,13 @@
 #
 # RESULT 8: The creations will fail.
 #
-# *** TEST WILL FAIL because of bug #201 in software ***
-# non existant route-set in member-of defaults to auth pass
+# Test used to fail because of bug(zilla) #201 in software
+# non existant route-set in member-of defaulted to auth pass
+#
+# Bug(zilla) #201 has been fixed as a result of not allowing dummy 
+# object creations.
+# The creations still fail, but because of referential integrity,
+# referencing a non existant object.
 
 
 route:   20.13.0.0/16

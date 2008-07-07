@@ -1,3 +1,14 @@
+% pgp override tests
+% load objects 
+%
+
+
+%----------------------------------------------------------------
+%        Standard Template Objects
+
+
+% admin-c, tech-c person
+
 person:       test person
 address:      Singel
 phone:        +0123456789
@@ -5,15 +16,109 @@ nic-hdl:      TP1-DB-TEST
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
+
+% referral-by maintainer
+
 mntner:       TEST-DBM-MNT
-descr:        Mntner for RIPE DBM objects
+descr:        Mntner for RIPE DBM objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-upd-to:       dbtest@ripe.net
 auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
+upd-to:       dbtest@ripe.net
 mnt-by:       TEST-DBM-MNT
 referral-by:  TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% allocation maintainer
+
+mntner:       RIPE-NCC-HM-MNT
+descr:        RIPE-NCC Hostmaster Maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         MD5-PW $1$12345678$NN4rSWChzZ4bTTjt90C8L.    # hostmaster
+upd-to:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
+source:       DB-TEST
+
+
+% root inetnum object
+
+inetnum:      0.0.0.0 - 255.255.255.255
+netname:      IANA-BLK
+descr:        The whole IPv4 address space
+country:      NL
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ALLOCATED UNSPECIFIED
+remarks:      The country is really worldwide.
+remarks:      This address space is assigned at various other places in
+remarks:      the world and might therefore not be in the RIPE database.
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+mnt-routes:   RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
+% root inet6num object
+
+inet6num:     0::/0
+netname:      ROOT
+descr:        Root inet6num object
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
+status:       ALLOCATED-BY-RIR
+remarks:      This network in not allocated.
+              This object is here for Database
+              consistency and to allow hierarchical
+              authorisation checks.
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+%      End of Standard Template Objects
+%----------------------------------------------------------------
+
+%  Additional objects required for this test
+
+% private passphrase - qwerty
+
+key-cert:     PGPKEY-D83C3FBD
+method:       PGP
+owner:        Test User (testing) <dbtest@ripe.net>
+fingerpr:     F127 F439 9286 0A5E 06D0  809B 471A AB9F D83C 3FBD
+certif:       -----BEGIN PGP PUBLIC KEY BLOCK-----
+certif:       Version: GnuPG v1.2.4 (GNU/Linux)
+certif:       
+certif:       mQGiBEhGaqcRBAC5Ml+/hCos6WbrISc2egEjQaMi5hcCURSZap2ZkYv4HFG1UiQ4
+certif:       SJ77YIWKRjtAugBKI0OtPc3+CG28l3Qjy3Af6ibRsMjokP77A3CldqrevHzVb11e
+certif:       g4uUBVDl1Z29LrczQ/36tizcA3Ae0GYTVGUqL7Ud9+VVw1hDLvbSbB3qfwCgkWC4
+certif:       TybC7d9RgrLHSLLxMdw6Z5kD/j1BQNT6GhVTeOssxtatkWl6XNulVP/KXGNj+fBi
+certif:       2f2987PdjogojvOEX1ISZg9r+dfJJpA1fREqxcmxOwnQqtyQg3P4gomkxgJ/Fgv9
+certif:       tcIsxUE4mdOyc4ndbMBcnC0qOb83i0ucxuFC97v0y1bzuagCvb3CMGNPZ6yAOcu4
+certif:       qPhiA/42xJngH7cTiNEu2fF1y0kzbg6v68Bs2e//4KKzuqnaWtEgWlh/azQntqs7
+certif:       Z8EONGIUWL78w4j41OLqW80SDrmhxXm4D4fkbmQ7PUxLJxRGlx92uAJb6BBn03F1
+certif:       vCKgNQ2dathLwEOOJaSZkO9QHnNKh37Vc1utDbeBJPLpR8mwN7YAAAAlVGVzdCBV
+certif:       c2VyICh0ZXN0aW5nKSA8ZGJ0ZXN0QHJpcGUubmV0PoheBBMRAgAeBQJIRmqnAhsD
+certif:       BgsJCAcDAgMVAgMDFgIBAh4BAheAAAoJEEcaq5/YPD+9w5MAnR1IX8Ukxn2tJwp9
+certif:       6qdgtXve8wQRAJ9awkI6XNo/VqSNUuXpy766K1X177kBDQRIRmqoEAQAisQxRI6G
+certif:       g97kmHgdhDSMw1Qj5AVsQU/1IZIdh40TRr7+zU5xen6EQLGy1PRJonKi1q9MymXA
+certif:       z7i5HO/1tJ/UzOxcXHKFWoCw0TyMNjoXQq/AQ8nzeJkTnfUuojTMMDwH4z78WYRp
+certif:       Pn7p2POUz2DMzVdosnKDY5ULlWJGxbl1SE8AAwUEAIlLU832nn5Po7MqpFHdiAuQ
+certif:       JB5JmNxbM18+QdadswYHJS2f7pNM1zChVdF3ZRdwbj0PliWd5727sHXj9EyAuJJF
+certif:       JDHVkA4i34cdnHnkjpCEEcemtUvtdynxhVHq1Y4TH8J3UB6pegwdiOMXTRkJCP03
+certif:       m+11oz9PCgQ2o3ANoebwiEkEGBECAAkFAkhGaqgCGwwACgkQRxqrn9g8P72xCgCf
+certif:       fjgQsp5kSoH1TKyP75YIcmUBBdwAn0UcPnm1xjJTVRqZZr7tpkKijF8I
+certif:       =8uv/
+certif:       -----END PGP PUBLIC KEY BLOCK-----
+mnt-by:       TEST-DBM-MNT
+changed:      bit-bucket@ripe.net
 source:       DB-TEST
 
 key-cert:     PGPKEY-0DAD2612

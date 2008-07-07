@@ -662,7 +662,8 @@ OVERRIDEPGP   22222222
 #
 # ALLOCMNT
 # List of maintainers which can create an inetnum object 
-# with status ALLOCATED (one per line or comma separated list
+# with status ALLOCATED 
+# (one per line or comma separated list
 # or combination of the above)
 
 ALLOCMNT MY-OWN-MNT
@@ -678,7 +679,8 @@ DISALLOWMNT NEW-MNT,RIPE-NCC-NONE-MNT
 #
 # ORG_POWER_MNT
 # List of maintainers which can create organistion objects with
-# "org-type:" IANA, RIR, NIR or LIR (one per line or space separated list
+# "org-type:" IANA, RIR, NIR, LIR or WHITEPAGES
+# (one per line or space separated list  ( ??? space or comma ??? )
 # or combination of the above)
 
 ORG_POWER_MNT MY-OWN-MNT

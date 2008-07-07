@@ -754,6 +754,19 @@ void RT_filter_set_syntax(RT_context_t* ctx) {
 
 
 /*+
+  RT_invalid_asblock_range - The as-block range is invalid: ASx - ASy where y<x 
+
+  RT_context_t* ctx - Context.
+ +*/
+void RT_invalid_asblock_range(RT_context_t* ctx) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"as_block_range");
+  rt_prepare_node(ctx, node);
+}
+
+
+/*+
   RT_multiple_changed_date_missing - Multiple changed without date.
 
   RT_context_t* ctx - Context.

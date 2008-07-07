@@ -7,7 +7,7 @@
 #
 #SUCCESS
 #
-# RESULT 3: The deletion will succeed.
+# RESULT 3: The deletion will fail as limericks have been deprecated.
 
 
 limerick:     LIM-OUR-SQL

@@ -329,15 +329,23 @@ set_rpsl_create (au_plugin_callback_info_t *info)
     } 
     else 
     {
+      /* There is no need to force an exit at this point. We can exit gracefully.
       assert(g_list_next(parents) == NULL);  /* must only be a single parent */
+      if ( g_list_next(parents) == NULL )
+      {
+        parent = parents->data;
+        parent_key = rpsl_object_get_key_value(parent);
+        LG_log(au_context, LG_DEBUG, "set_rpsl_create: parent is [%s]", parent_key);
+        UT_free(parent_key);
 
-      parent = parents->data;
-      parent_key = rpsl_object_get_key_value(parent);
-      LG_log(au_context, LG_DEBUG, "set_rpsl_create: parent is [%s]", parent_key);
-      UT_free(parent_key);
-
-      parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY, 
-                                          parent, "parent", info);
+        parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY, 
+                                            parent, "parent", info);
+      }
+      else
+      {
+        LG_log(au_context, LG_DEBUG, "set_rpsl_create: set has multiple parents");
+        parent_auth = AU_ERROR;
+      }
     }
   }
 
@@ -749,16 +757,24 @@ aut_num_rpsl_create (au_plugin_callback_info_t *info)
   }
   else 
   {
+    /* There is no need to force an exit at this point. We can exit gracefully.
     assert(g_list_next(parents) == NULL);  /* must only be a single parent */
-    
-    parent = parents->data;
-    parent_key = rpsl_object_get_key_value(parent);
-    LG_log(au_context, LG_DEBUG, "aut_num_rpsl_create: encompassing as-block is [%s]",
-           parent_key);
-    UT_free(parent_key);
+    if ( g_list_next(parents) == NULL )
+    {
+      parent = parents->data;
+      parent_key = rpsl_object_get_key_value(parent);
+      LG_log(au_context, LG_DEBUG, "aut_num_rpsl_create: encompassing as-block is [%s]",
+             parent_key);
+      UT_free(parent_key);
 
-    parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY, 
-                                          parent, "parent", info);
+      parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY, 
+                                            parent, "parent", info);
+    }
+    else
+    {
+      LG_log(au_context, LG_DEBUG, "aut_num_rpsl_create: as-block has multiple parents");
+      parent_auth = AU_ERROR;
+    }
   }
 
   LG_log(au_context, LG_DEBUG, "aut_num_rpsl_create: parent_auth is [%s]",

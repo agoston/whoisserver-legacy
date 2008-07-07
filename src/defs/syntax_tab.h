@@ -950,7 +950,7 @@ syntax_t syntax_tab[] = {
         /* core_parser */
         NULL,
         /* front_end_regex_pattern */
-        "^(IANA|RIR|NIR|LIR|OTHER)$",
+        "^(IANA|RIR|NIR|LIR|WHITEPAGES|OTHER)$",
         /* front_end_regex, set by syntax_init() */
         NULL,
         /* front_end_reserved_regex_pattern */
