@@ -1,0 +1,17 @@
+20080612 - version 3.4.1
+
+Changes:
+- Implemented white pages
+- Changed sender of notification emails to unread@ripe.net
+
+
+Merged:
+- feature-denis-notification_mail_loop
+- feature-denis-white_pages_only
+
+
+Affected stakeholders:
+ - Any user who parses the text in the notification message
+   The changes are only to the e-mail addresses and the information text at the start of the notification.
+   Any user who parses the notification sensibly to find information about what has changed
+   will not be affected.

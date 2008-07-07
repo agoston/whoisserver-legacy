@@ -1628,7 +1628,8 @@
    This attribute is required in the maintainer object.  It may
    never be altered after the addition of the maintainer.  This
    attribute refers to the maintainer that created this
-   maintainer.
+   maintainer.  It may be multiple if more than one signature
+   appeared on the transaction creating the object.
     </description>
     <syntax>object-name</syntax>
     <representation>

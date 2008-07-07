@@ -6,7 +6,7 @@ file: syntax.xml
 
 description: Defines the various syntaxes that RPSL attributes can have.
 
-$Id: syntax.xml,v 1.16 2006/12/18 14:49:40 denis Exp $
+$Id: syntax.xml,v 1.35 2007/02/21 15:47:00 agoston Exp $
 
 -->
 
@@ -455,8 +455,8 @@ $Id: syntax.xml,v 1.16 2006/12/18 14:49:40 denis Exp $
            </regex>
        </front_end>
        <description>
-     Domain name as specified in RFC 1034 with or without
-     trailing dot (".").  The total length should not exceed
+     Domain name as specified in RFC 1034 (point 5.2.1.2) with or
+     without trailing dot (".").  The total length should not exceed
      254 characters (octets).
        </description>
    </attribute_syntax>
@@ -623,41 +623,23 @@ $Id: syntax.xml,v 1.16 2006/12/18 14:49:40 denis Exp $
        </core>
        <front_end>
           <regex>
-              ^(CRYPT-PW [A-Z0-9./]{13}|MD5-PW \$1\$[A-Z0-9./]{1,8}\$[A-Z0-9./]{22}|PGPKEY-[A-F0-9]{8}|X509-[1-9][0-9]*|AUTO-[1-9][0-9]*)$
+              ^(MD5-PW \$1\$[A-Z0-9./]{1,8}\$[A-Z0-9./]{22}|PGPKEY-[A-F0-9]{8}|X509-[1-9][0-9]*|AUTO-[1-9][0-9]*)$
           </regex>
        </front_end>
        <description>
 &lt;auth-scheme&gt; &lt;scheme-info&gt;       Description
 
-CRYPT-PW      encrypted           This scheme is our weeakest form
-              password, produced  of authentication.  It is by
-              by UNIX crypt(3)    no means meant to keep out a
-              routine             determined malicious attacker.  The
-                                  crypt function is vulnerable to
-                                  exhaustive search by (lots of) fast
-                                  machines and programs to do the
-                                  searching are widely available. For
-                                  this reason it is strongly
-                                  discouraged to use encrypted
-                                  passwords also used for other
-                                  purposes such as UNIX login accounts
-                                  in this scheme. As you are
-                                  publishing the encrypted password in
-                                  the database, it is open to attack.
-                                  The usual caveats about crypt
-                                  passwords apply, so it is not very
-                                  wise to use words or combinations of
-                                  words found in any dictionary of any
-                                  language.
-
-MD5-PW        encrypted           This scheme is similar to the CRYPT-PW
-              password, produced  scheme, except that it uses an MD5
-              using the FreeBSD   hash rather than DES encryption to
-              crypt_md5           generate the password. The main
-              algorithm           benefit over CRYPT-PW is that pass 
-                                  phrases longer than 8 characters may
-                                  be used. All of the dangers of
-                                  CRYPT-PW also apply to MD5-PW.
+MD5-PW        encrypted           This scheme is the weakest form of 
+              password, produced  authentication. It is by no means 
+              using the FreeBSD   to keep out a determined malicious
+              crypt_md5           attacker. As you are publishing the
+              algorithm           encrypted password in the RIPE 
+                                  database, it is open to attack.
+                                  We strongly advise phrases longer 
+                                  than 8 characters to be used,
+                                  avoiding the use of words or
+                                  combinations of words found in any
+                                  dictionary of any language.
 
 PGPKEY-&lt;id&gt;                       Strong scheme of authentication.
                                   &lt;id&gt; is the PGP key ID to be

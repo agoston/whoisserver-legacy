@@ -27,7 +27,6 @@ Precedence: bulk
 From: RIPE Database Notifications &lt;unread@ripe.net&gt;</xsl:template>
   <xsl:template match="notification_header_subject">
 Subject: Notification of RIPE Database changes
-Reply-To: unread@ripe.net
 Precedence: bulk
 Auto-Submitted: auto-generated
   </xsl:template>
@@ -71,11 +70,9 @@ The update causing these changes had the following IP address:
      <xsl:apply-templates select="notification_header_from" />
      <xsl:apply-templates select="notification_header_subject" />
 <xsl:call-template name="intro"/><xsl:text>
-
 </xsl:text>
 
 <xsl:call-template name="contact"/><xsl:text>
-
 </xsl:text>
 
      <xsl:apply-templates select="mail_origin_of_request" />

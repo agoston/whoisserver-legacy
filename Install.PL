@@ -34,7 +34,7 @@ my $StartDaemon     = 0;
 my $All             = 1;
 
 my $DbPrefix    = File::Spec->catdir( $ENV{'HOME'}, 'projects', basename( $Cwd ) );
-my $DbPass      = $ENV{'RIPE_DBPASS'} || 'ri:Abpw'; # XXX don't hardcode me?
+my $DbPass      = $ENV{'RIPE_DBPASS'} || die 'Need db password. You can also set it via $ENV{RIPE_DBPASS}'.$/;
 my $DbUser      = 'dbint';
 my $DbPort      = $< . 0;    
 my $User        = scalar getpwuid($<);
@@ -155,14 +155,14 @@ if( $RunConfigure or $All ) {
 
 if( $SetupDb or $All ) {
     ### set up the databases to use. Replaces $USER with your username
-    _system( qq[echo "drop database $DbName"       | mysql -u $DbUser -p$DbPass], 1 );
-    _system( qq[echo "create database $DbName"     | mysql -u $DbUser -p$DbPass] );
+    _system( qq[echo "drop database ripe_$User"       | mysql -u $DbUser -p$DbPass], 1 );
+    _system( qq[echo "create database ripe_$User"     | mysql -u $DbUser -p$DbPass] );
 
-    _system( qq[echo "drop database $DbAdminName"   | mysql -u $DbUser -p$DbPass], 1 );
-    _system( qq[echo "create database $DbAdminName" | mysql -u $DbUser -p$DbPass] );
+    _system( qq[echo "drop database ripadmin_$User"   | mysql -u $DbUser -p$DbPass], 1 );
+    _system( qq[echo "create database ripadmin_$User" | mysql -u $DbUser -p$DbPass] );
 
     ### XXX can't we setup ripe db like this?
-    _system( qq[mysql -u $DbUser -p$DbPass $DbAdminName < src/SQL/create.RIPADMIN.sql] ); 
+    _system( qq[mysql -u $DbUser -p$DbPass ripadmin_$User < src/SQL/create.RIPADMIN.sql] ); 
 }
 
 if( $SetupConfig or $All ) {
@@ -194,12 +194,12 @@ if( $SetupConfig or $All ) {
         [ q[^SVCONFIG_PORT .*]    => q[SVCONFIG_PORT ] . ($DbPort+2) ],
         [ q[^SVMIRROR_PORT .*]    => q[SVMIRROR_PORT ] . ($DbPort+3) ],
         [ q[^UPDSOURCE .*]        => q[UPDSOURCE DB-TEST localhost,3306,$DbUser,].
-                                     qq[$DbPass,$DbName localhost,] .
+                                     qq[$DbPass,ripe_$User localhost,] .
                                      ($DbPort+1).q[,].($DbPort+4) ],
     
         ### access to the ripadmin db
         [ q[^RIPADMIN.*]          => q[RIPADMIN localhost,3306,$DbUser,] .
-                                     qq[$DbPass,$DbAdminName]   ], 
+                                     qq[$DbPass,ripadmin_$User]   ], 
         
         ### path to the config file
         [ q[^SOURCEFILE .*]       => q[SOURCEFILE $DbPrefix/conf/sources.config] ],

@@ -9,7 +9,6 @@
   </xsl:template>
 
   <xsl:template name="contact">
-
 This message is auto-generated.
 Please DO NOT reply to this message.
 
@@ -23,8 +22,8 @@ RIPE Database Administration &lt;ripe-dbm@ripe.net&gt;
 
 Dear Colleague,
 
-This is to notify you that some object(s) in RIPE database
-which you either maintain or are listed as to-be-notified have
+This is to notify you that some object(s) in RIPE Database that
+you either maintain or you are listed in as to-be-notified have
 been added, deleted or changed.
   </xsl:template>
 
