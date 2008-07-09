@@ -342,68 +342,6 @@ sub text {
 	object_get_text( $self->{object}, $col ) 
 }
 
-
-=item yaml_dump
-
-    my $dump = $rpsl->yaml_dump;
-
-Dump the internal state of the object in YAML.  This is primarly
-intended for debugging and testing.
-
-The basic format of the dump is...
-
-  attributes:
-     - person:    Yarrow Hock
-     - address:   123 Hockworth Lane
-     - address:   Lower Uppingsdownshire
-     - nic-hdl:   ABC123-HOCK
-     ...
-  class:
-     name:      person
-     key:       ABC123-HOCK
-  errors:
-     - { code: BADATTR, attr_num: 6, level: CRITICAL }
-
-"attributes" is simply a list of the attributes and their values in
-the order returned by C<get()>.  The values are the cleaned values.
-
-"class" is information about the class interpreted from the values.
-
-    name        name of the class
-    key         value of the class key
-
-"errors" is a list of any errors returned by C<errors>.
-
-    code        The error code, symbolic or numeric.
-    attr_num    Which attribute this error applies to.
-    level       The error level.
-
-=cut
-
-sub yaml_dump {
-    my $self = shift;
-
-    require YAML::XS;
-
-    my %dump;
-    my @attributes = $self->get;
-
-    $dump{class} = {
-        name    => $self->class,
-        key     => $self->class_key
-    };
-
-    $dump{attributes} = [
-        map { { $_->name, $_->clean_value } }
-            @attributes
-    ];
-
-    $dump{errors} = [$self->errors];
-
-    return YAML::XS::Dump(\%dump);
-}
-
-
 =item get_num_attr
 
 Return the number of attributes in the object.  For badly-formed
@@ -563,27 +501,6 @@ Returns the name of the class of the object.  If there is none
 =cut
 
 sub class { object_get_class( $_[0]->{object} ) }
-
-=item class_key
-
-    my @class_key = $rpsl->class_key;
-
-Returns the value of the @class_key of this object.  Since some
-classes (route) have multiple key attributes it is returned as a list.
-
-=cut
-
-sub class_key {
-    my $self = shift;
-
-    my @attributes = $self->get();
-
-    my @class_key = map  { $_->clean_value }
-                     grep { $self->is_key( $_->name ) }
-                          @attributes;
-
-    return @class_key;
-}
 
 =item errors 
 

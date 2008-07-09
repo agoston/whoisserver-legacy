@@ -10,23 +10,19 @@ if($^O =~ /sunos/) {
 }
 
 foreach $path (@search_path){
-    $full_ar = "$path/ar" if -f "$path/ar";
+  	$full_ar = "$path/ar" if -f "$path/ar";
 }
 
 
 my $libs = `pkg-config gthread-2.0 glib-2.0 --libs`;
 
 WriteMakefile(
-    'ABSTRACT'     => 'RPSL',
-    'AUTHOR'       => 'Kevin Baker <kevin@ripe.net>',
-    'NAME'         => 'Net::Whois::RIPE::RPSL',
-    'VERSION_FROM' => 'RPSL.pm',
-    'PREREQ_PM'    => {
-        Tie::IxHash => 1.21,
-        YAML::XS    => 0.26,
-        Test::More  => 0.62,
-    },
-    'DEFINE'       => '',
-    'LIBS'         => ['-L. -lrpsl_perl_dist -Llib '. $libs],
-    'INC'          => '-I../include `pkg-config gthread-2.0 glib-2.0 --cflags`',
+    'ABSTRACT'		=> 'RPSL',
+    'AUTHOR'		=> 'Kevin Baker <kevin@ripe.net>',
+	'NAME'         => 'Net::Whois::RIPE::RPSL',
+	'VERSION_FROM' => 'RPSL.pm',
+	'PREREQ_PM'    => { Tie::IxHash => 1.21 },
+	'DEFINE'       => '',
+	'LIBS'         => ['-L. -lrpsl_perl_dist -Llib '. $libs],
+	'INC'          => '-I../include `pkg-config gthread-2.0 glib-2.0 --cflags`',
 );
