@@ -222,7 +222,7 @@ has_rir_mntner (const rpsl_object_t *obj)
   alloc_mntner_str = ca_get_allocmnt;
   assert(alloc_mntner_str != NULL);  /* there should always be at least one */
   /* split the alloc_mntner_str on comma */
-  alloc_mntner_list = ut_g_strsplit_v1(alloc_mntner_str, ",\n", 0);
+  alloc_mntner_list = g_strsplit_set(alloc_mntner_str, ",\n", 0);
 
   /* compare the two lists and look for a match */
   rir_mntner_found = FALSE;
