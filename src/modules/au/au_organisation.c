@@ -17,7 +17,7 @@ AU_ret_t object_modification(au_plugin_callback_info_t *info);
 AU_ret_t org_allow(au_plugin_callback_info_t *info);
 
 
-static const au_check_by_type_t organisation_plugins[] = 
+static const au_check_by_type_t organisation_plugins[] =
 {
   /* any object can have an "org:" attribute */
 
@@ -56,8 +56,8 @@ au_has_org_power_mnt (const rpsl_object_t *obj)
   /* get the list of ORG_POWER_MNT mntner names */
   org_power_mnt_str = ca_get_org_power_mnt;
   /* split the alloc_mntner_str on space */
-  org_power_mnt_list = ut_g_strsplit_v1(org_power_mnt_str, " ", 0);
-  
+  org_power_mnt_list = ut_g_strsplit_v1(org_power_mnt_str, " \n", 0);
+
   /* compare the two lists and look for a match */
   org_power_mntner_found = FALSE;
   for (power_mnt_idx = 0; org_power_mnt_list[power_mnt_idx] != NULL && !org_power_mntner_found; power_mnt_idx++)
@@ -83,7 +83,7 @@ au_has_org_power_mnt (const rpsl_object_t *obj)
 
 
 /* creation rules for a organisation object */
-AU_ret_t 
+AU_ret_t
 org_creation (au_plugin_callback_info_t *info)
 {
   AU_ret_t ret_val, org_type_check;
@@ -105,13 +105,13 @@ org_creation (au_plugin_callback_info_t *info)
   if (org_type_attr == NULL)
   {
     org_type_check = AU_ERROR;
-    LG_log(au_context, LG_ERROR, 
+    LG_log(au_context, LG_ERROR,
            "object_creation: missing \"org-type:\" attribute");
   }
   else
   {
     org_type = rpsl_attr_get_clean_value(org_type_attr->data);
-    g_strup(org_type); 
+    g_strup(org_type);
     if(strncmp(org_type, generic_org_type, strlen(generic_org_type)) == 0){
       org_type_check = AU_AUTHORISED;
     }else{
@@ -124,12 +124,12 @@ org_creation (au_plugin_callback_info_t *info)
 
   }
 
-  if((org_type_check == AU_UNAUTHORISED_CONT) && 
+  if((org_type_check == AU_UNAUTHORISED_CONT) &&
      (ret_val != AU_ERROR) && (ret_val != AU_UNAUTHORISED_END)){
     ret_val = AU_UNAUTHORISED_CONT;
   }
 
-  
+
   ret_val = org_type_check;
 
   /* override if necessary */
@@ -192,14 +192,14 @@ au_org_authenticate (RT_context_t *ctx, const gchar *org_id, LU_server_t *lu,
      for (p=mnt_ref_attrs; p != NULL; p = g_list_next(p))
      {
         mntner_name = rpsl_attr_get_clean_value(p->data);
-    
-        if(au_mntner_authenticate(ctx, mntner_name, lu, 
-                        source_name, cred, 
+
+        if(au_mntner_authenticate(ctx, mntner_name, lu,
+                        source_name, cred,
                         &mntner) == AU_AUTHORISED){
           ret_val = AU_AUTHORISED;
         }
      }
- 
+
     }
   }
 
@@ -254,7 +254,7 @@ object_creation (au_plugin_callback_info_t *info)
     if (source_attr == NULL)
     {
       ret_val = AU_ERROR;
-      LG_log(au_context, LG_ERROR, 
+      LG_log(au_context, LG_ERROR,
              "object_creation: missing \"source:\" attribute");
     }
     else
@@ -268,7 +268,7 @@ object_creation (au_plugin_callback_info_t *info)
       {
         value = rpsl_attr_get_clean_value(p->data);
         g_strup(value);
-        LG_log(au_context, LG_DEBUG, 
+        LG_log(au_context, LG_DEBUG,
                "object_creation: checking \"org:\" for %s", value);
 
         switch (au_org_authenticate(info->ctx, value, au_lookup, source, info->cred, &organisation))
@@ -278,12 +278,12 @@ object_creation (au_plugin_callback_info_t *info)
             break;
           case AU_UNAUTHORISED_CONT:
             ret_val = AU_UNAUTHORISED_CONT;
-            if (organisation != NULL) 
+            if (organisation != NULL)
               org_used_fail = g_list_append(org_used_fail, organisation);
             break;
           case AU_ERROR:
             num_error++;
-            if (organisation != NULL) 
+            if (organisation != NULL)
               org_used_fail = g_list_append(org_used_fail, organisation);
             break;
           case AU_FWD:
@@ -362,7 +362,7 @@ object_modification (au_plugin_callback_info_t *info)
   LG_log(au_context, LG_FUNC, ">object_modify: entering");
 
   generic_org_type = g_strdup("OTHER");
-  
+
   LG_log(au_context, LG_FUNC, "org_creation: generic org type: %s", generic_org_type);
 
   /* grab key */
@@ -379,10 +379,10 @@ object_modification (au_plugin_callback_info_t *info)
   }
 
   /* get the old version of the object */
-  if (!LU_get_object(au_lookup, &old_object, info->obj, NULL)) 
+  if (!LU_get_object(au_lookup, &old_object, info->obj, NULL))
   {
     rpsl_attr_delete_list(org);
-    LG_log(au_context, LG_ERROR, 
+    LG_log(au_context, LG_ERROR,
            "object_modify: error looking up old version");
     LG_log(au_context, LG_FUNC,
            "<object_modify: exiting with value [AU_ERROR]");
@@ -394,7 +394,7 @@ object_modification (au_plugin_callback_info_t *info)
   if (source_attr == NULL)
   {
     rpsl_attr_delete_list(org);
-    LG_log(au_context, LG_ERROR, 
+    LG_log(au_context, LG_ERROR,
            "object_modify: missing \"source:\" attribute");
     LG_log(au_context, LG_FUNC,
            "<object_modify: exiting with value [AU_ERROR]");
@@ -437,12 +437,12 @@ object_modification (au_plugin_callback_info_t *info)
           break;
         case AU_UNAUTHORISED_CONT:
           ret_val = AU_UNAUTHORISED_CONT;
-          if (organisation != NULL) 
+          if (organisation != NULL)
             org_used_fail = g_list_append(org_used_fail, organisation);
           break;
         case AU_ERROR:
           num_error++;
-          if (organisation != NULL) 
+          if (organisation != NULL)
             org_used_fail = g_list_append(org_used_fail, organisation);
           break;
         case AU_FWD:
@@ -459,14 +459,14 @@ object_modification (au_plugin_callback_info_t *info)
 
       if (organisation == NULL)
       {
-        /* There is an org added and it was checked 
-           but the organisation object does not exist. 
+        /* There is an org added and it was checked
+           but the organisation object does not exist.
            We should still report this one */
         organisation_not_exist++;
       }
     }
     UT_free(val);
-  }    
+  }
 
 
 
@@ -479,13 +479,13 @@ object_modification (au_plugin_callback_info_t *info)
    if (org_type_attr == NULL)
    {
      org_type_check = AU_ERROR;
-     LG_log(au_context, LG_ERROR, 
+     LG_log(au_context, LG_ERROR,
             "object_creation: missing \"org-type:\" attribute");
    }
    else
    {
      org_type = rpsl_attr_get_clean_value(org_type_attr->data);
-     g_strup(org_type); 
+     g_strup(org_type);
      if(strncmp(org_type, generic_org_type, strlen(generic_org_type)) == 0){
        org_type_check = AU_AUTHORISED;
      }else{
@@ -502,12 +502,12 @@ object_modification (au_plugin_callback_info_t *info)
      organisation_type_check_failed = TRUE;
    }
 
-   if((org_type_check == AU_UNAUTHORISED_CONT) && 
+   if((org_type_check == AU_UNAUTHORISED_CONT) &&
       (ret_val != AU_ERROR) && (ret_val != AU_UNAUTHORISED_END)){
      ret_val = AU_UNAUTHORISED_CONT;
    }
   }
-  
+
 
   /* clean up */
   rpsl_attr_delete_list(org);
@@ -540,9 +540,9 @@ object_modification (au_plugin_callback_info_t *info)
   return ret_val;
 }
 
-/* 
+/*
   Entry point for organisation object authorisation - invoke AU by-type support
-  
+
   trans    - PG module transaction
   info     - AU plugin callback information
 
@@ -553,7 +553,7 @@ object_modification (au_plugin_callback_info_t *info)
 
   This is merely a dispatcher.
  */
-PG_status_t 
+PG_status_t
 au_organisation_check (PG_transaction_t *trans, gpointer *info)
 {
   PG_status_t ret_val;
@@ -565,7 +565,7 @@ au_organisation_check (PG_transaction_t *trans, gpointer *info)
 
   callback_info = PG_global_get(trans);
   au_ret_val = AU_check_by_type(organisation_plugins, callback_info);
-  switch (au_ret_val) 
+  switch (au_ret_val)
   {
     case AU_AUTHORISED:
       ret_val = PG_OK;
@@ -593,7 +593,7 @@ au_organisation_check (PG_transaction_t *trans, gpointer *info)
          au_ret_val);
   }
 
-  LG_log(au_context, LG_FUNC, "<au_organisation_check: exiting with value [%d]", 
+  LG_log(au_context, LG_FUNC, "<au_organisation_check: exiting with value [%d]",
          ret_val);
   return ret_val;
 }

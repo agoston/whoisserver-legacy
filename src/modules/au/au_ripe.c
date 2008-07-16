@@ -21,7 +21,7 @@ AU_ret_t ripe_inet6num_checks(au_plugin_callback_info_t *info);
 AU_ret_t ripe_allow(au_plugin_callback_info_t *info);
 AU_ret_t ripe_check_name_change(au_plugin_callback_info_t *info);
 
-static const au_check_by_type_t ripe_plugins[] = 
+static const au_check_by_type_t ripe_plugins[] =
 {
   { "inetnum", ripe_inetnum_checks, ripe_allow, ripe_inetnum_checks },
   { "inet6num", ripe_inet6num_checks, ripe_allow, ripe_inet6num_checks },
@@ -108,14 +108,14 @@ parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj, ...)
     key = rpsl_object_get_key_value(parent);
     if (parent_status == NULL)
     {
-      LG_log(au_context, LG_DEBUG, "parent_status_is_valid: parent \"%s\" has no status", 
+      LG_log(au_context, LG_DEBUG, "parent_status_is_valid: parent \"%s\" has no status",
         key);
       /* add bogus value, which will make checks fail */
       parent_status = UT_strdup("");
     }
     else
     {
-      LG_log(au_context, LG_DEBUG, "parent_status_is_valid: parent \"%s\" has status \"%s\"", 
+      LG_log(au_context, LG_DEBUG, "parent_status_is_valid: parent \"%s\" has status \"%s\"",
         key, parent_status);
     }
     UT_free(key);
@@ -129,7 +129,7 @@ parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj, ...)
   while (allowed_parent_type != NULL)
   {
     /* build a string of allowed types */
-    if (status_types_msg->len == 0) 
+    if (status_types_msg->len == 0)
     {
       g_string_append(status_types_msg, allowed_parent_type);
     }
@@ -184,7 +184,7 @@ parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj, ...)
     g_list_free(all_parent_status);
 
     /* note the failure */
-    for (p = parents; p != NULL; p = g_list_next(p)) 
+    for (p = parents; p != NULL; p = g_list_next(p))
     {
         parent = p->data;
         key = rpsl_object_get_key_value(parent);
@@ -222,8 +222,8 @@ has_rir_mntner (const rpsl_object_t *obj)
   alloc_mntner_str = ca_get_allocmnt;
   assert(alloc_mntner_str != NULL);  /* there should always be at least one */
   /* split the alloc_mntner_str on comma */
-  alloc_mntner_list = ut_g_strsplit_v1(alloc_mntner_str, ",", 0);
-  
+  alloc_mntner_list = ut_g_strsplit_v1(alloc_mntner_str, ",\n", 0);
+
   /* compare the two lists and look for a match */
   rir_mntner_found = FALSE;
   for (alloc_idx = 0; alloc_mntner_list[alloc_idx] != NULL && !rir_mntner_found; alloc_idx++)
@@ -248,7 +248,7 @@ has_rir_mntner (const rpsl_object_t *obj)
 }
 
 
-AU_ret_t 
+AU_ret_t
 ripe_inetnum_checks (au_plugin_callback_info_t *info)
 {
   rpsl_object_t *old_object;
@@ -269,7 +269,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
     LG_log(au_context, LG_FUNC, "<ripe_inetnum_checks: exiting with value [AU_ERROR]");
     return AU_ERROR;
   }
-  if (old_object == NULL) 
+  if (old_object == NULL)
   {
     LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: no old version, new");
   }
@@ -330,18 +330,18 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
 
       if (strcmp(new_status, "LIR-PARTITIONED PA") == 0)
       {
-        parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+        parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
           "LIR-PARTITIONED PA", "ALLOCATED PA", "ALLOCATED UNSPECIFIED", "SUB-ALLOCATED PA", NULL);
       }
       else if (strcmp(new_status, "LIR-PARTITIONED PI") == 0)
       {
-        parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+        parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
           "LIR-PARTITIONED PI", "ALLOCATED PI", "ALLOCATED UNSPECIFIED", NULL);
       }
       else
       {
         parent_status_ok = FALSE;
-        LG_log(au_context, LG_ERROR, "ripe_inetnum_checks: bogus LIR-PARTITIONED status \"%s\"", 
+        LG_log(au_context, LG_ERROR, "ripe_inetnum_checks: bogus LIR-PARTITIONED status \"%s\"",
           new_status);
       }
 
@@ -354,7 +354,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
         /* note that the RT logging is done by parent_status_is_valid() */
         ret_val = AU_UNAUTHORISED_CONT;
       }
-      
+
     }
     /* changing to SUB-ALLOCATED PA */
     else if ((strcmp(new_status, "SUB-ALLOCATED PA") == 0) &&
@@ -384,7 +384,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
 
       if ( strcmp(old_status, "") != 0 )
       {
-        /* ASSIGNED ANYCAST can only be set on object creation, 
+        /* ASSIGNED ANYCAST can only be set on object creation,
 	   not on modification */
         RT_status_check_failed_anycast_modify(info->ctx);
         ret_val = AU_UNAUTHORISED_CONT;
@@ -400,7 +400,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
 	}
 	else
 	{
-	  parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+	  parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
                              "ALLOCATED PI", "ALLOCATED UNSPECIFIED", NULL);
 
 	  if (parent_status_ok)
@@ -476,7 +476,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
     else
     {
       ret_val = AU_AUTHORISED;
-      LG_log(au_context, LG_DEBUG, 
+      LG_log(au_context, LG_DEBUG,
         "ripe_inetnum_checks: no special handling changing status \"%s\" to \"%s\"",
         old_status, new_status);
     }
@@ -494,13 +494,13 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
   /* override if necessary */
   au_override(&ret_val, &override, info);
 
-  LG_log(au_context, LG_FUNC, "<ripe_inetnum_checks: exiting with value [%s]", 
+  LG_log(au_context, LG_FUNC, "<ripe_inetnum_checks: exiting with value [%s]",
          AU_ret2str(ret_val));
 
   return ret_val;
 }
 
-AU_ret_t 
+AU_ret_t
 ripe_inet6num_checks (au_plugin_callback_info_t *info)
 {
   rpsl_object_t *old_object;
@@ -521,7 +521,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
     LG_log(au_context, LG_FUNC, "<ripe_inet6num_checks: exiting with value [AU_ERROR]");
     return AU_ERROR;
   }
-  if (old_object == NULL) 
+  if (old_object == NULL)
   {
     LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: no old version, new");
   }
@@ -572,7 +572,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
       else
       {
         LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: has RIPE NCC maintainer");
-        parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+        parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
           "ALLOCATED-BY-RIR", NULL);
         if (parent_status_ok)
         {
@@ -590,7 +590,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
              (strcmp(old_status, "ALLOCATED-BY-LIR") != 0))
     {
       LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: ALLOCATED-BY-LIR");
-      parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+      parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
         "ALLOCATED-BY-RIR", "ALLOCATED-BY-LIR", NULL);
       if (parent_status_ok)
       {
@@ -609,7 +609,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
 
       if ( strcmp(old_status, "") != 0 )
       {
-        /* ASSIGNED ANYCAST can only be set on object creation, 
+        /* ASSIGNED ANYCAST can only be set on object creation,
 	   not on modification */
         RT_status_check_failed_anycast_modify(info->ctx);
         ret_val = AU_UNAUTHORISED_CONT;
@@ -625,7 +625,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
 	}
 	else
 	{
-	  parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+	  parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
                              "ALLOCATED-BY-RIR", NULL);
 
 	  if (parent_status_ok)
@@ -647,7 +647,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
              (strcmp(old_status, "ASSIGNED") != 0))
     {
       LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: ASSIGNED");
-      parent_status_ok = parent_status_is_valid(info->ctx, info->obj, 
+      parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
         "ALLOCATED-BY-RIR", "ALLOCATED-BY-LIR", NULL);
       if (parent_status_ok)
       {
@@ -663,7 +663,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
     else
     {
       ret_val = AU_AUTHORISED;
-      LG_log(au_context, LG_DEBUG, 
+      LG_log(au_context, LG_DEBUG,
         "ripe_inet6num_checks: no special handling changing status \"%s\" to \"%s\"",
         old_status, new_status);
     }
@@ -681,7 +681,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
   /* override if necessary */
   au_override(&ret_val, &override, info);
 
-  LG_log(au_context, LG_FUNC, "<ripe_inet6num_checks: exiting with value [%s]", 
+  LG_log(au_context, LG_FUNC, "<ripe_inet6num_checks: exiting with value [%s]",
          AU_ret2str(ret_val));
 
   return ret_val;
@@ -690,15 +690,15 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
 
 /*
  * ripe_check_name_change() makes checks on private (person and role) objects,
- * and authorises the update only if the name attribute (person: or role:) is 
+ * and authorises the update only if the name attribute (person: or role:) is
  * unchanged.  Otherwise, the function returns AU_UNAUTHORISED_CONT which
  * prevents the object from being modified.
  *
  * The override scheme bypasses this check.
  *
  */
-AU_ret_t 
-ripe_check_name_change(au_plugin_callback_info_t *info) 
+AU_ret_t
+ripe_check_name_change(au_plugin_callback_info_t *info)
 {
 
   AU_ret_t ret_val = AU_AUTHORISED;
@@ -710,18 +710,18 @@ ripe_check_name_change(au_plugin_callback_info_t *info)
   const char *type = NULL;
   gchar *old_name;
   gchar *new_name;
-  
+
   LG_log(au_context, LG_FUNC, ">ripe_check_name_change: entering");
 
   au_override(&ret_val, &override, info);
 
   if ( override == TRUE )
-  {   
-    LG_log(au_context, LG_DEBUG, "ripe_check_name_change: override used");   
-    LG_log(au_context, LG_FUNC, "<ripe_check_name_change: exiting with value [%s]", AU_ret2str(ret_val));   
+  {
+    LG_log(au_context, LG_DEBUG, "ripe_check_name_change: override used");
+    LG_log(au_context, LG_FUNC, "<ripe_check_name_change: exiting with value [%s]", AU_ret2str(ret_val));
     return ret_val;
   }
-  
+
   type = rpsl_object_get_class(info->obj);
 
   if(type == NULL)
@@ -777,7 +777,7 @@ ripe_check_name_change(au_plugin_callback_info_t *info)
   g_free(new_name);
   g_free(old_name);
 
-  LG_log(au_context, LG_FUNC, "<ripe_check_name_change: exiting with value [%s]", 
+  LG_log(au_context, LG_FUNC, "<ripe_check_name_change: exiting with value [%s]",
          AU_ret2str(ret_val));
 
 
@@ -787,9 +787,9 @@ ripe_check_name_change(au_plugin_callback_info_t *info)
 
 
 
-/* 
+/*
   Entry point for RIPE authorisation - invoke AU by-type support
-  
+
   trans    - PG module transaction
   info     - AU plugin callback information
 
@@ -800,7 +800,7 @@ ripe_check_name_change(au_plugin_callback_info_t *info)
 
   This is merely a dispatcher.
  */
-PG_status_t 
+PG_status_t
 au_ripe_check (PG_transaction_t *trans, gpointer *info)
 {
   PG_status_t ret_val;
@@ -839,7 +839,7 @@ au_ripe_check (PG_transaction_t *trans, gpointer *info)
         au_ret_val);
   }
 
-  LG_log(au_context, LG_FUNC, "<au_ripe_check: exiting with value [%d]", 
+  LG_log(au_context, LG_FUNC, "<au_ripe_check: exiting with value [%d]",
          ret_val);
   return ret_val;
 }
