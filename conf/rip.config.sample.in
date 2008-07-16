@@ -662,23 +662,24 @@ OVERRIDEPGP   22222222
 #
 # ALLOCMNT
 # List of maintainers which can create an inetnum object 
-# with status ALLOCATED 
-# (one per line or comma separated list or combination of the above)
+# with status ALLOCATED (one per line or comma separated list
+# or combination of the above)
 
 ALLOCMNT MY-OWN-MNT
 
 #
 # DISALLOWMNT
 # List of maintainers which are not allowed to be used 
-# (one per line or comma separated list or combination of the above)
+# (one per line or comma separated list
+# or combination of the above)
 
 DISALLOWMNT NEW-MNT,RIPE-NCC-NONE-MNT
 
 #
 # ORG_POWER_MNT
 # List of maintainers which can create organistion objects with
-# "org-type:" IANA, RIR, NIR, LIR or WHITEPAGES
-# (one per line or space separated list or combination of the above)
+# "org-type:" IANA, RIR, NIR or LIR (one per line or space separated list
+# or combination of the above)
 
 ORG_POWER_MNT MY-OWN-MNT
 
@@ -717,6 +718,16 @@ PGPPATH @topdir@/.gnupg
 # Full pathname of your gpg executable
 
 GPGCMD @GPGCMD@
+
+#
+# X.509-related stuff
+#
+#  NOT IN USE
+
+OPENSSLCMD NULL
+CRLLIST NULL
+CACERTS NULL
+
 
 #
 # X.509-related stuff
