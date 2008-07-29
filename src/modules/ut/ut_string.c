@@ -56,7 +56,7 @@ gchar **ut_g_strsplit_v1(gchar *string, gchar *delimiter, gint max_tokens) {
         v2_result = g_strsplit(string_trimmed, delimiter, max_tokens);
         g_free(string_trimmed);
     } else {
-        v2_result = g_strsplit(string_trimmed, delimiter, max_tokens);
+        v2_result = g_strsplit(string, delimiter, max_tokens);
     }
 
     return v2_result;
