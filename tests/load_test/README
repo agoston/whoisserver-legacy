@@ -1,4 +1,7 @@
-This is the load tester for whois server.
+load_test:
+~~~~~~~~~~
+
+These are the load tester apps for whois server.
 
 It's a simple application which takes a file containing a query each line,
 and feeds it into whoisserver with a definable number of threads. The
@@ -10,12 +13,54 @@ Errors can occur at 2 places: when connecting (connection timeout because of
 high load), and when getting the data (because it takes too long for
 whoisserver to respond). These are marked in the output.
 
-An extract script is also supplied which takes a whoisserver query log file
-as an argument and outputs the queries only on its standard output,
-stripping '-k' flags from queries. The latter is needed as outherwise
-whoisserver wouldn't close the connection (it would wait for more queries
-after serving the first one), resulting in a timeout.
+stest:
+~~~~~~
 
-If you have any more questions, check out the source code.
+This is a slightly modified version of the above, but connects to 2
+whoisserver instances instead of one, comparing their output.
 
-Agoston, 2006-10-25.
+You can use it as sort of a real-world query test.
+
+
+load_server:
+~~~~~~~~~~~~
+
+It is a very simple threading app that emulates a whois-server. It was used
+to debug why ipv6 connections are dropped under 2.6.13 (turns out it was a
+kernel bug).
+
+It doesn't have much use nowadays, but I'll keep it here for possible future
+use.
+
+
+extract.sh:
+~~~~~~~~~~~
+
+It takes uncompressed qry logs on stdin, removes everything from each line
+except for the query string. Then, all the -k flags are stripped from the
+query string, which is then dumped to stdout.
+
+It is very easy to use this for query testing, like this:
+
+for i in ~/logs/*; do echo $i; bzcat $i | ./extract.sh; done >qrylog
+
+Or, you can just redirect output directly to the tester apps, like this:
+
+for i in ~/logs/*; do echo $i; bzcat $i | ./extract.sh; done | stest - 8 193.0.1.182 49001 193.0.1.109 49001
+
+
+NOTE:
+~~~~~
+
+When running this test suite, NEVER FORGET to run the sql command
+
+delete from refer;
+
+on the whois database first! Otherwise, referrals will get through to all
+the ccTLD's whois boxes, which is not very nice when doing a load test...
+
+
+If you have any more questions, check out the source code. It is _really_
+simple.
+
+Agoston, 2008-05-15

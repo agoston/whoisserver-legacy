@@ -60,7 +60,6 @@
 #include "mg_getopt.h"
 #include "globaldefs.h"
 #include "km.h"
-#include "inet6def.h"
 #include "iproutines.h"
 #include "ep.h"
 #include "lg.h"

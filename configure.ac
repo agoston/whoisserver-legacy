@@ -279,14 +279,20 @@ AC_SUBST(MYSQL_LIBS)
 AC_SUBST(MYSQL_CFLAGS)
 
 dnl Check for proper versions of libxml and libxslt
-AM_PATH_XML2([2.4.0], [], if test x"$OPLONLY" != xyes
-                          then
-                            AC_MSG_ERROR([libxml2 is required!])
-                          fi)
-AM_PATH_XSLT([1.0.0], [], if test x"$OPLONLY" != xyes
-                          then
-                            AC_MSG_ERROR([libxslt is required!])
-                          fi)
+dnl disabled by agoston, 2008-07-04, as we depend on an older version of
+dnl libxml & libxslt, and we will link the older version statically
+dnl to avoid incorrect dynamic linking
+dnl
+dnl AM_PATH_XML2([2.4.0], [], if test x"$OPLONLY" != xyes
+dnl                           then
+dnl                            AC_MSG_ERROR([libxml2 is required!])
+dnl                          fi)
+dnl AM_PATH_XSLT([1.0.0], [], if test x"$OPLONLY" != xyes
+dnl                          then
+dnl                            AC_MSG_ERROR([libxslt is required!])
+dnl                          fi)
+RIPE_CHECK_LIBXML
+RIPE_CHECK_LIBXSLT
 
 dnl Check for md5 headers
 AC_SEARCH_LIBS(MD5Init, md5)    # Solaris

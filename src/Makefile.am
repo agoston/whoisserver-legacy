@@ -12,7 +12,7 @@ LDRIPNOMYSQL =  @abs_top_builddir@/src/librip.a $(GLIB_LIBS)
 LDRIP = $(LDRIPNOMYSQL) $(MYSQL_LIBS)
 LDRIPFULL = @abs_top_builddir@/src/librip.a $(cclientlib)/c-client.a \
 	    $(GLIB_LIBS) $(MYSQL_LIBS) \
-	    $(XML_LIBS) $(XSLT_LIBS) \
+	    $(XSLT_LIBS) $(XML_LIBS) \
             $(RDNSLDFLAGS)
 LDHISTORY = libsq.a liblg.a libut.a \
 	    $(GLIB_LIBS) $(MYSQL_LIBS)
@@ -97,8 +97,7 @@ libdf_a_SOURCES = modules/df/defs.c
 libep_a_SOURCES = modules/ep/ep.c modules/ep/ep_mail_driver.c \
                   modules/ep/ep_text_driver.c modules/ep/mm.c \
                   modules/ep/mm_hook.c modules/ep/x509.c
-libip_a_SOURCES = modules/ip/inet_ntop.c modules/ip/inet_pton.c \
-                  modules/ip/ip.c
+libip_a_SOURCES = modules/ip/ip.c
 libkm_a_SOURCES = modules/km/km.c modules/km/km_X509.c \
                   modules/km/km_pgp.c modules/km/lulu.c
 liblg_a_SOURCES = modules/lg/lg.c modules/lg/lg_utils.c

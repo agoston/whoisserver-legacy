@@ -3,3 +3,6 @@ ModuleTemplatePath /home/agoston/workspace/whoisserver/conf/delcheck-template.xm
 
 ParamMinimumNumberNameservers              2
 ModuleNameserverIgnoreList                 ns.ripe.net
+
+ModuleQueryRemoteUDPTimeout 5
+ModuleQueryLocalUDPTimeout 3
