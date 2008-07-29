@@ -45,9 +45,9 @@ void rpsl_error_check(const GList *errors, const char *file, int line);
 void rpsl_attr_check(const rpsl_attr_t *attr, const char *file, int line);
 void rpsl_object_check(const rpsl_object_t *obj, const char *file, int line);
 #else
-#define chk_obj(o) 
-#define chk_attr(a) 
-#define chk_err(e) 
+#define chk_obj(o)
+#define chk_attr(a)
+#define chk_err(e)
 #endif /* RUNTIME_CHECK */
 
 /* type of check currently in place */
@@ -88,7 +88,7 @@ attribute_clean (const gchar *val)
     gchar *ret_val;
 
     /* split our value up into lines */
-    lines = (gchar**)ut_g_strsplit_v1(val, "\n", 0);
+    lines = g_strsplit(val, "\n", 0);
 
     for (i=0; lines[i] != NULL; i++) {
         /* remove comments */
@@ -218,25 +218,6 @@ attribute_clean_lines (const gchar *val)
     return (gchar *)ret_val;
 }
 
-/* see if the given string ends with the other string */
-static gboolean
-str_ends_with (const char *s1, const char *s2)
-{
-    int s1_len;
-    int s2_len;
-
-    s1_len = strlen(s1);
-    s2_len = strlen(s2);
-    if (s1_len < s2_len) {
-        return FALSE;
-    }
-    if (strcmp(s1 + s1_len - s2_len, s2) == 0) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
-}
-
 /* return each element in the list as a seperate gchar* */
 /* be sure to call g_strfreev() when done with this result!!! */
 static gchar **
@@ -251,11 +232,8 @@ generic_list_split (const char *val, const char *separator_char)
     /* clean up to remove comments and newlines */
     tmp_str = attribute_clean(val);
 
-    /* check for empty last element, which g_strsplit() will silently drop */
-    has_empty_last_element = str_ends_with(tmp_str, separator_char);
-
     /* split based on separator character */
-    ret_val = (gchar**)ut_g_strsplit_v1(tmp_str, separator_char, 0);
+    ret_val = g_strsplit(tmp_str, separator_char, 0);
 
     /* free our temporary variable */
     g_free(tmp_str);
@@ -265,13 +243,6 @@ generic_list_split (const char *val, const char *separator_char)
     for (i=0; ret_val[i] != NULL; i++) {
         g_strstrip(ret_val[i]);
         list_size++;
-    }
-
-    /* if we have an empty last element, add it back in */
-    if (has_empty_last_element) {
-        ret_val = g_renew(gchar*, ret_val, list_size+2);
-        ret_val[list_size] = g_strdup("");
-        ret_val[list_size+1] = NULL;
     }
 
     /* return our array */
@@ -285,7 +256,7 @@ attribute_list_split (const char *val)
     return generic_list_split(val, ",");
 }
 
-/* this function cleans the mnt-routes attribute value, leaves only maintainer name 
+/* this function cleans the mnt-routes attribute value, leaves only maintainer name
    and separates optional list to a GList of ip_prefix_range_t*.
    if prefix range is invalid, it is added t the list of invalid prefix ranges (Glist of gchars).
    prefix_range_list is NULL if there is no list in the value
@@ -309,10 +280,10 @@ GList **rpsl_mnt_routes_clean_split (rpsl_attr_t *attr, GList **prefix_range_lis
   if (strstr (attr_value, "{") == NULL )
   {
     /* no list, do nothing and return */
-    g_free(attr_value);  
+    g_free(attr_value);
     return (prefix_range_list);
   }
- 
+
   tokens = g_strsplit(attr_value, " ", 2);
 
   /* save mntner, modify the attribute */
@@ -325,7 +296,7 @@ GList **rpsl_mnt_routes_clean_split (rpsl_attr_t *attr, GList **prefix_range_lis
   prefix_list = attribute_list_split(rest[0]);
 
   /* clean up */
-  g_free(attr_value);  
+  g_free(attr_value);
 
   /* convert list of gchar* to GList of ip_prefix_range_t */
   for (i=0; prefix_list[i] != NULL; i++)
@@ -339,31 +310,31 @@ GList **rpsl_mnt_routes_clean_split (rpsl_attr_t *attr, GList **prefix_range_lis
       {
         *prefix_range_list = g_list_append (*prefix_range_list, prefix_range);
       }
-      else 
+      else
       {
         *invalid_list = g_list_append (*invalid_list, strdup(prefix_list[i]));
       }
     }
-    else 
-    { 
+    else
+    {
       /* if list contains ANY (should be only 1 element), empty the list */
       g_list_free (*prefix_range_list);
       g_strfreev (prefix_list);
       return (prefix_range_list);
     }
   }
-  
+
   return (prefix_range_list);
 }
 
 static gchar **
 ripe_list_split (const char *val)
 {
-    /* 
-       We can call generic_list_split() because it calls 
+    /*
+       We can call generic_list_split() because it calls
        attribute_clean() before using g_strsplit() to divide the string,
-       and attribute_clean() converts any runs of whitespace into a 
-       single space. 
+       and attribute_clean() converts any runs of whitespace into a
+       single space.
      */
     return generic_list_split(val, " ");
 }
@@ -372,10 +343,10 @@ ripe_list_split (const char *val)
  * function provided to free() an rpsl_error_t, making callers believe that there is no need for one.
  * agoston, 2007-11-07 */
 static void
-rpsl_error_assign (rpsl_error_t *error, 
-                   gint level, 
-                   gint code, 
-                   gchar *descr_fmt, 
+rpsl_error_assign (rpsl_error_t *error,
+                   gint level,
+                   gint code,
+                   gchar *descr_fmt,
                    ...)
 {
     va_list args;
@@ -391,7 +362,7 @@ rpsl_error_assign (rpsl_error_t *error,
 }
 
 static void
-rpsl_error_add (GList **errors, gint level, gint code, gint attr_num, 
+rpsl_error_add (GList **errors, gint level, gint code, gint attr_num,
                 gchar *descr_fmt, ...)
 {
     rpsl_error_t *error;
@@ -436,9 +407,9 @@ void rpsl_error_list_free(GList *errors) {
 }
 
 /* returns TRUE if okay, else FALSE */
-static gboolean 
+static gboolean
 rpsl_attr_syntax_check (const attribute_t *attr_info,
-                        const gchar *value, 
+                        const gchar *value,
                         GList **errors)
 {
     int level;
@@ -471,8 +442,8 @@ rpsl_attr_syntax_check (const attribute_t *attr_info,
             rpsl_error_add(errors,
                            RPSL_ERRLVL_ERROR,
                            RPSL_ERR_EMPTYLIST,
-                           -1, 
-                           "Attribute \"%s\" has an empty list", 
+                           -1,
+                           "Attribute \"%s\" has an empty list",
                            attr_info->name);
             goto exit_rpsl_syntax;
         }
@@ -511,10 +482,10 @@ exit_rpsl_syntax:
     }
 }
 
-/* FIXME: Another beautiful example of great engineering: we have to create a string rpsl attrib line 
+/* FIXME: Another beautiful example of great engineering: we have to create a string rpsl attrib line
  * in order to create the attribute structure. There is no function call which created the attrib
  * structure from the proper arguments - agoston, 2007-11-05 */
-/* 
+/*
    returns NULL on *coding errors*
       non-existant class specified
       attribute does not exist for class
@@ -522,7 +493,7 @@ exit_rpsl_syntax:
    returns a structure otherwise
       on *syntax errors* errors are in the rpsl_attr_t structure
 
-   XXX: there should be a way to preserve the original text, so 
+   XXX: there should be a way to preserve the original text, so
         that garbage attributes still retain meaning
  */
 rpsl_attr_t *
@@ -568,8 +539,8 @@ rpsl_attr_init (const gchar *s, const gchar *class)
     if (strchr(s, ':') == NULL) {
         /* this is a critical error - very bad if it is a class attribute */
         rpsl_error_add(&retval->errors,
-                       RPSL_ERRLVL_CRIT, 
-                       RPSL_ERR_BADATTR, 
+                       RPSL_ERRLVL_CRIT,
+                       RPSL_ERR_BADATTR,
                        -1,
                        "Attribute missing colon, ':'");
         retval->name = g_strdup("");
@@ -664,7 +635,7 @@ rpsl_attr_copy (const rpsl_attr_t *attr)
     retval->value = g_strdup(attr->value);
     retval->errors = NULL;
     for (ptr=attr->errors; ptr != NULL; ptr = g_list_next(ptr)) {
-        retval->errors = g_list_append(retval->errors, 
+        retval->errors = g_list_append(retval->errors,
                                        rpsl_error_copy(ptr->data));
     }
     retval->num = attr->num;
@@ -722,7 +693,7 @@ rpsl_attr_delete (rpsl_attr_t *attr)
     g_free(attr);
 }
 
-void 
+void
 rpsl_attr_delete_list (GList *attributes)
 {
     GList *ptr;
@@ -831,7 +802,7 @@ rpsl_attr_get_split_list (const rpsl_attr_t *attr)
     }
 }
 
-void 
+void
 rpsl_attr_split_multiple (GList **attrs)
 {
     GList *new;
@@ -874,7 +845,7 @@ rpsl_attr_errors (const rpsl_attr_t *attr)
     return attr->errors;
 }
 
-static gboolean 
+static gboolean
 object_is_comment (const gchar *s)
 {
     const gchar *p, *q;
@@ -924,7 +895,7 @@ object_is_comment (const gchar *s)
     }
 }
 
-/* we don't want to check whether an attribute belongs in the template 
+/* we don't want to check whether an attribute belongs in the template
    if it is a bad attribute, or and unknown attribute */
 static gboolean
 template_check_needed (const rpsl_attr_t *attr)
@@ -1053,7 +1024,7 @@ rpsl_object_init (const gchar *s)
     /* verify we have at least one line */
     if (lines->len <= 0) {
         rpsl_error_add(&retval->errors,
-                       RPSL_ERRLVL_CRIT, 
+                       RPSL_ERRLVL_CRIT,
                        RPSL_ERR_BADCLASS,
                        -1,
                        "Empty object");
@@ -1064,7 +1035,7 @@ rpsl_object_init (const gchar *s)
     attr = rpsl_attr_init(g_ptr_array_index(lines, 0), NULL);
     if (attr == NULL) {
         rpsl_error_add(&retval->errors,
-                       RPSL_ERRLVL_CRIT, 
+                       RPSL_ERRLVL_CRIT,
                        RPSL_ERR_BADCLASS,
                        -1,
                        "Error with class attribute, class invalid");
@@ -1083,7 +1054,7 @@ rpsl_object_init (const gchar *s)
         rpsl_attr_delete(attr);
         goto exit_rpsl_object_init;
     }
-    
+
 
     /* get the class information */
     class_name = rpsl_attr_get_name(attr);
@@ -1093,7 +1064,7 @@ rpsl_object_init (const gchar *s)
                        RPSL_ERRLVL_CRIT,
                        RPSL_ERR_UNKNOWNCLASS,
                        -1,
-                       "First attribute, \"%s\", is not a known RPSL class", 
+                       "First attribute, \"%s\", is not a known RPSL class",
                        class_name);
         rpsl_attr_delete(attr);
         goto exit_rpsl_object_init;
@@ -1105,7 +1076,7 @@ rpsl_object_init (const gchar *s)
                                RPSL_ERRLVL_ERROR,
                                RPSL_ERR_BADATTR,
                                0,
-                               "Error with attribute \"%s\"", 
+                               "Error with attribute \"%s\"",
                                class_name);
     }
 
@@ -1115,8 +1086,8 @@ rpsl_object_init (const gchar *s)
     /* add class attribute */
     retval->attributes = g_list_append(NULL, attr);
     attr_list = g_list_append(NULL, attr);
-    g_hash_table_insert(retval->attr_lookup, 
-                        (void *)rpsl_attr_get_name(attr), 
+    g_hash_table_insert(retval->attr_lookup,
+                        (void *)rpsl_attr_get_name(attr),
                         attr_list);
 
     /* valid class, process each attribute */
@@ -1128,7 +1099,7 @@ rpsl_object_init (const gchar *s)
             rpsl_error_add(&(attr->errors),
                            RPSL_ERRLVL_ERROR,
                            RPSL_ERR_BADATTR,
-                           -1, 
+                           -1,
                            "Attribute not valid in this class");
         }
         assert(attr != NULL);
@@ -1145,7 +1116,7 @@ rpsl_object_init (const gchar *s)
                                RPSL_ERRLVL_ERROR,
                                RPSL_ERR_BADATTR,
                                i,
-                               "Error with attribute \"%s\"", 
+                               "Error with attribute \"%s\"",
                                attr_name);
             } else {
                 rpsl_error_add(&retval->errors,
@@ -1160,7 +1131,7 @@ rpsl_object_init (const gchar *s)
 
 
         /* get list of existing attributes of this name, if any */
-        attr_list = g_hash_table_lookup(retval->attr_lookup, 
+        attr_list = g_hash_table_lookup(retval->attr_lookup,
                                         rpsl_attr_get_name(attr));
 
 
@@ -1168,7 +1139,7 @@ rpsl_object_init (const gchar *s)
         if (template_check_needed(attr)) {
 
             /* verify this attribute can go in this class */
-            class_attr_info = class_attr_lookup(class_info, 
+            class_attr_info = class_attr_lookup(class_info,
                                                 rpsl_attr_get_name(attr));
             if (class_attr_info == NULL) {
                 rpsl_error_add(&retval->errors,
@@ -1179,8 +1150,8 @@ rpsl_object_init (const gchar *s)
                                rpsl_attr_get_name(attr));
             } else {
                 /* if we have added a "single" attribute more than once */
-                if ((class_attr_info->number == ATTR_SINGLE) && 
-                    (attr_list != NULL)) 
+                if ((class_attr_info->number == ATTR_SINGLE) &&
+                    (attr_list != NULL))
                 {
                     rpsl_error_add(&retval->errors,
                                    RPSL_ERRLVL_ERROR,
@@ -1195,7 +1166,7 @@ rpsl_object_init (const gchar *s)
 
         /* add the attribute to the hash table for the class */
         attr_list = g_list_append(attr_list, attr);
-        g_hash_table_insert(retval->attr_lookup, 
+        g_hash_table_insert(retval->attr_lookup,
                             (void *)rpsl_attr_get_name(attr),
                             attr_list);         /* replaces any old value */
     }
@@ -1268,14 +1239,14 @@ rpsl_object_copy (const rpsl_object_t *object)
         attr_list = g_hash_table_lookup(retval->attr_lookup,
                                         rpsl_attr_get_name(attr));
         attr_list = g_list_append(attr_list, attr);  /* works for NULL too */
-        g_hash_table_insert(retval->attr_lookup, 
+        g_hash_table_insert(retval->attr_lookup,
                             (void *)rpsl_attr_get_name(attr),
                             attr_list);          /* replaces any old value */
     }
 
     /* copy errors */
     for (p=object->errors; p != NULL; p = g_list_next(p)) {
-        retval->errors = g_list_append(retval->errors, 
+        retval->errors = g_list_append(retval->errors,
                                        rpsl_error_copy(p->data));
     }
 
@@ -1324,7 +1295,7 @@ rpsl_object_copy_flattened (const rpsl_object_t *object)
             attr_list = g_hash_table_lookup(retval->attr_lookup,
                                             rpsl_attr_get_name(attr));
             attr_list = g_list_append(attr_list, attr); /* works for NULL too */
-            g_hash_table_insert(retval->attr_lookup, 
+            g_hash_table_insert(retval->attr_lookup,
                                 (void *)rpsl_attr_get_name(attr),
                                 attr_list);         /* replaces any old value */
         }
@@ -1339,15 +1310,15 @@ rpsl_object_copy_flattened (const rpsl_object_t *object)
     return retval;
 }
 
-static void 
-rpsl_object_delete_helper (gpointer attr_name, 
-                           gpointer attr_list, 
+static void
+rpsl_object_delete_helper (gpointer attr_name,
+                           gpointer attr_list,
                            gpointer null)
 {
     g_list_free((GList *)attr_list);
 }
 
-void 
+void
 rpsl_object_delete (rpsl_object_t *object)
 {
     GList *p;
@@ -1356,7 +1327,7 @@ rpsl_object_delete (rpsl_object_t *object)
     chk_obj(object);
 
     if (!object) return;
-    
+
     /* free the attributes */
     for (p=object->attributes; p != NULL; p = g_list_next(p)) {
         rpsl_attr_delete(p->data);
@@ -1416,7 +1387,7 @@ separate_leading_whitespace (const gchar *str, GString **ws, GString **non_ws)
 {
     int n;
 
-    n = 0; 
+    n = 0;
     while ((str[n] == ' ') || (str[n] == '\t')) {
         n++;
     }
@@ -1427,7 +1398,7 @@ separate_leading_whitespace (const gchar *str, GString **ws, GString **non_ws)
 }
 
 /* gets the length of a string of whitespace */
-static int 
+static int
 whitespace_length (const gchar *str, int start_col)
 {
     int len;
@@ -1493,7 +1464,7 @@ add_aligned_val (GString *s, const rpsl_attr_t *attr, int col)
     /* calculate the column we're at after the attribute name */
     start_col = strlen(name) + 1;
 
-    /* if the desired column is too small based on the name of the 
+    /* if the desired column is too small based on the name of the
        attribute, set to the smallest allowed column */
     if (col < (start_col + 1)) {
         col = start_col + 1;
@@ -1509,12 +1480,12 @@ add_aligned_val (GString *s, const rpsl_attr_t *attr, int col)
             start_col = next_tabstop(start_col);
         } else {
             break;
-        } 
+        }
         p++;
     }
 
     /* special case:
-       if there are *only* whitespace on the first line, or if it only 
+       if there are *only* whitespace on the first line, or if it only
        contains a comment, then use "as-is" */
     if ((*p == '\0') || (*p == '\n') || (*p == '#')) {
           g_string_append(s, val);
@@ -1527,7 +1498,7 @@ add_aligned_val (GString *s, const rpsl_attr_t *attr, int col)
     col_to_add = col - start_col;
 
     /* adding is (relatively) easy */
-    if (col_to_add > 0) { 
+    if (col_to_add > 0) {
         lines = (gchar**)ut_g_strsplit_v1(val, "\n", 0);
         /* for the first line, append the spaces and the line itself */
         q = lines[0];
@@ -1579,7 +1550,7 @@ add_aligned_val (GString *s, const rpsl_attr_t *attr, int col)
              /* if the line continuation character is a tab and
                 we don't have enough columns, convert it to spaces */
             if (lines[i][0] == '\t') {
-                if (whitespace_length(ws->str, 0) < col_to_sub) { 
+                if (whitespace_length(ws->str, 0) < col_to_sub) {
                     lines[i][0] = ' ';
                     for (j=1; j<TABSTOP; j++) {
                         g_string_prepend_c(ws, ' ');
@@ -1700,7 +1671,7 @@ rpsl_attr_uniq_list (GList **attr_list)
       p = retval;
       while ((p != NULL) && \
              (strcasecmp (rpsl_attr_get_clean_value((*attr_list)->data), \
-                          rpsl_attr_get_clean_value(p->data)) != 0)) 
+                          rpsl_attr_get_clean_value(p->data)) != 0))
       {
         p = g_list_next(p);
       }
@@ -1761,7 +1732,7 @@ rpsl_object_get_key_value (const rpsl_object_t *object)
 }
 
 /* using -1 for offset (ofs) to append to the end of the object */
-static int 
+static int
 add_attr_to_object(rpsl_object_t *object,
                 rpsl_attr_t *attr,
                 gint ofs,
@@ -1846,7 +1817,7 @@ add_attr_to_object(rpsl_object_t *object,
     err_list = object->errors;
     while (err_list != NULL) {
         err = err_list->data;
-        if (err->attr_num >= ofs) { 
+        if (err->attr_num >= ofs) {
             /* increment errors from later attributes */
             err->attr_num++;
         }
@@ -1881,18 +1852,18 @@ add_attr_to_object(rpsl_object_t *object,
     return 1;
 }
 
-int 
+int
 rpsl_object_append_attr (rpsl_object_t *object,
                          rpsl_attr_t *attr,
                          rpsl_error_t *error)
-{        
+{
     return add_attr_to_object(object, attr, -1, error);
 }
 
 int rpsl_object_add_attr (rpsl_object_t *object,
                       rpsl_attr_t *attr,
                       gint ofs,
-                      rpsl_error_t *error) 
+                      rpsl_error_t *error)
 {
   if (ofs <= 0) {
         rpsl_error_assign(error,
@@ -1913,7 +1884,7 @@ int rpsl_object_add_first_attr (rpsl_object_t *object,
   return rpsl_object_add_attr_internal(object, attr, 0, error);
 }
 
-int 
+int
 rpsl_object_add_attr_internal (rpsl_object_t *object,
                       rpsl_attr_t *attr,
                       gint ofs,
@@ -1922,13 +1893,13 @@ rpsl_object_add_attr_internal (rpsl_object_t *object,
   return add_attr_to_object(object, attr, ofs, error);
 }
 
-/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */ 
+/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */
 rpsl_attr_t *
 rpsl_object_remove_attr (rpsl_object_t *object, gint ofs, rpsl_error_t *error)
 {
   gint num_attr;
   chk_obj(object);
-  
+
   num_attr = rpsl_object_get_num_attr(object);
 
   if ((ofs <= 0) || (ofs >= num_attr)) {
@@ -1942,15 +1913,15 @@ rpsl_object_remove_attr (rpsl_object_t *object, gint ofs, rpsl_error_t *error)
   return rpsl_object_remove_attr_internal(object, ofs, error);
 }
 
-/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */ 
+/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */
 rpsl_attr_t *
 rpsl_object_remove_first_attr (rpsl_object_t *object, rpsl_error_t *error)
 {
-  return rpsl_object_remove_attr_internal(object, 0, error); 
+  return rpsl_object_remove_attr_internal(object, 0, error);
 
 }
 
-/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */ 
+/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */
 rpsl_attr_t *
 rpsl_object_remove_attr_internal (rpsl_object_t *object, gint ofs, rpsl_error_t *error)
 {
@@ -1977,8 +1948,8 @@ rpsl_object_remove_attr_internal (rpsl_object_t *object, gint ofs, rpsl_error_t 
 
         /* verify this attribute can be removed */
         class_attr_info = class_attr_lookup(class_info, attr_name);
-        if ((class_attr_info != NULL) && 
-            (class_attr_info->choice == ATTR_MANDATORY)) 
+        if ((class_attr_info != NULL) &&
+            (class_attr_info->choice == ATTR_MANDATORY))
         {
             rpsl_error_assign(error,
                               RPSL_ERRLVL_ERROR,
@@ -2002,8 +1973,8 @@ rpsl_object_remove_attr_internal (rpsl_object_t *object, gint ofs, rpsl_error_t 
     attr_list = g_list_remove(attr_list, attr);
     if (attr_list != NULL) {
         new_attr_name = rpsl_attr_get_name((rpsl_attr_t *)attr_list->data);
-        g_hash_table_insert(object->attr_lookup, 
-                            (void *)new_attr_name, 
+        g_hash_table_insert(object->attr_lookup,
+                            (void *)new_attr_name,
                             attr_list);
     }
 
@@ -2011,7 +1982,7 @@ rpsl_object_remove_attr_internal (rpsl_object_t *object, gint ofs, rpsl_error_t 
     err_list = object->errors;
     while (err_list != NULL) {
         err = err_list->data;
-        if (err->attr_num == ofs) { 
+        if (err->attr_num == ofs) {
             /* remove errors from this attribute */
             tmp_err_list = g_list_next(err_list);
             object->errors = g_list_remove_link(object->errors, err_list);
@@ -2035,7 +2006,7 @@ rpsl_object_remove_attr_internal (rpsl_object_t *object, gint ofs, rpsl_error_t 
     return attr;
 }
 
-/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */ 
+/* WARNING: caller is responsible for calling rpsl_attr_delete() on return value! */
 rpsl_attr_t *
 rpsl_object_remove_attr_name (rpsl_object_t *object,
                               const gchar *name,
@@ -2076,7 +2047,7 @@ rpsl_object_errors (const rpsl_object_t *object)
     return object->errors;
 }
 
-gboolean 
+gboolean
 rpsl_attr_is_required (const rpsl_object_t *object, const gchar *attr)
 {
     const class_attr_t *class_attr_info;
@@ -2084,11 +2055,11 @@ rpsl_attr_is_required (const rpsl_object_t *object, const gchar *attr)
     chk_obj(object);
 
     class_attr_info = class_attr_lookup(object->class_info, attr);
-    return (class_attr_info != NULL) && 
+    return (class_attr_info != NULL) &&
            (class_attr_info->choice == ATTR_MANDATORY);
 }
 
-gboolean 
+gboolean
 rpsl_attr_is_generated (const rpsl_object_t *object, const gchar *attr)
 {
     const class_attr_t *class_attr_info;
@@ -2096,11 +2067,11 @@ rpsl_attr_is_generated (const rpsl_object_t *object, const gchar *attr)
     chk_obj(object);
 
     class_attr_info = class_attr_lookup(object->class_info, attr);
-    return (class_attr_info != NULL) && 
+    return (class_attr_info != NULL) &&
            (class_attr_info->choice == ATTR_GENERATED);
 }
 
-gboolean 
+gboolean
 rpsl_attr_is_multivalued (const rpsl_object_t *object, const gchar *attr)
 {
     const class_attr_t *class_attr_info;
@@ -2112,7 +2083,7 @@ rpsl_attr_is_multivalued (const rpsl_object_t *object, const gchar *attr)
            (class_attr_info->number == ATTR_MULTIPLE);
 }
 
-gboolean 
+gboolean
 rpsl_attr_is_lookup (const rpsl_object_t *object, const gchar *attr)
 {
     const class_attr_t *class_attr_info;
@@ -2130,7 +2101,7 @@ rpsl_attr_is_lookup (const rpsl_object_t *object, const gchar *attr)
     }
 }
 
-gboolean 
+gboolean
 rpsl_attr_is_key (const rpsl_object_t *object, const gchar *attr)
 {
     const class_attr_t *class_attr_info;
@@ -2148,7 +2119,7 @@ rpsl_attr_is_key (const rpsl_object_t *object, const gchar *attr)
     }
 }
 
-gboolean 
+gboolean
 rpsl_object_is_deleted (const rpsl_object_t *object)
 {
     GList *attr_list;
@@ -2179,7 +2150,7 @@ search_errors (const GList *errors, int error_level)
 }
 
 
-gboolean 
+gboolean
 rpsl_attr_has_error (const rpsl_attr_t *attr, int error_level)
 {
     chk_attr(attr);
@@ -2187,7 +2158,7 @@ rpsl_attr_has_error (const rpsl_attr_t *attr, int error_level)
     return search_errors(attr->errors, error_level);
 }
 
-gboolean 
+gboolean
 rpsl_object_has_error (const rpsl_object_t *object, int error_level)
 {
     chk_obj(object);
@@ -2195,12 +2166,12 @@ rpsl_object_has_error (const rpsl_object_t *object, int error_level)
     return search_errors(object->errors, error_level);
 }
 
-gint 
+gint
 rpsl_get_attr_id (const gchar *attr_name)
 {
     const attribute_t *attr_info;
     gboolean is_ambiguous;
-    
+
     attr_info = attribute_lookup(attr_name, &is_ambiguous);
     if (attr_info == NULL) {
         return -1;
@@ -2209,7 +2180,7 @@ rpsl_get_attr_id (const gchar *attr_name)
     }
 }
 
-gint 
+gint
 rpsl_get_class_id (const gchar *class_name)
 {
     const class_t *class_info;
@@ -2226,13 +2197,13 @@ rpsl_get_class_id (const gchar *class_name)
     }
 }
 
-void 
+void
 rpsl_load_dictionary (int level)
 {
     rpsl_level = level;
 }
 
-int 
+int
 rpsl_read_dictionary ()
 {
     return rpsl_level;
@@ -2253,7 +2224,7 @@ static pthread_mutex_t class_name_to_template_mutex = PTHREAD_MUTEX_INITIALIZER;
 /* FIXME: this implementation is nonsense - this should be initialized from an rpsl_init() function on startup.
  * But I can't fix this quickly as this function is part of librpsl and is referenced from the RPSL:: perl lib
  * as well, so changing requires a lot of work with the API change. :(
- * Mutex locks are a killer of parallelism (which we aim for), and they are not needed here. - agoston, 2007-10-25  
+ * Mutex locks are a killer of parallelism (which we aim for), and they are not needed here. - agoston, 2007-10-25
  *
  * Same problem can be observed in class.c as well - they use pthread_once() there to do initial initialization.
  * This is braindead as init will indeed be executed only once, but if 2 or more threads start executing that
@@ -2272,7 +2243,7 @@ rpsl_get_template (const gchar *class)
     pthread_mutex_lock(&class_name_to_template_mutex);
 
     if (class_name_to_template == NULL) {
-        class_name_to_template = g_hash_table_new(my_g_str_hash, 
+        class_name_to_template = g_hash_table_new(my_g_str_hash,
                                                   my_g_strcasecmp);
     }
 
@@ -2404,7 +2375,7 @@ rpsl_attr_check (const rpsl_attr_t *attr, const char *file, int line)
     for (errors=attr->errors; errors != NULL; errors=g_list_next(errors)) {
         err = errors->data;
         if (err->attr_num != -1) {
-            fprintf(stderr, 
+            fprintf(stderr,
                     "rpsl_attr_check: attr_num (%d) != -1 at %s:%d\n",
                     err->attr_num, file, line);
             exit(1);
@@ -2414,7 +2385,7 @@ rpsl_attr_check (const rpsl_attr_t *attr, const char *file, int line)
 }
 
 /* XXX: could also verify keys - but that's a bit extreme */
-static void 
+static void
 count_attr_in_list (gpointer key, gpointer value, gpointer user_data)
 {
     GList *l;
@@ -2461,7 +2432,7 @@ rpsl_object_check (const rpsl_object_t *obj, const char *file, int line)
     cnt = 0;
     g_hash_table_foreach(obj->attr_lookup, count_attr_in_list, &cnt);
     if (num_attr != cnt) {
-        fprintf(stderr, 
+        fprintf(stderr,
             "rpsl_object_check: list count (%d) != hash count (%d) at %s:%d\n",
             num_attr, cnt,
             file, line);
@@ -2480,13 +2451,13 @@ rpsl_object_check (const rpsl_object_t *obj, const char *file, int line)
             l = g_list_next(l);
         }
         if (!attr_in_list) {
-            fprintf(stderr, 
+            fprintf(stderr,
                     "rpsl_object_check: attr #%d not in hash for %p %s:%d\n",
                     i, obj, file, line);
             exit(1);
         }
         if (attr->num != i) {
-            fprintf(stderr, 
+            fprintf(stderr,
                 "rpsl_object_check: attr #%d does not match offset %d %s:%d\n",
                     attr->num, i, file, line);
             exit(1);
@@ -2496,7 +2467,7 @@ rpsl_object_check (const rpsl_object_t *obj, const char *file, int line)
     for (errors=attr->errors; errors != NULL; errors=g_list_next(errors)) {
         err = errors->data;
         if (err->attr_num >= num_attr) {
-            fprintf(stderr, 
+            fprintf(stderr,
                 "rpsl_object_check: attr_num (%d) >= num_attr (%d) at %s:%d\n",
                 err->attr_num, num_attr, file, line);
             exit(1);
@@ -2556,7 +2527,7 @@ struct {
     { "trailing\n"
       "\ttabful multiline     ",
       "trailing tabful multiline" },
-    { "trailing\n" 
+    { "trailing\n"
       "+plus multiline\t",
       "trailing plus multiline" },
     { "multiline   \n"
@@ -2581,12 +2552,12 @@ struct {
     { "this # is also \n"
       "+    # legal, but less evil I suppose\n",
       "this" },
-    
+
 };
 
 #define NUM_TEST_ATTR (sizeof(test_attr) / sizeof(test_attr[0]))
 
-int 
+int
 main()
 {
     int i;
