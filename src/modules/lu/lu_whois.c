@@ -20,7 +20,7 @@
 /* the logging context is defined in lu.c */
 extern LG_context_t *lu_context;
 
-/* 
+/*
   Cleans up a WHOIS lookup connection
 
   server   - WHOIS server connection
@@ -33,7 +33,7 @@ lu_whois_cleanup (LU_server_t *server)
   LU_whois_info_t *whois_info;
 
   whois_info = (LU_whois_info_t *)server->info;
-  if (whois_info->socket >= 0) 
+  if (whois_info->socket >= 0)
   {
     SK_close(whois_info->socket);
     whois_info->socket = -1;
@@ -45,7 +45,7 @@ lu_whois_cleanup (LU_server_t *server)
 }
 
 
-/* 
+/*
   Perform a WHOIS lookup.
 
   whois_info   - structure with information about the WHOIS server
@@ -94,9 +94,9 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
   *objects = NULL;
 
   /* connect if not already connected */
-  if (whois_info->socket < 0) 
+  if (whois_info->socket < 0)
   {
-    if (whois_info->timeout == 0) 
+    if (whois_info->timeout == 0)
     {
       connect_timeout = 86400;  /* SK_connect doesn't have "unlimited" */
     }
@@ -104,11 +104,11 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
     {
       connect_timeout = whois_info->timeout;
     }
-    sk_err = SK_connect(&whois_info->socket, 
-                        whois_info->hostname, 
+    sk_err = SK_connect(&whois_info->socket,
+                        whois_info->hostname,
                         whois_info->port,
                         connect_timeout);
-    if (sk_err != SK_OK) 
+    if (sk_err != SK_OK)
     {
       LG_log(lu_context, LG_WARN, "lu_whois_query: error connecting to WHOIS server");
       LG_log(lu_context, LG_FUNC, "<lu_whois_query: exiting with value [FALSE]");
@@ -124,7 +124,7 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
   {
     puts_ret = SK_puts(whois_info->socket, fixed_query, NULL);
   }
-  else 
+  else
   {
     puts_timeout.tv_sec = whois_info->timeout;
     puts_timeout.tv_usec = 0;
@@ -152,9 +152,9 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
   {
     read_timeout = -1;
   }
-  for (;;) 
+  for (;;)
   {
-    if (poll(&pollfd, 1, read_timeout) == -1) 
+    if (poll(&pollfd, 1, read_timeout) == -1)
     {
       SK_close(whois_info->socket);
       whois_info->socket = -1;
@@ -173,7 +173,7 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
       return FALSE;
     }
     read_ret = read(whois_info->socket, reply_buf, sizeof(reply_buf)-1);
-    if (read_ret == -1) 
+    if (read_ret == -1)
     {
       SK_close(whois_info->socket);
       whois_info->socket = -1;
@@ -182,7 +182,7 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
       LG_log(lu_context, LG_FUNC, "<lu_whois_query: exiting with value [FALSE]");
       return FALSE;
     }
-    if (read_ret == 0) 
+    if (read_ret == 0)
     {
       break;
     }
@@ -195,23 +195,23 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
   whois_info->socket = -1;
 
   /* convert to objects result */
-  split_reply = (gchar**)ut_g_strsplit_v1(reply->str, "\n\n", 0);
+  split_reply = (gchar**)g_strsplit(reply->str, "\n\n", 0);
   g_string_free(reply, TRUE);
 
   error_code = 0;
-  for (i=0; split_reply[i] != NULL; i++) 
+  for (i=0; split_reply[i] != NULL; i++)
   {
     /* skip comments */
-    if (split_reply[i][0] == '%') 
+    if (split_reply[i][0] == '%')
     {
       /* if this comment is an error code, get the value */
-      if (strncmp(split_reply[i], "%ERROR:", 7) == 0) 
+      if (strncmp(split_reply[i], "%ERROR:", 7) == 0)
       {
         tmp_error_code = atoi(split_reply[i]+7);
         /* error 101 is "no objects found", which isn't really an error */
         if (tmp_error_code != 101)
         {
-          LG_log(lu_context, LG_WARN, "lu_whois_query: server returned code %d", 
+          LG_log(lu_context, LG_WARN, "lu_whois_query: server returned code %d",
                  tmp_error_code);
           error_code = tmp_error_code;
         }
@@ -221,14 +221,14 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
 
     /* clean trailing whitespace and skip if nothing left (i.e. last object) */
     g_strchomp(split_reply[i]);
-    if (split_reply[i][0] == '\0') 
+    if (split_reply[i][0] == '\0')
     {
       continue;
     }
 
     /* anything else should be an object, so add object to list */
     object = rpsl_object_init(split_reply[i]);
-    if (object == NULL) 
+    if (object == NULL)
     {
       LG_log(lu_context, LG_WARN, "lu_whois_query: error parsing object returned by WHOIS");
     }
@@ -243,7 +243,7 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
   {
     LG_log(lu_context, LG_FUNC, "<lu_whois_query: exiting with value [TRUE]");
     return TRUE;
-  } 
+  }
   else
   {
     LG_log(lu_context, LG_FUNC, "<lu_whois_query: exiting with value [FALSE]");
@@ -263,14 +263,14 @@ lu_log_object (rpsl_object_t *obj)
   const GList *p;
 
   attr = rpsl_object_get_all_attr(obj);
-  for (p=attr; p != NULL; p = g_list_next(p)) 
+  for (p=attr; p != NULL; p = g_list_next(p))
   {
     LG_log(lu_context, LG_DEBUG, "%s:%s", rpsl_attr_get_name(p->data),
                                           rpsl_attr_get_value(p->data));
   }
 }
 
-/* 
+/*
   Lookup a single object via WHOIS
 
   server   - connection information
@@ -287,7 +287,7 @@ lu_log_object (rpsl_object_t *obj)
   Logging perfomed via LG module.
  */
 LU_ret_t
-lu_whois_lookup (LU_server_t *server, rpsl_object_t **obj, 
+lu_whois_lookup (LU_server_t *server, rpsl_object_t **obj,
                  const gchar *type, const gchar *key, const gchar *source)
 {
   gchar *query;
@@ -306,15 +306,15 @@ lu_whois_lookup (LU_server_t *server, rpsl_object_t **obj,
 
   LG_log(lu_context, LG_FUNC, ">lu_whois_lookup: entered");
 
-  LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: type=\"%s\", key=\"%s\", source=\"%s\"", 
+  LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: type=\"%s\", key=\"%s\", source=\"%s\"",
          type, key, source);
 
   /* special case route & route6 , because they have a composite key */
-  if (!strcasecmp(type, "route") || !strcasecmp(type, "route6")) 
+  if (!strcasecmp(type, "route") || !strcasecmp(type, "route6"))
   {
     /* route keys look like this: "1.2.3.4/5AS6", but we cannot
-       perform a lookup on this, so we turn this into "1.2.3.4/5" for 
-       the query and filter out any prefixes that do not have the correct 
+       perform a lookup on this, so we turn this into "1.2.3.4/5" for
+       the query and filter out any prefixes that do not have the correct
        AS number */
     key_copy = g_strdup(key);
     g_strup(key_copy);
@@ -328,7 +328,7 @@ lu_whois_lookup (LU_server_t *server, rpsl_object_t **obj,
   }
 
   /* also special case inetnum and inet6num, since we want the -x flag */
-  else if (!strcasecmp(type, "inetnum") || !strcasecmp(type, "inet6num")) 
+  else if (!strcasecmp(type, "inetnum") || !strcasecmp(type, "inet6num"))
   {
     query = g_strdup_printf("-G -B -s %s -r -x -T %s %s", source, type, key);
   }
@@ -342,7 +342,7 @@ lu_whois_lookup (LU_server_t *server, rpsl_object_t **obj,
     query = g_strdup_printf("-G -B -s %s -r -T %s %s", source, type, key);
   }
 
-  /* XXX: There is a bug in the core server that causes a WHOIS query to 
+  /* XXX: There is a bug in the core server that causes a WHOIS query to
           occasionally return the same object multiple times.  I think this
           is related to the server not being strict about locking access
           on reads.  This will be fixed at a later time, but for now, try
@@ -355,13 +355,13 @@ lu_whois_lookup (LU_server_t *server, rpsl_object_t **obj,
     query_ret = lu_whois_query(server->info, query, &tmp_obj);
     if (!query_ret)
     {
-      LG_log(lu_context, LG_FUNC, "<lu_whois_lookup: exiting with value [%s]", 
+      LG_log(lu_context, LG_FUNC, "<lu_whois_lookup: exiting with value [%s]",
              LU_ret2str(LU_ERROR));
       g_free(query);
       return LU_ERROR;
     }
     num_query_attempts++;
-  
+
     /* filter out the objects that don't have the key */
     /* we have to do this, because certain object types can return multiple
        objects even if we specify the key, for example if you want to find
@@ -375,7 +375,7 @@ lu_whois_lookup (LU_server_t *server, rpsl_object_t **obj,
       object = p->data;
       object_key = rpsl_object_get_key_value(object);
       LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: object key is \"%s\"", object_key);
-      if (strcasecmp(object_key, key) == 0) 
+      if (strcasecmp(object_key, key) == 0)
       {
         if (*obj != NULL)
         {
@@ -384,7 +384,7 @@ lu_whois_lookup (LU_server_t *server, rpsl_object_t **obj,
           ret_val = LU_ERROR;
         }
         *obj = object;
-      } 
+      }
       else
       {
         rpsl_object_delete(object);
@@ -394,20 +394,20 @@ lu_whois_lookup (LU_server_t *server, rpsl_object_t **obj,
     g_list_free(tmp_obj);
 
     /* free resources on error */
-    if (ret_val == LU_ERROR) 
+    if (ret_val == LU_ERROR)
     {
       rpsl_object_delete(*obj);
       *obj = NULL;
     }
 
-  } 
+  }
   while ((ret_val == LU_ERROR) && (num_query_attempts < 3));
 
   /* free query memory */
   g_free(query);
 
   /* log object */
-  if (*obj != NULL) 
+  if (*obj != NULL)
   {
     LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: object returned");
     LG_log(lu_context, LG_DEBUG, "------------------------------------------");
@@ -420,7 +420,7 @@ lu_whois_lookup (LU_server_t *server, rpsl_object_t **obj,
   }
 
   /* return result */
-  LG_log(lu_context, LG_FUNC, "<lu_whois_lookup: exiting with value [%s]", 
+  LG_log(lu_context, LG_FUNC, "<lu_whois_lookup: exiting with value [%s]",
          LU_ret2str(ret_val));
   return ret_val;
 }
@@ -445,13 +445,13 @@ GList *p;
  return string;
 }
 
-/* 
+/*
   Inverse lookup a list of objects via WHOIS
 
   server   - connection information
   objects  - used to return a list of objects, if any
   types    - list of objects types to be returned, e.g. "person", "inetnum", may be NULL
-  key      - lookup key, e.g. "NC123-RIPE" or "193.0.1.0/24AS2.3333"      
+  key      - lookup key, e.g. "NC123-RIPE" or "193.0.1.0/24AS2.3333"
   inverse_keys - list of inverse keys to be looked up, NOT NULL
   source   - source, e.g. "RIPE"
 
@@ -463,7 +463,7 @@ GList *p;
  */
 
 LU_ret_t
-lu_whois_inverse_lookup (LU_server_t *server, GList **objects, 
+lu_whois_inverse_lookup (LU_server_t *server, GList **objects,
                  GList *types, const gchar *key, GList *inverse_keys, const gchar *source)
 {
 GList *p;
@@ -497,14 +497,14 @@ gboolean query_ret;
  if (types_string != NULL)
  {
    LG_log(lu_context, LG_DEBUG, "lu_whois_inverse_lookup: types=\"%s\", key=\"%s\", \
-                                 inverse_keys=\"%s\", source=\"%s\"", 
+                                 inverse_keys=\"%s\", source=\"%s\"",
                                  types_string->str, key, inverse_keys_string->str, source);
    query = g_strdup_printf("-G -B -s %s -r -i %s -T %s %s", source, inverse_keys_string->str, types_string->str, key);
  }
- else 
+ else
  {
    LG_log(lu_context, LG_DEBUG, "lu_whois_inverse_lookup: types=all, key=\"%s\", \
-                                 inverse_keys=\"%s\", source=\"%s\"", 
+                                 inverse_keys=\"%s\", source=\"%s\"",
                                  key, inverse_keys_string->str, source);
    query = g_strdup_printf("-G -B -s %s -r -i %s %s", source, inverse_keys_string->str, key);
  }
@@ -513,7 +513,7 @@ gboolean query_ret;
  if (types_string != NULL ) g_string_free(types_string,TRUE);
  g_string_free(inverse_keys_string,TRUE);
 
- /* XXX: There is a bug in the core server that causes a WHOIS query to 
+ /* XXX: There is a bug in the core server that causes a WHOIS query to
           occasionally return the same object multiple times.  I think this
           is related to the server not being strict about locking access
           on reads.  This will be fixed at a later time, but for now, try
@@ -529,15 +529,15 @@ gboolean query_ret;
     query_ret = lu_whois_query(server->info, query, objects);
     if (!query_ret)
     {
-      LG_log(lu_context, LG_FUNC, "<lu_whois_inverse_lookup: exiting with value [%s]", 
+      LG_log(lu_context, LG_FUNC, "<lu_whois_inverse_lookup: exiting with value [%s]",
              LU_ret2str(LU_ERROR));
       g_free(query);
       return LU_ERROR;
     }
     num_query_attempts++;
   }
-  while ((ret_val == LU_ERROR) && (num_query_attempts < 3));  
- 
+  while ((ret_val == LU_ERROR) && (num_query_attempts < 3));
+
   /* free query memory */
   g_free(query);
 
@@ -558,7 +558,7 @@ gboolean query_ret;
   }
 
   /* return result */
-  LG_log(lu_context, LG_FUNC, "<lu_whois_inverse_lookup: exiting with value [%s]", 
+  LG_log(lu_context, LG_FUNC, "<lu_whois_inverse_lookup: exiting with value [%s]",
          LU_ret2str(ret_val));
   return ret_val;
 
@@ -566,7 +566,7 @@ gboolean query_ret;
 
 
 
-/* 
+/*
   Lookup a current version of an object via WHOIS
 
   server     - connection information
@@ -576,13 +576,13 @@ gboolean query_ret;
 
   return       - LU_OKAY on success, LU_ERROR on error
 
-  Errors can come from lu_whois_lookup(), or if source is NULL and 
+  Errors can come from lu_whois_lookup(), or if source is NULL and
   there is no "source:" in the object.
 
   Logging perfomed via LG module.
  */
 LU_ret_t
-lu_whois_get_object (LU_server_t *server, rpsl_object_t **dbase_obj, 
+lu_whois_get_object (LU_server_t *server, rpsl_object_t **dbase_obj,
                      const rpsl_object_t *obj, const gchar *source)
 {
   const gchar *class;
@@ -601,7 +601,7 @@ lu_whois_get_object (LU_server_t *server, rpsl_object_t **dbase_obj,
     {
       /* lg(error, missing source) */
       rpsl_attr_delete_list(source_attr);
-      LG_log(lu_context, LG_FUNC, "<lu_whois_get_object: exiting with value [%s]", 
+      LG_log(lu_context, LG_FUNC, "<lu_whois_get_object: exiting with value [%s]",
              LU_ret2str(LU_ERROR));
       return LU_ERROR;
     }
@@ -624,12 +624,12 @@ lu_whois_get_object (LU_server_t *server, rpsl_object_t **dbase_obj,
   UT_free(lookup_source);
 
   /* return */
-  LG_log(lu_context, LG_FUNC, "<lu_whois_get_object: exiting with value [%s]", 
+  LG_log(lu_context, LG_FUNC, "<lu_whois_get_object: exiting with value [%s]",
          LU_ret2str(ret_val));
   return ret_val;
 }
 
-/* 
+/*
   determine if the class allows hierarchical naming
 
   class      - name of class, e.g. "person", "as-set"
@@ -654,7 +654,7 @@ has_hierarchical_name (const gchar *class)
  * and checks if they are overlapping *
  * true if overlap, false otherwise *
 */
-int is_overlap (const rpsl_object_t *obj1, rpsl_object_t *obj2) 
+int is_overlap (const rpsl_object_t *obj1, rpsl_object_t *obj2)
 {
   ip_range_t range1;
   ip_range_t range2;
@@ -670,15 +670,15 @@ int is_overlap (const rpsl_object_t *obj1, rpsl_object_t *obj2)
    overlaps with inetnum  *obj,                        *
    and adds it to the *overlap list in this case.      *
 */
-GList **check_and_append(GList **overlap, GList *list, const rpsl_object_t *obj) 
+GList **check_and_append(GList **overlap, GList *list, const rpsl_object_t *obj)
 {
   GList *p;
   for (p=list; p != NULL; p = g_list_next(p))
   {
     if (is_overlap(obj, p->data))
     {
-      LG_log(lu_context, LG_DEBUG, "is overlap"); 
-      *overlap = g_list_append (*overlap, (rpsl_object_t *) p->data); 
+      LG_log(lu_context, LG_DEBUG, "is overlap");
+      *overlap = g_list_append (*overlap, (rpsl_object_t *) p->data);
     }
     else {
        LG_log(lu_context, LG_DEBUG, "is not overlap");
@@ -687,7 +687,7 @@ GList **check_and_append(GList **overlap, GList *list, const rpsl_object_t *obj)
   return overlap;
 }
 
-/* 
+/*
   Check if there are overlaps for this object (supposed for inetnum only)
   dbupdate should pass only "inetnum" object to this function
 
@@ -696,9 +696,9 @@ GList **check_and_append(GList **overlap, GList *list, const rpsl_object_t *obj)
   obj        - object to look up overlaps of
   source     - source, e.g. "RIPE", or NULL to get from obj
 
-  return       - LU_OKAY on success, LU_ERROR on error 
+  return       - LU_OKAY on success, LU_ERROR on error
 
-  Errors can come from lu_whois_query(), or if source is NULL and 
+  Errors can come from lu_whois_query(), or if source is NULL and
   there is no "source:" in the object.
 
   Logging perfomed via LG module.
@@ -736,7 +736,7 @@ lu_whois_check_overlap (LU_server_t *server, GList **overlap,
     {
       /* lg(error, missing source) */
       rpsl_attr_delete_list(source_attr);
-      LG_log(lu_context, LG_FUNC, "<lu_whois_check_overlap: exiting with value [%s]", 
+      LG_log(lu_context, LG_FUNC, "<lu_whois_check_overlap: exiting with value [%s]",
              LU_ret2str(LU_ERROR));
       return LU_ERROR;
     }
@@ -748,24 +748,24 @@ lu_whois_check_overlap (LU_server_t *server, GList **overlap,
     lookup_source = UT_strdup(source);
   }
   class = rpsl_object_get_class(obj);
- 
+
   /* construct new ranges */
   range = rpsl_object_get_key_value(obj);
   split = (gchar**)ut_g_strsplit_v1(range, " - ", 0);
 
   /* query for overlap candidates */
   query = g_strdup_printf("-G -B -s %s -r -T %s -L %s", lookup_source, class, split[0]);
-  if (! lu_whois_query(server->info, query, &start_parents)) 
+  if (! lu_whois_query(server->info, query, &start_parents))
   {
     ret_val = LU_ERROR;
   }
   g_free(query);
 
   /* if start ip != end ip, query end ip */
-  if (strncasecmp(split[0], split[1],strlen(split[0])) != 0) 
+  if (strncasecmp(split[0], split[1],strlen(split[0])) != 0)
   {
     query = g_strdup_printf("-G -B -s %s -r -T %s -L %s", lookup_source, class, split[1]);
-    if (! lu_whois_query(server->info, query, &end_parents))  
+    if (! lu_whois_query(server->info, query, &end_parents))
     {
       ret_val = LU_ERROR;
     }
@@ -795,7 +795,7 @@ lu_whois_check_overlap (LU_server_t *server, GList **overlap,
     }
   }
 
-  LG_log(lu_context, LG_FUNC, "<lu_whois_check_overlap: exiting with value [%s]",          
+  LG_log(lu_context, LG_FUNC, "<lu_whois_check_overlap: exiting with value [%s]",
                        LU_ret2str(ret_val));
   g_free(range);
   g_strfreev(split);
@@ -848,7 +848,7 @@ LU_ret_t LU_get_inetnum_from_domain(LU_server_t *server,gchar *domain,
   return ret_val;
 }
 
-/* 
+/*
   Lookup a parents of an object via WHOIS
 
   server     - connection information
@@ -858,12 +858,12 @@ LU_ret_t LU_get_inetnum_from_domain(LU_server_t *server,gchar *domain,
 
   return       - LU_OKAY on success, LU_ERROR on error
 
-  Errors can come from lu_whois_query(), or if source is NULL and 
+  Errors can come from lu_whois_query(), or if source is NULL and
   there is no "source:" in the object.
 
   Logging perfomed via LG module.
  */
-LU_ret_t 
+LU_ret_t
 lu_whois_get_parents (LU_server_t *server, GList **parents,
                       const rpsl_object_t *obj, const gchar *source)
 {
@@ -892,7 +892,7 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
     {
       /* lg(error, missing source) */
       rpsl_attr_delete_list(source_attr);
-      LG_log(lu_context, LG_FUNC, "<lu_whois_get_parents: exiting with value [%s]", 
+      LG_log(lu_context, LG_FUNC, "<lu_whois_get_parents: exiting with value [%s]",
              LU_ret2str(LU_ERROR));
       return LU_ERROR;
     }
@@ -906,7 +906,7 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
   class = rpsl_object_get_class(obj);
 
   /* lookup parent based on object type */
-  if (has_hierarchical_name(class)) 
+  if (has_hierarchical_name(class))
   {
     gchar *parent_name;
     gchar *p;
@@ -919,8 +919,8 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
     if (p == NULL)
     {
       query = NULL;
-    } 
-    else 
+    }
+    else
     {
       /* colon, has parent */
       *p = '\0';
@@ -933,7 +933,7 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
         parent_type = class;
       }
       /* preform lookup */
-      query = g_strdup_printf("-G -B -s %s -r -T %s %s", lookup_source, 
+      query = g_strdup_printf("-G -B -s %s -r -T %s %s", lookup_source,
                               parent_type, parent_name);
     }
     UT_free(parent_name);
@@ -994,7 +994,7 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
       query = g_strdup_printf("-G -B -T%s -s %s -r -l %s", class, lookup_source, key);
       query_ret = lu_whois_query(server->info, query, &net_parents);
       g_free(query);
-      
+
       if (query_ret && ! net_parents)
       {
         /* look for exact match inetnum/inet6num */
@@ -1005,10 +1005,10 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
         else
         {
           query = g_strdup_printf("-G -B -Tinet6num -s %s -r -x %s", lookup_source, key);
-        } 
+        }
         query_ret = lu_whois_query(server->info, query, &net_parents);
         g_free(query);
-        
+
         if (query_ret && ! net_parents)
         {
           /* look for less specific inetnum/inet6num */
@@ -1062,7 +1062,7 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
     while ((ret_val == LU_OKAY) && (parent_name != NULL) && (*parents == NULL))
     {
       parent_name++;  /* skip the dot, '.' */
-      query = g_strdup_printf("-G -B -s %s -R -r -T domain %s", lookup_source, 
+      query = g_strdup_printf("-G -B -s %s -R -r -T domain %s", lookup_source,
                               parent_name);
       query_ret = lu_whois_query(server->info, query, parents);
       g_free(query);
@@ -1074,12 +1074,12 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
     }
     UT_free(domain);
   }
-  else 
+  else
   {
     LG_log(lu_context, LG_DEBUG, "lu_whois_get_parents: processing non-hierarchical class");
   }
 
-  if (ret_val == LU_OKAY) 
+  if (ret_val == LU_OKAY)
   {
     for (p = *parents; p != NULL; p = g_list_next(p))
     {
@@ -1096,12 +1096,12 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
   /* clean up and return */
   rpsl_attr_delete_list(source_attr);
   UT_free(lookup_source);
-  LG_log(lu_context, LG_FUNC, "<lu_whois_get_parents: exiting with value [%s]", 
+  LG_log(lu_context, LG_FUNC, "<lu_whois_get_parents: exiting with value [%s]",
          LU_ret2str(ret_val));
   return ret_val;
 }
 
-/* 
+/*
   Initialise a WHOIS lookup connection
 
   hostname   - name of server, e.g. "whois.ripe.net"

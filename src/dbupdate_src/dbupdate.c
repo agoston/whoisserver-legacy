@@ -1,7 +1,7 @@
 /***************************************
   $Id $
 
-  dbupdate 
+  dbupdate
 
   Status: NOT REVIEWED, NOT TESTED
 
@@ -46,7 +46,7 @@
 
 
 /* list of command line options */
-/* short form, long form, argument 
+/* short form, long form, argument
    argument 0-none, 1-required, 2-optional, 3-certificate */
 opt opt_list[] = { { 'm', "mail", 0},
                    { 'f', "file", 1},
@@ -77,7 +77,7 @@ key_words keywords[] = { {"help", UP_HELP},
 */
 
 int check_file(char * file_name)
-{    
+{
   int file_valid = 1;
   struct stat stat_buf;
 
@@ -100,7 +100,7 @@ int check_file(char * file_name)
 /* Sets an option in the options structure for reference later.
    Receives options structure
             option string or character
-            argument or null 
+            argument or null
             form of option, long or short
    Returns  none
             ( sets values in options structure )
@@ -184,7 +184,7 @@ int isoption(char *option, int form, int *arg_required)
   int found = 0;
   char opt_char[2];
   char *unrec_opt = NULL;
-  
+
   /* find option in list */
   for ( opt_idx=0; opt_idx<sizeof(opt_list)/sizeof(opt); opt_idx++ )
   {
@@ -195,7 +195,7 @@ int isoption(char *option, int form, int *arg_required)
       *arg_required = opt_list[opt_idx].arg_required;
     }
   }
-  
+
   if ( !found )
   {
     /* unrecognised option */
@@ -217,7 +217,7 @@ int isoption(char *option, int form, int *arg_required)
     fprintf(stderr, "isoption: invalid option %s\n", unrec_opt);
     free(unrec_opt);
   }
-  
+
   return found;
 }
 
@@ -244,7 +244,7 @@ int process_arguments(options_struct_t *options,
   char end_cert;
   char end_cert_start;
   GString *cert;
-  
+
   /* build a string of command line arguments to log later*/
   for ( arg_cnt = 0; arg_cnt < argc; arg_cnt++ )
   {
@@ -284,7 +284,7 @@ int process_arguments(options_struct_t *options,
         fprintf(stderr, "process_arguments: invalid option --\n");
         continue;
       }
-      
+
       /* determine form of option - short 0, long 1 */
       form = ( *arg_str == '-' ) ? 1 : 0;
 
@@ -292,8 +292,8 @@ int process_arguments(options_struct_t *options,
       {
         /* long form */
         /* move past second '-' */
-        ++arg_str;  
-        
+        ++arg_str;
+
 //printf("long form arg [%s]\n", arg_str);
         /* if this option is recognised, does it need an argument */
         if ( ! isoption(arg_str, form, &arg_required) )
@@ -301,13 +301,13 @@ int process_arguments(options_struct_t *options,
           ret_val = UP_FAIL;
           continue; /* option not recognised */
         }
-        
+
         if ( arg_required )
         {
 //printf("arg_required [%d]\n", arg_required);
-          /* look for the next argument, 
+          /* look for the next argument,
              which must not start with a '-' unless it is a certificate */
-          if ( arg_cnt+1==argc || *(argv[arg_cnt+1])=='\0' || 
+          if ( arg_cnt+1==argc || *(argv[arg_cnt+1])=='\0' ||
                  ( *(argv[arg_cnt+1])=='-' && arg_required != 3 ) )
           {
             /* no following argument found for this option */
@@ -384,9 +384,9 @@ int process_arguments(options_struct_t *options,
       {
         /* short form */
         /* this could be a single option or string of options
-           the single option or the last of a string of options 
+           the single option or the last of a string of options
            may require a following argument */
-        
+
         /* loop through the string of options in this arg */
         do
         {
@@ -403,7 +403,7 @@ int process_arguments(options_struct_t *options,
             ret_val = UP_FAIL;
             break;
           }
-          
+
           /* if this option is recognised, does it need an argument */
           if ( ! isoption(arg_str, form, &arg_required) )
           {
@@ -414,10 +414,10 @@ int process_arguments(options_struct_t *options,
           if ( arg_required )
           {
             /* this must be the last option if it is a string of options
-               and there must be a following argument, 
+               and there must be a following argument,
                which must not start with a '-' unless it is a certificate */
-            if ( *(arg_str+1) !='\0' || arg_cnt+1==argc || 
-                    argv[arg_cnt+1]==NULL || 
+            if ( *(arg_str+1) !='\0' || arg_cnt+1==argc ||
+                    argv[arg_cnt+1]==NULL ||
                     ( *(argv[arg_cnt+1])=='-' && arg_required != 3 ) )
             {
               /* no following argument found for this option */
@@ -481,7 +481,7 @@ int process_arguments(options_struct_t *options,
               }
             }
           }
-            
+
           set_option(options, arg_str, optarg, form);
           optarg = NULL;
         } while ( *(++arg_str) != '\0' );
@@ -505,7 +505,7 @@ int process_arguments(options_struct_t *options,
     fprintf(stderr, "process_arguments: invalid combination of options -m and -k\n");
     ret_val = UP_FAIL;
   }
-  
+
   /* -m and -x are mutually exclusive */
   if ( options->mail_input && options->X509cert_file )
   {
@@ -513,7 +513,7 @@ int process_arguments(options_struct_t *options,
     fprintf(stderr, "process_arguments: invalid combination of options -m and -x\n");
     ret_val = UP_FAIL;
   }
-  
+
   /* -c is mandatory */
   if ( options->config_file_name == NULL )
   {
@@ -521,7 +521,7 @@ int process_arguments(options_struct_t *options,
     fprintf(stderr, "process_arguments: missing mandatory option -c\n");
     ret_val = UP_FAIL;
   }
-  
+
   /* LG_log(lg_ctx, LG_FUNC,"<process_arguments: exiting with value %s", UP_ret2str(ret_val)); */
   return ret_val;
 }
@@ -596,13 +596,13 @@ void check_keywords(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   invalid_keywords = g_string_new(NULL);
 
-  /* if it is a mail message, get a list of the keywords from the subject line. 
+  /* if it is a mail message, get a list of the keywords from the subject line.
      These are returned as a comma seperated list. */
   if ( options->mail_input )
   {
     keyword_str = (char *)EP_get_candidate_keywords(input);
 //printf("keyword_str [%s]\n", keyword_str);
-    /* if there is a keywords: tag on the subject line, 
+    /* if there is a keywords: tag on the subject line,
        skip past everything up to and including it */
     if ( keyword_str && ( (ptrlc = strstr(keyword_str, "keywords:")) ||
                 (ptruc = strstr(keyword_str, "KEYWORDS:")) ) )
@@ -623,8 +623,8 @@ void check_keywords(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   {
     LG_log(lg_ctx, LG_DEBUG,"check_keywords: keywords [%s]", keyword_str);
     /* split the keyword string on comma */
-    keywords_list = ut_g_strsplit_v1(keyword_str, ",", 0);
-    
+    keywords_list = g_strsplit(keyword_str, ",", 0);
+
     /* check for valid and invalid keywords */
     for (kw_idx = 0; keywords_list[kw_idx] != NULL; kw_idx++)
     {
@@ -649,19 +649,19 @@ void check_keywords(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       }
     }
     g_strfreev(keywords_list);
-    
+
     if ( invalid )
     {
       /* at least one invalid keyword found, so ignoring all keywords */
       RT_invalid_keyword(rt_ctx, invalid_keywords->str);
       LG_log(lg_ctx, LG_WARN,
-          "check_keywords: invalid keyword(s) found [%s]\nAll keywords will be ignored", 
+          "check_keywords: invalid keyword(s) found [%s]\nAll keywords will be ignored",
           keyword_str);
     }
     else
     {
       /* check that the keywords combination is valid */
-      if ( (keywords_found[UP_HELP] || keywords_found[UP_HOWTO]) && 
+      if ( (keywords_found[UP_HELP] || keywords_found[UP_HOWTO]) &&
                keywords_found[UP_NEW] )
       {
         /* illegal combination */
@@ -669,7 +669,7 @@ void check_keywords(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         LG_log(lg_ctx, LG_WARN,
             "check_keywords: invalid combination of keywords NEW and HELP/HOWTO\nAll keywords will be ignored");
       }
-      else if ( (keywords_found[UP_HELP] || keywords_found[UP_HOWTO]) && 
+      else if ( (keywords_found[UP_HELP] || keywords_found[UP_HOWTO]) &&
                keywords_found[UP_NOTIF_DIFF] )
       {
         /* illegal combination */
@@ -700,7 +700,7 @@ void check_keywords(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
   else
     LG_log(lg_ctx, LG_DEBUG,"check_keywords: no keywords found");
-  
+
   g_string_free(invalid_keywords, 1);
   LG_log(lg_ctx, LG_FUNC,"<check_keywords: exiting");
 }
@@ -754,7 +754,7 @@ void get_input_init(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   LG_log(lg_ctx, LG_INFO,"get_input_init: gpgcmd %s", gpgcmd ? gpgcmd : "NULL");
   LG_log(lg_ctx, LG_INFO,"get_input_init: opensslcmd  %s", opensslcmd ? opensslcmd : "NULL");
   LG_log(lg_ctx, LG_INFO,"get_input_init: tmp_dir %s", tmp_dir ? tmp_dir : "NULL");
-  
+
   if ( ! gpgcmd )
   {
     UP_internal_error(rt_ctx, lg_ctx, options, "No gpg command returned from CA\n", 0);
@@ -767,7 +767,7 @@ void get_input_init(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   {
     tmp_dir = strdup("/tmp");
   }
-  
+
   /* initialise key management library */
   LG_log(lg_ctx, LG_INFO,"get_input_init: initialise key management");
   UP_connect_all_servers(rt_ctx, lg_ctx, options, server_list, source_list, unique_server_list);
@@ -837,7 +837,7 @@ void get_input_end(LG_context_t *lg_ctx,
    Returns  none
 */
 
-void process_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void process_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                          options_struct_t *options,
                          ep_input_structure_t *input)
 {
@@ -848,7 +848,7 @@ void process_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   GList *submission_item = NULL;
 
   LG_log(lg_ctx, LG_FUNC,">process_input: entered");
-  
+
   /* check the keywords */
   check_keywords(rt_ctx, lg_ctx, options, input);
 
@@ -895,7 +895,7 @@ void process_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     /* write the details of the origin causing these changes to this ctx */
     RT_notif_origin(rt_ctx, options->origin);
   }
-    
+
   if ( ! options->help )
   {
     LG_log(lg_ctx, LG_FUNC,"process_input: NOT a help request");
@@ -904,9 +904,9 @@ void process_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     num_submissions = g_list_length(submission_list);
     LG_log(lg_ctx, LG_DEBUG, "process_input: number of submissions= %d", num_submissions);
 
-    /* process each submission in turn, 
+    /* process each submission in turn,
        but stop processing if a fatal error is found in a submission */
-    for ( submission_item = submission_list; submission_item != NULL; 
+    for ( submission_item = submission_list; submission_item != NULL;
                        submission_item = g_list_next(submission_item) )
     {
       retval = UP_process_submission(rt_ctx, lg_ctx, options, (ep_authenticated_data_t*)(submission_item->data) );
@@ -937,7 +937,7 @@ void process_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 }
 
 
-/* Gets and logs the raw input data, 
+/* Gets and logs the raw input data,
    breaks it down into usable input (list of submissions with credentials),
    Receives RT context
             LG context
@@ -946,7 +946,7 @@ void process_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  UP_OK or UP_FAIL
 */
 
-int get_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+int get_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                        options_struct_t *options,
                        ep_input_structure_t **input)
 {
@@ -963,7 +963,7 @@ int get_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   /********************************************************************************/
   /* Get and log the raw input data.
-     If it is stdin, then write it to a temp file. 
+     If it is stdin, then write it to a temp file.
      Log the input to updlog */
   if ( ! options->input_file_name )
   {
@@ -986,7 +986,7 @@ int get_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     }
     fclose(input_file);
   }
- 
+
   /* open input file */
   if ((input_file = fopen(options->input_file_name, "r")) == NULL)
   {
@@ -1009,7 +1009,7 @@ int get_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* initialise modules needed to get the input */
   get_input_init(rt_ctx, lg_ctx, options,
                     &server_list, &source_list, &unique_server_list);
-  
+
   /* expand the input */
   LG_log(lg_ctx, LG_INFO, "get_input: expand the input");
   retval = EP_unfold(input_file, options->mail_input, options->X509cert_file,
@@ -1039,7 +1039,7 @@ int get_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   /* tidy up */
   get_input_end(lg_ctx, &server_list, &source_list, &unique_server_list);
-  
+
   if ( temp_input_file_name )
   {
     unlink(temp_input_file_name);
@@ -1078,7 +1078,7 @@ int main(int argc, char **argv)
   /* create hashes */
   options.ntfy_hash = g_hash_table_new(g_str_hash, g_str_equal);
   options.forw_hash = g_hash_table_new(g_str_hash, g_str_equal);
-  options.AUTO_key_hash = g_hash_table_new(g_str_hash, g_str_equal);       
+  options.AUTO_key_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
   /* process command line arguments */
   if ( process_arguments(&options, argc, argv, &args_str) != UP_OK )
@@ -1092,7 +1092,7 @@ int main(int argc, char **argv)
   }
 
   /* configure */
-  /* if -c flag is given, use the named file as config file */ 
+  /* if -c flag is given, use the named file as config file */
   if ( options.config_file_name != NULL)
   {
     /* check the file */
@@ -1161,7 +1161,7 @@ int main(int argc, char **argv)
   /* log the command line options */
   log_options(lg_ctx, &options, args_str);
   free(args_str);
-  
+
   /* check any supplied files */
   if ( options.input_file_name != NULL)
   {
@@ -1172,7 +1172,7 @@ int main(int argc, char **argv)
       UP_internal_error(rt_ctx, lg_ctx, &options, "main: input file does not exist\n", 0);
     }
   }
-  
+
   if ( options.X509cert_file != NULL)
   {
     if ( ! check_file(options.X509cert_file) )
@@ -1222,7 +1222,7 @@ int main(int argc, char **argv)
   }
   /* removed CB 20041208 */
   /* printf("options.help [%d]\n", options.help); */
-  
+
   if ( ! options.help )
   {
     /* check if we have processed any objects */
@@ -1231,13 +1231,13 @@ int main(int argc, char **argv)
     {
       RT_no_objects_processed(rt_ctx);
     }
-    
+
     /* if any object failed the update result is FAILED or
        if there are no objects processed the update result is FAILED
        ( so blank update msgs are failures) */
     if ( options.mail_input )
     {
-      if ( options.count_unsuccessful || 
+      if ( options.count_unsuccessful ||
            ( ! options.count_successful && ! options.count_unsuccessful &&
              ! options.count_noop ) )
       {
@@ -1268,13 +1268,13 @@ int main(int argc, char **argv)
   AU_end();
   KM_end(KM_PGP);
   KM_end(KM_X509);
-  
+
   /* close down the report */
   RT_destroy(rt_ctx);
-  
+
   /* free any remaining memory */
 //  UP_free_options(&options);
-  
+
   /* close down the logging and delete the state log file */
   LG_ctx_free(lg_ctx);
   close(statefd);
@@ -1287,8 +1287,8 @@ int main(int argc, char **argv)
     free(state_file_name);
     state_file_name = NULL;
   }
-  
+
   /* all tasks done successfully */
   /* report successful termination to the wrapper */
-  exit(0); 
+  exit(0);
 }

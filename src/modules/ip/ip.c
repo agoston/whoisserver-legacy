@@ -413,7 +413,7 @@ int IP_revd_t2b(ip_prefix_t *prefptr, const char *domstr, ip_exp_t expf) {
             ip[0] = '\0';
             i = 0;
             quads = 0;
-            domains = ut_g_strsplit_v1(temp, ".", -1);
+            domains = g_strsplit(temp, ".", -1);
             while (domains[i] != NULL) {
                 strcat(ip, domains[i]);
                 quads++;
