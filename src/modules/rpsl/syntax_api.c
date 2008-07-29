@@ -226,9 +226,7 @@ generic_list_split (const char *val, const char *separator_char)
 {
     gchar *tmp_str;
     gchar **ret_val;
-    gboolean has_empty_last_element;
     int i;
-    int list_size;
 
     /* clean up to remove comments and newlines */
     tmp_str = attribute_clean(val);
@@ -240,10 +238,8 @@ generic_list_split (const char *val, const char *separator_char)
     g_free(tmp_str);
 
     /* clean whitespace from each element */
-    list_size = 0;
     for (i=0; ret_val[i] != NULL; i++) {
         g_strstrip(ret_val[i]);
-        list_size++;
     }
 
     /* return our array */
