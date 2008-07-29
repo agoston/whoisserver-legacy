@@ -1,0 +1,22 @@
+20080729 - version 3.4.2
+
+Changes:
+- Did all the changes (including bugfixes) to make whoisserver compile and run
+  on:
+   - 64bit OS
+   - debian etch
+   - mysql5
+
+- Added libxml and libxslt sources, as whoisserver is depending on a
+  specific version of these libraries
+
+- Made libxml and libxslt link statically to dbupdate to avoid any chance of
+  accidental dynamic linking to the system libraries
+
+
+Merged:
+- bugfix-agoston-etch64bit
+
+
+Affected stakeholders:
+- None (no externally visible changes)
