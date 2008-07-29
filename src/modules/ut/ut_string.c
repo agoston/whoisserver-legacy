@@ -45,13 +45,13 @@
  * DEPRECATED
  * Wrapper for g_strsplit in glib v1
  */
-gchar **ut_g_strsplit_v1(gchar *string, gchar *delimiter, gint max_tokens) {
+gchar **ut_g_strsplit_v1(const gchar *string, const gchar *delimiter, gint max_tokens) {
     gchar **v2_result;
     gchar *string_trimmed;
 
     int len = strlen(string);
     if (string[len - 1] == delimiter[0]) {
-        string_trimmed = strdup(string);
+        string_trimmed = g_strdup(string);
         string_trimmed[len - 1] = 0;
         v2_result = g_strsplit(string_trimmed, delimiter, max_tokens);
         g_free(string_trimmed);
@@ -78,9 +78,7 @@ ut_string_compress    removes leading/trailing whitespaces and compresses
 
 char *input           source string
   +++++++++++++++++++++++++++++++++++++*/
-char *
-ut_string_compress(char *input)
-{
+char *ut_string_compress(char *input) {
   char *inchr;
   char *copy = UT_malloc(strlen(input)+1);
   char *outchr = copy;

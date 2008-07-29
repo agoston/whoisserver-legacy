@@ -1,7 +1,7 @@
 /***************************************
   $Id $
 
-  UP_util.c 
+  UP_util.c
 
   Status: NOT REVIEWED, NOT TESTED
 
@@ -68,10 +68,10 @@ void UP_internal_error(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 {
   /* ER_perror(FAC_UP, err_type, err_msg); */
   LG_log(lg_ctx, LG_FUNC,">UP_internal_error: entered");
-  
+
   LG_log(lg_ctx, LG_FATAL,"%s", err_msg);
   LG_log(lg_ctx, LG_PERROR,"%s", err_msg);
-  
+
   RT_internal_error(rt_ctx);
   /* close input to the reporting context */
   RT_end(rt_ctx);
@@ -82,17 +82,17 @@ void UP_internal_error(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
      be logged.
      If it is not a mail message then an ack will be sent and logged */
   /* If the internal error occured in the ack code then the ack will be surpressed */
-  if ( ! no_ack )  
+  if ( ! no_ack )
   {
     /* double negative, only process ack if it is NOT surpressed */
     NT_process_acknowledgement(rt_ctx, lg_ctx, options);
   }
-  
+
   /************************* TIDY UP AND SHUTDOWN  ***************************/
 
   /* close down the report */
   RT_destroy(rt_ctx);
-  
+
   /* free any remaining memory */
   UP_free_options(options);
 
@@ -202,7 +202,7 @@ char *UP_get_temp_filename(LG_context_t *lg_ctx, char *type)
     LG_log(lg_ctx, LG_FUNC,">UP_get_temp_filename: entered type=[%s]", type);
 
   gethostname(hostname, MAXHOSTNAMELEN);
-  pid = getpid(); 
+  pid = getpid();
   tmpdir = ca_get_tmpdir;
 
   length = strlen(tmpdir) +  strlen(hostname) + strlen(type) + 64 + 6;
@@ -215,7 +215,7 @@ char *UP_get_temp_filename(LG_context_t *lg_ctx, char *type)
   if ( lg_ctx )
     LG_log(lg_ctx, LG_FUNC,"<UP_get_temp_filename: exiting tmpfilename [%s]", tmpfilename);
   return tmpfilename;
-}      
+}
 
 
 
@@ -228,11 +228,11 @@ char *UP_get_temp_filename(LG_context_t *lg_ctx, char *type)
    Returns  none
 */
 
-void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                             options_struct_t *options, FILE *infile)
 {
   char *time_str;
-  char datestr[10]; 
+  char datestr[10];
   char *updlogfile = NULL;
   char *updlog = NULL;
   char buf[1024];
@@ -244,7 +244,7 @@ void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   FILE *cert_file;
 
   LG_log(lg_ctx, LG_FUNC,">UP_add_to_upd_log: entered");
-  
+
   /* We need to get the a date string to construct the updlog file name */
   time(&now);
   tmstr = localtime(&now);
@@ -255,8 +255,8 @@ void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   updlogfile = (char *)malloc(strlen(updlog) + strlen(datestr) + 2);
   snprintf(updlogfile, strlen(updlog) + strlen(datestr) + 2,
            "%s.%s", updlog, datestr);
-  
- 
+
+
   if (( log_file = fopen(updlogfile, "a")) == NULL)
   {
     LG_log(lg_ctx, LG_FATAL, "UP_add_to_upd_log: Can't open upd log file [%s]", updlogfile);
@@ -264,7 +264,7 @@ void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     UP_internal_error(rt_ctx, lg_ctx, options, "UP_add_to_upd_log: Can't open upd log file\n", 0);
   }
   free(updlogfile);
-   
+
   /* get time */
   cur_time = time(NULL);
   time_str = strdup(ctime(&cur_time));
@@ -279,7 +279,7 @@ void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   else if (options->origin)
   {
     /* include the origin */
-    fprintf(log_file, "\n>>> time: %s SYNC UPDATE (%s) <<<\n\n", 
+    fprintf(log_file, "\n>>> time: %s SYNC UPDATE (%s) <<<\n\n",
                        time_str, options->origin);
     /* add the keywords from the command options */
     fprintf(log_file, "keywords - %s\n\n",
@@ -293,12 +293,12 @@ void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                        options->keywords ? options->keywords : "None" );
   }
   free(time_str);
-  
+
   LG_log(lg_ctx, LG_DEBUG, "UP_add_to_upd_log: Input data");
   LG_log(lg_ctx, LG_DEBUG, ">[");
 
   /* write the full update to the upd log and state file */
-  while ( fgets(buf, 1023, infile) != NULL ) 
+  while ( fgets(buf, 1023, infile) != NULL )
   {
     line = strdup(buf);
     line = UP_remove_EOLs(line);
@@ -318,19 +318,19 @@ void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   if ( options->X509cert_file )
   {
     /* we were passed a certificate in a file, copy it to the log file */
-    
+
     if (( cert_file = fopen(options->X509cert_file, "r")) == NULL)
     {
       LG_log(lg_ctx, LG_FATAL, "UP_add_to_upd_log: Can't open X.509 certificate file [%s]", options->X509cert_file);
       UP_internal_error(rt_ctx, lg_ctx, options, "UP_add_to_upd_log: Can't open X.509 certificate file file\n", 0);
     }
-  
+
     LG_log(lg_ctx, LG_DEBUG, "UP_add_to_upd_log: X.509 certificate data");
     LG_log(lg_ctx, LG_DEBUG, ">[");
 
     /* write the certificate to the upd log and state file */
     fprintf(log_file, "\nThe following certificate was passed in a file\n\n");
-    while ( fgets(buf, 1023, cert_file) != NULL ) 
+    while ( fgets(buf, 1023, cert_file) != NULL )
     {
       line = strdup(buf);
       line = UP_remove_EOLs(line);
@@ -350,7 +350,7 @@ void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 
 
-/* Gets a GList of attr structures and checks if one of their 
+/* Gets a GList of attr structures and checks if one of their
    (upper case)values starts with substr.
    Receives LG context
             list of attribute structures
@@ -362,10 +362,10 @@ void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 int UP_strstr_in_attr_list(LG_context_t *lg_ctx, GList *list, const char *substr)
 {
   GList *item = NULL;
-  char *word; 
+  char *word;
 
   LG_log(lg_ctx, LG_FUNC,">UP_strstr_in_attr_list: entered with search string [%s]", substr);
- 
+
   for( item = list; item != NULL ; item = g_list_next(item) )
   {
    word = rpsl_attr_get_clean_value((rpsl_attr_t *)(item->data));
@@ -380,10 +380,10 @@ int UP_strstr_in_attr_list(LG_context_t *lg_ctx, GList *list, const char *substr
   }
   /* none of them matched, so return 0 */
   LG_log(lg_ctx, LG_FUNC,"<UP_strstr_in_attr_list: exiting with value 0 (no sub string found)");
-  return 0; 
+  return 0;
 }
 
-/* Remove generated parent attribute(s) 
+/* Remove generated parent attribute(s)
    Receives LG context
             pointer to object string
             parsed object
@@ -391,7 +391,7 @@ int UP_strstr_in_attr_list(LG_context_t *lg_ctx, GList *list, const char *substr
             0 otherwise
 */
 
-int up_remove_parent(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+int up_remove_parent(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                         char **object_str, rpsl_object_t *object)
 {
   int retval = 0;
@@ -416,7 +416,7 @@ int up_remove_parent(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
        deleting an attribute */
     parent_list = rpsl_object_get_attr(object, "parent");
   }
-  
+
   if ( retval )
   {
     /* regenerate object text string */
@@ -427,7 +427,7 @@ int up_remove_parent(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   return retval;
 }
 
-/* Cleans out any unwanted data 
+/* Cleans out any unwanted data
    Receives LG context
             pointer to object string
    Returns  1 if any changes made
@@ -436,7 +436,7 @@ int up_remove_parent(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 char *up_clean_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char **object_str)
 {
-  int retval = 0; 
+  int retval = 0;
   char *retstr = NULL;
   const char *type = NULL;
   char *value = NULL;
@@ -459,10 +459,10 @@ char *up_clean_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char **object_
 
 /* Gets the source data for each source from the list of config data for multiple sources.
    Gets the server name for each source and returns the list of servers and sources.
-   ******* An assumption was made here that the LU_whois_init call made the connection to 
+   ******* An assumption was made here that the LU_whois_init call made the connection to
            the server. This code is over complicated to 'use the same connection' and avoid
            having multiple connections to the same server. In actual fact the init function
-           only returns the name of the server and a connection is made each time a lookup is 
+           only returns the name of the server and a connection is made each time a lookup is
            performed. The complication has been left in case it is needed in the future.
    *******
    Receives RT context
@@ -492,11 +492,11 @@ void UP_connect_all_servers(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   GList *host_item = NULL;
   GList *port_item = NULL;
   GList *svr_item = NULL;
-  
+
   LG_log(lg_ctx, LG_FUNC,">UP_connect_all_servers: entered");
 
   /* retrieve source variables for the multiple sources */
-  /* upd_source_hdl is a pointer to an array of pointers to source data 
+  /* upd_source_hdl is a pointer to an array of pointers to source data
      held in the ca module */
   LG_log(lg_ctx, LG_INFO,"UP_connect_all_servers: get sources from config file");
   upd_source_hdl = ca_get_UpdSourceHandle(CA_UPDSOURCE);
@@ -508,11 +508,11 @@ void UP_connect_all_servers(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     UP_internal_error(rt_ctx, lg_ctx, options,
         "UP_connect_all_servers: There must be at least one updateable source in the config file. Exiting", 0);
   }
-  
+
   /* get the number of sources found */
   num_sources = ca_get_UpdSourceNum();
   LG_log(lg_ctx, LG_DEBUG, "UP_connect_all_servers: number of sources read from config file[%d]", num_sources);
-  
+
   for ( src_idx=0; src_idx<num_sources; src_idx++ )
   {
     source = strdup(upd_source_hdl[src_idx]->name);
@@ -521,16 +521,16 @@ void UP_connect_all_servers(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     LG_log(lg_ctx, LG_FUNC,"UP_connect_all_servers: source [%s]", source);
     LG_log(lg_ctx, LG_FUNC,"UP_connect_all_servers: query_host [%s]", query_host);
     LG_log(lg_ctx, LG_FUNC,"UP_connect_all_servers: query_port [%d]", query_port);
-    
+
     server = NULL;
     host_item = host_list;
     port_item = port_list;
     svr_item = *server_list;
     while ( host_item && port_item && svr_item  )
     {
-      if ( ! strcmp(query_host, host_item->data) && (gpointer)query_port == port_item->data )
+      if ( ! strcmp(query_host, host_item->data) && query_port == (int)(port_item->data))
       {
-        /* we have already connected to this host/port 
+        /* we have already connected to this host/port
            so use the same connection */
         server = svr_item->data;
         break;
@@ -539,20 +539,20 @@ void UP_connect_all_servers(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       port_item = port_item->next;
       svr_item = svr_item->next;
     }
-    
+
     if ( ! server )
     {
       /* this is a new server so connect to it */
       server = LU_whois_init(query_host, query_port, UPDATE_QUERY_TIMEOUT);
       *unique_server_list = g_list_append(*unique_server_list, server);
     }
-    
+
     *source_list = g_list_append(*source_list, source);
     *server_list = g_list_append(*server_list, server);
     host_list = g_list_append(host_list, query_host);
     port_list = g_list_append(port_list, (gpointer)query_port);
   }
-  
+
   /* clean up */
   host_item = host_list;
   while ( host_item  )
@@ -562,7 +562,7 @@ void UP_connect_all_servers(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
   g_list_free(host_list);
   g_list_free(port_list);
-  
+
 
   LG_log(lg_ctx, LG_FUNC,"<UP_connect_all_servers: exiting");
 }
@@ -570,13 +570,13 @@ void UP_connect_all_servers(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 
 /* takes the source string from an object and sets up the current source
-   data from the list of config data for multiple sources 
+   data from the list of config data for multiple sources
    Receives RT context
             LG context
             options structure
             source string
             source data structure pointer
-   Returns  UP_OK for success and UP_FAIL for source not found 
+   Returns  UP_OK for success and UP_FAIL for source not found
             source data in structure
 */
 
@@ -588,11 +588,11 @@ int up_set_current_source_data(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   int found = UP_FAIL;
   int num_sources = 0;
   ca_updDbSource_t **upd_source_hdl;
-  
+
   LG_log(lg_ctx, LG_FUNC,">up_set_current_source_data: entered source [%s]", obj_source);
 
   /* retrieve source variables for the multiple sources */
-  /* upd_source_hdl is a pointer to an array of pointers to source data 
+  /* upd_source_hdl is a pointer to an array of pointers to source data
      held in the ca module */
   LG_log(lg_ctx, LG_INFO,"up_set_current_source_data: get sources from config file");
   upd_source_hdl = ca_get_UpdSourceHandle(CA_UPDSOURCE);
@@ -604,10 +604,10 @@ int up_set_current_source_data(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     UP_internal_error(rt_ctx, lg_ctx, options,
         "up_set_current_source_data: There must be at least one updateable source in the config file. Exiting", 0);
   }
-  
+
   num_sources = ca_get_UpdSourceNum();
   LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: number of sources read from config file[%d]", num_sources);
-  
+
   for ( src_idx=0; src_idx<num_sources; src_idx++ )
   {
     if ( ! strcasecmp( obj_source, upd_source_hdl[src_idx]->name) )
@@ -615,7 +615,7 @@ int up_set_current_source_data(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       /* found the source in the list */
       found = UP_OK;
       LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: source found");
-      
+
       if ( source_data->current_source )
         free(source_data->current_source);
       source_data->current_source = strdup(upd_source_hdl[src_idx]->name);
@@ -629,28 +629,28 @@ int up_set_current_source_data(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       source_data->DBport = upd_source_hdl[src_idx]->updDb.port;
       source_data->DBname = upd_source_hdl[src_idx]->updDb.dbName;
       source_data->DBuser = upd_source_hdl[src_idx]->updDb.user;
-      source_data->DBpasswd = upd_source_hdl[src_idx]->updDb.password; 
+      source_data->DBpasswd = upd_source_hdl[src_idx]->updDb.password;
 
-      /* log the config variables for debugging */ 
-      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: CURRENT SOURCE is: [%s]", 
+      /* log the config variables for debugging */
+      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: CURRENT SOURCE is: [%s]",
                                      source_data->current_source);
-      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: UPDATE_HOST is: [%s]", 
+      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: UPDATE_HOST is: [%s]",
                                      source_data->update_host);
-      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: UPDATE_PORT is: [%d]", 
+      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: UPDATE_PORT is: [%d]",
                                      source_data->update_port);
-      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: QUERY_HOST is: [%s]",  
+      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: QUERY_HOST is: [%s]",
                                      source_data->query_host);
-      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: QUERY_PORT is: [%d]",  
-                                     source_data->query_port);   
-      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: DBhost is: [%s]", 
+      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: QUERY_PORT is: [%d]",
+                                     source_data->query_port);
+      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: DBhost is: [%s]",
                                      source_data->DBhost);
-      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: DBport is: [%d]",  
-                                     source_data->DBport);   
-      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: DBname is: [%s]", 
+      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: DBport is: [%d]",
+                                     source_data->DBport);
+      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: DBname is: [%s]",
                                      source_data->DBname);
-      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: DBuser is: [%s]", 
+      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: DBuser is: [%s]",
                                      source_data->DBuser);
-      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: DBpasswd is: [%s]", 
+      LG_log(lg_ctx, LG_DEBUG, "up_set_current_source_data: DBpasswd is: [%s]",
                                      source_data->DBpasswd);
       break;
     }
@@ -675,14 +675,14 @@ int up_set_current_source_data(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             parsed object
             ptr to source string
             source data structure pointer
-   Returns  UP_OK for success and UP_FAIL for source not found 
+   Returns  UP_OK for success and UP_FAIL for source not found
             source string
             source data in structure
 */
 
 int up_get_source(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                             options_struct_t *options,
-                            rpsl_object_t *object, char **obj_source, 
+                            rpsl_object_t *object, char **obj_source,
                             source_data_t *source_data)
 {
   int retval;
@@ -700,7 +700,7 @@ int up_get_source(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   if ( ! attr_list || ! (*obj_source) )
   {
-    /* should only happen if the object has no source: attribute or the attribute has no value, 
+    /* should only happen if the object has no source: attribute or the attribute has no value,
        but the parser should reject that case */
     LG_log(lg_ctx, LG_ERROR,"up_get_source: no source found");
     retval = UP_FAIL;
@@ -721,7 +721,7 @@ int up_get_source(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       /* set up current source data values */
       retval = up_set_current_source_data(rt_ctx, lg_ctx, options, (*obj_source), source_data);
     }
-    
+
     if ( retval != UP_OK )
     {
       free(*obj_source);
@@ -780,7 +780,7 @@ void up_string_pack(char *dest, const char *source)
 
 
 
-/* replaces the erase_str occurences with insert_str in str 
+/* replaces the erase_str occurences with insert_str in str
    Receives string
             erase string
             replace string
@@ -789,16 +789,16 @@ void up_string_pack(char *dest, const char *source)
 
 char * up_replace_strings(char *str, const char *erase_str, const char *insert_str)
 {
-  GString *g_str;  
+  GString *g_str;
   int pos;
   char *result_str;
-  
+
   /* if erase_str is NULL return a copy of input string */
   if (erase_str == NULL)
     return strdup(str);
-  
+
   g_str = g_string_new(str);
-  
+
   /* replace erase_str with insert_str */
   while (strstr(g_str->str, erase_str) != NULL)
   {
@@ -817,7 +817,7 @@ char * up_replace_strings(char *str, const char *erase_str, const char *insert_s
   return result_str;
 }
 
-/* used by g_list_foreach to delete the objects in a list 
+/* used by g_list_foreach to delete the objects in a list
    Receives object pointer
             NULL
    Returns  none
@@ -831,11 +831,11 @@ void up_rpsl_object_delete(gpointer data, gpointer user_data)
 
 /* checks if two objects are identical or not.
     Takes two objects, one as char *, the other as
-	a parsed object, 
+	a parsed object,
 
-    Algorithm is very simple: All strings of tabs and 
+    Algorithm is very simple: All strings of tabs and
     white spaces are collapsed into a single white space,
-    and then the strings are compared (strcmp) 
+    and then the strings are compared (strcmp)
    Receives LG context
             old object string
             parsed object
@@ -849,11 +849,11 @@ int up_identical(LG_context_t *lg_ctx, const char *old_version, rpsl_object_t *o
   rpsl_object_t *object2;
   rpsl_error_t error;
   int result = 0;
-  char *temp_str[2]; 
+  char *temp_str[2];
   char *temp;
 
   LG_log(lg_ctx, LG_FUNC,">up_identical: entered");
-  
+
   arg[0] = strdup(old_version);
   object2 = rpsl_object_copy(object);
   rpsl_object_remove_attr_name(object2, "delete", &error);
@@ -865,7 +865,7 @@ int up_identical(LG_context_t *lg_ctx, const char *old_version, rpsl_object_t *o
   {
     arg[str_idx] = g_strstrip(arg[str_idx]);
 
-    temp_str[str_idx] = (char *)malloc(strlen(arg[str_idx]) + 1); 
+    temp_str[str_idx] = (char *)malloc(strlen(arg[str_idx]) + 1);
     up_string_pack(temp_str[str_idx], arg[str_idx]);
 
     /* if there are still \r's at the end of strings, remove them */
@@ -931,7 +931,7 @@ int up_determine_operation(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     *operation = UP_MODIFY;
   else
     *operation = UP_CREATE;
-  LG_log(lg_ctx, LG_DEBUG,"up_determine_operation: operation is [%s]", 
+  LG_log(lg_ctx, LG_DEBUG,"up_determine_operation: operation is [%s]",
                                       UP_op2str(*operation));
 
   /* check for operation dependent errors */
@@ -945,7 +945,7 @@ int up_determine_operation(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
   else if ( *operation == UP_DELETE && ! up_identical(lg_ctx, old_object_str, object) )
   {
-    /* this is a delete operation but the object is not identical to the one that 
+    /* this is a delete operation but the object is not identical to the one that
        exists in the database */
     LG_log(lg_ctx, LG_ERROR,"up_determine_operation: object for deletion is not identical to the one in the database");
     RT_versions_dont_match(rt_ctx, old_obj);
@@ -954,7 +954,7 @@ int up_determine_operation(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   else if ( *operation == UP_MODIFY && up_identical(lg_ctx, old_object_str, object) )
   {
     /* this is a modify operation but the object is identical to the one that
-       exists in the database */    
+       exists in the database */
     LG_log(lg_ctx, LG_DEBUG,"up_determine_operation: object for modify is identical to the one in the database, no operation actioned");
     RT_versions_match(rt_ctx);
     *operation = UP_NOOP_OP;
@@ -963,7 +963,7 @@ int up_determine_operation(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   if ( options->enforced_new && old_object_str )
   {
-    /* the enforced new keyword was specified 
+    /* the enforced new keyword was specified
     but this object already exists in the database */
     LG_log(lg_ctx, LG_ERROR,"up_determine_operation: enforced new set, but object already exists in the database");
     RT_enforcednew_exists(rt_ctx);
@@ -990,9 +990,9 @@ int up_external_checks(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                             rpsl_object_t *object, char *object_str )
 {
   int retval = UP_OK;
-  
+
   /* currently there are no external checks to be done */
-  
+
   return retval;
 }
 
@@ -1055,7 +1055,7 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     /* Special processing needed for key-cert objects */
     /* Determine the type of key-cert object */
     /* Get a list with only one item */
-    attr = rpsl_object_get_attr(preproc_obj, type); 
+    attr = rpsl_object_get_attr(preproc_obj, type);
     value = rpsl_attr_get_clean_value((rpsl_attr_t *)(attr->data));
     g_strdown(value);
     if ( strstr(value, "pgpkey-") != NULL)
@@ -1067,7 +1067,7 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       key_cert_type = KM_X509;
     }
     rpsl_attr_delete_list(attr);
-    LG_log(lg_ctx, LG_DEBUG,"up_pre_process_object: key-cert type [%s]", 
+    LG_log(lg_ctx, LG_DEBUG,"up_pre_process_object: key-cert type [%s]",
                                KM_context_string(key_cert_type));
     if ( operation != UP_DELETE )
     {
@@ -1082,7 +1082,7 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
           retval |= UP_FAIL;
         }
       }
-      /* Create the generated attributes for a 
+      /* Create the generated attributes for a
          create or modify key-cert object */
       if ( retval == UP_OK )
       {
@@ -1157,8 +1157,8 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
 
   type = rpsl_object_get_class(preproc_obj);
-  if ( (! strcasecmp(type, "inetnum")) && (operation == UP_CREATE)) 
-  { 
+  if ( (! strcasecmp(type, "inetnum")) && (operation == UP_CREATE))
+  {
     /* check overlapping inetnums */
     if ( LU_check_overlap(server, &overlap, preproc_obj, obj_source) != LU_OKAY )
     {
@@ -1172,11 +1172,11 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       retval |= UP_FAIL;
     }
   }
-  
+
   /* MAKE THE POLICY CHECK THE LAST ONE IN THIS FUNCTION */
   /* stuff removed */
   /***** ADD ANY NEW CHECKS BEFORE THE POLICY CHECK ABOVE ******/
- 
+
   LG_log(lg_ctx, LG_FUNC,"<up_pre_process_object: exiting");
   return retval;
 }
@@ -1268,8 +1268,8 @@ long up_get_transaction_id(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   LG_log(lg_ctx, LG_FUNC,">up_get_transaction_id: entered");
 
   sql_connection = SQ_get_connection(source_data->DBhost, source_data->DBport,
-                                        source_data->DBname, source_data->DBuser, 
-                                        source_data->DBpasswd); 
+                                        source_data->DBname, source_data->DBuser,
+                                        source_data->DBpasswd);
   if (!sql_connection)
   {
     /* No SQL connection is fatal */
@@ -1286,7 +1286,7 @@ long up_get_transaction_id(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   new_id = mysql_insert_id(sql_connection);
 
-  SQ_close_connection(sql_connection);  
+  SQ_close_connection(sql_connection);
 
   LG_log(lg_ctx, LG_FUNC,"<up_get_transaction_id: exiting with new id [%ld]", new_id);
   return new_id;
@@ -1302,7 +1302,7 @@ long up_get_transaction_id(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             pointer to conection error flag
    Returns  error number
 */
-   
+
 int up_get_error_num(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                         options_struct_t *options,
                         const char *string, int *connect_err)
@@ -1312,9 +1312,9 @@ int up_get_error_num(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   int line_idx, char_idx, num_idx;
   int err = 0;
 
-  LG_log(lg_ctx, LG_FUNC,">up_get_error_num: entered, ripupd_result [%s]", 
+  LG_log(lg_ctx, LG_FUNC,">up_get_error_num: entered, ripupd_result [%s]",
                                 string ? string : "");
-     
+
   /* if the string is NULL or empty, fatal error */
   if (string == NULL || strlen(string) == 0)
   {
@@ -1348,7 +1348,7 @@ int up_get_error_num(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
           if ( temp[line_idx][char_idx] == ':' )
           {
             /* a : before the number means this is a conection type error */
-            *connect_err = 1;   
+            *connect_err = 1;
           }
         }
       }
@@ -1374,8 +1374,8 @@ int up_get_error_num(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 /* Interprets the result string coming from RIPupd
    Gets the error number. If not 0 (success) finds the error message(s) and passes them
    to RT without processing them.
-   assigned_key is filled in if this is a person/role creation with AUTO nic hdl 
-   assigned_key must be allocated enough memory before up_interpret_ripudb_result is called 
+   assigned_key is filled in if this is a person/role creation with AUTO nic hdl
+   assigned_key must be allocated enough memory before up_interpret_ripudb_result is called
    If the caller does not expect a NIC hdl back, then assigned_key MUST be NULL
 
    Receives RT context
@@ -1388,7 +1388,7 @@ int up_get_error_num(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             sets assigned_key
 */
 
-int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                                   options_struct_t *options,
                                   char *ripupd_result, char *assigned_key )
 {
@@ -1407,22 +1407,22 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   err = up_get_error_num(rt_ctx, lg_ctx, options, ripupd_result, &connect_err);
 
   if ( ! err && assigned_key != NULL)
-  { 
-    /* if the update was successful and the caller of the function expected 
+  {
+    /* if the update was successful and the caller of the function expected
        to get an assigned key, get the key from the returned message */
 //    retval = UP_get_assigned_key(rt_ctx, lg_ctx, options, ripupd_result, assigned_key);
     retval = get_assigned_key(rt_ctx, lg_ctx, options, ripupd_result, assigned_key);
   }
   else if ( err )
   {
-/**************************************************************************************/    
+/**************************************************************************************/
 /*                     TEMPORARY CODE TO USE EXISTING RIPUPD                          */
-  
+
     /* According to the error no got from RIPupdate, construct an error string  */
     char temp_str[1024];
     switch (err)
     {
-      case ERROR_U_MEM: 
+      case ERROR_U_MEM:
       case ERROR_U_DBS:
       case ERROR_U_BADOP:
       case ERROR_U_COP:
@@ -1430,25 +1430,25 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       case ERROR_U_BUG:
         snprintf(temp_str, 1024, "***Error: Please contact database admin: Error no %i", err);
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
-        break; 
+        break;
       case ERROR_U_OBJ:
         /* if the object contains refs to unknown objects */
-        if (strstr(ripupd_result, "dummy") != NULL || 
+        if (strstr(ripupd_result, "dummy") != NULL ||
               strstr(ripupd_result, "reference cannot be resolved") != NULL )
         {
-    	  /* if the response from RIPupd contains "dummy not allowed" string 
+    	  /* if the response from RIPupd contains "dummy not allowed" string
              or a reference that cannot be resolved */
     	  snprintf(temp_str, 1024, "***Error: Unknown object referenced");
         }
         else if (strstr(ripupd_result, "key-cert") != NULL)
         {
           /* if the response from RIPupd contains "no key-cert object" string */
-          snprintf(temp_str, 1024, "***Error: Unknown key-cert object referenced"); 
+          snprintf(temp_str, 1024, "***Error: Unknown key-cert object referenced");
         }
         else if (strstr(ripupd_result, "wrong prefix specified") != NULL)
         {
           /* if the response from RIPupd contains "wrong prefix specified" string */
-          snprintf(temp_str, 1024, "***Error: Invalid prefix specified"); 
+          snprintf(temp_str, 1024, "***Error: Invalid prefix specified");
         }
         else
         {
@@ -1456,22 +1456,22 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     	  snprintf(temp_str, 1024, "***Error: Object is referenced from other objects");
         }
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
-        break; 
+        break;
       case ERROR_U_AUT:
         snprintf(temp_str, 1024, "***Error: Membership authorisation failure");
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
-        break; 
-      default: 
+        break;
+      default:
         snprintf(temp_str, 1024, "***Error: Please contact database admin: Error no %i", err);
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
-        break; 
+        break;
     }
 
     RT_RIP_update_error(rt_ctx, temp_str);
-  
-goto temp_skip;  
-/**************************************************************************************/    
-    /* find the error message following the colon(:) 
+
+goto temp_skip;
+/**************************************************************************************/
+    /* find the error message following the colon(:)
        there may be more than one error message line in the reply */
     /* split the string into lines */
     temp = ut_g_strsplit_v1(ripupd_result , "\n", 0);
@@ -1520,9 +1520,9 @@ goto temp_skip;
     RT_RIP_update_error(rt_ctx, error_str);
     free(error_str);
     g_strfreev(temp);
-/**************************************************************************************/    
+/**************************************************************************************/
 temp_skip:
-/**************************************************************************************/    
+/**************************************************************************************/
     retval = UP_FAIL;
   }
 
@@ -1533,7 +1533,7 @@ temp_skip:
 
 
 /* Opens a socket to ripupd, sends the object,
-   receives the reply and closes the socket. 
+   receives the reply and closes the socket.
    operation is the UP integer value. This is converted to the ripupdate string
    'ADD' ,'DEL' or 'UPD' by the macro UP_op2ripopstr(operation)
    Receives RT context
@@ -1551,11 +1551,11 @@ temp_skip:
 int up_send_object_db(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                            options_struct_t *options,
                            source_data_t *source_data,
-                           rpsl_object_t *preproc_obj, 
+                           rpsl_object_t *preproc_obj,
                            int operation, char **result_string )
 {
   int retval = UP_OK;
-  int sockfd, numbytes;  
+  int sockfd, numbytes;
   char buf[DB_MAXDATASIZE + 1];
   char *to_be_sent = NULL;
   long tr_id;
@@ -1563,9 +1563,9 @@ int up_send_object_db(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   sk_conn_st condat;
   rpsl_object_t *send_obj;
   rpsl_error_t return_error;
-  
+
   LG_log(lg_ctx, LG_FUNC,">up_send_object_db: entered, operation [%s]", UP_op2str(operation));
-  
+
   /* get the object text */
   if ( operation == UP_DELETE )
   {
@@ -1623,7 +1623,7 @@ int up_send_object_db(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       goto UP_SEND_OBJECT_DB_ERROR;
 
   LG_log(lg_ctx, LG_INFO,"up_send_object_db: send complete");
-      
+
   /* get the reply from ripupdate */
   while (( numbytes=SK_cd_gets(&condat, buf, DB_MAXDATASIZE) ) > 0)
   {
@@ -1634,13 +1634,13 @@ int up_send_object_db(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       *result_string = strdup(buf);
     else
     {
-      *result_string = (char *)realloc(*result_string, 
+      *result_string = (char *)realloc(*result_string,
     				     strlen(*result_string) + strlen(buf) + 1);
       *result_string = strcat(*result_string, buf);
     }
 
     if (strstr(*result_string,"\n\n") != NULL)
-    { 
+    {
       /* if the result_string contains an empty line at the end, we will close */
       LG_log(lg_ctx, LG_DEBUG,"up_send_object_db: received blank line from socket, stop reading");
       break;
@@ -1699,17 +1699,17 @@ int up_source_commit(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   LG_log(lg_ctx, LG_FUNC,"up_source_commit: the object is [%s]", rpsl_object_get_text(preproc_obj,0));
 
   /* send the object to the database */
-  retval = up_send_object_db(rt_ctx, lg_ctx, options, source_data, preproc_obj, 
+  retval = up_send_object_db(rt_ctx, lg_ctx, options, source_data, preproc_obj,
                                        operation, &ripupd_result);
-  
+
   /* interpret the results returned by ripupdate */
   if ( retval == UP_OK )
     retval = up_interpret_ripudb_result(rt_ctx, lg_ctx, options,
                                              ripupd_result, assigned_key);
-  
+
   if ( ripupd_result )
     free(ripupd_result);
-  
+
   /* if the commit was not successful then rollback any external transactions */
   if ( retval != UP_OK )
   {
@@ -1743,7 +1743,7 @@ int up_source_commit(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             UP_FAIL for any error
 */
 
-int up_post_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+int up_post_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options, source_data_t *source_data,
                              rpsl_object_t *preproc_obj, rpsl_object_t *old_obj,
                              char *auto_key, char *assigned_key, int operation,
@@ -1752,7 +1752,7 @@ int up_post_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   int retval = UP_OK;
   rpsl_object_t *postproc_obj = NULL;
 
-  LG_log(lg_ctx, LG_FUNC,">up_post_process_object: entered with assigned_key [%s]", 
+  LG_log(lg_ctx, LG_FUNC,">up_post_process_object: entered with assigned_key [%s]",
                             (assigned_key && strlen(assigned_key)) ? assigned_key : "not set");
 
   postproc_obj = rpsl_object_copy(preproc_obj);
@@ -1793,8 +1793,8 @@ int up_post_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  one of the UP return_codes
 */
 
-int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
-                           options_struct_t *options, char *object_str, 
+int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                           options_struct_t *options, char *object_str,
                            GList *credentials, int handle_auto_keys)
 {
   int retval = UP_OK;
@@ -1803,7 +1803,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   int operation = 0;
   int parsed_ok = 0;
   int inetnum_key_converted = 0;
-  
+
   char *old_object_str = NULL;
   char *auto_key = NULL;
   char *assigned_key = NULL;
@@ -1837,7 +1837,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* remove trailing dot from domain, if any */
   is_dot_removed = ns_remove_trailing_dot(lg_ctx, &object_str);
 
-  /* Clean out any unwanted data 
+  /* Clean out any unwanted data
      This must be done before parsing the object as it may
      remove some attributes. */
   retstr = up_clean_object(rt_ctx, lg_ctx, &object_str);
@@ -1846,7 +1846,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   object = rpsl_object_init(object_str);
 
   RT_set_object(rt_ctx, object);
-  
+
   if ( retstr && strcmp(retstr, "") )  RT_clean_object(rt_ctx, retstr);
   if ( retstr ) free(retstr);
 
@@ -1857,8 +1857,8 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     free(domain_key);
     rpsl_object_delete(object);
     object = rpsl_object_init(object_str);
-  } 
-  
+  }
+
   if ( rpsl_object_has_error(object, RPSL_ERRLVL_ERROR) )
   {
     LG_log(lg_ctx, LG_DEBUG,"up_process_object: object parsed with errors");
@@ -1871,7 +1871,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     RT_syntax_ok(rt_ctx);
     parsed_ok = 1;
   }
-      
+
   /* if it did NOT parse OK and it is NOT a delete then this is an error.
      if it did not parse ok and it is a delete it MAY be ok if it is a
      legacy object */
@@ -1885,20 +1885,20 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   object_class = rpsl_object_get_class(object);
   key_value = rpsl_object_get_key_value(object);
-  
+
   /* If it is a delete of an object with syntax errors,
      check that the class attribute exists and does not have a null value
      and the primary key exists and is not null */
   if ( ! parsed_ok )
   {
-    if ( key_value == NULL || ! strcmp(key_value, "") ) 
+    if ( key_value == NULL || ! strcmp(key_value, "") )
     {
       /* primary key attribute has no value, cannot continue with this object */
       LG_log(lg_ctx, LG_DEBUG,"up_process_object: deletion, no primary key attribute value");
       retval = UP_FAIL;
       operation = UP_SYNTAX_ERR;
     }
-    else if ( object_class == NULL ) 
+    else if ( object_class == NULL )
     {
       /* no object class attribute, cannot continue with this object */
       LG_log(lg_ctx, LG_DEBUG,"up_process_object: deletion, no class attribute");
@@ -1907,9 +1907,9 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     }
     else
     {
-      attr = rpsl_object_get_attr(object, object_class); 
+      attr = rpsl_object_get_attr(object, object_class);
       value = rpsl_attr_get_clean_value((rpsl_attr_t *)(attr->data));
-      if ( ! strcmp(value, "") ) 
+      if ( ! strcmp(value, "") )
       {
         /* class attribute has no value, cannot continue with this object */
         LG_log(lg_ctx, LG_DEBUG,"up_process_object: deletion, no class attribute value");
@@ -1918,13 +1918,13 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       }
     }
   }
- 
+
   if ( retval != UP_OK ) goto up_process_object_exit;
 
   /* Convert prefixes into ranges on inetnum objects. */
   if( object_class != NULL && ! strcasecmp(object_class, "inetnum") )
   {
-    /* 
+    /*
        The slash notation expansion is performed on the original object submitted.
        This modified object becomes the 'new original' object.
        The modified object will be used in all further operations and reporting.
@@ -1932,18 +1932,18 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval = up_convert_inetnum_prefix(rt_ctx, lg_ctx, object, &inetnum_key_converted);
   }
 
-  /* Normalise nserver attribute in domain objects: lowercase IP, 
+  /* Normalise nserver attribute in domain objects: lowercase IP,
   *    * remove trailing dot in hostname. */
   if( object_class != NULL && ! strcasecmp(object_class, "domain") )
     {
-      /* 
+      /*
          The cleanup is performed on the original object submitted.
          This modified object becomes the 'new original' object.
          The modified object will be used in all further operations and reporting.
        */
       retval = up_normalise_nserver(rt_ctx, lg_ctx, object);
     }
-  
+
   if ( retval != UP_OK ) goto up_process_object_exit;
 
   /* find source from object and set current source */
@@ -1967,7 +1967,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   KM_init(KM_PGP, rt_ctx, lg_ctx, current_server_list,  obj_source_list, tmp_dir, gpgcmd );
   KM_init(KM_X509, rt_ctx, lg_ctx, current_server_list,  obj_source_list, tmp_dir, opensslcmd );
   g_list_free(obj_source_list);
-  
+
   /* get old object, if there is one */
   retval = LU_get_object(current_server, &old_object, object, obj_source);
   if ( retval != LU_OKAY )
@@ -1987,7 +1987,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                                    old_object_str, old_object, &operation);
   if ( retval != UP_OK ) goto up_process_object_exit;
 
-  /* Check if we have converted a CIDR key into range earlier.  
+  /* Check if we have converted a CIDR key into range earlier.
      This is only allowed for a creation. */
   if(inetnum_key_converted == 1 && operation != UP_CREATE)
   {
@@ -1995,13 +1995,13 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval = UP_FAIL;
     goto up_process_object_exit;
   }
-  
+
   preproc_obj = rpsl_object_copy(object);
 
   /* perform a set of pre-processing operations and checks on the object */
   /* set up storage location for the auto code sent to the core server  */
-  auto_key = (char *)calloc(AUTO_KEY_LENGTH, sizeof(char)); 
-  retval = up_pre_process_object(rt_ctx, lg_ctx, options, &key_info, preproc_obj, 
+  auto_key = (char *)calloc(AUTO_KEY_LENGTH, sizeof(char));
+  retval = up_pre_process_object(rt_ctx, lg_ctx, options, &key_info, preproc_obj,
                                     operation, auto_key, obj_source, current_server,
                                     handle_auto_keys, &reason, credentials);
 
@@ -2014,7 +2014,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       LG_log(lg_ctx, LG_FATAL,"up_process_object: %s", reason);
       /* send message to hostmaster */
       NT_forw_policy_fail(rt_ctx, lg_ctx, options, op2fwd_op_str(operation),
-                             object, reason, credentials); 
+                             object, reason, credentials);
       retval = UP_FWD;
       operation = UP_FWD_OP_POLICY;
       goto up_process_object_exit;   /* finished processing this object */
@@ -2025,7 +2025,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* auth checks */
   LG_log(lg_ctx, LG_DEBUG,"up_process_object: checking for auth errors");
   AU_set_lookup(current_server);
-  au_retval = AU_check_auth(preproc_obj, credentials, op2au_op(operation), 
+  au_retval = AU_check_auth(preproc_obj, credentials, op2au_op(operation),
                             rt_ctx, &mntner_used);
 
   if (au_retval != AU_AUTHORISED)
@@ -2039,7 +2039,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       if ( retval == UP_OK && ! options->test_mode )
       {
         LG_log(lg_ctx, LG_DEBUG,"up_process_object: send forward create message");
-        NT_forw_create_req(rt_ctx, lg_ctx, options, op2fwd_op_str(operation), 
+        NT_forw_create_req(rt_ctx, lg_ctx, options, op2fwd_op_str(operation),
                               object, credentials);
         retval = UP_FWD;
         operation = op2fwd_op(operation);
@@ -2065,7 +2065,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     else
     {
       /* The auth failed in a way that is not possible to continue to
-         process any other objects in this message. 
+         process any other objects in this message.
          Report a fatal error */
       retval = UP_FATAL;
       LG_log(lg_ctx, LG_FATAL,"up_process_object: AU_check_auth fatal error");
@@ -2093,7 +2093,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   /* there was a problem with AUTO-nic replacement */
   if ( retval != UP_OK ) goto up_process_object_exit;
-  
+
   /* external checks */
   retval = up_external_checks(rt_ctx, lg_ctx, preproc_obj, object_str);
   if ( retval != UP_OK ) goto up_process_object_exit;
@@ -2102,20 +2102,20 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
      for the actual key to be created by the core server */
   if ( strlen(auto_key) )
   {
-    assigned_key = (char *)calloc(AUTO_KEY_LENGTH, sizeof(char)); 
+    assigned_key = (char *)calloc(AUTO_KEY_LENGTH, sizeof(char));
   }
-  
+
   /* perform transactions to external data repositories */
   retval = up_external_transact(rt_ctx, lg_ctx, preproc_obj, operation);
   if ( retval != UP_OK ) goto up_process_object_exit;
 
   /* Commit to source database */
-  retval = up_source_commit(rt_ctx, lg_ctx, options, &source_data, preproc_obj, 
+  retval = up_source_commit(rt_ctx, lg_ctx, options, &source_data, preproc_obj,
                                      operation, assigned_key);
   if ( retval != UP_OK ) goto up_process_object_exit;
-  
+
   /* post process */
-  retval =  up_post_process_object(rt_ctx, lg_ctx, options, &source_data, 
+  retval =  up_post_process_object(rt_ctx, lg_ctx, options, &source_data,
                                      preproc_obj, old_object, auto_key, assigned_key,
                                      operation, mntner_used );
 
@@ -2127,7 +2127,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 	else if (retval == UP_NOOP)  options->count_noop++;
     else  options->count_unsuccessful++;
 
-    RT_unset_object(rt_ctx, op2rt_upd_op(operation), 
+    RT_unset_object(rt_ctx, op2rt_upd_op(operation),
                       (retval==UP_OK || retval==UP_NOOP || retval==UP_FWD) ? 1 : 0 );
     rpsl_object_delete(object);
     /* cleanup LU module */
@@ -2203,7 +2203,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 
 /* Gets a submission from the input with it's associated credentials.
-   A submission is one 'blob' of data from the input stream after 
+   A submission is one 'blob' of data from the input stream after
    un-wrapping the mime parts.
    The associated credentials may be all or a sub set of the total credentials
    presented which are in scope for this submission.
@@ -2214,7 +2214,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  one of the UP return_codes
 */
 
-int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                            options_struct_t *options,
                            ep_authenticated_data_t *submission )
 {
@@ -2244,7 +2244,7 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   guint current_number_of_objects;
   gint range_start; /*required for decomposition */
   gint range_end; /* required for decomposition */
-  
+
   LG_log(lg_ctx, LG_FUNC,">UP_process_submission: entered");
 
   /* get the data and credentials from this submission */
@@ -2258,10 +2258,10 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   new_data_str = strdup(data_str);
   new_data_str = realloc(new_data_str, strlen(new_data_str) + 2);
   strcat(new_data_str, "\n");
-  
+
   /* split the new_data_str on \n */
   split_lines = ut_g_strsplit_v1(new_data_str, "\n", 0);
-  
+
   /* process the lines in the submission */
   LG_log(lg_ctx, LG_INFO, "UP_process_submission: start to process the submission data");
   for (line_idx=0; split_lines[line_idx] != NULL; line_idx++)
@@ -2270,8 +2270,8 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     /* remove '\n's and '\r' first */
     line = UP_remove_EOLs(line);
     /* remove trailing white space */
-    line = g_strchomp(line); 
-    
+    line = g_strchomp(line);
+
     /* build up an object string */
     /* Whilst doing this check if it looks like an object --
        look for the first line starting with an alphabetic char and containing a colon before a white space
@@ -2283,7 +2283,7 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       if (object_str == NULL)
       {
         /* this is the first line of the current object string */
-        /* check if it starts with an alphabetic char and 
+        /* check if it starts with an alphabetic char and
            contains a colon (:) before any white spaces */
         if ( (*line >= 'a' && *line <= 'z') || (*line >= 'A' && *line <= 'Z') )
         {
@@ -2377,38 +2377,38 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
               /* check if decomposition is needed */
               LG_log(lg_ctx,LG_DEBUG,
                   "UP_process_submission: checking if the object should be decomposed");
-              if (ns_is_decompose(lg_ctx,object_str,&range_start,&range_end)) 
+              if (ns_is_decompose(lg_ctx,object_str,&range_start,&range_end))
               {
                 LG_log(lg_ctx,LG_DEBUG,
                     "UP_process_submission: object will be decomposed");
                 object_strings=ns_decompose_object(lg_ctx,rt_ctx,object_str,
                                                    range_start,range_end);
-              } 
-              else 
+              }
+              else
               {
                 object_strings=g_new(gchar *,3);
                 object_strings[0]=object_str;
                 object_strings[1]=NULL;
               }
 
-              if (object_strings==NULL) 
+              if (object_strings==NULL)
               {
                 RT_unparsable_input(rt_ctx, object_str);
                 object_strings=g_new(gchar *,2);
                 object_strings[0]=NULL;
                 retval |= UP_FAIL;
               }
-              /* process this object 
+              /* process this object
                  OR the return value so we can keep track of any failures */
               i=0;
-              while (object_strings[i]!=NULL) 
+              while (object_strings[i]!=NULL)
               {
                 retval |= up_process_object(rt_ctx, lg_ctx,
                                             options,
                                             object_strings[i], credentials, 0);
                 i++;
                 /* do not continue to process objects after a fatal error */
-                if (retval & UP_FATAL) 
+                if (retval & UP_FATAL)
                 {
                   retval = UP_FATAL;  /* so that UP_ret2str macro works */
                   /* free up memory */
@@ -2426,7 +2426,7 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                 }
               }
 
-              if (object_strings[i]!=NULL) 
+              if (object_strings[i]!=NULL)
               {
                 g_strfreev(object_strings);
               }
@@ -2481,7 +2481,7 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
              OR the return value so that we can keep track of any failures */
           retval |= up_process_object(rt_ctx, lg_ctx, options,
                                        object_str, credentials, 0);
-  
+
           /* do not continue to process objects after a fatal error */
           if (retval & UP_FATAL)
           {
@@ -2495,7 +2495,7 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             LG_log(lg_ctx, LG_FUNC,"<UP_process_submission: exiting with value %s", UP_ret2str(retval));
             return retval;
           }
-  
+
           free(object_str);
         }
         else
@@ -2511,10 +2511,10 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       g_slist_free(list_of_AUTO_refd_objects);
       list_of_AUTO_refd_objects = second_object_list;
       second_object_list = NULL;
-    } 
+    }
 
-    /* Now, if we still have objects to be processed, go ahead and process them. 
-      They certainly have unresolved AUTO keys, but we need to return relevant errors 
+    /* Now, if we still have objects to be processed, go ahead and process them.
+      They certainly have unresolved AUTO keys, but we need to return relevant errors
       to the user */
     if ( list_of_AUTO_refd_objects )
     {

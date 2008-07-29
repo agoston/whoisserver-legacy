@@ -30,6 +30,7 @@
 #include "attribute.h"
 #include "class.h"
 #include "iproutines.h"
+#include "ut_string.h"
 
 #include <assert.h>
 
