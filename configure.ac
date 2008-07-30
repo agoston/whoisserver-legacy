@@ -302,6 +302,9 @@ AC_CHECK_FUNCS(MD5_Init MD5_Update MD5_Final)
 # this is quite an assumption, in need of exceptions
 AC_CHECK_HEADER(openssl/md5.h,[ CFLAGS="$CFLAGS -I/usr/include/openssl -I/usr/local/include/openssl" ])
 
+dnl add -Wall to CFLAGS
+CFLAGS="$CFLAGS -Wall"
+
 dnl Create links for header files
 AC_MSG_CHECKING([Creating Links])
 AC_CONFIG_COMMANDS([links],[
