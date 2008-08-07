@@ -673,6 +673,35 @@ void RT_kc_gen_diff(RT_context_t* ctx, GList* attributes) {
 }
 
 /*+
+  RT_unmaintained_person - This person/role object is not maintained
+  RT_context_t* ctx - Context.
+  gchar* key - nic-hdl
+ +*/
+void RT_unmaintained_person(RT_context_t* ctx, gchar* key) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"unmaintained_person");
+  rt_add_text_node(node, "key", key);
+  rt_prepare_node(ctx, node);
+}
+
+/*+
+  RT_unmaintained_person_in_mntner - This person/role object referenced in the mntner
+                                     is not maintained
+  RT_context_t* ctx - Context.
+  gchar* key - nic-hdl
+  gchar* mntner - mntner name
+ +*/
+void RT_unmaintained_person_in_mntner(RT_context_t* ctx, gchar* key, gchar* mntner) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"unmaintained_person_in_mntner");
+  rt_add_text_node(node, "key", key);
+  rt_add_text_node(node, "mntner", mntner);
+  rt_prepare_node(ctx, node);
+}
+
+/*+
   RT_inetnum_prefix_converted - The prefix on an inetnum range was converted to range (WARNING)
   RT_context_t* ctx - Context.
 
