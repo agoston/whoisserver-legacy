@@ -324,7 +324,7 @@ int UP_check_organisation(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             LG context
             list of attribute types
             parsed object
-   Returns  list of attributes 
+   Returns  list of attributes (or NULL)
             (list needs to be freed by calling routine with rpsl_attr_delete_list)
 */
 
@@ -351,6 +351,158 @@ GList *up_get_referenced_objects(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   LG_log(lg_ctx, LG_FUNC,"<up_get_referenced_objects: exiting\n");
   return ret_obj_list;
+}
+
+
+/* Check the list of persons/roles to see if they are maintained
+   Receives RT context
+            LG context
+            list of referenced person/role objects
+            mntner referencing persons (or NULL)
+            server structure for lookups
+            object source
+   Returns  UP_OK always for now (with or without warnings)
+            when it becomes an error it will return UP_FAIL if an error occurs
+*/
+
+int up_check_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                                   GList *persons, char *mntner,
+                                   LU_server_t *server, char *obj_source)
+{
+  int retval = UP_OK; 
+  char *key;
+  GList *item;
+  GList *mb = NULL;
+  rpsl_object_t *object = NULL;
+
+  for ( item = persons; item != NULL; item = g_list_next(item) )
+  {
+    key = rpsl_attr_get_clean_value( (rpsl_attr_t *)(item->data) );
+    /* perform lookup (can be person or role object) */
+    if ( lu_whois_lookup(server, &object, "pn,ro", key, obj_source) != LU_OKAY )
+    {
+      /* any lookup error is considered a fatal error */
+      LG_log(lg_ctx, LG_FATAL,"up_check_persons: lookup error on [%s]", key);
+      UP_internal_error(rt_ctx, lg_ctx, options, "up_check_persons: lookup error\n", 0);
+    }
+    /* check for "mnt-by:" attribute */
+    if ( object &&
+         ! mb = rpsl_object_get_attr(object, "mnt-by") )
+    {
+      /* this person/role object is not maintained */
+      if ( mntner )
+      {
+        LG_log(lg_ctx, LG_DEBUG,"up_check_persons: [%s] referenced in mntner [%s] is not maintained", 
+                                    key, mntner);
+        RT_unmaintained_person_in_mntner(rt_ctx, key, mntner);
+      }
+      else
+      {
+        LG_log(lg_ctx, LG_DEBUG,"up_check_persons: [%s] is not maintained", key);
+        RT_unmaintained_person(rt_ctx, key);
+      }
+      /* uncomment next line if this becomes an error instead of a warning */
+//      retval = UP_FAIL;
+      rpsl_object_delete(object);
+    }
+    else if ( object && mb )
+    {
+      rpsl_attr_delete_list(mb);
+      mb = NULL;
+      rpsl_object_delete(object);
+    }
+    /* else 
+         This referenced person object does not exist.
+         This error will be handled later by ref integrity checks in server code */
+    free(key);
+  }
+  return retval;
+}
+
+
+/* checks referenced person objects to see if any are not maintained.
+   checks referenced mntner objects to see if any person objects referenced 
+   in the mntner objects are not maintained.
+   For now any unmaintained person objects found generate a warning message.
+   Later this may be changed to an error.
+   Receives RT context
+            LG context
+            parsed object
+            operation type
+            server structure for lookups
+            object source
+   Returns  UP_OK always for now (with or without warnings)
+            when it becomes an error it will return UP_FAIL if an error occurs
+*/
+
+int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                          rpsl_object_t *preproc_obj, int operation
+                          LU_server_t *server, char *obj_source)
+{
+  int retval = UP_OK; 
+  char *key;
+  GList *persons = NULL;
+  GList *mntners = NULL;
+  GList *mnt_pns = NULL;
+  GList *item;
+  rpsl_object_t *mnt_obj = NULL;
+  char **pn_attrs = {"admin-c","tech-c","zone-c",NULL};
+  char **mnt_attrs = {"mnt-by","mnt-lower","mnt-routes","mnt-domains","mnt-irt",NULL};
+
+  LG_log(lg_ctx, LG_FUNC,">UP_check_mnt_by: entered\n");
+
+  /* if the operation is a delete, then return OK */
+  if (operation == UP_DELETE)
+  {
+    LG_log(lg_ctx, LG_FUNC,"<UP_check_mnt_by: exiting with value [%s]\n", UP_ret2str(retval));
+    return retval;
+  }
+
+  /* get the list of all person/role referenced in the object */
+  LG_log(lg_ctx, LG_DEBUG,"UP_check_mnt_by: get list of person/role");
+  if ( persons = up_get_referenced_objects(rt_ctx, lg_ctx, pn_attrs, preproc_obj) )
+  {
+    rpsl_attr_split_multiple(&persons);
+    retval |= up_check_persons(rt_ctx, lg_ctx, persons, NULL, server, obj_source);
+    rpsl_attr_delete_list(persons);
+  }
+
+  /* get the list of all mntners referenced in the object */
+  LG_log(lg_ctx, LG_DEBUG,"UP_check_mnt_by: get list of mntners");
+  if ( mntners = up_get_referenced_objects(rt_ctx, lg_ctx, mnt_attrs, preproc_obj) )
+  {
+    rpsl_attr_split_multiple(&mntners);
+    /* check all person/role references in the mntners */
+    for ( item = mntners; item != NULL; item = g_list_next(item) )
+    {
+      key = rpsl_attr_get_clean_value( (rpsl_attr_t *)(item->data) );
+      /* perform lookup for mntner */
+      if ( lu_whois_lookup(server, &mnt_obj, "mntner", key, obj_source) != LU_OKAY )
+      {
+        /* any lookup error is considered a fatal error */
+        LG_log(lg_ctx, LG_FATAL,"UP_check_mnt_by: lookup error on [%s]", key);
+        UP_internal_error(rt_ctx, lg_ctx, options, "UP_check_mnt_by: lookup error\n", 0);
+      }
+      /* get the list of all person/role referenced in the mntner object */
+      if ( mnt_obj && 
+           mnt_pns = up_get_referenced_objects(rt_ctx, lg_ctx, pn_attrs, mnt_obj) )
+      {
+        LG_log(lg_ctx, LG_DEBUG,"UP_check_mnt_by: get list of person/role in mntner [%s]",key);
+        rpsl_attr_split_multiple(&mnt_pns);
+        retval |= up_check_persons(rt_ctx, lg_ctx, mnt_pns, key, server, obj_source);
+        rpsl_attr_delete_list(mnt_pns);
+        rpsl_object_delete(mnt_obj);
+        mnt_obj = NULL;
+      }
+      /* else 
+           This referenced mntner object does not exist.
+           This error will be handled later by ref integrity checks in server code */
+      free(key);
+    }
+    rpsl_attr_delete_list(mntners);
+  }
+  LG_log(lg_ctx, LG_FUNC,"<UP_check_mnt_by: exiting with value [%s]\n", UP_ret2str(retval));
+  return retval;
 }
 
 /* checks for a valid suffix at the end of a 'nic-hdl' attributes 

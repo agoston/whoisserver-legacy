@@ -1008,6 +1008,7 @@ int up_external_checks(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             operation
             auto_key pointer
             object source
+            server structure for lookups
             int handle_auto_keys (Handle AUTO keys if handle_auto_keys==1)
             reason pointer to policy check fail string
             list of credentials
@@ -1141,6 +1142,8 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval |= UP_check_org_attr(rt_ctx, lg_ctx, preproc_obj);
 
     retval |= UP_check_organisation(rt_ctx, lg_ctx, preproc_obj, operation);
+
+    retval |= UP_check_mnt_by(rt_ctx, lg_ctx, preproc_obj, operation, server, obj_source);
 
     /* check for references to AUTO- keys */
     if (handle_auto_keys)
