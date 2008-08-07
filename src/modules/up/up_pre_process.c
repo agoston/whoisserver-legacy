@@ -357,6 +357,7 @@ GList *up_get_referenced_objects(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 /* Check the list of persons/roles to see if they are maintained
    Receives RT context
             LG context
+            options structure
             list of referenced person/role objects
             mntner referencing persons (or NULL)
             server structure for lookups
@@ -366,7 +367,7 @@ GList *up_get_referenced_objects(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 */
 
 int up_check_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                                   GList *persons, char *mntner,
+                                   options_struct_t *options, GList *persons, char *mntner,
                                    LU_server_t *server, char *obj_source)
 {
   int retval = UP_OK; 
@@ -387,7 +388,7 @@ int up_check_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     }
     /* check for "mnt-by:" attribute */
     if ( object &&
-         ! mb = rpsl_object_get_attr(object, "mnt-by") )
+         ! (mb = rpsl_object_get_attr(object, "mnt-by")) )
     {
       /* this person/role object is not maintained */
       if ( mntner )
@@ -427,6 +428,7 @@ int up_check_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Later this may be changed to an error.
    Receives RT context
             LG context
+            options structure
             parsed object
             operation type
             server structure for lookups
@@ -436,8 +438,8 @@ int up_check_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 */
 
 int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                          rpsl_object_t *preproc_obj, int operation
-                          LU_server_t *server, char *obj_source)
+                     options_struct_t *options, rpsl_object_t *preproc_obj, 
+                     int operation, LU_server_t *server, char *obj_source)
 {
   int retval = UP_OK; 
   char *key;
@@ -446,8 +448,8 @@ int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   GList *mnt_pns = NULL;
   GList *item;
   rpsl_object_t *mnt_obj = NULL;
-  char **pn_attrs = {"admin-c","tech-c","zone-c",NULL};
-  char **mnt_attrs = {"mnt-by","mnt-lower","mnt-routes","mnt-domains","mnt-irt",NULL};
+  char *pn_attrs[] = {"admin-c","tech-c","zone-c",NULL};
+  char *mnt_attrs[] = {"mnt-by","mnt-lower","mnt-routes","mnt-domains","mnt-irt",NULL};
 
   LG_log(lg_ctx, LG_FUNC,">UP_check_mnt_by: entered\n");
 
@@ -463,7 +465,7 @@ int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   if ( persons = up_get_referenced_objects(rt_ctx, lg_ctx, pn_attrs, preproc_obj) )
   {
     rpsl_attr_split_multiple(&persons);
-    retval |= up_check_persons(rt_ctx, lg_ctx, persons, NULL, server, obj_source);
+    retval |= up_check_persons(rt_ctx, lg_ctx, options, persons, NULL, server, obj_source);
     rpsl_attr_delete_list(persons);
   }
 
@@ -485,11 +487,11 @@ int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       }
       /* get the list of all person/role referenced in the mntner object */
       if ( mnt_obj && 
-           mnt_pns = up_get_referenced_objects(rt_ctx, lg_ctx, pn_attrs, mnt_obj) )
+           (mnt_pns = up_get_referenced_objects(rt_ctx, lg_ctx, pn_attrs, mnt_obj)) )
       {
         LG_log(lg_ctx, LG_DEBUG,"UP_check_mnt_by: get list of person/role in mntner [%s]",key);
         rpsl_attr_split_multiple(&mnt_pns);
-        retval |= up_check_persons(rt_ctx, lg_ctx, mnt_pns, key, server, obj_source);
+        retval |= up_check_persons(rt_ctx, lg_ctx, options, mnt_pns, key, server, obj_source);
         rpsl_attr_delete_list(mnt_pns);
         rpsl_object_delete(mnt_obj);
         mnt_obj = NULL;

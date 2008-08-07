@@ -86,8 +86,9 @@ void RT_clean_object(RT_context_t* ctx, char *msg);
 void RT_invalid_source(RT_context_t* ctx);
 void RT_filtered_source(RT_context_t* ctx);
 
+void RT_unmaintained_person(RT_context_t* ctx, gchar* key);
+void RT_inetnum_prefix_converted(RT_context_t* ctx, gchar* prefix, gchar* range);
 void RT_unknown_country(RT_context_t* ctx, gchar* country);
-
 void RT_unknown_nic_suffix(RT_context_t* ctx);
 
 void RT_enforcednew_exists(RT_context_t* ctx);

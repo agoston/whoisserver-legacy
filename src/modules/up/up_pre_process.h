@@ -40,6 +40,10 @@ int UP_check_nicsuffixes(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options,
                              rpsl_object_t *preproc_obj, char **countries);
 
+int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                     options_struct_t *options, rpsl_object_t *preproc_obj, 
+                     int operation, LU_server_t *server, char *obj_source);
+
 char *UP_get_current_date();
 
 int UP_check_changed_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
