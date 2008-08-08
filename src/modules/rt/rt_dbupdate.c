@@ -702,6 +702,17 @@ void RT_unmaintained_person_in_mntner(RT_context_t* ctx, gchar* key, gchar* mntn
 }
 
 /*+
+  RT_startup - Person creation references a non existant mntner
+  RT_context_t* ctx - Context.
+ +*/
+void RT_startup(RT_context_t* ctx) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"startup");
+  rt_prepare_node(ctx, node);
+}
+
+/*+
   RT_inetnum_prefix_converted - The prefix on an inetnum range was converted to range (WARNING)
   RT_context_t* ctx - Context.
 

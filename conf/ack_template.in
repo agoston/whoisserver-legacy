@@ -425,6 +425,13 @@ Refered object <xsl:value-of select="refered_object/text()"/> exists.
 </xsl:if>
 </xsl:template>
 
+  <xsl:template match="startup">
+<xsl:if test="$level_notice>$level">
+***Info: To create a person/mntner pair of objects see
+         http://www.ripe.net/???
+</xsl:if>
+</xsl:template>
+
   <xsl:template match="inetnum_prefix_converted">
 <xsl:if test="$level_notice>$level">
 ***Warning: Prefix '<xsl:value-of select="prefix/text()"/>' converted to range '<xsl:value-of select="range/text()"/>'

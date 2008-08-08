@@ -443,6 +443,7 @@ int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 {
   int retval = UP_OK; 
   char *key;
+  char *type;
   GList *persons = NULL;
   GList *mntners = NULL;
   GList *mnt_pns = NULL;
@@ -459,6 +460,7 @@ int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     LG_log(lg_ctx, LG_FUNC,"<UP_check_mnt_by: exiting with value [%s]\n", UP_ret2str(retval));
     return retval;
   }
+  type = rpsl_object_get_class(preproc_obj);
 
   /* get the list of all person/role referenced in the object */
   LG_log(lg_ctx, LG_DEBUG,"UP_check_mnt_by: get list of person/role");
@@ -496,9 +498,15 @@ int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         rpsl_object_delete(mnt_obj);
         mnt_obj = NULL;
       }
-      /* else 
-           This referenced mntner object does not exist.
-           This error will be handled later by ref integrity checks in server code */
+      else if ( strcasecmp(type, "person") == 0 && operation == UP_CREATE
+                  && g_list_length(mntners) == 1 )
+      {
+        /* In general a referenced mntner object that does not exist
+           will be handled later by ref integrity checks in server code */
+        /* if we have a person creation referencing a single non existant mntner
+           maybe they need to use the startup cgi script */
+        RT_startup(rt_ctx);
+      }
       free(key);
     }
     rpsl_attr_delete_list(mntners);

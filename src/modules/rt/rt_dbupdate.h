@@ -88,6 +88,7 @@ void RT_filtered_source(RT_context_t* ctx);
 
 void RT_unmaintained_person(RT_context_t* ctx, gchar* key);
 void RT_unmaintained_person_in_mntner(RT_context_t* ctx, gchar* key, gchar* mntner);
+void RT_startup(RT_context_t* ctx);
 void RT_unknown_country(RT_context_t* ctx, gchar* country);
 void RT_unknown_nic_suffix(RT_context_t* ctx);
 
