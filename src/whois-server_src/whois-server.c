@@ -12,15 +12,15 @@
   +html+ <DD><UL>
   +html+ </UL>
   +html+ </DL>
- 
+
   ******************/ /******************
   Modification History:
         ottrey (09/03/1999) Created.
   ******************/ /******************
   Copyright (c) 1998                            RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -28,7 +28,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -40,44 +40,6 @@
 #include "rip.h"
 #include <signal.h>
 #include <unistd.h>
-
-void error_init(int argc, char ** argv) {
-  char *slash;     
-  char progname[32];
-  
-  slash = strrchr(argv[0],'/');                            
-  strncpy(progname, (slash != NULL) ? slash+1 : argv[0], 31);
-  progname[31]=0;
-  
-
-  //  ER_init(progname, 1);
-
-#if 0
-  /* add one more definition */
-  {
-    char *err_msg = NULL;
-    char *buf = 
-      "CREATE test { FORMAT SEVCHAR|FACSYMB|TEXTLONG|DATETIME SOCK 2 }"
-      "( FAC rp ASP RP_SRCH_GEN|RP_SRCH_DET|RP_LOAD_GEN SEV d-f ) "
-      "( FAC QI|SQ ASP SQ_QRYTIME | QI_COLL_GEN SEV d-f )"  
-      "( FAC PW ASP PW_I_QRYLOG SEV I-f )"
-      "( FAC ALL SEV E- )"
-      /*      "( FAC SV  ASP SV_PORT  SEV d )" */
-      ;
-
-    int parsres = ER_parse_spec(buf, &err_msg);
-
-    if( parsres != 0 ) { /* print only on failure */
-      puts(err_msg);
-    }
-    
-    wr_free(err_msg);
-    
-    dieif( parsres != 0 );
-  }
-#endif
-
-} /* error_init() */
 
 void segfault_handler(int sig) {
 	// we print a nice message, including sig, to make things absolutely clear
@@ -107,7 +69,7 @@ void install_signal_handler()
 	sigaction(SIGTERM, &sig, NULL);
 
 	/* SIGPIPE occurs at uncomfortable times on TCP sockets, so we ignore it.
-	   In such a case we still get a -1 from the offending I/O operation, and 
+	   In such a case we still get a -1 from the offending I/O operation, and
 	   the errno of EPIPE. */
 	sig.sa_handler = SIG_IGN;
 	sigaction(SIGPIPE, &sig, NULL);
@@ -141,7 +103,7 @@ static LG_context_t* sv_prepare_context(gchar* file, gchar* module) {
   LG_ctx_add_appender(ctx, app);
   sprintf(log_line, "$TIMESTAMP whois_rip-$PID/$TID %s-$SEV-$SEVERITY $MESSAGE\n", module);
   app->formatter = LG_frm_general_prepared(log_line);
- 
+
   return ctx;
 }
 
@@ -220,12 +182,7 @@ int main(int argc, char **argv)
 
 	sv_init_modules();
 
-	/* fprintf(stderr,"%s\n", ca_get_allriperr); */
-	/* Initialize error handling */
-	error_init(argc, argv);
-
 	/*  Start the server */
-
 	ret = SV_start(pid_file_name);
 
 	if (ret != 0)
