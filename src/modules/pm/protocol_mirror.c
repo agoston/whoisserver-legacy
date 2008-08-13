@@ -1,6 +1,6 @@
 /***************************************
 
- Protocol mirror module (pm). 
+ Protocol mirror module (pm).
 
  Status: NOT REVIEWED, TESTED
 
@@ -10,9 +10,9 @@
  OSs Tested          : Solaris
  ******************//******************
  Copyright (c) 2000                              RIPE NCC
- 
+
  All Rights Reserved
- 
+
  Permission to use, copy, modify, and distribute this software and its
  documentation for any purpose and without fee is hereby granted,
  provided that the above copyright notice appear in all copies and that
@@ -20,7 +20,7 @@
  supporting documentation, and that the name of the author not be
  used in advertising or publicity pertaining to distribution of the
  software without specific, written prior permission.
- 
+
  THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
  AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -64,10 +64,10 @@ GHashTable *PM_DUMMY_ATTR = NULL;
 
 /* Initializes variables to use in dummify_object().
  * Need to be executed before any calls to dummify_object() are made.
- * 
+ *
  * Also checks if all private object's mandatory attributes are covered in the rip.config file DUMMY_ATTR options
  * (and only those).
- * 
+ *
  * agoston, 2007-10-31 */
 static void dummify_init() {
 	gchar **lines, **actline;
@@ -85,7 +85,6 @@ static void dummify_init() {
 
 	void log_leftover_mandatory_attribs_callback(gpointer key, gpointer value, gpointer data) {
 		fprintf(stderr, "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!\n", key);
-		LG_log(pm_context, LG_FATAL, "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!", key);
 	}
 
 	/* collect all mandatory options of private objects to perform sanity check during config parsing */
@@ -106,14 +105,12 @@ static void dummify_init() {
 		gchar *equal = strchr(*actline, '=');
 		if (!equal) {
 			fprintf(stderr, "No = sign found in one of the DUMMY_ATTR lines in the rip.config file\n");
-			LG_log(pm_context, LG_FATAL, "No = sign found in one of the DUMMY_ATTR lines in the rip.config file");
 			die;
 		}
 
 		*equal = 0;
 		if (!g_hash_table_remove(mandatory_attribs, *actline)) {
 			fprintf(stderr, "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!\n", *actline);
-			LG_log(pm_context, LG_FATAL, "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!", *actline);
 			die;
 		}
 		g_hash_table_insert(PM_DUMMY_ATTR, *actline, equal+1);
@@ -271,7 +268,7 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 }
 
 /* PUBLIC NRTM STREAM DESIGN
- * 
+ *
  * Instead of simply dropping private objects from the public nrtm stream, we decided to send dummified objects.
  * It has the following adventages:
  * - We can add a nice 'this is a dummy object, for the real stuff, use whois.ripe.net blabla' message to each
@@ -280,29 +277,29 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  * - 3rd party software interpreting the nrtm streams do not need modification to handle special cases
  * - We won't create a special case which will bite into our asses when we do some change
  * - All referential integrity will be maintained
- * 
+ *
  * We do the dummification in a generic way. For each object, we first parse it using the RPSL module. This sucks
  * big time performance-wise, as it does a lot of surplus processing and error checking, however, we are more flexible
- * about future changes, handling outdated/erronous objects in the database, and also, we handle corner cases like 
+ * about future changes, handling outdated/erronous objects in the database, and also, we handle corner cases like
  * line continuation out of the box, error-free. Note however that the RPSL library's API is horrible, but there
  * was also no point in re-implementing one from scratch (I'd very much liked that, though).
- * 
+ *
  * This also means that objects which have been stuffed into the database earlier, not passing the current syntax
- * rules will produce an error. On such rpsl parser errors, we return NULL, which marks that the object could not 
+ * rules will produce an error. On such rpsl parser errors, we return NULL, which marks that the object could not
  * be dummified. In this case, the NRTM server will return an error message with all the necessary debug info.
  * This will normally not be a problem as we also don't want to give object history through public NRTM stream. Any
  * attempt to try to go back more than two weeks into the past should give an error.
- * 
+ *
  * After having the processed object structure, we iterate through the attributes. We discard any non-mandatory
  * attributes. From the mandatory ones, we keep the ones which maintain referential integrity. The remaining
  * attributes are dummified based on the corresponding entries in the rip.config file (read comments there).
- * 
+ *
  * After finishing the dummification, we return the flat object for the nrtm server to send to the client or NULL
  * on dummification error.
- * 
- * Note that dummify_init() must be called before any calls are made to dummify_object(). 
- * 
- * agoston, 2007-10-18   
+ *
+ * Note that dummify_init() must be called before any calls are made to dummify_object().
+ *
+ * agoston, 2007-10-18
  * */
 char *PM_dummify_object(char *object) {
 	const GList *errors = NULL;
@@ -327,9 +324,9 @@ char *PM_dummify_object(char *object) {
 			quit = TRUE;
 		}
 	}
-	
+
 	/* if there *was* an rpsl error, but not major (meaning the data structures are still filled),
-	 * let's continue running. 
+	 * let's continue running.
 	/* if there's a serious error, we skip this object */
 	if (quit && !(obj && obj->attributes && obj->attributes->data)) {
 		goto dummify_abort;
@@ -366,9 +363,9 @@ char *PM_dummify_object(char *object) {
 				die;
 			}
 		} else {
-			/* We use the _internal call as the normal one does some extra, and, in this case, surplus 
+			/* We use the _internal call as the normal one does some extra, and, in this case, surplus
 			 * checking.
-			 * 
+			 *
 			 * During call, the only possible error is trying to remove a mandatory attribute - but since
 			 * we already checked that, we don't care about errors here. - agoston, 2007-10-29 */
 			gli = gli->prev;
@@ -398,13 +395,13 @@ char *PM_dummify_object(char *object) {
 
 	if (dummified_attribs)
 		g_hash_table_destroy(dummified_attribs);
-	
+
 	if (prim_val)
 		free(prim_val);
-	
+
 	if (obj)
 		rpsl_object_delete(obj);
-	
+
 	return ret;
 }
 
@@ -585,7 +582,7 @@ void PM_interact(int sock) {
 	UT_free(db_pswd);
 
 	PM_get_minmax_serial(sql_connection, &oldest_serial, &current_serial);
-	/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial 
+	/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial
 	 * agoston, 2007-12-21 */
 	/*current_serial -= SAFE_BACKLOG; */
 
@@ -661,7 +658,7 @@ void PM_interact(int sock) {
 		/* there is a probability that mirroring interferes with HS cleanup */
 		/* in such case serial may be deleted before it is read by mirror client */
 		/* null object will be returned in this case and we need to break the loop */
-		
+
 		/* whatever the reason was for this, it's left here as if there indeed was a problem
 		 * getting an object from the DB, we shouldn't continue, as it would pollute the DB or screw
 		 * up the serials - agoston, 2008-01-30 */
@@ -683,7 +680,7 @@ void PM_interact(int sock) {
 				int i = 0;
 
 				/* check access history limit only if we actually been able to get a timestamp from the DB
-				 * for DBs filled by NRTM, timestamp of delete operation is lost due to a bug, check 
+				 * for DBs filled by NRTM, timestamp of delete operation is lost due to a bug, check
 				 * PM_get_serial_object() for more info
 				 * agoston, 2008-01-30 */
 				if (timestamp) {
@@ -740,11 +737,11 @@ void PM_interact(int sock) {
 				break;
 
 			case OP_NOOP:
-				/* In this case, don't do anything. 
+				/* In this case, don't do anything.
 				 * The reason is that the first serial, which is used to set the auto_increment pkey
 				 * in mysql has an opcode of 4 (OP_NOOP). We don't send anything for this serial,
 				 * as this has no data-holding functionality.
-				 * 
+				 *
 				 * More importantly, if a client requests an nrtm stream, that means it's starting serial is already
 				 * set up, so not sending this one will make sure that the serials will be the same.
 				 * agoston, 2008-01-21 */

@@ -605,7 +605,94 @@ int SV_start(char *pidfile) {
 	gettimeofday(&tval, NULL);
 	SV_starttime = tval.tv_sec; /* seconds since Jan. 1, 1970 */
 
-	/* Log the starting time */
+	/* Do anything that requires root priviles before dropping it */
+
+    /* Create a socket on the necessary ports/addresses and bind to them. */
+    /* whois socket */
+    whois_port = ca_get_svwhois_port;
+    SV_whois_sock = SK_getsock(NULL, whois_port, SOCK_STREAM, 2048);
+    fprintf(stderr, "Whois  port: %d\n", whois_port);
+    /* config interface socket */
+    config_port = ca_get_svconfig_port;
+    SV_config_sock = SK_getsock(NULL, config_port, SOCK_STREAM, 5);
+    fprintf(stderr, "Config port: %d\n", config_port);
+    /* nrtm socket */
+    mirror_port = ca_get_svmirror_port;
+    SV_mirror_sock = SK_getsock(NULL, mirror_port, SOCK_STREAM, 128);
+    fprintf(stderr, "Mirror port: %d\n", mirror_port);
+    /* per source update ports */
+    for (source = 0; (source_hdl = ca_get_SourceHandleByPosition(source)) != NULL; source++) {
+        update_mode = ca_get_srcmode(source_hdl);
+        if (IS_UPDATE(update_mode)) {
+            update_port = ca_get_srcupdateport(source_hdl);
+            SV_update_sock[source] = SK_getsock(NULL, update_port, SOCK_STREAM, 128);
+            fprintf(stderr, "Update port: %d for %s\n", update_port, source_hdl);
+        } else {
+            SV_update_sock[source] = 0;
+        }
+    }
+
+    /* Store the PID of the process */
+    SV_pidfile = pidfile;
+    /* create the file read-writable by the process owner */
+    if ((pid_fd = open(SV_pidfile, O_CREAT | O_TRUNC | O_WRONLY, 0600)) == -1) {
+        fprintf(stderr, "cannot open pid file %s", SV_pidfile);
+        return (-1);
+    }
+    sprintf(server_pid, "%d", (int)getpid());
+    nwrite = write(pid_fd, server_pid, strlen(server_pid));
+    close(pid_fd);
+    if (nwrite != strlen(server_pid)) {
+        fprintf(stderr, "cannot write to pid file %s", SV_pidfile);
+        return (-1);
+    }
+
+    /* Drop root privileges, if any */
+    if (getuid() != 0) {
+        fprintf(stderr, "Not running as root, keeping current uid and gid\n");
+    } else {
+        struct passwd *passwent;
+        char *procuser;
+        int lenproc;
+
+        fprintf(stderr, "*Running* as root, dropping privileges:\n");
+        procuser = strdup(ca_get_processuser);
+
+        /* chop off any trailing newline */
+        lenproc = strlen(procuser);
+        if ((lenproc > 0) && (procuser[lenproc - 1] == '\n')) {
+            procuser[lenproc - 1] = '\0';
+        }
+
+        passwent = getpwnam(procuser);
+        if (passwent == NULL) {
+            fprintf(stderr, " getpwnam failed for %s - %s\n", procuser, strerror(errno));
+            die;
+        }
+        if ((setgid(passwent->pw_gid)) != 0) {
+            fprintf(stderr, "can't setgid(%d)\n", passwent->pw_gid);
+            die;
+        }
+        fprintf(stderr, "Gid: %d ", passwent->pw_gid);
+        if ((setegid(passwent->pw_gid)) != 0) {
+            fprintf(stderr, "can't setegid(%d)\n", passwent->pw_gid);
+            die;
+        }
+        fprintf(stderr, "Egid: %d ", passwent->pw_gid);
+        if ((setuid(passwent->pw_uid)) != 0) {
+            fprintf(stderr, "can't setuid(%d)\n", passwent->pw_uid);
+            die;
+        }
+        fprintf(stderr, "Uid: %d ", passwent->pw_uid);
+        if ((seteuid(passwent->pw_uid)) != 0) {
+            fprintf(stderr, "can't seteuid(%d)\n", passwent->pw_uid);
+            die;
+        }
+        fprintf(stderr, "Euid: %d ", passwent->pw_uid);
+        fprintf(stderr, ".\n");
+    }
+
+    /* Log the starting time */
 	ctime_r(&SV_starttime, starttime);
 	LG_log(sv_context, LG_INFO, "Server is started %s", starttime);
 
@@ -616,21 +703,6 @@ int SV_start(char *pidfile) {
 	}
 	SV_shutdown_send_fd = shutdown_pipe[1];
 	SV_shutdown_recv_fd = shutdown_pipe[0];
-
-	/* Store the PID of the process */
-	SV_pidfile = pidfile;
-	/* create the file read-writable by the process owner */
-	if ((pid_fd = open(SV_pidfile, O_CREAT | O_TRUNC | O_WRONLY, 0600)) == -1) {
-		LG_log(sv_context, LG_ERROR, "cannot open pid file %s", SV_pidfile);
-		return (-1);
-	}
-	sprintf(server_pid, "%d", (int)getpid());
-	nwrite = write(pid_fd, server_pid, strlen(server_pid));
-	close(pid_fd);
-	if (nwrite != strlen(server_pid)) {
-		LG_log(sv_context, LG_ERROR, "cannot write to pid file %s", SV_pidfile);
-		return (-1);
-	}
 
 	/* Initialise modules */
 	/* XXX: must be handled previously!!! */
@@ -649,85 +721,9 @@ int SV_start(char *pidfile) {
 	TH_create((void *(*)(void *))AC_decay, NULL);
 	TH_create((void *(*)(void *))AC_persistence_daemon, NULL);
 
-	/* Get port information for each service */
-	whois_port = ca_get_svwhois_port;
 	LG_log(sv_context, LG_INFO, "whois port is %d", whois_port);
-	/*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "whois port is %d", whois_port); */
-
-	config_port = ca_get_svconfig_port;
 	LG_log(sv_context, LG_INFO, "config port is %d", config_port);
-	/*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "config port is %d", config_port); */
-
-	mirror_port = ca_get_svmirror_port;
 	LG_log(sv_context, LG_INFO, "mirror port is %d", mirror_port);
-	/*  ER_dbg_va(FAC_SV, ASP_SV_PORT, "mirror port is %d", mirror_port);*/
-
-	/* 6. Create a socket on the necessary ports/addresses and bind to them. */
-	/* whois socket */
-	SV_whois_sock = SK_getsock(NULL, whois_port, SOCK_STREAM, 2048);
-	fprintf(stderr, "Whois  port: %d\n", whois_port);
-	/* config interface socket */
-	SV_config_sock = SK_getsock(NULL, config_port, SOCK_STREAM, 5);
-	fprintf(stderr, "Config port: %d\n", config_port);
-	/* nrt socket */
-	SV_mirror_sock = SK_getsock(NULL, mirror_port, SOCK_STREAM, 128);
-	fprintf(stderr, "Mirror port: %d\n", mirror_port);
-	/* per source update ports */
-	for (source = 0; (source_hdl = ca_get_SourceHandleByPosition(source)) != NULL; source++) {
-		update_mode = ca_get_srcmode(source_hdl);
-		if (IS_UPDATE(update_mode)) {
-			update_port = ca_get_srcupdateport(source_hdl);
-			SV_update_sock[source] = SK_getsock(NULL, update_port, SOCK_STREAM, 128);
-			fprintf(stderr, "Update port: %d for %s\n", update_port, source_hdl);
-		} else {
-			SV_update_sock[source] = 0;
-		}
-	}
-
-	/* (after 6). Drop root privileges, if any */
-	if (getuid() != 0) {
-		fprintf(stderr, "Not running as root, keeping current uid and gid\n");
-	} else {
-		struct passwd *passwent;
-		char *procuser;
-		int lenproc;
-
-		fprintf(stderr, "*Running* as root, dropping privileges:\n");
-		procuser = strdup(ca_get_processuser);
-
-		/* chop off any trailing newline */
-		lenproc = strlen(procuser);
-		if ((lenproc > 0) && (procuser[lenproc - 1] == '\n')) {
-			procuser[lenproc - 1] = '\0';
-		}
-
-		passwent = getpwnam(procuser);
-		if (passwent == NULL) {
-			fprintf(stderr, " getpwnam failed for %s - %s\n", procuser, strerror(errno));
-			die;
-		}
-		if ((setgid(passwent->pw_gid)) != 0) {
-			fprintf(stderr, "can't setgid(%d)\n", passwent->pw_gid);
-			die;
-		}
-		fprintf(stderr, "Gid: %d ", passwent->pw_gid);
-		if ((setegid(passwent->pw_gid)) != 0) {
-			fprintf(stderr, "can't setegid(%d)\n", passwent->pw_gid);
-			die;
-		}
-		fprintf(stderr, "Egid: %d ", passwent->pw_gid);
-		if ((setuid(passwent->pw_uid)) != 0) {
-			fprintf(stderr, "can't setuid(%d)\n", passwent->pw_uid);
-			die;
-		}
-		fprintf(stderr, "Uid: %d ", passwent->pw_uid);
-		if ((seteuid(passwent->pw_uid)) != 0) {
-			fprintf(stderr, "can't seteuid(%d)\n", passwent->pw_uid);
-			die;
-		}
-		fprintf(stderr, "Euid: %d ", passwent->pw_uid);
-		fprintf(stderr, ".\n");
-	}
 
 #ifdef __linux__
 	if (prctl(PR_SET_DUMPABLE, 1) < 0) {
