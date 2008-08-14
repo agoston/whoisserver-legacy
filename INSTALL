@@ -5,3 +5,47 @@ given from the Install.PL file located in this directory.
   
 For older installation instructions and notes about libraries etc,
 you can look at the 'INSTALL.bak' file, which is NO LONGER UP TO DATE.
+
+
+STARTING THE SERVICE (initscripts)
+----------------------------------
+
+We have provided a new, revised version of the initscripts. The old
+initscripts (whoisd_start and whoisd.server) were replaced with a single
+initscript called ripe.whois.
+
+This requires the following directory layout
+
+$BASEDIR
+|-- bin
+|   |-- whois-server
+|   `-- ... (further whois-related binaries like dbupdate)
+|-- conf
+|   |-- WHOIS-HELP
+|   |-- gdbcomm
+|   |-- rip.config
+|   |-- sources.config
+|   `-- ... (further config files as needed)
+`-- var
+    |-- locks
+    |-- log
+    |   |-- ack
+    |   |-- audit
+    |   |-- dbuperr
+    |   |-- forw
+    |   |-- mirror
+    |   |-- notif
+    |   |-- qry
+    |   |-- riperr
+    |   |-- ripupd
+    |   |-- sql
+    |   |-- svr
+    |   `-- upd
+    `-- tmp
+
+
+Change the BASEDIR variable ripe.whois file to point to your whois basedir,
+and copy it to /etc/init.d.
+
+The original directory structure, created by 'make install' is now
+deprecated as well.

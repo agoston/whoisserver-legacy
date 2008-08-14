@@ -1,0 +1,289 @@
+#!/bin/bash
+# ****************************************
+# * This file is under version control
+# ****************************************
+#
+#  _aa,     _aa,   .awwwa,    .awwwwc.   
+#  )WWm     QQW`  <QQWQQQQf  <QWWWQWWW   
+#   WWQ;   =QQE  <QQQDT?$Qf _QQQT??9QW   
+#   ]QQL   jQQ[  mQQF    ?f ]QQf    -9   
+#   -QQm   QQW  =QQW        ]QQQc.       
+#    $QQ; <WQF  ]QQE        )QQQWQQw,    
+#    ]QQL jQQ(  ]QQk         ?QQQQWWQL   
+#    -QQQ QQ@   ]QQk          -?VQQQQQ;  
+#     4QWuQQf   =QQQ.     .       "QWQ[  
+#     )QQQQQ'    $QQ6.  .jf ja.    dQQ(  
+#      QWQQD     )WQQQwwQWf jQQgwayQQ@   
+#      ]QQQ[      )$QQWQWQ[ ]QQQWQQQD`   
+#      -"""`        "?T?!`   -!?T??^     
+#
+# ****************************************
+# * This file is under version control
+# ****************************************
+# svn export https://new-ncc/svn/db/whoisserver/trunk/src/utils/ripe.whois
+
+##############################################################################################
+# determine service name before anything else
+export SERVICE=`basename $0 | sed 's/^ripe.//'`
+# sanity check
+if [ $SERVICE = whois ]; then
+	echo "Do not use $0. It is the generic starter script for all whois services."
+	echo "Use $0-* instead!"
+	exit 1
+fi
+
+##############################################################################################
+# basedir of whois service
+export BASEDIR=/home/dbase/services/$SERVICE
+# E-mail address where crash notifications are sent
+#export NOTIFY=dbase24-7@ripe.net
+export NOTIFY=agoston@ripe.net
+# PID file
+export PIDFILE=$BASEDIR/var/tmp/whois-server.pid
+# ERR file (startup log and stderr of whois-server is redirected here)
+export ERRLOG=$BASEDIR/var/log/whois-server.err.log
+
+##############################################################################################
+# event handlers - change them according to current failover setup
+whois_exited() {
+	true
+#	my_log "Stopping quagga."
+#	/etc/init.d/quagga stop
+}
+
+whois_started() {
+	true
+#	my_log "Starting quagga."
+#	/etc/init.d/quagga start
+}
+
+##############################################################################################
+# helper functions
+my_log() {
+	echo "$@"
+	echo "`date +'%y%m%d %H:%M:%S'` $@" >>$ERRLOG
+}
+
+my_panic() {
+	SUBJECT=$1 ; shift
+	my_log "$@"
+	echo -e "$@" | mail -a "Auto-Submitted: auto-generated" -s "$SUBJECT" "$NOTIFY"
+	my_log "Email sent to $NOTIFY"
+}
+
+function send_command() {
+	echo -e "$@" | nc -q 1 localhost $CONFIG_PORT
+}
+
+function send_command_get_ret() {
+	return `echo -e "$@" | nc -q 1 localhost $CONFIG_PORT | sed 's/.*=\([0-9]*\)=.*/\1/g' | tail -1`
+}
+
+##############################################################################################
+# after the server is started, this function checks if it has come up, and screams if not.
+# it also handles the switch to dynamic mode.
+check_server() {
+	# give server a chance
+	my_log 'Waiting for the server to come up...'
+	NUM=0
+	while ! send_command help >/dev/null 2>&1; do
+		sleep 1
+		NUM=$[NUM+1]
+		if [ $NUM -gt 30 ]; then
+			# bail out
+			my_log "Couldn't connect to config port after 30 seconds - something's gone wrong!"
+			return
+		fi
+	done
+
+	# wait for rx_load thread to finish
+	my_log 'Waiting for rx_load thread to finish...'
+	RX_LOAD="Init"
+	NUM=0
+	while [ $NUM -lt 30 ]; do
+		RX_LOAD=`send_command 'show threads' | grep '^rx load' | awk '{printf("%s %s %s", $10, $11, $12);}'`
+		echo -en "\r${RX_LOAD}                              "
+		if [ "$RX_LOAD" ]; then
+			NUM=0
+		else 
+			NUM=$[NUM+1]
+		fi
+		sleep 1
+	done
+	echo -en "\r"
+
+	# first test - query the server (also takes care of any first-time initialization problems we might have)
+	if [ `echo '193.0/16' | nc -q 10 localhost $QUERY_PORT | wc -l` -gt 10 ]; then
+		my_log "$SERVICE first startup check succeeded."
+	else
+		my_panic "$SERVICE first startup check failed on `hostname`" "$SERVICE came up, but did not respond to the first test query - SOMETHING IS WRONG, check logs!"
+		return
+	fi
+	
+	# only enable updates if the last startup was more than 24 hours ago
+	CURRENT_DATE=`date +%s`
+	if [ $[CURRENT_DATE - LAST_START_DATE] -gt 86400 ]; then
+		my_log 'Executing "set dynamic start"...'
+		send_command 'set dynamic start' &>/dev/null
+	fi
+
+	# second test - query the server after (also takes care of any first-time initialization problems we might have)
+	# we'll sleep a bit (kinda like bears in the winter), so that dynamic mode has some time to start catching up
+	sleep 5
+	if [ `echo '193.0/16' | nc -q 10 localhost $QUERY_PORT | wc -l` -gt 10 ]; then
+		my_log "$SERVICE second startup check succeeded."
+	else
+		my_panic "$SERVICE second startup check failed on `hostname`" "$SERVICE came up, but did not respond to the second test query - SOMETHING IS WRONG, check logs!"
+		return
+	fi
+
+	# execute event handler
+	whois_started
+
+	my_log "$SERVICE start finished successfully."
+}
+	
+
+##############################################################################################
+# Starts the whois-server
+start_server () {
+	while true; do
+		# only start the server if the remaining crashes number is big enough
+		if [ $CRASHES -gt 0 ]; then
+			# only start check_server thread if this is our second start
+			# (because first start went to the stdout to give feedback to user)
+			if [ $CRASHES -lt 10 ]; then
+				my_panic "$SERVICE crashed & restarted on $HOSTNAME" "$HOSTNAME whois-server crashed & restarted"
+				check_server </dev/null >/dev/null 2>&1 &
+				CHECK_THREAD_PID=$!
+			else
+				CHECK_THREAD_PID=
+			fi
+
+			export LAST_START_DATE=`date +%s`
+			$BASEDIR/bin/whois-server -p $PIDFILE -c $BASEDIR/conf/rip.config  </dev/null >> $ERRLOG 2>&1
+
+			# kill existing whois-server-start check thread (so that it won't accidentally start event handler)
+			if ! [ $CHECK_THREAD_PID ]; then
+				if ps uxaw |  egrep '^root *'$CHECK_THREAD_PID" .*`basename $0`" &>/dev/null; then
+					kill -9 $CHECK_THREAD_PID
+				fi
+			fi
+
+			# execute event handler
+			whois_exited
+
+			# if pid file exists - that was a crash - restart the server in safe mode
+			if [ ! -f $PIDFILE ]; then
+				return
+			fi
+    
+			rm -f $PIDFILE
+    
+			export CRASHES=$[CRASHES-1]
+  		
+  		else
+			my_panic "ERROR:URGENT: $HOSTNAME $SERVICE is stopped and not restarted" "Number of whois-server crashes exceeded 10"
+			return
+		fi
+	done
+}
+
+##############################################################################################
+# Stops the whois-server
+stop_server() {
+	# Stop server using SIGTERM signal
+	if [ -f $PIDFILE ]; then
+		PID=`cat $PIDFILE`
+		if ps uxaw | awk '{if ($2 == '$PID') printf("%s\n", $13);}' | grep whois-server &>/dev/null; then
+			my_log "Stopping $SERVICE ..."
+			# first execute the event handler and wait a bit to let load balancing hardware route traffic elsewhere
+			whois_exited
+			sleep 10
+			# then, signal whois-server that it should stop
+			kill $PID
+			# then let running threads finish their workloads
+			sleep 10
+			# signal all remaining threads afterwards
+			ps uxaw -L | awk '{printf("%s %s\n", $2, $3);}' | grep "^$PID " | awk '{print $2}' | while read i; do
+				my_log "Thread $i didn't exit - sending TERM"
+				kill $i
+			done
+
+			# whois-server should remove the PIDFILE when it exits, so wait for it.
+			WAIT=15
+			while [ -s $PIDFILE ]; do
+				WAIT=$[WAIT-1]
+				if [ $WAIT -lt 0 ]; then
+					my_log "$SERVICE failed to stop; killing"
+					rm -f $PIDFILE
+					kill -9 $PID
+					break
+				fi
+				sleep 1
+			done
+		fi
+	else
+		my_log "$PIDFILE does not exist."
+		my_log "This suggests that you are trying to stop $SERVICE, but it is not running."
+		my_log "If this is not the case, manual intervention is required."
+	fi
+}
+
+##############################################################################################
+# MAIN
+
+# Safeguard (relative paths, ...)
+cd $BASEDIR
+
+# Default number of crashes before loop is stopped
+# check_server expects this to be 10 at startup
+export CRASHES=10
+
+# hostname, used only as a shortcut for `hostname`
+export HOSTNAME=`hostname`
+
+# get the config port from the config file
+export CONFIG_PORT=`grep ^SVCONFIG_PORT $BASEDIR/conf/rip.config | awk '{print $2}'`
+if [ -z $CONFIG_PORT ]; then
+	echo 'SVCONFIG_PORT is invalid in config file!'
+	exit 1
+fi
+
+# get the query port from the config file
+export QUERY_PORT=`grep ^SVWHOIS_PORT $BASEDIR/conf/rip.config | awk '{print $2}'`
+if [ -z $QUERY_PORT ]; then
+	echo 'SVWHOIS_PORT is invalid in config file!'
+	exit 1
+fi
+
+case "$1" in
+	'start')
+		# If an old pid file exists, check if the daemon is already running
+		if [ -f $PIDFILE ]; then
+			PID=`cat $PIDFILE`
+			if ps uxaw | awk '{if ($2 == '$PID') printf("%s\n", $13);}' | grep whois-server &>/dev/null; then
+				my_log "PID file $PIDFILE exists and points to a running whois-server."
+				my_log "This suggests that you are trying to start an already running whois service."
+				my_log "You should either remove the pid file if you are sure this whois service is not running yet, or perform some deeper investigation to solve this situation."
+				exit 1
+			else
+				my_log "Stale pid file $PIDFILE removed. This suggests an unclean shutdown."
+				rm -f $PIDFILE
+			fi
+		fi
+		
+		my_log "Starting $SERVICE: "
+		start_server </dev/null &
+		check_server
+	;;
+
+	'stop')
+		stop_server
+	;;
+
+	*)
+		echo "usage: $0 start|stop"
+		exit 1
+	;;
+esac
