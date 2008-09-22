@@ -7,6 +7,7 @@
 #include <netdb.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
 #include "SK.h"
 
@@ -20,8 +21,13 @@ FILE* logfile;
 char* infilename;
 
 void log_to_file(char *reason, char *actwork) {
+    time_t t = time(NULL);
+    char t_buf[32];
+    
+    ctime_r(&t, t_buf);
+    t_buf[strlen(t_buf)-1] = 0;		// remove trailing newline
     pthread_mutex_lock(&log_lock);
-    fprintf(logfile, "%s: %s", reason, actwork);
+    fprintf(logfile, "%s %s: %s", t_buf, reason, actwork);
     fflush(logfile);
     pthread_mutex_unlock(&log_lock);
 }
