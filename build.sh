@@ -106,9 +106,10 @@ fi
 ###
 
 echo ' ***'
-echo ' *** Compiling whois-server'
+echo ' *** Extensions built. You can now compile the whois-server'
 echo ' ***'
-./configure --with-rdns --prefix=$HOME/local
+
+#./configure --with-rdns --prefix=$HOME/local
 # default options omitted:
 #--with-cclientinc=`pwd`/third-party/imap-2004g/c-client --with-cclientlib=`pwd`/third-party/imap-2004g/c-client
 #--with-xml-prefix=`pwd`/third-party/libxml2_2.6.16-7sarge1 --with-xslt-prefix=`pwd`/third-party/libxslt_1.1.12-8

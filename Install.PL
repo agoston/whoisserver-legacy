@@ -148,9 +148,11 @@ if( $RunConfigure or $All ) {
     ### Run autogen first:
     _system( q[sh ./autogen.sh] );
     
+    ### Then run ./build.sh to build third party extensions
+    _system( q[sh ./build.sh] );
+    
     ### configure it to install into $HOME/projects/$name_of_branch
-    _system( qq[sh ./configure --with-rdns --prefix=$DbPrefix ].
-             qq[--with-cclientinc=$Cwd/third-party/c-client ]. qq[--with-cclientlib=$Cwd/third-party/c-client ] );
+    _system( qq[sh ./configure --with-rdns --prefix=$DbPrefix ] );
 }
 
 if( $SetupDb or $All ) {
