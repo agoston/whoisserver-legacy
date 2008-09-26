@@ -129,10 +129,16 @@ my $DbTempDir;
 {   ### we generate a path name for you if you want to use a tempdir -- only used for
     ### for development, not for deployment
     $DbTempDir = File::Spec->catdir( '/tmp', $User, basename( $DbPrefix ) );
+    
+    ### 64bit architectures apparently need this or src/opl/librspl.a (and
+    ### possibly other libs give this error:
+    ### "relocation R_X86_64_32 against `a local symbol' can not be used when 
+    ### making a shared object; recompile with -fPIC"
+    $ENV{'CFLAGS'} .= ' -fPIC';
 
     ### set CFLAGS for development mode, if needed
     ### -02 is default, which is production mode
-    $ENV{'CFLAGS'} = '-O0 -g' if $DevelMode;
+    $ENV{'CFLAGS'} .= ' -O0 -g' if $DevelMode;
                     
     ### need to make sure java is in our path
     {   my $java = `locate javac | grep bin | head -1 | xargs dirname`;
