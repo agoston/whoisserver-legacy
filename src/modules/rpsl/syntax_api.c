@@ -89,7 +89,7 @@ attribute_clean (const gchar *val)
     gchar *ret_val;
 
     /* split our value up into lines */
-    lines = g_strsplit(val, "\n", 0);
+    lines = ut_g_strsplit_v1(val, "\n", 0);
 
     for (i=0; lines[i] != NULL; i++) {
         /* remove comments */
