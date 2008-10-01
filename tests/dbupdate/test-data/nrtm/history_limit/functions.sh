@@ -1,22 +1,16 @@
 #!/bin/sh
 
+TMPFILE=`tempfile`
+
 # set the variables for the ripadmin database
-for i in `echo $RIPADMIN | tr "," " "`; do
-	if [ -z $RIPADMIN_DBHOST ]; then export RIPADMIN_DBHOST=$i; continue; fi
-	if [ -z $RIPADMIN_DBPORT ]; then export RIPADMIN_DBPORT=$i; continue; fi
-	if [ -z $RIPADMIN_DBUSER ]; then export RIPADMIN_DBUSER=$i; continue; fi
-	if [ -z $RIPADMIN_DBPASS ]; then export RIPADMIN_DBPASS=$i; continue; fi
-	if [ -z $RIPADMIN_DBNAME ]; then export RIPADMIN_DBNAME=$i; continue; fi
-done
+echo $RIPADMIN | tr "," " " >$TMPFILE
+read RIPADMIN_DBHOST RIPADMIN_DBPORT RIPADMIN_DBUSER RIPADMIN_DBPASS RIPADMIN_DBNAME <$TMPFILE
+rm -f $TMPFILE
 
 # set the variables for the RIPE database
-for i in `echo $UPDSOURCE | cut -d" " -f2 | tr "," " "`; do
-	if [ -z $RIPE_DBHOST ]; then export RIPE_DBHOST=$i; continue; fi
-	if [ -z $RIPE_DBPORT ]; then export RIPE_DBPORT=$i; continue; fi
-	if [ -z $RIPE_DBUSER ]; then export RIPE_DBUSER=$i; continue; fi
-	if [ -z $RIPE_DBPASS ]; then export RIPE_DBPASS=$i; continue; fi
-	if [ -z $RIPE_DBNAME ]; then export RIPE_DBNAME=$i; continue; fi
-done
+echo $UPDSOURCE | cut -d" " -f2 | tr "," " " >$TMPFILE
+read RIPE_DBHOST RIPE_DBPORT RIPE_DBUSER RIPE_DBPASS RIPE_DBNAME <$TMPFILE
+rm -f $TMPFILE
 
 # issue a single command to the server
 function issue_command() {
