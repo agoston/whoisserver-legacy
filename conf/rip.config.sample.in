@@ -656,8 +656,8 @@ OVERRIDECRYPTEDPW   1F.5OTsRVjwLo
 # PGP key to override all security for updates
 # Similar to OVERRIDECRYPTEDPW, but accepts PGP-signed messages
 #
-OVERRIDEPGP   11111111
-OVERRIDEPGP   22222222
+OVERRIDEPGP   0DAD2612
+OVERRIDEPGP   D83C3FBD
 
 #
 # ALLOCMNT
@@ -665,7 +665,7 @@ OVERRIDEPGP   22222222
 # with status ALLOCATED (one per line or comma separated list
 # or combination of the above)
 
-ALLOCMNT MY-OWN-MNT
+ALLOCMNT RIPE-NCC-HM-MNT,RIPE-NCC-SECOND-HM-MNT
 
 #
 # DISALLOWMNT
@@ -673,7 +673,7 @@ ALLOCMNT MY-OWN-MNT
 # (one per line or comma separated list
 # or combination of the above)
 
-DISALLOWMNT NEW-MNT,RIPE-NCC-NONE-MNT
+DISALLOWMNT NEW-MNT,RIPE-NCC-NONE-MNT,AUTO-1,MNT-1,MNT-2,MNT-3,MNT-4,MNT-5,MNT-6,MNT-7,MNT-8,MNT-9,MNTR-1,MNTR-2,MNTR-3,MNTR-4,MNTR-5,MNTR-6,MNTR-7,MNTR-8,MNTR-9,EXAMPLE-MNT,GOODY2SHOES-MNT,SANTA-MNT,MNT-BY,MNT-LOWER,MNT-ROUTES,MNT-ROUTE,MNT-DOMAINS,MNT-DOMAIN
 
 #
 # ORG_POWER_MNT
@@ -681,7 +681,7 @@ DISALLOWMNT NEW-MNT,RIPE-NCC-NONE-MNT
 # "org-type:" IANA, RIR, NIR or LIR (one per line or space separated list
 # or combination of the above)
 
-ORG_POWER_MNT MY-OWN-MNT
+ORG_POWER_MNT RIPE-NCC-HM-MNT TEST-DBM-MNT
 
 ###########
 ##
@@ -769,19 +769,19 @@ MAILCMD /usr/lib/sendmail -fmy-dbm -t
 # HUMAILBOX is a human mailbox, used for forwarding
 # special objects. IT MUST NOT BE THE AUTOMATIC MAILBOX!!!!
 
-HUMAILBOX       my-dbm@mydb.net
+HUMAILBOX       bitbucket@ripe.net
 
 #
 # AUTOBOX is the mailbox used for automatic updates.
 # The users must send mail to this address (and not
 # HUMAILBOX) to get their updates processed.
 
-AUTOBOX         auto-dbm@mydb.net
+AUTOBOX         bitbucket@ripe.net
 
 # DEFMAIL is the mailbox used when no mail notifications or acknowledgements
 # both as to and from address in various places.
 
-DEFMAIL my-dbm@ripe.net
+DEFMAIL         bitbucket@ripe.net
 
 ###########
 ##
@@ -795,6 +795,8 @@ NICSUFFIX LACNIC
 NICSUFFIX RADB
 NICSUFFIX APNIC
 NICSUFFIX RIPN
+NICSUFFIX AFRINIC
+NICSUFFIX DB-TEST
 
 # RDNS related entries
 
