@@ -169,7 +169,7 @@ if( $RunConfigure or $All ) {
     _system( q[sh ./build.sh] );
     
     ### configure it to install into $HOME/projects/$name_of_branch
-    _system( qq[sh ./configure --with-rdns --prefix=$DbPrefix ] );
+    _system( qq[sh ./configure --with-rdns --prefix=$DbPrefix --with-perl=$^X] );
 }
 
 if( $SetupDb or $All ) {
@@ -387,29 +387,27 @@ sub _replace {
     my $to   = shift;
     my $file = shift or die "Need file to operate on";
     my $mods = shift || '';
-    
+
     die "No such file: '$file'" unless -e $file;
 
     ### make a backup
     _system( qq[cp $file ${file}.bak] );
 
-    my $contents = do { open my $fh, $file or die "Could not open $file: $!"; 
-                        local $/; <$fh> 
+    my $contents = do { open my $fh, $file or die "Could not open $file: $!";
+                        local $/; <$fh>
                     };
 
     print "Replacing $from in $file";
     my $re = qq[s|(?$mods:$from)|$to|];
-    
+
     eval qq[\$contents =~ $re] or die qq[Failed to apply $re to $file];
-    
+
     {   open my $fh, ">$file" or die "Could not open $file for writing: $!";
         print $fh $contents;
         close $fh;
-    }        
+    }
     print "....done\n";
-    
-    
+
+
     return 1;
 }
-    
-
