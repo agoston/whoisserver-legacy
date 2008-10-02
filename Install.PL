@@ -32,9 +32,10 @@ my $UseTempDir      = 0;
 my $SetupTests      = 0;
 my $StartDaemon     = 0;
 my $All             = 1;
+my $SkipTest        = 0;
 
 my $DbPrefix    = File::Spec->catdir( $ENV{'HOME'}, 'projects', basename( $Cwd ) );
-my $DbPass      = $ENV{'RIPE_DBPASS'} || die 'Need db password. You can also set it via $ENV{RIPE_DBPASS}'.$/;
+my $DbPass      = $ENV{'RIPE_DBPASS'};
 my $DbUser      = 'dbint';
 my $DbPort      = $< . 0;    
 my $User        = scalar getpwuid($<);
@@ -59,9 +60,18 @@ GetOptions(
     'start-daemon!'     => \$StartDaemon,
     'all!'              => \$All,
     'help!'             => \$Help,
+    'skiptest!'         => \$SkipTest,
 ) or die usage();
 
 die usage() if $Help;
+die 'Need db password. You can also set it via $ENV{RIPE_DBPASS}'.$/ 
+    unless $DbPass;
+
+### Because of our mounting these paths will actually be different texually but
+### point to the same inode, make the check a bit more thorough and check the
+### actual inode.
+die "Source dir and installation dir are identical ($Cwd):\nPlease set --prefix!\n"
+    if [stat $DbPrefix]->[1] eq [stat $Cwd]->[1];
 
 ### documented here so it's close to the original options
 sub usage {
@@ -106,6 +116,7 @@ Options:
                         to your installation directory. --all implies --install
   --setup-tests         Run a sample test case to setup the skeleton database.
                         --all implies --setup-tests
+  --skiptest            Don't run any of the 'make test' commands                          
                         
   ### additional actions
   --use-tempdir         All temp, var and log dirs are written under /tmp for
