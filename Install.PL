@@ -147,6 +147,9 @@ my $DbTempDir;
     ### making a shared object; recompile with -fPIC"
     $ENV{'CFLAGS'} .= ' -fPIC';
 
+    ### show the include paths when building
+    $ENV{'CFLAGS'} .= ' -v' if $Verbose;
+
     ### set CFLAGS for development mode, if needed
     ### -02 is default, which is production mode
     $ENV{'CFLAGS'} .= ' -O0 -g' if $DevelMode;
@@ -155,7 +158,7 @@ my $DbTempDir;
     {   my $java = `locate javac | grep bin | head -1 | xargs dirname`;
         chomp $java;
         
-        die "Could not find /bin/java in your path -- can not continue\n" unless $java;
+        die "Could not find /bin/javac in your path -- can not continue\n" unless $java;
 
         $ENV{'PATH'} .= ':' . $java;
     }
@@ -283,27 +286,35 @@ if( $Install or $All ) {
     ### XXX don't set globally, as the perl bindings below will fail
     ### builing properly with error: RPSL.so: undefined symbol: __gcov_init at 
     ### /usr/lib/perl/5.8/DynaLoader.pm line 225.
-    {   local $ENV{'CFLAGS'} .= ' -fprofile-arcs -ftest-coverage' if $DevelMode;
+    {   my $rc = File::Spec->catfile( $Cwd, '.modulebuildrc' );
+        local $ENV{'MODULEBUILDRC'} = "$rc";
+        local $ENV{'PERL_MM_OPT'}   = "INSTALL_BASE=$DbPrefix/perl";
+        local $ENV{'CFLAGS'}        .= ' -fprofile-arcs -ftest-coverage' if $DevelMode;
+        
+        ### write an rc file for M::B. No other way, sigh =/ --jib
+        _system(qq[echo "install --install_base=$DbPrefix/perl" > $rc] );
 
         _system('make');
-        _system('make install');
+        ### XXX accept failing tests for now, see FB 463
+        _system('make test', 1) unless $SkipTest;    
+        ### XXX this is a wp1 feature, so don't use this now!!!! -jib
+        #_system('make all-install');
+        
+        ### throw away the rc file again
+        1 while unlink $rc; 
     }
     
     ### make install doesn't copy all relevant config files :(
     _system( qq[cp -R conf/* $DbPrefix/conf] );
 
     ### make install also doesn't install all files from bin/SQL
+    _system( qq[mkdir -p $DbPrefix/bin/SQL] );
     _system( qq[cp -R src/SQL/* $DbPrefix/bin/SQL] );
 
-    ### install the RPSL perl bindings into our project dir
-    {   local $ENV{'PERL_MM_OPT'} = "PREFIX=$DbPrefix/perl";
-        _system('cd src; make opl-perl-test && make opl-perl-install;');
-    }
-
     print qq[
-You can now use the Net::Whois::RIPE::RPSL module using:
+You can now use the Net::Whois::RIPE::RPSL, and all the other RIPE::* modules using:
 
-   $^X -I $DbPrefix/perl/lib/perl/$Config{version} -MNet::Whois::RIPE::RPSL -e'...'
+   $^X -I $DbPrefix/perl/lib/perl5 -MYour::Module::Here -e'...'
 
    \n];
 
@@ -407,7 +418,6 @@ sub _replace {
         close $fh;
     }
     print "....done\n";
-
 
     return 1;
 }
