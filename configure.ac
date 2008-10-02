@@ -229,20 +229,7 @@ dnl AC_CHECK_LIB(pthread, pthread_create)
 
 dnl first, try linking a threaded application with "-pthread"
 dnl which will work on FreeBSD (and OpenBSD) systems
-save_LDFLAG="$LDFLAGS"
-LDFLAGS="-pthread $LDFLAGS"
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-#include <pthread.h>
-]], [[
-pthread_self();
-]])],[os_name="$host_os"
-os_name=`echo $os_name|tr -d 0-9.`
-if test "$os_name" = freebsd ; then
-  LDFLAGS="$LDFLAGS"
-else
-  LDFLAGS="$save_LDFLAGS"
-fi ],[LDFLAGS="$save_LDFLAGS"
-])
+dnl LDFLAGS="-lpthread $LDFLAGS"
 
 dnl then, try looking in various libraries, which will work on other systems
 AC_SEARCH_LIBS(pthread_create, [ pthread pthreads thread threads ])
@@ -311,7 +298,12 @@ AC_CHECK_FUNCS(MD5_Init MD5_Update MD5_Final)
 AC_CHECK_HEADER(openssl/md5.h,[ CFLAGS="$CFLAGS -I/usr/include/openssl -I/usr/local/include/openssl" ])
 
 dnl add -Wall to CFLAGS
-CFLAGS="$CFLAGS -Wall"
+dnl also add the flags that were, almost accidentally, provided by
+dnl '$PERL5 -MExtUtils::Embed -e ccopts', which included pthread. Meaning builds
+dnl would fail with a non-threaded perl used for rdns... scary! --jib
+dnl The flags after -Wall were provided by a threaded perl(5.8), but not by an
+dnl unthreaded perl(5.10)
+CFLAGS="$CFLAGS -Wall -D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS"
 
 dnl Create links for header files
 AC_MSG_CHECKING([Creating Links])
