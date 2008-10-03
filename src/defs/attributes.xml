@@ -2457,7 +2457,7 @@
           AND    route_set.thread_id = 0
 -->
         SELECT member_of.object_id,0
-        FROM mbrs_by_ref, member_of, route_set
+        FROM mbrs_by_ref, route_set, member_of
         LEFT OUTER JOIN mnt_by ON member_of.object_id = mnt_by.object_id
         /* an old object might have no mntner at all */
         WHERE (mbrs_by_ref.mnt_id = 0 OR mbrs_by_ref.mnt_id = mnt_by.mnt_id)
@@ -2471,7 +2471,7 @@
         <sqlquery keytype="wk_assetname" class="an">
                 <!-- the same as for route_set -->
           SELECT member_of.object_id,0
-          FROM  as_set, member_of, mbrs_by_ref
+          FROM  mbrs_by_ref, as_set, member_of 
           LEFT OUTER JOIN mnt_by ON member_of.object_id = mnt_by.object_id
           WHERE (mbrs_by_ref.mnt_id = 0 OR mbrs_by_ref.mnt_id = mnt_by.mnt_id)
           AND member_of.set_id = mbrs_by_ref.object_id
