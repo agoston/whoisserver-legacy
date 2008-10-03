@@ -135,6 +135,20 @@ Examples:
     \n];
 }
 
+### do we have a working net::delcheck?
+{   my $pkg = 'Net::DelCheck';
+    my $svn = 'https://new-ncc.ripe.net/svn/dns/delcheck/trunk/';
+
+    eval "require $pkg; 1;";
+
+    ### we couldn't find Net::DelCheck or it didn't load appropriately
+    if( $@ ) {
+        die "We could not find a working '$pkg' for $^X. This is needed for ".
+            "RDNS functionality. You can get it from svn here: $svn.\n".
+            "The full error was: $@\n";
+    }
+}
+
 ### option post-processing
 my $DbTempDir;
 {   ### we generate a path name for you if you want to use a tempdir -- only used for
@@ -297,8 +311,8 @@ if( $Install or $All ) {
         _system('make');
         ### XXX accept failing tests for now, see FB 463
         _system('make test', 1) unless $SkipTest;    
-        ### XXX this is a wp1 feature, so don't use this now!!!! -jib
-        #_system('make all-install');
+        ### XXX this needs to be 'all-install' in wp1
+        _system('make install');
         
         ### throw away the rc file again
         1 while unlink $rc; 
