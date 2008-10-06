@@ -319,38 +319,31 @@ if( $SetupTests or $All ) {
 
 ### final steps
 {   my $pid_dir = $UseTempDir ? $DbTempDir : $Cwd;
-    my $cmd = qq[src/whois-server -p $pid_dir/whoisd.pid -c conf/rip.config];
-
+    my $cmd = q[$ src/whois-server ] . qq[-p $pid_dir/whoisd.pid -c conf/rip.config];
 
     print '=' x 70;
     print "\n\nYou can now start the whoisserver using:\n\n    $cmd\n\n";
 
-    my $test_cmd = q[./tests/dbupdate/testing/bin/test.pl -e -o -u -c ].
+    my $test_cmd = q[$ ./tests/dbupdate/testing/bin/test.pl -e -o -u -c ].
                    q[tests/dbupdate/testing/conf/dataset.config -r ].
                    qq[$Cwd/tests/dbupdate/test-data/];
 
-    print "\nYou can then run the test suite using:\n\n    $test_cmd\n\n";
+    print q[
+If the whois server console does not show the line 'Mode of operation:' when
+running the tests, set it to dynamic mode as follows:
+
+    $ echo set dynamic start | netcat -q1 localhost ] . ($DbPort+2) . $/.$/;
+
+    print "\nYou can then run the test suite using:\n\n     $test_cmd\n\n";
     print q[
 The test program writes its output to the following directories:
     
     tests/dbupdate/testing/log
     tests/dbupdate/testing/dump
-
-If the whois server console does not show the line 'Mode of operation:' when
-running the tests, set it to dynamic mode as follows:
-
-    $ telnet localhost ]. ($DbPort+2) . qq[
-
-And at the prompt type:
-
-    =0= whois R.I.P. config> set dynamic start
-
-    \n\n];
+    ];
 
     print '=' x 70;
     print $/.$/;
-
-
 
     _system( $cmd ) if $StartDaemon;
 }
