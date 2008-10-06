@@ -31,7 +31,6 @@
 #include "class.h"
 #include "iproutines.h"
 #include "ut_string.h"
-
 #include <assert.h>
 
 #define RUNTIME_CHECK 0
@@ -1073,8 +1072,8 @@ rpsl_object_init (const gchar *s)
                                RPSL_ERRLVL_ERROR,
                                RPSL_ERR_BADATTR,
                                0,
-                               "Error with attribute \"%s\"",
-                               class_name);
+                               "Error with class attribute \"%s\" (%s)",
+                               class_name, attr->value);
     }
 
     /* possibly dangerous, but we promise only to read this value! */
@@ -1113,8 +1112,8 @@ rpsl_object_init (const gchar *s)
                                RPSL_ERRLVL_ERROR,
                                RPSL_ERR_BADATTR,
                                i,
-                               "Error with attribute \"%s\"",
-                               attr_name);
+                               "Error with attribute \"%s\" (%s) index[%d]",
+                               attr_name, attr->value, i);
             } else {
                 rpsl_error_add(&retval->errors,
                                RPSL_ERRLVL_ERROR,
