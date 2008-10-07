@@ -13,8 +13,11 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
 nserver:      no-such-name.ripe.net
+mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 password: host3
+
+password:     test-dbm
 

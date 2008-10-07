@@ -58,7 +58,7 @@ const char *Templates[] = {
 "dom-net:        [optional]   [multiple]   [ ]\n"
 "remarks:        [optional]   [multiple]   [ ]\n"
 "notify:         [optional]   [multiple]   [inverse key]\n"
-"mnt-by:         [optional]   [multiple]   [inverse key]\n"
+"mnt-by:         [mandatory]  [multiple]   [inverse key]\n"
 "mnt-lower:      [optional]   [multiple]   [inverse key]\n"
 "refer:          [optional]   [single]     [ ]\n"
 "changed:        [mandatory]  [multiple]   [ ]\n"

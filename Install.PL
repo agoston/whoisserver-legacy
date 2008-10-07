@@ -319,10 +319,10 @@ if( $SetupTests or $All ) {
 
 ### final steps
 {   my $pid_dir = $UseTempDir ? $DbTempDir : $Cwd;
-    my $cmd = q[$ src/whois-server ] . qq[-p $pid_dir/whoisd.pid -c conf/rip.config];
+    my $cmd = q[src/whois-server ] . qq[-p $pid_dir/whoisd.pid -c conf/rip.config];
 
     print '=' x 70;
-    print "\n\nYou can now start the whoisserver using:\n\n    $cmd\n\n";
+    print "\n\nYou can now start the whoisserver using:\n\n    \$ $cmd\n\n";
 
     my $test_cmd = q[$ ./tests/dbupdate/testing/bin/test.pl -e -o -u -c ].
                    q[tests/dbupdate/testing/conf/dataset.config -r ].

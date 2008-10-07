@@ -133,3 +133,12 @@
 #
 # RESULT 11: The creation will fail but expantion will be done.
 
+# CASE 12: We try to create domain object mydomain.net
+#          with no mnt-by
+# 
+#
+# create domain object 
+#
+#FAILURE
+#
+# RESULT 12: The creation will fail.

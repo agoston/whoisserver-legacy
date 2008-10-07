@@ -614,7 +614,7 @@ class_t class_tab[] = {
                 /* offset */
                 49,
                 /* choice */
-                ATTR_OPTIONAL,
+                ATTR_MANDATORY,
                 /* number */
                 ATTR_MULTIPLE
             },
