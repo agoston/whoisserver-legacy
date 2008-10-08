@@ -1,0 +1,23 @@
+# domain authorisation tests
+# CASE 12: We try to create domain object mydomain.net
+#          with no mnt-by
+# 
+#
+# create domain object 
+#
+#FAILURE
+#
+# RESULT 12: The creation will fail.
+
+domain:       mydomain.net
+descr:        my test domain
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns1.some.net
+nserver:      ns2.some.net
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+password: hostmaster

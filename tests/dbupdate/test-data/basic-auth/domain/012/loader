@@ -1,4 +1,6 @@
-% misc tests
+% per type tests
+% load objects 
+%
 
 
 %----------------------------------------------------------------
@@ -29,46 +31,6 @@ changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
 
-% mnt-by maintainer
-
-mntner:       TEST-MB-MNT
-descr:        Mntner for RIPE DBM objects.
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-auth:         MD5-PW  $1$sD3zsAJS$7PZETePHEP4z3HE8cRLyx/ # test-mb
-upd-to:       dbtest@ripe.net
-mnt-by:       TEST-DBM-MNT
-referral-by:  TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
-
-
-% mnt-lower maintainer
-
-mntner:       RIPE-NCC-HM-LOW-MNT
-descr:        RIPE-NCC Hostmaster Maintainer
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-auth:         MD5-PW $1$12345678$VSFejqqZYGC9blDcZWEwS.    # host2
-upd-to:       dbtest@ripe.net
-mnt-by:       RIPE-NCC-HM-MNT
-referral-by:  TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101 
-source:       DB-TEST
-
-% mnt-domains maintainer
-
-mntner:       RIPE-NCC-HM-DOM-MNT
-descr:        RIPE-NCC Hostmaster Maintainer
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-auth:         MD5-PW $1$12345678$QdQScgKoWL4lfEn/IkAUP1    # host3
-upd-to:       dbtest@ripe.net
-mnt-by:       RIPE-NCC-HM-MNT
-referral-by:  TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101 
-source:       DB-TEST
-
 % allocation maintainer
 
 mntner:       RIPE-NCC-HM-MNT
@@ -96,9 +58,8 @@ remarks:      The country is really worldwide.
 remarks:      This address space is assigned at various other places in
 remarks:      the world and might therefore not be in the RIPE database.
 mnt-by:       RIPE-NCC-HM-MNT
-mnt-lower:    RIPE-NCC-HM-LOW-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
 mnt-routes:   RIPE-NCC-HM-MNT
-mnt-domains:  RIPE-NCC-HM-DOM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
@@ -111,9 +72,8 @@ descr:        Root inet6num object
 country:      EU
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-mnt-by:       RIPE-NCC-HM-DOM-MNT
-mnt-lower:    RIPE-NCC-HM-DOM-MNT
-mnt-domains:  RIPE-NCC-HM-DOM-MNT
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    RIPE-NCC-HM-MNT
 status:       ALLOCATED-BY-RIR
 remarks:      This network in not allocated.
               This object is here for Database
@@ -122,42 +82,46 @@ remarks:      This network in not allocated.
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
-% sample /8 domain object
+%      End of Standard Template Objects
+%----------------------------------------------------------------
 
-domain:       193.in-addr.arpa
-descr:        Test
+%  Additional objects required for this test
+
+
+% create maintainer for successful authorisation
+
+mntner:  TEST-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  TEST-MNT
+auth:    MD5-PW $1$12345678$Y5n.GDFOxpXd2S1etuHFa/  # auth
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+% create an encompassing as-block 
+
+as-block: AS1 - AS65534
+admin-c: TP1-DB-TEST
+tech-c: TP1-DB-TEST
+mnt-by: TEST-MNT
+changed: dbtest@ripe.net 20020101
+source: DB-TEST
+
+% create parent domain object
+
+domain:       net
+descr:        my test domain parent
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
-nserver:      ns-pri.ripe.net
-nserver:      ns-sec.ripe.net
+nserver:      ns1.some.net
+nserver:      ns2.some.net
+notify:       dbtest@ripe.net
 mnt-by:       TEST-DBM-MNT
-mnt-lower:    TEST-DBM-MNT
-changed:      dbtest@ripe.net 20040329
+mnt-lower:    RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 
-% sample domain object
-
-domain:       1.0.0.2.ip6.arpa
-descr:        Test2222
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-zone-c:       TP1-DB-TEST
-nserver:      ns-pri.ripe.net
-mnt-lower:    TEST-DBM-MNT
-changed:      dbtest@ripe.net 20040329
-source:       DB-TEST
-
-
-domain:       0.1.6.0.1.0.0.2.ip6.arpa
-descr:        Test2222
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-zone-c:       TP1-DB-TEST
-nserver:      ns1.surfnet.nl
-nserver:      ns2.surfnet.nl
-nserver:      ns3.surfnet.nl
-mnt-lower:    TEST-DBM-MNT
-changed:      dbtest@ripe.net 20040329
-source:       DB-TEST
-
+% End of loader data file

@@ -24,7 +24,7 @@
       <dom-net     choice="optional"  number="multiple" />
       <remarks     choice="optional"  number="multiple" />
       <notify      choice="optional"  number="multiple" />
-      <mnt-by      choice="optional"  number="multiple" />
+      <mnt-by      choice="mandatory" number="multiple" />
       <mnt-lower   choice="optional"  number="multiple" />
       <refer       choice="optional"  number="single"   />
       <changed     choice="mandatory" number="multiple" />

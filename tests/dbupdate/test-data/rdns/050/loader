@@ -29,6 +29,20 @@ changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
 
+% mnt-by maintainer
+
+mntner:       TEST-MB-MNT
+descr:        Mntner for RIPE DBM objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         MD5-PW  $1$sD3zsAJS$7PZETePHEP4z3HE8cRLyx/ # test-mb
+upd-to:       dbtest@ripe.net
+mnt-by:       TEST-DBM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
 % mnt-lower maintainer
 
 mntner:       RIPE-NCC-HM-LOW-MNT
