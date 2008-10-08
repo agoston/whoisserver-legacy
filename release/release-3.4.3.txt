@@ -1,0 +1,17 @@
+20081008 - version 3.4.3
+
+Changes:
+- changed syntax of domain class to make mnt-by mandatory
+- added a new test case for creating a non maintained domain object
+- updated several test cases in rdns group to add mnt-by:
+- updated Install.pl
+- small bugfixes throughout the code
+
+
+Merged:
+- feature-denis-domain_mnt_syntax
+
+
+Affected stakeholders:
+- RIPE NCC DNS WG
+- RIPE community
