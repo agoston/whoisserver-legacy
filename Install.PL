@@ -34,7 +34,7 @@ my $StartDaemon     = 0;
 my $All             = 1;
 
 my $DbPrefix    = File::Spec->catdir( $ENV{'HOME'}, 'projects', basename( $Cwd ) );
-my $DbPass      = $ENV{'RIPE_DBPASS'} || die 'Need db password. You can also set it via $ENV{RIPE_DBPASS}'.$/;
+my $DbPass      = $ENV{'RIPE_DBPASS'};
 my $DbUser      = 'dbint';
 my $DbPort      = $< . 0;    
 my $User        = scalar getpwuid($<);
@@ -129,6 +129,11 @@ my $DbTempDir;
 {   ### we generate a path name for you if you want to use a tempdir -- only used for
     ### for development, not for deployment
     $DbTempDir = File::Spec->catdir( '/tmp', $User, basename( $DbPrefix ) );
+    
+    ### die if no sqldb password set
+    if (!$DbPass) {
+      die 'Need db password. You can also set it via $ENV{RIPE_DBPASS}'.$/;
+    }
     
     ### 64bit architectures apparently need this or src/opl/librspl.a (and
     ### possibly other libs give this error:
