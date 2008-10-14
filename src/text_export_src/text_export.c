@@ -35,7 +35,7 @@
 
 /* defined in PM module */
 extern const int PM_PRIVATE_OBJECT_TYPES[5];
-                                  
+
 /* global variables */
 char *Program_Name;
 int Verbose = 0;
@@ -146,7 +146,7 @@ int load_classes(struct class **c) {
 	char fname[256];
 
 	class_names = DF_get_class_names();
-	for (num_classes = 0; class_names[num_classes] != NULL; num_classes++); 
+	for (num_classes = 0; class_names[num_classes] != NULL; num_classes++);
 
 	tmp = calloc(num_classes, sizeof(struct class));
 
@@ -254,7 +254,7 @@ int main(int argc, char **argv) {
 	long first_serial, qlast, last_serial;
 	FILE *serial_file;
 	LG_context_t *ctx, *null_ctx;
-	
+
 	/* record our program's name for any future use */
 	get_program_name(argc, argv);
 
@@ -281,7 +281,7 @@ int main(int argc, char **argv) {
 	LG_ctx_add_appender(ctx, LG_app_get_file_info_dump(stdout));
 
 	null_ctx = LG_ctx_new();
-	
+
 	/* initialise required modules */
 	SQ_init(ctx);
 	UT_init(ctx);
@@ -334,7 +334,7 @@ int main(int argc, char **argv) {
 	/* Collect the serials we are going to dump - at this point, we close today's serials, any new
 	 * update will make its way into tomorrow's dump */
 	PM_get_minmax_serial(sql, &first_serial, &last_serial);
-	
+
 	if (Verbose) {
 		printf("Min serial: %d\nMax serial:%d\n\n", first_serial, last_serial);
 		printf("Dumping objects (each . marks 10000 object dumped):\n");
@@ -343,7 +343,7 @@ int main(int argc, char **argv) {
 	/* Outer query, crawling through the last table */
 	sprintf(buf, "SELECT last.object, last.object_id, last.sequence_id FROM last "
 		"WHERE last.thread_id=0 AND last.object_type<>100 AND last.object<>\"\"");
-	
+
 	if (SQ_execute_query_nostore(sql, buf, &rs) != 0) {
 		fprintf(stderr, "%s: error with query; %s\n", Program_Name, SQ_error(sql));
 		exit(1);
@@ -355,17 +355,17 @@ int main(int argc, char **argv) {
 		long object_id, sequence_id;
 		char *object;
 		int skip = 1;
-		
+
 		if (!(object = SQ_get_column_string_nocopy(rs, row, 0))) {
 			fprintf(stderr, "Error: NULL object returned (#%d): %s\n", num_object, SQ_error(sql));
 			exit(1);
 		}
-		
+
 		if (SQ_get_column_int(rs, row, 1, &object_id) || SQ_get_column_int(rs, row, 2, &sequence_id)) {
-			fprintf(stderr, "Error: Couldn't read object_id and sequence_id: %s\n", num_object, SQ_error(sql));
+			fprintf(stderr, "Error: Couldn't read object_id and sequence_id (#%d): %s\n", num_object, SQ_error(sql));
 			exit(1);
 		}
-		
+
 		/* lookup serial_id */
 		sprintf(buf, "SELECT serial_id FROM serials WHERE object_id = %d AND sequence_id = %d", object_id, sequence_id);
 		if (SQ_execute_query(sql2, buf, &rs2) != 0) {
@@ -382,7 +382,7 @@ int main(int argc, char **argv) {
 			}
 
 			skip = (serial_id > last_serial);
-			
+
 		} else {	/* zero serials - buggy DB, emit object */
 			skip = 0;
 		}
@@ -394,7 +394,7 @@ int main(int argc, char **argv) {
 		if (!skip) {
 			output_object(object, classes, num_classes);
 			num_object++;
-			
+
 			if (Verbose && !(num_object % 10000)) {
 				printf(".");
 			}
@@ -404,35 +404,35 @@ int main(int argc, char **argv) {
 		num_queries++;
 		if (num_queries > 200) {
 			num_queries = 0;
-			
+
 			/* release locks */
 			if (SQ_execute_query(sql2, "ROLLBACK", NULL)) {
 				fprintf(stderr, "%s: error executing ROLLBACK; %s\n", Program_Name, SQ_error(sql));
 				exit(1);
 			}
 		}
-	
+
 	}
 
 	if (rs) SQ_free_result(rs);
 	rs = NULL;
-	
+
 	/* close SQL connections, releasing locks on server side */
 	SQ_close_connection(sql);
 	SQ_close_connection(sql2);
-	
+
 	if (Verbose) printf("\n\n");
-	
+
 	/* create last serial file */
 	serial_file = fopen("CURRENTSERIAL", "w+");
 	if (!serial_file) {
 		perror("Error opening CURRENTSERIAL");
 		exit(1);
 	}
-	
+
 	fprintf(serial_file, "%d\n", last_serial);
 	fclose(serial_file);
-	
+
 	if (Verbose) {
 		printf("Dumped last serial value (%d)\n", last_serial);
 	}
