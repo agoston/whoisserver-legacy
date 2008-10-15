@@ -145,33 +145,33 @@ pthread_mutex_t Lock;
 
 typedef struct ca_database_s {
 
-	char host[64];
+	char host[STRLENGTH_S];
 	int port;
 	char trx_support[2]; /* added 24.10.2002 EG */
-	char user[16];
-	char password[64];
-	char dbName[16];
+	char user[STRLENGTH_S];
+	char password[STRLENGTH_S];
+	char dbName[STRLENGTH_S];
 } ca_database_t;
 
 typedef struct ca_mirror_s {
-	char host[64];
+	char host[STRLENGTH_S];
 	int port;
-	char log[64];
+	char log[STRLENGTH_S];
 	int delay;
 	int protocolVer;
-	char mrName[16];
+	char mrName[STRLENGTH_S];
 } ca_mirror_t;
 
 typedef struct ca_ripadmin_s {
-	char host[64];
+	char host[STRLENGTH_S];
 	int port;
-	char user[16];
-	char password[64];
-	char tableName[72];
+	char user[STRLENGTH_S];
+	char password[STRLENGTH_S];
+	char tableName[STRLENGTH_S];
 } ca_ripadmin_t;
 
 typedef struct ca_database_list_s {
-	char name[16];
+	char name[STRLENGTH_S];
 	ca_database_t db;
 	int opMode;
 	ca_mirror_t nrtm;
@@ -187,7 +187,7 @@ typedef struct ca_database_list_s {
  * makes this source.
  */
 typedef struct ca_dbSource_s {
-	char name[16];
+	char name[STRLENGTH_S];
 	ca_database_t db;
 	int opMode;
 	ca_mirror_t nrtm;
@@ -208,9 +208,9 @@ typedef ca_dbSource_t ca_SrcHdl_t;
  *
  */
 typedef struct ca_updDbSource_s {
-	char name[16];
+	char name[STRLENGTH_S];
 	ca_database_t updDb;
-	char whoisd_host[32];
+	char whoisd_host[STRLENGTH_S];
 	int qryPort;
 	int updPort;
 } ca_updDbSource_t;
