@@ -142,7 +142,7 @@ my $DbTempDir;
     $ENV{'CFLAGS'} .= ' -fPIC';
 
     ### set CFLAGS for development mode, if needed
-    ### -02 is default, which is production mode
+    ### -O2 is default, which is production mode
     $ENV{'CFLAGS'} .= ' -O0 -g' if $DevelMode;
                     
     ### need to make sure java is in our path
