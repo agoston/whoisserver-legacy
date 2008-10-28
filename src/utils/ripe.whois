@@ -164,7 +164,7 @@ start_server () {
 			$BASEDIR/bin/whois-server -p $PIDFILE -c $BASEDIR/conf/rip.config  </dev/null >> $ERRLOG 2>&1
 
 			# kill existing whois-server-start check thread (so that it won't accidentally start event handler)
-			if ! [ $CHECK_THREAD_PID ]; then
+			if [ $CHECK_THREAD_PID ]; then
 				if ps uxaw |  egrep '^root *'$CHECK_THREAD_PID" .*`basename $0`" &>/dev/null; then
 					kill -9 $CHECK_THREAD_PID
 				fi
