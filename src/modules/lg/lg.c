@@ -112,7 +112,7 @@ void LG_app_set_formatter(LG_appender_t* app, LG_formatter_t* frm) {
 void LG_log(LG_context_t* ctx, LG_level_t level, char* message, ...) {
   va_list ap;
   LG_appender_t* app;
-  char* formated_message;
+  char* formatted_message;
   GList* l;
 
   pthread_mutex_lock(&(ctx->lock));
@@ -120,11 +120,11 @@ void LG_log(LG_context_t* ctx, LG_level_t level, char* message, ...) {
   while (l != NULL) {
     app = (LG_appender_t*) l->data;
     if (app->level & level) {
-      formated_message = app->formatter->format_func(level, &(app->formatter->data), message);
+      formatted_message = app->formatter->format_func(level, &(app->formatter->data), message);
       va_start(ap, message);
-      app->device->write_func(app->device, formated_message, ap);
+      app->device->write_func(app->device, formatted_message, ap);
       va_end(ap);
-      g_free(formated_message);
+      g_free(formatted_message);
     }
     l = g_list_next(l);
   }
