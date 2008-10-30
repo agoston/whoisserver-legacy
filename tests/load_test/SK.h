@@ -113,7 +113,7 @@ int SK_getsock(const char *node, unsigned port, int socket_type, int backlog) {
      }
      */
 
-    //fprintf(stderr, "Fuckme: %d, %d\n", ((struct sockaddr_in6 *)ai_iter->ai_addr)->sin6_flowinfo, ((struct sockaddr_in6 *)ai_iter->ai_addr)->sin6_scope_id);
+    //fprintf(stderr, "DEBUG: %d, %d\n", ((struct sockaddr_in6 *)ai_iter->ai_addr)->sin6_flowinfo, ((struct sockaddr_in6 *)ai_iter->ai_addr)->sin6_scope_id);
     if ((bind(sock, ai_iter->ai_addr, ai_iter->ai_addrlen)) == -1) {
         fprintf(stderr, "SK_getsock(%s, %d): bind(): %d (%s)", node, port, errno, strerror(errno));
         return -1;
@@ -295,7 +295,7 @@ int SK_connect(char *hostname, unsigned int port, unsigned int timeout) {
     /*
      * if not v6 address found either, bail out
      */
-    fprintf(stderr, "SK_connect(%s, %d): No v6 nor v4 address found", hostname, port);
+    //fprintf(stderr, "SK_connect(%s, %d): No v6 nor v4 address found", hostname, port);
     freeaddrinfo(res);
     return -1;
 }
