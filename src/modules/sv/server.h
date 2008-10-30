@@ -48,8 +48,7 @@ typedef struct _wd_args_t {
 
 
 
-void
-SV_init (LG_context_t *ctx);
+void SV_init (LG_context_t *ctx);
 int SV_start();
 void SV_shutdown();
 int SV_sleep(int sleeptime);
@@ -58,7 +57,7 @@ void SV_watchdog(wd_args_t *wd_args);
 void SV_init (LG_context_t *ctx);
 void SV_switchdynamic();
 
-
+char *SV_command_on_die;
 
 
 

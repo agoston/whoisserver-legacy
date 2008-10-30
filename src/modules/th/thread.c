@@ -347,13 +347,12 @@ volatile int dying = 0;
 void do_nice_die(int line, char *file) {
 	if (!dying) {
 		dying = 1;
-		char *command = ca_get_command_on_die;
 		fprintf(stderr," *** died: +%d %s\n",line, file);
 
 		if (command) {
 			char buf[1024];
-			fprintf(stderr, " *** Backtrace:\n");
-			snprintf(buf, 1024, command, GETTID());
+            snprintf(buf, 1024, SV_command_on_die, GETTID());
+			fprintf(stderr, " *** Backtrace with command line %s\n", buf);
 			system(buf);
 		}
 	}

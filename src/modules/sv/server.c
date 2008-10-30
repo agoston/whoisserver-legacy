@@ -605,6 +605,9 @@ int SV_start(char *pidfile) {
 	gettimeofday(&tval, NULL);
 	SV_starttime = tval.tv_sec; /* seconds since Jan. 1, 1970 */
 
+	/* get command on die value, so that there is no deadlock if we are die()ing in CA module */
+	SV_command_on_die = ca_get_command_on_die;
+
 	/* Do anything that requires root priviles before dropping it */
 
     /* Create a socket on the necessary ports/addresses and bind to them. */
