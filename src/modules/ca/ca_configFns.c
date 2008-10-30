@@ -1748,12 +1748,22 @@ char * ca_srchandle2Strelement(ca_SrcHdl_t * ah, int srcAttrib)
 
         case 9:
             /* Near-Real-Time Mirror host */
-            myStr = UT_strdup((ah->nrtm).host);
+            if (ah->nrtm.host[0]) {
+                myStr = UT_strdup((ah->nrtm).host);
+            } else {
+                fprintf(stderr, " *** Source %s does not have nrtm defined\n", ah->name);
+                die;
+            }
             break;
 
         case 11:
             /* NRTM Log */
-            myStr = UT_strdup((ah->nrtm).log);
+            if (ah->nrtm.host[0]) {
+                myStr = UT_strdup((ah->nrtm).log);
+            } else {
+                fprintf(stderr, " *** Source %s does not have nrtm defined\n", ah->name);
+                die;
+            }
             break;
 
         case 18: /* added 24.10.2002 EG */
@@ -1810,17 +1820,32 @@ int ca_srchandle2Intelement(ca_SrcHdl_t * ah, int srcAttrib)
 
         case 10:
             /* Near-Real-Time Mirror port */
-            myInt = (ah->nrtm).port;
+            if (ah->nrtm.host[0]) {
+                myInt = (ah->nrtm).port;
+            } else {
+                fprintf(stderr, " *** Source %s does not have nrtm defined\n", ah->name);
+                die;
+            }
             break;
 
         case 12:
             /* NRTM Delay */
-            myInt = (ah->nrtm).delay;
+            if (ah->nrtm.host[0]) {
+                myInt = (ah->nrtm).delay;
+            } else {
+                fprintf(stderr, " *** Source %s does not have nrtm defined\n", ah->name);
+                die;
+            }
             break;
 
         case 13:
             /* NRTM Protocol Version. */
-            myInt = (ah->nrtm).protocolVer;
+            if (ah->nrtm.host[0]) {
+                myInt = (ah->nrtm).protocolVer;
+            } else {
+                fprintf(stderr, " *** Source %s does not have nrtm defined\n", ah->name);
+                die;
+            }
             break;
 
         case 14:
