@@ -23,9 +23,9 @@ char* infilename;
 void log_to_file(char *reason, char *actwork) {
     time_t t = time(NULL);
     char t_buf[32];
-    
+
     ctime_r(&t, t_buf);
-    t_buf[strlen(t_buf)-1] = 0;		// remove trailing newline
+    t_buf[strlen(t_buf) - 1] = 0; // remove trailing newline
     pthread_mutex_lock(&log_lock);
     fprintf(logfile, "%s %s: %s", t_buf, reason, actwork);
     fflush(logfile);
@@ -35,7 +35,7 @@ void log_to_file(char *reason, char *actwork) {
 void *startup(void *arg) {
     int sock;
     size_t len;
-    char *line= NULL;
+    char *line = NULL;
     char buf[1024];
     fd_set rset;
     struct timeval ptm;

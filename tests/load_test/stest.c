@@ -27,8 +27,8 @@
 
 int arg_port1, arg_port2;
 char *arg_hostname1, *arg_hostname2;
-pthread_mutex_t lock= PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t log_lock= PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
 int numlines = 0;
 FILE* infile;
 FILE* logfile;
@@ -64,14 +64,14 @@ int try_connect(char *hostname, int port) {
 
 int read_buf(int sock, char *buf, int &p) {
     int remaining_space = BUF_SIZE-p;
-    
-    /* we need to read the whole reply of whoisserver, as it has a nasty memleak otherwise :( 
+
+    /* we need to read the whole reply of whoisserver, as it has a nasty memleak otherwise :(
      * agoston, 2008-06-03 */
     if (!remaining_space) {
         char devnull[4096];
         return read(sock, devnull, 4096);
     }
-    
+
     int ret = read(sock, buf+p, remaining_space);
 
     if (ret <= 0) return 0;
@@ -83,7 +83,7 @@ int read_buf(int sock, char *buf, int &p) {
 void *startup(void *arg) {
     int sock1, sock2;
     size_t len, linelen;
-    char *line= NULL;
+    char *line = NULL;
     char buf1[BUF_SIZE];
     char buf2[BUF_SIZE];
     int p1, p2;
@@ -99,7 +99,7 @@ void *startup(void *arg) {
             return NULL;
         }
         numlines++;
-        if (numlines> 1000) {
+        if (numlines > 1000) {
             numlines -= 1000;
             fprintf(stderr, ".");
             fflush(stderr);
@@ -119,18 +119,18 @@ void *startup(void *arg) {
             ptm.tv_usec = 0;
             ptm.tv_sec = 30;
 
-            if (sock1) FD_SET(sock1, &rset);
-            if (sock2) FD_SET(sock2, &rset);
+            if (sock1)
+                FD_SET(sock1, &rset);
+            if (sock2)
+                FD_SET(sock2, &rset);
 
             maxfd = (sock1 > sock2) ? sock1 + 1 : sock2 + 1;
 
             if ((sel = select(maxfd, &rset, NULL, NULL, &ptm)) <= 0) {
                 fprintf(stderr, "!");
                 fflush(stderr);
-                if (sock1)
-                    log_to_file(arg_hostname1, arg_port1, "read timeout", line);
-                if (sock2)
-                    log_to_file(arg_hostname2, arg_port2, "read timeout", line);
+                if (sock1) log_to_file(arg_hostname1, arg_port1, "read timeout", line);
+                if (sock2) log_to_file(arg_hostname2, arg_port2, "read timeout", line);
                 continue;
             }
 
