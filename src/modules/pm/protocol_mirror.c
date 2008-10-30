@@ -363,10 +363,13 @@ char *PM_dummify_object(char *object) {
 				die;
 			}
 		} else {
-			/* During call, the only possible error is trying to remove a mandatory attribute - but since
+			/* We use the _internal call as the normal one does some extra, and, in this case, surplus
+			 * checking.
+			 *
+			 * During call, the only possible error is trying to remove a mandatory attribute - but since
 			 * we already checked that, we don't care about errors here. - agoston, 2007-10-29 */
 			gli = gli->prev;
-			rpsl_attr_delete(rpsl_object_remove_attr(obj, actoff, NULL));
+			rpsl_attr_delete(rpsl_object_remove_attr_internal(obj, actoff, NULL));
 			actoff--;
 		}
 	}
