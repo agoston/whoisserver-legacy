@@ -206,6 +206,9 @@ PW_HELP_FILE @docdir@/WHOIS-HELP
 # then executed with system()
 # For source code, see stubs.h:die and thread.c:do_nice_die()
 #
+# Note: this variable is cached on server startup. any changes to it while whoisserver
+# runs won't take effect.
+#
 
 COMMAND_ON_DIE /usr/bin/gdb -q -batch -x @confdir@/gdbcomm --pid=%d 1>&2
 
