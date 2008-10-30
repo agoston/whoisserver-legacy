@@ -294,7 +294,7 @@ void UD_do_nrtm(void *arg) {
 		if (do_update) {
 
 			/* Check connection to the database and try to reconnect */
-			if (SQ_ping(ud_stream.db_connection)) {
+			if (SQ_ping(&ud_stream.db_connection)) {
 				LG_log(src_ctx, LG_DEBUG, "%s connection to SQL server timed out - reistablishing", UD_TAG);
 			}
 
@@ -573,7 +573,7 @@ void UD_do_updates(void *arg) {
 
 		if (do_update) {
 			/* Check connection to the database and try to reconnect*/
-			if (SQ_ping(ud_stream.db_connection)) {
+			if (SQ_ping(&ud_stream.db_connection)) {
 				LG_log(ud_context, LG_SEVERE, "%s", SQ_error(ud_stream.db_connection));
 				die;
 			}

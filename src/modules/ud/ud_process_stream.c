@@ -1202,7 +1202,7 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 	g_obj_buff = g_string_sized_new(STR_XXL);
 
 	/* Check connection to the database */
-	if (SQ_ping(ud_stream->db_connection)) {
+	if (SQ_ping(&ud_stream->db_connection)) {
 		LG_log(ud_context, LG_ERROR, "%s", SQ_error(ud_stream->db_connection));
 		die;
 	}
