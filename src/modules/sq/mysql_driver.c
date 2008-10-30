@@ -12,9 +12,9 @@
   OSs Tested          : Solaris 7 / sun4u / sparc
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -49,7 +49,7 @@ void SQ_init (LG_context_t *ctx) {
   sq_context = ctx;
 }
 
-/* 
+/*
 Description:
 
   Connect to the the MySQL database, returning an error if unsuccessful.
@@ -58,24 +58,24 @@ Arguments:
 
   SQ_connection_t **conn; used to return pointer to connection structure
 
-  const char *host; database server host to connect to, may be NULL or 
+  const char *host; database server host to connect to, may be NULL or
     "localhost", in which case Unix sockets may be used
 
-  unsigned int port; port to connect to database server on, may be 0 to use  
+  unsigned int port; port to connect to database server on, may be 0 to use
     default
 
   const char *db; name of database to use, may be NULL
 
-  const char *user; name of user to connect as, if NULL then the current Unix 
+  const char *user; name of user to connect as, if NULL then the current Unix
     user login is used
 
   const char *password; password to send, may be NULL to not use a password
 
 Returns:
-  
+
   SQ_OK on success
 
-  SQ_CTCONN on error; the exact reason may be determined by using SQ_error() 
+  SQ_CTCONN on error; the exact reason may be determined by using SQ_error()
     on the value returned in *conn - this structure should be properly via
     SQ_close_connection(), even on error
 
@@ -85,13 +85,13 @@ Notes:
   so the MySQL documentation should be checked for current meaning.
 */
 
-int 
+int
 SQ_try_connection (SQ_connection_t **conn, const char *host,
                    unsigned int port, const char *db,
                    const char *user, const char *password)
 {
     SQ_connection_t *res;
-    
+
     *conn = mysql_init(NULL);
     dieif(*conn == NULL);  /* XXX SK - need to call "out of memory handler" */
 
@@ -110,15 +110,15 @@ SQ_try_connection (SQ_connection_t **conn, const char *host,
   Get a connection to the database.
 
   const char *host
-  
+
   unsigned int port
 
   const char *db
-  
+
   const char *user
-  
+
   const char *password
-   
+
   More:
   +html+ <PRE>
   Authors:
@@ -138,7 +138,7 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
   unsigned try = 0;
 
   /* XXX MB.
-     This is really kludgy! 
+     This is really kludgy!
      For some (unknown yet) reason, sometimes the connection does not
      work the first time. So we try up to 3 times here, and give up only
      then.
@@ -158,7 +158,7 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
         return sql_connection;
     }
     else {
-      
+
       /* if we've tried enough, exit with error */
       if (try >= 3) {
     	  fprintf(stderr, " %s; %s", db, sql_connection ? SQ_error(sql_connection) : "-?");
@@ -167,14 +167,14 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
       }
 
       /* otherwise, prepare to try again */
-      LG_log(sq_context, LG_ERROR, " %s; %s", db, 
+      LG_log(sq_context, LG_ERROR, " %s; %s", db,
 		sql_connection ? SQ_error(sql_connection) : "-?");
 
       if (try > 0) {
         sleep(try);
       }
       try++;
-      
+
       if( sql_connection ) {
 	SQ_close_connection(sql_connection);
       }
@@ -187,16 +187,16 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
   Execute the sql query.
 
   SQ_connection_t *sql_connection Connection to database.
-  
+
   const char *query SQL query.
 
-  SQ_result_set_t *result ptr to the structure to hold result. 
+  SQ_result_set_t *result ptr to the structure to hold result.
   May be NULL if no result is needed.
 
-  Returns: 
+  Returns:
     0 if the query was successful.
     Non-zero if an error occured.
-  
+
   More:
   +html+ <PRE>
   Authors:
@@ -241,9 +241,9 @@ int SQ_execute_query(SQ_connection_t *sql_connection, const char *query, SQ_resu
 
 } /* SQ_execute_query() */
 
-/* 
+/*
 Description:
- 
+
     Performs identially to SQ_execute_query(), except that it does not read the
     entire query into memory.
 
@@ -253,13 +253,13 @@ Notes:
     so this should only be used in cases where:
 
     1. an unacceptably large amount of memory will be returned by the query
-    2. there is no chance that a user can accidentally or maliciously 
+    2. there is no chance that a user can accidentally or maliciously
        prevent the result set from being read in a expedicious manner
 */
 
-int 
-SQ_execute_query_nostore(SQ_connection_t *sql_connection, 
-                         const char *query, SQ_result_set_t **result_ptr) 
+int
+SQ_execute_query_nostore(SQ_connection_t *sql_connection,
+                         const char *query, SQ_result_set_t **result_ptr)
 {
   int err;
   SQ_result_set_t *result;
@@ -271,7 +271,7 @@ SQ_execute_query_nostore(SQ_connection_t *sql_connection,
   result = mysql_use_result(sql_connection);
   if (result == NULL) {
       return -1;
-  } 
+  }
   *result_ptr = result;
   return 0;
 } /* SQ_execute_query_nostore() */
@@ -281,7 +281,7 @@ SQ_execute_query_nostore(SQ_connection_t *sql_connection,
   Get the column count.
 
   SQ_result_set_t *result The results from the query.
-  
+
   More:
   +html+ <PRE>
   Authors:
@@ -302,7 +302,7 @@ int SQ_get_column_count(SQ_result_set_t *result) {
   Get the row count of a table
 
   char *table   The table to be examined
-  
+
   More:
   +html+ <PRE>
   Authors:
@@ -311,27 +311,27 @@ int SQ_get_column_count(SQ_result_set_t *result) {
 
   ++++++++++++++++++++++++++++++++++++++*/
 int SQ_get_table_size(SQ_connection_t *sql_connection,
-		     char *table) {  
+		     char *table) {
   int count;
   GString *sql_command;
   SQ_result_set_t *result;
   SQ_row_t *row;
   char *countstr;
-  
+
   sql_command = g_string_new("");
   g_string_sprintf(sql_command, "SELECT COUNT(*) FROM %s", table);
   dieif(SQ_execute_query(sql_connection, sql_command->str, &result) == -1 );
   g_string_free(sql_command, TRUE);
 
   row = SQ_row_next(result);
-  
+
   countstr = SQ_get_column_string(result, row, 0);
-  sscanf(countstr, "%d", &count);	
+  sscanf(countstr, "%d", &count);
   UT_free(countstr);
-  
+
   SQ_free_result(result);
-	
-  return count;  
+
+  return count;
 } /* SQ_get_table_size() */
 
 /* SQ_get_affected_rows() */
@@ -339,7 +339,7 @@ int SQ_get_table_size(SQ_connection_t *sql_connection,
   Get the row count of a table
 
   char *table   The table to be examined
-  
+
   More:
   +html+ <PRE>
   Authors:
@@ -351,12 +351,12 @@ int SQ_get_affected_rows(SQ_connection_t *sql_connection)
 {
   return (int)mysql_affected_rows(sql_connection);
 }/* SQ_get_affected_rows() */
-		      
+
 /* SQ_get_insert_id() */
 /*++++++++++++++++++++++++++++++++++++++
   Get the ID that was most recently generated for an AUTO_INCREMENT field
 
- 
+
   More:
   +html+ <PRE>
   Authors:
@@ -368,13 +368,13 @@ long SQ_get_insert_id(SQ_connection_t *sql_connection)
 {
   return (long)mysql_insert_id(sql_connection);
 }/* SQ_get_insert_id() */
-	
+
 /* SQ_get_column_label() */
 /*++++++++++++++++++++++++++++++++++++++
   Get the column label.
 
   SQ_result_set_t *result The results from the query.
-  
+
   unsigned int column The column index.
 
   More:
@@ -428,7 +428,7 @@ char *SQ_get_column_label(SQ_result_set_t *result, unsigned int column) {
   Get the max length of the column.
 
   SQ_result_set_t *result The results from the query.
-  
+
   unsigned int column The column index.
 
   More:
@@ -465,7 +465,7 @@ unsigned int SQ_get_column_max_length(SQ_result_set_t *result, unsigned int colu
   Get the next row.
 
   SQ_result_set_t *result The results from the query.
-  
+
   unsigned int column The column index.
 
   More:
@@ -490,7 +490,7 @@ SQ_row_t *SQ_row_next(SQ_result_set_t *result) {
  Get the column string.
 
  SQ_row_t *current_row The current row (obtained from a SQ_row_next() ).
- 
+
  unsigned int column The column index.
 
  More:
@@ -530,7 +530,7 @@ char *SQ_get_column_string_nocopy(SQ_result_set_t *result, SQ_row_t *current_row
   Get the all the strings in one column.
 
   SQ_result_set_t *result The results.
-  
+
   unsigned int column The column index.
 
   More:
@@ -578,28 +578,28 @@ char *SQ_get_column_strings(SQ_result_set_t *result, unsigned int column) {
  * SQ_row_t *current_row          the current row
  * unsigned int column            the column index
  * long *resultptr                pointer where the result should be stored
- * 
+ *
  * Returns <0 if error occurs, 0 otherwise
  *         -1 if NULL
  *         -2 if out of bounds
  *         -3 if not a number
- * 
+ *
  * FIXME: this function returns a long* instead of int* for legacy reasons.
  *        should be fixed, but there are just too many darn references to it.
  *        agoston, 2008-01-18
- * 
+ *
  */
 int SQ_get_column_int(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long *resultptr) {
 	long long int res;
-	int ret = SQ_get_column_llint(result, current_row, column, &res); 
-	
+	int ret = SQ_get_column_llint(result, current_row, column, &res);
+
 	if (ret < 0)
 		return ret;
 
 	if (res <  INT_MIN || res > INT_MAX) {
 		return -2;
 	}
-	
+
 	*resultptr = (long)res;
 	return 0;
 }
@@ -609,7 +609,7 @@ int SQ_get_column_int(SQ_result_set_t *result, SQ_row_t *current_row, unsigned i
  * SQ_row_t *current_row          the current row
  * unsigned int column            the column index
  * long *resultptr                pointer where the result should be stored
- * 
+ *
  * Returns <0 if error occurs, 0 otherwise
  *         -1 if NULL
  *         -2 if out of bounds
@@ -617,15 +617,15 @@ int SQ_get_column_int(SQ_result_set_t *result, SQ_row_t *current_row, unsigned i
  */
 int SQ_get_column_unsigned(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, unsigned *resultptr) {
 	long long int res;
-	int ret = SQ_get_column_llint(result, current_row, column, &res); 
-	
+	int ret = SQ_get_column_llint(result, current_row, column, &res);
+
 	if (ret < 0)
 		return ret;
 
 	if (res < 0 || res > UINT_MAX) {
 		return -2;
 	}
-	
+
 	*resultptr = (unsigned)res;
 	return 0;
 }
@@ -636,7 +636,7 @@ int SQ_get_column_unsigned(SQ_result_set_t *result, SQ_row_t *current_row, unsig
  * SQ_row_t *current_row          the current row
  * unsigned int column            the column index
  * long long int *resultptr       pointer where the result should be stored
- * 
+ *
  * Returns <0 if error occurs, 0 otherwise
  *         -1 if NULL
  *         -2 if out of bounds
@@ -672,7 +672,7 @@ int SQ_get_column_llint(SQ_result_set_t *result, SQ_row_t *current_row, unsigned
   Convert the result set to a string.
 
   SQ_result_set_t *result The results.
-  
+
   More:
   +html+ <PRE>
   Authors:
@@ -730,7 +730,7 @@ char *SQ_result_to_string(SQ_result_set_t *result) {
     }
   }
   strcat(str_buffer, "|\n");
-  
+
   strcat(str_buffer, border);
 
 
@@ -753,7 +753,7 @@ char *SQ_result_to_string(SQ_result_set_t *result) {
   }
 
   strcat(str_buffer, border);
-  
+
   return UT_strdup(str_buffer);
 
 } /* SQ_result_to_string() */
@@ -763,7 +763,7 @@ char *SQ_result_to_string(SQ_result_set_t *result) {
   Free the result set.
 
   SQ_result_set_t *result The results.
-  
+
   More:
   +html+ <PRE>
   Authors:
@@ -785,7 +785,7 @@ void SQ_free_result(SQ_result_set_t *result) {
   Call this function to close a connection to the server
 
   SQ_connection_t *sql_connection The connection to the database.
-  
+
   More:
   +html+ <PRE>
   Authors:
@@ -806,7 +806,7 @@ void SQ_close_connection(SQ_connection_t *sql_connection) {
   Call this function to find out how many rows are in a query result
 
   SQ_result_set_t *result The results.
-  
+
   More:
   +html+ <PRE>
   Authors:
@@ -846,7 +846,7 @@ char *SQ_info_to_string(SQ_connection_t *sql_connection) {
   buf = g_string_sized_new(STR_XXL);
 
   /* Makes the server dump debug information to the log. */
-  g_string_sprintfa(buf, "mysql_dump_debug_info()=%d\n", 
+  g_string_sprintfa(buf, "mysql_dump_debug_info()=%d\n",
                     mysql_dump_debug_info(sql_connection));
 
   /* Returns the error number from the last MySQL function. */
@@ -856,7 +856,7 @@ char *SQ_info_to_string(SQ_connection_t *sql_connection) {
   g_string_sprintfa(buf, "mysql_error()=%s\n", mysql_error(sql_connection));
 
   /* Returns client version information. */
-  g_string_sprintfa(buf, "mysql_get_client_info()=%s\n", 
+  g_string_sprintfa(buf, "mysql_get_client_info()=%s\n",
                     mysql_get_client_info() );
 
   /* Returns a string describing the connection. */
@@ -864,7 +864,7 @@ char *SQ_info_to_string(SQ_connection_t *sql_connection) {
                     mysql_get_host_info(sql_connection));
 
   /* Returns the protocol version used by the connection. */
-  g_string_sprintfa(buf, "mysql_get_proto_info()=%d\n", 
+  g_string_sprintfa(buf, "mysql_get_proto_info()=%d\n",
                     mysql_get_proto_info(sql_connection));
 
   /* Returns the server version number. */
@@ -880,14 +880,14 @@ char *SQ_info_to_string(SQ_connection_t *sql_connection) {
   }
 
 
-  /* Returns a list of the current server threads. 
+  /* Returns a list of the current server threads.
 
-     NOT Used here, because it returns a RESULT struct that must be 
+     NOT Used here, because it returns a RESULT struct that must be
      iterated through.
-     
+
      sprintf(str_buffer_tmp, "mysql_list_processes()=%x\n", mysql_list_processes(sql_connection));
      strcat(str_buffer, str_buffer_tmp);
-     
+
   */
 
   /* Checks if the connection to the server is working. */
@@ -1020,19 +1020,19 @@ long sq_get_minmax_id(SQ_connection_t *sql_connection, char *id_name, char *tabl
 
 /* SQ_get_info() */
 /*++++++++++++++++++++++++++++++++++++++
-  Get additional information about the most 
+  Get additional information about the most
   recently executed query.
-  
+
   SQ_connection_t *sql_connection The connection to the database.
   int info[3] array of integers where information is stored
-  
+
   The meaning of the numbers returned depends on the query type:
-  
+
   info[SQL_RECORDS] - # of Records for INSERT
   info[SQL_MATCHES] - # of Matches for UPDATE
   info[SQL_DUPLICATES] - # of Duplicates
   info[SQL_WARNINGS] - # of Warnings
-  
+
   More:
  +html+ <PRE>
  Authors:
@@ -1043,15 +1043,15 @@ long sq_get_minmax_id(SQ_connection_t *sql_connection, char *id_name, char *tabl
  +html+     <LI><A HREF="http://www.tcx.se/Manual/manual.html#mysql_info">mysql_info()</A>
  +html+ </UL></DL>
 
-++++++++++++++++++++++++++++++++++++++*/  
-  
+++++++++++++++++++++++++++++++++++++++*/
+
 int SQ_get_info(SQ_connection_t *sql_connection, int info[3])
 {
 int ii;
-char *colon, *buf_ptr, buf[20]; 
+char *colon, *buf_ptr, buf[20];
 char *infoline;
 
-  infoline=(char*)mysql_info(sql_connection); 
+  infoline=(char*)mysql_info(sql_connection);
   ii=0;
   colon = infoline;
   while (*colon != '\0') {
@@ -1063,13 +1063,13 @@ char *infoline;
     }
     *buf_ptr='\0';
     info[ii]=atoi(buf); ii++;
-   } 
+   }
   }
  return(0);
 }
 
 
-/* 
+/*
    open a connection with the same parameters
 
    by marek
@@ -1077,11 +1077,11 @@ char *infoline;
 SQ_connection_t *
 SQ_duplicate_connection(SQ_connection_t *orig)
 {
-  return SQ_get_connection(orig->host, orig->port, orig->db, 
+  return SQ_get_connection(orig->host, orig->port, orig->db,
 			   orig->user, orig->passwd);
 }
 
-/* 
+/*
    abort the current query on the given connection
 
    by marek
@@ -1104,7 +1104,7 @@ SQ_abort_query(SQ_connection_t *sql_connection)
 
 /* SQ_ping() */
 /*++++++++++++++++++++++++++++++++++++++
-  Checks whether or not the connection to the server is working. 
+  Checks whether or not the connection to the server is working.
   If it has gone down, an automatic reconnection is attempted.
 
   Return values

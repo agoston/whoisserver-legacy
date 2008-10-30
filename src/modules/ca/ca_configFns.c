@@ -79,7 +79,7 @@ void stringPack(char *dest, const char *source)
      * This while loop continues until the NULL character is copied into
      * the destination string.  If a tab character is copied into the
      * destination string, it is replaced with a blank-space character.
-     * 
+     *
      * Multiple blank-space and/or tab characters are skipped in the source
      * string until any other character is found.
      */
@@ -101,7 +101,7 @@ void stringPack(char *dest, const char *source)
          * (i.e. ignore these characters).  When any other character
          * is found in the source string, move to the next element of
          * the destination string.
-         * 
+         *
          * Otherwise, simultaneously, move to the next elements of the
          * destination and the source strings.
          */
@@ -376,7 +376,7 @@ void opSplitsen(FILE * filePtr, gchar ** tokenArray)
         /*
          * g_strsplit() is a GLib function; it returns an array of
          * strings.
-         * 
+         *
          * Here, we split on two spaces, "  ". We set max_tokenArray to
          * be 0.  We want the first token to be the name of the
          * variable and the other tokens to be the value of the
@@ -515,21 +515,21 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size)
     /*
      * Function Prototype for ca_getStorageLocation() We put it here;
      * thus it can only be called from within ca_readConfig()
-     * 
+     *
      * This function finds the location in the values_t array where we store
      * pointers to the string value and the actual value of the variable.
      * It returns this location as an integer.
-     * 
+     *
      */
     int ca_getStorageLocation(char[], dict_t[], int);
 
     /*
      * Function Prototype for ca_getType() We put it here so that it can
      * only be called from within ca_readConfig()
-     * 
+     *
      * This function returns the type of the configuration variable.  It
      * returns it as a string.
-     * 
+     *
      */
     int ca_getType(char[], dict_t[], int);
 
@@ -574,7 +574,7 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size)
          * From the variable name, find the dictionary number. The
          * dictionary number is defined as the place in the values
          * array in which to store the value of the variable.
-         * 
+         *
          */
 
         /*
@@ -594,7 +594,7 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size)
              * From the variable name, find the element of the
              * values array in which to store the value of the
              * variable.
-             * 
+             *
              */
             location = ca_getStorageLocation(name, dictionary, CA_NUMBEROFSYMBOLS);
 
@@ -626,7 +626,7 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size)
                 /*
                  * Store a pointer to the string that
                  * contains the value This is not necessarily
-                 * the actual value itself. 
+                 * the actual value itself.
                  */
 
                 confVars[location].strPtr = g_string_new(value);
@@ -671,7 +671,7 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size)
                      * Test if this variable has already been
                      * created. Look for a non-zero i.e. true
                      * value.
-                     * 
+                     *
                      * First put a '\n' character at the end of the
                      * existing string. Then, concatenate the
                      * additional string.
@@ -734,11 +734,11 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size)
                      * been read in.
                      * Now, split up the elements and assign them
                      * to the
-                     * components of the Admin-DB structure. 
+                     * components of the Admin-DB structure.
                      *
                      * First, separate the values in "value",
                      * using ',' as a
-                     * delimiting character.  
+                     * delimiting character.
                      */
                     dbcomps = ut_g_strsplit_v1(value, ",", 0);
 
@@ -880,7 +880,7 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size)
                      * the "source" value and the values of
                      * updDbcomps, populate the ca_updDbSource_t
                      * structure.
-                     * 
+                     *
                      */
 
                     /*
@@ -984,11 +984,11 @@ int ca_get_int(int symbol) {
     /*
      * Look at the appropriate place in the dictionary; e.g. C_BINDPORT
      * => the first element, index = 0.
-     * 
+     *
      * if the varType is not an integer, exit with an error;
-     * 
+     *
      * otherwise, return an integer.
-     * 
+     *
      */
 
     /* Look at the appropriate place in the dictionary. */
@@ -1028,7 +1028,7 @@ char * ca_get_dirlist(int symbol) {
     /*
      * This function returns a pointer to a character array.  Thus, we
      * need to declare such a pointer.
-     * 
+     *
      */
 
     char *xPtr= NULL;
@@ -1039,11 +1039,11 @@ char * ca_get_dirlist(int symbol) {
     /*
      * Look at the appropriate place in the dictionary; e.g. CA_HELP =>
      * the second element, index = 1.
-     * 
+     *
      * if the varType is not CA_DIRLIST, exit with an error;
-     * 
+     *
      * otherwise, return a pointer to the value.
-     * 
+     *
      */
 
     /* Look at the appropriate place in the dictionary. */
@@ -1080,7 +1080,7 @@ char * ca_get_string(int symbol) {
     /*
      * This function returns a pointer to a character array.  Thus, we
      * need to declare such a pointer.
-     * 
+     *
      */
 
     char *xPtr= NULL;
@@ -1091,11 +1091,11 @@ char * ca_get_string(int symbol) {
     /*
      * Look at the appropriate place in the dictionary; e.g.
      * CA_REPLYBANNER => the third element, index = 2.
-     * 
+     *
      * if the varType is not CA_STRING, exit with an error;
-     * 
+     *
      * otherwise, return the value.
-     * 
+     *
      */
 
     /* Look at the appropriate place in the dictionary. */
@@ -1157,7 +1157,7 @@ int ca_get_boolean(int symbol) {
 
     /*
      * Print this message if in debug mode.
-     * 
+     *
      */
 #ifdef DEBUG
     printf("\nca_get_boolean() function is called .....\n");
@@ -1193,11 +1193,11 @@ int ca_get_boolean(int symbol) {
     /*
      * Look at the appropriate place in the dictionary; e.g. CA_BOOLEAN =
      * the fifth element of the dict_t array, => index = 4.
-     * 
+     *
      * If the varType is not Boolean, exit with an error
-     * 
+     *
      * Otherwise,
-     * 
+     *
      */
 
 #ifdef DEBUG
@@ -1216,12 +1216,12 @@ int ca_get_boolean(int symbol) {
 
         /*
          * Otherwise, return an integer value.
-         * 
+         *
          */
 
         /*
          * Lock the value of the variable before reading it.
-         * 
+         *
          */
 
         pthread_mutex_lock(&Lock);
@@ -1348,7 +1348,7 @@ void ca_set_int(int symbol) {
              *																				*
              ************************************************************/
 
-            /*	
+            /*
              * globals[symbol].strPtr = newPort;
              *
              * globals[symbol].strPtr = (char *) calloc(1, sizeof(newPort));
@@ -1408,7 +1408,7 @@ void ca_set_int(int symbol) {
              *		fprintf(stderr, "Cannot allocate memory for locals[symbol].strPtr\n");
              *	 exit(8);
              * }
-             * 
+             *
              * strcpy(locals[symbol].strPtr, newPort);
              */
 
@@ -1445,7 +1445,7 @@ int * ca_change_int_value(char value[]) {
     tempPtr = UT_malloc(sizeof(int));
 
     /*
-     * No need to check the return value of UT_malloc() in case we did not 
+     * No need to check the return value of UT_malloc() in case we did not
      * actually get the memory.
      *
      *if (tempPtr == NULL) {
@@ -1518,10 +1518,10 @@ void ca_getAsource(char *sourceName, GSList * sources)
     { /* Begin special block I got a syntax error when I defined
      * "ca_database_list_t *srcPtr = currentPtr->data;" in the
      * usual way, with all the other local variables.
-     * 
+     *
      * However, if I define it inside this block, I do not get any
      * syntax errors.
-     * 
+     *
      */
 
         ca_database_list_t *srcPtr = currentPtr->data;
@@ -2066,7 +2066,7 @@ void ca_set_boolean(int symbol) {
 
     /*
      * Write the new value of this variable back to the config file.
-     * 
+     *
      * To be implemented.
      */
 
@@ -2145,7 +2145,7 @@ void ca_set_boolean(int symbol) {
          * If we read the variable that we want to change, replace
          * the value of this variable in the config file with the
          * value supplied from the keyboard.
-         * 
+         *
          */
         if (strcmp(name, dictionary[symbol].varName) == 0) {
             strcpy(value, newTestmodeStr);
@@ -2165,27 +2165,27 @@ void ca_set_boolean(int symbol) {
     /*
      * While !(the record to be updated) BEGIN Write the record to the
      * temporary file Read the next record in the config file END
-     * 
+     *
      * Write the new value to the temporary file Read the next record in the
      * config file COMMENT: this is the record to be updated. COMMENT:
      * discard this record.
-     * 
+     *
      * Read the next record in the config file
-     * 
+     *
      * While !(EOF) BEGIN write the record to the temporary file read the
      * next record in the config file END
-     * 
+     *
      * Close Config file Close Temporary file
-     * 
+     *
      * Open Temporary file for reading Open Config file for writing
-     * 
+     *
      * Read the next record of the Temporary file
-     * 
+     *
      * While (!EOF of Temporary file) BEGIN write the record into the Config
      * file read the next record of the Temporary file END
-     * 
+     *
      * Close Temporary file Close Config file
-     * 
+     *
      */
 
     fclose(testPtr);
@@ -2245,7 +2245,7 @@ void ca_set_boolean(int symbol) {
     /*
      * Unlock the value of the variable after setting it and writing the
      * new value back to the configuration (and the dictionary) file.
-     * 
+     *
      */
     pthread_mutex_unlock(&Lock);
 
@@ -2297,9 +2297,9 @@ void ca_set_dirlist(int symbol) {
     /*
      * Make sure that a reasonable, sensible value of the directory value
      * has been read from the keyboard.
-     * 
+     *
      * How do we implement this ???
-     * 
+     *
      */
 
     /*
@@ -2346,7 +2346,7 @@ void ca_set_dirlist(int symbol) {
     /*
      * Write the new value of the variable to the correct place in the
      * [appropriate] values array.
-     * 
+     *
      * Note that there is no need to check if UT_malloc() actually worked.
      *
      */
@@ -2380,7 +2380,7 @@ void ca_set_dirlist(int symbol) {
 
     /*
      * Free the temporary pointer, hereValues.
-     * 
+     *
      */
     UT_free(hereValues);
     hereValues = NULL;
@@ -2450,9 +2450,9 @@ ca_set_string(int symbol)
     /*
      * Make sure that a reasonable, sensible value of the string value
      * has been read from the keyboard.
-     * 
+     *
      * How do we implement this ???
-     * 
+     *
      */
 
     /*
@@ -2536,7 +2536,7 @@ ca_set_string(int symbol)
 
     /*
      * Free the temporary pointer, hereValues.
-     * 
+     *
      */
     UT_free(hereValues);
     hereValues = NULL;
@@ -2614,7 +2614,7 @@ int ca_writeNewValue(int dictSymbol, char *newValue) {
      * If we read the variable that we want to change, replace the value
      * of this variable in the config file with the value supplied from
      * the keyboard.
-     * 
+     *
      */
     if (strcmp(name, dictionary[dictSymbol].varName) == 0) {
         strcpy(value, newValue);
@@ -2656,7 +2656,7 @@ int ca_writeNewValue(int dictSymbol, char *newValue) {
          * If we read the variable that we want to change, replace
          * the value of this variable in the config file with the
          * value supplied from the keyboard.
-         * 
+         *
          */
         if (strcmp(name, dictionary[dictSymbol].varName) == 0) {
             strcpy(value, newValue);
@@ -2680,27 +2680,27 @@ int ca_writeNewValue(int dictSymbol, char *newValue) {
     /*
      * While !(the record to be updated) BEGIN Write the record to the
      * temporary file Read the next record in the config file END
-     * 
+     *
      * Write the new value to the temporary file Read the next record in the
      * config file COMMENT: this is the record to be updated. COMMENT:
      * discard this record.
-     * 
+     *
      * Read the next record in the config file
-     * 
+     *
      * While !(EOF) BEGIN write the record to the temporary file read the
      * next record in the config file END
-     * 
+     *
      * Close Config file Close Temporary file
-     * 
+     *
      * Open Temporary file for reading Open Config file for writing
-     * 
+     *
      * Read the next record of the Temporary file
-     * 
+     *
      * While (!EOF of Temporary file) BEGIN write the record into the Config
      * file read the next record of the Temporary file END
-     * 
+     *
      * Close Temporary file Close Config file
-     * 
+     *
      */
 
     fclose(confPtr);
@@ -3006,7 +3006,7 @@ ca_updDbSource_t ** ca_get_UpdSourceHandle(int symbol)
     return (myUpdSourcePtr);
 }
 
-/* returns the number of sources read from the config file 
+/* returns the number of sources read from the config file
  num_sources is declared at the start of this source module
  */
 
@@ -3139,7 +3139,7 @@ int ca_sanityChk(values_t confVars[])
  - does a simple sanity check
  - Parameters
  - confVars - the array of configuration variables
- - Returns 
+ - Returns
  - an integer: -1 or 0
  */
 {
@@ -3181,7 +3181,7 @@ int ca_mandVarChk(void)
     int undefVars = 0; /* Number of undefined variables. */
 
     /*
-     * This output does not tell us anything useful.  
+     * This output does not tell us anything useful.
      * Thus, we comment it out.
      *
      * puts("Running mandatory variables check .....");
@@ -3201,7 +3201,7 @@ int ca_mandVarChk(void)
         fprintf(stderr, "%d%s\n", undefVars, configError_2Str);
     } else {
         /*
-         * This output does not give us new information.  
+         * This output does not give us new information.
          * Thus, we comment it out.
          *
          * fprintf(stderr, "%s\n", configVarChk_OK_Str);

@@ -10,9 +10,9 @@
 
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -20,7 +20,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -31,12 +31,12 @@
 #include <pthread.h>       /* Posix thread library */
 
 /* THIS MODULE IS OBSOLETE
- * 
+ *
  * There is pthread_rwlock support in libc, there is absolutely no need
  * to simulate those using pthread_mutex calls
- * 
+ *
  * for example on pthread_rwlock, see aa.c
- */ 
+ */
 
 /* structure for writers favouring functions */
 typedef struct _rwlock {

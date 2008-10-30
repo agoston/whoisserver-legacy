@@ -12,9 +12,9 @@
         tiago (10/04/2003) Created.
   ******************/ /******************
   Copyright (c) 2003               RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -42,7 +42,7 @@ LG_device_t* LG_dev_get_stdout() {
   dev = UT_malloc(sizeof(LG_device_t));
   dev->destroy_func = NULL;
   dev->write_func = &vprintf;
-  
+
   return dev;
 }
 */
@@ -74,7 +74,7 @@ static pthread_mutex_t LG_dev_vfprintf_lock = PTHREAD_MUTEX_INITIALIZER;
 void LG_dev_vfprintf(LG_device_t* dev, const char* message, va_list ap) {
   FILE* f;
   f = (FILE*) dev->data;
-  
+
   pthread_mutex_lock(&LG_dev_vfprintf_lock);
   vfprintf(f, message, ap);
   fflush(f);
@@ -87,7 +87,7 @@ void LG_dev_vasprintf(LG_device_t* dev, const char* message, va_list ap) {
 	int len;
 	int fd = (int)dev->data;
 	off_t currpos;
-	
+
 	len = vasprintf(&buf, message, ap);
 	currpos = lseek(fd, 0, SEEK_END);
 	lockf(fd, F_LOCK, 0);
@@ -151,17 +151,17 @@ gchar *stresc (const gchar *s)
 {
   gchar *ret_val;
   gchar *p;
-  
+
   ret_val = g_new(char, (strlen(s) * 4) + 1);
   p = ret_val;
-  while (*s) 
+  while (*s)
   {
-    if (isprint((int)*s)) 
+    if (isprint((int)*s))
     {
       *p = *s;
       p++;
-    } 
-    else 
+    }
+    else
     {
       sprintf(p, "\\x%02X", (*s & 0xFF));
       p += 4;
@@ -198,20 +198,20 @@ char* LG_frm_general(const LG_level_t level, void** data, const char* str) {
         frm += 7;
       }
       else if (strstr(frm, "TIMESTAMP") == frm) {
-        sprintf(buffer, "%04d%02d%02d %02d:%02d:%02d", 
+        sprintf(buffer, "%04d%02d%02d %02d:%02d:%02d",
                 ltime.tm_year+1900, ltime.tm_mon+1, ltime.tm_mday,
                 ltime.tm_hour, ltime.tm_min, ltime.tm_sec);
         frm +=9;
         g_string_append(mystr, buffer);
       }
       else if (strstr(frm, "TIME") == frm) {
-        sprintf(buffer, "%02d:%02d:%02d", 
+        sprintf(buffer, "%02d:%02d:%02d",
                 ltime.tm_hour, ltime.tm_min, ltime.tm_sec);
         frm +=4;
         g_string_append(mystr, buffer);
       }
       else if (strstr(frm, "DATE") == frm) {
-        sprintf(buffer, "%04d-%02d-%02d", 
+        sprintf(buffer, "%04d-%02d-%02d",
                 ltime.tm_year+1900, ltime.tm_mon+1, ltime.tm_mday);
         frm +=4;
         g_string_append(mystr, buffer);
@@ -319,7 +319,7 @@ char* LG_frm_dbupdate(const LG_level_t level, void** data, const char* str) {
   for (i=0; i<current_indent; i++) {
       g_string_append_c(mystr, ' ');
   }
-  
+
   g_string_append(mystr, str);
   g_string_append_c(mystr, '\n');
   if (current_indent != indent_level && level == LG_FUNC) {
@@ -421,7 +421,7 @@ LG_appender_t* LG_app_get_daily_info_dump(gchar* path) {
   return app;
 }
 
-/** You MUSTN'T USE this for anything else than stdout or stderr!!! */ 
+/** You MUSTN'T USE this for anything else than stdout or stderr!!! */
 LG_appender_t* LG_app_get_file_info_dump(FILE* f) {
   LG_appender_t* app;
 

@@ -12,9 +12,9 @@
         tiago (10/04/2003) Created.
   ******************/ /******************
   Copyright (c) 2003               RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -55,13 +55,13 @@ typedef struct LG_device {
   void (*destroy_func)(struct LG_device*);
   void (*write_func)(struct LG_device*, const char*, va_list);
   void* data;
-} LG_device_t;  
+} LG_device_t;
 
 typedef struct LG_formatter {
   //void (*destroy_func)(struct LG_formatter*);
   char* (*format_func)(const LG_level_t, void** data, const char*);
   void* data;
-} LG_formatter_t;  
+} LG_formatter_t;
 
 
 typedef struct {

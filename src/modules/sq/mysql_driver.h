@@ -7,9 +7,9 @@
 
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -17,7 +17,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -36,7 +36,7 @@
 #define SQL_RECORDS 0
 #define SQL_MATCHES 0 // for UPDATE queries (checking for duplicates)
 #define SQL_DUPLICATES 1
-#define SQL_WARNINGS 2 
+#define SQL_WARNINGS 2
 
 /* errors */
 #define SQ_OK       0
@@ -53,11 +53,11 @@ extern "C" {
 
 
 
-int SQ_try_connection(SQ_connection_t **conn, const char *host, 
-                           unsigned int port, const char *db, 
+int SQ_try_connection(SQ_connection_t **conn, const char *host,
+                           unsigned int port, const char *db,
 		           const char *user, const char *password);
 SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const char *db, const char *user, const char *password);
-int SQ_execute_query(SQ_connection_t *sql_connection, 
+int SQ_execute_query(SQ_connection_t *sql_connection,
 		     const char *query, SQ_result_set_t **result_ptr);
 int SQ_execute_query_nostore(SQ_connection_t *sql_connection,
                              const char *query, SQ_result_set_t **result_ptr);
@@ -66,8 +66,8 @@ char *SQ_get_column_label(SQ_result_set_t *result, unsigned int column);
 unsigned int SQ_get_column_max_length(SQ_result_set_t *result, unsigned int column);
 SQ_row_t *SQ_row_next(SQ_result_set_t *result);
 char *SQ_get_column_string(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column);
-char *SQ_get_column_string_nocopy(SQ_result_set_t *result, 
-				  SQ_row_t *current_row, 
+char *SQ_get_column_string_nocopy(SQ_result_set_t *result,
+				  SQ_row_t *current_row,
 				  unsigned int column);
 char *SQ_get_column_strings(SQ_result_set_t *result, unsigned int column);
 int SQ_get_column_int(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long  *resultptr);

@@ -12,9 +12,9 @@
  andrei (17/01/2000) Created.
  ******************//******************
  Copyright (c) 2000                              RIPE NCC
- 
+
  All Rights Reserved
- 
+
  Permission to use, copy, modify, and distribute this software and its
  documentation for any purpose and without fee is hereby granted,
  provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
  supporting documentation, and that the name of the author not be
  used in advertising or publicity pertaining to distribution of the
  software without specific, written prior permission.
- 
+
  THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
  AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -50,10 +50,10 @@ extern int SV_update_sock[];
 extern int SV_shutdown_recv_fd;
 
 /* Response time to swtching updates on and off */
-#define TIMEOUT 60 
+#define TIMEOUT 60
 
 /* timeout between successive attempts to establish connection with server */
-#define PM_CONNECTION_TIMEOUT 10 
+#define PM_CONNECTION_TIMEOUT 10
 
 /* Maximum number of objects(serials) we can consume at a time */
 #define SBUNCH 1000
@@ -155,7 +155,7 @@ int get_NRTM_fd(struct _nrtm *nrtm, int upto_last, char *source) {
  *                                                           *
  * Processes NRTM stream                                     *
  *                                                           *
- * It cycles requesting objects from the NRTM server,        * 
+ * It cycles requesting objects from the NRTM server,        *
  * processing them and then sleeping a specified amount of   *
  * time.                                                     *
  *                                                           *
@@ -393,7 +393,7 @@ void UD_do_nrtm(void *arg) {
  *                                                           *
  * Processes updates                                         *
  *                                                           *
- * It cycles accepting connections and processing them       * 
+ * It cycles accepting connections and processing them       *
  * (interactive server). This assures that there is only     *
  * one write thread per database/source.                     *
  *                                                           *

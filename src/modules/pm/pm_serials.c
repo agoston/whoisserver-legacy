@@ -14,12 +14,12 @@
  Author:
  andrei
  +html+ </PRE>
- 
+
  ******************//******************
  Copyright (c) 2000                              RIPE NCC
- 
+
  All Rights Reserved
- 
+
  Permission to use, copy, modify, and distribute this software and its
  documentation for any purpose and without fee is hereby granted,
  provided that the above copyright notice appear in all copies and that
@@ -27,7 +27,7 @@
  supporting documentation, and that the name of the author not be
  used in advertising or publicity pertaining to distribution of the
  software without specific, written prior permission.
- 
+
  THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
  AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -45,12 +45,12 @@ extern LG_context_t *pm_context;
 
 /************************************************************
  * Gets the min and max serial number.
- * 
+ *
  * Returns:
  *  min & max serial number
  *  in case of an error, it dies (only sql errors possible)
- * 
- * Note: 
+ *
+ * Note:
  *  min serial= MIN(serial_id)+1
  *  MIN(serial_id) represents legacy RIPE.CURRENSERIAL of the snapshot
  *************************************************************/
@@ -95,7 +95,7 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
  * Returns:
  *  operation (ADD/DEL) and text object
  *  NULL in case of an error
- * 
+ *
  * Fills *object_type, *operation, *timestamp if not NULL
  *
  * Note:
@@ -103,7 +103,7 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
  *************************************************************/
 char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, long *object_type, unsigned *timestamp,
         int *operation) {
-	
+
 	SQ_result_set_t * sql_result;
 	SQ_row_t *sql_row;
 	char *sql_str;
@@ -130,13 +130,13 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 			/* if the operation is delete, and we need to get the timestamps, a little bit different strategy is
 			 * needed because of the bad database design. In this case, there are two entries with the same
 			 * sequence_id and object_id in the serials table, both with atlast=0. The referred entry in the
-			 * history table is the object as it was created/updated, and the timestamp there reflects the 
+			 * history table is the object as it was created/updated, and the timestamp there reflects the
 			 * creation/update time, not the deletion time.
 			 * Deletion time can be digged from the last table, looking up object_id with sequence_id = 0.
 			 * Following some twisted logic, this is how deletions are done in the RIPE DB.
 			 * FIXME: Weird, bad design. Should be fixed.
 			 * agoston, 2008-01-22
-			 * 
+			 *
 			 * FIXME: real-world unearthed even more shit. NRTM updates database in a different way: when
 			 * recreating a previously deleted pkey, it simply keeps the object_id, and updates (deletes)
 			 * the sequence_id=0 record in the last table to the following sequence_id, puts the object
@@ -145,9 +145,9 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 			 * It's funny as this proves that NRTM is NOT a proper replication - luckily this bug keeps the
 			 * serials the same, but the sql DB itself is vastly different.
 			 * As a workaround, I've changed the inner joins to left join. Of course this will result in
-			 * timestamp being NULL in NRTM delete+re-create cases, but that data is lost anyway (as the 
+			 * timestamp being NULL in NRTM delete+re-create cases, but that data is lost anyway (as the
 			 * placeholder last record is overwritten).
-			 * 
+			 *
 			 * agoston, 2008-01-30 */
 			if ((locop[1] == OP_DEL) && timestamp) {
 				sprintf(query, "SELECT history.object, history.object_type, last.timestamp FROM serials "
@@ -161,10 +161,10 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 					"WHERE serials.serial_id=%ld "
 					"AND serials.object_id=history.object_id "
 					"AND serials.sequence_id=history.sequence_id", serial_number);
-				
+
 			}
 			break;
-			
+
 		/* last */
 		case 1:
 			sprintf(query, "SELECT last.object, last.object_type, last.timestamp FROM last, serials "
@@ -172,8 +172,8 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 				"AND serials.object_id=last.object_id "
 				"AND serials.sequence_id=last.sequence_id", serial_number);
 			break;
-			
-		/* failed_transaction */	
+
+		/* failed_transaction */
 		case 2:
 			sprintf(query, "SELECT object FROM failed_transaction WHERE serial_id=%ld ", serial_number);
 			/* return some meaningful value - in this case, UINT_MAX */
@@ -198,7 +198,7 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
 				die;
 			}
-			/* (*timestamp) is left at zero if timestamp is NULL */ 
+			/* (*timestamp) is left at zero if timestamp is NULL */
 			if (timestamp && (SQ_get_column_unsigned(sql_result, sql_row, 2, timestamp) < -1)) {
 				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
 				die;
@@ -225,10 +225,10 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
  * Format:                                                   *
  * <source>:<can_mirror>:min_serial-max_serial               *
  * source - name of the source (e.g. RIPE, RADB, etc.)       *
- * can_mirror                                                * 
+ * can_mirror                                                *
  *    'Y' if the client is allowed to mirror the source      *
  *    'N' if not                                             *
- *    'N' if there is no serials (then the range starts at 0)*    
+ *    'N' if there is no serials (then the range starts at 0)*
  *************************************************************/
 void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source, ca_dbSource_t *source_hdl) {
 
@@ -245,7 +245,7 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
 	/* Connect to the database */
 	db_connection=SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
 	PM_get_minmax_serial(db_connection, &min_serial, &max_serial);
-	/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial 
+	/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial
 	 * agoston, 2007-12-21 */
 	/* max_serial -= SAFE_BACKLOG; */
 
@@ -281,7 +281,7 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
 /************************************************************
  * Fills supplied buffer with information about the sources  *
  *                                                           *
- *                                                           * 
+ *                                                           *
  * Note:                                                     *
  *  returned GString should be freed by the caller           *
  *************************************************************/

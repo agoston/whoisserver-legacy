@@ -3,9 +3,9 @@
  for less frequent clients (ripupdate, mirror).
  ******************//******************
  Copyright (c) 1999                              RIPE NCC
- 
+
  All Rights Reserved
- 
+
  Permission to use, copy, modify, and distribute this software and its
  documentation for any purpose and without fee is hereby granted,
  provided that the above copyright notice appear in all copies and that
@@ -13,7 +13,7 @@
  supporting documentation, and that the name of the author not be
  used in advertising or publicity pertaining to distribution of the
  software without specific, written prior permission.
- 
+
  THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
  AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -126,7 +126,7 @@ void AA_load() {
 void AA_init() {
 	pthread_rwlockattr_t aaa_lock_attr;
 	int i;
-	
+
 	for (i = MIN_IPSPACE_ID; i <=MAX_IPSPACE_ID; i++) {
 		aaa[i] = NULL;
 	}
@@ -135,7 +135,7 @@ void AA_init() {
 	pthread_rwlockattr_init(&aaa_lock_attr);
 	pthread_rwlockattr_setkind_np(&aaa_lock_attr, PTHREAD_RWLOCK_PREFER_WRITER_NP);
 	pthread_rwlock_init(&aaa_lock, &aaa_lock_attr);
-	
+
 	AA_load();
 }
 
@@ -160,7 +160,7 @@ aa_rights *aa_find(ip_addr_t * address, char *source) {
 	return ret;
 }
 
-/* returns the ripupdate field of the most specific aaa record for the given ip address and source 
+/* returns the ripupdate field of the most specific aaa record for the given ip address and source
  * 0 = can't do updates through update port
  * 1 = can do updates through update port */
 int AA_can_ripupdate(ip_addr_t *address, char *source) {
@@ -170,7 +170,7 @@ int AA_can_ripupdate(ip_addr_t *address, char *source) {
 	return 0;
 }
 
-/* returns the mirror field of the most specific aaa record for the given ip address and source */ 
+/* returns the mirror field of the most specific aaa record for the given ip address and source */
 aa_mirror_right AA_can_mirror(ip_addr_t *address, char *source) {
 	aa_rights *myrights = aa_find(address, source);
 	if (myrights)

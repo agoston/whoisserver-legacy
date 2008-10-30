@@ -240,7 +240,7 @@ char *ac_acl_to_string(GList *leafptr)
   ac_find_acl_l:
 
   find the exact or exact/less specific match for the given prefix in the acl tree.
-  DOES NOT COPY THE RESULT! 
+  DOES NOT COPY THE RESULT!
 
   ip_prefix_t *prefix - prefix to look for
   acl_st *store_acl  - pointer to store the acl struct
@@ -308,10 +308,10 @@ int AC_findcreate_acl_l(ip_prefix_t * prefix, acl_st ** store_acl)
 		case 0:
 			/* make the new one inherit all parameters after the old one */
 			ac_find_acl_l(RX_SRCH_EXLESS, localpref, &retacl);
-			
+
 			newacl = UT_malloc(sizeof(acl_st));
 			*newacl = *retacl;
-			
+
 			/* link in */
 			rx_bin_node(RX_OPER_CRE, localpref, act_acl[localpref->ip.space], (rx_dataleaf_t *) newacl);
 			break;
@@ -356,7 +356,7 @@ int AC_findcreate_acl_l(ip_prefix_t * prefix, acl_st ** store_acl)
   returns error code from RX or OK
 
   MT-Note: assumes locked accounting tree
-  
+
   FIXME: It is called with a write lock on the tree from _EVERYWHERE_. There is no use to do that;
          a simple read lock is OK, and we only need to fetch a write lock if we create a new node
          I won't fix this now, as a complete thread+locking optimization is needed anyway - Agoston, 2006
@@ -1031,7 +1031,7 @@ int AC_asc_set_nodeny(char *ip)
 	GList *preflist = NULL;
 	acl_st *treeacl;
 	ip_keytype_t key_type;
-	
+
 	/* convert the prefix */
 	ret_err = IP_smart_conv(ip, 0, 0, &preflist, IP_PLAIN, &key_type);
 
@@ -1081,8 +1081,8 @@ int AC_asc_set_nodeny(char *ip)
 
 /*++++++++++++++++++++++++++++++++++++++
  *
- * set an access entry from the console command 'set access' 
- * 
+ * set an access entry from the console command 'set access'
+ *
  *++++++++++++++++++++++++++++++++++++++*/
 int AC_set_access_command(char *command)
 {
@@ -1092,7 +1092,7 @@ int AC_set_access_command(char *command)
 	char *array[AC_ACC_SIZE];
 	acc_st *acc;
 	ut_timer_t currtime;
-	
+
 	UT_timeget(&currtime);
 
 	memset(array, 0, sizeof(array));
@@ -1142,8 +1142,8 @@ int AC_set_access_command(char *command)
 			if (NOERR(ret)) {
 				/* set its status to 'changed' */
 				if (acc->changed == AC_ACC_NOT_CHANGED) acc->changed = AC_ACC_CHANGED;
-				/* we only change timestamp if a decayed field is modified - see below */ 
-				
+				/* we only change timestamp if a decayed field is modified - see below */
+
 				/* update it from the array */
 				for (i = 0; i < AC_ACC_SIZE; i++) {
 					if (array[i] != NULL) {	/* set only those that have been specified */
@@ -1370,7 +1370,7 @@ int AC_decay_hook(rx_node_t * node, int level, int nodecounter, void *con)
   AC_decay:
 
   Started as a thread from server.c.
-  
+
   Every AC_DECAY_TIME goes through the accounting tree(s) and decays the
   bonus values.
 

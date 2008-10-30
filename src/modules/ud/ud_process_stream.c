@@ -12,9 +12,9 @@
  andrei (17/01/2000) Created.
  ******************//******************
  Copyright (c) 2000                              RIPE NCC
- 
+
  All Rights Reserved
- 
+
  Permission to use, copy, modify, and distribute this software and its
  documentation for any purpose and without fee is hereby granted,
  provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
  supporting documentation, and that the name of the author not be
  used in advertising or publicity pertaining to distribution of the
  software without specific, written prior permission.
- 
+
  THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
  AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -81,7 +81,7 @@ static void ud_reorder_attributes(rpsl_object_t *object);
  *                                                                 *
  * Checks if nic handle is an AUTO one (XX*-SRS)                   *
  * So it tries to assign a nic handle and if successfull           *
- * substitutes the attribute value                                 * 
+ * substitutes the attribute value                                 *
  *                                                                 *
  ******************************************************************/
 static nic_handle_t *ud_replace_autonic(Transaction_t *tr, rpsl_object_t *object) {
@@ -129,12 +129,12 @@ static nic_handle_t *ud_replace_autonic(Transaction_t *tr, rpsl_object_t *object
  *                                                                 *
  * Checks if an (key-cert) object name is an AUTO one (X509-*)     *
  * So it tries to assign an integer and if successfull             *
- * substitutes the attribute value                                 * 
+ * substitutes the attribute value                                 *
  * if it is not AUTO-nic, check if id is consistent with the DB    *
  * and strip leading zeroes                                        *
  * returns: > 0 if index found and replaced;                       *
  *            0 wrong or not allowed                               *
- *          < 0 if error                                           * 
+ *          < 0 if error                                           *
  * assigns the value of the pointer to an integer:                 *
  * pointing to 0 if it is not a X509 object                        *
  *  and to 1 if it is X509 object                                  *
@@ -202,7 +202,7 @@ static long ud_replace_autokey(Transaction_t *tr, rpsl_object_t *object, int *IS
  *                                                                 *
  * Checks if org object NIC handle is an AUTO one (ORG-XX*-SRS)    *
  * If so it tries to assign a NIC handle and if successfull        *
- * substitutes the attribute value                                 * 
+ * substitutes the attribute value                                 *
  *                                                                 *
  ******************************************************************/
 static nic_handle_t *ud_replace_autonic_org(Transaction_t *tr, rpsl_object_t *object) {
@@ -237,7 +237,7 @@ static void reorder_attr(void *element_data, void *ptr) {
 	rpsl_object_t *object = (rpsl_object_t *)ptr;
 	int ofs;
 
-	/* move the attribute to the beginning 
+	/* move the attribute to the beginning
 	 so that all mnt-by are at the beginning of the object */
 	ofs = rpsl_attr_get_ofs(attr);
 	attr = rpsl_object_remove_attr(object, ofs, NULL);
@@ -249,9 +249,9 @@ static void reorder_attr(void *element_data, void *ptr) {
 
 /******************************************************************
  * reorder attributes                                              *
- *  . mnt-by should go before member-of to allow correct           * 
+ *  . mnt-by should go before member-of to allow correct           *
  *      membership autorization (still done in RIPupd)             *
- *  . nic-hdl should go before any admin-c, tech-c to prevent      * 
+ *  . nic-hdl should go before any admin-c, tech-c to prevent      *
  *       errrors in self referencing role objects                  *
  ******************************************************************/
 static void ud_reorder_attributes(rpsl_object_t *object) {
@@ -423,7 +423,7 @@ static Line_Type_t line_type(const char *line, long *transaction_id) {
 
 /******************************************************************
  * report_transaction()                                            *
- *                                                                 * 
+ *                                                                 *
  * Prints error report to the log                                  *
  *                                                                 *
  * reason - additional message that will be included               *
@@ -475,7 +475,7 @@ static int report_transaction(Transaction_t *tr, long transaction_id, Log_t *log
  *                                                           *
  * nrtm - pointer to _nrtm structure                         *
  * log - pointer to Log_t structure                          *
- * object_name - name of the object                          * 
+ * object_name - name of the object                          *
  * operation - operation code (OP_ADD/OP_DEL)                *
  *                                                           *
  * Returns:                                                  *
@@ -746,7 +746,7 @@ static int process_nrtm(UD_stream_t *ud_stream, Transaction_t *tr, int operation
  * Returns:                                                  *
  * 0  - okay                                                 *
  * <0- number of failed objects                              *
- *                                                           * 
+ *                                                           *
  ************************************************************/
 
 static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int operation) {
@@ -1270,12 +1270,12 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 				/*	 print_object(obj); */
 				/* check if we have collected something */
 				if (g_obj_buff->len >0) {
-#if 0         
+#if 0
 					/* no operation suggest a garbage in the stream - just ignore it */
 					if(IS_NRTM_CLNT(ud_stream->ud_mode) && (operation==OP_NOOP)) {
 						ER_inf_va(FAC_UD, ASP_UD_UPDLOG, "garbage in NRTM stream");
 					} else
-#endif           
+#endif
 					{
 						/* start new transaction now */
 						result=process_transaction(ud_stream, g_obj_buff, operation, transaction_id, src_ctx);
@@ -1314,11 +1314,11 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 		/* In NRTM mode there may be a saved object that is unprocessed */
 		if (nrtm->tr) { /*saved backlog?*/
 			/*XXX Do nothing with this backlog; next time we connect we will process it */
-#if 0   
+#if 0
 			/* restart the timer for statistics */
 			UT_timeget(&sotime);
 			object_process(nrtm->tr); /* delete the previous(saved) object*/
-			/*    result=report_transaction(nrtm->tr, &(ud_stream->log), nrtm->object_name, 
+			/*    result=report_transaction(nrtm->tr, &(ud_stream->log), nrtm->object_name,
 			 "NRTM:DEL:While deleting previous(saved) object"); */
 			/* create DEL serial record no matter what the result is */
 			UD_lock_serial(nrtm->tr);

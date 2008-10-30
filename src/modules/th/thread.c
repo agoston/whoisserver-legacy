@@ -1,12 +1,12 @@
 /* THIS MODULE IS OBSOLETE
- * 
+ *
  * There is pthread_rwlock support in libc, there is absolutely no need
  * to simulate those using pthread_mutex calls
- * 
+ *
  * for example on pthread_rwlock, see aa.c
- * 
+ *
  * agoston, 2008-01-22
- */ 
+ */
 
 /***************************************
   $Revision: 1.7 $
@@ -69,7 +69,7 @@ void TH_acquire_read_lock(rw_lock_t * prw_lock)
 
 	pthread_mutex_lock(&prw_lock->rw_mutex);
 
-	/* if we got an rw lock, we can get read lock as well */ 
+	/* if we got an rw lock, we can get read lock as well */
 	while ((prw_lock->rw_count > 0) && !pthread_equal(prw_lock->thread_id, thread_id)) {
 		pthread_cond_wait(&prw_lock->rw_cond, &prw_lock->rw_mutex);
 	}
@@ -208,7 +208,7 @@ void TH_acquire_write_lockw(rw_lock_t * prw_lock)
 void TH_release_write_lockw(rw_lock_t * prw_lock)
 {
 	pthread_mutex_lock(&prw_lock->rw_mutex);
-	
+
 	if (prw_lock->rw_count > 0)
 		prw_lock->rw_count--;
 
@@ -218,7 +218,7 @@ void TH_release_write_lockw(rw_lock_t * prw_lock)
 		pthread_cond_signal(&prw_lock->w_cond);
 		/* signal to other threads waiting for read lock */
 		pthread_cond_broadcast(&prw_lock->rw_cond);
-	}		
+	}
 
 	pthread_mutex_unlock(&prw_lock->rw_mutex);
 }
