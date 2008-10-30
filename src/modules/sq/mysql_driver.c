@@ -95,7 +95,18 @@ SQ_try_connection (SQ_connection_t **conn, const char *host,
     *conn = mysql_init(NULL);
     dieif(*conn == NULL);  /* XXX SK - need to call "out of memory handler" */
 
-    mysql_options(*conn, MYSQL_READ_DEFAULT_GROUP, "client");
+    if (mysql_options(*conn, MYSQL_READ_DEFAULT_GROUP, "client")) {
+        fprintf(stderr, "mysql_options failed: unknown option MYSQL_READ_DEFAULT_GROUP: %s\n", mysql_error(*conn));
+        die;
+    }
+
+    /* This is commented out for now, as it changes behavior, but would probably be useful at some point
+     * agoston, 2008-10-16 */
+//    my_bool my_true = 1;
+//    if (mysql_options(*conn, MYSQL_OPT_RECONNECT, &my_true)) {
+//        fprintf(stderr, "mysql_options failed: unknown option MYSQL_OPT_RECONNECT: %s\n", mysql_error(*conn));
+//        die;
+//    }
 
     res = mysql_real_connect(*conn, host, user, password, db, port, NULL, 0);
     if (res == NULL) {
@@ -131,13 +142,14 @@ SQ_try_connection (SQ_connection_t **conn, const char *host,
   +html+ </UL></DL>
 
   ++++++++++++++++++++++++++++++++++++++*/
-SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const char *db, const char *user, const char *password) {
+SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const char *db, const char *user,
+        const char *password) {
 
-  SQ_connection_t *sql_connection;
-  int res;
-  unsigned try = 0;
+    SQ_connection_t *sql_connection;
+    int res;
+    unsigned try = 0;
 
-  /* XXX MB.
+    /* XXX MB.
      This is really kludgy!
      For some (unknown yet) reason, sometimes the connection does not
      work the first time. So we try up to 3 times here, and give up only
@@ -147,39 +159,37 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
      like 3.23. The problem may or may not go away.
 
      SK - I added a sleep() to avoid crushing the poor server.
-  */
+     */
 
-  for (;;) {
-    /* try to connect */
-    res = SQ_try_connection(&sql_connection, host, port, db, user, password);
+    for (;;) {
+        /* try to connect */
+        res = SQ_try_connection(&sql_connection, host, port, db, user, password);
 
-    /* on success, return our result */
-    if (NOERR(res)) {
-        return sql_connection;
-    }
-    else {
+        /* on success, return our result */
+        if (NOERR(res)) {
+            return sql_connection;
+        } else {
 
-      /* if we've tried enough, exit with error */
-      if (try >= 3) {
-    	  fprintf(stderr, " %s; %s", db, sql_connection ? SQ_error(sql_connection) : "-?");
-    	  LG_log(sq_context, LG_SEVERE, " %s; %s", db, sql_connection ? SQ_error(sql_connection) : "-?");
-    	  die;
-      }
+            /* if we've tried enough, exit with error */
+            if (try >= 3) {
+                fprintf(stderr, " %s; %s", db, sql_connection ? SQ_error(sql_connection) : "-?");
+                LG_log(sq_context, LG_SEVERE, " %s; %s", db, sql_connection ? SQ_error(sql_connection) : "-?");
+                die;
+            }
 
-      /* otherwise, prepare to try again */
-      LG_log(sq_context, LG_ERROR, " %s; %s", db,
-		sql_connection ? SQ_error(sql_connection) : "-?");
+            /* otherwise, prepare to try again */
+            LG_log(sq_context, LG_ERROR, " %s; %s", db, sql_connection ? SQ_error(sql_connection) : "-?");
 
-      if (try > 0) {
-        sleep(try);
-      }
-      try++;
+            if (try > 0) {
+                sleep(try);
+            }
+            try++;
 
-      if( sql_connection ) {
-	SQ_close_connection(sql_connection);
-      }
-    }
-  }/* for(;;) */
+            if (sql_connection) {
+                SQ_close_connection(sql_connection);
+            }
+        }
+    }/* for(;;) */
 } /* SQ_get_connection() */
 
 /* SQ_execute_query() */
@@ -977,12 +987,12 @@ long sq_get_minmax_id(SQ_connection_t *sql_connection, char *id_name, char *tabl
 	else
 		minmax="min";
 
-	g_string_sprintf(query, "SELECT %s(%s) FROM %s ", minmax, id_name, table);
+	g_string_sprintf(query, "SELECT %s(%s) FROM %s", minmax, id_name, table);
 
 	sql_err = SQ_execute_query(sql_connection, query->str, &sql_result);
 
 	if (sql_err) {
-		LG_log(sq_context, LG_SEVERE, "%s[%s]\n", SQ_error(sql_connection), query->str);
+		LG_log(sq_context, LG_SEVERE, "%s[%s]", SQ_error(sql_connection), query->str);
 		die;
 	}
 
@@ -992,7 +1002,7 @@ long sq_get_minmax_id(SQ_connection_t *sql_connection, char *id_name, char *tabl
 		/* We must process all the rows of the result,*/
 		/* otherwise we'll have them as part of the next qry */
 		while ( (sql_row = SQ_row_next(sql_result)) != NULL) {
-			LG_log(sq_context, LG_SEVERE, "duplicate max [%s]\n", query->str);
+			LG_log(sq_context, LG_SEVERE, "duplicate max [%s]", query->str);
 			die;
 		}
 	} else
@@ -1121,9 +1131,13 @@ SQ_abort_query(SQ_connection_t *sql_connection)
   +html+ </UL></DL>
 
   ++++++++++++++++++++++++++++++++++++++*/
-int SQ_ping(SQ_connection_t *sql_connection)
-{
-	return(mysql_ping(sql_connection));
+int SQ_ping(SQ_connection_t **sql_connection) {
+	if (mysql_ping(*sql_connection)) {
+	    /* connection is down - reopen */
+	    SQ_connection_t *contemp = SQ_duplicate_connection(*sql_connection);
+	    SQ_close_connection(*sql_connection);
+	    *sql_connection = contemp;
+	}
 }
 
 /* SQ_escape_string() */
