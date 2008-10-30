@@ -11,11 +11,14 @@
 
 #include "SK.h"
 
+#define MEASURE_SEC 10
+
 int arg_port;
 char *arg_hostname;
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
-int numlines = 0;
+volatile int numlines = 0;
+volatile int qps = 0;
 FILE* infile;
 FILE* logfile;
 char* infilename;
@@ -49,6 +52,7 @@ void *startup(void *arg) {
             infile = fopen(infilename, "r");
         }
         numlines++;
+        qps++;
         if (numlines > 1000) {
             numlines -= 1000;
             fprintf(stderr, ".");
@@ -123,6 +127,14 @@ int main(int argc, char **argv) {
     }
 
     printf("Thread creation done. Each . represents 1000 queries. * means a connect() timeout, ! means a read() timeout.\nPress ctrl-c to exit.\n");
-    sleep(2147483647);
+
+    for (;;) {
+        sleep(MEASURE_SEC);
+        pthread_mutex_lock(&lock);
+        fprintf(stderr, " ===> %d q/s\n", qps / MEASURE_SEC);
+        qps = 0;
+        numlines = 0;
+        pthread_mutex_unlock(&lock);
+    }
     return 0;
 }
