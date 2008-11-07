@@ -49,12 +49,14 @@ whois_exited() {
 	true
 #	my_log "Stopping quagga."
 #	/etc/init.d/quagga stop
+#	sleep 10
 }
 
 whois_started() {
 	true
 #	my_log "Starting quagga."
 #	/etc/init.d/quagga start
+#	sleep 10
 }
 
 ##############################################################################################
@@ -191,15 +193,15 @@ start_server () {
 
 ##############################################################################################
 # Stops the whois-server
+# it's a bit complicated as we have to handle all kinds of misbehavior on whois-server's side
 stop_server() {
 	# Stop server using SIGTERM signal
 	if [ -f $PIDFILE ]; then
 		PID=`cat $PIDFILE`
 		if ps uxaw | awk '{if ($2 == '$PID') printf("%s\n", $13);}' | grep whois-server &>/dev/null; then
 			my_log "Stopping $SERVICE ..."
-			# first execute the event handler and wait a bit to let load balancing hardware route traffic elsewhere
+			# first execute the event handler
 			whois_exited
-			sleep 10
 			# then, signal whois-server that it should stop
 			kill $PID
 			# then let running threads finish their workloads
@@ -222,6 +224,12 @@ stop_server() {
 				fi
 				sleep 1
 			done
+			
+			# in case of a leftover/daemon whois process, kill it
+			if ps uxaw |  egrep "^dbase *$PID .*whois-server" &>/dev/null; then
+				my_log "whois-server ($PID) failed to stop graciously; sending KILL signal"
+				kill -9 $PID
+			fi
 		fi
 	else
 		my_log "$PIDFILE does not exist."
