@@ -2483,7 +2483,7 @@
         <sqlquery keytype="wk_rtrset" class="is">
                 <!-- the same as for route-set -->
           SELECT member_of.object_id,0
-          FROM  rtr_set, member_of, mbrs_by_ref
+          FROM   mbrs_by_ref, rtr_set, member_of
           LEFT OUTER JOIN mnt_by ON member_of.object_id = mnt_by.object_id
           WHERE (mbrs_by_ref.mnt_id = 0 OR mbrs_by_ref.mnt_id = mnt_by.mnt_id)
           AND member_of.set_id = mbrs_by_ref.object_id
