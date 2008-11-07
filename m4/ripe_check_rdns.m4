@@ -2,7 +2,8 @@ dnl
 dnl enable rdns features(requires Perl5)
 dnl
 AC_DEFUN(RIPE_CHECK_RDNS,[
-AC_PATH_PROGS(PERL5, perl perl5)
+dnl DO NOT reprobe perl5 here! it's set from the configure.ac! --jib
+dnl AC_PATH_PROGS(PERL5, perl perl5)
 AC_ARG_WITH(rdns,
     [  --with-rdns             use this to enable rdns extensions],
     [
