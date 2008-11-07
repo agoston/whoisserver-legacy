@@ -76,6 +76,14 @@ AC_ARG_WITH(logdir,
     fi
 )
 
+AC_ARG_WITH(perl,
+    AC_HELP_STRING([--with-perl=/path/to/perl], [Full path to perl. Defaults to path lookup)]),
+    if test "x$withval" != xyes; then
+        PERL5=$withval
+        echo "Using perl located in $PERL5"
+    fi
+)
+
 dnl Log infrastructure
 qrylog=${logdir}/qry
 dbuperr=${logdir}/dbuperr
