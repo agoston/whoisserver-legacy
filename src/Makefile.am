@@ -22,6 +22,8 @@ OPLMAKE = $(MAKE) LDDLFLAGS=" -shared $(OPLLDLOADLIBS)" LDFLAGS="$(OPLLDLOADLIBS
 
 SUBDIRS = defs
 
+PROVE = `dirname $(PERL5)`/prove
+
 if BUILDRDNS
 LIBNS = libns.a
 else

@@ -1,5 +1,6 @@
 SUBDIRS = src
 AUTOMAKE_OPTIONS = subdir-objects
+PROVE = `dirname $(PERL5)`/prove
 EXTRA_DIST = README \
 	     README.MODULES \
 	     README.freebsd \
