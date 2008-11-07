@@ -1,0 +1,23 @@
+* make the perl we compile with an optional argument
+* on 64bit + mysql5 these 2 tests were failing: asn32/inet-rtr/003 asn32/inet-rtr/005
+  Turns out the error is a mysql error: Unknown column 'member_of.object_id' in 'on clause'
+  This can be reproduced using the query:
+  'SELECT member_of.object_id,0 FROM rtr_set, member_of, mbrs_by_ref LEFT OUTER JOIN mnt_by ON member_of.object_id = mnt_by.object_id'
+  Changing the order in the 'FROM' clause fixes the issue. It's unclear to me at this point WHY, but it
+  does. Chalk on up to 'Amazing MySQL features(tm)'
+* XXX since it's unclear whihc of the 2 attributes.xml files is authoritative, i've modifed both. As a side
+  effect, QI_queries.def also seems modified so it appears to be generated, even though it's a checked in file.
+  Should this no longer be checked in?
+* detect Net::DelCheck availability, it's vital for RDNS tests
+* XXX RDNS tests should probably complain LOUDLY for missing Net::DelCheck, see: BugzID: 675 
+* remove the freebsd compatibility for pthread detection. just look through the libpaths now for it
+* add the -D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS flags to CLFAGS. these were 'accidentally'
+  added via the rdns m4 macro, but prove to be crucial to building the whoisserver. if you build without
+  a threaded perl, you will not get these flags and then whoisserver can't build
+* make gcc be verbose if we add the verbose flag to install.pl
+* copy the module::build and eu::mm settings from wp1 to pass perl options down
+* RDNS macro was re-probing perl5, this is BAAAAAAAAAAAAAAD. It's now set from configure.ac
+  and this macro should adhere to it.
+* allow dbpass to be set properly via --dbpass
+* check inodes to see if our source is identical to our install destination
+* pre-empt the use of prove, and illustrate that any perl program should be invoked with $(PERL5)
