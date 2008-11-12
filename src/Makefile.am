@@ -157,7 +157,9 @@ loader_SOURCES = loader_src/loader.c
 loader_LDADD = $(LDRIP)
 
 getvar_SOURCES = getvar_src/getvar.c
-getvar_LDADD = $(LDRIPNOMYSQL)
+# FIXME: this should be LDRIPNOMYSQL, but we have compilation problems on the old whois boxes
+#getvar_LDADD = $(LDRIPNOMYSQL)
+getvar_LDADD = $(LDRIP)
 
 #archive_SOURCES = history/miniconf.c history/aconf.c history/archive.c history/dbsupport.c
 #archive_LDADD = $(LDHISTORY)
@@ -177,7 +179,9 @@ getvar_LDADD = $(LDRIPNOMYSQL)
 ripupdate_SOURCES = ripupdate_src/ripupdate.c
 
 mr_SOURCES = mr_src/mr.c
-mr_LDADD = $(LDRIPNOMYSQL)
+# FIXME: this should be LDRIPNOMYSQL, but we have compilation problems on the old whois boxes
+#mr_LDADD = $(LDRIPNOMYSQL)
+mr_LDADD = $(LDRIP)
 
 text_export_SOURCES = text_export_src/text_export.c
 text_export_LDADD = $(LDRIP)
