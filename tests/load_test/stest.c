@@ -22,7 +22,7 @@
 
 #include "SK.h"
 
-#define BUF_SIZE 1048576
+#define BUF_SIZE 1048576*4
 #define STACK_SIZE (1048576+2*BUF_SIZE)
 
 int arg_port1, arg_port2;
@@ -34,16 +34,16 @@ FILE* infile;
 FILE* logfile;
 char* infilename;
 
-void log_to_file(char *reason, char *actwork = NULL) {
+void log_to_file(char *reason, char *actwork = "") {
     pthread_mutex_lock(&log_lock);
-    fprintf(logfile, "%s: %s", reason, actwork ? actwork : "");
+    fprintf(logfile, "%s: %s", reason, actwork);
     fflush(logfile);
     pthread_mutex_unlock(&log_lock);
 }
 
-void log_to_file(char *hostname, int port, char *reason, char *actwork = NULL) {
+void log_to_file(char *hostname, int port, char *reason, char *actwork = "") {
     pthread_mutex_lock(&log_lock);
-    fprintf(logfile, "[%s:%d] %s: %s", hostname, port, reason, actwork ? actwork : "");
+    fprintf(logfile, "[%s:%d] %s: %s", hostname, port, reason, actwork);
     fflush(logfile);
     pthread_mutex_unlock(&log_lock);
 }
@@ -80,12 +80,39 @@ int read_buf(int sock, char *buf, int &p) {
     return ret;
 }
 
+char *skip_initial_comment(char *buf, int len) {
+    char *p, *ret = buf;
+
+    // ignore the first lines up to the first object
+    while ((*ret < 'a') || (*ret > 'z')) {
+        p = strchr(ret, '\n');
+        if (p && p[1]) { // if newline found & next character is not 0
+            ret = p+1;
+        } else {
+            // we'll return a pointer to the end of the buffer
+            return buf+len;
+        }
+    }
+
+    return ret;
+}
+
+int compare_buf(char *buf1, int len1, char *buf2, int len2) {
+    // ignore the first comment lines
+    char *b1 = skip_initial_comment(buf1, len1);
+    char *b2 = skip_initial_comment(buf2, len2);
+
+    // compare results
+    //fprintf(stderr, "##################################### >>> %s\n >>> %s\n", b1, b2);
+    return strcmp(b1, b2);
+}
+
 void *startup(void *arg) {
     int sock1, sock2;
     size_t len, linelen;
     char *line = NULL;
-    char buf1[BUF_SIZE];
-    char buf2[BUF_SIZE];
+    char buf1[BUF_SIZE+1];
+    char buf2[BUF_SIZE+1];
     int p1, p2;
     fd_set rset;
     struct timeval ptm;
@@ -149,9 +176,15 @@ void *startup(void *arg) {
             }
         }
 
+        // zero-terminate buffers
+        buf1[p1] = 0;
+        buf2[p2] = 0;
+
         /* Compare results */
-        if ((p1 != p2) || memcmp(buf1, buf2, p1)) {
+        if (compare_buf(buf1, p1, buf2, p2)) {
             log_to_file("results differ", line);
+            log_to_file("result1", buf1);
+            log_to_file("result2", buf2);
             fprintf(stderr, "#");
             fflush(stderr);
         }
@@ -183,7 +216,7 @@ int main(int argc, char **argv) {
     arg_port1 = strtol(argv[4], NULL, 10);
     arg_hostname2 = argv[5];
     arg_port2 = strtol(argv[6], NULL, 10);
-    logfile = fopen("load_test.log", "w+");
+    logfile = fopen("stest.log", "w+");
 
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
