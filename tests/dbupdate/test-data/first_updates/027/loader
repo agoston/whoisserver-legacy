@@ -12,6 +12,7 @@ person:       test person
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP1-DB-TEST
+mnt-by:       TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 

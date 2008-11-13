@@ -16,6 +16,7 @@ e-mail:       bitbucket@ripe.net
 org:          ORG-TEST1-DB-TEST
 fax-no:       +0123456789
 nic-hdl:      TP1-DB-TEST
+mnt-by:       TEST-DBM-MNT
 remarks:      ZOH
 notify:       bitbucket@ripe.net
 abuse-mailbox: bitbucket@ripe.net
