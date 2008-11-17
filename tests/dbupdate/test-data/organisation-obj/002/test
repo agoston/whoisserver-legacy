@@ -11,6 +11,8 @@
 # RESULT 2: The creations will succeed
 
 
+password: test-person
+
 organisation:  AUTO-1
 org-name:      EXAMPLE TTTTTT
 org-type:      OTHER
@@ -29,5 +31,6 @@ address:       Address
 phone:         +34
 nic-hdl:       AUTO-2
 org:           AUTO-1
+mnt-by:        PERSON-MNT
 changed:       engin@ripe.net 20030102
 source:        DB-TEST

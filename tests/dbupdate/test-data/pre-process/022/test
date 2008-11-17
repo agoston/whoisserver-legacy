@@ -11,10 +11,13 @@
 # RESULT 22: The creation will fail
 
 
+password: test-person
+
 person:       test person2
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP2-fred
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 

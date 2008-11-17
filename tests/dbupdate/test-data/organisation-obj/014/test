@@ -8,10 +8,13 @@
 #
 # RESULT 14: The modification will fail
 
+password: test-person
+
 person:       test person
 org:          ORG-EOOF1-DB-TEST
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP1-DB-TEST
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST

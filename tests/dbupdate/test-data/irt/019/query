@@ -35,6 +35,7 @@ person:       test person2
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP2-DB-TEST
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
@@ -42,6 +43,7 @@ person:       test person
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP1-DB-TEST
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
