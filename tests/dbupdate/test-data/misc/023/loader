@@ -87,43 +87,17 @@ source:       DB-TEST
 
 %  Additional objects required for this test
 
-mntner:       LIR-MNT
-descr:        Test maintainer for LIR
+% person maintainer
+
+mntner:       PERSON-MNT
+descr:        Mntner for person objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
+auth:         MD5-PW $1$NsvagbHL$tY49rj3wFgWpsbSySQBEc/   # test-person
 upd-to:       dbtest@ripe.net
-mnt-nfy:      dbtest@ripe.net
-auth:         MD5-PW $1$12345678$ctXe/33SiImj97lXBf4Mw0   # LIR
-notify:       dbtest@ripe.net
-mnt-by:       LIR-MNT
-referral-by:  TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101 
-source:       DB-TEST
-
-
-mntner:       END-USER-MNT
-descr:        Test maintainer for end user
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-upd-to:       dbtest@ripe.net
-mnt-nfy:      dbtest@ripe.net
-auth:         MD5-PW $1$12345678$mvVg2qg9mfB9tlQoFo2W//   # END-USER
-notify:       dbtest@ripe.net
-mnt-by:       END-USER-MNT
-referral-by:  TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101 
-source:       DB-TEST
-
-inetnum:      192.168.128.0 - 192.168.255.255
-netname:      TEST-NET-NAME
-descr:        TEST network
-country:      NL
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-status:       ALLOCATED PA
-mnt-by:       RIPE-NCC-HM-MNT
-mnt-lower:    LIR-MNT
-changed:      dbtest@ripe.net 20020101
+mnt-by:       PERSON-MNT
+referral-by:  PERSON-MNT
+changed:      dbtest@ripe.net 20081113
 source:       DB-TEST
 
 % End of loader data file

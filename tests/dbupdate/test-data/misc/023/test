@@ -8,6 +8,8 @@
 #
 # RESULT 23: The creation will fail
 
+password: test-person
+
 role:           Test Role
 address:        Left of the middle of nowhere
 phone:          +1 2 234 5678
@@ -16,5 +18,6 @@ e-mail:         dbtest@ripe.net
 admin-c:        NAN1-RIPE
 tech-c:         NAN1-RIPE
 nic-hdl:        TR123-RIPE
+mnt-by:         PERSON-MNT
 changed:        dbtest@ripe.net 20050819
-source:       DB-TEST
+source:         DB-TEST
