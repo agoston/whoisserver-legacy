@@ -12,11 +12,14 @@
 #            successful creations, modify and deletion and no forward message.
 
 
+password: test-person
+
 person:  Test Person10
 address: Singel 258
 address: Amsterdam
 phone:   +31 20 535 4444
 nic-hdl: TP10-DB-TEST
+mnt-by:  PERSON-MNT
 changed: dbtest@ripe.net 20020101
 notify:  case015-1@ripe.net
 source:  DB-TEST
@@ -26,6 +29,7 @@ address: Singel 258
 address: Amsterdam
 phone:   +31 20 535 4444
 nic-hdl: TP11-DB-TEST
+mnt-by:  PERSON-MNT
 changed: dbtest@ripe.net 20020101
 notify:  case015-2@ripe.net
 source:  DB-TEST
@@ -35,6 +39,7 @@ address: Singel 258
 address: Amsterdam
 phone:   +31 20 535 4444
 nic-hdl: TP12-DB-TEST
+mnt-by:  PERSON-MNT
 changed: dbtest@ripe.net 20020101
 notify:  case015-1@ripe.net
 source:  DB-TEST
@@ -45,6 +50,7 @@ address: Singel 258
 address: Amsterdam
 phone:   +31 20 535 4444
 nic-hdl: TP13-DB-TEST
+mnt-by:  PERSON-MNT
 changed: dbtest@ripe.net 20020101
 notify:  case015-1@ripe.net
 source:  DB-TEST
