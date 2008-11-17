@@ -5,9 +5,9 @@
 #
 # modify person object 
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 7: The modify will succeed
+# RESULT 7: The modify will fail
 
 
 password:  test

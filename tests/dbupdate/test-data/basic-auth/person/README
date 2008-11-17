@@ -74,20 +74,9 @@
 #
 # modify person object 
 #
-#SUCCESS
-#
-# RESULT 7: The modify will succeed
-
-
-# CASE 8: Modify a person object with a mnt-by
-#         and remove the mnt-by with wrong password
-%
-#
-# modify person object 
-#
 #FAILURE
 #
-# RESULT 8: The modify will fail
+# RESULT 7: The modify will fail
 
 
 # CASE 9: Create a person object
