@@ -32,7 +32,8 @@ person:         test person2
 address:        Singel
 phone:          +0123456789
 nic-hdl:        TP2-DB-TEST
-e-mail:		dbtest@ripe.net
+mnt-by:         PERSON-MNT
+e-mail:	        dbtest@ripe.net
 changed:        dbtest@ripe.net 20020101
 source:         DB-TEST
 
