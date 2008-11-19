@@ -15,4 +15,5 @@ address : here
 phone:   +1
 changed: dbtest@ripe.net
 nic-hdl: TP2-DB-TEST
+mnt-by:  PERSON-MNT
 source:  db-test

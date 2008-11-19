@@ -8,9 +8,12 @@
 # RESULT 21: syntax error in nic-hdl: attribute
 
 
+password: test-person
+
 person:       Test Person2
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TPýŸ2-DB-TEST
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST

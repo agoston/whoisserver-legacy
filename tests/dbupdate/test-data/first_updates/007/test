@@ -8,9 +8,12 @@
 # RESULT 7: Syntax error  reported
 
 
+password: test-person
+
 person:  test person2
 address: here
 phone:   123
 changed: dbtest@ripe.net
 nic-hdl: TP2-DB-TEST
+mnt-by:       PERSON-MNT
 source:  db-test

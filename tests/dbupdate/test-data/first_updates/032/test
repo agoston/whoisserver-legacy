@@ -20,11 +20,14 @@ $DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -m -f
 From: dbtest@ripe.net
 
 
+password: test-person
+
 person:  test person4
 address: here
 phone:   +0123456789
 changed: dbtest@ripe.net 
 nic-hdl: TP4-DB-TEST
+mnt-by:  PERSON-MNT
 source:  db-test
 
 person:  test person2
@@ -32,6 +35,7 @@ address: here
 phone:   +0123456789
 changed: dbtest@ripe.net 20030101
 nic-hdl: TP2-DB-TEST
+mnt-by:  PERSON-MNT
 source:  db-test
 
 person:  test person3
@@ -39,4 +43,5 @@ address: here
 phone:   
 changed: dbtest@ripe.net
 nic-hdl: TP3-DB-TEST
+mnt-by:  PERSON-MNT
 source:  db-test

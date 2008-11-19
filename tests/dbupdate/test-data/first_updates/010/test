@@ -8,9 +8,12 @@
 # RESULT 10: source in object not recognised  reported
 
 
+password: test-person
+
 person:  test person2
 address: here
 phone:   +0123456789
 changed: dbtest@ripe.net
 nic-hdl: TP2-DB-TEST
+mnt-by:       PERSON-MNT
 source:  fred
