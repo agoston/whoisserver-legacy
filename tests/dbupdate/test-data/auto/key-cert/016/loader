@@ -90,6 +90,19 @@ source:       DB-TEST
 %  Additional objects required for this test
 
 
+% person maintainer
+
+mntner:       PERSON-MNT
+descr:        Mntner for person objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         MD5-PW $1$NsvagbHL$tY49rj3wFgWpsbSySQBEc/   # test-person
+upd-to:       dbtest@ripe.net
+mnt-by:       PERSON-MNT
+referral-by:  PERSON-MNT
+changed:      dbtest@ripe.net 20081113
+source:       DB-TEST
+
 % create maintainer for successful authorisation
 
 mntner:  TEST-MNT

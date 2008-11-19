@@ -49,7 +49,7 @@ person:       Test Person2
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP2-DB-TEST
-mnt-by:       TEST-DBM-MNT
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 
