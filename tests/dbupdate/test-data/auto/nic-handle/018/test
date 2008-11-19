@@ -10,11 +10,14 @@
 # RESULT 18: The role creation will fail
 
 
+password: test-person
+
 role:         Test Role
 address:      Singel
 e-mail:       dbtest@ripe.net
 admin-c:      AUTO-1
 tech-c:       TP1-DB-TEST
 nic-hdl:      AUTO-1
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
