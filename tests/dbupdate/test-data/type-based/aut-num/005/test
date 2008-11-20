@@ -10,6 +10,9 @@
 # RESULT 5: 
 #           see bug 252 for this.
 #           bug is fixed so it succeeds!
+#
+# Cannot find a bug 252 in Bugzilla!!!
+# So don't know what was fixed.
 
 
 aut-num:      AS123
