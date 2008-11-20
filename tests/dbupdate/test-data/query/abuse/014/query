@@ -28,6 +28,7 @@ person:         test person
 address:        Singel
 phone:          +0123456789
 nic-hdl:        TP1-DB-TEST
+mnt-by:         TEST-DBM-MNT
 source:         DB-TEST
 
 % Information related to '80.16.151.184 - 80.16.151.191'
@@ -47,6 +48,7 @@ person:         test person
 address:        Singel
 phone:          +0123456789
 nic-hdl:        TP2-DB-TEST
+mnt-by:         PERSON-MNT
 abuse-mailbox:  dbtest-person1@ripe.net
 abuse-mailbox:  dbtest-person2@ripe.net
 source:         DB-TEST
