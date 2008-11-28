@@ -30,6 +30,16 @@
 #include "syntax_api.h"
 #include "up_util.h"
 
+typedef struct {
+  char *nic;
+  char *mntner;
+} nic_info_t;
+
+typedef struct {
+  GList **nic_list;
+  GList **nic_mnt_list;
+} nic_list_info_t;
+
 
 /* function prototypes */
 
@@ -67,6 +77,12 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                         rpsl_object_t *preproc_obj, int *inetnum_key_converted);
 
 int up_is_inetnum_cidr(rpsl_object_t *object);
+
+int UP_check_filter_set_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                             rpsl_object_t *preproc_obj);
+
+int UP_check_peering_set_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                             rpsl_object_t *preproc_obj);
 
 int UP_check_org_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              rpsl_object_t *preproc_obj);
