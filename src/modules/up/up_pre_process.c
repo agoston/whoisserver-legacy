@@ -613,6 +613,7 @@ int up_report_unmaintained(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   int retval = UP_OK; 
   char *key;
   char *mntner;
+  const char *type = NULL;
   GList *item;
   GList *mb = NULL;
   rpsl_object_t *object = NULL;
@@ -632,16 +633,17 @@ int up_report_unmaintained(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
          ! (mb = rpsl_object_get_attr(object, "mnt-by")) )
     {
       /* this person/role object is not maintained */
+      type = rpsl_object_get_class(object);
       if ( mntner && strcmp(mntner,"")  )
       {
         LG_log(lg_ctx, LG_DEBUG,"up_report_unmaintained: [%s] referenced in mntner [%s] is not maintained", 
                                     key, mntner);
-        RT_unmaintained_person_in_mntner(rt_ctx, key, mntner);
+        RT_unmaintained_person_in_mntner(rt_ctx, key, type, mntner);
       }
       else
       {
         LG_log(lg_ctx, LG_DEBUG,"up_report_unmaintained: [%s] is not maintained", key);
-        RT_unmaintained_person(rt_ctx, key);
+        RT_unmaintained_person(rt_ctx, key, type);
       }
       /* uncomment next line if this becomes an error instead of a warning
          and change RT_unmaintained* function text */

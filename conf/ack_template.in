@@ -415,13 +415,13 @@ Refered object <xsl:value-of select="refered_object/text()"/> exists.
 
   <xsl:template match="unmaintained_person">
 <xsl:if test="$level_notice>$level">
-***Warning: Un-maintained person object referenced ['<xsl:value-of select="key/text()"/>'].
+***Warning: Un-maintained <xsl:value-of select="type/text()"/> object referenced ['<xsl:value-of select="key/text()"/>'].
 </xsl:if>
 </xsl:template>
 
   <xsl:template match="unmaintained_person_in_mntner">
 <xsl:if test="$level_notice>$level">
-***Warning: Un-maintained person object referenced ['<xsl:value-of select="key/text()"/>'] in mntner ['<xsl:value-of select="mntner/text()"/>'].
+***Warning: Un-maintained <xsl:value-of select="type/text()"/> object referenced ['<xsl:value-of select="key/text()"/>'] in mntner ['<xsl:value-of select="mntner/text()"/>'].
 </xsl:if>
 </xsl:template>
 
