@@ -234,16 +234,16 @@ if( $SetupConfig or $All ) {
         [ q[^SVWHOIS_PORT .*]     => q[SVWHOIS_PORT ]  . ($DbPort+1) ],
         [ q[^SVCONFIG_PORT .*]    => q[SVCONFIG_PORT ] . ($DbPort+2) ],
         [ q[^SVMIRROR_PORT .*]    => q[SVMIRROR_PORT ] . ($DbPort+3) ],
-        [ q[^UPDSOURCE .*]        => q[UPDSOURCE DB-TEST localhost,3306,$DbUser,].
+        [ q[^UPDSOURCE .*]        => qq[UPDSOURCE DB-TEST localhost,3306,$DbUser,].
                                      qq[$DbPass,$DbName localhost,] .
                                      ($DbPort+1).q[,].($DbPort+4) ],
     
         ### access to the ripadmin db
-        [ q[^RIPADMIN.*]          => q[RIPADMIN localhost,3306,$DbUser,] .
+        [ q[^RIPADMIN.*]          => qq[RIPADMIN localhost,3306,$DbUser,] .
                                      qq[$DbPass,$DbName]   ], 
         
         ### path to the config file
-        [ q[^SOURCEFILE .*]       => q[SOURCEFILE $DbPrefix/conf/sources.config] ],
+        [ q[^SOURCEFILE .*]       => qq[SOURCEFILE $DbPrefix/conf/sources.config] ],
                                      
         ### rdns suffix change
         [ q[^NS_SUFFIX\s*ip6.int] => q[NS_SUFFIX e164.arpa] ],
@@ -316,7 +316,12 @@ if( $Install or $All ) {
         _system('make');
         ### XXX accept failing tests for now, see FB 463
         _system('make test', 1) unless $SkipTest;    
+
         ### XXX this needs to be 'all-install' in wp1
+        ### install the RPSL perl bindings into our project dir
+        {   local $ENV{'PERL_MM_OPT'} = "PREFIX=$DbPrefix/perl";
+             _system('cd src; make opl-perl-test && make opl-perl-install;');
+        }
         _system('make install');
         
         ### throw away the rc file again
@@ -330,13 +335,18 @@ if( $Install or $All ) {
     _system( qq[mkdir -p $DbPrefix/bin/SQL] );
     _system( qq[cp -R src/SQL/* $DbPrefix/bin/SQL] );
 
-    print qq[
+    {   ### XXX not pretty :(
+        my ($lib) = `$^X -MConfig -le'print \$Config{sitelib}'`;
+        chomp $lib;
+        $lib =~ s/^.*?(perl)/$1/;
+
+        print qq[
 You can now use the Net::Whois::RIPE::RPSL, and all the other RIPE::* modules using:
 
-   $^X -I $DbPrefix/perl/lib/perl5 -MYour::Module::Here -e'...'
+   $^X -I $DbPrefix/$lib -MYour::Module::Here -e'...'
 
-   \n];
-
+        \n];
+    }
 }
 
 if( $UseTempDir ) {
