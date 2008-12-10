@@ -129,9 +129,14 @@ int main(int argc, char **argv) {
     printf("Thread creation done. Each . represents 1000 queries. * means a connect() timeout, ! means a read() timeout.\nPress ctrl-c to exit.\n");
 
     for (;;) {
+        time_t t = time(NULL);
+        char t_buf[32];
+
         sleep(MEASURE_SEC);
         pthread_mutex_lock(&lock);
-        fprintf(stderr, " ===> %d q/s\n", qps / MEASURE_SEC);
+        ctime_r(&t, t_buf);
+        t_buf[strlen(t_buf) - 1] = 0; // remove trailing newline
+        fprintf(stderr, " ===> %d q/s\n%s: ", qps / MEASURE_SEC, t_buf);
         qps = 0;
         numlines = 0;
         pthread_mutex_unlock(&lock);
