@@ -19,12 +19,8 @@ INT            [0-9]+
 IPV4           {INT}(\.{INT}){3}
 RTRSNAME       RTRS-[A-Z0-9_-]*[A-Z0-9]
 DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
-ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
-ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
-ASNO           {ASNO32}|{ASNO16}
-ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
-ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
-
+ASNO           AS[0-9]+
+ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 
 %{
 #include <string.h>
@@ -43,8 +39,20 @@ void yy_input(char *buf, int *result, int max_size);
 
 [ \t\n]+    { ; }
 
-{ASNOMIX} {
-    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
+{ASNO} {
+  char *p, *s;
+  p = yytext;
+  long long int val;
+  val = strtoll(p+2, &s, 10);
+  if (*s) {
+    syntax_error("AS number invalid");
+  }
+  
+  if (val < 0 || val >= 4294967296) {
+    syntax_error ("AS number not within boundaries");
+  }
+
+  return TKN_ASNO; 
 }
 
 (({ASNO}|peeras|{RTRSNAME}):)*{RTRSNAME}(:({ASNO}|peeras|{RTRSNAME}))* {
