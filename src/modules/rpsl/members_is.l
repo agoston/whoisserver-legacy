@@ -19,7 +19,8 @@ INT            [0-9]+
 IPV4           {INT}(\.{INT}){3}
 RTRSNAME       RTRS-[A-Z0-9_-]*[A-Z0-9]
 DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
-ASNO           AS[0-9]+
+ASNODOT        [^ ]*AS[0-9]+\.[0-9]+[^ ]*
+ASNO           AS(0|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5])
 ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 
 %{
@@ -39,20 +40,12 @@ void yy_input(char *buf, int *result, int max_size);
 
 [ \t\n]+    { ; }
 
-{ASNO} {
-  char *p, *s;
-  p = yytext;
-  long long int val;
-  val = strtoll(p+2, &s, 10);
-  if (*s) {
-    syntax_error("AS number invalid");
-  }
-  
-  if (val < 0 || val >= 4294967296) {
-    syntax_error ("AS number not within boundaries");
-  }
+{ASNODOT} {
+     syntax_error("The RIPE Database represents AS numbers in \'ASn\' notation");
+}
 
-  return TKN_ASNO; 
+{ASNO} {
+    return TKN_ASNO;
 }
 
 (({ASNO}|peeras|{RTRSNAME}):)*{RTRSNAME}(:({ASNO}|peeras|{RTRSNAME}))* {

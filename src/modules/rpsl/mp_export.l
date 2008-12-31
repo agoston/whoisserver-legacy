@@ -38,12 +38,8 @@ AFIVALUE_V4    IPV4|IPV4\.UNICAST|IPV4\.MULTICAST
 AFIVALUE_V6    IPV6|IPV6\.UNICAST|IPV6\.MULTICAST
 AFIVALUE_ANY   ANY\.UNICAST|ANY\.MULTICAST
 DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
-ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
-ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
-ASNO           {ASNO32}|{ASNO16}
-ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
-ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
-
+ASNODOT        [^ ]*AS[0-9]+\.[0-9]+[^ ]*
+ASNO           AS(0|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5])
 
 %{
 #include <string.h>
@@ -149,8 +145,8 @@ COST        { return TKN_COST; }
 \~?\{INT,\}     { return ASPATH_POSTFIX; }
 
 
-{ASNOMIX} { 
-    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
+{ASNODOT} { 
+    syntax_error("The RIPE Database represents AS numbers in \'ASn\' notation");
 }
 {ASNO} {
     return TKN_ASNO;
