@@ -532,6 +532,7 @@ void PM_interact(int sock) {
 	LG_log(pm_context, LG_DEBUG, "[%s] -- input parsed: %s:%d:%ld-%ld", hostaddress, nrtm_q.source, nrtm_q.version,
 	        nrtm_q.first, nrtm_q.last);
 
+	/* check if source exists */
 	source_hdl = ca_get_SourceHandleByName(nrtm_q.source);
 	if (source_hdl == NULL) {
 		LG_log(pm_context, LG_DEBUG, "[%s] --  Unknown source %s", hostaddress, nrtm_q.source);
@@ -541,6 +542,16 @@ void PM_interact(int sock) {
 		UT_free(nrtm_q.source);
 		return;
 	}
+
+	/* check if source has NRTM defined */
+    if (!(source_hdl->nrtm.host[0])) {
+        LG_log(pm_context, LG_DEBUG, "[%s] --  No NRTM defined for source %s", hostaddress, nrtm_q.source);
+        sprintf(buff, "\n%%ERROR:403: No NRTM defined for source %s\n\n\n", nrtm_q.source);
+        SK_cd_puts(&condat, buff);
+        UT_free(hostaddress);
+        UT_free(nrtm_q.source);
+        return;
+    }
 
 	/* check if the client is authorized to mirror */
 	SK_getpeerip(sock, &address);
