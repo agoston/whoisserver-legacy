@@ -286,21 +286,23 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
  *  returned GString should be freed by the caller           *
  *************************************************************/
 GString *PM_get_nrtm_sources(ip_addr_t *client_address, char *source) {
-	GString *gbuff=g_string_sized_new(STR_L);
-	int nsource;
-	ca_dbSource_t *source_hdl;
+    GString *gbuff=g_string_sized_new(STR_L);
+    int nsource;
+    ca_dbSource_t *source_hdl;
 
-	if (source) {
-		source_hdl = ca_get_SourceHandleByName(source);
-		if (source_hdl)
-			pm_get_source_info(gbuff, client_address, source, source_hdl);
-	} else
-		for (nsource=0; (source_hdl = ca_get_SourceHandleByPosition(nsource))!=NULL; nsource++) {
-			source=ca_get_srcname(source_hdl);
-			pm_get_source_info(gbuff, client_address, source, source_hdl);
-			UT_free(source);
-		}
-	/* one extra line, another one will be put bt PW or PM */
-	g_string_sprintfa(gbuff, "\n");
-	return (gbuff);
+    if (source) {
+        source_hdl = ca_get_SourceHandleByName(source);
+        if (source_hdl && source_hdl->nrtm.host[0])
+            pm_get_source_info(gbuff, client_address, source, source_hdl);
+    } else
+        for (nsource=0; (source_hdl = ca_get_SourceHandleByPosition(nsource))!=NULL; nsource++) {
+            if (source_hdl->nrtm.host[0]) {
+                source=ca_get_srcname(source_hdl);
+                pm_get_source_info(gbuff, client_address, source, source_hdl);
+                UT_free(source);
+            }
+        }
+    /* one extra line, another one will be put bt PW or PM */
+    g_string_sprintfa(gbuff, "\n");
+    return (gbuff);
 }
