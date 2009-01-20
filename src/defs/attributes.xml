@@ -1883,7 +1883,8 @@
   Internet Assigned Numbers Authority, 'RIR' for Regional Internet
   Registries, 'NIR' for National Internet Registries, 'LIR' for Local
   Internet Registries, WHITEPAGES for special links to industry people, 
-  and 'OTHER' for all other organisations.
+  DIRECT_ASSIGNMENT for direct contract with RIPE NCC and 'OTHER' for all 
+  other organisations.
     </description>
     <syntax>org-type</syntax>
   </ripe_attribute>

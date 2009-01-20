@@ -585,7 +585,7 @@ $Id: syntax.xml,v 1.35 2007/02/21 15:47:00 agoston Exp $
    <attribute_syntax name="org-type">
        <front_end>
            <regex>
-           ^(IANA|RIR|NIR|LIR|WHITEPAGES|OTHER)$
+           ^(IANA|RIR|NIR|LIR|WHITEPAGES|DIRECT_ASSIGNMENT|OTHER)$
            </regex>
        </front_end>
        <description>
@@ -596,6 +596,7 @@ $Id: syntax.xml,v 1.35 2007/02/21 15:47:00 agoston Exp $
      o NIR (There are no NIRs in the RIPE NCC service region.)
      o LIR
      o WHITEPAGES
+     o DIRECT_ASSIGNMENT
      o OTHER
        </description>
    </attribute_syntax>
