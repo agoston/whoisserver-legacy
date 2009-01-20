@@ -292,15 +292,13 @@ GString *PM_get_nrtm_sources(ip_addr_t *client_address, char *source) {
 
     if (source) {
         source_hdl = ca_get_SourceHandleByName(source);
-        if (source_hdl && source_hdl->nrtm.host[0])
+        if (source_hdl)
             pm_get_source_info(gbuff, client_address, source, source_hdl);
     } else
         for (nsource=0; (source_hdl = ca_get_SourceHandleByPosition(nsource))!=NULL; nsource++) {
-            if (source_hdl->nrtm.host[0]) {
-                source=ca_get_srcname(source_hdl);
-                pm_get_source_info(gbuff, client_address, source, source_hdl);
-                UT_free(source);
-            }
+            source=ca_get_srcname(source_hdl);
+            pm_get_source_info(gbuff, client_address, source, source_hdl);
+            UT_free(source);
         }
     /* one extra line, another one will be put bt PW or PM */
     g_string_sprintfa(gbuff, "\n");
