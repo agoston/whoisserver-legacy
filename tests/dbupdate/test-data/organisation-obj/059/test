@@ -1,0 +1,28 @@
+# organisation object tests
+# CASE 59: Create an org object
+#          with "org-type: DIRECT_ASSIGNMENT" with
+#          a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#          variable.
+#
+# make sure that TEST-DBM-MNT is in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 57: The creation will succeed
+
+
+organisation:  AUTO-1PAGE
+org-name:      EXAMPLE organisation object for tests
+org-type:      DIRECT_ASSIGNMENT
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+
+password: test-dbm
