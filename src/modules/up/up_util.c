@@ -436,10 +436,7 @@ int up_remove_parent(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 char *up_clean_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char **object_str)
 {
-  int retval = 0;
   char *retstr = NULL;
-  const char *type = NULL;
-  char *value = NULL;
   rpsl_object_t *object = NULL;
   GString *mess;
 
@@ -1392,15 +1389,10 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx, optio
         char *ripupd_result, char *assigned_key) {
     int retval = UP_OK;
     int err = 0;
-    int line_idx;
     int connect_err = 0;
-    char *pos = NULL;
-    char *error_str = NULL;
-    char **temp = NULL;
-    char *temp_str = NULL;
-    GString *mess;
     gchar **split_res;
     int split_num = 0;
+    gchar *split_p, *split_p2;     // for pointing inside split_res[]
 
     LG_log(lg_ctx, LG_FUNC, ">up_interpret_ripudb_result: entered, ripupd_result [%s]", ripupd_result);
 
@@ -1416,7 +1408,7 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx, optio
     } else if (err) {
 
         /* split string into something sensible & count the tokens */
-        split_res = g_strsplit_set(ripupd_result, "[]:\"", 0);
+        split_res = g_strsplit_set(ripupd_result, "[]", 0);
         while (split_res[split_num])
             split_num++;
 
@@ -1440,7 +1432,8 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx, optio
                     snprintf(temp_str, 1024, "***Error: Unknown object referenced");
                 } else if (strstr(ripupd_result, "reference cannot be resolved") != NULL) {
                     /* if the response from RIPupd contains a reference that cannot be resolved */
-                    snprintf(temp_str, 1024, "***Error: Unknown object referenced %s", split_num > 4 ? split_res[4] : "");
+                    split_p = strchr(split_res[3], ':');
+                    snprintf(temp_str, 1024, "***Error: Unknown object referenced %s", split_p+1);
                 } else if (strstr(ripupd_result, "key-cert") != NULL) {
                     /* if the response from RIPupd contains "no key-cert object" string */
                     snprintf(temp_str, 1024, "***Error: Unknown key-cert object referenced");
@@ -1449,7 +1442,16 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx, optio
                     snprintf(temp_str, 1024, "***Error: Invalid prefix specified");
                 } else if (strstr(ripupd_result, "Error with attribute") != NULL) {
                     /* if the response from RIPupd contains "Error with attribute" string */
-                    snprintf(temp_str, 1024, "***Error: Error with attribute %s", split_num > 4 ? split_res[4] : "unknown");
+                    split_p = strchr(split_res[2], '"');
+                    split_p2 = strchr(split_p+1, '"');
+                    *split_p2 = 0;
+                    snprintf(temp_str, 1024, "***Error: Error with attribute %s", split_p+1);
+                } else if (strstr(ripupd_result, "Error with class attribute") != NULL) {
+                    /* if the response from RIPupd contains "Error with class attribute" string */
+                    split_p = strchr(split_res[2], '"');
+                    split_p2 = strchr(split_p+1, '"');
+                    *split_p2 = 0;
+                    snprintf(temp_str, 1024, "***Error: Error with class attribute %s", split_p+1);
                 } else {
                     /* then, the object is referenced from other objects */
                     snprintf(temp_str, 1024, "***Error: Object is referenced from other objects");
@@ -1458,8 +1460,9 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx, optio
                 break;
             case ERROR_U_AUT:
                 if (strstr(ripupd_result, "membership not allowed") != NULL) {
+                    split_p = strchr(split_res[3], ':');
                     snprintf(temp_str, 1024, "***Error: Membership claim is not supported by mbrs-by-ref:\n"
-                        "          attribute of the referenced set %s", split_num > 4 ? split_res[4] : "");
+                        "          attribute of the referenced set %s", split_p+1);
                 }
                 LG_log(lg_ctx, LG_DEBUG, "up_interpret_ripudb_result: error string [%s]", temp_str);
                 break;
