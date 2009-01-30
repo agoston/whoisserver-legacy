@@ -1,0 +1,14 @@
+# first updates tests
+# CASE 33: help message
+#          check if the acknowledgent message headers are right
+#
+# No content in the update message
+#
+#FAILURE
+#
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -m -f 
+#
+#
+From: dbtest@ripe.net
+Subject: help
+Date: Tue, 27 Jan 2009 16:42:57 +0100
