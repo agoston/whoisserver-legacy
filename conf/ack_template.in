@@ -297,10 +297,11 @@ key-cert operation OK
 To: <xsl:value-of select="to/text()"/>
   </xsl:template>
 
-  <xsl:template match="notification_header_subject">
-Subject: <xsl:value-of select="subject/text()"/>
+  <xsl:template match="upd_result">
+Subject: <xsl:value-of select="result/text()"/>
   </xsl:template>
 
+  <xsl:template match="notification_header_subject">: <xsl:value-of select="subject/text()"/>
 <xsl:text>
 
 </xsl:text>
@@ -509,6 +510,11 @@ No PGP error on object
   <xsl:template match="filter_set_syntax">
 
 ***Error: a filter-set object cannot contain both mp-filter and filter attributes
+  </xsl:template>
+
+  <xsl:template match="as_block_range">
+
+***Error: the as-block range is invalid
   </xsl:template>
 
   <xsl:template match="non_existent_origin">
