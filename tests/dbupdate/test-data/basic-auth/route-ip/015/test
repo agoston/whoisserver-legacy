@@ -8,6 +8,11 @@
 #
 # *** THIS TEST WILL FAIL UNLESS WE CHECK BOTH PARENT OBJECTS ***
 #
+# *** This test is added to the EXCLUDE list as its fix is non-trivial,
+# *** requires deep internal changes.
+# *** For more info, check Fogbugz #788
+# *** agoston, 2009-01-30
+#
 # FAILURE
 #
 # RESULT 15: The creation will fail

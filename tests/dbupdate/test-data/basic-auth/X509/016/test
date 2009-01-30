@@ -11,7 +11,13 @@
 #SUCCESS
 #
 # RESULT 16: The creation will succeed
-#            This SHOULD work, but fails at the moment.
+#            This SHOULD work, but fails, because the password and the MIME
+#            message is on the same level authentication-wise, thus
+#            the password does not have influence inside the MIME message
+#            (pgp case also fails, but we don't have a test case for it)
+#
+# DISABLED until the above behavior is decided upon.
+# agoston, 2009-01-30
 %
 %
 $DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -rm -f 
