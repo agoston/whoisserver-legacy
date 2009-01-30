@@ -665,7 +665,8 @@ OVERRIDEPGP   D83C3FBD
 #
 # ALLOCMNT
 # List of maintainers which can create an inetnum object 
-# with status ALLOCATED (one per line or comma separated list
+# with status ALLOCATED 
+# (one per line or comma separated list
 # or combination of the above)
 
 ALLOCMNT RIPE-NCC-HM-MNT,RIPE-NCC-SECOND-HM-MNT
@@ -681,7 +682,8 @@ DISALLOWMNT NEW-MNT,RIPE-NCC-NONE-MNT,AUTO-1,MNT-1,MNT-2,MNT-3,MNT-4,MNT-5,MNT-6
 #
 # ORG_POWER_MNT
 # List of maintainers which can create organistion objects with
-# "org-type:" IANA, RIR, NIR or LIR (one per line or space separated list
+# "org-type:" IANA, RIR, NIR, LIR or WHITEPAGES
+# (one per line or space separated list  ( ??? space or comma ??? )
 # or combination of the above)
 
 ORG_POWER_MNT RIPE-NCC-HM-MNT TEST-DBM-MNT

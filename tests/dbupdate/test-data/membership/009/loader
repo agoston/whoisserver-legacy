@@ -118,4 +118,14 @@ mnt-by:       RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
+as-set:       AS-TEST2
+descr:        test2 as-set
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+notify:       dbtest@ripe.net
+mbrs-by-ref:  TEST-MNT
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
 % End of loader data file

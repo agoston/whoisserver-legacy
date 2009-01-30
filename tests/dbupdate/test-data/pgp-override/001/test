@@ -18,10 +18,11 @@ changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 override:     pgp somereason
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.2 (GNU/Linux)
 
-iD8DBQE/XcuKsR6P2g2tJhIRAsPRAJ4onZ0f8geuOejI7vBZcNQ7Mx6PWQCeMclN
-w9bxQY7vBu0I/hXyDsf7yPE=
-=kHbd
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFIRm6CRxqrn9g8P70RAob7AJ9WiCicv9IwVJzf+qRmCM3e102K3QCeKvjW
+9SSmtbtEWAiB8r7PxJN9DYM=
+=XSlL
 -----END PGP SIGNATURE-----

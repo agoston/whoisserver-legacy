@@ -1,13 +1,11 @@
 
 # CASE 2: We try to modify limerick object LIM-OUR-SQL
-%
-% requires initial objects to be loaded
 #
 # modify limerick object 
 #
 #SUCCESS
 #
-# RESULT 2: The modification will succeed.
+# RESULT 2: The modification will fail as limericks have been deprecated.
 
 
 limerick:     LIM-OUR-SQL

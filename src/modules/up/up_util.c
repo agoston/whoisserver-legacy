@@ -96,7 +96,7 @@ void UP_internal_error(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* free any remaining memory */
   UP_free_options(options);
 
-  LG_log(lg_ctx, LG_FATAL,"UP_internal_error: exit(1)");
+  LG_log(lg_ctx, LG_FATAL,"UP_internal_error: exit(20)");
   /* close down the logging */
   LG_ctx_free(lg_ctx);
   /* close the state log file, but do not delete the file */
@@ -1397,8 +1397,12 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   int line_idx;
   int connect_err = 0;
   char *pos = NULL;
+  char *pos1 = NULL;
+  char *pos2 = NULL;
   char *error_str = NULL;
   char **temp = NULL;
+  char *temp_str = NULL;
+  GString *mess;
 
   LG_log(lg_ctx, LG_FUNC,">up_interpret_ripudb_result: entered, ripupd_result [%s]", ripupd_result);
 
@@ -1433,12 +1437,27 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         break;
       case ERROR_U_OBJ:
         /* if the object contains refs to unknown objects */
-        if (strstr(ripupd_result, "dummy") != NULL ||
-              strstr(ripupd_result, "reference cannot be resolved") != NULL )
+        if (strstr(ripupd_result, "dummy") != NULL  )
         {
-    	  /* if the response from RIPupd contains "dummy not allowed" string
-             or a reference that cannot be resolved */
+    	  /* if the response from RIPupd contains "dummy not allowed" string */
     	  snprintf(temp_str, 1024, "***Error: Unknown object referenced");
+        }
+        else if ( strstr(ripupd_result, "reference cannot be resolved") != NULL )
+        {
+    	  /* if the response from RIPupd contains a reference that cannot be resolved */
+          /* find the referenced object */
+          pos2 = NULL;
+          if ( pos1 = strstr(ripupd_result, "[4][") )
+          {
+            pos1+=4;
+            if ( pos1 = strchr(ripupd_result, ':') )
+            {
+              pos1++;
+              if ( pos2 = strchr(pos1, ']') )
+              { *pos2 = '\0'; }
+            }
+          }
+    	  snprintf(temp_str, 1024, "***Error: Unknown object referenced %s", pos2 ? pos1 : "");
         }
         else if (strstr(ripupd_result, "key-cert") != NULL)
         {
@@ -1450,6 +1469,19 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
           /* if the response from RIPupd contains "wrong prefix specified" string */
           snprintf(temp_str, 1024, "***Error: Invalid prefix specified");
         }
+        else if (strstr(ripupd_result, "Error with attribute") != NULL)
+        {
+          /* if the response from RIPupd contains "Error with attribute" string */
+          /* find the attribute */
+          pos2 = NULL;
+          if ( pos1 = strchr(ripupd_result, '"') )
+          {
+            pos1++;
+            if ( pos2 = strchr(pos1, '"') )
+            { *pos2 = '\0'; }
+          }
+          snprintf(temp_str, 1024, "***Error: Error with attribute %s", pos2 ? pos1 : "unknown"); 
+        }
         else
         {
         /* then, the object is referenced from other objects */
@@ -1458,7 +1490,22 @@ int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
         break;
       case ERROR_U_AUT:
-        snprintf(temp_str, 1024, "***Error: Membership authorisation failure");
+        if (strstr(ripupd_result, "membership not allowed") != NULL  )
+        {
+          /* find the referenced set */
+          pos2 = NULL;
+          if ( pos1 = strstr(ripupd_result, "[8][") )
+          {
+            pos1+=4;
+            if ( pos1 = strchr(ripupd_result, ':') )
+            {
+              pos1++;
+              if ( pos2 = strchr(pos1, ']') )
+              { *pos2 = '\0'; }
+            }
+          }
+          snprintf(temp_str, 1024, "***Error: Membership claim is not supported by mbrs-by-ref:\n          attribute of the referenced set %s", pos2 ? pos1 : "");
+        }
         LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
         break;
       default:
@@ -1931,6 +1978,17 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
      */
     retval = up_convert_inetnum_prefix(rt_ctx, lg_ctx, object, &inetnum_key_converted);
   }
+  
+  if ( retval != UP_OK ) goto up_process_object_exit;
+  
+  if ( object_class != NULL && ! strcasecmp(object_class, "as-block") 
+         && up_check_as_block(rt_ctx, lg_ctx, key_value) != UP_OK ) 
+  {
+    retval = UP_FAIL;
+    operation = UP_SYNTAX_ERR;
+  }
+  
+  if ( retval != UP_OK ) goto up_process_object_exit;
 
   /* Normalise nserver attribute in domain objects: lowercase IP,
   *    * remove trailing dot in hostname. */
@@ -2033,7 +2091,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     LG_log(lg_ctx, LG_DEBUG,"up_process_object: check auth returned %s", AU_ret2str(au_retval));
     if ( au_retval == AU_FWD )
     {
-      /* This was an irt (RIPE) or as-block creation request with no override.
+      /* This was an as-block creation request with no override.
          If we are not in test mode and no pre-processing errors were found,
          forward it to <HUMAILBOX>  */
       if ( retval == UP_OK && ! options->test_mode )

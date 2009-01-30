@@ -1,3 +1,20 @@
+************************************************************
+
+This whole set of tests is a lottery as currently written
+
+************************************************************
+
+They use real netblocks and interact with real dns servers.
+This gives variable results on multiple test runs.
+
+The whole set needs re-writing with a test dns server
+under the control of the test suite.
+
+************************************************************
+
+
+
+
 # rdns tests
 # CASE 1: Delete fails because of wrong password
 #

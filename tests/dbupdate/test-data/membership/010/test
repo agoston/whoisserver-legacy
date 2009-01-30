@@ -6,9 +6,9 @@
 %
 # create route object
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 10: The creation will succeed.
+# RESULT 10: The creation will fail.
 
 route:        1.0.0.0/24
 descr:        test

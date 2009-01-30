@@ -1,14 +1,14 @@
 # organisation object tests
-# CASE 48: Create an org object
+# CASE 49: Create an org object
 #         with an AUTO-1 nic-hdl (orgID)
-#         and a two-word name
+#         and a three-word name
 #         every word is shorter than 64 chars.
 #
 # create organisation object 
 #
 #SUCCESS
 #
-# RESULT 48: The creation will succeed
+# RESULT 49: The creation will succeed
 
 
 organisation:  AUTO-1
