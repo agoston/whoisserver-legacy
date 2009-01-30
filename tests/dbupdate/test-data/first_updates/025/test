@@ -17,7 +17,7 @@ $DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -m -f
 %
 %
 From: dbtest@ripe.net
-
+Subject: Please update
 
 person:  test person2
 address: here
