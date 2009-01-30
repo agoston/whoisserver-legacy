@@ -12,7 +12,9 @@
 # RESULT 1: Internal error generated.
 #           Check dbuperr file for error message:
 #            There must be at least one updateable source in the config file
-
+$EXEC_AFTER=$DATADIR/manual/first_001/uncomment.sh
+$EXEC_BEFORE=$DATADIR/manual/first_001/comment.sh
+?20
 
 person:  test person2
 address: here
