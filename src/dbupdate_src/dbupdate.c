@@ -884,8 +884,7 @@ void process_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     RT_header_to(rt_ctx,
                options->mail_hdr_data.replyto ? options->mail_hdr_data.replyto : options->mail_hdr_data.from);
     RT_header_from(rt_ctx, g_strstrip(ca_get_humailbox));
-    // only set return header if help requested
-    if (options->help) RT_header_subject(rt_ctx, options->mail_hdr_data.subject);
+    RT_header_subject(rt_ctx, options->mail_hdr_data.subject);
 
     /* incomming email header */
     RT_from_mail(rt_ctx, &options->mail_hdr_data);
@@ -920,6 +919,7 @@ void process_input(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   else
   {
     LG_log(lg_ctx, LG_FUNC,"process_input: help request");
+    RT_update_result(rt_ctx, "HELP");
     RT_help_request(rt_ctx);
     /* no more processing required, all done in the template */
   }
