@@ -1177,8 +1177,7 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  UP_FAIL if any errors found
             UP_OK if all ok
 */
-
-up_check_as_block(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char *key_value) {
+int up_check_as_block(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char *key_value) {
     int retval = UP_OK;
     unsigned int x = 0;
     unsigned int y = 0;
@@ -1213,9 +1212,10 @@ up_check_as_block(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char *key_value) {
     }
 
     if (s_val != -1 && retval != UP_FAIL) {
-        if ((a < x) || (a == x && s_val == 4 && b < y) {
+        if ((a < x) || (a == x && s_val == 4 && b < y)) {
             LG_log(lg_ctx, LG_DEBUG, "up_check_as_block: second ASN < first ASN");
             retval = UP_FAIL;
+        }
     }
 
     if (retval == UP_FAIL) {
@@ -1664,7 +1664,6 @@ int UP_generate_keycert_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 int up_normalise_nserver(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *preproc_obj)
 {
-  int retval = UP_OK;
   gchar *elm = NULL;
   gchar *p = NULL;
   GList *nservers_list = NULL;
