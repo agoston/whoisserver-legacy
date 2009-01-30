@@ -651,12 +651,12 @@ TESTMODE  0
 # source: MYSRC
 # override: Reason_for_overriding_all_security Password
 #
-# [ This sample crypted password correspond to the word "password" ]
+# [ This sample crypted password corresponds to the word "password" ]
 
 OVERRIDECRYPTEDPW   1F.5OTsRVjwLo
 
 #
-# PGP key to override all security for updates
+# PGP key(s) to override all security for updates
 # Similar to OVERRIDECRYPTEDPW, but accepts PGP-signed messages
 #
 OVERRIDEPGP   0DAD2612
@@ -680,7 +680,7 @@ DISALLOWMNT NEW-MNT,RIPE-NCC-NONE-MNT,AUTO-1,MNT-1,MNT-2,MNT-3,MNT-4,MNT-5,MNT-6
 #
 # ORG_POWER_MNT
 # List of maintainers which can create organistion objects with
-# "org-type:" IANA, RIR, NIR, LIR or WHITEPAGES
+# "org-type:" IANA, RIR, NIR, LIR, DIRECT_ASSIGNMENT or WHITEPAGES
 # (one per line or space separated list or combination of the above)
 
 ORG_POWER_MNT RIPE-NCC-HM-MNT TEST-DBM-MNT
