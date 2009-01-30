@@ -429,7 +429,7 @@
 
 <PROBLEM code="PROBLEM_SKIPPED_SERIAL_NUMBER" severity="0">
 <SHORT>
-	INFO: Several tests were skipped for one of more servers
+	INFO: Several tests were skipped for one or more servers
 	having the version of the zone with serial number
 	<ARG no="1"/>, which had already been checked.
 	
