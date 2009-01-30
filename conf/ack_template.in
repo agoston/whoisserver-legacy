@@ -297,12 +297,10 @@ key-cert operation OK
 To: <xsl:value-of select="to/text()"/>
   </xsl:template>
 
-  <xsl:template match="upd_result">
-Subject: <xsl:value-of select="result/text()"/>
+  <xsl:template match="notification_header_subject">
+Subject: <xsl:value-of select="subject/text()"/>
   </xsl:template>
 
-  <xsl:template match="notification_header_subject">: <xsl:value-of select="subject/text()"/>
-Reply-To: ripe-dbm@ripe.net
 <xsl:text>
 
 </xsl:text>
