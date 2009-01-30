@@ -169,18 +169,6 @@ mnt-lower:  PARENT-ML-MNT
 changed:    dbtest@ripe.net 20020101
 source:     DB-TEST
 
-% create a second parent route
-
-route:      20.0.0.0/8
-descr:      parent route object
-origin:     AS200
-mnt-by:     TEST-DBM-MNT
-mnt-lower:  TEST-DBM-MNT
-changed:    dbtest@ripe.net 20020101
-source:     DB-TEST
-
-
-
 % create an aut-num for the child route
 
 aut-num: AS200
