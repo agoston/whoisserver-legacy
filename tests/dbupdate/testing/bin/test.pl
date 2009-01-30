@@ -1973,7 +1973,7 @@ sub filter($$$$) {
             next;
         }
         elsif (/^\?([-]?[0-9]+)/o) {
-#            setvar('DBUPDATE_IGNORE_EXIT_CODE',$1);
+            setvar('DBUPDATE_IGNORE_EXIT_CODE',$1);
             next;
         }
         elsif (/^@/o) {
