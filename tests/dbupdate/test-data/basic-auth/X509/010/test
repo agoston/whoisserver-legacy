@@ -9,10 +9,12 @@
 # ./dbupdate -c ~/db/conf/rip.config -rm -f test
 #
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 10: The modify will succeed
-#            This SHOULD work, but fails 
+# RESULT 10: The modify will fail
+#            This SHOULD work, but fails, because the password and the MIME
+#            message is on the same level authentication-wise, thus
+#            the password does not have influence inside the MIME message
 #            (pgp case also fails, but we don't have a test case for it)
 %
 %
