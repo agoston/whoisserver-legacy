@@ -2411,8 +2411,10 @@ sub is_ignored ($) {
     my @ignore_dirs = (qw /CVS doc README/);
     my $dir         = $_[0];
 
+    return 1 if ($dir =~ /^(#|%)/);
+
     foreach (@ignore_dirs) {
-        return 1 if ( ( $dir =~ /\/$_[\s]*\/?$/ ) || ( $dir =~ /^(#|%)/ ) );
+        return 1 if ($dir =~ /\/$_[\s]*\/?$/ );
     }
     return 0;
 
@@ -2439,13 +2441,12 @@ sub get_test_dirs() {
         while (<EXCLUDE>) {
             chomp();
             s/\/$//;
-            s/^/$datadir\//;
-            push @exclude_dirs, expand_dir($_) if ( !is_ignored($_) );
+            push @exclude_dirs, ($_) unless is_ignored($_);
         }
         close(EXCLUDE)
             or die "Couldn't close $!";
     }
-
+    
     my @test_dirs;
     my $rundirs = getvar('RUNDIRS');
 
@@ -2474,14 +2475,16 @@ sub get_test_dirs() {
         my $flag;
         if (@exclude_dirs) {
             foreach my $exclude_path (@exclude_dirs) {
-                if ( $dir =~ /^$exclude_path(($)|(\/.*?$))/i ) {
+                if ( $dir =~ /$exclude_path(($)|(\/.*?$))/i ) {
                     push @skipped, $dir;
                     $flag = 1;
+                    last;
                 }
             }
         }
         if ( is_ignored($dir) ) {
             # ignore if needed
+            $flag = 1;
         }
         elsif ( !$flag ) {
             push @run, $dir;

@@ -1,14 +1,12 @@
-basic-auth/X509/010
+# disabled by agoston, 2009-01-30
+# reason: tests were written with the belief that a password: field outside
+# a MIME-encoded part would be effective inside the MIME-part.
+# This is not the case, as there seems to be no reason to change this
+# behavior.
+# Test is adjusted for x509/10 to except a failure, and x509/16 is disabled
+# until this behavior is fixed or decided upon.
+#basic-auth/X509/010
 basic-auth/X509/016
-basic-auth/forw-create/008
-basic-auth/forw-create/009
+# disabled by agoston, 2009-01-30
+# See FogBugz #788 or test description
 basic-auth/route-ip/015
-manual/first_001
-membership/009
-membership/010
-notification/041
-pgp-override/001
-syntax/001
-type-based/limerick/001
-type-based/limerick/002
-type-based/limerick/003
