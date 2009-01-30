@@ -2,6 +2,8 @@
 # CASE 7: Unsuccessfully try to modify a maintained object
 #         where mntner has both a mnt-nfy attribute and an upd-to
 #         attribute.
+#         Make this a mail message to ensure we get all the parts
+#         of the forward message.
 #
 # Modify with no password
 #
@@ -9,6 +11,12 @@
 #
 # RESULT 7: There should be a forw message to case007-1@ripe.net
 #           about the unsuccessful modify and no notif message.
+%
+%
+$DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -mr -f 
+%
+%
+From: dbtest@ripe.net
 
 
 person:  Test Person
