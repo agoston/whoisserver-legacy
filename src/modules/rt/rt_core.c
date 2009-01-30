@@ -12,9 +12,9 @@
         tiago (10/04/2003) Created.
   ******************/ /******************
   Copyright (c) 2003               RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -126,7 +126,7 @@ GString* rt_generate_dump(gint level, gint parent_level, xmlNodePtr text) {
     }
     else {
       g_string_append(string, (char*)current_node->content);
-      
+
     }
 
     current_node = current_node ->next;
@@ -142,8 +142,8 @@ gchar* rt_clean_entities(gchar* dirrty) {
   gchar* cret;
   int c;
 #define ENT_QT 4 /* If you change the array below, reflect it here!*/
-  gchar* ents[][2] = {  {"&amp;", "&"}, {"&quot;", "\""}, {"&gt;", ">"}, {"&lt;", "<"}, 
-}; 
+  gchar* ents[][2] = {  {"&amp;", "&"}, {"&quot;", "\""}, {"&gt;", ">"}, {"&lt;", "<"},
+};
 
   cllean = g_malloc(strlen(dirrty) + 1);
   cret = cllean;
@@ -187,21 +187,25 @@ gchar* RT_get(RT_context_t* ctx, gint level, gchar* template_name) {
   gchar*            return_str;
   gchar*            real_return_str;
 
-  //xmlDocDump(stdout, ctx->doc);
+//  xmlDocDump(stdout, ctx->doc);
 
   xslt = xsltParseStylesheetFile((const xmlChar*)template_name);
+  if (!xslt) {
+      LG_log(lg_ctx, LG_FUNC, "RT_get: xsltParseStylesheetFile() returned NULL!");
+      die;
+  }
   params[0] = NULL;
   doc = xmlCopyDoc(ctx->doc, 1);
-  sprintf(level_string, "%d", level); 
+  sprintf(level_string, "%d", level);
   xmlNewProp(xmlDocGetRootElement(doc), (xmlChar*)"level", (xmlChar*)level_string);
 
-  // xmlDocDump(stdout, doc);
+//  xmlDocDump(stdout, doc);
 
   text = xsltApplyStylesheet(xslt, doc, params);
   xmlFreeDoc(doc);
   xsltFreeStylesheet(xslt);
 
-  //xmlDocDump(stdout, text);
+//  xmlDocDump(stdout, text);
   name_len = strlen(template_name);
 
   xmlDocDumpMemory(text, &doc_dump, &size);
@@ -349,7 +353,7 @@ void RT_message(RT_context_t* ctx, gchar* name, gchar* message) {
   rt_prepare_node(ctx, node);
 }
 
-//xmlNodePtr 
+//xmlNodePtr
 void rt_generate_list(xmlNodePtr parent_node, gchar* tag, GList* list) {
   xmlNodePtr node;
 
@@ -361,7 +365,7 @@ void rt_generate_list(xmlNodePtr parent_node, gchar* tag, GList* list) {
   }
 }
 
-//xmlNodePtr 
+//xmlNodePtr
 void rt_generate_list_map(xmlNodePtr parent_node,
   gchar* tag, GList* list, rt_map_function f) {
   xmlNodePtr node;
@@ -410,9 +414,9 @@ void rt_add_text_node(xmlNodePtr parent, gchar* name, gchar* content) {
 //  xmlNodePtr node;
 
   char *copy_content = NULL;
-  
+
   /* Introduced a copy of the content because many functions pass
-     const pointers as the content. 
+     const pointers as the content.
      This function calls rt_clean_data that changes the contents of the content
      pointer. */
   if (content)
@@ -430,7 +434,7 @@ void rt_add_text_node(xmlNodePtr parent, gchar* name, gchar* content) {
     xmlNewTextChild(parent, NULL, (xmlChar*)name, (xmlChar*)copy_content);
     free(copy_content);
   }
-  
+
 }
 
 
