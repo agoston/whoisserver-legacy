@@ -968,7 +968,7 @@ LG_log(lg_ctx, LG_DEBUG, "UP_check_disallowmnt: disallow_mntner_str %s",
   {
     /* there are some disallowed mntners */
     /* split the disallow_mntner_str on comma */
-    disallow_mntner_list = ut_g_strsplit_v1(disallow_mntner_str, ",\n", 0);
+    disallow_mntner_list = g_strsplit_set(disallow_mntner_str, ",\n", 0);
 
     /* get the list of all mntner names in the object */
     mntby = rpsl_object_get_attr(preproc_obj, "mnt-by");
@@ -1178,57 +1178,53 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             UP_OK if all ok
 */
 
-up_check_as_block(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char *key_value)
-{
-  int retval = UP_OK;
-  unsigned int x=0;
-  unsigned int y=0;
-  unsigned int a=0;
-  unsigned int b=0;
-  int s_val = -1;
+up_check_as_block(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char *key_value) {
+    int retval = UP_OK;
+    unsigned int x = 0;
+    unsigned int y = 0;
+    unsigned int a = 0;
+    unsigned int b = 0;
+    int s_val = -1;
 
-  LG_log(lg_ctx, LG_FUNC,">up_check_as_block: entered with value [%s]", key_value);
+    LG_log(lg_ctx, LG_FUNC, ">up_check_as_block: entered with value [%s]", key_value);
 
-  if ( strchr(key_value, '-') )
-  {
-    /* The as-block is a range
-       possible formats are:
-       ASx - ASa
-       ASx.y - ASa.b */
-    if ( strchr(key_value, '.') )
-    {
-      s_val = sscanf(key_value, "%*[ ASas]%u.%u%*[ -]%*[ ASas]%u.%u", &x,&y,&a,&b);
-      if ( s_val != 4 ) { retval = UP_FAIL; }
-      LG_log(lg_ctx, LG_DEBUG,"up_check_as_block: s_val %d x [%u] y [%u] a [%u] b [%u]",
-                                    s_val,x,y,a,b);
+    if (strchr(key_value, '-')) {
+        /* The as-block is a range
+         possible formats are:
+         ASx - ASa
+         ASx.y - ASa.b */
+        if (strchr(key_value, '.')) {
+            s_val = sscanf(key_value, "%*[ ASas]%u.%u%*[ -]%*[ ASas]%u.%u", &x, &y, &a, &b);
+            if (s_val != 4) {
+                retval = UP_FAIL;
+            }
+            LG_log(lg_ctx, LG_DEBUG, "up_check_as_block: s_val [%d] x [%u] y [%u] a [%u] b [%u]", s_val, x, y, a, b);
+        } else {
+            s_val = sscanf(key_value, "%*[ ASas]%u%*[ -]%*[ ASas]%u", &x, &a);
+            if (s_val != 2) {
+                retval = UP_FAIL;
+            }
+            LG_log(lg_ctx, LG_DEBUG, "up_check_as_block: s_val [%d] x [%u] a [%u]", s_val, x, a);
+        }
+    } else {
+        /* this shouldn't happen; fallback to fail */
+        LG_log(lg_ctx, LG_SEVERE, "up_check_as_block: called for non-as-block");
+        retval = UP_FAIL;
     }
-    else
-    {
-      s_val = sscanf(key_value, "%*[ ASas]%u%*[ -]%*[ ASas]%u", &x,&a);
-      if ( s_val != 2 ) { retval = UP_FAIL; }
-      LG_log(lg_ctx, LG_DEBUG,"up_check_as_block: s_val %d x [%u] a [%u]", s_val,x,a);
-    }
-  }
 
-  if ( s_val != -1 && retval != UP_FAIL )
-  {
-    if ( a < x ) { retval = UP_FAIL; }
-    else if ( a == x && s_val == 4 )
-    {
-      if ( b < y ) { retval = UP_FAIL; }
+    if (s_val != -1 && retval != UP_FAIL) {
+        if ((a < x) || (a == x && s_val == 4 && b < y) {
+            LG_log(lg_ctx, LG_DEBUG, "up_check_as_block: second ASN < first ASN");
+            retval = UP_FAIL;
     }
-  }
-  if ( retval == UP_FAIL )
-  {
-    LG_log(lg_ctx, LG_DEBUG,"up_check_as_block: second ASN < first ASN");
-    RT_invalid_asblock_range(rt_ctx);
-  }
 
-  LG_log(lg_ctx, LG_FUNC,"<up_check_as_block: exiting with value [%s]",
-             UP_ret2str(retval));
-  return retval;
+    if (retval == UP_FAIL) {
+        RT_invalid_asblock_range(rt_ctx);
+    }
+
+    LG_log(lg_ctx, LG_FUNC, "<up_check_as_block: exiting with value [%s]", UP_ret2str(retval));
+    return retval;
 }
-
 
 /* checks the filter-set objects.
    makes sure that the object has only one of the "mp-filter:" and "filter:"

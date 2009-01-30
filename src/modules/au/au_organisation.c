@@ -56,7 +56,7 @@ au_has_org_power_mnt (const rpsl_object_t *obj)
   /* get the list of ORG_POWER_MNT mntner names */
   org_power_mnt_str = ca_get_org_power_mnt;
   /* split the alloc_mntner_str on space */
-  org_power_mnt_list = ut_g_strsplit_v1(org_power_mnt_str, " \n", 0);
+  org_power_mnt_list = g_strsplit_set(org_power_mnt_str, " \n", 0);
 
   /* compare the two lists and look for a match */
   org_power_mntner_found = FALSE;
