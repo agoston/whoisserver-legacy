@@ -14,6 +14,7 @@ Changes:
 	- unreferenced object - includes object
 	- no mbrs-by-ref: attribute - includes referencing object
 - numerous other cleanups and fixes
+- test case fixes drops number of failed tests to 0
 
 
 Merged:
@@ -34,4 +35,3 @@ Affected stakeholders:
 - The improved error reporting will benefit all users.
 - The pgp-override changes will allow a new override to be implemented
 - as-block changes only benefit RIPE NCC staff as only we can create these objects
-- test case fixes drops number of failed tests from 23 to 7
