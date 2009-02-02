@@ -1,13 +1,11 @@
 
 # CASE 1: We try to create limerick object LIM-OUR-SQL
-%
-% requires initial objects to be loaded
 #
 # create limerick object 
 #
 #SUCCESS
 #
-# RESULT 1: The creation will succeed.
+# RESULT 1: The creation will fail as limericks have been deprecated.
 
 
 limerick:     LIM-OUR-SQL

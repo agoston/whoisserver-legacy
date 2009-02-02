@@ -1,0 +1,17 @@
+20090121 - version 3.4.4
+
+Changes:
+- added perl-5.10 support
+- updated Install.pl
+- added support for new org-type: DIRECT_ASSIGNMENT
+- added 2 test cases for the new org-type
+- numerous cleanups and small fixes
+
+
+Merged:
+- feature-agoston-orgtype_da
+- feature-perl5.10-64bit-support.txt
+
+
+Affected stakeholders:
+- none

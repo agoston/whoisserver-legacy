@@ -1,0 +1,37 @@
+20090130 - version 3.4.5
+
+Changes:
+- Changed sender of forward emails to unread@ripe.net
+- Removed Reply-to: field from notification and forward messages
+- Changed envelope from <> to 'unread@ripe.net'
+- Some tidying up of the text in notification and forward messages
+- Some compressing of excessive blank lines between paragraphs in acknowledgement messages
+- fixed invalid subject header for replies to HELP messages
+- fixed typo in rdns error message
+- fixed as-block related checks
+- fixed pgp override
+- vastly improved error reporting:
+	- unreferenced object - includes object
+	- no mbrs-by-ref: attribute - includes referencing object
+- numerous other cleanups and fixes
+- test case fixes drops number of failed tests to 0
+
+
+Merged:
+- feature-denis-White_pages
+- feature-denis-notification_mail_loop2
+
+
+Affected stakeholders:
+- Any user who parses the text in the notification or forward message. 
+   (Note the user does not see these as different message types. To the user
+   they are both notification messages.) The changes are only to the e-mail
+   addresses and the information text at the start of the notification.
+
+- Any user who parses the notification text sensibly to find information
+   about what has changed will not be affected.
+
+- Internally and externally, anyone who filters e-mail on the From: field.
+- The improved error reporting will benefit all users.
+- The pgp-override changes will allow a new override to be implemented
+- as-block changes only benefit RIPE NCC staff as only we can create these objects

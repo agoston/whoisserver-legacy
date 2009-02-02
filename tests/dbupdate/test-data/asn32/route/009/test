@@ -1,9 +1,10 @@
 # CASE 9: We try to create route object 20.13.0.0/16,AS200
 # member-of is an route-set which does not exists
+# This used to succeed when we allowed dummy objects, but now fails.
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 9: The creation will succeed.
+# RESULT 9: The creation will fail.
 
 
 route:     20.13.0.0/16

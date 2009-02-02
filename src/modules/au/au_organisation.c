@@ -56,7 +56,7 @@ au_has_org_power_mnt (const rpsl_object_t *obj)
   /* get the list of ORG_POWER_MNT mntner names */
   org_power_mnt_str = ca_get_org_power_mnt;
   /* split the alloc_mntner_str on space */
-  org_power_mnt_list = ut_g_strsplit_v1(org_power_mnt_str, " ", 0);
+  org_power_mnt_list = g_strsplit_set(org_power_mnt_str, " \n", 0);
 
   /* compare the two lists and look for a match */
   org_power_mntner_found = FALSE;
@@ -106,7 +106,7 @@ org_creation (au_plugin_callback_info_t *info)
   {
     org_type_check = AU_ERROR;
     LG_log(au_context, LG_ERROR,
-           "object_creation: missing \"org-type:\" attribute");
+           "org_creation: missing \"org-type:\" attribute");
   }
   else
   {
@@ -359,11 +359,11 @@ object_modification (au_plugin_callback_info_t *info)
   char *generic_org_type = NULL;
 
 
-  LG_log(au_context, LG_FUNC, ">object_modify: entering");
+  LG_log(au_context, LG_FUNC, ">object_modification: entering");
 
   generic_org_type = g_strdup("OTHER");
 
-  LG_log(au_context, LG_FUNC, "org_creation: generic org type: %s", generic_org_type);
+  LG_log(au_context, LG_FUNC, "object_modification: generic org type: %s", generic_org_type);
 
   /* grab key */
   key = rpsl_object_get_key_value(info->obj);
@@ -374,7 +374,7 @@ object_modification (au_plugin_callback_info_t *info)
   org = rpsl_object_get_attr(info->obj, "org");
   if (org == NULL)
   {
-    LG_log(au_context, LG_DEBUG, "object_modify: no \"org:\"");
+    LG_log(au_context, LG_DEBUG, "object_modification: no \"org:\"");
     ret_val = AU_AUTHORISED;
   }
 
@@ -383,9 +383,9 @@ object_modification (au_plugin_callback_info_t *info)
   {
     rpsl_attr_delete_list(org);
     LG_log(au_context, LG_ERROR,
-           "object_modify: error looking up old version");
+           "object_modification: error looking up old version");
     LG_log(au_context, LG_FUNC,
-           "<object_modify: exiting with value [AU_ERROR]");
+           "<object_modification: exiting with value [AU_ERROR]");
     return AU_ERROR;
   }
 
@@ -395,9 +395,9 @@ object_modification (au_plugin_callback_info_t *info)
   {
     rpsl_attr_delete_list(org);
     LG_log(au_context, LG_ERROR,
-           "object_modify: missing \"source:\" attribute");
+           "object_modification: missing \"source:\" attribute");
     LG_log(au_context, LG_FUNC,
-           "<object_modify: exiting with value [AU_ERROR]");
+           "<object_modification: exiting with value [AU_ERROR]");
     return AU_ERROR;
   }
   source = rpsl_attr_get_clean_value(source_attr->data);
@@ -427,7 +427,7 @@ object_modification (au_plugin_callback_info_t *info)
     if (g_hash_table_lookup(old_org_hash, val) == NULL)
     {
       /* this org has been added */
-      LG_log(au_context, LG_DEBUG, "object_modify: %s added", val);
+      LG_log(au_context, LG_DEBUG, "object_modification: %s added", val);
 
       switch (au_org_authenticate(info->ctx, val, au_lookup, source, info->cred, &organisation))
       {
@@ -446,12 +446,12 @@ object_modification (au_plugin_callback_info_t *info)
           break;
         case AU_FWD:
           LG_log(au_context, LG_WARN,
-            "object_creation: au_org_authenticate returned invalid value AU_FWD");
+            "object_modification: au_org_authenticate returned invalid value AU_FWD");
           ret_val = AU_ERROR;
           break;
         case AU_UNAUTHORISED_END:
           LG_log(au_context, LG_WARN,
-            "object_creation: au_org_authenticate returned invalid value AU_UNAUTHORISED_END");
+            "object_modification: au_org_authenticate returned invalid value AU_UNAUTHORISED_END");
           ret_val = AU_ERROR;
           break;
       }
@@ -479,7 +479,7 @@ object_modification (au_plugin_callback_info_t *info)
    {
      org_type_check = AU_ERROR;
      LG_log(au_context, LG_ERROR,
-            "object_creation: missing \"org-type:\" attribute");
+            "object_modification: missing \"org-type:\" attribute");
    }
    else
    {
@@ -534,7 +534,7 @@ object_modification (au_plugin_callback_info_t *info)
     RT_org_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override, organisation_type_check_failed);
   }
 
-  LG_log(au_context, LG_FUNC, "<object_modify: exiting with value [%s]",
+  LG_log(au_context, LG_FUNC, "<object_modification: exiting with value [%s]",
          AU_ret2str(ret_val));
   return ret_val;
 }

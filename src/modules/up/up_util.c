@@ -96,7 +96,7 @@ void UP_internal_error(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* free any remaining memory */
   UP_free_options(options);
 
-  LG_log(lg_ctx, LG_FATAL,"UP_internal_error: exit(1)");
+  LG_log(lg_ctx, LG_FATAL,"UP_internal_error: exit(20)");
   /* close down the logging */
   LG_ctx_free(lg_ctx);
   /* close the state log file, but do not delete the file */
@@ -436,10 +436,7 @@ int up_remove_parent(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 char *up_clean_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char **object_str)
 {
-  int retval = 0;
   char *retstr = NULL;
-  const char *type = NULL;
-  char *value = NULL;
   rpsl_object_t *object = NULL;
   GString *mess;
 
@@ -1388,146 +1385,100 @@ int up_get_error_num(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             sets assigned_key
 */
 
-int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                                  options_struct_t *options,
-                                  char *ripupd_result, char *assigned_key )
-{
-  int retval = UP_OK;
-  int err = 0;
-  int line_idx;
-  int connect_err = 0;
-  char *pos = NULL;
-  char *error_str = NULL;
-  char **temp = NULL;
+int up_interpret_ripudb_result(RT_context_t *rt_ctx, LG_context_t *lg_ctx, options_struct_t *options,
+        char *ripupd_result, char *assigned_key) {
+    int retval = UP_OK;
+    int err = 0;
+    int connect_err = 0;
+    gchar **split_res;
+    int split_num = 0;
+    gchar *split_p, *split_p2;     // for pointing inside split_res[]
 
-  LG_log(lg_ctx, LG_FUNC,">up_interpret_ripudb_result: entered, ripupd_result [%s]", ripupd_result);
+    LG_log(lg_ctx, LG_FUNC, ">up_interpret_ripudb_result: entered, ripupd_result [%s]", ripupd_result);
 
-  /* Get the error number from the return string.
+    /* Get the error number from the return string.
      0 means no error in this context */
-  err = up_get_error_num(rt_ctx, lg_ctx, options, ripupd_result, &connect_err);
+    err = up_get_error_num(rt_ctx, lg_ctx, options, ripupd_result, &connect_err);
 
-  if ( ! err && assigned_key != NULL)
-  {
-    /* if the update was successful and the caller of the function expected
-       to get an assigned key, get the key from the returned message */
-//    retval = UP_get_assigned_key(rt_ctx, lg_ctx, options, ripupd_result, assigned_key);
-    retval = get_assigned_key(rt_ctx, lg_ctx, options, ripupd_result, assigned_key);
-  }
-  else if ( err )
-  {
-/**************************************************************************************/
-/*                     TEMPORARY CODE TO USE EXISTING RIPUPD                          */
+    if (!err && assigned_key != NULL) {
+        /* if the update was successful and the caller of the function expected
+         to get an assigned key, get the key from the returned message */
+        //    retval = UP_get_assigned_key(rt_ctx, lg_ctx, options, ripupd_result, assigned_key);
+        retval = get_assigned_key(rt_ctx, lg_ctx, options, ripupd_result, assigned_key);
+    } else if (err) {
 
-    /* According to the error no got from RIPupdate, construct an error string  */
-    char temp_str[1024];
-    switch (err)
-    {
-      case ERROR_U_MEM:
-      case ERROR_U_DBS:
-      case ERROR_U_BADOP:
-      case ERROR_U_COP:
-      case ERROR_U_NSUP:
-      case ERROR_U_BUG:
-        snprintf(temp_str, 1024, "***Error: Please contact database admin: Error no %i", err);
-        LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
-        break;
-      case ERROR_U_OBJ:
-        /* if the object contains refs to unknown objects */
-        if (strstr(ripupd_result, "dummy") != NULL ||
-              strstr(ripupd_result, "reference cannot be resolved") != NULL )
-        {
-    	  /* if the response from RIPupd contains "dummy not allowed" string
-             or a reference that cannot be resolved */
-    	  snprintf(temp_str, 1024, "***Error: Unknown object referenced");
+        /* split string into something sensible & count the tokens */
+        split_res = g_strsplit_set(ripupd_result, "[]", 0);
+        while (split_res[split_num])
+            split_num++;
+
+        /* According to the error no got from RIPupdate, construct an error string  */
+        char temp_str[1024];
+        switch (err) {
+            case ERROR_U_MEM:
+            case ERROR_U_DBS:
+            case ERROR_U_BADOP:
+            case ERROR_U_COP:
+            case ERROR_U_NSUP:
+            case ERROR_U_BUG:
+                snprintf(temp_str, 1024, "***Error: Please contact database admin: Error no %i", err);
+                LG_log(lg_ctx, LG_DEBUG, "up_interpret_ripudb_result: error string [%s]", temp_str);
+                break;
+
+            case ERROR_U_OBJ:
+                /* if the object contains refs to unknown objects */
+                if (strstr(ripupd_result, "dummy") != NULL) {
+                    /* if the response from RIPupd contains "dummy not allowed" string */
+                    snprintf(temp_str, 1024, "***Error: Unknown object referenced");
+                } else if (strstr(ripupd_result, "reference cannot be resolved") != NULL) {
+                    /* if the response from RIPupd contains a reference that cannot be resolved */
+                    split_p = strchr(split_res[3], ':');
+                    snprintf(temp_str, 1024, "***Error: Unknown object referenced %s", split_p+1);
+                } else if (strstr(ripupd_result, "key-cert") != NULL) {
+                    /* if the response from RIPupd contains "no key-cert object" string */
+                    snprintf(temp_str, 1024, "***Error: Unknown key-cert object referenced");
+                } else if (strstr(ripupd_result, "wrong prefix specified") != NULL) {
+                    /* if the response from RIPupd contains "wrong prefix specified" string */
+                    snprintf(temp_str, 1024, "***Error: Invalid prefix specified");
+                } else if (strstr(ripupd_result, "Error with attribute") != NULL) {
+                    /* if the response from RIPupd contains "Error with attribute" string */
+                    split_p = strchr(split_res[2], '"');
+                    split_p2 = strchr(split_p+1, '"');
+                    *split_p2 = 0;
+                    snprintf(temp_str, 1024, "***Error: Error with attribute %s", split_p+1);
+                } else if (strstr(ripupd_result, "Error with class attribute") != NULL) {
+                    /* if the response from RIPupd contains "Error with class attribute" string */
+                    split_p = strchr(split_res[2], '"');
+                    split_p2 = strchr(split_p+1, '"');
+                    *split_p2 = 0;
+                    snprintf(temp_str, 1024, "***Error: Error with class attribute %s", split_p+1);
+                } else {
+                    /* then, the object is referenced from other objects */
+                    snprintf(temp_str, 1024, "***Error: Object is referenced from other objects");
+                }
+                LG_log(lg_ctx, LG_DEBUG, "up_interpret_ripudb_result: error string [%s]", temp_str);
+                break;
+            case ERROR_U_AUT:
+                if (strstr(ripupd_result, "membership not allowed") != NULL) {
+                    split_p = strchr(split_res[3], ':');
+                    snprintf(temp_str, 1024, "***Error: Membership claim is not supported by mbrs-by-ref:\n"
+                        "          attribute of the referenced set %s", split_p+1);
+                }
+                LG_log(lg_ctx, LG_DEBUG, "up_interpret_ripudb_result: error string [%s]", temp_str);
+                break;
+            default:
+                snprintf(temp_str, 1024, "***Error: Please contact database admin: Error no %i", err);
+                LG_log(lg_ctx, LG_DEBUG, "up_interpret_ripudb_result: error string [%s]", temp_str);
+                break;
         }
-        else if (strstr(ripupd_result, "key-cert") != NULL)
-        {
-          /* if the response from RIPupd contains "no key-cert object" string */
-          snprintf(temp_str, 1024, "***Error: Unknown key-cert object referenced");
-        }
-        else if (strstr(ripupd_result, "wrong prefix specified") != NULL)
-        {
-          /* if the response from RIPupd contains "wrong prefix specified" string */
-          snprintf(temp_str, 1024, "***Error: Invalid prefix specified");
-        }
-        else
-        {
-        /* then, the object is referenced from other objects */
-    	  snprintf(temp_str, 1024, "***Error: Object is referenced from other objects");
-        }
-        LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
-        break;
-      case ERROR_U_AUT:
-        snprintf(temp_str, 1024, "***Error: Membership authorisation failure");
-        LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
-        break;
-      default:
-        snprintf(temp_str, 1024, "***Error: Please contact database admin: Error no %i", err);
-        LG_log(lg_ctx, LG_DEBUG,"up_interpret_ripudb_result: error string [%s]", temp_str);
-        break;
+
+        g_strfreev(split_res);
+        RT_RIP_update_error(rt_ctx, temp_str);
+        retval = UP_FAIL;
     }
 
-    RT_RIP_update_error(rt_ctx, temp_str);
-
-goto temp_skip;
-/**************************************************************************************/
-    /* find the error message following the colon(:)
-       there may be more than one error message line in the reply */
-    /* split the string into lines */
-    temp = ut_g_strsplit_v1(ripupd_result , "\n", 0);
-    for (line_idx = 0; temp[line_idx] != NULL; line_idx++)
-    {
-      if ( strstr(temp[line_idx], "E") == temp[line_idx] ||
-            strstr(temp[line_idx], "W") == temp[line_idx] ||
-            strstr(temp[line_idx], "I") == temp[line_idx] ||
-            (strstr(temp[line_idx], "%ERROR") == temp[line_idx] && connect_err) )
-      {
-        /* Look for the colon(:) */
-        pos = strchr(temp[line_idx], ':');
-        if ( pos && connect_err )
-        {
-          /* connection error messages have a different format, eg
-             %ERROR:406: not authorized to update the database
-             so find the next colon(:) */
-          char *pos_str = pos+1;
-          pos = strchr(pos_str, ':');
-        }
-        if ( pos )
-        {
-          /* colon(:) found, the error message follows */
-          if ( ! error_str )
-          {
-            error_str = malloc(strlen(pos + 1) +2);
-            strcpy(error_str, pos + 1);
-            strcat(error_str, "\n");
-          }
-          else
-          {
-            error_str = realloc(error_str, strlen(error_str) + strlen(pos + 1) +2);
-            strcat(error_str, pos + 1);
-            strcat(error_str, "\n");
-          }
-        }
-        else
-        {
-          /* there is no error message, or the colon was missing,
-             this should not happen, but just in case */
-          LG_log(lg_ctx, LG_FATAL, "up_interpret_ripudb_result: no :error message returned from ripupdate");
-          UP_internal_error(rt_ctx, lg_ctx, options, "up_interpret_ripudb_result: no :error message returned from ripupdate\n", 0);
-        }
-      }
-    }
-    RT_RIP_update_error(rt_ctx, error_str);
-    free(error_str);
-    g_strfreev(temp);
-/**************************************************************************************/
-temp_skip:
-/**************************************************************************************/
-    retval = UP_FAIL;
-  }
-
-  LG_log(lg_ctx, LG_FUNC,"<up_interpret_ripudb_result: exiting with value %s", UP_ret2str(retval));
-  return retval;
+    LG_log(lg_ctx, LG_FUNC, "<up_interpret_ripudb_result: exiting with value %s", UP_ret2str(retval));
+    return retval;
 }
 
 
@@ -1932,6 +1883,17 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval = up_convert_inetnum_prefix(rt_ctx, lg_ctx, object, &inetnum_key_converted);
   }
 
+  if ( retval != UP_OK ) goto up_process_object_exit;
+
+  if ( object_class != NULL && ! strcasecmp(object_class, "as-block")
+         && up_check_as_block(rt_ctx, lg_ctx, key_value) != UP_OK )
+  {
+    retval = UP_FAIL;
+    operation = UP_SYNTAX_ERR;
+  }
+
+  if ( retval != UP_OK ) goto up_process_object_exit;
+
   /* Normalise nserver attribute in domain objects: lowercase IP,
   *    * remove trailing dot in hostname. */
   if( object_class != NULL && ! strcasecmp(object_class, "domain") )
@@ -2033,7 +1995,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     LG_log(lg_ctx, LG_DEBUG,"up_process_object: check auth returned %s", AU_ret2str(au_retval));
     if ( au_retval == AU_FWD )
     {
-      /* This was an irt (RIPE) or as-block creation request with no override.
+      /* This was an as-block creation request with no override.
          If we are not in test mode and no pre-processing errors were found,
          forward it to <HUMAILBOX>  */
       if ( retval == UP_OK && ! options->test_mode )

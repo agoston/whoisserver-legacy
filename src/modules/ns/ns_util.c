@@ -255,29 +255,31 @@ static gboolean ns_check_suffix(rpsl_object_t * obj, gboolean with_dot)
   domain = rpsl_object_get_key_value(obj);
 
   /* check suffix */
-  while (ns_suffix[i] != NULL) {
-    if (with_dot) {
-      ns_suffix_dotted = g_strdup_printf("%s.", ns_suffix[i]);
-    } else {
-      ns_suffix_dotted = g_strdup_printf("%s", ns_suffix[i]);
-    }
-    p = stristr(domain, ns_suffix_dotted);
-    if ((p != NULL) && (strcasecmp(p, ns_suffix_dotted) == 0)) {
+  if ( domain != NULL ) {
+    while (ns_suffix[i] != NULL) {
+      if (with_dot) {
+        ns_suffix_dotted = g_strdup_printf("%s.", ns_suffix[i]);
+      } else {
+        ns_suffix_dotted = g_strdup_printf("%s", ns_suffix[i]);
+      }
+      p = stristr(domain, ns_suffix_dotted);
+      if ((p != NULL) && (strcasecmp(p, ns_suffix_dotted) == 0)) {
 
-      if (p != ns_suffix_dotted) /* domain: something.?suffix */ {
-        /* make sure suffix is preceded by dot */ 
-        if (((p-1) != NULL) && (*(p-1) == '.')) {
+        if (p != ns_suffix_dotted) /* domain: something.?suffix */ {
+          /* make sure suffix is preceded by dot */ 
+          if (((p-1) != NULL) && (*(p-1) == '.')) {
+            ret_val = TRUE;
+          }
+        } else {
           ret_val = TRUE;
         }
-      } else {
-        ret_val = TRUE;
       }
+      g_free(ns_suffix_dotted);
+      i++;
     }
-    g_free(ns_suffix_dotted);
-    i++;
+    free(domain);
   }
 
-  free(domain);
   g_strfreev(ns_suffix);
   return ret_val;
 }

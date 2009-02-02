@@ -532,6 +532,7 @@ void PM_interact(int sock) {
 	LG_log(pm_context, LG_DEBUG, "[%s] -- input parsed: %s:%d:%ld-%ld", hostaddress, nrtm_q.source, nrtm_q.version,
 	        nrtm_q.first, nrtm_q.last);
 
+	/* check if source exists */
 	source_hdl = ca_get_SourceHandleByName(nrtm_q.source);
 	if (source_hdl == NULL) {
 		LG_log(pm_context, LG_DEBUG, "[%s] --  Unknown source %s", hostaddress, nrtm_q.source);

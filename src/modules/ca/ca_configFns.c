@@ -1843,8 +1843,12 @@ int ca_srchandle2Intelement(ca_SrcHdl_t * ah, int srcAttrib)
             if (ah->nrtm.host[0]) {
                 myInt = (ah->nrtm).protocolVer;
             } else {
-                fprintf(stderr, " *** Source %s does not have nrtm defined\n", ah->name);
-                die;
+                 /* we need to know the nrtm version number on every source, but if there is no NRTM defined for a source,
+                  * this call would fail.
+                  * Returning '2' in such cases, as that is the default for local databases.
+                  * agoston, 2009-01-20
+                  */
+                myInt = 2;
             }
             break;
 

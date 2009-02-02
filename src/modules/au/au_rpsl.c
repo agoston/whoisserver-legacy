@@ -40,7 +40,7 @@ AU_ret_t hierarchical_rpsl_create(au_plugin_callback_info_t *info);
 AU_ret_t route_rpsl_create(au_plugin_callback_info_t *info);
 AU_ret_t route6_rpsl_create(au_plugin_callback_info_t *info);
 
-static const au_check_by_type_t rpsl_plugins[] = 
+static const au_check_by_type_t rpsl_plugins[] =
 {
   /* 3.1.2 restricted classes */
   { "as-block", restricted_rpsl_create, generic_rpsl_delete, generic_rpsl_modify },
@@ -78,9 +78,9 @@ static char *CHECK_MNT_BY[]                 = { "mnt-by", NULL };
 static char *CHECK_MNT_LOWER[]              = { "mnt-lower", NULL };
 static char *CHECK_MNT_LOWER_THEN_MNT_BY[]  = { "mnt-lower", "mnt-by", NULL };
 static char *CHECK_MNT_ROUTES_THEN_MNT_BY[] = { "mnt-routes", "mnt-by", NULL };
-static char *CHECK_MNT_ROUTES_THEN_MNT_LOWER_THEN_MNT_BY[] = { "mnt-routes", 
+static char *CHECK_MNT_ROUTES_THEN_MNT_LOWER_THEN_MNT_BY[] = { "mnt-routes",
                                                                "mnt-lower",
-                                                               "mnt-by", 
+                                                               "mnt-by",
                                                                NULL };
 
 AU_ret_t
@@ -115,7 +115,7 @@ banned_create (au_plugin_callback_info_t *info)
   LG_log(au_context, LG_FUNC, ">banned_create: entering");
 
   ret_val = banned_operation(info);
-  
+
   LG_log(au_context, LG_FUNC, "<banned_create: exiting with value [%s]",
          AU_ret2str(ret_val));
   return ret_val;
@@ -205,7 +205,7 @@ restricted_rpsl_create (au_plugin_callback_info_t *info)
   LG_log(au_context, LG_FUNC, ">restricted_rpsl_create: entering");
 
   ret_val = restricted_rpsl_operation(info);
-  
+
   LG_log(au_context, LG_FUNC, "<restricted_rpsl_create: exiting with value [%s]",
          AU_ret2str(ret_val));
   return ret_val;
@@ -250,7 +250,7 @@ mntner_rpsl_create (au_plugin_callback_info_t *info)
 
   LG_log(au_context, LG_FUNC, ">mntner_rpsl_create: entering");
 
-  /* Currently all mntner objects are authorised without any checks. 
+  /* Currently all mntner objects are authorised without any checks.
      This is a transient situation to remove mntners from the list of
      manually created objects by ripe-dbm.
      Authorisation INFO will be "default" in the ack message.
@@ -278,6 +278,7 @@ mntner_rpsl_create (au_plugin_callback_info_t *info)
   return ret_val;
 }
 
+/* checks *-set rpsl types */
 AU_ret_t
 set_rpsl_create (au_plugin_callback_info_t *info)
 {
@@ -307,37 +308,45 @@ set_rpsl_create (au_plugin_callback_info_t *info)
   LG_log(au_context, LG_DEBUG, "set_rpsl_create: set is [%s]", set_name);
 
   /* check for parent authorisation */
-  if (strchr(set_name, ':') == NULL) 
+  if (strchr(set_name, ':') == NULL)
   {
     /* not hierarchical, implicit parental authorisation */
     parent_auth = AU_AUTHORISED;
     LG_log(au_context, LG_DEBUG, "set_rpsl_create: non-hierarchical set");
-  } 
-  else 
+  }
+  else
   {
     /* hierarchical, get parent */
-    if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY) 
+    if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY)
     {
       parent_auth = AU_ERROR;
-    } 
-    else if (parents == NULL) 
+    }
+    else if (parents == NULL)
     {
       /* parent does not exist */
       parent_auth = AU_UNAUTHORISED_CONT;
       RT_parent_not_exist(info->ctx);
       LG_log(au_context, LG_DEBUG, "set_rpsl_create: no parent, invalid name");
-    } 
-    else 
+    }
+    else
     {
+      /* There is no need to force an exit at this point. We can exit gracefully.
       assert(g_list_next(parents) == NULL);  /* must only be a single parent */
+      if ( g_list_next(parents) == NULL )
+      {
+        parent = parents->data;
+        parent_key = rpsl_object_get_key_value(parent);
+        LG_log(au_context, LG_DEBUG, "set_rpsl_create: parent is [%s]", parent_key);
+        UT_free(parent_key);
 
-      parent = parents->data;
-      parent_key = rpsl_object_get_key_value(parent);
-      LG_log(au_context, LG_DEBUG, "set_rpsl_create: parent is [%s]", parent_key);
-      UT_free(parent_key);
-
-      parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY, 
-                                          parent, "parent", info);
+        parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY,
+                                            parent, "parent", info);
+      }
+      else
+      {
+        LG_log(au_context, LG_DEBUG, "set_rpsl_create: set has multiple parents");
+        parent_auth = AU_ERROR;
+      }
     }
   }
 
@@ -347,22 +356,22 @@ set_rpsl_create (au_plugin_callback_info_t *info)
   UT_free(set_name);
 
   /* now check the "mnt-by:" in the object itself */
-  child_auth = au_check_multiple_authentications(CHECK_MNT_BY, 
+  child_auth = au_check_multiple_authentications(CHECK_MNT_BY,
                                      info->obj, "", info);
 
   LG_log(au_context, LG_DEBUG, "set_rpsl_create: child_auth is [%s]",
          AU_ret2str(child_auth));
 
   /* determine authorisation based on the parent and child */
-  if ((parent_auth == AU_ERROR) || (child_auth == AU_ERROR)) 
+  if ((parent_auth == AU_ERROR) || (child_auth == AU_ERROR))
   {
     ret_val = AU_ERROR;
-  } 
-  else if ((parent_auth == AU_AUTHORISED) && (child_auth == AU_AUTHORISED)) 
+  }
+  else if ((parent_auth == AU_AUTHORISED) && (child_auth == AU_AUTHORISED))
   {
     ret_val = AU_AUTHORISED;
-  } 
-  else 
+  }
+  else
   {
     ret_val = AU_UNAUTHORISED_CONT;
   }
@@ -372,7 +381,7 @@ set_rpsl_create (au_plugin_callback_info_t *info)
 
   /* return maintainers, or free maintainers */
   LG_log(au_context, LG_DEBUG,"set_rpsl_create: [%d] mntners used", g_list_length(info->mntner_used));
-  if (ret_val == AU_ERROR) 
+  if (ret_val == AU_ERROR)
   {
       g_list_foreach(info->mntner_used, au_rpsl_object_delete, NULL);
       info->mntner_used = NULL;
@@ -381,7 +390,7 @@ set_rpsl_create (au_plugin_callback_info_t *info)
   /* report result */
   RT_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);
 
-  LG_log(au_context, LG_FUNC, "<set_rpsl_create: exiting with value [%s]", 
+  LG_log(au_context, LG_FUNC, "<set_rpsl_create: exiting with value [%s]",
          AU_ret2str(ret_val));
 
   return ret_val;
@@ -421,7 +430,7 @@ hierarchical_rpsl_create (au_plugin_callback_info_t *info)
   }
 
   /* check for parent authorisation */
-  if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY) 
+  if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY)
   {
     /* error finding parent */
     parent_auth = AU_ERROR;
@@ -450,12 +459,12 @@ hierarchical_rpsl_create (au_plugin_callback_info_t *info)
       LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: parent is [%s]", parent_key);
       UT_free(parent_key);
 
-      parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY, 
+      parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY,
                                           parent, "parent", info);
-      
+
       parents = g_list_next(parents);
     }
-    
+
     /* set parent_auth to AU_UNAUTHORISED_CONT, regardless of the result */
     parent_auth = AU_UNAUTHORISED_CONT;
   }
@@ -466,7 +475,7 @@ hierarchical_rpsl_create (au_plugin_callback_info_t *info)
     LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: parent is [%s]", parent_key);
     UT_free(parent_key);
 
-    parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY, 
+    parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY,
                                           parent, "parent", info);
   }
 
@@ -474,22 +483,22 @@ hierarchical_rpsl_create (au_plugin_callback_info_t *info)
          AU_ret2str(parent_auth));
 
   /* now check the "mnt-by:" in the object itself */
-  child_auth = au_check_multiple_authentications(CHECK_MNT_BY, 
+  child_auth = au_check_multiple_authentications(CHECK_MNT_BY,
                                      info->obj, "", info);
 
   LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: child_auth is [%s]",
          AU_ret2str(child_auth));
 
   /* determine authorisation based on the parent and child */
-  if ((parent_auth == AU_ERROR) || (child_auth == AU_ERROR)) 
+  if ((parent_auth == AU_ERROR) || (child_auth == AU_ERROR))
   {
     ret_val = AU_ERROR;
-  } 
-  else if ((parent_auth == AU_AUTHORISED) && (child_auth == AU_AUTHORISED)) 
+  }
+  else if ((parent_auth == AU_AUTHORISED) && (child_auth == AU_AUTHORISED))
   {
     ret_val = AU_AUTHORISED;
-  } 
-  else 
+  }
+  else
   {
     ret_val = AU_UNAUTHORISED_CONT;
   }
@@ -498,7 +507,7 @@ hierarchical_rpsl_create (au_plugin_callback_info_t *info)
 
   /* return maintainers, or free maintainers */
   LG_log(au_context, LG_DEBUG,"hierarchical_rpsl_create: [%d] mntners used", g_list_length(info->mntner_used));
-  if (ret_val == AU_ERROR) 
+  if (ret_val == AU_ERROR)
   {
       g_list_foreach(info->mntner_used, au_rpsl_object_delete, NULL);
       info->mntner_used = NULL;
@@ -507,7 +516,7 @@ hierarchical_rpsl_create (au_plugin_callback_info_t *info)
   /* report result */
   RT_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);
 
-  LG_log(au_context, LG_FUNC, "<hierarchical_rpsl_create: exiting with value [%s]", 
+  LG_log(au_context, LG_FUNC, "<hierarchical_rpsl_create: exiting with value [%s]",
          AU_ret2str(ret_val));
 
   return ret_val;
@@ -550,12 +559,12 @@ route_rpsl_create (au_plugin_callback_info_t *info)
   UT_free(key);
 
   /* check for parent authorisation */
-  if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY) 
+  if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY)
   {
     parent_auth = AU_ERROR;
     aut_num_auth = AU_ERROR;
   }
-  else 
+  else
   {
     parent = NULL;
     aut_num = NULL;
@@ -673,26 +682,26 @@ route_rpsl_create (au_plugin_callback_info_t *info)
          AU_ret2str(aut_num_auth));
 
   /* now check the "mnt-by:" in the object itself */
-  child_auth = au_check_multiple_authentications(CHECK_MNT_BY, 
+  child_auth = au_check_multiple_authentications(CHECK_MNT_BY,
                                      info->obj, "", info);
 
   LG_log(au_context, LG_DEBUG, "route_rpsl_create: child_auth is [%s]",
          AU_ret2str(child_auth));
 
   /* determine authorisation based on the parent and child */
-  if ((parent_auth == AU_ERROR) || 
+  if ((parent_auth == AU_ERROR) ||
       (aut_num_auth == AU_ERROR) ||
-      (child_auth == AU_ERROR)) 
+      (child_auth == AU_ERROR))
   {
     ret_val = AU_ERROR;
-  } 
-  else if ((parent_auth == AU_AUTHORISED) && 
+  }
+  else if ((parent_auth == AU_AUTHORISED) &&
            (aut_num_auth == AU_AUTHORISED) &&
-           (child_auth == AU_AUTHORISED)) 
+           (child_auth == AU_AUTHORISED))
   {
     ret_val = AU_AUTHORISED;
-  } 
-  else 
+  }
+  else
   {
     ret_val = AU_UNAUTHORISED_CONT;
   }
@@ -701,7 +710,7 @@ route_rpsl_create (au_plugin_callback_info_t *info)
 
   /* return maintainers, or free maintainers */
   LG_log(au_context, LG_DEBUG,"route_rpsl_create: [%d] mntners used", g_list_length(info->mntner_used));
-  if (ret_val == AU_ERROR) 
+  if (ret_val == AU_ERROR)
   {
       g_list_foreach(info->mntner_used, au_rpsl_object_delete, NULL);
       info->mntner_used = NULL;
@@ -710,7 +719,7 @@ route_rpsl_create (au_plugin_callback_info_t *info)
   /* report result */
   RT_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);
 
-  LG_log(au_context, LG_FUNC, "<route_rpsl_create: exiting with value [%s]", 
+  LG_log(au_context, LG_FUNC, "<route_rpsl_create: exiting with value [%s]",
          AU_ret2str(ret_val));
 
   return ret_val;
@@ -737,50 +746,58 @@ aut_num_rpsl_create (au_plugin_callback_info_t *info)
   UT_free(child_key);
 
   /* get the key */
-  if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY) 
+  if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY)
   {
     parent_auth = AU_ERROR;
-  } 
+  }
   else if (parents == NULL)
   {
     LG_log(au_context, LG_DEBUG, "aut_num_rpsl_create: no as-block");
     parent_auth = AU_UNAUTHORISED_CONT;
     RT_parent_not_exist(info->ctx);
   }
-  else 
+  else
   {
+    /* There is no need to force an exit at this point. We can exit gracefully.
     assert(g_list_next(parents) == NULL);  /* must only be a single parent */
-    
-    parent = parents->data;
-    parent_key = rpsl_object_get_key_value(parent);
-    LG_log(au_context, LG_DEBUG, "aut_num_rpsl_create: encompassing as-block is [%s]",
-           parent_key);
-    UT_free(parent_key);
+    if ( g_list_next(parents) == NULL )
+    {
+      parent = parents->data;
+      parent_key = rpsl_object_get_key_value(parent);
+      LG_log(au_context, LG_DEBUG, "aut_num_rpsl_create: encompassing as-block is [%s]",
+             parent_key);
+      UT_free(parent_key);
 
-    parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY, 
-                                          parent, "parent", info);
+      parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY,
+                                            parent, "parent", info);
+    }
+    else
+    {
+      LG_log(au_context, LG_DEBUG, "aut_num_rpsl_create: as-block has multiple parents");
+      parent_auth = AU_ERROR;
+    }
   }
 
   LG_log(au_context, LG_DEBUG, "aut_num_rpsl_create: parent_auth is [%s]",
          AU_ret2str(parent_auth));
 
   /* now check the "mnt-by:" in the object itself */
-  child_auth = au_check_multiple_authentications(CHECK_MNT_BY, 
+  child_auth = au_check_multiple_authentications(CHECK_MNT_BY,
                                      info->obj, "", info);
 
   LG_log(au_context, LG_DEBUG, "aut_num_rpsl_create: child_auth is [%s]",
          AU_ret2str(child_auth));
 
   /* determine authorisation based on the parent and child */
-  if ((parent_auth == AU_ERROR) || (child_auth == AU_ERROR)) 
+  if ((parent_auth == AU_ERROR) || (child_auth == AU_ERROR))
   {
     ret_val = AU_ERROR;
-  } 
-  else if ((parent_auth == AU_AUTHORISED) && (child_auth == AU_AUTHORISED)) 
+  }
+  else if ((parent_auth == AU_AUTHORISED) && (child_auth == AU_AUTHORISED))
   {
     ret_val = AU_AUTHORISED;
-  } 
-  else 
+  }
+  else
   {
     ret_val = AU_UNAUTHORISED_CONT;
   }
@@ -789,7 +806,7 @@ aut_num_rpsl_create (au_plugin_callback_info_t *info)
 
   /* return maintainers, or free maintainers */
   LG_log(au_context, LG_DEBUG,"aut_num_rpsl_create: [%d] mntners used", g_list_length(info->mntner_used));
-  if (ret_val == AU_ERROR) 
+  if (ret_val == AU_ERROR)
   {
       g_list_foreach(info->mntner_used, au_rpsl_object_delete, NULL);
       info->mntner_used = NULL;
@@ -798,7 +815,7 @@ aut_num_rpsl_create (au_plugin_callback_info_t *info)
   /* report result */
   RT_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);
 
-  LG_log(au_context, LG_FUNC, "<aut_num_rpsl_create: exiting with value [%s]", 
+  LG_log(au_context, LG_FUNC, "<aut_num_rpsl_create: exiting with value [%s]",
          AU_ret2str(ret_val));
 
   return ret_val;
@@ -838,12 +855,12 @@ route6_rpsl_create (au_plugin_callback_info_t *info)
   UT_free(key);
 
   /* check for parent authorisation */
-  if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY) 
+  if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY)
   {
     parent_auth = AU_ERROR;
     aut_num_auth = AU_ERROR;
   }
-  else 
+  else
   {
     parent = NULL;
     aut_num = NULL;
@@ -953,26 +970,26 @@ route6_rpsl_create (au_plugin_callback_info_t *info)
          AU_ret2str(aut_num_auth));
 
   /* now check the "mnt-by:" in the object itself */
-  child_auth = au_check_multiple_authentications(CHECK_MNT_BY, 
+  child_auth = au_check_multiple_authentications(CHECK_MNT_BY,
                                      info->obj, "", info);
 
   LG_log(au_context, LG_DEBUG, "route6_rpsl_create: child_auth is [%s]",
          AU_ret2str(child_auth));
 
   /* determine authorisation based on the parent and child */
-  if ((parent_auth == AU_ERROR) || 
+  if ((parent_auth == AU_ERROR) ||
       (aut_num_auth == AU_ERROR) ||
-      (child_auth == AU_ERROR)) 
+      (child_auth == AU_ERROR))
   {
     ret_val = AU_ERROR;
-  } 
-  else if ((parent_auth == AU_AUTHORISED) && 
+  }
+  else if ((parent_auth == AU_AUTHORISED) &&
            (aut_num_auth == AU_AUTHORISED) &&
-           (child_auth == AU_AUTHORISED)) 
+           (child_auth == AU_AUTHORISED))
   {
     ret_val = AU_AUTHORISED;
-  } 
-  else 
+  }
+  else
   {
     ret_val = AU_UNAUTHORISED_CONT;
   }
@@ -981,7 +998,7 @@ route6_rpsl_create (au_plugin_callback_info_t *info)
 
   /* return maintainers, or free maintainers */
   LG_log(au_context, LG_DEBUG,"route6_rpsl_create: [%d] mntners used", g_list_length(info->mntner_used));
-  if (ret_val == AU_ERROR) 
+  if (ret_val == AU_ERROR)
   {
       g_list_foreach(info->mntner_used, au_rpsl_object_delete, NULL);
       info->mntner_used = NULL;
@@ -990,14 +1007,14 @@ route6_rpsl_create (au_plugin_callback_info_t *info)
   /* report result */
   RT_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);
 
-  LG_log(au_context, LG_FUNC, "<route6_rpsl_create: exiting with value [%s]", 
+  LG_log(au_context, LG_FUNC, "<route6_rpsl_create: exiting with value [%s]",
          AU_ret2str(ret_val));
 
   return ret_val;
 }
 
 
-AU_ret_t 
+AU_ret_t
 generic_rpsl_create (au_plugin_callback_info_t *info)
 {
   AU_ret_t ret_val;
@@ -1015,7 +1032,7 @@ generic_rpsl_create (au_plugin_callback_info_t *info)
     override = FALSE;
   } else {
     /* get the maintainers listed in the object, if any */
-    ret_val = au_check_multiple_authentications(CHECK_MNT_BY, 
+    ret_val = au_check_multiple_authentications(CHECK_MNT_BY,
                                   info->obj, "", info);
 
     /* override if necessary */
@@ -1027,13 +1044,13 @@ generic_rpsl_create (au_plugin_callback_info_t *info)
   /* report result */
   RT_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
 
-  LG_log(au_context, LG_FUNC, "<generic_rpsl_create: exiting with value [%s]", 
+  LG_log(au_context, LG_FUNC, "<generic_rpsl_create: exiting with value [%s]",
          AU_ret2str(ret_val));
 
   return ret_val;
 }
 
-AU_ret_t 
+AU_ret_t
 generic_rpsl_delete (au_plugin_callback_info_t *info)
 {
   AU_ret_t ret_val;
@@ -1052,7 +1069,7 @@ generic_rpsl_delete (au_plugin_callback_info_t *info)
   } else {
 
     /* get the maintainers listed in the object, if any */
-    ret_val = au_check_multiple_authentications(CHECK_MNT_BY, 
+    ret_val = au_check_multiple_authentications(CHECK_MNT_BY,
                                   info->obj, "", info);
 
     au_override(&ret_val, &override, info);
@@ -1063,22 +1080,22 @@ generic_rpsl_delete (au_plugin_callback_info_t *info)
   /* report result */
   RT_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);
 
-  LG_log(au_context, LG_FUNC, "<generic_rpsl_delete: exiting with value [%s]", 
+  LG_log(au_context, LG_FUNC, "<generic_rpsl_delete: exiting with value [%s]",
        AU_ret2str(ret_val));
 
   return ret_val;
 }
 
-/* 
+/*
   Authentication check for generic RPSL modifies.
-  
+
   info     - AU plugin callback information
 
   return   - AU_AUTHORISED, AU_UNAUTHORISED_CONT, or AU_ERROR
 
   This implements the semantics for changing an object.
  */
-AU_ret_t 
+AU_ret_t
 generic_rpsl_modify (au_plugin_callback_info_t *info)
 {
   rpsl_object_t *old_object;
@@ -1090,13 +1107,13 @@ generic_rpsl_modify (au_plugin_callback_info_t *info)
   LG_log(au_context, LG_FUNC, ">generic_rpsl_modify: entering");
 
   /* get the old version of the object */
-  if (!LU_get_object(au_lookup, &old_object, info->obj, NULL)) 
+  if (!LU_get_object(au_lookup, &old_object, info->obj, NULL))
   {
     LG_log(au_context, LG_ERROR, "generic_rpsl_modify: error looking up old version");
     LG_log(au_context, LG_FUNC, "<generic_rpsl_modify: exiting with value [AU_ERROR]");
     return AU_ERROR;
   }
-  if (old_object == NULL) 
+  if (old_object == NULL)
   {
     LG_log(au_context, LG_ERROR, "generic_rpsl_modify: no old version");
     LG_log(au_context, LG_FUNC, "<generic_rpsl_modify: exiting with value [AU_ERROR]");
@@ -1104,20 +1121,20 @@ generic_rpsl_modify (au_plugin_callback_info_t *info)
   }
 
   /* find which objects maintainers to use */
-  if ( rpsl_object_get_attr(old_object, "mnt-by") ) 
+  if ( rpsl_object_get_attr(old_object, "mnt-by") )
   {
     /* if the old version has a "mnt-by:" attribute, use that */
     LG_log(au_context, LG_DEBUG, "generic_rpsl_modify: using \"mnt-by:\" of old object");
     object_to_use = old_object;
-  } 
-  else 
+  }
+  else
   {
     /* otherwise use the "mnt-by:" in the new object, if any */
     LG_log(au_context, LG_DEBUG, "generic_rpsl_modify: using \"mnt-by:\" of new object");
     object_to_use = info->obj;
   }
 
-  ret_val = au_check_multiple_authentications(CHECK_MNT_BY, 
+  ret_val = au_check_multiple_authentications(CHECK_MNT_BY,
                                   object_to_use, "", info);
 
   /* memory cleanup */
@@ -1136,9 +1153,9 @@ generic_rpsl_modify (au_plugin_callback_info_t *info)
 }
 
 
-/* 
+/*
   Entry point for RPSL authentication - invoke AU by-type support
-  
+
   trans    - PG module transaction
   info     - AU plugin callback information
 
@@ -1149,7 +1166,7 @@ generic_rpsl_modify (au_plugin_callback_info_t *info)
 
   This is merely a dispatcher.
  */
-PG_status_t 
+PG_status_t
 au_rpsl_check (PG_transaction_t *trans, gpointer *info)
 {
   PG_status_t ret_val;
@@ -1177,7 +1194,7 @@ au_rpsl_check (PG_transaction_t *trans, gpointer *info)
     case AU_FWD:
       ret_val = PG_ERROR_STOP;
       callback_info->ret_val = au_ret_val;
-      break; 
+      break;
     case AU_UNAUTHORISED_END:
       ret_val = PG_ERROR_STOP;
       callback_info->ret_val = au_ret_val;
@@ -1207,7 +1224,7 @@ au_rpsl_check (PG_transaction_t *trans, gpointer *info)
     RT_end_detailed_report(callback_info->ctx);
   }
 
-  LG_log(au_context, LG_FUNC, "<au_rpsl_check: exiting with value [%d]", 
+  LG_log(au_context, LG_FUNC, "<au_rpsl_check: exiting with value [%d]",
          ret_val);
   return ret_val;
 }
@@ -1226,7 +1243,7 @@ AU_ret_t au_check_mnt_routes_prefix (GList **mntners, rpsl_object_t *parent, cha
   const gchar *route_text;
   const rpsl_attr_t *route;
   AU_ret_t ret_val = AU_UNAUTHORISED_CONT;
-  
+
   p = *mntners;
 
   invalid_list = NULL;
@@ -1253,7 +1270,7 @@ AU_ret_t au_check_mnt_routes_prefix (GList **mntners, rpsl_object_t *parent, cha
     if (partial_invalid_list != NULL)
     {
       /* report error and delete this maintainer from the list */
-      LG_log(au_context, LG_INFO, "au_check_mnt_routes_prefix: mntner [%s] excluded", 
+      LG_log(au_context, LG_INFO, "au_check_mnt_routes_prefix: mntner [%s] excluded",
                                    rpsl_attr_get_clean_value(p->data));
       LG_log(au_context, LG_INFO, "au_check_mnt_routes_prefix: mnt-routes contains invalid prefix(es)");
 
@@ -1272,13 +1289,13 @@ AU_ret_t au_check_mnt_routes_prefix (GList **mntners, rpsl_object_t *parent, cha
     {
       /* check if the prefix is contained in prefix range list */
       q = prefix_list;
-      while ((q != NULL) && (found != 1)) 
+      while ((q != NULL) && (found != 1))
       {
         if (IP_pref_in_prefrang(&prefix, q->data))
         {
           found = 1;
         }
-        else 
+        else
         {
           q = g_list_next(q);
         }
@@ -1294,27 +1311,27 @@ AU_ret_t au_check_mnt_routes_prefix (GList **mntners, rpsl_object_t *parent, cha
         UT_free(removed_link->data);
         g_list_free(removed_link);
       }
-      else 
+      else
       {
         p = g_list_next(p);
       }
     }
-    else 
+    else
     {
       p = g_list_next(p);
     }
-  }  
+  }
 
   /* report errors */
 
   if ((invalid_list != NULL) && (failed_mntners != NULL))
   {
     LG_log(au_context, LG_INFO, "au_check_mnt_routes_prefix: adding errors to report");
-    RT_invalid_mnt_routes(info->ctx, rpsl_object_get_key_value(parent), (gchar*)rpsl_object_get_class(parent), 
+    RT_invalid_mnt_routes(info->ctx, rpsl_object_get_key_value(parent), (gchar*)rpsl_object_get_class(parent),
                           parent_text, failed_mntners, invalid_list);
-    ret_val |= AU_UNAUTHORISED_CONT;   
+    ret_val |= AU_UNAUTHORISED_CONT;
   }
-  
+
   LG_log(au_context, LG_INFO, "<au_check_mnt_routes_prefix: exiting with value [%s]", AU_ret2str(ret_val));
   return ret_val;
 }

@@ -17,56 +17,53 @@
 #undef MAX
 #include "memwrap.h"
 
-void
-au_override (AU_ret_t *ret_val, gboolean *override, au_plugin_callback_info_t *info)
-{
-  char *override_pwd;
-  gchar **override_pgp_keys,**override_pgp_key;
-  size_t len;
+void au_override(AU_ret_t *ret_val, gboolean *override, au_plugin_callback_info_t *info) {
+    char *override_pwd;
+    gchar **override_pgp_keys, **override_pgp_key;
+    size_t len;
 
-  LG_log(au_context, LG_FUNC, ">au_override: entering");
+    LG_log(au_context, LG_FUNC, ">au_override: entering");
 
-  LG_log(au_context, LG_DEBUG, "au_override: ret_val start [%s]", 
-         AU_ret2str(*ret_val));
+    LG_log(au_context, LG_DEBUG, "au_override: ret_val start [%s]", AU_ret2str(*ret_val));
 
-  /* only allow override if we do not have an error */
-  if (*ret_val != AU_ERROR)
-  {
-    override_pwd = ca_get_overridecryptedpw;
-    /* chop off any trailing newline */
-    len = strlen(override_pwd);
-    if ((len > 0) && (override_pwd[len-1] == '\n'))
-    {
-      override_pwd[len-1] = '\0';
-    }
-    if (CR_credential_list_check(info->cred, CR_OVERRIDE, override_pwd, FALSE))
-    {
-      *ret_val = AU_AUTHORISED;
-      *override = TRUE;
-    }
-    else
-    {
-      *override = FALSE;
-    }
-    if ((*override==FALSE)&&(CR_credential_list_check(info->cred, CR_OVERRIDE, override_pwd, FALSE))) { /* check for PGP override if password override fails */
-      override_pgp_keys=ut_g_strsplit_v1(ca_get_overridepgp,"\n",-1);
-      override_pgp_key=override_pgp_keys;
-      *override=FALSE;
-      while ((*override==FALSE) && override_pgp_key && *override_pgp_key) {
-        if (CR_credential_list_check(info->cred,CR_PGP,*override_pgp_key,FALSE)) {
-          *ret_val=AU_AUTHORISED;
-          *override=TRUE;
+    /* only allow override if we do not have an error */
+    if (*ret_val != AU_ERROR) {
+        /* set default value */
+        *override = FALSE;
+
+        override_pwd = ca_get_overridecryptedpw;
+        /* chop off any trailing newline */
+        len = strlen(override_pwd);
+        while ((len > 0) && (override_pwd[len - 1] == '\n')) {
+            override_pwd[len - 1] = '\0';
+            len--;
         }
-        override_pgp_key++;
-      }
-      g_strfreev(override_pgp_keys);
-    }
-    UT_free(override_pwd);
-  }
 
-  LG_log(au_context, LG_DEBUG, "au_override: ret_val final [%s]",
-         AU_ret2str(*ret_val));
-  LG_log(au_context, LG_FUNC, "<au_override: exiting");
+        if (CR_credential_list_check(info->cred, CR_OVERRIDE, override_pwd, FALSE)) {
+            *ret_val = AU_AUTHORISED;
+            *override = TRUE;
+        } else {
+            /* check for PGP override if password override fails */
+            char *overridepgp = ca_get_overridepgp;
+            override_pgp_keys = g_strsplit(overridepgp, "\n", -1);
+
+            for (override_pgp_key = override_pgp_keys; override_pgp_key && *override_pgp_key; override_pgp_key++) {
+                LG_log(au_context, LG_DEBUG, "au_override: trying override_pgp_key [%s]", *override_pgp_key);
+                if (CR_credential_list_check(info->cred, CR_PGP, *override_pgp_key, FALSE)) {
+                    *ret_val = AU_AUTHORISED;
+                    *override = TRUE;
+                    LG_log(au_context, LG_DEBUG, "au_override: successfully authorized override_pgp_key [%s]", *override_pgp_key);
+                    break;
+                }
+            }
+            UT_free(overridepgp);
+            g_strfreev(override_pgp_keys);
+        }
+        UT_free(override_pwd);
+    }
+
+    LG_log(au_context, LG_DEBUG, "au_override: ret_val final [%s]", AU_ret2str(*ret_val));
+    LG_log(au_context, LG_FUNC, "<au_override: exiting");
 }
 
 AU_ret_t
@@ -90,17 +87,17 @@ au_check_authentications (GList *auth_attrs, GList *cred)
     auth = rpsl_attr_get_value(p->data);
 
     /* NONE is a special case and always succeeds */
-    if (strcasecmp(auth, "NONE") == 0) 
+    if (strcasecmp(auth, "NONE") == 0)
     {
       ret_val = AU_AUTHORISED;
       LG_log(au_context, LG_DEBUG,
              "au_check_authentications: NONE authenticated");
     }
-    else 
+    else
     {
       /* flag to verify we have a good authentication type */
       known_auth = TRUE;
-      
+
       /* determine the authentication type and data from the attribute */
       if (strncasecmp(auth, "PGPKEY-", 7) == 0)
       {
@@ -130,20 +127,20 @@ au_check_authentications (GList *auth_attrs, GList *cred)
       else
       {
         known_auth = FALSE;
-        LG_log(au_context, LG_WARN, 
+        LG_log(au_context, LG_WARN,
                "au_check_authentications: unrecognised authentication %s",
                auth);
       }
 
-      LG_log(au_context, LG_DEBUG, 
+      LG_log(au_context, LG_DEBUG,
                "au_check_authentications: auth_type %s", CR_type2str(auth_type));
-      LG_log(au_context, LG_DEBUG, 
+      LG_log(au_context, LG_DEBUG,
                "au_check_authentications: auth_val %s", auth_val ? auth_val : "UNKNOWN");
 
       /* check the credential list for this authentication */
       if (known_auth &&
           CR_credential_list_check(cred, auth_type, auth_val, FALSE))
-      { 
+      {
         ret_val = AU_AUTHORISED;
         LG_log(au_context, LG_DEBUG,
                "au_check_authentications: %s authenticated", auth);
@@ -157,7 +154,7 @@ au_check_authentications (GList *auth_attrs, GList *cred)
   }
 
   /* log result */
-  LG_log(au_context, LG_FUNC, 
+  LG_log(au_context, LG_FUNC,
          "<au_check_authentications: exiting with value [%s]",
          AU_ret2str(ret_val));
 
@@ -171,7 +168,6 @@ au_mntner_authenticate(RT_context_t * ctx, const gchar * mntner_name, LU_server_
 {
 	AU_ret_t ret_val;
 	GList *auth_attrs;
-	GList *p;
 
 	LG_log(au_context, LG_FUNC, ">au_mntner_authenticate: entering");
 
@@ -230,8 +226,8 @@ get_source (const rpsl_object_t *obj)
 }
 
 AU_ret_t
-au_check_multiple_authentications (char *attr_to_check[], 
-                                   rpsl_object_t *obj, 
+au_check_multiple_authentications (char *attr_to_check[],
+                                   rpsl_object_t *obj,
                                    char *parent_text,
                                    au_plugin_callback_info_t *info)
 {
@@ -257,19 +253,19 @@ au_check_multiple_authentications (char *attr_to_check[],
   num_error = 0;
   authenticated = NULL;
   unauthenticated = NULL;
-  
+
   /* look through the list of attributes to use authentications in, and
      stop when we find the first one */
-  
+
   mntners = NULL;
-  for (i=0; (mntners == NULL) && (attr_to_check[i] != NULL); i++) 
+  for (i=0; (mntners == NULL) && (attr_to_check[i] != NULL); i++)
   {
     mntners = rpsl_object_get_attr(obj, attr_to_check[i]);
     mnt_type = strdup(attr_to_check[i]);
   }
 
-  /* for now, if there are no maintainers, the creation is authorised. 
-     this is bogus, and should be changed to unauthorised, which could be 
+  /* for now, if there are no maintainers, the creation is authorised.
+     this is bogus, and should be changed to unauthorised, which could be
      done by simply removing these 7 lines
      */
   if (mntners == NULL)
@@ -312,14 +308,14 @@ au_check_multiple_authentications (char *attr_to_check[],
   /* make the mntner list unique */
   rpsl_attr_uniq_list(&mntners);
 
-  for (attr = mntners; attr != NULL; attr = g_list_next(attr)) 
+  for (attr = mntners; attr != NULL; attr = g_list_next(attr))
   {
     value = rpsl_attr_get_clean_value(attr->data);
     g_strup(value);
-    LG_log(au_context, LG_DEBUG, "check_authentications: checking mntner %s", 
+    LG_log(au_context, LG_DEBUG, "check_authentications: checking mntner %s",
            value);
 
-    switch (au_mntner_authenticate(info->ctx, value, au_lookup, source, info->cred, &mntner)) 
+    switch (au_mntner_authenticate(info->ctx, value, au_lookup, source, info->cred, &mntner))
     {
       case AU_AUTHORISED:
         LG_log(au_context, LG_DEBUG, "check_authentications: %s authenticated", value);
@@ -329,7 +325,7 @@ au_check_multiple_authentications (char *attr_to_check[],
         break;
       case AU_UNAUTHORISED_CONT:
         LG_log(au_context, LG_DEBUG, "check_authentications: %s not authenticated", value);
-        if (mntner != NULL) 
+        if (mntner != NULL)
         {
           unauthenticated = g_list_append(unauthenticated, mntner);
           LG_log(au_context, LG_DEBUG,"check_authentications: not authenticated by [%d] mntners", g_list_length(unauthenticated));
@@ -338,7 +334,7 @@ au_check_multiple_authentications (char *attr_to_check[],
       case AU_ERROR:
         LG_log(au_context, LG_DEBUG, "check_authentications: %s caused error", value);
         num_error++;
-        if (mntner != NULL) 
+        if (mntner != NULL)
         {
           unauthenticated = g_list_append(unauthenticated, mntner);
           LG_log(au_context, LG_DEBUG,"check_authentications: not authenticated by [%d] mntners", g_list_length(unauthenticated));

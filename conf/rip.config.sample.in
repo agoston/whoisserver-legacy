@@ -651,12 +651,12 @@ TESTMODE  0
 # source: MYSRC
 # override: Reason_for_overriding_all_security Password
 #
-# [ This sample crypted password correspond to the word "password" ]
+# [ This sample crypted password corresponds to the word "password" ]
 
 OVERRIDECRYPTEDPW   1F.5OTsRVjwLo
 
 #
-# PGP key to override all security for updates
+# PGP key(s) to override all security for updates
 # Similar to OVERRIDECRYPTEDPW, but accepts PGP-signed messages
 #
 OVERRIDEPGP   0DAD2612
@@ -665,24 +665,23 @@ OVERRIDEPGP   D83C3FBD
 #
 # ALLOCMNT
 # List of maintainers which can create an inetnum object 
-# with status ALLOCATED (one per line or comma separated list
-# or combination of the above)
+# with status ALLOCATED 
+# (one per line or comma separated list or combination of the above)
 
 ALLOCMNT RIPE-NCC-HM-MNT,RIPE-NCC-SECOND-HM-MNT
 
 #
 # DISALLOWMNT
 # List of maintainers which are not allowed to be used 
-# (one per line or comma separated list
-# or combination of the above)
+# (one per line or comma separated list or combination of the above)
 
 DISALLOWMNT NEW-MNT,RIPE-NCC-NONE-MNT,AUTO-1,MNT-1,MNT-2,MNT-3,MNT-4,MNT-5,MNT-6,MNT-7,MNT-8,MNT-9,MNTR-1,MNTR-2,MNTR-3,MNTR-4,MNTR-5,MNTR-6,MNTR-7,MNTR-8,MNTR-9,EXAMPLE-MNT,GOODY2SHOES-MNT,SANTA-MNT,MNT-BY,MNT-LOWER,MNT-ROUTES,MNT-ROUTE,MNT-DOMAINS,MNT-DOMAIN
 
 #
 # ORG_POWER_MNT
 # List of maintainers which can create organistion objects with
-# "org-type:" IANA, RIR, NIR or LIR (one per line or space separated list
-# or combination of the above)
+# "org-type:" IANA, RIR, NIR, LIR, DIRECT_ASSIGNMENT or WHITEPAGES
+# (one per line or space separated list or combination of the above)
 
 ORG_POWER_MNT RIPE-NCC-HM-MNT TEST-DBM-MNT
 
@@ -721,16 +720,6 @@ PGPPATH @topdir@/.gnupg
 # Full pathname of your gpg executable
 
 GPGCMD @GPGCMD@
-
-#
-# X.509-related stuff
-#
-#  NOT IN USE
-
-OPENSSLCMD NULL
-CRLLIST NULL
-CACERTS NULL
-
 
 #
 # X.509-related stuff
@@ -799,7 +788,6 @@ NICSUFFIX RADB
 NICSUFFIX APNIC
 NICSUFFIX RIPN
 NICSUFFIX AFRINIC
-NICSUFFIX DB-TEST
 
 # RDNS related entries
 

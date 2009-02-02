@@ -106,17 +106,23 @@
 #
 # RESULT 8: The creations will fail.
 #
-# *** TEST WILL FAIL because of bug #201 in software ***
-# non existant route-set in member-of defaults to auth pass
+# Test used to fail because of bug(zilla) #201 in software
+# non existant route-set in member-of defaulted to auth pass
+#
+# Bug(zilla) #201 has been fixed as a result of not allowing dummy 
+# object creations.
+# The creations still fail, but because of referential integrity,
+# referencing a non existant object.
 
 >> asn32/route/009 <<
 
 # CASE 9: We try to create route object 20.13.0.0/16,AS200
 # member-of is an route-set which does not exists
+# This used to succeed when we allowed dummy objects, but now fails.
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 9: The creation will succeed.
+# RESULT 9: The creation will fail.
 
 >> asn32/route/010 <<
 

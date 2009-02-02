@@ -12,9 +12,9 @@
         engin (06/07/2000) Created.
   ******************/ /******************
   Copyright (c) 2000                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -32,7 +32,7 @@
  ***************************************/
 
 #ifndef NOTIFICATION_H
-#define NOTIFICATION_H 
+#define NOTIFICATION_H
 
 
 #include <stdarg.h>
@@ -48,19 +48,18 @@
 #define MNTNER_OBJ   1
 #define DIFF_BUFFER_SIZE 1025
 #define DIFF_READ_SIZE 1024
-/* TODO absolute path */
 #define DIFF_COMMAND "/usr/bin/diff"
 
 typedef struct {
-      char *key; 
+      char *key;
       RT_context_t *value;
 } ctx_data_t;
 
 
-/*  codes used to indicate type of notification message */ 
+/*  codes used to indicate type of notification message */
 typedef enum
 {
-  UP_NOTIF=0, 
+  UP_NOTIF=0,
   UP_FRWD,
   UP_FRWD_CREATE,
   UP_FRWD_MODIFY,
@@ -94,29 +93,29 @@ typedef enum
 
 /* function prototypes */
 
-void NT_write_all_ntfs(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_write_all_ntfs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options, source_data_t *source_data,
                              rpsl_object_t *postproc_obj, rpsl_object_t *old_obj,
                              GList *mntner_used );
 
-void NT_write_all_frwds(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_write_all_frwds(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options, source_data_t *source_data,
                              rpsl_object_t *postproc_obj, rpsl_object_t *old_obj,
                              GList *mntner_used  );
 
-void NT_process_acknowledgement(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_process_acknowledgement(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                                   options_struct_t *options);
 
-void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                                   options_struct_t *options, int type);
 
-void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options, char *operation,
                              rpsl_object_t *object, GList *credentials);
 
-void NT_forw_policy_fail(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_forw_policy_fail(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options, char *operation,
-                             rpsl_object_t *object, char *reason, 
+                             rpsl_object_t *object, char *reason,
                              GList *credentials);
 
 

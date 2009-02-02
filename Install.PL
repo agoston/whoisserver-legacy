@@ -35,8 +35,10 @@ my $All             = 1;
 my $SkipTest        = 0;
 
 my $DbPrefix    = File::Spec->catdir( $ENV{'HOME'}, 'projects', basename( $Cwd ) );
-my $DbPass      = $ENV{'RIPE_DBPASS'};
-my $DbUser      = 'dbint';
+my $SQLPass     = $ENV{'RIPE_SQLPASS'};
+my $SQLUser     = 'dbint';
+my $SQLHost     = 'localhost';
+my $SQLPort     = 3306;
 my $DbPort      = $< . 0;    
 my $User        = scalar getpwuid($<);
 my $DbName      = "ripe_".$User;
@@ -47,8 +49,10 @@ GetOptions(
     'verbose!'          => \$Verbose,
     'debug!'            => \$Debug,
     'prefix=s'          => \$DbPrefix,
-    'dbuser=s'          => \$DbUser,
-    'dbpass=s'          => \$DbPass,
+    'sqluser=s'         => \$SQLUser,
+    'sqlpass=s'         => \$SQLPass,
+    'sqlhost=s'         => \$SQLHost,
+    'sqlport=s'         => \$SQLPort,
     'dbport=s'          => \$DbPort,
     'for-development!'  => \$DevelMode,
     'configure!'        => \$RunConfigure,
@@ -64,8 +68,8 @@ GetOptions(
 ) or die usage();
 
 die usage() if $Help;
-die 'Need db password. You can also set it via $ENV{RIPE_DBPASS}'.$/ 
-    unless $DbPass;
+die 'Need db password. You can also set it via $ENV{RIPE_SQLPASS}'.$/ 
+    unless $SQLPass;
 
 ### Because of our mounting these paths will actually be different texually but
 ### point to the same inode, make the check a bit more thorough and check the
@@ -94,9 +98,11 @@ Options:
   ### configuration options
   --prefix=%s           Installation prefix to use. Ie, /usr/local/whoisserver. Defaults
                         to \$HOME/projects/`basename pwd`
-  --dbuser=%s           Username to use to connect to your MySQL server. Defaults to 'dbint'
-  --dbpass=%s           Password to use to connect to your MySQL server. Defaults to
-                        \$ENV{RIPE_DBPASS}
+  --sqluser=%s          Username to use to connect to your MySQL server. Defaults to 'dbint'
+  --sqlpass=%s          Password to use to connect to your MySQL server. Defaults to
+                        \$ENV{RIPE_SQLPASS}
+  --sqlhost=%s          MySQL host to connect to (defaults to 'localhost')
+  --sqlport=%d          MySQL port to connect to (defaults to 3306)
   --dbport=%d           Starting number of port range to use for this server instance.
                         Needs 5 consecutive port numbers. Defaults to `id`0.
 
@@ -156,8 +162,8 @@ my $DbTempDir;
     $DbTempDir = File::Spec->catdir( '/tmp', $User, basename( $DbPrefix ) );
     
     ### die if no sqldb password set
-    if (!$DbPass) {
-      die 'Need db password. You can also set it via $ENV{RIPE_DBPASS}'.$/;
+    if (!$SQLPass) {
+      die 'Need db password. You can also set it via $ENV{RIPE_SQLPASS}'.$/;
     }
     
     ### 64bit architectures apparently need this or src/opl/librspl.a (and
@@ -196,14 +202,14 @@ if( $RunConfigure or $All ) {
 
 if( $SetupDb or $All ) {
     ### set up the databases to use. Replaces $USER with your username
-    _system( qq[echo "drop database $DbName"       | mysql -u $DbUser -p$DbPass], 1 );
-    _system( qq[echo "create database $DbName"     | mysql -u $DbUser -p$DbPass] );
+    _system( qq[echo "drop database $DbName"       | mysql -h $SQLHost -P $SQLPort -u $SQLUser -p$SQLPass], 1 );
+    _system( qq[echo "create database $DbName"     | mysql -h $SQLHost -P $SQLPort -u $SQLUser -p$SQLPass] );
 
-    _system( qq[echo "drop database $DbAdminName"   | mysql -u $DbUser -p$DbPass], 1 );
-    _system( qq[echo "create database $DbAdminName" | mysql -u $DbUser -p$DbPass] );
+    _system( qq[echo "drop database $DbAdminName"   | mysql -h $SQLHost -P $SQLPort -u $SQLUser -p$SQLPass], 1 );
+    _system( qq[echo "create database $DbAdminName" | mysql -h $SQLHost -P $SQLPort -u $SQLUser -p$SQLPass] );
 
     ### XXX can't we setup ripe db like this?
-    _system( qq[mysql -u $DbUser -p$DbPass $DbAdminName < src/SQL/create.RIPADMIN.sql] ); 
+    _system( qq[mysql -h $SQLHost -P $SQLPort -u $SQLUser -p$SQLPass $DbAdminName < src/SQL/create.RIPADMIN.sql] ); 
 }
 
 if( $SetupConfig or $All ) {
@@ -234,13 +240,11 @@ if( $SetupConfig or $All ) {
         [ q[^SVWHOIS_PORT .*]     => q[SVWHOIS_PORT ]  . ($DbPort+1) ],
         [ q[^SVCONFIG_PORT .*]    => q[SVCONFIG_PORT ] . ($DbPort+2) ],
         [ q[^SVMIRROR_PORT .*]    => q[SVMIRROR_PORT ] . ($DbPort+3) ],
-        [ q[^UPDSOURCE .*]        => qq[UPDSOURCE DB-TEST localhost,3306,$DbUser,].
-                                     qq[$DbPass,$DbName localhost,] .
-                                     ($DbPort+1).q[,].($DbPort+4) ],
+        [ q[^UPDSOURCE .*]        => qq[UPDSOURCE DB-TEST $SQLHost,$SQLPort,$SQLUser,$SQLPass,$DbName ].
+                                     qq[localhost,].($DbPort+1).q[,].($DbPort+4) ],
     
         ### access to the ripadmin db
-        [ q[^RIPADMIN.*]          => qq[RIPADMIN localhost,3306,$DbUser,] .
-                                     qq[$DbPass,$DbName]   ], 
+        [ q[^RIPADMIN.*]          => qq[RIPADMIN $SQLHost,$SQLPort,$SQLUser,$SQLPass,$DbName] ], 
         
         ### path to the config file
         [ q[^SOURCEFILE .*]       => qq[SOURCEFILE $DbPrefix/conf/sources.config] ],
@@ -260,11 +264,11 @@ if( $SetupConfig or $All ) {
         [ q[\nDATABASE\s+.*?/DATABASE] => qq[
 #
 DATABASE     $DbName
-host:        localhost
-port:        3306
+host:        $SQLHost
+port:        $SQLPort
 trx_support: y
-user:        $DbUser
-password:    $DbPass
+user:        $SQLUser
+password:    $SQLPass
 /DATABASE
     ] ],
         
@@ -275,7 +279,7 @@ password:    $DbPass
 #host:   master.server.net                                                                         
 #port:   4444                                                                                      
 #delay:  60                                                                                        
-#protocolVersion: 1                                                                                
+#protocolVersion: 2
 #/NRTM
     ] ],
         

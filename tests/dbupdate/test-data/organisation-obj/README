@@ -588,3 +588,25 @@
 #
 # RESULT 57: The creation will succeed
 
+# CASE 58: Create an org object
+#          with "org-type: LIR" but without
+#          a mntner in "mnt-by:" which is in ORG_POWER_MNT config
+#          variable.  
+#
+% make sure that NON-ORG-POWER-MNT is NOT in ORG_POWER_MNT config var.
+#
+# create organisation object 
+#
+#FAILURE
+#
+# RESULT 58: The creation will fail
+
+# CASE 59: Modify a person object adding an "org:" attribute, 
+#          but using the password for organisation mnt-by:
+#          instead of mnt-ref
+#
+# modify person object
+#
+#FAILURE
+#
+# RESULT 59: The modify will fail

@@ -1,14 +1,15 @@
 # CASE 8: We create an AS and try to query this AS.
 # Two hierarchical as-blocks exist.
 # 16 bit
-# currently FAILS: dbupdate dies because it finds two parent as-block objects.
 # 
 # create AS object
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 8: The creation will succeed
+# RESULT 8: The creation will fail
 
+# this test will cause dbupdate to exit with code 20
+?20
 
 password: hostmaster
 override: password

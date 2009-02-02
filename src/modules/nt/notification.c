@@ -14,9 +14,9 @@
         denis (22/11/2002) partial re-write for re-structured dbupdate
   ******************/ /******************
   Copyright (c) 2000                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -24,7 +24,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -38,9 +38,9 @@
 #include "rip.h"
 
 
-/* Generates a unique file name and returns the full path of the filename 
+/* Generates a unique file name and returns the full path of the filename
    for storing the out going message to direct to sendmail.
-   Creates the file and writes the outgoing email message to it. 
+   Creates the file and writes the outgoing email message to it.
    May use PID or time or both to ensure uniqueness.
    Receives RT context
             LG context
@@ -50,9 +50,9 @@
             redirect appendage for file name or NULL
    Returns  file path/name
 */
-      
+
 char *nt_filename_generate( RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                            options_struct_t *options, char *e_mail, 
+                            options_struct_t *options, char *e_mail,
                             char *out_mess, char *redirect )
 {
   char *name = NULL;
@@ -60,10 +60,10 @@ char *nt_filename_generate( RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   char *cleaned_email = NULL;
   int oloop, iloop;
   FILE *ntfy_file;
-  
-  LG_log(lg_ctx, LG_FUNC,">nt_filename_generate: entered, e-mail [%s] redirect [%s]\n", 
+
+  LG_log(lg_ctx, LG_FUNC,">nt_filename_generate: entered, e-mail [%s] redirect [%s]\n",
                               e_mail, redirect ? redirect : "NULL" );
-       
+
   /* get the temp dir name */
   tmpdir = ca_get_tmpdir;
   tmpdir = g_strstrip(tmpdir);
@@ -85,12 +85,12 @@ char *nt_filename_generate( RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   if ( redirect )
   {
     name = (char*)malloc(strlen(tmpdir) + strlen(cleaned_email) + strlen("notify")
-                           + strlen(redirect) +37 ); 
+                           + strlen(redirect) +37 );
     sprintf(name, "%s/%s-%s.%i.%s", tmpdir, "notify", cleaned_email, (int)(getpid()), redirect );
   }
   else
   {
-    name = (char*)malloc(strlen(tmpdir) + strlen(cleaned_email) + strlen("notify") +36 ); 
+    name = (char*)malloc(strlen(tmpdir) + strlen(cleaned_email) + strlen("notify") +36 );
     sprintf(name, "%s/%s-%s.%i", tmpdir, "notify", cleaned_email, (int)(getpid()) );
   }
   free(tmpdir);
@@ -124,20 +124,20 @@ char *nt_filename_generate( RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             subject string for Subject field of outgoing email
    Returns  new RT context
 */
-      
-RT_context_t *nt_generate_new_context(LG_context_t *lg_ctx, 
-                                       options_struct_t *options, 
+
+RT_context_t *nt_generate_new_context(LG_context_t *lg_ctx,
+                                       options_struct_t *options,
                                        char *e_mail, char *subject)
 {
   char *from_address = NULL;
   RT_context_t *new_rt_ctx;
 
-  LG_log(lg_ctx, LG_FUNC,">nt_generate_new_context: entered with email [%s] subject [%s]\n", 
+  LG_log(lg_ctx, LG_FUNC,">nt_generate_new_context: entered with email [%s] subject [%s]\n",
                                e_mail, subject ? subject : "NULL");
-   
+
   /* create a new RT context */
   new_rt_ctx = RT_start();
-  
+
   /* write outgoing mail header info to this ctx */
   from_address = g_strstrip(ca_get_humailbox);
 //  RT_header(new_rt_ctx, e_mail, from_address, options->mail_hdr_data.subject);
@@ -146,7 +146,7 @@ RT_context_t *nt_generate_new_context(LG_context_t *lg_ctx,
   RT_header_subject(new_rt_ctx, subject ? subject : options->mail_hdr_data.subject);
   free(from_address);
   RT_process_time(new_rt_ctx, options->time_str);
-  
+
   if (options->mail_input)
   {
     /* write the details of the mail causing these changes to this ctx */
@@ -186,10 +186,10 @@ void nt_add_list_to_hash(LG_context_t *lg_ctx, options_struct_t *options,
     e_mail = (char *)(temp->data);
 
     if ( g_hash_table_lookup(hash, e_mail) == NULL )
-    { 
+    {
       /* there is no such entry, so create it */
       LG_log(lg_ctx, LG_DEBUG,"nt_add_list_to_hash: email %s not in hash, create new context", e_mail);
-      g_hash_table_insert(hash, strdup(e_mail), 
+      g_hash_table_insert(hash, strdup(e_mail),
                              nt_generate_new_context(lg_ctx, options, e_mail, options->mail_hdr_data.subject));
     }
     else
@@ -200,7 +200,7 @@ void nt_add_list_to_hash(LG_context_t *lg_ctx, options_struct_t *options,
 
 
 
-/* Adds the message to the new context (taken from the hash) 
+/* Adds the message to the new context (taken from the hash)
    for each email address in the list, then free the email address.
    Receives LG context
             list of email addresses
@@ -209,7 +209,7 @@ void nt_add_list_to_hash(LG_context_t *lg_ctx, options_struct_t *options,
    Returns  none
 */
 
-void nt_add_msg_to_list(LG_context_t *lg_ctx, GList *list, 
+void nt_add_msg_to_list(LG_context_t *lg_ctx, GList *list,
                                 GHashTable *hash, char *msg)
 {
   GList *email_item = NULL;
@@ -262,10 +262,10 @@ GList *nt_unify_list(LG_context_t *lg_ctx, GList *attr_list)
   GList *temp;
   GList *return_list = NULL;
   char *key, *value;
-  
+
   LG_log(lg_ctx, LG_FUNC,">nt_unify_list: entered\n");
 
-  /* allocate space for address_list */ 
+  /* allocate space for address_list */
   address_list = (GList **)malloc(sizeof(GList *));
   *address_list = NULL;
 
@@ -279,16 +279,16 @@ GList *nt_unify_list(LG_context_t *lg_ctx, GList *attr_list)
     key = rpsl_attr_get_clean_value((rpsl_attr_t *)(temp->data));
     value = strdup(key);
     g_strdown(key);
-    
+
     if (g_hash_table_lookup(unification_hash, key) == NULL)
-	{ 
+	{
       /* if it is not already in the hash table, add to the hash and append to new list */
       LG_log(lg_ctx, LG_DEBUG,"nt_unify_list: add [%s] to hash", value);
       g_hash_table_insert(unification_hash, key, value);
       *address_list = g_list_insert_sorted( *address_list, strdup(value), (GCompareFunc)strcmp );
     }
 	else
-	{  
+	{
       /* it is a duplicate email address, don't append to new list */
 	  free(key);
 	  free(value);
@@ -299,7 +299,7 @@ GList *nt_unify_list(LG_context_t *lg_ctx, GList *attr_list)
   g_hash_table_foreach(unification_hash, (GHFunc)nt_free_list, NULL);
 
   g_hash_table_destroy(unification_hash);
-  
+
   return_list = *address_list;
   free(address_list);
   LG_log(lg_ctx, LG_FUNC,"<nt_unify_list: exiting\n");
@@ -332,7 +332,7 @@ GList *nt_compare_lists(LG_context_t *lg_ctx, GList *old_irts,
 	rpsl_attr_t *irts;
 	gint   matched;
   } irt_details_t;
-  
+
   char *irt_name;
   GList *old_irt_details = NULL;
   GList *new_irt_details = NULL;
@@ -340,7 +340,7 @@ GList *nt_compare_lists(LG_context_t *lg_ctx, GList *old_irts,
   GList *new_irts_item = NULL;
   GList *return_list = NULL;
   irt_details_t *irt_details;
-  
+
   LG_log(lg_ctx, LG_FUNC,">nt_compare_lists: entered with option [%d]\n", option);
 
   /* collect data from the old_irts */
@@ -356,7 +356,7 @@ GList *nt_compare_lists(LG_context_t *lg_ctx, GList *old_irts,
 	/* append irt_details structure to old_irt_details list */
 	old_irt_details = g_list_append(old_irt_details, irt_details);
   }
-  
+
   /* collect data from the new_irts and compare with the old in the same loop */
   for ( new_irts_item = new_irts; new_irts_item != NULL; new_irts_item = g_list_next(new_irts_item) )
   {
@@ -383,7 +383,7 @@ GList *nt_compare_lists(LG_context_t *lg_ctx, GList *old_irts,
 	/* append irt_details structure to new_irt_details list */
 	new_irt_details = g_list_append(new_irt_details, irt_details);
   }
-  
+
   /* we now want a list of mnt-irt taken from the old and new irt_details lists
      where the matched flag is _NOT_ set. These will only exist in one list
 	 and have therefore just been added/deleted */
@@ -392,7 +392,7 @@ GList *nt_compare_lists(LG_context_t *lg_ctx, GList *old_irts,
      if option==3, return list contains both */
   if ( option == 1 || option == 3 )
   {
-    /* Find newly deleted mnt-irt attrs 
+    /* Find newly deleted mnt-irt attrs
        These will be NOT flagged as matched in the old list */
     for ( old_irts_item = old_irt_details; old_irts_item != NULL; old_irts_item = g_list_next(old_irts_item) )
     {
@@ -408,8 +408,8 @@ GList *nt_compare_lists(LG_context_t *lg_ctx, GList *old_irts,
   g_list_free(old_irt_details);
 
   if ( option == 2 || option == 3 )
-  {   
-    /* Find newly added mnt-irt attrs 
+  {
+    /* Find newly added mnt-irt attrs
        These will be NOT flagged as matched in the new list */
     for ( new_irts_item = new_irt_details; new_irts_item != NULL; new_irts_item = g_list_next(new_irts_item) )
     {
@@ -423,7 +423,7 @@ GList *nt_compare_lists(LG_context_t *lg_ctx, GList *old_irts,
     }
   }
   g_list_free(new_irt_details);
-  
+
   LG_log(lg_ctx, LG_FUNC,"<nt_compare_lists: exiting\n");
   return return_list;
 }
@@ -442,7 +442,7 @@ GList *nt_get_mnt_by(rpsl_object_t *object)
   list_of_mnt_attrs = rpsl_object_get_attr(object, "mnt-by");
   rpsl_attr_split_multiple(&list_of_mnt_attrs);
 
-  return list_of_mnt_attrs; 
+  return list_of_mnt_attrs;
 }
 
 
@@ -459,7 +459,7 @@ GList *nt_get_mnt_irt(rpsl_object_t *object)
   list_of_irt_attrs = rpsl_object_get_attr(object, "mnt-irt");
   rpsl_attr_split_multiple(&list_of_irt_attrs);
 
-  return list_of_irt_attrs; 
+  return list_of_irt_attrs;
 }
 
 
@@ -476,7 +476,7 @@ GList *nt_get_org(rpsl_object_t *object)
   list_of_org_attrs = rpsl_object_get_attr(object, "org");
   rpsl_attr_split_multiple(&list_of_org_attrs);
 
-  return list_of_org_attrs; 
+  return list_of_org_attrs;
 }
 
 
@@ -509,7 +509,7 @@ GList *nt_get_nfy_vector(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   LG_log(lg_ctx, LG_FUNC,">nt_get_nfy_vector: entered with nfy_type [%s] list_type [%s]\n",
                       nfy_type, (list_type == ATTRIBUTE) ? "ATTRIBUTE" : "MNTNER_OBJ" );
-  
+
   /* loop through the list of attributes (eg mnt-by, mnt-irt) or mntner objects */
   for ( attr_item = attributes; attr_item != NULL; attr_item = g_list_next(attr_item) )
   {
@@ -552,14 +552,14 @@ GList *nt_get_nfy_vector(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         rpsl_object_delete(object);
     }
   }
-  
+
   LG_log(lg_ctx, LG_FUNC,"<nt_get_nfy_vector: exiting with total %s attributes [%i]\n", nfy_type, g_list_length(list_of_nfy_attrs) );
-  return list_of_nfy_attrs; 
+  return list_of_nfy_attrs;
 }
 
 
 
-/* Gets old and new objects supplied, forms lists of any irt objects referenced 
+/* Gets old and new objects supplied, forms lists of any irt objects referenced
    by these (mnt-irt). Returns a GList of irt-nfy attributes for any irt objects
    that heve been added or deleted with this update.
    Receives RT context
@@ -575,9 +575,9 @@ GList *nt_check_irtnfy(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                             options_struct_t *options, source_data_t *source_data,
                             rpsl_object_t *old_obj, rpsl_object_t *new_obj)
 {
-  GList *old_irt_attrs = NULL; 
-  GList *new_irt_attrs = NULL; 
-  GList *changed_irt_attrs = NULL; 
+  GList *old_irt_attrs = NULL;
+  GList *new_irt_attrs = NULL;
+  GList *changed_irt_attrs = NULL;
   GList *irt_nfy_attrs = NULL;
 
   LG_log(lg_ctx, LG_FUNC,">nt_check_irtnfy: entered\n");
@@ -628,7 +628,7 @@ GList *nt_check_irtnfy(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 
 
-/* Gets old and new objects supplied, forms lists of any organisation objects referenced 
+/* Gets old and new objects supplied, forms lists of any organisation objects referenced
    by these ("org:"). Returns a GList of ref-nfy attributes for any organisation objects
    that heve been added or deleted with this update.
    Receives RT context
@@ -644,9 +644,9 @@ GList *nt_check_refnfy(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                             options_struct_t *options, source_data_t *source_data,
                             rpsl_object_t *old_obj, rpsl_object_t *new_obj)
 {
-  GList *old_org_attrs = NULL; 
-  GList *new_org_attrs = NULL; 
-  GList *changed_org_attrs = NULL; 
+  GList *old_org_attrs = NULL;
+  GList *new_org_attrs = NULL;
+  GList *changed_org_attrs = NULL;
   GList *ref_nfy_attrs = NULL;
 
   LG_log(lg_ctx, LG_FUNC,">nt_check_refnfy: entered\n");
@@ -699,11 +699,11 @@ GList *nt_check_refnfy(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 
 
-/* Gathers e-mail addresses to which we will send normal notification messages. It 
-   takes old and new object strings, looks up maintainers and less specific inetnums/domains/routes 
-   when necessary, finds the addresses (in mnt-nfy and notify attributes) and returns 
-   a list of email addresses as strings. 
-   Also now checks for irt-nfy in any irt objects that have been added or deleted 
+/* Gathers e-mail addresses to which we will send normal notification messages. It
+   takes old and new object strings, looks up maintainers and less specific inetnums/domains/routes
+   when necessary, finds the addresses (in mnt-nfy and notify attributes) and returns
+   a list of email addresses as strings.
+   Also now checks for irt-nfy in any irt objects that have been added or deleted
    Receives RT context
             LG context
             options structure
@@ -722,25 +722,25 @@ GList *nt_gather_ntfy_addresses(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   GList *temp_list = NULL;
   GList *address_list = NULL;
   GList *email_attrs = NULL;
-  GList *attr_list = NULL; 
+  GList *attr_list = NULL;
   rpsl_object_t *object = NULL;
 
   LG_log(lg_ctx, LG_FUNC,">nt_gather_ntfy_addresses: entered\n");
 
   if (old_obj != NULL && new_obj != NULL)
-  { 
+  {
     /* it was a modify, use the old object */
     object = old_obj;
     LG_log(lg_ctx, LG_DEBUG,"nt_gather_ntfy_addresses: modify");
   }
   else if (old_obj == NULL && new_obj != NULL)
-  { 
+  {
     /* it was a creation, use the new object */
     object = new_obj;
     LG_log(lg_ctx, LG_DEBUG,"nt_gather_ntfy_addresses: creation");
   }
   else if (old_obj != NULL && new_obj == NULL)
-  { 
+  {
     /* it was a deletion, use the old object */
     object = old_obj;
     LG_log(lg_ctx, LG_DEBUG,"nt_gather_ntfy_addresses: deletion");
@@ -778,9 +778,9 @@ GList *nt_gather_ntfy_addresses(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   /* Now add the 'irt-nfy'
      For a modify, from any of the irts in the old and new objects
-     if they have just been added or deleted 
+     if they have just been added or deleted
      For a creation, from any of the irts in the new object
-     as they have just been added 
+     as they have just been added
      For a deletion, from any of the mntners in the old object only
      as they have just been deleted */
   LG_log(lg_ctx, LG_DEBUG,"nt_gather_ntfy_addresses: get irt-nfy");
@@ -798,8 +798,8 @@ GList *nt_gather_ntfy_addresses(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   if ( email_attrs )
   {
-    /* if we have any emails, 
-       we have to 'unify' the list here to remove duplicates, 
+    /* if we have any emails,
+       we have to 'unify' the list here to remove duplicates,
        address_list is now a list of malloc'd email address strings */
     address_list = nt_unify_list(lg_ctx, email_attrs);
 
@@ -821,7 +821,7 @@ GList *nt_gather_ntfy_addresses(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 
 /* Gathers e-mail addresses to which we will forward messages. It takes
-   an object, looks up maintainers in mnt-by, finds the mail addresses 
+   an object, looks up maintainers in mnt-by, finds the mail addresses
    (in upd-to attributes) and returns a list of them.
    Receives RT context
             LG context
@@ -857,7 +857,7 @@ GList *nt_gather_frwd_addresses(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* now extract the email addresses from the values of these attributes */
   if ( updto_attrs  )
   {
-    /* if we have any emails, we have to 'unify' the list here to remove duplicates, 
+    /* if we have any emails, we have to 'unify' the list here to remove duplicates,
        address_list is now a list of malloc'd email address strings */
     address_list = nt_unify_list(lg_ctx, updto_attrs);
 
@@ -878,7 +878,7 @@ GList *nt_gather_frwd_addresses(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 
 
-/* Gets the "From" line of the incoming mail message and extracts the address 
+/* Gets the "From" line of the incoming mail message and extracts the address
    Receives RT context
             LG context
             options structure
@@ -892,8 +892,8 @@ char *nt_find_email_address(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   char *temp = NULL;
   char *new_temp = NULL;
   char *part1 = NULL, *part2 = NULL;
-  
-  LG_log(lg_ctx, LG_FUNC,">nt_find_email_address entered with from_line [%s]", 
+
+  LG_log(lg_ctx, LG_FUNC,">nt_find_email_address entered with from_line [%s]",
                         options->mail_hdr_data.from ? options->mail_hdr_data.from : "" );
 
   if (options->mail_hdr_data.from == NULL)
@@ -910,8 +910,8 @@ char *nt_find_email_address(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
   g_strstrip(temp);
 
-  /* and now, we have to remove the parts in parantheses 
-     this code assumes there are no nested parentheses */ 
+  /* and now, we have to remove the parts in parantheses
+     this code assumes there are no nested parentheses */
   while ( strchr(temp, '(') != NULL && strchr(temp, ')') != NULL
           && strchr(temp, '(') < strchr(temp, ')') )
   {
@@ -928,7 +928,7 @@ char *nt_find_email_address(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     free(part2);
   }
 
-  /* and now, we have to remove the parts in double quotes */ 
+  /* and now, we have to remove the parts in double quotes */
   while ( (pos = strchr(temp, '"')) != NULL && strchr(pos+1, '"') != NULL )
   {
     part1 = strdup(temp);
@@ -955,16 +955,16 @@ char *nt_find_email_address(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     LG_log(lg_ctx, LG_FATAL,"nt_find_email_address: malformed email adress found [%s]", options->mail_hdr_data.from);
     UP_internal_error(rt_ctx, lg_ctx, options, "nt_find_email_address: malformed email adress found\n", 0);
   }
-  
+
 
   /* unless the email address is malformed there should now only be one set of
      angle brackets <> in the string (or none at all) */
   pos1 = strchr(temp, '<');
   pos2 = strchr(temp, '>');
   if ( pos1 || pos2 )
-  { 
+  {
     /* we have found at least one angle bracket */
-    if ( ! (pos1 && pos2) || pos1 > pos2 || 
+    if ( ! (pos1 && pos2) || pos1 > pos2 ||
           strchr(pos1+1, '<') || strchr(pos2+1, '>') )
     {
       /* Either we don't have a matching pair of angle brackets
@@ -974,7 +974,7 @@ char *nt_find_email_address(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       LG_log(lg_ctx, LG_FATAL,"nt_find_email_address: malformed email adress found [%s]", options->mail_hdr_data.from);
       UP_internal_error(rt_ctx, lg_ctx, options, "nt_find_email_address: malformed email adress found\n", 0);
     }
-    
+
     /* then the line contains something like '...<john@inter.net>...' */
     pos2 = strchr(temp, '>');
     *pos2 = '\0';
@@ -985,11 +985,11 @@ char *nt_find_email_address(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     free(new_temp);
     LG_log(lg_ctx, LG_DEBUG,"nt_find_email_address email=[%s]", temp);
   }
-  
-  g_strstrip(temp); 
+
+  g_strstrip(temp);
   LG_log(lg_ctx, LG_FUNC,"<nt_find_email_address exiting with email [%s]\n", temp);
   return temp;
-}  
+}
 
 
 
@@ -1006,11 +1006,11 @@ char *nt_find_email_address(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  none
 */
 
-void NT_write_all_ntfs(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_write_all_ntfs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options, source_data_t *source_data,
                              rpsl_object_t *postproc_obj, rpsl_object_t *old_obj,
                              GList *mntner_used )
-{ 
+{
   char *e_mail_address = NULL;
   char *postproc_obj_str = NULL;
   char *old_obj_str = NULL;
@@ -1045,13 +1045,13 @@ void NT_write_all_ntfs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
 
   /* get a list of email addresses to send notifications to */
-  e_mail_list = nt_gather_ntfy_addresses(rt_ctx, lg_ctx, options, source_data, 
+  e_mail_list = nt_gather_ntfy_addresses(rt_ctx, lg_ctx, options, source_data,
                                                postproc_obj, old_obj, mntner_used );
 
   if ( e_mail_list )
   {
     /* add the emails from this list to the notif hash */
-    nt_add_list_to_hash(lg_ctx, options, e_mail_list, options->ntfy_hash); 
+    nt_add_list_to_hash(lg_ctx, options, e_mail_list, options->ntfy_hash);
 
     /* get the text versions of the objects */
     if ( postproc_obj )
@@ -1061,8 +1061,8 @@ void NT_write_all_ntfs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     mess = g_string_new(NULL);
 
     if (old_obj != NULL && postproc_obj != NULL)
-    { 
-      /* it was a modification */   
+    {
+      /* it was a modification */
       LG_log(lg_ctx, LG_DEBUG, "NT_write_all_ntfs: it was a modification");
 
       /* start the message */
@@ -1099,7 +1099,7 @@ void NT_write_all_ntfs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         diff_command_line = g_string_append(diff_command_line, " ");
         diff_command_line = g_string_append(diff_command_line, diff_new);
         diff_command_line = g_string_append(diff_command_line, " > ");
-        diff_command_line = g_string_append(diff_command_line, diff_res); 
+        diff_command_line = g_string_append(diff_command_line, diff_res);
         LG_log(lg_ctx, LG_DEBUG,"NT_write_all_ntfs: diff_command_line [%s]", diff_command_line->str);
         system(diff_command_line->str);
         g_string_free(diff_command_line, 1);
@@ -1113,7 +1113,7 @@ void NT_write_all_ntfs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
           UP_internal_error(rt_ctx, lg_ctx, options, "Can't open temp diff file\n", 0);
         }
         differences = g_string_new(NULL);
-        while ( ! feof(diff_file) ) 
+        while ( ! feof(diff_file) )
         {
           data_cnt = fread(buffer, 1, DIFF_READ_SIZE, diff_file);
           buffer[data_cnt] ='\0';
@@ -1160,7 +1160,7 @@ void NT_write_all_ntfs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       mess = g_string_append(mess, "\n");
     }
     else if (old_obj == NULL && postproc_obj != NULL)
-    { 
+    {
       /* it was a creation */
       LG_log(lg_ctx, LG_DEBUG, "NT_write_all_ntfs: it was a creation");
 
@@ -1170,7 +1170,7 @@ void NT_write_all_ntfs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       mess = g_string_append(mess, "\n");
     }
     else if (old_obj != NULL && postproc_obj == NULL)
-    { 
+    {
       /* it was a deletion */
       LG_log(lg_ctx, LG_DEBUG, "NT_write_all_ntfs: it was a deletion");
 
@@ -1211,11 +1211,11 @@ void NT_write_all_ntfs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  none
 */
 
-void NT_write_all_frwds(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_write_all_frwds(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options, source_data_t *source_data,
                              rpsl_object_t *postproc_obj, rpsl_object_t *old_obj,
                              GList *mntner_used )
-{ 
+{
   char *object_str = NULL;
   GList *e_mail_list = NULL;
   rpsl_object_t *object;
@@ -1243,7 +1243,7 @@ void NT_write_all_frwds(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     mess = g_string_new(NULL);
 
     if (old_obj != NULL && postproc_obj != NULL)
-    { 
+    {
       /* it was a modify */
       LG_log(lg_ctx, LG_DEBUG, "NT_write_all_frwds: it was a modify");
 
@@ -1251,7 +1251,7 @@ void NT_write_all_frwds(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       mess = g_string_append(mess, "----\nMODIFY REQUESTED FOR:\n\n");
     }
     else if (old_obj == NULL && postproc_obj != NULL)
-    { 
+    {
       /* it was a creation */
       LG_log(lg_ctx, LG_DEBUG, "NT_write_all_frwds: it was a creation");
 
@@ -1259,7 +1259,7 @@ void NT_write_all_frwds(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
       mess = g_string_append(mess, "----\nCREATION REQUESTED FOR:\n\n");
     }
     else if (old_obj != NULL && postproc_obj == NULL)
-    { 
+    {
       /* it was a deletion */
       LG_log(lg_ctx, LG_DEBUG, "NT_write_all_frwds: it was a deletion ");
 
@@ -1296,8 +1296,8 @@ void NT_write_all_frwds(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  none
 */
 
-void nt_send_email( RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
-                             options_struct_t *options, char *out_mess, 
+void nt_send_email( RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                             options_struct_t *options, char *out_mess,
                              char *to_address, char *redirect_hdg)
 {
   char *mail_command_line = NULL;
@@ -1317,15 +1317,15 @@ void nt_send_email( RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   {
     LG_log(lg_ctx, LG_DEBUG,"nt_send_email: no re-direction");
     /* create a temp file and write the out going message to it */
-    name = nt_filename_generate( rt_ctx, lg_ctx, options, 
-                                     to_address ? to_address : "", 
+    name = nt_filename_generate( rt_ctx, lg_ctx, options,
+                                     to_address ? to_address : "",
                                      out_mess, NULL);
     LG_log(lg_ctx, LG_DEBUG,"nt_send_email: temp file name [%s]", name);
 
     if (to_address != NULL)
 	{
       /* send the email taking input from the temp file */
-      mail_command_line = (char *)malloc(strlen(mailcmd) + strlen(name) + 
+      mail_command_line = (char *)malloc(strlen(mailcmd) + strlen(name) +
                                         strlen(to_address) + 5);
       sprintf(mail_command_line, "%s %s < %s", mailcmd, to_address, name);
       LG_log(lg_ctx, LG_DEBUG,"nt_send_email: mail_command_line [%s]", mail_command_line);
@@ -1341,11 +1341,11 @@ void nt_send_email( RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     /* get the default mail address to send the redirected message to */
     defmail = g_strstrip(ca_get_defmail);
     humailbox = g_strstrip(ca_get_humailbox);
-    LG_log(lg_ctx, LG_DEBUG,"nt_send_email: re-direction, From [%s] To [%s]", 
+    LG_log(lg_ctx, LG_DEBUG,"nt_send_email: re-direction, From [%s] To [%s]",
                                     humailbox, defmail);
-    
+
     /* prepend the out going message with a new mail header */
-    new_out = malloc(strlen(out_mess) + strlen(humailbox) + 
+    new_out = malloc(strlen(out_mess) + strlen(humailbox) +
                        strlen(defmail) + strlen(redirect_hdg) +
                        strlen("From: \nTo: \nSubject: Redirected  mail\n\n") +5);
     sprintf(new_out, "From: %s\nTo: %s\nSubject: Redirected %s mail\n\n%s",
@@ -1356,7 +1356,7 @@ void nt_send_email( RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     LG_log(lg_ctx, LG_DEBUG,"nt_send_email: temp file name [%s]", name);
 
     /* send the email taking input from the temp file */
-    mail_command_line = (char *)malloc(strlen(mailcmd) + strlen(defmail) + 
+    mail_command_line = (char *)malloc(strlen(mailcmd) + strlen(defmail) +
                                           strlen(name) + 5);
     sprintf(mail_command_line, "%s %s < %s", mailcmd, defmail, name);
     LG_log(lg_ctx, LG_DEBUG,"nt_send_email: mail_command_line [%s]", mail_command_line);
@@ -1384,8 +1384,8 @@ void nt_send_email( RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  none
 */
 
-void nt_log_message( RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
-                      options_struct_t *options, const char *out_mess, 
+void nt_log_message( RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                      options_struct_t *options, const char *out_mess,
                       const char *logfilename, int type )
 {
   char *logfile_date;
@@ -1460,7 +1460,7 @@ void nt_log_message( RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  none
 */
 
-void NT_process_acknowledgement(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_process_acknowledgement(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                                   options_struct_t *options)
 {
   char *logname = NULL;
@@ -1476,10 +1476,10 @@ void NT_process_acknowledgement(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* get the template for the ack message */
   template = ca_get_ack_template;
   LG_log(lg_ctx, LG_DEBUG,"NT_process_acknowledgement: using template [%s]", template);
-  
+
   /* create the email to be sent from the RT template */
   out_mess = RT_get(rt_ctx, RT_UPD_INFO, template);
-  LG_log(lg_ctx, LG_DEBUG,">NT_process_acknowledgement: out going message");
+  LG_log(lg_ctx, LG_DEBUG,">NT_process_acknowledgement: outgoing message");
   LG_log(lg_ctx, LG_DEBUG,"[");
   LG_log(lg_ctx, LG_DEBUG,"%s", out_mess);
   LG_log(lg_ctx, LG_DEBUG,"<]");
@@ -1487,7 +1487,7 @@ void NT_process_acknowledgement(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   /* send the acknowledgement message if it is a mail update and we have the To address */
   /* use the ReplyTo address if there is one, otherwise the From address */
-  to_address = options->mail_hdr_data.replyto ? options->mail_hdr_data.replyto 
+  to_address = options->mail_hdr_data.replyto ? options->mail_hdr_data.replyto
                                               : options->mail_hdr_data.from;
   if ( options->mail_input && to_address )
     nt_send_email(rt_ctx, lg_ctx, options, out_mess, to_address, redirect_hdg);
@@ -1499,7 +1499,7 @@ void NT_process_acknowledgement(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   /* log the acknowledgement message */
   nt_log_message(rt_ctx, lg_ctx, options, out_mess, logname, UP_ACK);
-    
+
   /* clean up */
   free(out_mess);
   free(logname);
@@ -1541,7 +1541,7 @@ void  nt_gfunc_values(gpointer key, gpointer value, gpointer user_data)
    Returns  none
 */
 
-void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                                   options_struct_t *options, int type)
 {
   char *logname = NULL;
@@ -1583,7 +1583,7 @@ void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   /* get a list of the values (RT_ctx) and keys (email address) from the hash */
   g_hash_table_foreach( hash, (GHFunc)nt_gfunc_values, &ctx_list);
-  
+
   /* loop through the list of RT contexts for the notification messages */
   for ( ctx_item = ctx_list; ctx_item != NULL; ctx_item = g_list_next(ctx_item) )
   {
@@ -1601,10 +1601,10 @@ void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
     /* send the notification message */
     nt_send_email(rt_ctx, lg_ctx, options, out_mess, email_addr, redirect_hdg);
-    
+
     /* log the notification message */
     nt_log_message(rt_ctx, lg_ctx, options, out_mess, logname, type);
-    
+
     /* clean up */
     free(out_mess);
     /* delete the notif RT context */
@@ -1617,7 +1617,7 @@ void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   /* finally delete the list and hash */
   g_list_free(ctx_list);
   g_hash_table_destroy(hash);
-  
+
   free(logname);
   free(template);
   LG_log(lg_ctx, LG_FUNC,"<NT_process_notifications: exiting\n");
@@ -1625,7 +1625,7 @@ void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 
 
-/* Forwards the as-block and irt creation requests to <HUMAILBOX>
+/* Forwards the as-block creation requests to <HUMAILBOX>
    Receives RT context
             LG context
             options structure
@@ -1635,7 +1635,7 @@ void NT_process_notifications(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  none
 */
 
-void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options, char *operation,
                              rpsl_object_t *object, GList *credentials)
 {
@@ -1697,20 +1697,20 @@ void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   out_mess = RT_get(new_rt_ctx, RT_UPD_INFO, template);
   LG_log(lg_ctx, LG_DEBUG,"NT_forw_create_req: out going message [\n%s]", out_mess);
 
-  /* send it */ 
+  /* send it */
   nt_send_email(rt_ctx, lg_ctx, options, out_mess, to_address, redirect_hdg);
 
   /* log it */
   forwlog = ca_get_forwlog;
   nt_log_message(rt_ctx, lg_ctx, options, out_mess, forwlog, UP_FRWD_CREATE);
-  
+
   /* close down the new report */
   RT_destroy(new_rt_ctx);
 
   /* free the g-string and the content */
   g_string_free(mess, 1);
   g_string_free(subject, 1);
-  /* free the mem */ 
+  /* free the mem */
   free(object_str);
   free(to_address);
   free(template);
@@ -1731,9 +1731,9 @@ void NT_forw_create_req(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  none
 */
 
-void NT_forw_policy_fail(RT_context_t *rt_ctx, LG_context_t *lg_ctx, 
+void NT_forw_policy_fail(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options, char *operation,
-                             rpsl_object_t *object, char *reason, 
+                             rpsl_object_t *object, char *reason,
                              GList *credentials)
 {
   char *object_str = NULL;
@@ -1805,13 +1805,13 @@ void NT_forw_policy_fail(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   out_mess = RT_get(new_rt_ctx, RT_UPD_INFO, template);
   LG_log(lg_ctx, LG_DEBUG,"NT_forw_policy_fail: out going message [\n%s]", out_mess);
 
-  /* send it */ 
+  /* send it */
   nt_send_email(rt_ctx, lg_ctx, options, out_mess, to_address, redirect_hdg);
 
   /* log it */
   forwlog = ca_get_forwlog;
   nt_log_message(rt_ctx, lg_ctx, options, out_mess, forwlog, UP_FRWD_POLICY);
-  
+
   /* close down the new report */
   RT_destroy(new_rt_ctx);
 
@@ -1819,7 +1819,7 @@ void NT_forw_policy_fail(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   g_string_free(mess, 1);
   g_string_free(subject, 1);
   g_string_free(policy_reason, 1);
-  /* free the mem */ 
+  /* free the mem */
   free(object_str);
   free(to_address);
   free(template);
