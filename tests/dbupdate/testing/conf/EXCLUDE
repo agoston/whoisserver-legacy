@@ -3,7 +3,7 @@
 # a MIME-encoded part would be effective inside the MIME-part.
 # This is not the case, as there seems to be no reason to change this
 # behavior.
-# Test is adjusted for x509/10 to except a failure, and x509/16 is disabled
+# Test is adjusted for x509/10 to expect a failure, and x509/16 is disabled
 # until this behavior is fixed or decided upon.
 #basic-auth/X509/010
 basic-auth/X509/016
