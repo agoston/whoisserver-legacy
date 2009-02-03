@@ -2,16 +2,16 @@
   $Revision: 1.6 $
 
   which_keytypes:  Determine which keys to look for.
-  
-  This is based on the existing Perl code. 
+
+  This is based on the existing Perl code.
 
   Authors: ottrey, marek
 
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -19,7 +19,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -93,8 +93,8 @@ void wk_regex_init ()
 
     /* initialize our table */
     for (i=0; i<WK_REGEX_LIST_LEN; i++) {
-        errcode = regcomp(&wk_regex_list[i].regex, 
-	                  wk_regex_list[i].pattern, 
+        errcode = regcomp(&wk_regex_list[i].regex,
+	                  wk_regex_list[i].pattern,
 		          REG_EXTENDED|REG_NOSUB);
         dieif(errcode != 0);
     }
@@ -112,21 +112,23 @@ void wk_regex_init ()
     dieif(errcode != 0);
     errcode = regcomp(&domainalpha, WK_REXP_DOMAINALPHA, REG_EXTENDED|REG_NOSUB);
     dieif(errcode != 0);
+    errcode = regcomp(&aut_num, WK_REXP_ASNUM, REG_EXTENDED|REG_NOSUB);
+    dieif(errcode != 0);
 }
 
 
 /* see if the key looks like it could be a name */
-static unsigned int 
-wk_is_name (char *key) 
+static unsigned int
+wk_is_name (char *key)
 {
     /* if it's an address, it cannot be a name */
-    if (regexec(&ipaddress, key, 0, NULL, 0) == 0) { 
+    if (regexec(&ipaddress, key, 0, NULL, 0) == 0) {
         return 0;
     }
-    if (regexec(&ipprefix, key, 0, NULL, 0) == 0) { 
+    if (regexec(&ipprefix, key, 0, NULL, 0) == 0) {
         return 0;
     }
-    if (regexec(&validip6prefix, key, 0, NULL, 0) == 0) { 
+    if (regexec(&validip6prefix, key, 0, NULL, 0) == 0) {
         return 0;
     }
 
@@ -135,8 +137,8 @@ wk_is_name (char *key)
 } /* wk_is_name() */
 
 /* check for domain name */
-static unsigned int 
-wk_is_domain (char *key) 
+static unsigned int
+wk_is_domain (char *key)
 {
     /* if it matches the general domain name search, and contains an */
     /* alphabetic character, consider it a possible domain name */
@@ -146,17 +148,17 @@ wk_is_domain (char *key)
 	}
     }
     return 0;
-} 
+}
 
 /* check for a host name (could be a domain, or an IP) */
-static unsigned int 
-wk_is_hostname (char *key) 
+static unsigned int
+wk_is_hostname (char *key)
 {
     /* Fix - should check for IPADDRESS, not IPRANGE.  - Shane */
     return (wk_is_domain(key) || (regexec(&ipaddress, key, 0, NULL, 0) == 0));
 } /* wk_is_hostname() */
 
-/* 
+/*
   determine if the key represents an aut-num
 
   key      - object key, e.g. "AS123" or "AS2.456"
@@ -164,16 +166,11 @@ wk_is_hostname (char *key)
   return   - 1 or 0
 
  */
-int
-WK_is_aut_num (char *key)
-{
-int errcode;
-  errcode = regcomp(&aut_num, WK_REXP_ASNUM, REG_EXTENDED|REG_NOSUB);
-  dieif(errcode != 0);
-  if (regexec(&aut_num, (const char *)key, 0, NULL, 0) == 0) { 
-      return 1;
-  }
-  return 0;
+int WK_is_aut_num(char *key) {
+    if (regexec(&aut_num, (const char *) key, 0, NULL, 0) == 0) {
+        return 1;
+    }
+    return 0;
 }
 
 /* WK_to_string() */
@@ -193,7 +190,7 @@ int errcode;
 
   ++++++++++++++++++++++++++++++++++++++*/
 char *
-WK_to_string (mask_t wk) 
+WK_to_string (mask_t wk)
 {
 
   return MA_to_string(wk, Keytypes);
@@ -204,7 +201,7 @@ WK_to_string (mask_t wk)
 /*++++++++++++++++++++++++++++++++++++++
   Create a new which keytypes bitmap.
 
-  This checks the string to see which keys it looks like.  This helps 
+  This checks the string to see which keys it looks like.  This helps
   us decide what SQL tables (or radix trees) we need to query for a
   match.
 
@@ -221,10 +218,10 @@ WK_to_string (mask_t wk)
   +html+ </UL></DL>
 
   ++++++++++++++++++++++++++++++++++++++*/
-mask_t 
-WK_new (char *key) 
+mask_t
+WK_new (char *key)
 {
-  mask_t wk; 
+  mask_t wk;
   int i;
 
   /* empty bitmask */
@@ -232,7 +229,7 @@ WK_new (char *key)
 
   /* search regular expressions in the list */
   for (i=0; i<WK_REGEX_LIST_LEN; i++) {
-      if (regexec(&wk_regex_list[i].regex, key, 0, NULL, 0) == 0) { 
+      if (regexec(&wk_regex_list[i].regex, key, 0, NULL, 0) == 0) {
           MA_set(&wk, wk_regex_list[i].key_type, 1);
       }
   }
@@ -241,7 +238,7 @@ WK_new (char *key)
   MA_set(&wk, WK_NAME,         wk_is_name(key));
   MA_set(&wk, WK_DOMAIN,       wk_is_domain(key));
   MA_set(&wk, WK_HOSTNAME,     wk_is_hostname(key));
-  
+
   /* return resulting bitmask */
   return wk;
 
