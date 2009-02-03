@@ -11,9 +11,9 @@
 
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -21,7 +21,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -121,19 +121,19 @@ typedef struct UD_query_t {
 } UD_query;
 
 /* take nothing, return array of strings */
-char * const *DF_get_filter_names(void);
-char * const *DF_get_class_names(void);
-char * const *DF_get_class_aliases(void);
-char * const *DF_get_attribute_aliases(void);
-char * const *DF_get_attribute_names(void);
+char **DF_get_filter_names(void);
+char **DF_get_class_names(void);
+char **DF_get_class_aliases(void);
+char **DF_get_attribute_aliases(void);
+char **DF_get_attribute_names(void);
 
 
 /* take class type enum, return the corresponding string  */
-char * const DF_get_class_sql_table(C_Type_t index);
-const char *DF_get_class_template(C_Type_t index);
-const char *DF_get_class_template_v(C_Type_t index);
-const char *DF_class_type2name(C_Type_t index);
-char * const DF_get_class_code(C_Type_t index);
+char *DF_get_class_sql_table(C_Type_t index);
+char *DF_get_class_template(C_Type_t index);
+char *DF_get_class_template_v(C_Type_t index);
+char *DF_class_type2name(C_Type_t index);
+char *DF_get_class_code(C_Type_t index);
 
 /* take index to class alias array */
 int DF_get_class_index(int alias_index);
@@ -142,15 +142,15 @@ int DF_get_class_index(int alias_index);
 int DF_get_attribute_index(int alias_index);
 
 /* take attribute type enum, return the corresponding string  */
-const char *DF_get_attribute_name(A_Type_t index);
-const char *DF_get_attribute_code(A_Type_t index);
+char *DF_get_attribute_name(A_Type_t index);
+char *DF_get_attribute_code(A_Type_t index);
 
 /* take attribute type enum, return UD related data: */
 	/* return the corresponding UD query string */
-const char *DF_get_update_query(A_Type_t index);
-const char *DF_get_select_query(A_Type_t index);
-const char *DF_get_insert_query(A_Type_t index);
-const char *DF_get_dummy_query(A_Type_t index);
+char *DF_get_update_query(A_Type_t index);
+char *DF_get_select_query(A_Type_t index);
+char *DF_get_insert_query(A_Type_t index);
+char *DF_get_dummy_query(A_Type_t index);
 	/* return the corresponding UD query type  */
 UD_qtype DF_get_update_query_type(A_Type_t index);
 UD_qtype DF_get_insert_query_type(A_Type_t index);
