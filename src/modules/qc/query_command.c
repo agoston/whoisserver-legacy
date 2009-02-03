@@ -978,17 +978,6 @@ int QC_fill (const char *query_str,
             UT_free(fmt);
         }
 
-        if (fixed_lookup) {
-            /* WARNING:905 */
-            char *fmt = ca_get_qc_fmt_fixedlookup;
-            query_command->parse_messages =
-                g_list_append(query_command->parse_messages,
-                            g_strdup_printf(fmt, keycopy, query_command->keys));
-            UT_free(keycopy);
-            UT_free(fmt);
-        }
-
-
         /* -d handling: if the keytype is IPv4/v6 address/prefix/range, then
            exclude the domains unless -d is set
            XXX this must be kept in sync with new types */
