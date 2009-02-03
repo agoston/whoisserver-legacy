@@ -12,9 +12,9 @@
   Modifications by    : marek@ripe.net
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -42,8 +42,8 @@
 /* logging */
 LG_context_t *qc_context;
 
-/* 
-  note on errors: 
+/*
+  note on errors:
      QC_SYNERR returns a full help text
      QC_PARERR returns only any messags
  */
@@ -61,7 +61,7 @@ extern int getsubopt(char **optionp, char * const *tokens, char **valuep);
 
   char *
   qc_sources_list_to_string     returns an allocated string, must be freed
-  
+
   GList *list                   list of source handles (as defined by CA)
 
   ++++++++++++++++++++++++++++++++++++++*/
@@ -92,7 +92,7 @@ qc_sources_list_to_string(GList *list)
             g_string_append_c(tmp, ',');
         }
     }
-      
+
     /* move to a new buffer for the return */
     result = UT_strdup(tmp->str);
     g_string_free(tmp, TRUE);
@@ -104,7 +104,7 @@ qc_sources_list_to_string(GList *list)
   Convert the query_environ to a string.
 
   Query_environ *query_environ The query_environ to be converted.
-   
+
   More:
   +html+ <PRE>
   Authors:
@@ -116,7 +116,7 @@ qc_sources_list_to_string(GList *list)
 
   ++++++++++++++++++++++++++++++++++++++*/
 char *
-QC_environ_to_string(Query_environ qe) 
+QC_environ_to_string(Query_environ qe)
 {
   char *sources;
   char passed_addr[IP_ADDRSTR_MAX];
@@ -125,28 +125,28 @@ QC_environ_to_string(Query_environ qe)
 
   /* convert the sources and the passed address (if any) to printable strings */
   sources = qc_sources_list_to_string(qe.sources_list);
-  if( IP_addr_b2a( &(qe.pIP), passed_addr, IP_ADDRSTR_MAX) != IP_OK ) { 
+  if( IP_addr_b2a( &(qe.pIP), passed_addr, IP_ADDRSTR_MAX) != IP_OK ) {
     passed_addr[0] = '\0';
   }
-  
+
   /* format the environment info */
   tmp = g_string_sized_new(STR_L);
-  g_string_sprintf(tmp, 
-                   "host=%s, keep_connection=%s, sources=%s, version=%s%s%s", 
-                   qe.condat.ip, 
-                   qe.k ? "on" : "off", 
-                   sources, 
+  g_string_sprintf(tmp,
+                   "host=%s, keep_connection=%s, sources=%s, version=%s%s%s",
+                   qe.condat.ip,
+                   qe.k ? "on" : "off",
+                   sources,
                    (qe.version == NULL) ? "?" : qe.version,
                    passed_addr[0] == '\0' ? "" : ", passedIP=",
                    passed_addr);
-  
+
   /* move result to return buffer, and free up memory */
   result = UT_strdup(tmp->str);
   g_string_free(tmp, TRUE);
   UT_free(sources);
 
   return result;
-  
+
 } /* QC_environ_to_string() */
 
 /* QC_query_command_to_string() */
@@ -154,7 +154,7 @@ QC_environ_to_string(Query_environ qe)
   Convert the query_command to a string.
 
   Query_command *query_command The query_command to be converted.
-   
+
   More:
   +html+ <PRE>
   Authors:
@@ -174,7 +174,7 @@ char *QC_query_command_to_string(Query_command *query_command) {
   str1 = MA_to_string(query_command->inv_attrs_bitmap, DF_get_attribute_names());
   str2 = MA_to_string(query_command->object_type_bitmap, DF_get_class_names());
   str3 = WK_to_string(query_command->keytypes_bitmap);
-  
+
   sprintf(result_buf, "Query_command : inv_attrs=%s, recursive=%s, object_type=%s, (c=%s,C=%s,G=%s,B=%s,b=%s,g=%d,l=%d,m=%d,q=%d,t=%d,v=%d,x=%d,F=%d,K=%d,L=%d,M=%d,R=%d), possible keytypes=%s, keys=[%s]",
           str1,
 	  query_command->recursive?"y":"n",
@@ -203,7 +203,7 @@ char *QC_query_command_to_string(Query_command *query_command) {
   UT_free(str3);
 
   return UT_strdup(result_buf);
-  
+
 } /* QC_query_command_to_string() */
 
 /* log_command() */
@@ -213,9 +213,9 @@ char *QC_query_command_to_string(Query_command *query_command) {
   module (when it is finalized.)
 
   char *query_str
-  
+
   Query_command *query_command
-   
+
   More:
   +html+ <PRE>
   Authors:
@@ -226,8 +226,8 @@ char *QC_query_command_to_string(Query_command *query_command) {
   +html+ </UL></DL>
 
   ++++++++++++++++++++++++++++++++++++++*/
-static void 
-log_command (const char *query_str, Query_command *query_command) 
+static void
+log_command (const char *query_str, Query_command *query_command)
 {
   char *str;
 
@@ -257,7 +257,7 @@ void QC_environ_free(Query_environ *qe) {
     UT_free(qe->version);
 
     if (qe->sources_list != NULL) {
-      g_list_free(qe->sources_list); 
+      g_list_free(qe->sources_list);
       qe->sources_list=NULL;
     }
     UT_free(qe);
@@ -285,7 +285,7 @@ void QC_environ_free(Query_environ *qe) {
   +html+ </UL></DL>
 
   ++++++++++++++++++++++++++++++++++++++*/
-void 
+void
 QC_free (Query_command *qc) {
     GList *message_node;
 
@@ -303,7 +303,7 @@ QC_free (Query_command *qc) {
     }
 } /* QC_free() */
 
-void 
+void
 QC_init_struct (Query_command *query_command)
 {
     query_command->query_type = QC_SYNERR;
@@ -327,8 +327,8 @@ QC_init_struct (Query_command *query_command)
     query_command->L = 0;
     query_command->M = 0;
     query_command->R = 0;
-    /* XXX UGLY - "all zeros" in object_type_bitmap means the same as 
-      "all ones". To limit the inconsistency, this is changed at the end 
+    /* XXX UGLY - "all zeros" in object_type_bitmap means the same as
+      "all ones". To limit the inconsistency, this is changed at the end
       of this function, so outside "all zeros" is an illegal value. */
     query_command->object_type_bitmap = MA_new(MA_END);
     query_command->keytypes_bitmap = MA_new(MA_END);
@@ -341,7 +341,7 @@ QC_init_struct (Query_command *query_command)
 /*++++++++++++++++++++++++++++++++++++++
   Create a new query_command.
   Returns 0 when OK, -1 when query incorrect.
-  
+
   char *query_str The garden variety whois query string.
 
   Query_environ *qe the environment
@@ -359,11 +359,11 @@ QC_init_struct (Query_command *query_command)
 
   ++++++++++++++++++++++++++++++++++++++*/
 static
-int QC_fill (const char *query_str, 
-             Query_command *query_command, 
-             Query_environ *qe) 
+int QC_fill (const char *query_str,
+             Query_command *query_command,
+             Query_environ *qe)
 {
-  
+
   int c;
   int synerrflg = 0;
   int badparerr = 0;
@@ -423,8 +423,8 @@ int QC_fill (const char *query_str,
   opt_argv = opt_argv_copy;
 
   dieif( (gst = mg_new(0)) == NULL );
-  
-  while ((c = mg_getopt(opt_argc, opt_argv, "acdgi:klbmq:rs:t:v:xBCGFKLMRST:V:", 
+
+  while ((c = mg_getopt(opt_argc, opt_argv, "acdgi:klbmq:rs:t:v:xBCGFKLMRST:V:",
 			gst)) != EOF) {
     num_flags++;
 
@@ -434,7 +434,7 @@ int QC_fill (const char *query_str,
           {
 	      int i;
 	      ca_dbSource_t *hdl;
-	  
+
 	      for (i=0; (hdl = ca_get_SourceHandleByPosition(i)) != NULL; i++) {
 	          sources_specified = g_list_append(sources_specified, hdl);
 	      }
@@ -498,12 +498,12 @@ int QC_fill (const char *query_str,
         /* always get an argument here (according to the code) */
         dieif(gst->optarg == NULL);
 
-        /* 
+        /*
            Now a really stupid hard-coded hack to support "pn" being a
            synonym for "ac,tc,zc,ah".  I particularly object to this because
            it references attributes that should only be defined in XML - but
            I don't see a simplier more robust way of doing this hack.
-           :-( - ottrey 8/12/99 
+           :-( - ottrey 8/12/99
 
 	   ** removed a memory leak - MB, 1/08/00
 
@@ -532,8 +532,8 @@ int QC_fill (const char *query_str,
                     /* ERROR:104 */
                     /* "%s" is not a known RPSL attribute. */
                     char *fmt = ca_get_qc_fmt_badattr;
-                    query_command->parse_messages = 
-                        g_list_append(query_command->parse_messages, 
+                    query_command->parse_messages =
+                        g_list_append(query_command->parse_messages,
                                       g_strdup_printf(fmt, inv_attrs[i]));
                     UT_free(fmt);
                     badparerr++;
@@ -541,8 +541,8 @@ int QC_fill (const char *query_str,
                     /* ERROR:105 */
 	            /* "%s" is not an inverse searchable attribute. */
                     char *fmt = ca_get_qc_fmt_attrnotinv;
-                    query_command->parse_messages = 
-                        g_list_append(query_command->parse_messages, 
+                    query_command->parse_messages =
+                        g_list_append(query_command->parse_messages,
                                       g_strdup_printf(fmt, inv_attrs[i]));
                     UT_free(fmt);
                     badparerr++;
@@ -600,7 +600,7 @@ int QC_fill (const char *query_str,
             query_command->q = QC_Q_TYPES;
         } else {
             synerrflg++;
-        } 
+        }
       break;
 
       case 's':
@@ -612,7 +612,7 @@ int QC_fill (const char *query_str,
 	    ca_dbSource_t *hdl;
 
             g_strdown(gst->optarg);
-	  
+
 	    /* go through specified sources */
             sources = ut_g_strsplit_v1(gst->optarg, ",", -1);
             for (i=0; sources[i] != NULL; i++) {
@@ -622,8 +622,8 @@ int QC_fill (const char *query_str,
 	            /* Unknown source %s requested. */
                     char *fmt = ca_get_qc_fmt_badsource;
                     g_strup(sources[i]);
-                    query_command->parse_messages = 
-                        g_list_append(query_command->parse_messages, 
+                    query_command->parse_messages =
+                        g_list_append(query_command->parse_messages,
                                       g_strdup_printf(fmt, sources[i]));
                     UT_free(fmt);
                     badparerr++;
@@ -635,7 +635,7 @@ int QC_fill (const char *query_str,
             g_strfreev(sources);
         }
 	break;
-	
+
       case 't':
         /* always get an argument here (according to the code) */
         dieif(gst->optarg == NULL);
@@ -766,7 +766,7 @@ int QC_fill (const char *query_str,
             } else {
                 num_client_ip++;
             }
-            
+
             UT_free(qe->version);
             qe->version = UT_strdup(version_info[0]);
         } else {
@@ -788,7 +788,7 @@ int QC_fill (const char *query_str,
         GList *ptr, *next_ptr;
 
         /* free space from previous version of the list */
-	g_list_free(qe->sources_list); 
+	g_list_free(qe->sources_list);
 	qe->sources_list = NULL;
 
         /* add each new source */
@@ -806,13 +806,13 @@ int QC_fill (const char *query_str,
     }
 
     /* check for duplicate IP flags */
-    if (ip_flag_duplicated) { 
+    if (ip_flag_duplicated) {
         /* WARNING:901 */
         char *fmt = ca_get_qc_fmt_dupipflag;
         char ip_flag_str[2];
         ip_flag_str[0] = ip_flag_used; ip_flag_str[1] = '\0';
-        query_command->parse_messages = 
-            g_list_append(query_command->parse_messages, 
+        query_command->parse_messages =
+            g_list_append(query_command->parse_messages,
                           g_strdup_printf(fmt, ip_flag_str));
         UT_free(fmt);
     }
@@ -820,8 +820,8 @@ int QC_fill (const char *query_str,
     /* check for duplicate proxy IP settings */
     if (num_client_ip > 1) {
         /* ERROR:205 */
-        query_command->parse_messages = 
-            g_list_append(query_command->parse_messages, 
+        query_command->parse_messages =
+            g_list_append(query_command->parse_messages,
                           ca_get_qc_dupproxyipflag);
         badparerr++;
     }
@@ -866,7 +866,7 @@ int QC_fill (const char *query_str,
 
         UT_free(fmt);
         badparerr++;
-    }    
+    }
 
     if ((query_command->b == 1) && (query_command->G_group_search == 0)) {
     /* -G -b is error, we need grouping */
@@ -903,16 +903,16 @@ int QC_fill (const char *query_str,
     }
 
     /* if no error, process the key, otherwise don't bother */
-    if (!synerrflg && !badparerr) { 
+    if (!synerrflg && !badparerr) {
         /* convert the key to uppercase. */
         g_strup(query_command->keys);
-    
+
         /* make the keytypes_bitmap. */
         query_command->keytypes_bitmap = WK_new(query_command->keys);
 
         /* fix the object type bitmap - turn "all zeros" into "all ones" */
         if (MA_bitcount(query_command->object_type_bitmap) == 0 ) {
-            query_command->object_type_bitmap = 
+            query_command->object_type_bitmap =
                  MA_not(query_command->object_type_bitmap);
         }
 
@@ -926,8 +926,8 @@ int QC_fill (const char *query_str,
         /* check for use of IP flags on non-IP lookups */
         if ((ip_flag_used || query_command->d) && !is_ip_key) {
             /* WARNING:902, meaningless IP flag */
-            query_command->parse_messages = 
-                g_list_append(query_command->parse_messages, 
+            query_command->parse_messages =
+                g_list_append(query_command->parse_messages,
                               ca_get_qc_uselessipflag);
         }
 
@@ -950,7 +950,7 @@ int QC_fill (const char *query_str,
                 }
             }
         } else if (MA_isset(query_command->keytypes_bitmap, WK_IPPREFIX) ||
-                   MA_isset(query_command->keytypes_bitmap, WK_IP6PREFIX)) 
+                   MA_isset(query_command->keytypes_bitmap, WK_IP6PREFIX))
         {
             ip_prefix_t pref;
             int ip_pref_a2b_retval= IP_pref_a2b(&pref, query_command->keys);
@@ -962,14 +962,14 @@ int QC_fill (const char *query_str,
                 }
             }
         }
-        
+
         if (fixed_lookup) {
             /* WARNING:905 */
             char *fmt = ca_get_qc_fmt_fixedlookup;
-            query_command->parse_messages = 
-                g_list_append(query_command->parse_messages, 
+            query_command->parse_messages =
+                g_list_append(query_command->parse_messages,
                             g_strdup_printf(fmt, query_command->keys, lookup));
-            /* here we also need to set query_command->keys to 'lookup' 
+            /* here we also need to set query_command->keys to 'lookup'
                variable, otherwise, in some cases the object might not
                get returned from radix tree. EG 2003-08-07 */
             UT_free(query_command->keys);
@@ -978,100 +978,31 @@ int QC_fill (const char *query_str,
             UT_free(fmt);
         }
 
-        /* check for "fixed" lookups on AS numbers */
-        char *keycopy;
-        char *ptr, *ptr2;
-        fixed_lookup = 0;
-        if (MA_isset(query_command->keytypes_bitmap, WK_AUTNUM)) {
-          if ( ptr = strstr(query_command->keys, "AS0.") ) {
-            /* fix the format */
-            keycopy = UT_strdup(query_command->keys);
-	    /* remove the '0.' from the key */
-	    ptr += 2;  /* move past 'AS' */
-	    ptr2 = ptr + 2;  /* move past '0.' */
-	    while ( *ptr2 != '\0' ) {
-	      *(ptr++) = *(ptr2++);
-	    }
-	    *ptr = '\0';
-            fixed_lookup = 1;
-          }
-        /* check for "fixed" lookups on as-blocks */
-        /* we fix them to make them consistent with AS numbers
-           even though they don't need to be fixed as they are 
-           internally represented as long integers */
-        } else if (MA_isset(query_command->keytypes_bitmap, WK_ASRANGE)) {
-          char *key_tokens;
-          char *token, *cursor;
-          int   upper = 0;
-          int   lower = 0;
-          int   count = 0; /* two possible ASNs in a range */
-          long  begin_asnum = 0;
-          long  end_asnum = 0;
-          keycopy = UT_strdup(query_command->keys);
-          while ( ptr = strstr(query_command->keys, "AS0.") ) {
-            /* fix the format */
-	    /* remove the '0.' from the key */
-	    ptr += 2;  /* move past 'AS' */
-	    ptr2 = ptr + 2;  /* move past '0.' */
-	    while ( *ptr2 != '\0' ) {
-	      *(ptr++) = *(ptr2++);
-	    }
-	    *ptr = '\0';
-            fixed_lookup = 1;
-          }
-          /* now check ASx - ASy for x>y */
-          key_tokens = UT_strdup(query_command->keys);
-          cursor = key_tokens;
-          while( (token = strsep( &cursor, "-" )) != NULL && count < 2) {  
-            /* discard the letters (or leading whitespace), take the (number.)number */
-            if ( strchr(token, '.') == NULL ) {
-              sscanf(token, "%*[ AS]%d", &lower);
-            } 
-            else {
-              sscanf(token, "%*[ AS]%d.%d", &upper, &lower);
-            }
-            if ( count++ == 0 ) {
-              begin_asnum = (65536 * upper) + lower;
-            }
-            else {
-              end_asnum = (65536 * upper) + lower;
-            }
-          }
-          UT_free(key_tokens);
-          if ( ! fixed_lookup ) UT_free(keycopy);
-          if ( count == 2 && begin_asnum > end_asnum ) {
-            /* ERROR:110 */
-            query_command->parse_messages = 
-                    g_list_append(query_command->parse_messages, ca_get_qi_badrange);
-            badparerr++;
-          }
-        }
-        
         if (fixed_lookup) {
             /* WARNING:905 */
             char *fmt = ca_get_qc_fmt_fixedlookup;
-            query_command->parse_messages = 
-                g_list_append(query_command->parse_messages, 
+            query_command->parse_messages =
+                g_list_append(query_command->parse_messages,
                             g_strdup_printf(fmt, keycopy, query_command->keys));
             UT_free(keycopy);
             UT_free(fmt);
         }
 
-   
+
         /* -d handling: if the keytype is IPv4/v6 address/prefix/range, then
-           exclude the domains unless -d is set 
+           exclude the domains unless -d is set
            XXX this must be kept in sync with new types */
         /* XXX: do we want this?  what's the point?!?!? - shane */
         if (is_ip_key && !query_command->d) {
             MA_set(&(query_command->object_type_bitmap), C_DN , 0);
         }
 
-        if (query_command->R && 
+        if (query_command->R &&
             !MA_isset(query_command->keytypes_bitmap, WK_DOMAIN))
         {
             /* WARNING:904, meaningless no-referral flag */
-            query_command->parse_messages = 
-                g_list_append(query_command->parse_messages, 
+            query_command->parse_messages =
+                g_list_append(query_command->parse_messages,
                               ca_get_qc_uselessnorefflag);
         }
 
@@ -1098,7 +1029,7 @@ int QC_fill (const char *query_str,
            or an error) for the connection to close.
         */
         if (minusk)  {
-            if (qe->k == 0) { /* opening */ 
+            if (qe->k == 0) { /* opening */
 	        qe->k = 1;
             } else { /* closing, if no key; otherwise keep open */
 	        if (query_command->keys[0] == '\0') {
@@ -1106,7 +1037,7 @@ int QC_fill (const char *query_str,
 	        }
             }
         }
-    
+
     } /* if no error */
 
   /* we don't need this anymore */
@@ -1149,7 +1080,7 @@ Query_environ *QC_environ_new(char *ip, int sock) {
   {
     int i;
     ca_dbSource_t *hdl;
-    
+
     for (i=0; (hdl = ca_get_SourceHandleByPosition(i)) != NULL; i++) {
       char *amrmrulez = ca_get_srcdeflook(hdl);
       if( strcmp(amrmrulez, "y")==0 ) {
@@ -1158,7 +1089,7 @@ Query_environ *QC_environ_new(char *ip, int sock) {
       UT_free(amrmrulez);
     }
   }
-  
+
   return qe;
 
 } /* QC_environ_new() */
@@ -1168,18 +1099,18 @@ Query_environ *QC_environ_new(char *ip, int sock) {
 
 /* QC_create() */
 /*++++++++++++++++++++++++++++++++++++++
-  try to parse the query and fill in the QC struct, setting 
+  try to parse the query and fill in the QC struct, setting
   qc->query_type accordingly.
-  
+
   Query_command *QC_create    returns allocated structure
-  
+
   char *input                 user query
-  
+
   Query_environ *qe           query environment structure
-  
-  Author: 
+
+  Author:
     marek.
-  
+
   ++++++++++++++++++++++++++++++++++++++*/
 
 Query_command *QC_create(const char *input, Query_environ *qe)
@@ -1195,16 +1126,16 @@ Query_command *QC_create(const char *input, Query_environ *qe)
   for (s=input; *s != '\0'; s++) {
       if (!strchr(ALLOWED_QUERY_CHARS, *s)) {
           qc->query_type = QC_PARERR;
-          qc->parse_messages = g_list_append(qc->parse_messages, 
+          qc->parse_messages = g_list_append(qc->parse_messages,
                                              ca_get_qc_badinput);
           return qc;
       }
   }
-  
+
   if (strlen(input) == 0) {
     /* An empty query (Ie return) was sent */
     qc->query_type = QC_EMPTY;
-  } 
+  }
   else {        /* else <==> input_length > 0 ) */
     /* parse query */
     qt = QC_fill(input, qc, qe);
