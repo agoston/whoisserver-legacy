@@ -12,9 +12,9 @@
         tiago (10/04/2003) Created.
   ******************/ /******************
   Copyright (c) 2003               RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -265,7 +265,7 @@ xmlNodePtr rt_process_attr(const rpsl_attr_t* attr) {
   }
 
   return node;
-} 
+}
 
 
 /*+
@@ -297,7 +297,7 @@ void RT_set_object(RT_context_t* ctx, rpsl_object_t* object) {
   const rpsl_error_t* err;
   xmlChar* id;
 
-  
+
   id = (xmlChar*)rpsl_object_get_key_value(object);
   if (id == NULL) {
     id = (xmlChar*)rpsl_object_get_attr_by_ofs(object, 0)->value;
@@ -351,7 +351,7 @@ void RT_unset_object(RT_context_t* ctx, RT_upd_op operation, gboolean result) {
     node = xmlNewNode(NULL,
 		      (xmlChar*)"pr_name");
 
-    xmlNewProp(node, (xmlChar*)"pr_name", 
+    xmlNewProp(node, (xmlChar*)"pr_name",
      (xmlChar*)rpsl_object_get_attr_by_ofs((rpsl_object_t*)ctx->specific_data, 0)->value);
     rt_prepare_node(ctx, node);
 //  }
@@ -563,7 +563,7 @@ void RT_unknown_nic_suffix(RT_context_t* ctx) { //
 
 
 /*+
-  RT_auth_failure - Reports an authorization failure. 
+  RT_auth_failure - Reports an authorization failure.
 
   RT_context_t* ctx - Context.
 
@@ -583,17 +583,17 @@ void RT_auth_failure(RT_context_t* ctx,
   xmlNodePtr mnt_node;
 
   node = xmlNewNode(NULL, (xmlChar*)"auth_failure");
-  
+
   mnt_node = xmlNewNode(NULL, (xmlChar*)"possible_maintainers");
   rt_generate_list(mnt_node, "list", mntner);
   xmlAddChild(node, mnt_node);
-  
+
   rt_prepare_node(ctx, node);
 }
 
 
 /*+
-  RT_auth_ok - Reports an authorization OK. 
+  RT_auth_ok - Reports an authorization OK.
 
   RT_context_t* ctx - Context.
 
@@ -741,7 +741,7 @@ void RT_peering_set_syntax(RT_context_t* ctx) {
 
 /*+
   RT_filter_set_syntax - The filter-set object contains both mp-filter and filter
-    attributes. 
+    attributes.
 
   RT_context_t* ctx - Context.
  +*/
@@ -754,7 +754,7 @@ void RT_filter_set_syntax(RT_context_t* ctx) {
 
 
 /*+
-  RT_invalid_asblock_range - The as-block range is invalid: ASx - ASy where y<x 
+  RT_invalid_asblock_range - The as-block range is invalid: ASx - ASy where y<x
 
   RT_context_t* ctx - Context.
  +*/
@@ -1013,7 +1013,7 @@ void RT_known_refered_object(RT_context_t* ctx, gchar* refered_name){
   gchar* key - The unknown key
   +*/
 void RT_unknown_auto_key(RT_context_t* ctx,
-				gchar* key) { 
+				gchar* key) {
   xmlNodePtr     node;
 
   node = xmlNewNode(NULL, (xmlChar*)"unknown_auto_key");
@@ -1023,7 +1023,7 @@ void RT_unknown_auto_key(RT_context_t* ctx,
 }
 
 void RT_cert_error(RT_context_t* ctx,
-				gchar* err_str) { 
+				gchar* err_str) {
   xmlNodePtr     node;
 
   node = xmlNewNode(NULL, (xmlChar*)"cert_error");
@@ -1032,7 +1032,7 @@ void RT_cert_error(RT_context_t* ctx,
   rt_prepare_node(ctx, node);
 }
 
-void RT_report_key_info(RT_context_t* ctx, KM_key_return_t* info) { 
+void RT_report_key_info(RT_context_t* ctx, KM_key_return_t* info) {
   KM_status_t    status;
   xmlNodePtr     node;
   xmlNodePtr     child;
@@ -1108,7 +1108,7 @@ void RT_report_key_info(RT_context_t* ctx, KM_key_return_t* info) {
 
   KM_status_t - status.
   +*/
-void RT_key_add_error(RT_context_t* ctx, KM_status_t status) { 
+void RT_key_add_error(RT_context_t* ctx, KM_status_t status) {
   xmlNodePtr node;
   gchar*     error_string;
 
@@ -1530,7 +1530,7 @@ void RT_overlap_inetnums(RT_context_t* ctx, GList *overlap) {
   rt_generate_list_map(node, "list_line", overlap, (rt_map_function)rt_object_class);
 
   rt_prepare_node(ctx, node);
-} 
+}
 
 /*+
   RT_no_mntners - Report that there are no mntners to be checked
@@ -1540,7 +1540,7 @@ void RT_overlap_inetnums(RT_context_t* ctx, GList *overlap) {
   gchar *type - type of the parent object
   gchar *parent_text - exact match/parent
   +*/
-void RT_no_mntners(RT_context_t *ctx, gchar *key, gchar *type, gchar *parent_text) 
+void RT_no_mntners(RT_context_t *ctx, gchar *key, gchar *type, gchar *parent_text)
 {
   xmlNodePtr node;
 
@@ -1584,7 +1584,7 @@ void RT_invalid_mnt_routes(RT_context_t *ctx, gchar *key, gchar *type, gchar *pa
     p = g_list_next(p);
   }
   xmlAddChild(node, invalid_list_node);
-  
+
   p = failed_mntners;
   failed_mntners_node = xmlNewNode(NULL, (xmlChar*)"failed_mntners");
 
@@ -1612,7 +1612,7 @@ void RT_disallowed_mnt(RT_context_t* ctx, gchar* name) {
   rt_add_text_node(node, "mntner", name);
 
   rt_prepare_node(ctx, node);
-} 
+}
 
 /* auth check */
 void RT_irt_auth(RT_context_t* ctx, gchar* key, gchar* type, gchar* attr_checked,
@@ -1831,7 +1831,7 @@ void RT_update_result(RT_context_t* ctx, gchar* result) {
 
   node = xmlNewNode(NULL, (xmlChar*)"upd_result");
   rt_add_text_node(node, "result", result);
-  
+
   rt_prepare_node(ctx, node);
 }
 
@@ -1918,7 +1918,7 @@ void RT_rdns_invalid_range(RT_context_t *ctx,gchar *object_str) {
 void RT_status_check_failed_parentwithoutstatus(
     RT_context_t *ctx, gchar *parent, gchar *status) {
   xmlNodePtr node;
-  
+
   node = xmlNewNode(NULL, (xmlChar*)"status_check_failed_parentwithoutstatus");
   rt_add_text_node(node, "parent", (xmlChar*) parent);
   rt_add_text_node(node, "status", (xmlChar*) status);
