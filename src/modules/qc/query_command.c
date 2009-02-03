@@ -963,6 +963,16 @@ int QC_fill (const char *query_str,
             }
         }
 
+        /* now check ASx - ASy for x>y */
+        if (MA_isset(query_command->keytypes_bitmap, WK_ASRANGE)) {
+            unsigned long asnum1, asnum2;
+            convert_as_range(query_command->keys, &asnum1, &asnum2);
+            if (asnum1 > asnum2) {
+                query_command->parse_messages = g_list_append(query_command->parse_messages, ca_get_qi_badrange);
+                badparerr++;
+            }
+        }
+
         if (fixed_lookup) {
             /* WARNING:905 */
             char *fmt = ca_get_qc_fmt_fixedlookup;
