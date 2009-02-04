@@ -328,58 +328,55 @@ static void qi_create_org_name_query(GString *query_str, const char *sql_query, 
   Author:
     marek
   ++++++++++++++++++++++++++++++++++++++*/
-static int create_asblock_query(GString *query_str,
-				const char *sql_query,
-				Query_command *qc) {
-  char *keycopy = UT_strdup(qc->keys);
-  char *token, *cursor = keycopy;
-  long  begin_asnum = 0;
-  long  end_asnum = 0;
-  int   upper = 0;
-  int   lower = 0;
-  int   count = 0; /* two possible ASNs in a range */
+static int create_asblock_query(GString *query_str, const char *sql_query, Query_command *qc) {
+    char *keycopy = UT_strdup(qc->keys);
+    char *token, *cursor = keycopy;
+    long begin_asnum = 0;
+    long end_asnum = 0;
+    int upper = 0;
+    int lower = 0;
+    int count = 0; /* two possible ASNs in a range */
 
-  while( (token = strsep( &cursor, "-" )) != NULL && count < 2) {
+    while ((token = strsep(&cursor, "-")) != NULL && count < 2) {
 
-    /* discard the letters (or leading whitespace), take the (number.)number */
-    if ( strchr(token, '.') == NULL ) {
-      if( sscanf(token, "%*[ AS]%d", &lower) < 1 ) {
-        goto error_return; /* error */
-      }
+        /* discard the letters (or leading whitespace), take the (number.)number */
+        if (strchr(token, '.') == NULL) {
+            if (sscanf(token, "%*[ AS]%d", &lower) < 1) {
+                goto error_return;
+                /* error */
+            }
+        } else {
+            if (sscanf(token, "%*[ AS]%d.%d", &upper, &lower) < 1) {
+                goto error_return;
+                /* error */
+            }
+        }
+        if (count++ == 0) {
+            begin_asnum = (65536 * upper) + lower;
+        } else {
+            end_asnum = (65536 * upper) + lower;
+        }
     }
-    else {
-      if( sscanf(token, "%*[ AS]%d.%d", &upper, &lower) < 1 ) {
-        goto error_return; /* error */
-      }
+    /* now construct the query */
+    /* if only beginning was supplied, use it also as end */
+    if (count == 1) {
+        end_asnum = begin_asnum;
+    } else {
+        if (end_asnum < begin_asnum) {
+            qc->parse_messages = g_list_append(qc->parse_messages, ca_get_qi_badrange);
+            goto error_return;
+            /* error */
+        }
     }
-    if ( count++ == 0 ) {
-      begin_asnum = (65536 * upper) + lower;
-    }
-    else {
-      end_asnum = (65536 * upper) + lower;
-    }
-  }
-  /* now construct the query */
-  /* if only beginning was supplied, use it also as end */
-  if ( count == 1 ) {
-    end_asnum = begin_asnum;
-  }
-  else {
-    if ( end_asnum < begin_asnum ) {
-      qc->parse_messages = g_list_append(qc->parse_messages,
-                                             ca_get_qi_badrange);
-      goto error_return; /* error */
-    }
-  }
-  g_string_sprintf(query_str, sql_query, begin_asnum, end_asnum);
+    g_string_sprintf(query_str, sql_query, begin_asnum, end_asnum);
 
-  UT_free(keycopy);
-  return 0;
+    UT_free(keycopy);
+    return 0;
 
-  error_return:
+    error_return:
 
-  UT_free(keycopy);
-  return -1;
+    UT_free(keycopy);
+    return -1;
 }
 
 
