@@ -329,53 +329,35 @@ static void qi_create_org_name_query(GString *query_str, const char *sql_query, 
     marek
   ++++++++++++++++++++++++++++++++++++++*/
 static int create_asblock_query(GString *query_str, const char *sql_query, Query_command *qc) {
-    char *keycopy = UT_strdup(qc->keys);
-    char *token, *cursor = keycopy;
-    long begin_asnum = 0;
-    long end_asnum = 0;
-    int upper = 0;
-    int lower = 0;
-    int count = 0; /* two possible ASNs in a range */
+    gchar **tok;
+    unsigned long ret[2];
+    int i;
 
-    while ((token = strsep(&cursor, "-")) != NULL && count < 2) {
+    /* tokenize & count how many tokens we have */
+    tok = g_strsplit(as_range, "-", -1);
+    for (i=0; tok[i] ; i++) {
+        if (i >= 2) goto error_return;
 
-        /* discard the letters (or leading whitespace), take the (number.)number */
-        if (strchr(token, '.') == NULL) {
-            if (sscanf(token, "%*[ AS]%d", &lower) < 1) {
-                goto error_return;
-                /* error */
-            }
-        } else {
-            if (sscanf(token, "%*[ AS]%d.%d", &upper, &lower) < 1) {
-                goto error_return;
-                /* error */
-            }
-        }
-        if (count++ == 0) {
-            begin_asnum = (65536 * upper) + lower;
-        } else {
-            end_asnum = (65536 * upper) + lower;
-        }
+        if (convert_as(tok[i], &ret[i])) goto error_return;
     }
+
     /* now construct the query */
-    /* if only beginning was supplied, use it also as end */
-    if (count == 1) {
-        end_asnum = begin_asnum;
+    /* if only beginning was supplied (single token), use it also as end */
+    if (i == 1) {
+        ret[1] = ret[0];
     } else {
-        if (end_asnum < begin_asnum) {
+        if (ret[1] < ret[0]) {
             qc->parse_messages = g_list_append(qc->parse_messages, ca_get_qi_badrange);
             goto error_return;
             /* error */
         }
     }
     g_string_sprintf(query_str, sql_query, begin_asnum, end_asnum);
-
-    UT_free(keycopy);
+    g_strfreev(tok);
     return 0;
 
     error_return:
-
-    UT_free(keycopy);
+    g_strfreev(tok);
     return -1;
 }
 
