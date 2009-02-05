@@ -203,13 +203,20 @@ char *convert_rf(const char *avalue, int *type, int *port) {
  *
  * */
 int convert_as(const char *as, unsigned long *asnum) {
-	char *ptr = as;
-	char *endptr;
+	char *ptr, *endptr, *finptr;
 	unsigned long res;
 
-	/* discard the letters (or leading whitespace) */
-	while ((*ptr) && (!isdigit(*ptr)))
-	    ptr++;
+	/* discard the letters and leading whitespace) */
+	for (ptr = as; *ptr && !isdigit(*ptr); ptr++);
+	/* walk through the digits */
+	for (endptr = ptr; *endptr && isdigit(*endptr); endptr++);
+	/* check if the end only contains whitespace */
+	for (finptr = endptr; *finptr && isspace(*finptr); finptr++);
+	/* return error if there is any garbage at the end */
+	if (*finptr) return 1;
+
+	/* chomp trailing whitespace */
+	*endptr = 0;
 
 	res = strtoul(ptr, &endptr, 10);
 	if (*endptr) {
