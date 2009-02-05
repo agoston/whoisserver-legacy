@@ -202,7 +202,7 @@ char *convert_rf(const char *avalue, int *type, int *port) {
  *          1 if error (*asnum left untouched)
  *
  * */
-static int convert_as(const char *as, unsigned long *asnum) {
+int convert_as(const char *as, unsigned long *asnum) {
 	char *ptr = as;
 	char *endptr;
 	unsigned long res;

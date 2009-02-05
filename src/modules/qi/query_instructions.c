@@ -330,29 +330,29 @@ static void qi_create_org_name_query(GString *query_str, const char *sql_query, 
   ++++++++++++++++++++++++++++++++++++++*/
 static int create_asblock_query(GString *query_str, const char *sql_query, Query_command *qc) {
     gchar **tok;
-    unsigned long ret[2];
+    unsigned long asn[2];
     int i;
 
     /* tokenize & count how many tokens we have */
-    tok = g_strsplit(as_range, "-", -1);
+    tok = g_strsplit(qc->keys, "-", -1);
     for (i=0; tok[i] ; i++) {
         if (i >= 2) goto error_return;
 
-        if (convert_as(tok[i], &ret[i])) goto error_return;
+        if (convert_as(tok[i], &asn[i])) goto error_return;
     }
 
     /* now construct the query */
     /* if only beginning was supplied (single token), use it also as end */
     if (i == 1) {
-        ret[1] = ret[0];
+        asn[1] = asn[0];
     } else {
-        if (ret[1] < ret[0]) {
+        if (asn[1] < asn[0]) {
             qc->parse_messages = g_list_append(qc->parse_messages, ca_get_qi_badrange);
             goto error_return;
             /* error */
         }
     }
-    g_string_sprintf(query_str, sql_query, begin_asnum, end_asnum);
+    g_string_sprintf(query_str, sql_query, asn[0], asn[1]);
     g_strfreev(tok);
     return 0;
 
