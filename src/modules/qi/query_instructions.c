@@ -449,120 +449,110 @@ static void add_filter(GString *query_str, const Query_command *qc)
   +html+ </PRE>
 
   ++++++++++++++++++++++++++++++++++++++*/
-static char *create_query(const Query_t q, Query_command *qc)
-{
-  GString *result_buff;
-  char *result;
-  Q_Type_t querytype;
-  int addquery = 0; /* controls if the query should be added to the list */
+static char *create_query(const Query_t q, Query_command *qc) {
+    GString *result_buff;
+    char *result;
+    Q_Type_t querytype;
+    int addquery = 0; /* controls if the query should be added to the list */
 
-  result_buff = g_string_sized_new(STR_XL);
+    result_buff = g_string_sized_new(STR_XL);
 
-  if (MA_bitcount(qc->inv_attrs_bitmap) > 0) {
-    querytype = Q_INVERSE;
-  }
-  else {
-    querytype = Q_LOOKUP;
-  }
-
-  if ( (q.query != NULL)
-    && (q.querytype == querytype) ) {
-
-    /* addquery = 1; */
-    /* if it got here, it should be added, unless.(see asblock)*/
-
-    if (q.keytype == WK_NAME) {
-      /* Name queries require special treatment. */
-      if(q.class == C_OA){
-        qi_create_org_name_query(result_buff, q.query, qc->keys);
-      }else{
-        qi_create_name_query(result_buff, q.query, qc->keys);
-      }
-
-      addquery = 1;
-    }
-    else if( q.keytype == WK_IPADDRESS ) {  /* ifaddr sql lookups */
-      ip_range_t myrang;
-      unsigned   begin, end;
-      ip_keytype_t key_type;
-      int  err;
-
-      /* The only inverse query for IPADDRESS is nserver. */
-      /* We need to insure that we don't try to use the numeric values for this
-       * query, because the address of the server is stored as a string, and
-       * the SQL query is formatted appropriately. */
-      if (NOERR(err = IP_smart_range(qc->keys, &myrang, IP_EXPN, &key_type)))
-      {
-        if(IP_rang_b2_space(&myrang) == IP_V4 ) {
-	  IP_rang_b2v4(&myrang, &begin, &end);
-	  if (querytype == Q_INVERSE) {
-	      /* for inverse queries, convert number to dotted-quad */
-	      char buf[64];
-	      const char *inet_ntop_ret;
-	      inet_ntop_ret = inet_ntop(AF_INET, &begin, buf, sizeof(buf));
-	      dieif(inet_ntop_ret == NULL);
-	      g_string_sprintf(result_buff, q.query, buf);
-	  } else {
-	      /* otherwise, execute appropriate query on numeric values */
-	      g_string_sprintf(result_buff, q.query, begin, end);
-	  }
-	  addquery = 1;
-	}
-	else {
-	  die;
-	}
-      }
-    }
-    else if( q.keytype == WK_IP6PREFIX ) { /* "interface:" sql lookup */
-      ip_prefix_t ip_prefix;
-      char *ipv6_prefix;
-      ip_v6word_t high;
-      ip_v6word_t low;
-      int ret;
-      unsigned prefix_length;
-
-      /* first make sure the address has a prefix length part,
-         because IP_pref_a2v6 requires it */
-      if( index(qc->keys,'/')  == NULL ){ /* if the query does not have a prefix length */
-        ipv6_prefix = g_strdup_printf("%s/128", qc->keys);
-      } else {
-        ipv6_prefix = g_strdup_printf("%s", qc->keys);
-      }
-
-      ret = IP_pref_a2v6(ipv6_prefix, &ip_prefix, &high, &low, &prefix_length);
-      UT_free(ipv6_prefix);
-
-      g_string_sprintf(result_buff, q.query, high, low);
-
-      addquery = 1;
-    }
-    else if( q.keytype == WK_ASRANGE ) {   /* as_block range composition */
-      if( create_asblock_query(result_buff, q.query, qc) != 0 ) {
-	addquery = 0; /* ... unless it's not correct */
-      }
-      else {
-	addquery = 1;
-      }
-    }
-    else {
-      g_string_sprintf(result_buff, q.query, qc->keys);
-      addquery = 1;
+    if (MA_bitcount(qc->inv_attrs_bitmap) > 0) {
+        querytype = Q_INVERSE;
+    } else {
+        querytype = Q_LOOKUP;
     }
 
-    if (q.class == C_ANY && addquery == 1 ) {
-      /* It is class type ANY so add the object filtering */
-      add_filter(result_buff, qc);
+    if ((q.query != NULL) && (q.querytype == querytype)) {
+
+        /* addquery = 1; */
+        /* if it got here, it should be added, unless.(see asblock)*/
+
+        if (q.keytype == WK_NAME) {
+            /* Name queries require special treatment. */
+            if (q.class == C_OA) {
+                qi_create_org_name_query(result_buff, q.query, qc->keys);
+            } else {
+                qi_create_name_query(result_buff, q.query, qc->keys);
+            }
+
+            addquery = 1;
+        } else if (q.keytype == WK_IPADDRESS) { /* ifaddr sql lookups */
+            ip_range_t myrang;
+            unsigned begin, end;
+            ip_keytype_t key_type;
+            int err;
+
+            /* The only inverse query for IPADDRESS is nserver. */
+            /* We need to insure that we don't try to use the numeric values for this
+             * query, because the address of the server is stored as a string, and
+             * the SQL query is formatted appropriately. */
+            if (NOERR(err = IP_smart_range(qc->keys, &myrang, IP_EXPN, &key_type))) {
+                if (IP_rang_b2_space(&myrang) == IP_V4) {
+                    IP_rang_b2v4(&myrang, &begin, &end);
+                    if (querytype == Q_INVERSE) {
+                        /* for inverse queries, convert number to dotted-quad */
+                        char buf[64];
+                        const char *inet_ntop_ret;
+                        inet_ntop_ret = inet_ntop(AF_INET, &begin, buf, sizeof(buf));
+                        dieif(inet_ntop_ret == NULL);
+                        g_string_sprintf(result_buff, q.query, buf);
+                    } else {
+                        /* otherwise, execute appropriate query on numeric values */
+                        g_string_sprintf(result_buff, q.query, begin, end);
+                    }
+                    addquery = 1;
+                } else {
+                    die;
+                }
+            }
+        } else if (q.keytype == WK_IP6PREFIX) { /* "interface:" sql lookup */
+            ip_prefix_t ip_prefix;
+            char *ipv6_prefix;
+            ip_v6word_t high;
+            ip_v6word_t low;
+            int ret;
+            unsigned prefix_length;
+
+            /* first make sure the address has a prefix length part,
+             because IP_pref_a2v6 requires it */
+            if (index(qc->keys, '/') == NULL) { /* if the query does not have a prefix length */
+                ipv6_prefix = g_strdup_printf("%s/128", qc->keys);
+            } else {
+                ipv6_prefix = g_strdup_printf("%s", qc->keys);
+            }
+
+            ret = IP_pref_a2v6(ipv6_prefix, &ip_prefix, &high, &low, &prefix_length);
+            UT_free(ipv6_prefix);
+
+            g_string_sprintf(result_buff, q.query, high, low);
+
+            addquery = 1;
+        } else if (q.keytype == WK_ASRANGE) { /* as_block range composition */
+            if (create_asblock_query(result_buff, q.query, qc) != 0) {
+                addquery = 0; /* ... unless it's not correct */
+            } else {
+                addquery = 1;
+            }
+        } else {
+            g_string_sprintf(result_buff, q.query, qc->keys);
+            addquery = 1;
+        }
+
+        if (q.class == C_ANY && addquery == 1) {
+            /* It is class type ANY so add the object filtering */
+            add_filter(result_buff, qc);
+        }
     }
-  }
 
-  if( addquery == 1 ) {
-    result = UT_strdup(result_buff->str);
-  } else {
-    result = NULL;
-  }
-  g_string_free(result_buff, TRUE);
+    if (addquery == 1) {
+        result = UT_strdup(result_buff->str);
+    } else {
+        result = NULL;
+    }
+    g_string_free(result_buff, TRUE);
 
-  return result;
+    return result;
 } /* create_query() */
 
 /* QI_fast_output() */
