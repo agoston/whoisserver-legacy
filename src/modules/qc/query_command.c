@@ -129,7 +129,9 @@ QC_environ_to_string(Query_environ qe) {
 
     /* format the environment info */
     tmp = g_string_sized_new(STR_L);
-    g_string_sprintf(tmp, "host=%s, keep_connection=%s, sources=%s, version=%s%s%s", qe.condat.ip, qe.k ? "on" : "off", sources, (qe.version == NULL) ? "?" : qe.version, passed_addr[0] == '\0' ? "" : ", passedIP=", passed_addr);
+    g_string_sprintf(tmp, "host=%s, keep_connection=%s, sources=%s, version=%s%s%s", qe.condat.ip, qe.k ? "on" : "off",
+                     sources, (qe.version == NULL) ? "?" : qe.version, passed_addr[0] == '\0' ? "" : ", passedIP=",
+                     passed_addr);
 
     /* move result to return buffer, and free up memory */
     result = UT_strdup(tmp->str);
@@ -166,10 +168,14 @@ char *QC_query_command_to_string(Query_command *query_command) {
     str2 = MA_to_string(query_command->object_type_bitmap, DF_get_class_names());
     str3 = WK_to_string(query_command->keytypes_bitmap);
 
-    sprintf(result_buf, "Query_command : inv_attrs=%s, recursive=%s, object_type=%s, (c=%s,C=%s,G=%s,B=%s,b=%s,g=%d,l=%d,m=%d,q=%d,t=%d,v=%d,x=%d,F=%d,K=%d,L=%d,M=%d,R=%d), possible keytypes=%s, keys=[%s]", str1,
-            query_command->recursive ? "y" : "n", str2, query_command->c_irt_search ? "TRUE" : "FALSE", query_command->C ? "TRUE" : "FALSE", query_command->G_group_search ? "TRUE" : "FALSE", query_command->B ? "TRUE" : "FALSE",
-            query_command->b ? "TRUE" : "FALSE", query_command->g, query_command->l, query_command->m, query_command->q, query_command->t, query_command->v, query_command->x, query_command->fast, query_command->filtered, query_command->L,
-            query_command->M, query_command->R, str3, query_command->keys);
+    sprintf(result_buf,
+            "Query_command : inv_attrs=%s, recursive=%s, object_type=%s, (c=%s,C=%s,G=%s,B=%s,b=%s,g=%d,l=%d,m=%d,q=%d,t=%d,v=%d,x=%d,F=%d,K=%d,L=%d,M=%d,R=%d), possible keytypes=%s, keys=[%s]",
+            str1, query_command->recursive ? "y" : "n", str2, query_command->c_irt_search ? "TRUE" : "FALSE",
+            query_command->C ? "TRUE" : "FALSE", query_command->G_group_search ? "TRUE" : "FALSE",
+            query_command->B ? "TRUE" : "FALSE", query_command->b ? "TRUE" : "FALSE", query_command->g,
+            query_command->l, query_command->m, query_command->q, query_command->t, query_command->v, query_command->x,
+            query_command->fast, query_command->filtered, query_command->L, query_command->M, query_command->R, str3,
+            query_command->keys);
     UT_free(str1);
     UT_free(str2);
     UT_free(str3);
@@ -870,8 +876,10 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
 
         /* XXX: missing checks for "-i" and "-T" versus key types */
 
-        is_ip_key = MA_isset(query_command->keytypes_bitmap, WK_IPADDRESS) || MA_isset(query_command->keytypes_bitmap, WK_IPRANGE) || MA_isset(query_command->keytypes_bitmap, WK_IPPREFIX) || MA_isset(query_command->keytypes_bitmap,
-                                                                                                                                                                                                        WK_IP6PREFIX);
+        is_ip_key = MA_isset(query_command->keytypes_bitmap, WK_IPADDRESS) || MA_isset(query_command->keytypes_bitmap,
+                                                                                       WK_IPRANGE)
+                || MA_isset(query_command->keytypes_bitmap, WK_IPPREFIX) || MA_isset(query_command->keytypes_bitmap,
+                                                                                     WK_IP6PREFIX);
 
         /* check for use of IP flags on non-IP lookups */
         if ((ip_flag_used || query_command->d) && !is_ip_key) {
