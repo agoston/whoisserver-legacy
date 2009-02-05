@@ -236,6 +236,9 @@ int convert_as_range(const char *as_range, unsigned long *begin, unsigned long *
 
 	    if (convert_as(tok[i], &ret[i])) goto error_return;
 	}
+	/* if no - (which would indicate an autnum instead of range), throw an error */
+	if (i < 2) goto error_return;
+
 	*begin = ret[0];
 	*end = ret[1];
 	g_strfreev(tok);
