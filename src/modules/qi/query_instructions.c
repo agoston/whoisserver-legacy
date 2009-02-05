@@ -544,36 +544,6 @@ static char *create_query(const Query_t q, Query_command *qc)
 	addquery = 1;
       }
     }
-//    else if( q.keytype == WK_AUTNUM ) {   /* as_number check */
-      /* check for 16 bit number in 32 bit format */
-//      char *ptr, *ptr2;
-//fprintf(stderr, "qc->keys [%s]\n",qc->keys);
-//      if ( ptr = strstr(qc->keys, "AS0.") ) {
-//fprintf(stderr, "ptr [%s]\n",ptr);
-
-        /* fix the format */
-//        char *keycopy = UT_strdup(qc->keys);
-	/* remove the '0.' from the key */
-//	ptr += 2;  /* move past 'AS' */
-//fprintf(stderr, "ptr [%s]\n",ptr);
-//	ptr2 = ptr + 2;  /* move past '0.' */
-//fprintf(stderr, "ptr2 [%s]\n",ptr2);
-//	while ( *ptr2 != '\0' ) {
-//	  *(ptr++) = *(ptr2++);
-//	}
-//	*ptr = '\0';
-
-	/* add a warning */
-//        char *fmt = ca_get_qc_fmt_fixedlookup;
-//fprintf(stderr, "fmt [%s]\n",fmt);
-//        qc->parse_messages = g_list_append(qc->parse_messages,
-//                                g_strdup_printf(fmt, keycopy, qc->keys));
-//        UT_free(fmt);
-//        UT_free(keycopy);
-//      }
-//      g_string_sprintf(result_buff, q.query, qc->keys);
-//      addquery = 1;
-//    }
     else {
       g_string_sprintf(result_buff, q.query, qc->keys);
       addquery = 1;
