@@ -750,7 +750,7 @@ CACERTS NULL
 # mailbox, where it will bounce again, and again, ....
 # User has to be a trusted user, T<name> in sendmail.cf.
 
-MAILCMD /usr/lib/sendmail -fmy-dbm -t
+MAILCMD /usr/lib/sendmail -funread@ripe.net -t
 
 
 ###########
@@ -788,7 +788,6 @@ NICSUFFIX LACNIC
 NICSUFFIX RADB
 NICSUFFIX APNIC
 NICSUFFIX RIPN
-NICSUFFIX AFRINIC
 
 # RDNS related entries
 
