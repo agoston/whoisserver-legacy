@@ -548,18 +548,18 @@ QI_FILTER_BANNER % Note: this output has been filtered.
 #
 
 DUMMY_ATTR admin-c=
-DUMMY_ATTR tech-c= 
-DUMMY_ATTR mnt-by= 
+DUMMY_ATTR tech-c=
+DUMMY_ATTR mnt-by=
 DUMMY_ATTR mnt-ref=
 DUMMY_ATTR referral-by=
-DUMMY_ATTR source=     
-DUMMY_ATTR org-type=   
+DUMMY_ATTR source=
+DUMMY_ATTR org-type=
 DUMMY_ATTR irt=
 DUMMY_ATTR mntner=
 DUMMY_ATTR organisation=
 DUMMY_ATTR nic-hdl=
 DUMMY_ATTR person=Dummy name for %s
-DUMMY_ATTR role=Dummy role for %s  
+DUMMY_ATTR role=Dummy role for %s
 DUMMY_ATTR address=Dummy address for %s
 DUMMY_ATTR changed=unread@ripe.net 20000101
 DUMMY_ATTR phone=+31205354444
@@ -572,10 +572,10 @@ DUMMY_ATTR org-name=Dummy organisation name for %s
 # Additional remarks to be added to the end of the dummified object.
 
 DUMMY_ADD_ATTR ****************************
-DUMMY_ADD_ATTR * THIS OBJECT IS NOT VALID 
+DUMMY_ADD_ATTR * THIS OBJECT IS NOT VALID
 DUMMY_ADD_ATTR * Please note that all personal data has been removed from this object.
 DUMMY_ADD_ATTR * To view the original object, please query the RIPE Database at:
-DUMMY_ADD_ATTR * http://www.ripe.net/whois 
+DUMMY_ADD_ATTR * http://www.ripe.net/whois
 DUMMY_ADD_ATTR ****************************
 
 # After this many seconds have passed since the object was put in the database,
