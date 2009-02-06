@@ -552,8 +552,8 @@ DUMMY_ATTR tech-c=
 DUMMY_ATTR mnt-by= 
 DUMMY_ATTR mnt-ref=
 DUMMY_ATTR referral-by=
-DUMMY_ATTR source=  
-DUMMY_ATTR org-type=
+DUMMY_ATTR source=     
+DUMMY_ATTR org-type=   
 DUMMY_ATTR irt=
 DUMMY_ATTR mntner=
 DUMMY_ATTR organisation=
@@ -573,8 +573,9 @@ DUMMY_ATTR org-name=Dummy organisation name for %s
 
 DUMMY_ADD_ATTR ****************************
 DUMMY_ADD_ATTR * THIS OBJECT IS NOT VALID 
-DUMMY_ADD_ATTR * Please note that this object has all its personal data removed, and acts as a stub only.
-DUMMY_ADD_ATTR * To get the original object, please query the RIPE Database.
+DUMMY_ADD_ATTR * Please note that all personal data has been removed from this object.
+DUMMY_ADD_ATTR * To view the original object, please query the RIPE Database at:
+DUMMY_ADD_ATTR * http://www.ripe.net/whois 
 DUMMY_ADD_ATTR ****************************
 
 # After this many seconds have passed since the object was put in the database,
