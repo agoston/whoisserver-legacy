@@ -42,13 +42,6 @@ Please read the file `LICENCE' for details of the software Copyright
 and Terms & Conditions of using the software.
 
 Requirements:
-In order to build the whois binaries you need to have available the source 
-code for c-client.
-The build links to libxml2, libxslt1 and glib libraries.
 We use lex and yacc for syntax parsing.
 It also needs JDK.
 You must also have a MySQL server running with InnoDB support.
-
-
-$Date: 2007/02/19 13:32:19 $
-
