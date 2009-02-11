@@ -33,7 +33,7 @@
 
 >> asn32/aut-num/003 <<
 
-# CASE 3: We try to create aut-num object AS200.200
+# CASE 3: We try to create aut-num object AS94967295
 # parent as-block exists
 #
 # create aut-num object 
@@ -44,7 +44,7 @@
 
 >> asn32/aut-num/004 <<
 
-# CASE 4: We try to create aut-num object AS200.200
+# CASE 4: We try to create aut-num object AS94967295
 # parent as-block does not exist
 # fail with 'no parent object' error
 #
@@ -57,8 +57,9 @@
 >> asn32/aut-num/005 <<
 
 # CASE 5: We try to create aut-num object AS200
-# it has member-of: as300.300:as-test:AS400.400
-# which in turn exists and has mbrs-by-ref: RIPE-NCC-HM-MNT
+# it has member-of: as7775535:as-test:AS94967295
+# which in turn exists and has mbrs-by-ref:TEST-MNT
+# different case for as and AS
 #
 # create aut-num object 
 #
@@ -69,8 +70,8 @@
 >> asn32/aut-num/006 <<
 
 # CASE 6: We try to create aut-num object AS200
-# it has member-of: as300.300:as-test:AS.400.400
-# which in turn exists and has NO mbrs-by-ref: RIPE-NCC-HM-MNT
+# it has member-of: as7775535:as-test:AS94967295
+# which in turn exists and has NO mbrs-by-ref: TEST-MNT
 #
 # create aut-num object 
 #
@@ -80,7 +81,8 @@
 
 >> asn32/aut-num/007 <<
 
-# CASE 7: We try to create aut-num object AS0.123
+# CASE 7: We try to create aut-num object AS4294967299
+# which is more than a 32 bit number
 # rejected with syntax error
 #
 # create aut-num object 
@@ -92,7 +94,7 @@
 >> asn32/aut-num/008 <<
 
 # CASE 8: We try to create aut-num object AS200
-# it has member-of: as300.300:as-test:AS400.400
+# it has member-of: as7775535:as-test:AS94967295
 # which in turn does not exist. This previously
 # generated a dummy object.
 #
@@ -101,3 +103,45 @@
 #FAILURE
 #
 # RESULT 8: The creation will fail.
+
+
+# CASE 9: We try to create aut-num object AS0
+# parent as-block exists
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 9: The creation will succeed.
+
+
+# CASE 10: We try to create aut-num object AS4294967295
+# parent as-block exists
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 10: The creation will succeed.
+
+
+# CASE 11: We try to create aut-num object AS-1
+# rejected with syntax error
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 11: The creation will fail.
+
+
+# CASE 12: We try to create aut-num object AS2.3
+# rejected with syntax error
+#
+# create aut-num object 
+#
+#FAILURE
+#
+# RESULT 12: The creation will fail.
+
+

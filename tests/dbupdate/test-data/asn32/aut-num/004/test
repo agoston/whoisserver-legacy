@@ -1,9 +1,7 @@
-
-# CASE 4: We try to create aut-num object AS200.200
+#asn32/aut-num/
+# CASE 4: We try to create aut-num object AS94967295
 # parent as-block does not exist
 # fail with 'no parent object' error
-%
-% requires initial objects to be loaded
 #
 # create aut-num object 
 #
@@ -12,13 +10,13 @@
 # RESULT 4: The creation will fail.
 
 
-aut-num:      AS200.200
+aut-num:      AS94967295
 as-name:      ASTEST
 descr:        TEST TELEKOM
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 notify:       dbtest@ripe.net
-mnt-by:       RIPE-NCC-HM-MNT
+mnt-by:       TEST-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 

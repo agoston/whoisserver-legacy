@@ -1,4 +1,4 @@
-asn32/aut-num/
+#asn32/aut-num/
 # CASE 2: We try to create aut-num object AS123
 # this objects tests various flavors of the attributes:
 # import mp-default
@@ -32,7 +32,7 @@ mp-default:      to AS1 networks community.contains(4294967295:-1)
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 notify:       dbtest@ripe.net
-mnt-by:       RIPE-NCC-HM-MNT
+mnt-by:       TEST-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 

@@ -1,15 +1,15 @@
 #asn32/aut-num/
-# CASE 3: We try to create aut-num object AS94967295
+# CASE 10: We try to create aut-num object AS4294967295
 # parent as-block exists
 #
 # create aut-num object 
 #
 #SUCCESS
 #
-# RESULT 3: The creation will succeed.
+# RESULT 10: The creation will succeed.
 
 
-aut-num:      AS94967295
+aut-num:      AS4294967295
 as-name:      ASTEST
 descr:        TEST TELEKOM
 admin-c:      TP1-DB-TEST
