@@ -1,14 +1,11 @@
-
+asn32/aut-num/
 # CASE 2: We try to create aut-num object AS123
 # this objects tests various flavors of the attributes:
-# mp-import mp-export mp-default
-# import export default
-# we test 32 AS number on itself
-# we test 32 AS number as a part of the set name
-# we test community value as a part of filter in import/export etc
+# import mp-default
+# we test AS 32 number on itself
+# we test AS 32 number as a part of the set name
+# we test community value as a part of filter in import/mp-default.
 # many errors to count.
-%
-% requires initial objects to be loaded
 #
 # create aut-num object 
 #
@@ -16,26 +13,22 @@
 #
 # RESULT 2: The creation will fail.
 
-
 aut-num:      AS123
 as-name:      ASTEST
 descr:        TEST TELEKOM
-import:       from AS1 accept (AS0.1 and not AS3.40 and AS1:as-myset:AS34.245:As-otherset)
-import:       from AS1 accept community.contains(65536.65535:65535)
-import:       from AS1 accept community.contains(65535.65536:65535)
-import:       from AS1 accept community.contains(65535.65535:65536)
-import:       from AS1 accept community.contains(65535.65535:-1)
-import:       from AS1:as-myset:AS34.245:As-otherset accept <.* AS0.234 .*>
-import:       from AS1:as-myset:AS0.34:As-otherset accept community.contains(0.1:65535)
-import:       from AS1:as-myset:AS0.34:As-otherset accept community.contains(0.1:65535)
-import:       from AS1:as-myset:AS0.34.35:As-otherset accept community.contains(0.1:65535)
-mp-default:      to AS1 networks (AS0.1 and not AS3.40 and AS1:as-myset:AS34.245:As-otherset)
-mp-default:      to AS1:as-myset:AS0.34:As-otherset networks community.contains(0.1:0)
-mp-default:      to AS1 networks <.* AS0.23 .*>
-mp-default:      to AS1 networks community.contains(65536.65535:65535)
-mp-default:      to AS1 networks community.contains(65535.65536:65535)
-mp-default:      to AS1 networks community.contains(65535.65535:65536)
-mp-default:      to AS1 networks community.contains(65535.65535:-1)
+import:       from AS1 accept (AS65536 and not AS7775535 and AS1:as-myset:AS94967295:As-otherset)
+import:       from AS1 accept community.contains(4294967299:65535)
+import:       from AS1 accept community.contains(4294967295:65536)
+import:       from AS1 accept community.contains(4294967295:-1)
+import:       from AS1:as-myset:AS94967295:As-otherset accept <.* AS234 .*>
+import:       from AS1:as-myset:AS34:As-otherset accept community.contains(1:65535)
+import:       from AS1:as-myset:AS4294967299:As-otherset accept community.contains(1:65535)
+mp-default:      to AS1 networks (AS1 and not AS7775535 and AS1:as-myset:AS94967295:As-otherset)
+mp-default:      to AS1:as-myset:AS34:As-otherset networks community.contains(1:0)
+mp-default:      to AS1 networks <.* AS23 .*>
+mp-default:      to AS1 networks community.contains(4294967299:65535)
+mp-default:      to AS1 networks community.contains(4294967295:65536)
+mp-default:      to AS1 networks community.contains(4294967295:-1)
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 notify:       dbtest@ripe.net

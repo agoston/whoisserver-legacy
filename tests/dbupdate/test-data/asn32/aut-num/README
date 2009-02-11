@@ -5,8 +5,8 @@
 # this objects tests various flavors of the attributes:
 # mp-import mp-export mp-default
 # import export default
-# we test 32 AS number on itself
-# we test 32 AS number as a part of the set name
+# we test AS 32 number on itself
+# we test AS 32 number as a part of the set name
 # we test community value as a part of filter in import/export etc
 #
 # create aut-num object 
@@ -19,11 +19,10 @@
 
 # CASE 2: We try to create aut-num object AS123
 # this objects tests various flavors of the attributes:
-# mp-import mp-export mp-default
-# import export default
-# we test 32 AS number on itself
-# we test 32 AS number as a part of the set name
-# we test community value as a part of filter in import/export etc
+# import mp-default
+# we test AS 32 number on itself
+# we test AS 32 number as a part of the set name
+# we test community value as a part of filter in import/mp-default.
 # many errors to count.
 #
 # create aut-num object 
