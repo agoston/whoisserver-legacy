@@ -94,7 +94,6 @@ int main(int argc, char** argv) {
     extern char *optarg;
     int errflg = 0;
     int dummy_allowed;
-    int start_object;
     int num_ok, num_failed;
     long num_skip = 0;
     int load_pass = -1;
@@ -114,9 +113,7 @@ int main(int argc, char** argv) {
     num_ok = 0;
     num_failed = 0;
     dummy_allowed = 0;
-    load_pass =
-
-    start_object = 1;
+    load_pass = 1;
 
     while ((c = getopt(argc, argv, "n:M:L:p:s:?")) != EOF)
         switch (c) {
