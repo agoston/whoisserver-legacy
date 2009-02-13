@@ -1,5 +1,5 @@
-# CASE 3: We try to create as-set object AS200.200:AS-TEST:AS300.300
-# AS200.200:AS-TEST exists in the database
+# CASE 3: We try to create as-set object AS7775535:AS-TEST:AS94967295
+# AS7775535:AS-TEST exists in the database
 #
 # create as-set object 
 #
@@ -8,10 +8,10 @@
 # RESULT 3: The creation will succeed.
 
 
-as-set:       AS200.200:AS-TEST:AS300.300
+as-set:       AS7775535:AS-TEST:AS94967295
 descr:        test as-set
 members:      AS1, AS2, AS3, AS4
-members:      AS1.0, AS20.234, AS3.65535, AS4.3444
+members:      AS65536, AS7775535, AS94967295
 tech-c:       TP1-DB-TEST
 admin-c:      TP1-DB-TEST
 notify:       dbtest@ripe.net

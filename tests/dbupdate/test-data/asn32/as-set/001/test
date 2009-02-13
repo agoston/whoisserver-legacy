@@ -10,7 +10,7 @@
 as-set:       AS-TEST
 descr:        test as-set
 members:      AS1, AS2, AS3, AS4
-members:      AS1.0, AS20.234, AS3.65535, AS4.3444
+members:      AS65536, AS7775535, AS94967295
 tech-c:       TP1-DB-TEST
 admin-c:      TP1-DB-TEST
 notify:       dbtest@ripe.net

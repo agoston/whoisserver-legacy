@@ -7,8 +7,8 @@
 # RESULT 1: The creation will succeed.
 
 
-# CASE 2: We try to create as-set object AS-TEST
-# with a member AS0.1384
+# CASE 2: We try to create as-set objects
+# with invalid members.
 #
 # create as-set object 
 #
@@ -17,8 +17,8 @@
 # RESULT 2: The creation will fail.
 
 
-# CASE 3: We try to create as-set object AS200.200:AS-TEST:AS300.300
-# AS200.200:AS-TEST exists in the database
+# CASE 3: We try to create as-set object AS7775535:AS-TEST:AS94967295
+# AS7775535:AS-TEST exists in the database
 #
 # create as-set object 
 #
@@ -27,12 +27,13 @@
 # RESULT 3: The creation will succeed.
 
 
-# CASE 4: We try to create as-set object AS200.200:AS-TEST:AS300.300
-# AS200.200:AS-TEST DOES NOT exist in the database
+# CASE 4: We try to create as-set object AS7775535:AS-TEST:AS94967295
+# AS7775535:AS-TEST does NOT exist in the database
 #
 # create as-set object 
 #
 #FAILURE
 #
 # RESULT 4: The creation will fail.
+
 
