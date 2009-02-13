@@ -11,13 +11,9 @@
 
 
 # CASE 2: We try to create as-block objects
-# maintained, using override
-#
-# syntax errors:
-# 0.x anywhere
-# x mixed with x.x
-# 65536 anywhere
-# range x to x-1 <-- this test fails at the moment
+# all maintained but no override password
+# all tests expected to fail on syntax
+# so no checks made on auth
 #
 # create as-block objects
 #
@@ -25,15 +21,13 @@
 #
 # RESULT 2: The creation will fail
 
-# test 2a 0.x - x.x
-# test 2b x.x - 0.x
-# test 2c x.65536 - x.x
-# test 2d 65536.x - x.x
-# test 2e x.x - 65536.x
-# test 2f x.x - x.65536
-# test 2g x - x.x
-# test 2h x.x - x
-# test 2i x.x - x.x-1
+# test 2a asdot notation
+# test 2b x - y where y>32 bit
+# test 2c x - y where x,y > 32 bit
+# test 2d -x - y
+# test 2e x - -y
+# test 2f x - x-1
+# test 2g x
 
 
 # CASE 3: We try create 32bit AS object and query it
@@ -58,10 +52,9 @@
 # RESULT 4: The creation will succeed
 
 
-# CASE 5: We try create 16bit AS object and query it as AS0.n (without -r)
+# CASE 5: We try create an AS object and query it as AS0.n (without -r)
 # parent object exist
-# as a query result, there should be 1 16-bit as-block object and 1 aut-num object
-# and maybe some warning that we have converted the query?
+# as a query result, there should be no objects found
 #
 # create aut-num object
 #
@@ -99,13 +92,14 @@
 # CASE 8: We create an AS and try to query this AS.
 # Two hierarchical as-blocks exist.
 # 16 bit
-# currently FAILS: dbupdate dies because it finds two parent as-block objects.
 # 
 # create AS object
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 8: The creation will succeed
+# RESULT 8: The creation will fail
+
+# this test will cause dbupdate to exit with code 20
 
 
 # CASE 9: We create two as-blocks which are hierarchical to each other 
@@ -132,9 +126,7 @@
 # RESULT 10: The creation will succeed
 
 
-# CASE 11: We create 16-bit as-block
-# query: -r -B AS0.n - AS0.m
-# should return 16-bit block
+# CASE 11: We create as-block with single asn
 #
 # create as-block object
 #
@@ -154,4 +146,39 @@
 #
 # RESULT 12: The creation will succeed
 
+
+# CASE 13: We create as-block ranging from 16 bit to 32 bit number
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 13: The creation will succeed
+
+
+# CASE 14: We create as-block with single as0
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 14: The creation will succeed
+
+
+# CASE 15: We create as-block with single as4294967295
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 15: The creation will succeed
+
+
+# CASE 16: We create as-block covering full range
+#
+# create as-block object
+#
+#SUCCESS
+#
+# RESULT 16: The creation will succeed
 

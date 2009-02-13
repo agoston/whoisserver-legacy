@@ -1,8 +1,8 @@
 % This is the MyDB Whois server.
 
-% Information related to 'AS200.0 - AS400.0'
+% Information related to 'AS7775540 - AS7775550'
 
-as-block:       AS200.0 - AS400.0
+as-block:       AS7775540 - AS7775550
 descr:          Test block
 remarks:        These AS numbers are further assigned by RIPE NCC
 remarks:        to LIRs and end-users in the RIPE NCC region

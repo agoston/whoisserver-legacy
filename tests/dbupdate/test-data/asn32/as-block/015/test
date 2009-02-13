@@ -1,16 +1,16 @@
-# CASE 11: We create as-block with single asn
+# CASE 15: We create as-block with single as4294967295
 #
 # create as-block object
 #
 #SUCCESS
 #
-# RESULT 11: The creation will succeed
+# RESULT 15: The creation will succeed
 
 
 password: hostmaster
 override: password
 
-as-block:     AS7775535 - AS7775535
+as-block:     AS4294967295 - AS4294967295
 descr:        Test block
 remarks:      These AS numbers are further assigned by RIPE NCC
 remarks:      to LIRs and end-users in the RIPE NCC region
