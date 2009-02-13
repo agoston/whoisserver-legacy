@@ -1,7 +1,5 @@
 
 # CASE 1: We try to create filter-set object fltr-customers
-%
-% requires initial objects to be loaded
 #
 # create filter-set object 
 #
@@ -12,8 +10,8 @@
 
 filter-set:   fltr-customers
 descr:        This filter contains customers
-filter:       <^AS2603.345> OR <^AS8501 AS20965> AND community.contains(234.234:234)
- AND as-customers:AS234.234:as-test OR rs-customers:AS234.234:rs-test
+filter:       <^AS7775535> OR <^AS8501 AS20965> AND community.contains(94967295:7295)
+ AND as-customers:AS94967295:as-test OR rs-customers:AS94967295:rs-test
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       TEST-MNT
