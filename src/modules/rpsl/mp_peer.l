@@ -88,11 +88,11 @@ BGP4|MPBGP {
 
 {IPV4} {
     /* check each number of 1.2.3.4 in address is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
+        val = strtoul(p, &s, 10);
         if ((val < 0) || (val > 255)) {
              syntax_error("IP address \"%s\" contains an invalid octet, %ld", 
                           yytext, val);
@@ -104,11 +104,11 @@ BGP4|MPBGP {
 
 {IPV6} {
     /* check each quad of 1A:3:7:8:AAAA:BBBB:DEAD:BEEF in address is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 16);
+        val = strtoul(p, &s, 16);
         if ((val < 0) || (val > 65535)) {
              syntax_error("IPv6 address \"%s\" contains an invalid quad",
                           yytext);
@@ -120,14 +120,14 @@ BGP4|MPBGP {
 
 {IPV6DC} {
     /* check each quad of 1A::AAAA:BBBB:DEAD:BEEF in address is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p, *r;
     int leftquads = 0;
     int rightquads = 0;
 
     r = p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 16);
+        val = strtoul(p, &s, 16);
         if ((val < 0) || (val > 65535)) {
              syntax_error("IPv6 address \"%s\" contains an invalid quad",
                           yytext);
@@ -165,9 +165,9 @@ BGP4|MPBGP {
 }
 
 {INT} {
-    long int val;
+    unsigned long int val;
     /* check port is in range */
-    val = strtol(yytext, NULL, 10);
+    val = strtoul(yytext, NULL, 10);
     if ((val < 0) || (val > 65535)) {
         syntax_error("Numeric value \"%s\" must be between 0 and 65535", 
                       yytext);

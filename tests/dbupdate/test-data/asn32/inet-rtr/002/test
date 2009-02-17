@@ -1,8 +1,5 @@
-
 # CASE 2: We try to create inet-rtr object kst1-core.swip.net
 # introduce many syntax errors
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
@@ -14,22 +11,24 @@
 inet-rtr:    kst1-core.swip.net
 descr:       test router
 local-as:    AS1257.100
-ifaddr:      146.188.49.14 masklen 30 action community.append(123.45632333:20);
-ifaddr:      146.188.49.14 masklen 30 action community.append(0.456:2030982387);
-ifaddr:      146.188.49.14 masklen 30 action aspath.prepend(AS0.456);
-interface:   146.188.49.14 masklen 30 action aspath.prepend(AS0.456);
-interface:   146.188.49.14 masklen 30 action community.append(123.45632333:20);
-interface:   146.188.49.14 masklen 30 action community.append(0.456:2030982387);
-peer:        BGP4 146.188.49.13 asno(AS0702.234)
-peer:        BGP4 146.188.49.13 asno(AS0.234)
-peer:        BGP4 195.158.247.61 asno(AS01755.234)
-peer:        BGP4 prng-my-test:AS0234.345:prng-test asno (AS0.34)
-peer:        BGP4 rtrs--my-test:AS0.345:rtrs-test asno (AS0.34)
-mp-peer:     BGP4 146.188.49.13 asno(AS702.234)
-mp-peer:     BGP4 146.188.49.13 asno(AS0.234)
-mp-peer:     BGP4 195.158.247.61 asno(AS01755.234)
-mp-peer:     BGP4 prng-my-test:AS0234.345:prng-test asno (AS234.34)
-mp-peer:     BGP4 rtrs--my-test:AS0.345:rtrs-test asno (AS234.34)
+ifaddr:      146.188.49.14 masklen 30 action community.append(4294967299:20);
+ifaddr:      146.188.49.14 masklen 30 action community.append(42949.7299:20);
+ifaddr:      146.188.49.14 masklen 30 action community.append(456:5030982387);
+ifaddr:      146.188.49.14 masklen 30 action aspath.prepend(AS456);
+interface:   146.188.49.14 masklen 30 action aspath.prepend(AS456);
+interface:   146.188.49.14 masklen 30 action community.append(4294967299:20);
+interface:   146.188.49.14 masklen 30 action community.append(42949.7299:20);
+interface:   146.188.49.14 masklen 30 action community.append(456:5030982387);
+peer:        BGP4 146.188.49.13 asno(AS0702234)
+peer:        BGP4 146.188.49.13 asno(AS-1)
+peer:        BGP4 195.158.247.61 asno(AS4294967299)
+peer:        BGP4 prng-my-test:AS0234.345:prng-test asno (AS34)
+peer:        BGP4 rtrs--my-test:AS0345:rtrs-test asno (AS34)
+mp-peer:     BGP4 146.188.49.13 asno(AS702234)
+mp-peer:     BGP4 146.188.49.13 asno(AS0234)
+mp-peer:     BGP4 195.158.247.61 asno(AS4294967299)
+mp-peer:     BGP4 prng-my-test:AS0234345:prng-test asno (AS23434)
+mp-peer:     BGP4 rtrs--my-test:AS2.345:rtrs-test asno (AS234.34)
 admin-c:     TP1-DB-TEST
 tech-c:      TP1-DB-TEST
 mnt-by:      TEST-MNT

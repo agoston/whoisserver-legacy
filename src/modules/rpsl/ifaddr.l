@@ -24,9 +24,8 @@ INT            [0-9]+
 IPV4           {INT}(\.{INT}){3}
 PRFXV4         {IPV4}\/{INT}
 PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
-COMM_NO32      {INT}.{INT}:{INT}
-COMM_NO16      {INT}:{INT}
-COMM_NO        {COMM_NO32}|{COMM_NO16}
+COMM_32_NO     [0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5]
+COMM_NO        {COMM_32_NO}:{COMM_32_NO}
 PROTOCOL_NAME  BGP4|OSPF|RIP|IGRP|IS-IS|STATIC|RIPng|DVMRP|PIM-DM|PIM-SM|CBT|MOSPF
 DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
 ASNODOT        [^ ]*AS[0-9]+\.[0-9]+[^ ]*
@@ -48,6 +47,10 @@ void yy_input(char *buf, int *result, int max_size);
 %%
 
 [ \t\n]+    { ; }
+
+{ASNODOT} { 
+    syntax_error("The RIPE Database represents AS numbers in \'ASn\' notation");
+}
 
 OR    { return OP_OR; }
 ==    { return OP_COMPARE; }
@@ -77,9 +80,6 @@ COMMUNITY   { return TKN_COMMUNITY; }
 NEXT_HOP    { return TKN_NEXT_HOP; }
 COST        { return TKN_COST; }
 
-{ASNODOT} {
-    syntax_error("The RIPE Database represents AS numbers in \'ASn\' notation");
-}
 
 {ASNO} {
     return TKN_ASNO;
@@ -87,11 +87,11 @@ COST        { return TKN_COST; }
 
 {IPV4} {
     /* check each number of 1.2.3.4 is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
+        val = strtoul(p, &s, 10);
         if ((val < 0) || (val > 255)) {
              syntax_error("IP address \"%s\" contains an invalid octet", 
                           yytext);
@@ -102,13 +102,13 @@ COST        { return TKN_COST; }
 }
 
 {COMM_NO} {
-    /* verify each part is a 16-bit number */
-    long int val;
+    /* verify each part is a 32-bit number */
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 65535)) {
+        val = strtoul(p, &s, 10);
+        if ((val < 0) || (val > 4294967295)) {
              syntax_error("Community number \"%s\" contains an invalid number", 
                            yytext);
         }

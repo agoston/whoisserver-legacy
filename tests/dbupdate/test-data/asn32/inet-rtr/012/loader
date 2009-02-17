@@ -102,12 +102,12 @@ source:  DB-TEST
 
 % create an encompassing as-block 
 
-as-block: AS1 - AS65534
-admin-c: TP1-DB-TEST
-tech-c: TP1-DB-TEST
-mnt-by: TEST-MNT
-changed: dbtest@ripe.net 20020101
-source: DB-TEST
+as-block: AS1 - AS4294967295
+admin-c:  TP1-DB-TEST
+tech-c:   TP1-DB-TEST
+mnt-by:   RIPE-NCC-HM-MNT
+changed:  dbtest@ripe.net 20020101
+source:   DB-TEST
 
 rtr-set:      rtrs-my-test
 descr:        TEST router set
@@ -122,9 +122,9 @@ source:       DB-TEST
 
 inet-rtr:    kst1-core.swip.net
 descr:       test router
-local-as:    AS1257.100
-ifaddr:      146.188.49.14 masklen 30 action community.append(123.456:20);
-peer:        BGP4 rtrs--my-test:AS234.345:rtrs-test asno (AS234.34)
+local-as:    AS1257100
+ifaddr:      146.188.49.14 masklen 30 action community.append(123456:20);
+peer:        BGP4 rtrs--my-test:AS234345:rtrs-test asno (AS23434)
 admin-c:     TP1-DB-TEST
 tech-c:      TP1-DB-TEST
 mnt-by:      TEST-MNT
@@ -132,5 +132,6 @@ notify:      dbtest@ripe.net
 changed:     dbtest@ripe.net 20060101
 source:      DB-TEST
 member-of:   rtrs-my-test
+
 
 % End of loader data file

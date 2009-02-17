@@ -86,11 +86,11 @@ BGP4 {
 
 {IPV4} {
     /* check each number of 1.2.3.4 in address is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
+        val = strtoul(p, &s, 10);
         if ((val < 0) || (val > 255)) {
              syntax_error("IP address \"%s\" contains an invalid octet, %ld", 
                           yytext, val);
@@ -105,9 +105,9 @@ BGP4 {
 }
 
 {INT} {
-    long int val;
+    unsigned long int val;
     /* check port is in range */
-    val = strtol(yytext, NULL, 10);
+    val = strtoul(yytext, NULL, 10);
     if ((val < 0) || (val > 65535)) {
         syntax_error("Numeric value \"%s\" must be between 0 and 65535", 
                       yytext);
