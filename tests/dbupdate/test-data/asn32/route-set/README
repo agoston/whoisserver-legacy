@@ -1,8 +1,6 @@
 ==> route-set/001/test <==
 
 # CASE 1: We try to create route-set object RS-CUSTOMERS
-%
-% requires initial objects to be loaded
 #
 # create route-set object 
 #
@@ -16,8 +14,6 @@
 
 # CASE 2: We try to create route-set object RS-CUSTOMERS
 # syntax errors
-%
-% requires initial objects to be loaded
 #
 # create route-set object 
 #
@@ -30,8 +26,6 @@
 
 # CASE 3: We try to create route-set object AS200.200:RS-CUSTOMERS:AS300.300
 # AS200.200:RS-CUSTOMERS exists in the DB
-%
-% requires initial objects to be loaded
 #
 # create route-set object 
 #
@@ -44,8 +38,6 @@
 
 # CASE 4: We try to create route-set object AS200.200:RS-CUSTOMERS:AS300.300
 # AS200.200:RS-CUSTOMERS does NOT exist in the DB
-%
-% requires initial objects to be loaded
 #
 # create route-set object 
 #
