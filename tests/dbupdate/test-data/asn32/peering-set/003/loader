@@ -102,17 +102,17 @@ source:  DB-TEST
 
 % create an encompassing as-block 
 
-as-block: AS1 - AS65534
-admin-c: TP1-DB-TEST
-tech-c: TP1-DB-TEST
-mnt-by: TEST-MNT
-changed: dbtest@ripe.net 20020101
-source: DB-TEST
+as-block: AS1 - AS4294967295
+admin-c:  TP1-DB-TEST
+tech-c:   TP1-DB-TEST
+mnt-by:   RIPE-NCC-HM-MNT
+changed:  dbtest@ripe.net 20020101
+source:   DB-TEST
 
-peering-set:      AS200.200:prng-lipex1
+peering-set:  AS200200:prng-lipex1
 descr:        Test peering partners
-peering:      AS123.20834 at 193.109.219.24
-mp-peering:   AS123.20834 at 193.109.219.24
+peering:      AS2320834 at 193.109.219.24
+mp-peering:   AS2320834 at 193.109.219.24
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       TEST-MNT

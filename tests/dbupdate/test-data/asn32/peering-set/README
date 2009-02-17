@@ -1,8 +1,6 @@
 ==> peering-set/001/test <==
 
 # CASE 1: We try to create peering-set object prng-lipex1
-%
-% requires initial objects to be loaded
 #
 # create peering-set object 
 #
@@ -16,8 +14,6 @@
 
 # CASE 2: We try to create peering-set object prng-lipex1
 # syntax errors
-%
-% requires initial objects to be loaded
 #
 # create peering-set object 
 #
@@ -30,8 +26,6 @@
 
 # CASE 3: We try to create peering-set object AS200.200:prng-lipex1:AS300.300
 # AS200.200:prng-lipex1 exists in DB
-%
-% requires initial objects to be loaded
 #
 # create peering-set object 
 #
@@ -44,8 +38,6 @@
 
 # CASE 4: We try to create peering-set object AS200.200:prng-lipex1:AS300.300
 # AS200.200:prng-lipex1 does not exist in DB
-%
-% requires initial objects to be loaded
 #
 # create peering-set object 
 #

@@ -1,8 +1,6 @@
 
-# CASE 4: We try to create peering-set object AS200.200:prng-lipex1:AS300.300
-# AS200.200:prng-lipex1 does not exist in DB
-%
-% requires initial objects to be loaded
+# CASE 4: We try to create peering-set object AS200200:prng-lipex1:AS300300
+# AS200200:prng-lipex1 does not exist in DB
 #
 # create peering-set object 
 #
@@ -12,10 +10,10 @@
 
 
 
-peering-set:      AS200.200:prng-lipex1:AS300.300
+peering-set:  AS200200:prng-lipex1:AS300300
 descr:        Test peering partners
-peering:      AS123.20834 at 193.109.219.24
-mp-peering:   AS123.20834 at 193.109.219.24
+peering:      AS2320834 at 193.109.219.24
+mp-peering:   AS2320834 at 193.109.219.24
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       TEST-MNT
