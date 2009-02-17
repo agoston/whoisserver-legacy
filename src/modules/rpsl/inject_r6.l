@@ -29,9 +29,8 @@ PRFXV6DC       {IPV6DC}\/{INT}
 PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 PRFXV6RNG      {PRFXV6}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 PRFXV6DCRNG    {PRFXV6DC}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
-COMM_NO32      {INT}.{INT}:{INT}
-COMM_NO16      {INT}:{INT}
-COMM_NO        {COMM_NO32}|{COMM_NO16}
+COMM_32_NO     [0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5]
+COMM_NO        {COMM_32_NO}:{COMM_32_NO}
 AFI            AFI
 AFIVALUE       IPV4|IPV4\.UNICAST|IPV4\.MULTICAST|IPV6|IPV6\.UNICAST|IPV6\.MULTICAST
 DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
@@ -429,12 +428,12 @@ COST        { return TKN_COST; }
 
 {COMM_NO} {
     /* verify each part is a 16-bit number */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 65535)) {
+        val = strtoul(p, &s, 10);
+        if ((val < 0) || (val > 4294967295)) {
              syntax_error("Community number \"%s\" contains an invalid number", 
                            yytext);
         }
