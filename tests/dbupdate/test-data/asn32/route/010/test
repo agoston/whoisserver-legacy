@@ -5,8 +5,8 @@
 # RESULT 10: The deletion will fail.
 
 
-route-set:   AS200.200:rs-test
-descr:       AS200.200:rs-test
+route-set:   AS200200:rs-test
+descr:       AS200200:rs-test
 tech-c:      TP1-DB-TEST
 admin-c:     TP1-DB-TEST
 mnt-by:      TEST-MNT

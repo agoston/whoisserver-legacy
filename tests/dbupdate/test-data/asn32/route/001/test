@@ -18,13 +18,13 @@ origin:  AS200
 mnt-by:  TEST-MNT
 changed: dbtest@ripe.net
 source:  DB-TEST
-aggr-bndry: AS1.234:AS-mytest:AS3:AS-test:AS5.234
-aggr-mtd: outbound AS1.234:AS-mytest:AS3:AS-test:AS5.234
-components: ATOMIC protocol BGP4 community.contains(30.65535:2)
+aggr-bndry: AS1234:AS-mytest:AS3:AS-test:AS7775234
+aggr-mtd: outbound AS1234:AS-mytest:AS3:AS-test:AS7775234
+components: ATOMIC protocol BGP4 community.contains(3065535:2)
 inject: at 193.0.0.1
-inject: at rtrs-myset:AS2:rtrs-test:AS2.34
-inject: at AS2.34:rtrs-myset:AS2:rtrs-test:AS2.34
-inject: action community = {20.2:20};
+inject: at rtrs-myset:AS2:rtrs-test:AS234
+inject: at AS234:rtrs-myset:AS2:rtrs-test:AS777234
+inject: action community = {777202:20};
 inject: upon HAVE-COMPONENTS {128.8.0.0/16, 128.9.0.0/16}
 
 

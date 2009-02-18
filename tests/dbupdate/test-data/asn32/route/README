@@ -32,9 +32,9 @@
 
 >> asn32/route/003 <<
 
-# CASE 3: We try to create route object 20.13.0.0/16,AS200.200
+# CASE 3: We try to create route object 20.13.0.0/16,AS200200
 # origin is asn32
-# make query to check that "-i origin AS200.200" works
+# make query to check that "-i origin AS200200" works
 #
 # create route object 
 #
@@ -47,7 +47,7 @@
 # CASE 4: We try to create route object 20.13.0.0/16,AS200
 # member-of is an route-set with as32bit-related name
 # which exists in db
-# also make a query to check whether '-i member-of AS200.200:rs-test' works
+# also make a query to check whether '-i member-of AS200200:rs-test' works
 #
 # create route object 
 #
@@ -95,7 +95,7 @@
 >> asn32/route/008 <<
 
 # CASE 8: We try to create 2 route objects 
-# 20.13.0.0/16,AS200.200 and 20.13.0.0/16,AS200
+# 20.13.0.0/16,AS200200 and 20.13.0.0/16,AS200
 # member-of is a route-set with as32bit-related name
 # member-of is a route-set with as16bit-related name
 # which do not exist in db

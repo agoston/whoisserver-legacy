@@ -103,11 +103,11 @@ source:  DB-TEST
 % create an encompassing as-block 
 
 as-block: AS1 - AS65534
-admin-c: TP1-DB-TEST
-tech-c: TP1-DB-TEST
-mnt-by: TEST-MNT
-changed: dbtest@ripe.net 20020101
-source: DB-TEST
+admin-c:  TP1-DB-TEST
+tech-c:   TP1-DB-TEST
+mnt-by:   RIPE-NCC-HM-MNT
+changed:  dbtest@ripe.net 20020101
+source:   DB-TEST
 
 aut-num:      AS200
 as-name:      TESTAS
@@ -121,7 +121,7 @@ mnt-by:       TEST-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
-aut-num:      AS200.200
+aut-num:      AS200200
 as-name:      TESTAS
 descr:        TEST TELEKOM
 import:       from AS1 accept {1.2.3.4/24}
