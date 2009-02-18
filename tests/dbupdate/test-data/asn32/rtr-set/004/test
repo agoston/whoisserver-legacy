@@ -1,9 +1,7 @@
 
-# CASE 4: We try to create rtr-set object AS200.200:rtrs-test:AS300.300
+# CASE 4: We try to create rtr-set object AS200200:rtrs-test:AS300300
 # testing the hierarchical name
-# object AS200.200:rtrs-test DOES NOT exist in the DB
-%
-% requires initial objects to be loaded
+# object AS200200:rtrs-test DOES NOT exist in the DB
 #
 # create rtr-set object 
 #
@@ -12,11 +10,11 @@
 # RESULT 4: The creation will fail.
 
 
-rtr-set:      AS200.200:rtrs-test:AS300.300
+rtr-set:      AS200200:rtrs-test:AS300300
 descr:        TEST router set
 members:      rmws-brln-de07.nw.mediaWays.net
-members:      AS123.234:rtrs-test:AS123.234
-mp-members:      AS123.234:rtrs-test:AS123.234
+members:      AS123234:rtrs-test:AS123234
+mp-members:   AS123234:rtrs-test:AS123234
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       TEST-MNT

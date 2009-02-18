@@ -102,18 +102,18 @@ source:  DB-TEST
 
 % create an encompassing as-block 
 
-as-block: AS1 - AS65534
-admin-c: TP1-DB-TEST
-tech-c: TP1-DB-TEST
-mnt-by: TEST-MNT
-changed: dbtest@ripe.net 20020101
-source: DB-TEST
+as-block: AS1 - AS4294967295
+admin-c:  TP1-DB-TEST
+tech-c:   TP1-DB-TEST
+mnt-by:   RIPE-NCC-HM-MNT
+changed:  dbtest@ripe.net 20020101
+source:   DB-TEST
 
-rtr-set:      AS200.200:rtrs-test
+rtr-set:      AS200200:rtrs-test
 descr:        TEST router set
 members:      rmws-brln-de07.nw.mediaWays.net
-members:      AS123.234:rtrs-test:AS123.234
-mp-members:      AS123.234:rtrs-test:AS123.234
+members:      AS123234:rtrs-test:AS123234
+mp-members:   AS123234:rtrs-test:AS123234
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       TEST-MNT
