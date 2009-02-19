@@ -6,8 +6,10 @@
 # components
 # inject
 # trying to introduce many errors and count them
-%
-% requires initial objects to be loaded
+#
+# There is an issue with community = {0:20}
+# the 0 is passed by the parser when it should not be according to the syntax
+# but in practice it should be allowed. 
 #
 # create route object 
 #

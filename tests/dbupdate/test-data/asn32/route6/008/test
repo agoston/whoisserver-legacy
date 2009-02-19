@@ -1,8 +1,6 @@
 
 # CASE 8: We try to delete a referenced route-set
 # failing with a referential integrity error
-%
-% requires initial objects to be loaded
 #
 # delete route-set object 
 #
@@ -10,7 +8,7 @@
 #
 # RESULT 8: The deletion will fail.
 
-route-set:    AS200.200:rs-test
+route-set:    AS200200:rs-test
 members:      1.2.3.0/24
 mbrs-by-ref:  TEST-MNT
 descr:        is missing
