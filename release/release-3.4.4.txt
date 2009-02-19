@@ -10,7 +10,7 @@ Changes:
 
 Merged:
 - feature-agoston-orgtype_da
-- feature-perl5.10-64bit-support.txt
+- feature-perl5.10-64bit-support
 
 
 Affected stakeholders:
