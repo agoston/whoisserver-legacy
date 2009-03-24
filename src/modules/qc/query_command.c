@@ -923,7 +923,6 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
             if (convert_as_range(query_command->keys, &asnum1, &asnum2)) {
                 LG_log(qc_context, LG_FATAL, "ASx>ASy INTERNAL ERROR: convert_as_range('%s') failed", query_command->keys);
             } else if (asnum1 > asnum2) {
-                fprintf(stderr, "FAIL! %s = %lu - %lu\n", query_command->keys, asnum1, asnum2);
                 query_command->parse_messages = g_list_append(query_command->parse_messages, ca_get_qi_badrange);
                 badparerr++;
             }
