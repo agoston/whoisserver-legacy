@@ -12,9 +12,9 @@
  andrei (17/01/2000) Created.
  ******************//******************
  Copyright (c) 2000                              RIPE NCC
- 
+
  All Rights Reserved
- 
+
  Permission to use, copy, modify, and distribute this software and its
  documentation for any purpose and without fee is hereby granted,
  provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
  supporting documentation, and that the name of the author not be
  used in advertising or publicity pertaining to distribution of the
  software without specific, written prior permission.
- 
+
  THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
  AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -176,7 +176,8 @@ void get_rx_data(void *element_data, void *tr_ptr);
 void ud_each_primary_key_select(void *element_data, void *result_ptr);
 
 char *convert_rf(const char *avalue, int *type, int *port);
-int convert_as_range(const char *as_range, long *begin, long *end);
+int convert_as(const char *as, unsigned long *asnum);
+int convert_as_range(const char *as_range, unsigned long *begin, unsigned long *end);
 time_t convert_time(const char *asc_time);
 
 int UD_lock_serial(Transaction_t *tr);

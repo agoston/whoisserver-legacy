@@ -1,8 +1,6 @@
 
 # CASE 2: We try to create peering-set object prng-lipex1
 # syntax errors
-%
-% requires initial objects to be loaded
 #
 # create peering-set object 
 #

@@ -14,7 +14,6 @@
 %}
 
 FLTRNAME       FLTR-[A-Z0-9_-]*[A-Z0-9]
-ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 RSNAME         RS-[A-Z0-9_-]*[A-Z0-9]
 PRNGNAME       PRNG-[A-Z0-9_-]*[A-Z0-9]
 RTRSNAME       RTRS-[A-Z0-9_-]*[A-Z0-9]
@@ -23,16 +22,12 @@ QUAD           [0-9A-F]{1,4}
 IPV4           {INT}(\.{INT}){3}
 IPV6           {QUAD}(:{QUAD}){7}
 IPV6DC         (({QUAD}:){0,6}{QUAD})?::({QUAD}(:{QUAD}){0,6})?
-COMM_NO32      {INT}.{INT}:{INT}
-COMM_NO16      {INT}:{INT}
-COMM_NO        {COMM_NO32}|{COMM_NO16}
+COMM_32_NO     [0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5]
+COMM_NO        {COMM_32_NO}:{COMM_32_NO}
 ENCAPSULATION  GRE|IPINIP
-ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
-ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
-ASNO           {ASNO32}|{ASNO16}
-ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
-ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
-
+ASNODOT        [^ ]*AS[0-9]+\.[0-9]+[^ ]*
+ASNO           AS([0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5])
+ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 
 %{
 #include <string.h>
@@ -51,6 +46,10 @@ void yy_input(char *buf, int *result, int max_size);
 %%
 
 [ \t\n]+    { ; }
+
+{ASNODOT} {
+    syntax_error("The RIPE Database represents AS numbers in \'ASn\' notation");
+}
 
 OR    { return OP_OR; }
 ==    { return OP_COMPARE; }
@@ -84,20 +83,17 @@ NEXT_HOP    { return TKN_NEXT_HOP; }
 COST        { return TKN_COST; }
 
 
-{ASNOMIX} {
-    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
-}
 {ASNO} {
     return TKN_ASNO;
 }
 
 {IPV4} {
     /* check each number of 1.2.3.4 is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
+        val = strtoul(p, &s, 10);
         if ((val < 0) || (val > 255)) {
              syntax_error("IP address \"%s\" contains an invalid octet", 
                           yytext);
@@ -109,11 +105,11 @@ COST        { return TKN_COST; }
 
 {IPV6} {
     /* check each quad of 1A:3:7:8:AAAA:BBBB:DEAD:BEEF in address is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 16);
+        val = strtoul(p, &s, 16);
         if ((val < 0) || (val > 65535)) {
              syntax_error("IPv6 address \"%s\" contains an invalid quad",
                           yytext);
@@ -125,14 +121,14 @@ COST        { return TKN_COST; }
 
 {IPV6DC} {
     /* check each quad of 1A::AAAA:BBBB:DEAD:BEEF in address is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p, *r;
     int leftquads = 0;
     int rightquads = 0;
 
     r = p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 16);
+        val = strtoul(p, &s, 16);
         if ((val < 0) || (val > 65535)) {
              syntax_error("IPv6 address \"%s\" contains an invalid quad",
                           yytext);
@@ -166,13 +162,13 @@ COST        { return TKN_COST; }
 }
 
 {COMM_NO} {
-    /* verify each part is a 16-bit number */
-    long int val;
+    /* verify each part is a 32-bit number */
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 65535)) {
+        val = strtoul(p, &s, 10);
+        if ((val < 0) || (val > 4294967295)) {
              syntax_error("Community number \"%s\" contains an invalid number", 
                            yytext);
         }

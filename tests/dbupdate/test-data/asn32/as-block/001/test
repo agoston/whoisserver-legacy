@@ -1,3 +1,4 @@
+#asn32/as-block
 # CASE 1: We try to create as-block object
 # maintained, using override
 #
@@ -8,7 +9,7 @@
 # RESULT 1: The creation will succeed
 
 
-as-block:     AS101.0 - AS1000.2345
+as-block:     AS7775535 - AS94967295
 descr:        Test block
 remarks:      These AS numbers are further assigned by RIPE NCC
 remarks:      to LIRs and end-users in the RIPE NCC region

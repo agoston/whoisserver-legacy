@@ -1,9 +1,7 @@
 
-# CASE 6: We try to create route6 object for ::/16,AS200.200
+# CASE 6: We try to create route6 object for ::/16,AS200200
 # origin is 32bit asn
 # asn doesn't exist in the DB
-#
-% requires initial objects to be loaded
 #
 # create route object 
 #
@@ -14,7 +12,7 @@
 
 route6:  ::/16
 descr:   test route
-origin:  AS200.200
+origin:  AS200200
 mnt-by:  TEST-MNT
 changed: dbtest@ripe.net
 source:  DB-TEST

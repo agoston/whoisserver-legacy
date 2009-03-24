@@ -35,7 +35,7 @@
 int yyerror(const char *s);
 %}
 
-%token TKN_IPV4 TKN_RTRSNAME TKN_DOMAIN
+%token TKN_IPV4 TKN_RTRSNAME TKN_DOMAIN TKN_ASNO
 
 %%
 

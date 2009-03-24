@@ -11,7 +11,7 @@
 
 password: hostmaster
 
-aut-num:      AS200.200
+aut-num:      AS7775535
 as-name:      ASTEST
 descr:        TEST TELEKOM
 admin-c:      TP1-DB-TEST

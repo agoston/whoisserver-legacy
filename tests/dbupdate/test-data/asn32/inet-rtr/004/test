@@ -1,10 +1,8 @@
 
 # CASE 4: We try to create inet-rtr object kst1-core.swip.net
-# it has member-of: rtrs-my-test:AS200.200:rtrs-my-customers
+# it has member-of: rtrs-my-test:AS200200:rtrs-my-customers
 # which in turn has NO mbrs-by-ref: TEST-MNT
 # expecting membership authorisation error
-%
-% requires initial objects to be loaded
 #
 # create inet-rtr object 
 #
@@ -15,15 +13,15 @@
 
 inet-rtr:    kst1-core.here.net
 descr:       test router
-local-as:    AS1257.100
-ifaddr:      146.188.49.14 masklen 30 action community.append(123.456:20);
-peer:        BGP4 rtrs--my-test:AS234.345:rtrs-test asno (AS234.34)
+local-as:    AS1257100
+ifaddr:      146.188.49.14 masklen 30 action community.append(123456:20);
+peer:        BGP4 rtrs--my-test:AS234345:rtrs-test asno (AS23434)
 admin-c:     TP1-DB-TEST
 tech-c:      TP1-DB-TEST
 mnt-by:      TEST-MNT
 notify:      dbtest@ripe.net
 changed:     dbtest@ripe.net
 source:      DB-TEST
-member-of:   rtrs-my-test:AS200.200:rtrs-my-customers
+member-of:   rtrs-my-test:AS200200:rtrs-my-customers
 
 password: auth

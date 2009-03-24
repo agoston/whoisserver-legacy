@@ -1,7 +1,5 @@
 
 # CASE 1: We try to create rtr-set object rtrs-test
-%
-% requires initial objects to be loaded
 #
 # create rtr-set object 
 #
@@ -13,8 +11,8 @@
 rtr-set:      rtrs-test
 descr:        TEST router set
 members:      rmws-brln-de07.nw.mediaWays.net
-members:      AS123.234:rtrs-test:AS123.234
-mp-members:      AS123.234:rtrs-test:AS123.234
+members:      AS123234:rtrs-test:AS123234
+mp-members:   AS123234:rtrs-test:AS123234
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       TEST-MNT

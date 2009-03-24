@@ -1,6 +1,4 @@
-# CASE 11: We create 16-bit as-block
-# query: -r -B AS0.n - AS0.m
-# should return 16-bit block
+# CASE 11: We create as-block with single asn
 #
 # create as-block object
 #
@@ -12,7 +10,7 @@
 password: hostmaster
 override: password
 
-as-block:     AS100 - AS300
+as-block:     AS7775535 - AS7775535
 descr:        Test block
 remarks:      These AS numbers are further assigned by RIPE NCC
 remarks:      to LIRs and end-users in the RIPE NCC region

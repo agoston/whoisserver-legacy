@@ -1,7 +1,6 @@
-# CASE 5: We try create 16bit AS object and query it as AS0.n (without -r)
+# CASE 5: We try create an AS object and query it as AS0.n (without -r)
 # parent object exist
-# as a query result, there should be 1 16-bit as-block object and 1 aut-num object
-# and maybe some warning that we have converted the query?
+# as a query result, there should be no objects found
 #
 # create aut-num object
 #

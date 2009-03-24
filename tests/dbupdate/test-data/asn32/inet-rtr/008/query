@@ -4,11 +4,11 @@
 
 inet-rtr:       kst1-core.swip.net
 descr:          test router
-local-as:       AS1257.100
-ifaddr:         1.2.3.4 masklen 30 action community.append(123.456:20);
-interface:      2001:: masklen 30 action community.append(123.456:20);
-interface:      2.3.4.5 masklen 30 action community.append(123.456:20);
-peer:           BGP4 rtrs--my-test:AS234.345:rtrs-test asno (AS234.34)
+local-as:       AS1257100
+ifaddr:         1.2.3.4 masklen 30 action community.append(123456:20);
+interface:      2001:: masklen 30 action community.append(123456:20);
+interface:      2.3.4.5 masklen 30 action community.append(123456:20);
+peer:           BGP4 rtrs--my-test:AS234345:rtrs-test asno (AS23434)
 admin-c:        TP1-DB-TEST
 tech-c:         TP1-DB-TEST
 mnt-by:         TEST-MNT

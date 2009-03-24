@@ -10,9 +10,9 @@
 
   ******************/ /******************
   Copyright (c) 1999                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -20,7 +20,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -30,8 +30,8 @@
   ***************************************/
 #include "bitmask.h"
 
-/******************************************* 
-If any IP reg exps change - check whois cgi which has a copy 
+/*******************************************
+If any IP reg exps change - check whois cgi which has a copy
 *******************************************/
 
 #define WK_REXP_DOMAINNAME "^[ ]*[a-zA-Z0-9/-]*(\\.[a-zA-Z0-9-]+)*\\.?[ ]*$"
@@ -43,12 +43,10 @@ If any IP reg exps change - check whois cgi which has a copy
 /* "^[0-9A-F]{1,4}(:[0-9A-F]{1,4}){7}$"*/
 
 /* AS numbers, prepared for 32-bit AS numbers */
-/*#define WK_REXP_ASNUM "^AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))$"*/
-#define WK_REXP_ASNUM "^AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|((0|([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))$"
+#define WK_REXP_ASNUM "^AS([0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5])$"
 
 /* AS numbers, prepared for 32-bit AS numbers */
-/*#define WK_REXP_ASRANGE "^AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))[ ]*([-][ ]*AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))){0,1}$"   /* [ ]*(-[ ]*AS[0-9]+)?   */
-#define WK_REXP_ASRANGE "^AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|((0|([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))[ ]*([-][ ]*AS((0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])|((0|([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))\\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])))){0,1}$"   /* [ ]*(-[ ]*AS[0-9]+)?   */
+#define WK_REXP_ASRANGE "^AS([0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5])[ ]*([-][ ]*AS([0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5])){0,1}$"
 
 #define WK_REXP_NETNAME "^[A-Z][A-Z0-9_-]*$"
 
@@ -70,7 +68,7 @@ If any IP reg exps change - check whois cgi which has a copy
 /* made less restrictive to make consistent with other sets ... shane */
 /* made to match what we're actually looking for - shane */
 /*#define WK_REXP_ASSETNAME "^AS-[A-Z0-9_:-]*$"*/
-#define WK_REXP_ASSETNAME "(^|:)AS-[A-Z0-9_-]*[A-Z0-9](:|$)" 
+#define WK_REXP_ASSETNAME "(^|:)AS-[A-Z0-9_-]*[A-Z0-9](:|$)"
 
 /* #define WK_REXP_AUTONICPREFIXREGULAR "^AUTO-" */
 
@@ -81,13 +79,13 @@ If any IP reg exps change - check whois cgi which has a copy
 #define WK_REXP_IPPREFIX "^[0-9.]+/[0-9]+$"
 
 /*#define WK_REXP_PEERINGSET "^PRNG-"*/
-#define WK_REXP_PEERINGSET "(^|:)PRNG-[A-Z0-9_-]*[A-Z0-9](:|$)" 
+#define WK_REXP_PEERINGSET "(^|:)PRNG-[A-Z0-9_-]*[A-Z0-9](:|$)"
 
 /*#define WK_REXP_FILTERSET  "^FLTR-"*/
-#define WK_REXP_FILTERSET "(^|:)FLTR-[A-Z0-9_-]*[A-Z0-9](:|$)" 
+#define WK_REXP_FILTERSET "(^|:)FLTR-[A-Z0-9_-]*[A-Z0-9](:|$)"
 
 /*#define WK_REXP_RTRSET     "^RTRS-"*/
-#define WK_REXP_RTRSET "(^|:)RTRS-[A-Z0-9_-]*[A-Z0-9](:|$)" 
+#define WK_REXP_RTRSET "(^|:)RTRS-[A-Z0-9_-]*[A-Z0-9](:|$)"
 
 #define WK_REXP_IRT "^IRT-[A-Z0-9_-]+[A-Z0-9]$"
 
@@ -152,7 +150,7 @@ typedef enum WK_Type_t {
    be kept in sync!!!
 
    Guarded with WK_IMPL so that they are compiled only once, inside wk.c
- */ 
+ */
 #ifdef WK_IMPL
 char * const Keytypes[] = {
   "name",
@@ -186,7 +184,7 @@ char * const Keytypes[] = {
   NULL
 }; /* Keytypes[] */
 
-#endif 
+#endif
 
 void wk_regex_init();
 char *WK_to_string(mask_t wk);

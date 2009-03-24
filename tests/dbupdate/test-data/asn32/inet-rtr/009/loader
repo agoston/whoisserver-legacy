@@ -102,18 +102,18 @@ source:  DB-TEST
 
 % create an encompassing as-block 
 
-as-block: AS1 - AS65534
-admin-c: TP1-DB-TEST
-tech-c: TP1-DB-TEST
-mnt-by: TEST-MNT
-changed: dbtest@ripe.net 20020101
-source: DB-TEST
+as-block: AS1 - AS4294967295
+admin-c:  TP1-DB-TEST
+tech-c:   TP1-DB-TEST
+mnt-by:   TEST-MNT
+changed:  dbtest@ripe.net 20020101
+source:   DB-TEST
 
-rtr-set: rtrs-my-test
-members: test.net
-mnt-by: TEST-MNT
+rtr-set:     rtrs-my-test
+members:     test.net
+mnt-by:      TEST-MNT
 mbrs-by-ref: TEST-MNT
-changed: dbtest@ripe.net
-source: DB-TEST
+changed:     dbtest@ripe.net
+source:      DB-TEST
 
 % End of loader data file

@@ -8,7 +8,7 @@
 #
 # create route object 
 #
-#SUCCESS
+#FAILURE
 #
 # RESULT 2: The creation will fail.
 
@@ -20,12 +20,12 @@ mnt-by:  TEST-MNT
 changed: dbtest@ripe.net
 source:  DB-TEST
 aggr-bndry: AS0.234:AS-mytest:AS3:AS-test:AS0.234
-aggr-mtd: outbound AS1.234:AS-mytest:AS3:AS-test:AS0.234
+aggr-mtd: outbound AS94967295:AS-mytest:AS3:AS-test:AS7777777234
 components: ATOMIC protocol BGP4 community.contains(20.65536:20)
-inject: at rtrs-myset:AS0.2:rtrs-test:AS2.34
-inject: at AS0.234:rtrs-myset:AS2:rtrs-test:AS2.34
-inject: at AS234:rtrs-myset:AS2:rtrs-test:AS02.34
-inject: action community = {20.65536:20};
+inject: at rtrs-myset:AS2:rtrs-test:AS7777777234
+inject: at AS2.234:rtrs-myset:AS2:rtrs-test:AS234
+inject: at AS234:rtrs-myset:AS2:rtrs-test:AS0234
+inject: action community = {7777777234:20};
 
 
 password: auth

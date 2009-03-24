@@ -4,8 +4,6 @@
 # which exists in db
 # and doesn't have mbrs-by-ref attribute!!!
 # expecting membership authorisation error
-%
-% requires initial objects to be loaded
 #
 # create route object 
 #
@@ -20,6 +18,6 @@ origin:  AS200
 mnt-by:  TEST-MNT
 changed: dbtest@ripe.net
 source:  DB-TEST
-member-of: AS200.200:rs-test
+member-of: AS200200:rs-test
 
 password: auth

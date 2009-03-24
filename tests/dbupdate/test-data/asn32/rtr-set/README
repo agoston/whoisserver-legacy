@@ -1,8 +1,6 @@
 ==> rtr-set/001/test <==
 
 # CASE 1: We try to create rtr-set object rtrs-test
-%
-% requires initial objects to be loaded
 #
 # create rtr-set object 
 #
@@ -16,8 +14,6 @@
 
 # CASE 2: We try to create rtr-set object rtrs-test
 # syntax AS32 errors
-%
-% requires initial objects to be loaded
 #
 # create rtr-set object 
 #
@@ -28,11 +24,9 @@
 
 ==> rtr-set/003/test <==
 
-# CASE 3: We try to create rtr-set object AS200.200:rtrs-test:AS300.300
+# CASE 3: We try to create rtr-set object AS200200:rtrs-test:AS30300
 # testing the hierarchical name
-# object AS200.200:rtrs-test exists in the DB
-%
-% requires initial objects to be loaded
+# object AS200200:rtrs-test exists in the DB
 #
 # create rtr-set object 
 #
@@ -42,11 +36,9 @@
 
 ==> rtr-set/004/test <==
 
-# CASE 4: We try to create rtr-set object AS200.200:rtrs-test:AS300.300
+# CASE 4: We try to create rtr-set object AS200200:rtrs-test:AS300300
 # testing the hierarchical name
-# object AS200.200:rtrs-test DOES NOT exist in the DB
-%
-% requires initial objects to be loaded
+# object AS200200:rtrs-test DOES NOT exist in the DB
 #
 # create rtr-set object 
 #

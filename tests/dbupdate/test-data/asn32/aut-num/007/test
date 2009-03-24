@@ -1,8 +1,7 @@
-
-# CASE 7: We try to create aut-num object AS0.123
+#asn32/aut-num/
+# CASE 7: We try to create aut-num object AS4294967299
+# which is more than a 32 bit number
 # rejected with syntax error
-%
-% requires initial objects to be loaded
 #
 # create aut-num object 
 #
@@ -11,13 +10,13 @@
 # RESULT 7: The creation will fail.
 
 
-aut-num:      AS0.123
+aut-num:      AS4294967299
 as-name:      ASTEST
 descr:        TEST TELEKOM
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 notify:       dbtest@ripe.net
-mnt-by:       RIPE-NCC-HM-MNT
+mnt-by:       TEST-MNT
 changed:      dbtest@ripe.net 20010101
 source:       DB-TEST
 

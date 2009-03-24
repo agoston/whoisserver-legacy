@@ -1,8 +1,8 @@
 /***************************************
- 
+
  $Revision: 1.7 $
 
- Core functions for update lower layer 
+ Core functions for update lower layer
 
  Status: NOT REVUED, NOT TESTED
 
@@ -13,9 +13,9 @@
  andrei (17/01/2000) Created.
  ******************//******************
  Copyright (c) 2000                              RIPE NCC
- 
+
  All Rights Reserved
- 
+
  Permission to use, copy, modify, and distribute this software and its
  documentation for any purpose and without fee is hereby granted,
  provided that the above copyright notice appear in all copies and that
@@ -23,7 +23,7 @@
  supporting documentation, and that the name of the author not be
  used in advertising or publicity pertaining to distribution of the
  software without specific, written prior permission.
- 
+
  THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
  AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -196,50 +196,64 @@ char *convert_rf(const char *avalue, int *type, int *port) {
 	return (host);
 }
 
-/* Convert AS# into integer */
-static int convert_as(const char *as, long *asnum) {
-	char *ptr;
-	int upper = 0;
-	int lower = 0;
+/* Convert AS# into integer
+ *
+ * returns: 0 if OK
+ *          1 if error (*asnum left untouched)
+ *
+ * */
+int convert_as(const char *as, unsigned long *asnum) {
+	char *ptr, *endptr, *finptr;
+	unsigned long res;
 
-	ptr=(char *)as;
-	/* discard the letters (or leading whitespace) */
-	while ((*ptr) && (!isdigit((int)*ptr)))
-		ptr++;
+	/* discard the letters and leading whitespace) */
+	for (ptr = as; *ptr && !isdigit(*ptr); ptr++);
+	/* walk through the digits */
+	for (endptr = ptr; *endptr && isdigit(*endptr); endptr++);
+	/* check if the end only contains whitespace */
+	for (finptr = endptr; *finptr && isspace(*finptr); finptr++);
+	/* return error if there is any garbage at the end */
+	if (*finptr) return 1;
 
-	/* take the (number.)number */
-	if (strchr(ptr, '.') == NULL) {
-		if (sscanf(ptr, "%d", &lower) < 1) {
-			die; /* return 0;  /* error */
-		}
+	/* chomp trailing whitespace */
+	*endptr = 0;
+
+	res = strtoul(ptr, &endptr, 10);
+	if (*endptr) {
+	    return 1;
 	} else {
-		if (sscanf(ptr, "%d.%d", &upper, &lower) < 1) {
-			die; /* return 0; /* error */
-		}
+        *asnum = res;
+        return 0;
 	}
-	*asnum = (65536 * upper) + lower;
-
-	return 1;
 }
 
-/* Convert AS range (AS4321 - AS5672) into numbers */
-int convert_as_range(const char *as_range, long *begin, long *end) {
-	char *range;
-	char *token;
+/* Convert AS range (AS4321 - AS5672) into numbers
+ *
+ * returns: 0 if OK
+ *          1 on error (*begin and *end are left untouched)
+ * */
+int convert_as_range(const char *as_range, unsigned long *begin, unsigned long *end) {
+	gchar **tok;
+	unsigned long ret[2];
+	int i;
 
-	range=g_strdup(as_range);
-	token=range;
-	if ( !convert_as(strsep(&token, "-"), begin) )
-		goto error_return;
-	if ( !convert_as(token, end) )
-		goto error_return;
-	UT_free(range);
-	return (1);
+	tok = g_strsplit(as_range, "-", -1);
+	for (i=0; tok[i] ; i++) {
+	    if (i >= 2) goto error_return;
+
+	    if (convert_as(tok[i], &ret[i])) goto error_return;
+	}
+	/* if no - (which would indicate an autnum instead of range), throw an error */
+	if (i < 2) goto error_return;
+
+	*begin = ret[0];
+	*end = ret[1];
+	g_strfreev(tok);
+	return 0;
 
 	error_return:
-
-	UT_free(range);
-	return 0;
+    g_strfreev(tok);
+    return 1;
 }
 
 /* Convert time in ASCII format (19991224) into time_t unix time */
@@ -299,7 +313,7 @@ static char *get_set_name(C_Type_t class_type) {
  * >0 - object exists, returns object_id                     *
  * 0  - object does not exist                                *
  * -1 - error (f.e. more than one object with the same PK)   *
- * -2 - synatx error in the primary key                      *   
+ * -2 - synatx error in the primary key                      *
  * Error code is stored in tr->error                         *
  *                                                           *
  * **********************************************************/
@@ -480,10 +494,10 @@ void get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_que
 /************************************************************
  * Executes a query and returns the first row as a long array
  * dies on sql errors
- * 
+ *
  * Returns:
  * long* pointing to the integer array, to be freed by caller
- *  
+ *
  *************************************************************/
 long *get_fields_int(SQ_connection_t *sql_connection, const char *sql_query) {
 	SQ_result_set_t *sql_result;
@@ -567,9 +581,9 @@ static long get_ref_id(Transaction_t *tr, const char *ref_tbl_name, const char *
 /************************************************************
  * int isdummy()
  *
- * Returns 1 if the object in question is a dummy, 
+ * Returns 1 if the object in question is a dummy,
  * otherwise returns 0.
- * 
+ *
  * In case of error:
  * -1 - sql error or object does not exist
  *
@@ -674,7 +688,7 @@ static int process_reverse_domain(Transaction_t *tr, ip_prefix_t *prefptr, int o
  * Returns:                                                  *
  * 0  success                                                *
  * 1  not allowed                                            *
- * -1 SQL error                                              *  
+ * -1 SQL error                                              *
  *                                                           *
  *************************************************************/
 static int auth_member_of(const rpsl_attr_t *attribute, Transaction_t *tr) {
@@ -688,8 +702,8 @@ static int auth_member_of(const rpsl_attr_t *attribute, Transaction_t *tr) {
 	attribute_type = rpsl_get_attr_id(rpsl_attr_get_name(attribute));
 	attribute_value = rpsl_attr_get_value(attribute);
 
-	/* Check if set has mbrs_by_ref==ANY 
-	 In such case mbrs_by_ref.mnt_id==0 
+	/* Check if set has mbrs_by_ref==ANY
+	 In such case mbrs_by_ref.mnt_id==0
 	 */
 
 	query = g_string_sized_new(STR_XL);
@@ -718,7 +732,7 @@ static int auth_member_of(const rpsl_attr_t *attribute, Transaction_t *tr) {
 	/* Its object_id==0 */
 	/* EXAMPLE:
 
-	 SELECT route_set.object_id 
+	 SELECT route_set.object_id
 	 FROM   mbrs_by_ref, route_set
 	 WHERE  mbrs_by_ref.object_id=route_set.object_id
 	 AND    route_set.route_set=<setname>
@@ -1210,7 +1224,7 @@ static int create_attr(const rpsl_attr_t *attribute, Transaction_t *tr) {
 	ip_v6word_t high, low;
 	ip_v6word_t high_ipv6, low_ipv6;
 
-	long begin_as, end_as;
+	unsigned long begin_as, end_as;
 	char * set_name;
 	char * rf_host; /* needs to be freed after use*/
 	int rf_type, rf_port;
@@ -1273,7 +1287,7 @@ static int create_attr(const rpsl_attr_t *attribute, Transaction_t *tr) {
 				do_query=0;
 			else {
 				/* Here, the two possible table names ('route' and 'route6') are of the
-				 same name as the two possible object names. 
+				 same name as the two possible object names.
 				 So we can use rpsl_object_get_class(tr->object) */
 				g_string_sprintf(tr->query, query_fmt, rpsl_object_get_class(tr->object), tr->thread_ins,
 				        attribute_value, tr->object_id);
@@ -1506,11 +1520,11 @@ static int create_attr(const rpsl_attr_t *attribute, Transaction_t *tr) {
  * each_attribute_proces()                                   *
  *                                                           *
  * Main function that processes object attributes one by one.*
- * Called from g_slist_foreach() function.                   * 
+ * Called from g_slist_foreach() function.                   *
  * First it tries to insert an attribute.                    *
  * If an error it assumes that attribute is already in       *
  * a table and calls update_attr() to update it.             *
- * Queries for the attributes are defined in Insert[] array. * 
+ * Queries for the attributes are defined in Insert[] array. *
  *                                                           *
  * Returns: Nothing. Error code is stored in tr->error.      *
  *                                                           *
@@ -1823,7 +1837,7 @@ void ud_each_primary_key_select(void *element_data, void *result_ptr) {
 }
 
 /************************************************************
- * perform_create(const Object_t *obj, Transaction_t *tr)    * 
+ * perform_create(const Object_t *obj, Transaction_t *tr)    *
  *                                                           *
  * Procedure for creating a new object.                      *
  * First inserts object into 'last' table and gets object_id.*
@@ -1868,7 +1882,7 @@ static int perform_create(Transaction_t *tr) {
 } /* perform_create() */
 
 /************************************************************
- * perform_update(Transaction_t *tr)                         * 
+ * perform_update(Transaction_t *tr)                         *
  *                                                           *
  * Procedure for updating (existing) object.                 *
  * First processes all attributes.                           *

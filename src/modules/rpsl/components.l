@@ -16,11 +16,8 @@
 %}
 
 
-ASNO32         AS(([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655+[0-2][0-9]|6553[0-5])\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][+0-9]{2}|655[0-2][0-9]|6553[0-5]))
-ASNO16         AS(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
-ASNOSUB        AS[0]+\.(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
-ASNOMIX        [^ ]*{ASNOSUB}[^ ]*
-ASNO           {ASNO32}|{ASNO16}
+ASNODOT        [^ ]*AS[0-9]+\.[0-9]+[^ ]*
+ASNO           AS([0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5])
 FLTRNAME       FLTR-[A-Z0-9_-]*[A-Z0-9]
 ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 RSNAME         RS-[A-Z0-9_-]*[A-Z0-9]
@@ -29,9 +26,8 @@ IPV4           {INT}(\.{INT}){3}
 PRFXV4         {IPV4}\/{INT}
 PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 PROTOCOL_NAME  BGP4|OSPF|RIP|IGRP|IS-IS|STATIC|RIPng|DVMRP|PIM-DM|PIM-SM|CBT|MOSPF
-COMM_NO32      {INT}.{INT}:{INT}
-COMM_NO16      {INT}:{INT}
-COMM_NO        {COMM_NO32}|{COMM_NO16}
+COMM_32_NO     [0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5]
+COMM_NO        {COMM_32_NO}:{COMM_32_NO}
 
 %{
 #include <stdlib.h>
@@ -120,8 +116,8 @@ COST        { return TKN_COST; }
 PROTOCOL         { return KEYW_PROTOCOL; }
 {PROTOCOL_NAME}  { return TKN_PROTOCOL; }
 
-{ASNOMIX} { 
-    syntax_error("The RIPE Database currently represents 16-bit AS numbers in \'ASn\' notation");
+{ASNODOT} { 
+    syntax_error("The RIPE Database represents AS numbers in \'ASn\' notation");
 }
 
 {ASNO} {
@@ -207,20 +203,19 @@ PROTOCOL         { return KEYW_PROTOCOL; }
 
 {COMM_NO} {
     /* verify each part is a 16-bit number */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 65535)) {
-             syntax_error("Community number \"%s\" contains an invalid number",
+        val = strtoul(p, &s, 10);
+        if ((val < 0) || (val > 4294967295)) {
+             syntax_error("Community number \"%s\" contains an invalid number", 
                            yytext);
         }
         p = s + 1;
     }
     return TKN_COMM_NO;
 }
-
 
 {INT} {
     componentslval.sval = yytext;

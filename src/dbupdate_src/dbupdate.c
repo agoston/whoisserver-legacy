@@ -1212,6 +1212,7 @@ int main(int argc, char **argv)
   SK_init(lg_ctx);
   UT_init(lg_ctx);
   CR_init(lg_ctx);
+  wk_regex_init();
 
   /***************************** UPDATE  **************************************/
 

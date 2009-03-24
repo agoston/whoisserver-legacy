@@ -1,9 +1,9 @@
-# CASE 10: We create two as-blocks which are hierarchical to each other
-# and try to query bigger one.
+# CASE 10: We create two as-blocks which are hierarchical to each other 
+# and try to query larger one.
 # 32 bit
 # should return only bigger block
 #
-# create as-block object
+# create as-block objects
 #
 #SUCCESS
 #
@@ -13,7 +13,7 @@
 password: hostmaster
 override: password
 
-as-block:     AS100.0 - AS300.0
+as-block:     AS7775535 - AS94967295
 descr:        Test block
 remarks:      These AS numbers are further assigned by RIPE NCC
 remarks:      to LIRs and end-users in the RIPE NCC region
@@ -26,7 +26,7 @@ changed:      dbtest@ripe.net 20060101
 source:       DB-TEST
 
 
-as-block:     AS101.0 - AS299.0
+as-block:     AS7775535 - AS7775545
 descr:        Test block
 remarks:      These AS numbers are further assigned by RIPE NCC
 remarks:      to LIRs and end-users in the RIPE NCC region

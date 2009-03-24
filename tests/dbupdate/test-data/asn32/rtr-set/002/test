@@ -1,8 +1,6 @@
 
 # CASE 2: We try to create rtr-set object rtrs-test
 # syntax AS32 errors
-%
-% requires initial objects to be loaded
 #
 # create rtr-set object 
 #
@@ -14,8 +12,8 @@
 rtr-set:      rtrs-test
 descr:        TEST router set
 members:      rmws-brln-de07.nw.mediaWays.net
-members:      AS0.234:rtrs-test:AS123.234
-mp-members:   AS0.234:rtrs-test:AS123.234
+members:      AS3.234:rtrs-test:AS123234
+mp-members:   AS234:rtrs-test:AS12323456789
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       TEST-MNT

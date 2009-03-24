@@ -1,8 +1,6 @@
 
 # CASE 9: We try to create a route6 object referencing a non existing
 # route-set
-%
-% requires initial objects to be loaded
 #
 # create route-set object 
 #
@@ -17,6 +15,6 @@ origin:    AS200
 mnt-by:    TEST-MNT
 changed:   dbtest@ripe.net 20060101
 source:    DB-TEST
-member-of: AS200.200:rs-test
+member-of: AS200200:rs-test
 
 password: auth

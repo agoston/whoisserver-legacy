@@ -1,7 +1,5 @@
 
 # CASE 1: We try to create peering-set object prng-lipex1
-%
-% requires initial objects to be loaded
 #
 # create peering-set object 
 #
@@ -11,10 +9,10 @@
 
 
 
-peering-set:      prng-lipex1
+peering-set:  prng-lipex1
 descr:        Test peering partners
-peering:      AS123.20834 at 193.109.219.24
-mp-peering:   AS123.20834 at 193.109.219.24
+peering:      AS2320834 at 193.109.219.24
+mp-peering:   AS2320834 at 193.109.219.24
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       TEST-MNT

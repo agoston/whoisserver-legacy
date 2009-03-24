@@ -1,0 +1,23 @@
+#asn32/aut-num/
+# CASE 10: We try to create aut-num object AS4294967295
+# parent as-block exists
+#
+# create aut-num object 
+#
+#SUCCESS
+#
+# RESULT 10: The creation will succeed.
+
+
+aut-num:      AS4294967295
+as-name:      ASTEST
+descr:        TEST TELEKOM
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+notify:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+password:     hostmaster
+password:     auth

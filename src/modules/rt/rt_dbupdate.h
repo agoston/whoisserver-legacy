@@ -12,9 +12,9 @@
         tiago (10/04/2003) Created.
   ******************/ /******************
   Copyright (c) 2003               RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -22,7 +22,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -107,12 +107,13 @@ void RT_changed_date_missing(RT_context_t* ctx, gchar* date, gchar* value);
 void RT_multiple_changed_date_missing(RT_context_t* ctx);
 void RT_peering_set_syntax(RT_context_t* ctx);
 void RT_filter_set_syntax(RT_context_t* ctx);
+void RT_invalid_asblock_range(RT_context_t* ctx);
 void RT_changed_date_order(RT_context_t* ctx, gchar* value, gchar* previous);
 void RT_changed_line_order(RT_context_t* ctx, gchar* msg, gchar* date);
 void RT_changed_date_syntax(RT_context_t* ctx, gchar* msg);
 
-/* 
- * Prefix to range conversion on inetnums 
+/*
+ * Prefix to range conversion on inetnums
  */
 void RT_inetnum_prefix_converted(RT_context_t* ctx, gchar* prefix, gchar* range);
 void RT_inetnum_prefix_convert_failed(RT_context_t* ctx, gchar* prefix);
@@ -241,7 +242,7 @@ void RT_irt_auth(RT_context_t* ctx, gchar* key, gchar* type, gchar* attr_checked
         GList* irt_ok, GList* irt_fail);
 void RT_irt_auth_result(RT_context_t* ctx, gboolean result, gboolean override);
 
-void RT_invalid_mnt_routes(RT_context_t* ctx, gchar *key, gchar *type, 
+void RT_invalid_mnt_routes(RT_context_t* ctx, gchar *key, gchar *type,
         gchar *parent_text, GList *failed_mntners, GList *invalid_list);
 void RT_no_mntners(RT_context_t* ctx, gchar *key, gchar *type, gchar *parent_text);
 void RT_disallowed_mnt(RT_context_t* ctx, gchar* name);

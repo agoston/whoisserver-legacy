@@ -6,8 +6,10 @@
 # components
 # inject
 # trying to introduce many errors and count them
-%
-% requires initial objects to be loaded
+#
+# There is an issue with community = {0:20}
+# the 0 is passed by the parser when it should not be according to the syntax
+# but in practice it should be allowed. 
 #
 # create route object 
 #
@@ -22,13 +24,14 @@ origin:  AS200
 mnt-by:  TEST-MNT
 changed: dbtest@ripe.net
 source:  DB-TEST
-aggr-bndry: AS0.234:AS-mytest:AS3:AS-test:AS0.234
-aggr-mtd: outbound AS1.234:AS-mytest:AS3:AS-test:AS0.234
-components: ATOMIC protocol BGP4 community.contains(20.65536:20)
-inject: at rtrs-myset:AS0.2:rtrs-test:AS2.34
-inject: at AS0.234:rtrs-myset:AS2:rtrs-test:AS2.34
-inject: at AS234:rtrs-myset:AS2:rtrs-test:AS02.34
-inject: action community = {20.65536:20};
+aggr-bndry: AS2.234:AS-mytest:AS3:AS-test:AS9294967295
+aggr-mtd: outbound AS9294967295:AS-mytest:AS3:AS-test:AS2.234
+components: ATOMIC protocol BGP4 community.contains(9294967295:20)
+inject: at rtrs-myset:AS3.2:rtrs-test:AS9294967295
+inject: at AS-1:rtrs-myset:AS2:rtrs-test:AS9294967295
+inject: at AS234:rtrs-myset:AS2:rtrs-test:AS0234
+inject: action community = {9294967295:20};
+inject: action community = {0:20};
 
 
 password: auth

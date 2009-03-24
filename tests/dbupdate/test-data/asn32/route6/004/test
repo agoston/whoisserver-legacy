@@ -2,9 +2,7 @@
 # CASE 4: We try to create route object ::/16,AS200
 # member-of is an route-set with as32bit-related name
 # which exists in db
-# also make a query to check whether member-of works (-i member-of AS200.200:rs-test)
-%
-% requires initial objects to be loaded
+# also make a query to check whether member-of works (-i member-of AS200200:rs-test)
 #
 # create route object 
 #
@@ -19,6 +17,6 @@ origin:  AS200
 mnt-by:  TEST-MNT
 changed: dbtest@ripe.net 20060101
 source:  DB-TEST
-member-of: AS200.200:rs-test
+member-of: AS200200:rs-test
 
 password: auth
