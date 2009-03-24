@@ -1,0 +1,18 @@
+20090323 - version 3.5
+
+Changes:
+- Implemented ASPlain for representing 32-bit AS numbers, as described in
+  RFC 5396.
+
+- Small cleanups.
+
+
+Merged:
+- feature-agoston-asplain
+
+
+Affected stakeholders:
+- Anyone doing AS number updates or lookups in the RIPE Database
+
+- NCC Services WG
+- DB WG
