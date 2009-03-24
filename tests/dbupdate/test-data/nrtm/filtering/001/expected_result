@@ -17,8 +17,9 @@ changed:        unread@ripe.net 20000101
 source:         DB-TEST
 remarks:        ****************************
 remarks:        * THIS OBJECT IS NOT VALID
-remarks:        * Please note that this object has all its personal data removed, and acts as a stub only.
-remarks:        * To get the original object, please query the RIPE Database.
+remarks:        * Please note that all personal data has been removed from this object.
+remarks:        * To view the original object, please query the RIPE Database at:
+remarks:        * http://www.ripe.net/whois
 remarks:        ****************************
 
 ADD
@@ -31,8 +32,9 @@ changed:        unread@ripe.net 20000101
 source:         DB-TEST
 remarks:        ****************************
 remarks:        * THIS OBJECT IS NOT VALID
-remarks:        * Please note that this object has all its personal data removed, and acts as a stub only.
-remarks:        * To get the original object, please query the RIPE Database.
+remarks:        * Please note that all personal data has been removed from this object.
+remarks:        * To view the original object, please query the RIPE Database at:
+remarks:        * http://www.ripe.net/whois
 remarks:        ****************************
 
 ADD
@@ -48,8 +50,9 @@ changed:        unread@ripe.net 20000101
 source:         DB-TEST
 remarks:        ****************************
 remarks:        * THIS OBJECT IS NOT VALID
-remarks:        * Please note that this object has all its personal data removed, and acts as a stub only.
-remarks:        * To get the original object, please query the RIPE Database.
+remarks:        * Please note that all personal data has been removed from this object.
+remarks:        * To view the original object, please query the RIPE Database at:
+remarks:        * http://www.ripe.net/whois
 remarks:        ****************************
 
 ADD
@@ -64,8 +67,9 @@ changed:        unread@ripe.net 20000101
 source:         DB-TEST
 remarks:        ****************************
 remarks:        * THIS OBJECT IS NOT VALID
-remarks:        * Please note that this object has all its personal data removed, and acts as a stub only.
-remarks:        * To get the original object, please query the RIPE Database.
+remarks:        * Please note that all personal data has been removed from this object.
+remarks:        * To view the original object, please query the RIPE Database at:
+remarks:        * http://www.ripe.net/whois
 remarks:        ****************************
 
 ADD
@@ -81,8 +85,9 @@ changed:        unread@ripe.net 20000101
 source:         DB-TEST
 remarks:        ****************************
 remarks:        * THIS OBJECT IS NOT VALID
-remarks:        * Please note that this object has all its personal data removed, and acts as a stub only.
-remarks:        * To get the original object, please query the RIPE Database.
+remarks:        * Please note that all personal data has been removed from this object.
+remarks:        * To view the original object, please query the RIPE Database at:
+remarks:        * http://www.ripe.net/whois
 remarks:        ****************************
 
 %END DB-TEST
