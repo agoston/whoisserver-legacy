@@ -24,6 +24,7 @@ ANY            ANY
 %{
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 #include <iproutines.h>
 
 /* tokens defined in the grammar */

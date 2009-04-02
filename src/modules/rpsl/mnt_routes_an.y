@@ -32,6 +32,7 @@
   ***************************************/
 
 #include <stdlib.h>
+#include <errno.h>
 
 int yyerror(const char *s);
 %}

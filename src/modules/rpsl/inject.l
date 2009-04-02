@@ -24,8 +24,7 @@ INT            [0-9]+
 IPV4           {INT}(\.{INT}){3}
 PRFXV4         {IPV4}\/{INT}
 PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
-COMM_32_NO     [0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5]
-COMM_NO        {COMM_32_NO}:{COMM_32_NO}
+COMM_NO        {INT}:{INT}
 PROTOCOL_NAME  BGP4|OSPF|RIP|IGRP|IS-IS|STATIC|RIPng|DVMRP|PIM-DM|PIM-SM|CBT|MOSPF
 DNAME          [[:alnum:]]([[:alnum:]-]*[[:alnum:]])?
 ASNODOT        [^ ]*AS[0-9]+\.[0-9]+[^ ]*
@@ -35,6 +34,7 @@ ASNO           AS([0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 
 /* tokens defined in the grammar */
 #include "inject.tab.h"
@@ -102,33 +102,37 @@ COST        { return TKN_COST; }
 {PRFXV4RNG} {
     /* check each number of 1.2.3.4/5 in prefix is valid, as
        well as any bit ranges specified */
-    long int val;
-    long int endval;
+    unsigned long int val;
+    unsigned long int endval;
     char *s, *p;
     p = s = yytext;
     while (*s != '/') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
+        errno = 0;
+        val = strtoul(p, &s, 10);
+        if (errno || (val > 255)) {
              syntax_error("IP prefix \"%s\" contains an invalid octet",
                           yytext);
         }
         p = s + 1;
     }
-    val = strtol(p, &s, 10);
-    if ((val < 0) || (val > 32)) {
+    errno = 0;
+    val = strtoul(p, &s, 10);
+    if (errno || (val > 32)) {
         syntax_error("IP prefix range \"%s\" contains an invalid prefix length",                     yytext);
     }
     p = s + 1;
     if (isdigit((int)*p)) {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 32)) {
+        errno = 0;
+        val = strtoul(p, &s, 10);
+        if (errno || (val > 32)) {
             syntax_error("IP prefix range \"%s\" contains an invalid range",
                          yytext);
         }
         p = s + 1;
         if (isdigit((int)*p)) {
-            endval = strtol(p, NULL, 10);
-            if ((endval < 0) || (endval > 32)) {
+            errno = 0;
+            endval = strtoul(p, NULL, 10);
+            if (errno || (endval > 32)) {
                 syntax_error("IP prefix \"%s\" contains an invalid prefix range",
                              yytext);
             }
@@ -143,19 +147,21 @@ COST        { return TKN_COST; }
 
 {PRFXV4} {
     /* check each number of 1.2.3.4/5 in prefix is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '/') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
+        errno = 0;
+        val = strtoul(p, &s, 10);
+        if (errno || (val > 255)) {
              syntax_error("IP prefix \"%s\" contains an invalid octet",
                           yytext);
         }
         p = s + 1;
     }
-    val = strtol(p, NULL, 10);
-    if ((val < 0) || (val > 32)) {
+    errno = 0;
+    val = strtoul(p, NULL, 10);
+    if (errno || (val > 32)) {
         syntax_error("IP prefix \"%s\" contains an invalid prefix length",
                      yytext);
     }
@@ -164,12 +170,13 @@ COST        { return TKN_COST; }
 
 {IPV4} {
     /* check each number of 1.2.3.4 is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
+        errno = 0;
+        val = strtoul(p, &s, 10);
+        if (errno || (val > 255)) {
              syntax_error("IP address \"%s\" contains an invalid octet", 
                           yytext);
         }
@@ -184,8 +191,9 @@ COST        { return TKN_COST; }
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
+        errno = 0;
         val = strtoul(p, &s, 10);
-        if ((val < 0) || (val > 4294967295)) {
+        if (errno || (val > 4294967295UL)) {
              syntax_error("Community number \"%s\" contains an invalid number", 
                            yytext);
         }

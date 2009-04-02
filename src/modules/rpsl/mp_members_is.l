@@ -67,6 +67,7 @@ ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 
 /* tokens defined in the grammar */
 #include "mp_members_is.tab.h"
@@ -93,15 +94,16 @@ void yy_input(char *buf, int *result, int max_size);
 
 {IPV6DC}  {
     /* check each quad of 1A::AAAA:BBBB:DEAD:BEEF in address is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p, *r;
     int leftquads = 0;
     int rightquads = 0;
 
     r = p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
+        errno = 0;
+        val = strtoul(p, &s, 16);
+        if (errno || (val > 65535)) {
              syntax_error("IPv6 address \"%s\" contains an invalid quad",
                           yytext);
         }
@@ -135,12 +137,13 @@ void yy_input(char *buf, int *result, int max_size);
 
 {IPV4} {
     /* check each number of 1.2.3.4 is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
+        errno = 0;
+        val = strtoul(p, &s, 10);
+        if (errno || (val > 255)) {
              syntax_error("IP address \"%s\" contains an invalid octet", 
                           yytext);
         }

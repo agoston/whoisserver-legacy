@@ -22,6 +22,7 @@ ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 %{
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 
 /* tokens defined in the grammar */
 #include "aggr_bndry.tab.h"
