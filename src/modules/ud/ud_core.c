@@ -1740,7 +1740,7 @@ void ud_each_primary_key_select(void *element_data, void *result_ptr) {
 	const char *query_fmt;
 	unsigned int prefix, prefix_length;
 	unsigned int begin_in, end_in;
-	long begin_as, end_as;
+	unsigned long begin_as, end_as;
 	ip_prefix_t prefstr;
 	ip_range_t rangstr;
 	ip_v6word_t i6_msb, i6_lsb;
