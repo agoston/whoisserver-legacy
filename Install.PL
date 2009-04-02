@@ -54,6 +54,8 @@ GetOptions(
     'sqlhost=s'         => \$SQLHost,
     'sqlport=s'         => \$SQLPort,
     'dbport=s'          => \$DbPort,
+    # XXX: dbname needs some error handling: not all names are good for the MySQL database.
+    'dbname=s'          => sub { $DbName = q{ripe_} . $_[1]; $DbAdminName = q{ripadmin_} . $_[1]; },
     'for-development!'  => \$DevelMode,
     'configure!'        => \$RunConfigure,
     'setup-db!'         => \$SetupDb,
@@ -105,6 +107,8 @@ Options:
   --sqlport=%d          MySQL port to connect to (defaults to 3306)
   --dbport=%d           Starting number of port range to use for this server instance.
                         Needs 5 consecutive port numbers. Defaults to `id`0.
+  --dbname=%s           Database name, just in case you need more than one in parallel.
+                        Defaults to your effective username (from /etc/passwd).
 
   ### build/configure/install options
   --all                 Do all of the below operations. Can be negated by --no-all.
