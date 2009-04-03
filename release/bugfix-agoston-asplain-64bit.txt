@@ -1,0 +1,7 @@
+Changes:
+- fixed outstanding bugs related to 32-bit operation after asplain deployment
+- consolidated rpsl module changes made during asplain project
+
+
+Affected stakeholders:
+none
