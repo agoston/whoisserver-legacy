@@ -340,106 +340,118 @@ KM_key_return_t* km_pgp_signature_verify(gchar* text, gchar* signature) {
   The variable key ring is used for testing, ie, doing an operation
   on a safe key ring before doing it on the real one.
  */
-KM_key_return_t* km_pgp_key_add_internal(gchar* key, gchar *key_ring) {
+KM_key_return_t* km_pgp_key_add_internal(gchar* key, gchar *key_ring)
+{
 #define LINE_LENGTH 400
 
-  km_key_return_t* key_ret;
-  FILE* general;
-  gboolean valid;
-  gchar key_id[LINE_LENGTH];
-  gchar txt[LINE_LENGTH];
-  GString* gpg_line;
-  gchar out_file[LINE_LENGTH];
-  gchar secret_key_ring[LINE_LENGTH];
-  gchar status_file[LINE_LENGTH];
-  gchar in_file[LINE_LENGTH];
-  gchar tmp[LINE_LENGTH];
-  int imported;
-  int unchanged;
-  int secret;
+    km_key_return_t* key_ret;
+    FILE* general;
+    gboolean valid;
+    gchar key_id[LINE_LENGTH];
+    gchar txt[LINE_LENGTH];
+    GString* gpg_line;
+    gchar out_file[LINE_LENGTH];
+    gchar secret_key_ring[LINE_LENGTH];
+    gchar status_file[LINE_LENGTH];
+    gchar in_file[LINE_LENGTH];
+    gchar tmp[LINE_LENGTH];
+    int imported;
+    int unchanged;
+    int secret;
 
-  imported = 0;
-  unchanged = 0;
-  secret = 0;
-  valid = FALSE;
-  if (temporary_directory) {
-    strcpy(tmp, temporary_directory);
-  }
-  else {
-    strcpy(tmp, "/tmp");
-  }
-  sprintf(secret_key_ring,"%s/km_sec_%d.gpg", tmp, (int)(getpid()) );
-  sprintf(out_file,"%s/km_out_%d", tmp, (int)(getpid()) );
-  sprintf(status_file,"%s/km_status_%d", tmp, (int)(getpid()) );
-  sprintf(in_file,"%s/km_in_%d", tmp, (int)(getpid()) );
-
-  general = fopen(in_file,"w");
-  fprintf(general, "%s", key);
-  fclose(general);
-  //awful
-  gpg_line = g_string_new(gpg_path);
-  g_string_append(gpg_line, " --no-default-keyring --no-secmem-warning ");
-  g_string_append(gpg_line, " --secret-keyring ");
-  g_string_append(gpg_line, secret_key_ring);
-  g_string_append(gpg_line, " --keyring ");
-  g_string_append(gpg_line, key_ring);
-  g_string_append(gpg_line, " --import ");
-  g_string_append(gpg_line, in_file);
-  g_string_append(gpg_line, " > ");
-  g_string_append(gpg_line, status_file);
-  g_string_append(gpg_line, " 2>&1");
-  LG_log(ctx, LG_DEBUG, "%s\n", gpg_line->str);
-  system(gpg_line->str);
-  g_string_free(gpg_line, TRUE);
-  /* Parsing gpg output */
-
-  general = fopen(status_file, "r");
-  while (fgets (txt, LINE_LENGTH - 1, general) != NULL) {
-    LG_log(ctx, LG_DEBUG, "%s", txt);
-    if (strstr(txt, "public key") != NULL) {
-      if ((strstr(txt, "unchanged") != NULL) ||
-          (strstr(txt, "not changed") != NULL)) {
-        snprintf(key_id, LINE_LENGTH - 1, "%8s\n", txt + 9);
-        key_id[8] = 0;
-        unchanged++;
-      }
-      if(strstr(txt, "imported") != NULL) {
-        snprintf(key_id, LINE_LENGTH -1, "%8s\n", txt + 9);
-        key_id[8] = 0;
-        imported++;
-      }
+    imported = 0;
+    unchanged = 0;
+    secret = 0;
+    valid = FALSE;
+    if (temporary_directory)
+    {
+        strcpy(tmp, temporary_directory);
     }
-    if (strstr(txt, "secret key") != NULL ||
-        strstr(txt, "failed to create temporary file") != NULL ) {
-        //this falied stuff has to do with using /dev/null its OK
-      secret++;
+    else
+    {
+        strcpy(tmp, "/tmp");
     }
-  }
-  fclose(general);
+    sprintf(secret_key_ring, "%s/km_sec_%d.gpg", tmp, (int) (getpid()));
+    sprintf(out_file, "%s/km_out_%d", tmp, (int) (getpid()));
+    sprintf(status_file, "%s/km_status_%d", tmp, (int) (getpid()));
+    sprintf(in_file, "%s/km_in_%d", tmp, (int) (getpid()));
 
-  unlink(in_file);
-  unlink(out_file);
-  unlink(status_file);
-  unlink(secret_key_ring);
+    general = fopen(in_file, "w");
+    fprintf(general, "%s", key);
+    fclose(general);
+    //awful
+    gpg_line = g_string_new(gpg_path);
+    g_string_append(gpg_line, " --no-default-keyring --no-secmem-warning ");
+    g_string_append(gpg_line, " --secret-keyring ");
+    g_string_append(gpg_line, secret_key_ring);
+    g_string_append(gpg_line, " --keyring ");
+    g_string_append(gpg_line, key_ring);
+    g_string_append(gpg_line, " --import ");
+    g_string_append(gpg_line, in_file);
+    g_string_append(gpg_line, " > ");
+    g_string_append(gpg_line, status_file);
+    g_string_append(gpg_line, " 2>&1");
+    LG_log(ctx, LG_DEBUG, "%s\n", gpg_line->str);
+    system(gpg_line->str);
+    g_string_free(gpg_line, TRUE);
+    /* Parsing gpg output */
 
-  //If there is more than 1 key...
-  if (secret) {
-    key_ret = km_key_return_new(key_id, FALSE, NULL, KM_SECRET_KEY);
-  }
-  else if (unchanged) {
-    key_ret = km_key_return_new(key_id, FALSE, NULL, KM_KEY_EXISTS);
-  }
-  else if ((unchanged+imported+secret) > 1) {
-    key_ret = km_key_return_new(NULL, FALSE, NULL, KM_MULTIPLE_KEYS);
-  }
-  else if (imported) {
-    key_ret = km_key_return_new(key_id, FALSE, NULL, KM_OK);
-  }
-  else {
-    key_ret = km_key_return_new(NULL, FALSE, NULL, KM_NO_KEY);
-  }
+    general = fopen(status_file, "r");
+    while (fgets(txt, LINE_LENGTH - 1, general) != NULL)
+    {
+        LG_log(ctx, LG_DEBUG, "%s", txt);
+        if (strstr(txt, "public key") != NULL)
+        {
+            if ((strstr(txt, "unchanged") != NULL) || (strstr(txt, "not changed") != NULL))
+            {
+                snprintf(key_id, LINE_LENGTH - 1, "%8s\n", txt + 9);
+                key_id[8] = 0;
+                unchanged++;
+            }
+            if (strstr(txt, "imported") != NULL)
+            {
+                snprintf(key_id, LINE_LENGTH - 1, "%8s\n", txt + 9);
+                key_id[8] = 0;
+                imported++;
+            }
+        }
+        if (strstr(txt, "secret key") != NULL || strstr(txt, "failed to create temporary file")
+            != NULL)
+        {
+            //this falied stuff has to do with using /dev/null its OK
+            secret++;
+        }
+    }
+    fclose(general);
 
-  return key_ret;
+    unlink(in_file);
+    unlink(out_file);
+    unlink(status_file);
+    unlink(secret_key_ring);
+
+    //If there is more than 1 key...
+    if (secret)
+    {
+        key_ret = km_key_return_new(key_id, FALSE, NULL, KM_SECRET_KEY);
+    }
+    else if (unchanged)
+    {
+        key_ret = km_key_return_new(key_id, FALSE, NULL, KM_KEY_EXISTS);
+    }
+    else if ((unchanged + imported + secret) > 1)
+    {
+        key_ret = km_key_return_new(NULL, FALSE, NULL, KM_MULTIPLE_KEYS);
+    }
+    else if (imported)
+    {
+        key_ret = km_key_return_new(key_id, FALSE, NULL, KM_OK);
+    }
+    else
+    {
+        key_ret = km_key_return_new(NULL, FALSE, NULL, KM_NO_KEY);
+    }
+
+    return key_ret;
 }
 
 
