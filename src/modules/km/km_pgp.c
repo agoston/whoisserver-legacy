@@ -108,7 +108,7 @@ static gchar* km_file_to_char(FILE *file)
 
     do
     {
-        len = fread(buf, 4096, 1, file);
+        len = fread(buf, 1, 4096, file);
         g_string_append_len(g, buf, len);
     }
     while (len == 4096);
