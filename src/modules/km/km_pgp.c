@@ -121,126 +121,157 @@ static gchar* km_file_to_char(FILE *file)
  * The low-lever signature verification. Contains all the dirty stuff.
  * Called from this file only.
  */
-KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature, gchar *key_ring) {
-  km_key_return_t* key_ret;
-  FILE* general;
-  gboolean valid;
-  gchar* key_str;
+KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
+    gchar *key_ring)
+{
+    km_key_return_t* key_ret;
+    FILE* general;
+    gboolean valid;
+    gchar* key_str;
 #define LINE_LENGTH 400
-  gchar key_id[LINE_LENGTH];
-  gchar txt[LINE_LENGTH];
-  GString* gpg_line;
-  gchar out_file[LINE_LENGTH];
-  gchar status_file[LINE_LENGTH];
-  gchar signature_file[LINE_LENGTH];
-  gchar in_file[LINE_LENGTH];
-  gchar tmp[LINE_LENGTH];
-  gchar* char_file;
+    gchar key_id[LINE_LENGTH];
+    gchar txt[LINE_LENGTH];
+    GString* gpg_line;
+    gchar out_file[LINE_LENGTH];
+    gchar status_file[LINE_LENGTH];
+    gchar signature_file[LINE_LENGTH];
+    gchar in_file[LINE_LENGTH];
+    gchar tmp[LINE_LENGTH];
+    gchar* char_file;
 
-  LG_log(ctx, LG_FUNC, ">Entering km_pgp_signature_verify_low");
-  valid = FALSE;
-  if (temporary_directory) {
-    strcpy(tmp, temporary_directory);
-  }
-  else {
-    strcpy(tmp, "/tmp");
-  }
-  sprintf(out_file,"%s/km_out_%d", tmp, (int)(getpid()) );
-  sprintf(status_file,"%s/km_status_%d", tmp, (int)(getpid()) );
-  sprintf(signature_file,"%s/km_sig_%d", tmp, (int)(getpid()) );
-  sprintf(in_file,"%s/km_in_%d", tmp, (int)(getpid()) );
-
-  general = fopen(in_file,"w");
-  fprintf(general, "%s", text);
-  fclose(general);
-  if (signature) {
-    general = fopen(signature_file,"w");
-    fprintf(general, "%s", signature);
-    fclose(general);
-  }
-  //awful
-  gpg_line = g_string_new(gpg_path);
-  g_string_append(gpg_line, " --no-default-keyring --no-secmem-warning ");
-  if (key_ring) {
-    g_string_append(gpg_line, "--keyring ");
-    g_string_append(gpg_line, key_ring);
-  }
-  g_string_append(gpg_line, " -o ");
-  g_string_append(gpg_line, out_file);
-  if (signature) {
-    g_string_append(gpg_line, " --verify ");
-    g_string_append(gpg_line, signature_file);
-  }
-  else {
-    g_string_append(gpg_line, " -d");
-  }
-  g_string_append(gpg_line, " ");
-  g_string_append(gpg_line, in_file);
-  g_string_append(gpg_line, " >");
-  g_string_append(gpg_line, status_file);
-  g_string_append(gpg_line, " 2>&1");
-  LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: command_line: %s", gpg_line->str);
-  system(gpg_line->str);
-  g_string_free(gpg_line, TRUE);
-  /* Parsing gpg output */
-
-  general = fopen(status_file, "r");
-  while (fgets (txt, LINE_LENGTH - 1, general) != NULL) {
-    LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: gpg returns: %s", txt);
-    if (strstr(txt, "Good signature") != NULL)
+    LG_log(ctx, LG_FUNC, ">Entering km_pgp_signature_verify_low");
+    valid = FALSE;
+    if (temporary_directory)
     {
-      valid = TRUE;
-      LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: Good signature found");
+        strcpy(tmp, temporary_directory);
+    }
+    else
+    {
+        strcpy(tmp, "/tmp");
+    }
+    sprintf(out_file, "%s/km_out_%d", tmp, (int) (getpid()));
+    sprintf(status_file, "%s/km_status_%d", tmp, (int) (getpid()));
+    sprintf(signature_file, "%s/km_sig_%d", tmp, (int) (getpid()));
+    sprintf(in_file, "%s/km_in_%d", tmp, (int) (getpid()));
+
+    general = fopen(in_file, "w");
+    fprintf(general, "%s", text);
+    fclose(general);
+    if (signature)
+    {
+        general = fopen(signature_file, "w");
+        fprintf(general, "%s", signature);
+        fclose(general);
+    }
+    //awful
+    gpg_line = g_string_new(gpg_path);
+    g_string_append(gpg_line, " --no-default-keyring --no-secmem-warning ");
+    if (key_ring)
+    {
+        g_string_append(gpg_line, "--keyring ");
+        g_string_append(gpg_line, key_ring);
+    }
+    g_string_append(gpg_line, " -o ");
+    g_string_append(gpg_line, out_file);
+    if (signature)
+    {
+        g_string_append(gpg_line, " --verify ");
+        g_string_append(gpg_line, signature_file);
+    }
+    else
+    {
+        g_string_append(gpg_line, " -d");
+    }
+    g_string_append(gpg_line, " ");
+    g_string_append(gpg_line, in_file);
+    g_string_append(gpg_line, " >");
+    g_string_append(gpg_line, status_file);
+    g_string_append(gpg_line, " 2>&1");
+    LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: command_line: %s",
+        gpg_line->str);
+    system(gpg_line->str);
+    g_string_free(gpg_line, TRUE);
+    /* Parsing gpg output */
+
+    general = fopen(status_file, "r");
+    while (fgets(txt, LINE_LENGTH - 1, general) != NULL)
+    {
+        LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: gpg returns: %s",
+            txt);
+        if (strstr(txt, "Good signature") != NULL)
+        {
+            valid = TRUE;
+            LG_log(ctx, LG_DEBUG,
+                "km_pgp_signature_verify_low: Good signature found");
+        }
+
+        if ((key_str = strstr(txt, "key ID")) != NULL)
+        {
+            key_str += 7;
+            strcpy((char*) key_id, key_str);
+            key_id[8] = 0;
+            LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: key_id [%s]",
+                key_id);
+        }
+    }
+    fclose(general);
+
+    if (!signature)
+    {
+        LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: not signature");
+        general = fopen(out_file, "r");
+        if (!general)
+        {
+            LG_log(
+                ctx,
+                LG_DEBUG,
+                "km_pgp_signature_verify_low: no out file, set FALSE cred with KM_INTERNAL status");
+            key_ret = km_key_return_new(NULL, FALSE, NULL, KM_INTERNAL);
+        }
+        else
+        {
+            char_file = km_file_to_char(general);
+            if (valid == TRUE)
+            {
+                LG_log(ctx, LG_DEBUG,
+                    "km_pgp_signature_verify_low: set TRUE cred with KM_OK status");
+            }
+            else
+            {
+                LG_log(ctx, LG_DEBUG,
+                    "km_pgp_signature_verify_low: set FALSE cred with KM_OK status");
+            }
+            key_ret = km_key_return_new((gchar*) key_id, valid, char_file,
+                KM_OK);
+            g_free(char_file);
+            fclose(general);
+        }
+    }
+    else
+    {
+        LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: signature");
+        if (valid == TRUE)
+        {
+            LG_log(ctx, LG_DEBUG,
+                "km_pgp_signature_verify_low: set TRUE cred with KM_OK status");
+        }
+        else
+        {
+            LG_log(ctx, LG_DEBUG,
+                "km_pgp_signature_verify_low: set FALSE cred with KM_OK status");
+        }
+        key_ret = km_key_return_new((gchar*) key_id, valid, text, KM_OK);
     }
 
-    if ((key_str = strstr(txt, "key ID")) != NULL) {
-      key_str += 7;
-      strcpy((char*)key_id, key_str);
-      key_id[8] = 0;
-      LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: key_id [%s]", key_id);
+    unlink(in_file);
+    unlink(out_file);
+    unlink(status_file);
+    if (signature)
+    {
+        unlink(signature_file);
     }
-  }
-  fclose(general);
-
-  if (!signature) {
-    LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: not signature");
-    general = fopen(out_file,"r");
-    if (!general) {
-      LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: no out file, set FALSE cred with KM_INTERNAL status");
-      key_ret = km_key_return_new(NULL, FALSE, NULL, KM_INTERNAL);
-    }
-    else {
-      char_file = km_file_to_char(general);
-      if ( valid == TRUE ) {
-        LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: set TRUE cred with KM_OK status");
-      }
-      else {
-        LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: set FALSE cred with KM_OK status");
-      }
-      key_ret = km_key_return_new((gchar*)key_id, valid, char_file, KM_OK);
-      g_free(char_file);
-      fclose(general);
-    }
-  }
-  else {
-    LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: signature");
-    if ( valid == TRUE ) {
-      LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: set TRUE cred with KM_OK status");
-    }
-    else {
-      LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: set FALSE cred with KM_OK status");
-    }
-    key_ret = km_key_return_new((gchar*)key_id, valid, text, KM_OK);
-  }
-
-  unlink(in_file);
-  unlink(out_file);
-  unlink(status_file);
-  if (signature) {
-    unlink(signature_file);
-  }
-  LG_log(ctx, LG_FUNC, "<Exiting km_pgp_signature_verify_low");
-  return key_ret;
+    LG_log(ctx, LG_FUNC, "<Exiting km_pgp_signature_verify_low");
+    return key_ret;
 }
 
 
