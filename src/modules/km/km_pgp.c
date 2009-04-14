@@ -187,8 +187,7 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
     g_string_append(gpg_line, " >");
     g_string_append(gpg_line, status_file);
     g_string_append(gpg_line, " 2>&1");
-    LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: command_line: %s",
-        gpg_line->str);
+    LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: command_line: %s", gpg_line->str);
     system(gpg_line->str);
     g_string_free(gpg_line, TRUE);
     /* Parsing gpg output */
@@ -196,8 +195,7 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
     general = fopen(status_file, "r");
     while (fgets(txt, LINE_LENGTH - 1, general) != NULL)
     {
-        LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: gpg returns: %s",
-            txt);
+        LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: gpg returns: %s", txt);
         if (strstr(txt, "Good signature") != NULL)
         {
             valid = TRUE;
@@ -210,8 +208,7 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
             key_str += 7;
             strcpy((char*) key_id, key_str);
             key_id[8] = 0;
-            LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: key_id [%s]",
-                key_id);
+            LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: key_id [%s]", key_id);
         }
     }
     fclose(general);
@@ -390,8 +387,7 @@ KM_key_return_t* km_pgp_key_add_internal(gchar* key, gchar *key_ring) {
   g_string_append(gpg_line, in_file);
   g_string_append(gpg_line, " > ");
   g_string_append(gpg_line, status_file);
-  g_string_append(gpg_line, " 2> ");
-  g_string_append(gpg_line, status_file);
+  g_string_append(gpg_line, " 2>&1");
   LG_log(ctx, LG_DEBUG, "%s\n", gpg_line->str);
   system(gpg_line->str);
   g_string_free(gpg_line, TRUE);
