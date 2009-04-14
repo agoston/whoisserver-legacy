@@ -178,8 +178,7 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature, gcha
   g_string_append(gpg_line, in_file);
   g_string_append(gpg_line, " >");
   g_string_append(gpg_line, status_file);
-  g_string_append(gpg_line, " 2>");
-  g_string_append(gpg_line, status_file);
+  g_string_append(gpg_line, " 2>&1");
   LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: command_line: %s", gpg_line->str);
   system(gpg_line->str);
   g_string_free(gpg_line, TRUE);
