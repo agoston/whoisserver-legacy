@@ -184,9 +184,8 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
     }
     g_string_append(gpg_line, " ");
     g_string_append(gpg_line, in_file);
-    g_string_append(gpg_line, " >");
+    g_string_append(gpg_line, " &>");
     g_string_append(gpg_line, status_file);
-    g_string_append(gpg_line, " 2>&1");
     LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: command_line: %s", gpg_line->str);
     system(gpg_line->str);
     g_string_free(gpg_line, TRUE);
@@ -388,9 +387,8 @@ KM_key_return_t* km_pgp_key_add_internal(gchar* key, gchar *key_ring)
     g_string_append(gpg_line, key_ring);
     g_string_append(gpg_line, " --import ");
     g_string_append(gpg_line, in_file);
-    g_string_append(gpg_line, " > ");
+    g_string_append(gpg_line, " &>");
     g_string_append(gpg_line, status_file);
-    g_string_append(gpg_line, " 2>&1");
     LG_log(ctx, LG_DEBUG, "%s\n", gpg_line->str);
     system(gpg_line->str);
     g_string_free(gpg_line, TRUE);
@@ -490,14 +488,12 @@ void km_pgp_key_get_fingerprint(km_key_return_t* kr, gchar *key_ring) {
 
   //awful
   gpg_line = g_string_new(gpg_path);
-  g_string_append(gpg_line, " --no-default-keyring --no-secmem-warning ");
+  g_string_append(gpg_line, " --batch --no-default-keyring --no-secmem-warning ");
   g_string_append(gpg_line, "--keyring ");
   g_string_append(gpg_line, key_ring);
   g_string_append(gpg_line, " --fingerprint ");
   g_string_append(gpg_line, KM_key_return_get_key_id(kr) );
-  g_string_append(gpg_line, " > ");
-  g_string_append(gpg_line, status_file);
-  g_string_append(gpg_line, " 2> ");
+  g_string_append(gpg_line, " &>");
   g_string_append(gpg_line, status_file);
 
   //printf("%s\n", gpg_line->str);
@@ -508,8 +504,8 @@ void km_pgp_key_get_fingerprint(km_key_return_t* kr, gchar *key_ring) {
   general = fopen(status_file, "r");
   while (fgets (txt, LINE_LENGTH - 1, general) != NULL) {
     LG_log(ctx, LG_DEBUG, "gnupg: %s", txt);
-    if ((key_str = strstr(txt, "pub "/*"Key fingerprint ="*/)) == txt /*!= NULL*/) {
-      strcpy(key_owner, key_str + 30);
+    if ((key_str = strstr(txt, "uid ")) == txt) {
+      strcpy(key_owner, key_str + 21);
       key_owner[strlen(key_owner)-1] = 0;
     }
     if ((key_str = strstr(txt, "Key fingerprint =")) !=NULL) {
