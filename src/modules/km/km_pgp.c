@@ -165,7 +165,7 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
     }
     //awful
     gpg_line = g_string_new(gpg_path);
-    g_string_append(gpg_line, " --no-default-keyring --no-secmem-warning ");
+    g_string_append(gpg_line, " --batch --no-default-keyring --no-secmem-warning ");
     if (key_ring)
     {
         g_string_append(gpg_line, "--keyring ");
@@ -381,7 +381,7 @@ KM_key_return_t* km_pgp_key_add_internal(gchar* key, gchar *key_ring)
     fclose(general);
     //awful
     gpg_line = g_string_new(gpg_path);
-    g_string_append(gpg_line, " --no-default-keyring --no-secmem-warning ");
+    g_string_append(gpg_line, " --batch --no-default-keyring --no-secmem-warning ");
     g_string_append(gpg_line, " --secret-keyring ");
     g_string_append(gpg_line, secret_key_ring);
     g_string_append(gpg_line, " --keyring ");
@@ -472,6 +472,7 @@ void km_pgp_key_get_fingerprint(km_key_return_t* kr, gchar *key_ring) {
   int unchanged;
   int secret;
 
+  LG_log(ctx, LG_FUNC, ">Entering km_pgp_key_get_fingerprint");
   imported = 0;
   unchanged = 0;
   secret = 0;
@@ -506,7 +507,7 @@ void km_pgp_key_get_fingerprint(km_key_return_t* kr, gchar *key_ring) {
 
   general = fopen(status_file, "r");
   while (fgets (txt, LINE_LENGTH - 1, general) != NULL) {
-    //printf("%s\n", txt);
+    LG_log(ctx, LG_DEBUG, "gnupg: %s", txt);
     if ((key_str = strstr(txt, "pub "/*"Key fingerprint ="*/)) == txt /*!= NULL*/) {
       strcpy(key_owner, key_str + 30);
       key_owner[strlen(key_owner)-1] = 0;
@@ -527,6 +528,7 @@ void km_pgp_key_get_fingerprint(km_key_return_t* kr, gchar *key_ring) {
   if (key_owner[0]) {
     km_key_return_add(kr, "key_owner", key_owner);
   }
+  LG_log(ctx, LG_FUNC, "<Exiting km_pgp_key_get_fingerprint");
 }
 
 KM_key_return_t* km_pgp_add_check(gchar* key, gboolean get_information) {
