@@ -43,6 +43,7 @@ PORT           {INT}
 %{
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 #include <string.h>
 
 /* tokens defined in the grammar */
@@ -62,12 +63,13 @@ void yy_input(char *buf, int *result, int max_size);
 
 {IPV4} {
     /* check each number of 1.2.3.4 in address is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
+        errno = 0;
+        val = strtoul(p, &s, 10);
+        if (errno || (val > 255)) {
              syntax_error("IP address \"%s\" contains an invalid octet, %ld", 
                           yytext, val);
         }
@@ -77,10 +79,11 @@ void yy_input(char *buf, int *result, int max_size);
 }
 
 {PORT} {
-    long int val;
+    unsigned long int val;
     /* check port is in range */
-    val = strtol(yytext, NULL, 10);
-    if ((val < 0) || (val > 65535)) {
+    errno = 0;
+    val = strtoul(yytext, NULL, 10);
+    if (errno || (val > 65535)) {
         syntax_error("Port number %s is not between 0 and 65535", 
                       yytext);
     }

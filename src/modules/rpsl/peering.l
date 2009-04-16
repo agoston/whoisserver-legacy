@@ -33,6 +33,7 @@ ASNO           AS([0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 
 /* tokens defined in the grammar */
 #include "peering.tab.h"
@@ -71,12 +72,13 @@ EXCEPT      { return KEYW_EXCEPT; }
 
 {IPV4} {
     /* check each number of 1.2.3.4 is valid */
-    long int val;
+    unsigned long int val;
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
-        val = strtol(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
+        errno = 0;
+        val = strtoul(p, &s, 10);
+        if (errno || (val > 255)) {
              syntax_error("IP address \"%s\" contains an invalid octet", 
                           yytext);
         }

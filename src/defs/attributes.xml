@@ -2157,11 +2157,11 @@
     <sqltable name="as_block">
       <insert qtype="ud_ma_ak">
         INSERT as_block
-        SET thread_id=%d, object_id=%ld, begin_as=%ld, end_as=%ld
+        SET thread_id=%d, object_id=%lu, begin_as=%lu, end_as=%lu
       </insert>
       <update qtype="ud_main_"></update>
       <select qtype="ud_ma_ak">
-        begin_as=%ld AND end_as=%ld AND
+        begin_as=%lu AND end_as=%lu AND
       </select>
     </sqltable>
     </representation>
@@ -2172,8 +2172,8 @@
         <sqlquery keytype="wk_asrange">
           SELECT object_id,0
           FROM  as_block
-          WHERE begin_as &lt;= %ld
-          AND   end_as   &gt;= %ld
+          WHERE begin_as &lt;= %lu
+          AND   end_as   &gt;= %lu
           AND   thread_id = 0
         </sqlquery>
       </queries>

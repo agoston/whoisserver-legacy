@@ -50,6 +50,7 @@ MNTNER         [A-Z0-9]([A-Z0-9_-]*[A-Z0-9])?
 %{
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 #include <string.h>
 #include <iproutines.h>
 

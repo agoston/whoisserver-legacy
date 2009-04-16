@@ -46,6 +46,7 @@ ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 %{
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 #include <string.h>
 
 /* tokens defined in the grammar */
@@ -90,8 +91,9 @@ BGP4 {
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
+        errno = 0;
         val = strtoul(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
+        if (errno || (val > 255)) {
              syntax_error("IP address \"%s\" contains an invalid octet, %ld", 
                           yytext, val);
         }
@@ -107,8 +109,9 @@ BGP4 {
 {INT} {
     unsigned long int val;
     /* check port is in range */
+    errno = 0;
     val = strtoul(yytext, NULL, 10);
-    if ((val < 0) || (val > 65535)) {
+    if (errno || (val > 65535)) {
         syntax_error("Numeric value \"%s\" must be between 0 and 65535", 
                       yytext);
     }

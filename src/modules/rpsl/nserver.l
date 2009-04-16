@@ -53,6 +53,7 @@ HOSTNAME       ({LABEL}\.)*{TLD}(\.)?
 %{
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 #include <string.h>
 #include <iproutines.h>
 

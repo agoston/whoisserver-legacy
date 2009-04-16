@@ -22,8 +22,7 @@ QUAD           [0-9A-F]{1,4}
 IPV4           {INT}(\.{INT}){3}
 IPV6           {QUAD}(:{QUAD}){7}
 IPV6DC         (({QUAD}:){0,6}{QUAD})?::({QUAD}(:{QUAD}){0,6})?
-COMM_32_NO     [0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5]
-COMM_NO        {COMM_32_NO}:{COMM_32_NO}
+COMM_NO        {INT}:{INT}
 ENCAPSULATION  GRE|IPINIP
 ASNODOT        [^ ]*AS[0-9]+\.[0-9]+[^ ]*
 ASNO           AS([0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5])
@@ -33,6 +32,7 @@ ASNAME         AS-[A-Z0-9_-]*[A-Z0-9]
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 
 /* tokens defined in the grammar */
 #include "interface.tab.h"
@@ -93,8 +93,9 @@ COST        { return TKN_COST; }
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
+        errno = 0;
         val = strtoul(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
+        if (errno || (val > 255)) {
              syntax_error("IP address \"%s\" contains an invalid octet", 
                           yytext);
         }
@@ -109,8 +110,9 @@ COST        { return TKN_COST; }
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
+        errno = 0;
         val = strtoul(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
+        if (errno || (val > 65535)) {
              syntax_error("IPv6 address \"%s\" contains an invalid quad",
                           yytext);
         }
@@ -128,8 +130,9 @@ COST        { return TKN_COST; }
 
     r = p = s = yytext;
     while (*s != '\0') {
+        errno = 0;
         val = strtoul(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
+        if (errno || (val > 65535)) {
              syntax_error("IPv6 address \"%s\" contains an invalid quad",
                           yytext);
         }
@@ -167,8 +170,9 @@ COST        { return TKN_COST; }
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
+        errno = 0;
         val = strtoul(p, &s, 10);
-        if ((val < 0) || (val > 4294967295)) {
+        if (errno || (val > 4294967295UL)) {
              syntax_error("Community number \"%s\" contains an invalid number", 
                            yytext);
         }

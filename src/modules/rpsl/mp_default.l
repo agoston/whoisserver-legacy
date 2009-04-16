@@ -30,8 +30,7 @@ PRFXV6DC       {IPV6DC}\/{INT}
 PRFXV4RNG      {PRFXV4}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 PRFXV6RNG      {PRFXV6}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
 PRFXV6DCRNG    {PRFXV6DC}("^+"|"^-"|"^"{INT}|"^"{INT}-{INT})
-COMM_32_NO     [0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[0-1][0-9]{2}|42949672[0-8][0-9]|429496729[0-5]
-COMM_NO        {COMM_32_NO}:{COMM_32_NO}
+COMM_NO        {INT}:{INT}
 AFI            AFI
 AFIVALUE_V4    IPV4|IPV4\.UNICAST|IPV4\.MULTICAST
 AFIVALUE_V6    IPV6|IPV6\.UNICAST|IPV6\.MULTICAST
@@ -45,6 +44,7 @@ ASNO           AS([0-9]|[1-9][0-9]{1,8}|[1-3][0-9]{9}|4[0-1][0-9]{8}|42[0-8][0-9
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 
 /* tokens defined in the grammar */
 #include "mp_default.tab.h"
@@ -71,8 +71,9 @@ NOT   { return OP_NOT; }
 \^\+        { return OP_MS; }
 \^[0-9]+ { 
     unsigned long int val;
+    errno = 0;
     val = strtoul(yytext+1, NULL, 10);
-    if ((val < 0) || (val > 32)) {
+    if (errno || (val > 32)) {
         syntax_error("more specifics operator \"%s\" not 0 to 32 bits", 
                      yytext);
     }
@@ -81,13 +82,15 @@ NOT   { return OP_NOT; }
 \^[0-9]+-[0-9]+ {
     unsigned long int val1, val2;
     char *p;
+    errno = 0;
     val1 = strtoul(yytext+1, &p, 10);
-    if ((val1 < 0) || (val1 > 32)) {
+    if (errno || (val1 > 32)) {
         syntax_error("more specifics operator \"%s\" not 0 to 32 bits", 
                      yytext);
     }
+    errno = 0;
     val2 = strtoul(p+1, NULL, 10);
-    if ((val2 < 0) || (val2 > 32)) {
+    if (errno || (val2 > 32)) {
         syntax_error("more specifics operator \"%s\" not 0 to 32 bits", 
                      yytext);
     }
@@ -169,29 +172,33 @@ COST        { return TKN_COST; }
     char *s, *p;
     p = s = yytext;
     while (*s != '/') {
+        errno = 0;
         val = strtoul(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
+        if (errno || (val > 255)) {
              syntax_error("IP prefix \"%s\" contains an invalid octet", 
                           yytext);
         }
         p = s + 1;
     }
+    errno = 0;
     val = strtoul(p, &s, 10);
-    if ((val < 0) || (val > 32)) {
+    if (errno || (val > 32)) {
         syntax_error("IP prefix range \"%s\" contains an invalid prefix length",
                      yytext);
     }
     p = s + 1;
     if (isdigit((int)*p)) {
+        errno = 0;
         val = strtoul(p, &s, 10);
-        if ((val < 0) || (val > 32)) {
+        if (errno || (val > 32)) {
             syntax_error("IP prefix range \"%s\" contains an invalid range",
                          yytext);
         }
         p = s + 1;
         if (isdigit((int)*p)) {
+            errno = 0;
             endval = strtoul(p, NULL, 10);
-            if ((endval < 0) || (endval > 32)) {
+            if (errno || (endval > 32)) {
                 syntax_error("IP prefix \"%s\" contains an invalid prefix range", 
                              yytext);
             }
@@ -212,29 +219,33 @@ COST        { return TKN_COST; }
     char *s, *p;
     p = s = yytext;
     while (*s != '/') {
+        errno = 0;
         val = strtoul(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
+        if (errno || (val > 65535)) {
              syntax_error("IPv6 prefix \"%s\" contains an invalid quad",
                           yytext);
         }
         p = s + 1;
     }
+    errno = 0;
     val = strtoul(p, &s, 10);
-    if ((val < 0) || (val > 128)) {
+    if (errno || (val > 128)) {
         syntax_error("IPv6 prefix range \"%s\" contains an invalid prefix length",
                      yytext);
     }
     p = s + 1;
     if (isdigit((int)*p)) {
+        errno = 0;
         val = strtoul(p, &s, 10);
-        if ((val < 0) || (val > 128)) {
+        if (errno || (val > 128)) {
             syntax_error("IPv6 prefix range \"%s\" contains an invalid range",
                          yytext);
         }
         p = s + 1;
         if (isdigit((int)*p)) {
+            errno = 0;
             endval = strtoul(p, NULL, 10);
-            if ((endval < 0) || (endval > 128)) {
+            if (errno || (endval > 128)) {
                 syntax_error("IPv6 prefix \"%s\" contains an invalid prefix range",
                              yytext);
             }
@@ -258,29 +269,33 @@ COST        { return TKN_COST; }
 
     p = s = yytext;
     while (*s != '/') {
+        errno = 0;
         val = strtoul(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
+        if (errno || (val > 65535)) {
              syntax_error("IPv6 prefix \"%s\" contains an invalid quad",
                           yytext);
         }
         p = s + 1;
     }
+    errno = 0;
     val = strtoul(p, &s, 10);
-    if ((val < 0) || (val > 128)) {
+    if (errno || (val > 128)) {
         syntax_error("IPv6 prefix range \"%s\" contains an invalid prefix length",
                      yytext);
     }
     p = s + 1;
     if (isdigit((int)*p)) {
+        errno = 0;
         val = strtoul(p, &s, 10);
-        if ((val < 0) || (val > 128)) {
+        if (errno || (val > 128)) {
             syntax_error("IPv6 prefix range \"%s\" contains an invalid range",
                          yytext);
         }
         p = s + 1;
         if (isdigit((int)*p)) {
+            errno = 0;
             endval = strtoul(p, NULL, 10);
-            if ((endval < 0) || (endval > 128)) {
+            if (errno || (endval > 128)) {
                 syntax_error("IPv6 prefix \"%s\" contains an invalid prefix range",
                              yytext);
             }
@@ -323,15 +338,17 @@ COST        { return TKN_COST; }
     char *s, *p;
     p = s = yytext;
     while (*s != '/') {
+        errno = 0;
         val = strtoul(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
+        if (errno || (val > 255)) {
              syntax_error("IP prefix \"%s\" contains an invalid octet", 
                           yytext);
         }
         p = s + 1;
     }
+    errno = 0;
     val = strtoul(p, NULL, 10);
-    if ((val < 0) || (val > 32)) {
+    if (errno || (val > 32)) {
         syntax_error("IP prefix \"%s\" contains an invalid prefix length", 
                      yytext);
     }
@@ -344,15 +361,17 @@ COST        { return TKN_COST; }
     char *s, *p;
     p = s = yytext;
     while (*s != '/') {
+        errno = 0;
         val = strtoul(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
+        if (errno || (val > 65535)) {
              syntax_error("IPv6 prefix \"%s\" contains an invalid quad",
                           yytext);
         }
         p = s + 1;
     }
+    errno = 0;
     val = strtoul(p, NULL, 10);
-    if ((val < 0) || (val > 128)) {
+    if (errno || (val > 128)) {
         syntax_error("IPv6 prefix \"%s\" contains an invalid prefix length",
                      yytext);
     }
@@ -368,15 +387,17 @@ COST        { return TKN_COST; }
 
     r = p = s = yytext;
     while (*s != '/') {
+        errno = 0;
         val = strtoul(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
+        if (errno || (val > 65535)) {
              syntax_error("IPv6 prefix \"%s\" contains an invalid quad",
                           yytext);
         }
         p = s + 1;
     }
+    errno = 0;
     val = strtoul(p, NULL, 10);
-    if ((val < 0) || (val > 128)) {
+    if (errno || (val > 128)) {
         syntax_error("IPv6 prefix \"%s\" contains an invalid prefix length",
                      yytext);
     }
@@ -413,8 +434,9 @@ COST        { return TKN_COST; }
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
+        errno = 0;
         val = strtoul(p, &s, 10);
-        if ((val < 0) || (val > 255)) {
+        if (errno || (val > 255)) {
              syntax_error("IP address \"%s\" contains an invalid octet", 
                           yytext);
         }
@@ -429,8 +451,9 @@ COST        { return TKN_COST; }
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
+        errno = 0;
         val = strtoul(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
+        if (errno || (val > 65535)) {
              syntax_error("IPv6 address \"%s\" contains an invalid quad",
                           yytext);
         }
@@ -448,8 +471,9 @@ COST        { return TKN_COST; }
 
     r = p = s = yytext;
     while (*s != '\0') {
+        errno = 0;
         val = strtoul(p, &s, 16);
-        if ((val < 0) || (val > 65535)) {
+        if (errno || (val > 65535)) {
              syntax_error("IPv6 address \"%s\" contains an invalid quad",
                           yytext);
         }
@@ -487,8 +511,9 @@ COST        { return TKN_COST; }
     char *s, *p;
     p = s = yytext;
     while (*s != '\0') {
+        errno = 0;
         val = strtoul(p, &s, 10);
-        if ((val < 0) || (val > 4294967295)) {
+        if (errno || (val > 4294967295UL)) {
              syntax_error("Community number \"%s\" contains an invalid number", 
                            yytext);
         }

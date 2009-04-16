@@ -57,6 +57,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <string.h>
 
 int yyerror(const char *s);
@@ -149,8 +150,9 @@ pref: TKN_PREF OP_EQUAL TKN_INT {
       unsigned long int val;
       char *s, *p;
       p = $3;
+      errno = 0;
       val = strtoul(p, &s, 10);
-      if ((val < 0) || (val > 65535)) {
+      if (errno || (val > 65535)) {
           syntax_error("pref value \"%s\" is not between 0 and 65535", p);
       }
 }
@@ -160,8 +162,9 @@ med: TKN_MED OP_EQUAL TKN_INT {
       unsigned long int val;
       char *s, *p;
       p = $3;
+      errno = 0;
       val = strtoul(p, &s, 10);
-      if ((val < 0) || (val > 65535)) {
+      if (errno || (val > 65535)) {
           syntax_error("med value \"%s\" is not between 0 and 65535", p);
       }
 }
@@ -172,8 +175,9 @@ dpa: TKN_DPA OP_EQUAL TKN_INT {
       unsigned long int val;
       char *s, *p;
       p = $3;
+      errno = 0;
       val = strtoul(p, &s, 10);
-      if ((val < 0) || (val > 65535)) {
+      if (errno || (val > 65535)) {
           syntax_error("dpa value \"%s\" is not between 0 and 65535", p);
       }
 }
@@ -209,8 +213,9 @@ community_elm: KEYW_INTERNET
       unsigned long int val;
       char *s, *p;
       p = $1;
+      errno = 0;
       val = strtoul(p, &s, 10);
-      if ((val < 1) || (val > 4294967295UL) || (*s != '\0')) {
+      if (errno || (val < 1) || (val > 4294967295UL) || (*s != '\0')) {
           syntax_error("community element \"%s\" is not between 1 and 4294967295", 
                        p);
       }
@@ -226,8 +231,9 @@ cost: TKN_COST OP_EQUAL TKN_INT {
       unsigned long int val;
       char *s, *p;
       p = $3;
+      errno = 0;
       val = strtoul(p, &s, 10);
-      if ((val < 0) || (val > 65535)) {
+      if (errno || (val > 65535)) {
           syntax_error("cost value \"%s\" is not between 0 and 65535", p);
       }
 }
