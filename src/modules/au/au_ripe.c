@@ -564,16 +564,6 @@ au_v6_assigned_check ( RT_context_t * rt_context, LG_context_t *au_context, char
   return ret_val;
 }
 
-gboolean
-inet6num_adds_mnt_lower( rpsl_object_t old, rpsl_object_t new )
-{
-/* questions: 
- * 1. What if this is a new object (i.e., old == NULL)? 
- * 2. What if there are mnt-lower: attributes defined already?
- * 3. How do I know there's an override?
- */
-}
-
 /** 
  * \brief Run several business logic tests over inet6num objects
  *
@@ -584,6 +574,8 @@ inet6num_adds_mnt_lower( rpsl_object_t old, rpsl_object_t new )
  * 4. If the "status:" is changed to "ALLOCATED-BY-RIR", enforce that the object:
  * 4.1. ... has the RIR maintainer in it;
  * 4.2. ... 
+ *
+ * XXX: FINISH DOCUMENTATION
  *
  * \param *info The plugin callback information structure.
  * \return AU_ERROR in case of lookup error while searching for the previous version of the object;
@@ -639,6 +631,8 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
         old_status = UT_strdup("");
       }
     }
+
+    /// XXX: This must be transformed in a assertion list, so we can get rid of the if-else-if chain
 
     /* changing from ASSIGNED ANYCAST not allowed */
     if ((strcmp(new_status, "ASSIGNED ANYCAST") != 0) &&
