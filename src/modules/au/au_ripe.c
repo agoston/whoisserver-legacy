@@ -538,7 +538,7 @@ au_v6_assigned_check ( RT_context_t * rt_context, LG_context_t *au_context, char
   {
     if ( ! has_rir_mntner(object))
     {
-      RT_status_check_failed_anycast_rir(rt_context);
+      RT_status_check_failed_rir(rt_context, status);
       ret_val = AU_UNAUTHORISED_CONT;
       LG_log(au_context, LG_DEBUG, "au_v6_assigned_check: status %s can only be set by hostmaster", status);
     }
@@ -652,7 +652,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
     else if ((strcmp(new_status, "ASSIGNED PI") != 0) &&
              (strcmp(old_status, "ASSIGNED PI") == 0))
     {
-      RT_status_check_failed_anycast_modify(info->ctx);
+      RT_status_check_failed_pi_modify(info->ctx);
       ret_val = AU_UNAUTHORISED_CONT;
       LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED PI");
     }
