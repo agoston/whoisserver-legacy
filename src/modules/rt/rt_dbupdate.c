@@ -1956,8 +1956,12 @@ void RT_status_check_failed_anycast_modify(RT_context_t *ctx) {
   RT_status_check_failed_message(ctx,"status_check_failed_anycast_modify");
 }
 
-void RT_status_check_failed_pi_modify(RT_context_t *ctx) {
-  RT_status_check_failed_message(ctx,"status_check_failed_pi_modify");
+void RT_status_check_failed_modify(RT_context_t *ctx, char* status) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*) "status_check_failed_modify");
+  rt_add_text_node(node, "status", (xmlChar*) status);
+  rt_prepare_node(ctx, node);
 }
 
 void RT_status_check_failed_anycast_rir(RT_context_t *ctx) {

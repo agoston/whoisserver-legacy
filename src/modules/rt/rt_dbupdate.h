@@ -277,7 +277,7 @@ void RT_status_check_failed_earlyregistration(RT_context_t*);
 void RT_status_check_failed_notset(RT_context_t*);
 void RT_status_check_failed_allocbyrir(RT_context_t*);
 void RT_status_check_failed_anycast_modify(RT_context_t*);
-void RT_status_check_failed_pi_modify(RT_context_t*);
+void RT_status_check_failed_modify(RT_context_t*, char *status);
 void RT_status_check_failed_anycast_rir(RT_context_t*);
 void RT_status_check_failed_rir(RT_context_t*, char *status);
 

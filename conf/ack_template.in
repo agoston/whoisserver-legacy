@@ -41,9 +41,9 @@
           This status cannot be changed.
 </xsl:template>
 
-<xsl:template match="status_check_failed_pi_modify">
+<xsl:template match="status_check_failed_modify">
 
-***Error: Status ASSIGNED PI can only be set when an object is created.
+***Error: Status <xsl:value-of select="status/text()"/> can only be set when an object is created.
           This status cannot be changed.
 </xsl:template>
 
