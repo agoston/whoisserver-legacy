@@ -1,12 +1,14 @@
 # ipv6 status tests
-# CASE 31: create an inet6num with ASSIGNED PI
-# with less specific having ALLOCATED-BY-RIR status
+# CASE 44: modify an inet6num with ASSIGNED PI
+#          with less specific having ALLOCATED-BY-RIR status
+#          no change to status
 #
-# create inet6num object 
+# modify inet6num object 
 #
 #SUCCESS
 #
-# RESULT 31: The creation will succeed
+# RESULT 44: The modify will succeed
+
 
 inet6num:     2001:0610:0260::/64
 netname:      RIPE-NCC-IPv6
@@ -17,8 +19,9 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 status:       ASSIGNED PI
 mnt-by:       RIPE-NCC-HM-MNT
-changed:      dbtest@ripe.net 20020101
+changed:      dbtest@ripe.net 
 source:       DB-TEST
+
 password:     hostmaster
 password:     LIR
 

@@ -308,13 +308,173 @@
 # RESULT 30: The creation will fail
 
 
-# CASE 31: create an inet6num with status ASSIGNED
+# old (missing) CASE 31: create an inet6num with status ASSIGNED
 #          with parent status ASSIGNED ANYCAST
 #
 # create inet6num object 
 #
 #FAILURE
 #
-# RESULT 31: The creation will fail
+# old (missing) RESULT 31: The creation will fail
+
+
+# CASE 32: create an inet6num with status ASSIGNED
+#          with parent status ASSIGNED ANYCAST
+#          (should have been Case 31 to follow the sequence)
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 32: The creation will fail
+
+
+# CASE 31: create an inet6num with ASSIGNED PI
+# with less specific having ALLOCATED-BY-RIR status
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 31: The creation will succeed
+
+
+# CASE 33: create an inet6num with status ASSIGNED PI
+#          with parent status ALLOCATED-BY-RIR
+#          not mnt-by hostmaster mnt
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 33: The creation will fail
+
+
+ CASE 34: create an inet6num with status ASSIGNED PI
+#          with parent status ALLOCATED-BY-RIR
+#          no org password
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 34: The creation will fail
+
+
+# CASE 35
+# create an inet6num with status ASSIGNED PI
+#          with parent status ALLOCATED-BY-RIR
+#          no org reference
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 35: The creation will fail
+
+
+# CASE 36: create an inet6num with status ASSIGNED PI
+#          with parent status ALLOCATED-BY-LIR
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 36: The creation will fail
+
+
+# CASE 37: create an inet6num with status ASSIGNED PI
+#          with parent status ASSIGNED
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 37: The creation will fail
+
+
+# CASE 38: create an inet6num with status ASSIGNED PI
+#          with parent status ASSIGNED ANYCAST
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 38: The creation will fail
+
+
+# CASE 39: create an inet6num with status ASSIGNED PI
+#          with parent status ASSIGNED PI
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 39: The creation will fail
+
+
+# CASE 40: modify an inet6num with status ASSIGNED PI
+#          with parent status ALLOCATED-BY-RIR
+#          to status ASSIGNED ANYCAST
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 40: The modify will fail
+
+
+# CASE 41: modify an inet6num with status ASSIGNED PI
+#          with parent status ALLOCATED-BY-RIR
+#          to status ASSIGNED
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 41: The modify will fail
+
+
+# CASE 42: modify an inet6num with status ASSIGNED PI
+#          with parent status ALLOCATED-BY-RIR
+#          to status ALLOCATED-BY-LIR
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 42: The modify will fail
+
+
+# CASE 43: modify an inet6num with status ASSIGNED PI
+#          with parent status ALLOCATED-BY-RIR
+#          to status ALLOCATED-BY-RIR
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 43: The modify will fail
+
+
+# CASE 44: modify an inet6num with ASSIGNED PI
+#          with less specific having ALLOCATED-BY-RIR status
+#          no change to status
+#
+# modify inet6num object 
+#
+#SUCCESS
+#
+# RESULT 44: The modify will succeed
+
+
+# CASE 46: delete an inet6num with ASSIGNED PI
+#          with less specific having ALLOCATED-BY-RIR status
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 46: The deletion will succeed
 
 

@@ -1,12 +1,13 @@
 # ipv6 status tests
-# CASE 31: create an inet6num with ASSIGNED PI
-# with less specific having ALLOCATED-BY-RIR status
+# CASE 46: delete an inet6num with ASSIGNED PI
+#          with less specific having ALLOCATED-BY-RIR status
 #
-# create inet6num object 
+# delete inet6num object 
 #
 #SUCCESS
 #
-# RESULT 31: The creation will succeed
+# RESULT 46: The deletion will succeed
+
 
 inet6num:     2001:0610:0260::/64
 netname:      RIPE-NCC-IPv6
@@ -19,6 +20,7 @@ status:       ASSIGNED PI
 mnt-by:       RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
+delete:
+
 password:     hostmaster
-password:     LIR
 
