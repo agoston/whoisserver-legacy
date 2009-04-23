@@ -1,9 +1,0 @@
-Changes:
-- whoisserver now support gnupg 1.4.6 (the one in debian etch) instead of 1.2.4
-
-Installation notes:
-- You have to upgrade gnupg from 1.2.4 to 1.4.6 for this change to work!
-
-Affected stakeholders:
-- whoever tried to use features present in the newer versions of gnupg, like
-bigger hashes.
