@@ -1,7 +1,10 @@
 # Ignore cscope files, so I can use them to index the C code without commiting them to the codebase.
 cscope*
+*~
 .*.sw[a-z]
 .nfs*
+.cproject
+.project
 *.[oa]
 *.lex.c
 *.tab.[ch]
