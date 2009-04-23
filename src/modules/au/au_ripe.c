@@ -500,6 +500,89 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
   return ret_val;
 }
 
+/**
+ * \brief IPv6 Address Assignment Business Logic Checks
+ *
+ * Check that the status is only set on creation;
+ * Check that the object is only created by the hostmaster;
+ * Check that the parent status is ALLOCATED-BY-RIR;
+ *
+ * \param *au_context Logging context
+ * \param *old_status Status string on the old object
+ * \param *new_status Status string on the new object
+ * \param *rt_context Reporting context
+ * \param *object The new object
+ * \param *status The object status value to set
+ *
+ * \returns AU_AUTHORISED (default) in case the desired change is allowed by the business rules.
+ * \returns AU_UNAUTHORISED_CONT in case the desired change is against some of those business rules.
+ *
+ */
+gboolean
+au_v6_assigned_check ( RT_context_t * rt_context, LG_context_t *au_context, char* old_status, 
+                       char* new_status, rpsl_object_t * object, char* status )
+{
+  int ret_val = AU_AUTHORISED;
+  gboolean parent_status_ok;
+
+  LG_log(au_context, LG_FUNC, ">au_v6_assigned_check: entered.");
+  LG_log(au_context, LG_DEBUG, "au_v6_assigned_check: changing to %s", status );
+
+  if ( strcmp(old_status, "") != 0 )
+  {
+    /* status can only be set on object creation, not on modification */
+    RT_status_check_failed_modify( rt_context, status );
+    ret_val = AU_UNAUTHORISED_CONT;
+    LG_log(au_context, LG_DEBUG, "au_v6_assigned_check: trying to modify status to %s", status );
+  }
+  else
+  {
+    if ( ! has_rir_mntner(object))
+    {
+      RT_status_check_failed_rir(rt_context, status);
+      ret_val = AU_UNAUTHORISED_CONT;
+      LG_log(au_context, LG_DEBUG, "au_v6_assigned_check: status %s can only be set by hostmaster", status);
+    }
+    else
+    {
+      parent_status_ok = parent_status_is_valid(rt_context, object, "ALLOCATED-BY-RIR", NULL);
+
+      if (parent_status_ok)
+      {
+        ret_val = AU_AUTHORISED;
+        LG_log(au_context, LG_ERROR, "au_v6_assigned_check: parent status check ok");
+      }
+      else
+      {
+        /* note that the RT logging is done by parent_status_is_valid() */
+        ret_val = AU_UNAUTHORISED_CONT;
+        LG_log(au_context, LG_ERROR, "au_v6_assigned_check: parent status check failed");
+      }
+    }
+  }
+
+  LG_log(au_context, LG_FUNC, "<au_v6_assigned_check: exiting.");
+  return ret_val;
+}
+
+/** 
+ * \brief Run several business logic tests over inet6num objects
+ *
+ * Tests currently implemented include: 
+ * 1. There are no lookup errors while trying to lookup the previous version of this object (doesn't matter if the object exists or not);
+ * 2. There is a non-blank "status:" attribute on the new version of the object;
+ * 3. If the old object "status:" is "ASSIGNED ANYCAST", don't allow it to be changed;
+ * 4. If the "status:" is changed to "ALLOCATED-BY-RIR", enforce that the object:
+ * 4.1. ... has the RIR maintainer in it;
+ * 4.2. ... 
+ *
+ * XXX: FINISH DOCUMENTATION
+ *
+ * \param *info The plugin callback information structure.
+ * \return AU_ERROR in case of lookup error while searching for the previous version of the object;
+ * \return AU_UNAUTHORISED_CONT if any business logic test is not satisfied.
+ *
+ */
 AU_ret_t
 ripe_inet6num_checks (au_plugin_callback_info_t *info)
 {
@@ -544,11 +627,13 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
     else
     {
       old_status = get_status(old_object);
-      if (old_status == NULL)
+      if (!old_status)
       {
         old_status = UT_strdup("");
       }
     }
+
+    /// XXX: This must be transformed in a assertion list, so we can get rid of the if-else-if chain
 
     /* changing from ASSIGNED ANYCAST not allowed */
     if ((strcmp(new_status, "ASSIGNED ANYCAST") != 0) &&
@@ -557,6 +642,26 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
       RT_status_check_failed_anycast_modify(info->ctx);
       ret_val = AU_UNAUTHORISED_CONT;
       LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED ANYCAST");
+    }
+    /* changing to ASSIGNED ANYCAST */
+    else if ((strcmp(new_status, "ASSIGNED ANYCAST") == 0) &&
+             (strcmp(old_status, "ASSIGNED ANYCAST") != 0))
+    {
+      ret_val = au_v6_assigned_check( info->ctx, au_context, old_status, new_status, info->obj, "ASSIGNED ANYCAST" );
+    }
+    /* changing from ASSIGNED PI not allowed */
+    else if ((strcmp(new_status, "ASSIGNED PI") != 0) &&
+             (strcmp(old_status, "ASSIGNED PI") == 0))
+    {
+      RT_status_check_failed_modify(info->ctx, "ASSIGNED PI");
+      ret_val = AU_UNAUTHORISED_CONT;
+      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED PI");
+    }
+    /* changing to ASSIGNED PI */
+    else if ((strcmp(new_status, "ASSIGNED PI") == 0) &&
+             (strcmp(old_status, "ASSIGNED PI") != 0))
+    {
+      ret_val = au_v6_assigned_check( info->ctx, au_context, old_status, new_status, info->obj, "ASSIGNED PI" );
     }
     /* changing to ALLOCATED-BY-RIR */
     else if ((strcmp(new_status, "ALLOCATED-BY-RIR") == 0) &&
@@ -600,46 +705,6 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
       {
         /* note that the RT logging is done by parent_status_is_valid() */
         ret_val = AU_UNAUTHORISED_CONT;
-      }
-    }
-    else if ((strcmp(new_status, "ASSIGNED ANYCAST") == 0) &&
-             (strcmp(old_status, "ASSIGNED ANYCAST") != 0))
-    {
-      LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: changing to ASSIGNED ANYCAST");
-
-      if ( strcmp(old_status, "") != 0 )
-      {
-        /* ASSIGNED ANYCAST can only be set on object creation,
-	   not on modification */
-        RT_status_check_failed_anycast_modify(info->ctx);
-        ret_val = AU_UNAUTHORISED_CONT;
-        LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: trying to modify status to ASSIGNED ANYCAST");
-      }
-      else
-      {
-	if ( ! has_rir_mntner(info->obj))
-	{
-          RT_status_check_failed_anycast_rir(info->ctx);
-          ret_val = AU_UNAUTHORISED_CONT;
-          LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: status ASSIGNED ANYCAST can only be set by hostmaster");
-	}
-	else
-	{
-	  parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
-                             "ALLOCATED-BY-RIR", NULL);
-
-	  if (parent_status_ok)
-	  {
-            ret_val = AU_AUTHORISED;
-            LG_log(au_context, LG_ERROR, "ripe_inet6num_checks: parent status check ok");
-	  }
-	  else
-	  {
-            /* note that the RT logging is done by parent_status_is_valid() */
-            ret_val = AU_UNAUTHORISED_CONT;
-            LG_log(au_context, LG_ERROR, "ripe_inet6num_checks: parent status check failed");
-	  }
-	}
       }
     }
     /* changing to ASSIGNED */

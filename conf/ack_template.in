@@ -41,9 +41,20 @@
           This status cannot be changed.
 </xsl:template>
 
+<xsl:template match="status_check_failed_modify">
+
+***Error: Status <xsl:value-of select="status/text()"/> can only be set when an object is created.
+          This status cannot be changed.
+</xsl:template>
+
 <xsl:template match="status_check_failed_anycast_rir">
 
 ***Error: Setting status ASSIGNED ANYCAST requires the administrative maintainer.
+</xsl:template>
+
+<xsl:template match="status_check_failed_rir">
+
+***Error: setting status <xsl:value-of select="status/text()"/> requires the administrative maintainer.
 </xsl:template>
 
 <xsl:template match="status_check_failed_notset">

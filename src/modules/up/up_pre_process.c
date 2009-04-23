@@ -138,8 +138,9 @@ int UP_check_country_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 /* checks that the incoming object has correct "org:" attributes.
    The inetnums and inet6nums have to have an "org:" attribute if their
-   "status:" attribute is ALLOCATED-BY-RIR, ALLOCATED PI,
-   ALLOCATED PA or ALLOCATED UNSPECIFIED
+   "status:" attribute is:
+     inet6num: ALLOCATED-BY-RIR, ASSIGNED PI
+     inetnum: ALLOCATED PI, ALLOCATED PA, ALLOCATED UNSPECIFIED 
 
    Receives RT context
             LG context
@@ -212,7 +213,8 @@ int UP_check_org_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     {
        status_value = rpsl_attr_get_clean_value(status_attrs->data);
        g_strup(status_value);
-       if ( strncmp(status_value, "ALLOCATED-BY-RIR", strlen("ALLOCATED-BY-RIR")) == 0 )
+       if ( ( strncmp(status_value, "ALLOCATED-BY-RIR", strlen("ALLOCATED-BY-RIR")) == 0 ) || 
+            ( strncmp(status_value, "ASSIGNED PI", strlen("ASSIGNED PI")) == 0 ) )
        {
          if (org_attrs == NULL)
          {

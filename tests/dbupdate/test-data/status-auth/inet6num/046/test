@@ -1,0 +1,26 @@
+# ipv6 status tests
+# CASE 46: delete an inet6num with ASSIGNED PI
+#          with less specific having ALLOCATED-BY-RIR status
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 46: The deletion will succeed
+
+
+inet6num:     2001:0610:0260::/64
+netname:      RIPE-NCC-IPv6
+descr:        RIPE NCC
+country:      NL
+org:          ORG-Eoof1-DB-TEST
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+status:       ASSIGNED PI
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+delete:
+
+password:     hostmaster
+

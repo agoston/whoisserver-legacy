@@ -1,0 +1,27 @@
+# ipv6 status tests
+# CASE 45: modify an inet6num with status ASSIGNED
+#          with parent status ALLOCATED-BY-RIR
+#          to status ASSIGNED PI
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 45: The modify will fail
+
+
+inet6num:     2001:0600::/25
+netname:      EU-ZZ-2001-0600
+descr:        European Regional Registry
+country:      EU
+org:          ORG-Eoof1-DB-TEST
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+status:       ASSIGNED PI
+changed:      dbtest@ripe.net 20060101
+source:       DB-TEST
+
+password: hostmaster
+password: LIR
+
