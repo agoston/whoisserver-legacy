@@ -4,6 +4,8 @@ Changes:
 - fixed outstanding bugs related to 32-bit operation after asplain deployment
 - whoisserver now support gnupg 1.4.6 (the one in debian etch) instead of 1.2.4
 - added the ability to override the 'default' database name in Install.PL
+- added support for assigning ipv6 PI space
+
 
 
 Merged:
@@ -20,11 +22,7 @@ Installation notes:
 
 
 
-
 Affected stakeholders:
 - Anyone who tried to use features present in the newer versions of gnupg, like bigger hashes.
 - NCC Services WG
 - DB WG
-
-
-
