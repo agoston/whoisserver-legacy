@@ -1,0 +1,30 @@
+20090423 - version 3.5.1
+
+Changes:
+- fixed outstanding bugs related to 32-bit operation after asplain deployment
+- whoisserver now support gnupg 1.4.6 (the one in debian etch) instead of 1.2.4
+- added the ability to override the 'default' database name in Install.PL
+
+
+Merged:
+- bugfix-agoston-asplain-32bit
+- bugfix-agoston-gnupg
+- feature-lcampos-install-pl-dbname-param
+- feature-ipv6-business-rules
+
+
+
+Installation notes:
+- You have to upgrade gnupg from 1.2.4 to 1.4.6 for this change to work
+- You have to install new version of ack_template
+
+
+
+
+Affected stakeholders:
+- Anyone who tried to use features present in the newer versions of gnupg, like bigger hashes.
+- NCC Services WG
+- DB WG
+
+
+
