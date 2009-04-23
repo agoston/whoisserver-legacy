@@ -17,6 +17,12 @@ or for assistance or clarification please contact:
 RIPE Database Administration &lt;ripe-dbm@ripe.net&gt;
   </xsl:template>
 
+  <xsl:template name="tandc">
+
+The RIPE Database is subject to Terms and Conditions:
+http://www.ripe.net/db/support/db-terms-conditions.pdf
+  </xsl:template>
+
 
   <xsl:template name="intro">
 

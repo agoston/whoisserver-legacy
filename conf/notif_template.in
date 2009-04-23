@@ -80,6 +80,9 @@ The update causing these changes had the following IP address:
 
 
 <xsl:apply-templates select="notif_message" />
+
+<xsl:call-template name="tandc"/><xsl:text>
+</xsl:text>
   </xsl:template>
 
 <!-- level stuff

@@ -939,6 +939,8 @@ and were NOT PROCESSED:
     </xsl:otherwise>
   </xsl:choose>
 
+<xsl:call-template name="tandc" />
+
 <xsl:call-template name="contact" />
   </xsl:template>
 
