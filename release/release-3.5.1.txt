@@ -2,9 +2,10 @@
 
 Changes:
 - fixed outstanding bugs related to 32-bit operation after asplain deployment
-- whoisserver now support gnupg 1.4.6 (the one in debian etch) instead of 1.2.4
+- whoisserver now supports gnupg 1.4.6 (the one in debian etch) instead of 1.2.4
 - added the ability to override the 'default' database name in Install.PL
 - added support for assigning ipv6 PI space
+- added legal text pointing to the RIPE Database Terms & Conditions
 
 
 
@@ -23,6 +24,7 @@ Installation notes:
 frwd_text, notif_template, notif_text
 - You have to change the PW_RESP_HEADER, PW_FMT_LIMIT_REACHED and PW_BANNER
 to reflect the new copyright message changes.
+
 
 
 Affected stakeholders:
