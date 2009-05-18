@@ -3,6 +3,9 @@
 # prerequisites: run autogen.sh
 # postrequisites: run make
 #
+# FIXME: this should be done by configure, not a custom shellscript
+#        no way I'm gonna 
+#
 # agoston, 2008-07-04
 
 # bail out if anything went wrong
@@ -34,9 +37,15 @@ if [ $CCCOMP -eq 1 ]; then
 	echo ' *** Compiling c-client'
 	echo ' ***'
 	pushd $CCDIR
-	make clean
+	rm -rf imap2004g
+	tar xjf imap-2004g.tar.bz2
+	cd imap2004g
 	make slx
 	popd
+	# clean up
+	cd ..
+	cp -Lr imap-2004g/c-client .
+	rm -rf imap2004g
 fi
 
 ###
@@ -68,6 +77,9 @@ if [ $LIBXMLCOMP -eq 1 ]; then
 	./configure --prefix=$LIBXMLDIR
 	make
 	make install
+	# clean up
+	cd $LIBXMLDIR
+	rm -rf libxml2-2.6.16
 	popd
 fi
 
@@ -98,6 +110,9 @@ if [ $LIBXSLTCOMP -eq 1 ]; then
 	./configure --prefix=$LIBXSLTDIR --with-libxml-prefix=$LIBXMLDIR
 	make
 	make install
+	# clean up
+	cd ..
+	rm -rf libxslt-1.1.12
 	popd
 fi
 
