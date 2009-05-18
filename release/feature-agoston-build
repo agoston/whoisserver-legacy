@@ -1,0 +1,2 @@
+changed build system so that source code of third-party software is removed
+after compilation, leaving less clutter around.
