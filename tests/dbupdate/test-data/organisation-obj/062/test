@@ -4,10 +4,9 @@
 #
 # create organisation object 
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 1: The creation will succeed
-
+# RESULT 1: The creation will fail
 
 organisation:  "AUTO-1
 org-name:      EXAMPLE TTTTTT
