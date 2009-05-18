@@ -39,13 +39,13 @@ if [ $CCCOMP -eq 1 ]; then
 	pushd $CCDIR
 	rm -rf imap2004g
 	tar xjf imap-2004g.tar.bz2
-	cd imap2004g
+	cd imap-2004g
 	make slx
-	popd
 	# clean up
 	cd ..
 	cp -Lr imap-2004g/c-client .
-	rm -rf imap2004g
+	rm -rf imap-2004g
+	popd
 fi
 
 ###
