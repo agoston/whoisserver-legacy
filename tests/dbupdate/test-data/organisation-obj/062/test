@@ -1,0 +1,49 @@
+# organisation object tests
+# CASE 62: Try to create a number of bogus org objects
+#          All of them should fail
+#
+# create organisation object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed
+
+
+organisation:  "AUTO-1
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+
+organisation:  1AUTO-1
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+
+organisation:  'AUTO-1
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
