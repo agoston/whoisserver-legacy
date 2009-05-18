@@ -291,7 +291,7 @@ $Id: syntax.xml,v 1.35 2007/02/21 15:47:00 agoston Exp $
        </core>
        <front_end>
           <regex>
-             ^ORG-([A-Z]{2,4}([1-9][0-9]{0,5})?(-[A-Z]([A-Z0-9_-]{0,7}[A-Z0-9])))|(AUTO-[0-9]+([A-Z]{2,4})?)$
+             ^(ORG-([A-Z]{2,4}([1-9][0-9]{0,5})?(-[A-Z]([A-Z0-9_-]{0,7}[A-Z0-9])))|(AUTO-[0-9]+([A-Z]{2,4})?))$
           </regex>
           <!-- disallow improperly formatted AUTO organisation IDs -->
           <reserved_regex>
