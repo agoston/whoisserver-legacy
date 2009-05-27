@@ -1738,48 +1738,6 @@
     </representation>
   </ripe_attribute>
 
-  <ripe_attribute name="rev-srv" code="rz">
-    <description>
-   Specifies a DNS nameserver for a range of IP addresses
-   represented by the inetnum object that contains this
-   attribute.
-    </description>
-    <syntax><ripe-list/>domain-name</syntax>
-
-    <representation>
-    <sqltable name="rev_srv">
-      <insert qtype="ud_lf_ot">
-        INSERT rev_srv
-        SET thread_id=%d, object_id=%ld, object_type=%d, rev_srv='%s'
-      </insert>
-      <update qtype="ud_leaf_">
-        UPDATE rev_srv
-        SET thread_id=%d
-        WHERE object_id=%ld
-        AND rev_srv='%s'
-      </update>
-    </sqltable>
-    </representation>
-
-    <keys searchable="inverse">
-
-      <queries>
-        <sqlquery keytype="wk_domain" class="in">
-          SELECT object_id,0
-          FROM   rev_srv
-          WHERE  rev_srv = '%s'
-          AND    thread_id = 0
-        </sqlquery>
-        <sqlquery keytype="wk_domain" class="i6">
-          SELECT object_id,0
-          FROM   rev_srv
-          WHERE  rev_srv = '%s'
-          AND    thread_id = 0
-        </sqlquery>
-      </queries>
-    </keys>
-  </ripe_attribute>
-
   <ripe_attribute name="role" code="ro">
     <description>
    Specifies the full name of a role entity, e.g. RIPE DBM.
