@@ -4,7 +4,6 @@
 # postrequisites: run make
 #
 # FIXME: this should be done by configure, not a custom shellscript
-#        no way I'm gonna 
 #
 # agoston, 2008-07-04
 
