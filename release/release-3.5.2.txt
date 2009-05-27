@@ -1,0 +1,24 @@
+20090527 - version 3.5.2
+
+Changes: 
+- Changed build system so that source code of third-party software is
+removed after compilation, leaving less clutter around.
+- Removed rev-srv attribute from RPSL syntax and the inverse query options.
+- Fixed syntax check on the primary key of organisation object.
+
+
+Merged:
+feature-agoston-build
+feature-agoston-revsrv-removal
+feature-agoston-syntax_regex
+
+
+Installation notes:
+None.
+
+
+Affected stakeholders:
+- Any user who tried to create/modify objects that have rev-srv: line(s) in
+them
+- NCC Services WG
+- DB WG
