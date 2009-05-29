@@ -556,6 +556,7 @@ static char *create_query(const Query_t q, Query_command *qc) {
 } /* create_query() */
 
 /* QI_fast_output() */
+
 /*++++++++++++++++++++++++++++++++++++++
   This is for the '-F' flag.
   It assumes lines starting with ' ', '\t' or '+' belong to the prior attribute.
@@ -567,83 +568,91 @@ static char *create_query(const Query_t q, Query_command *qc) {
   +html+ <PRE>
   Authors:
         ottrey,
-	marek - glib strings + small changes
+    marek - glib strings + small changes
   +html+ </PRE>
   ++++++++++++++++++++++++++++++++++++++*/
 char *QI_fast_output(const char *str)
 {
-  int i,j;
-  char *result;
-  GString *result_buff = g_string_sized_new(STR_XL);
-  gchar **lines = ut_g_strsplit_v1((char*)str, "\n", 0);
-  unsigned char *value, *colon;
-  char *attr;
+    int i, j;
+    char *result;
+    GString *result_buff = g_string_sized_new(STR_XL);
+    gchar **lines = ut_g_strsplit_v1((char*) str, "\n", 0);
+    unsigned char *value, *colon;
+    char *attr;
 
-  g_string_assign(result_buff, "");
+    g_string_assign(result_buff, "");
 
-  for (j=0; lines[j] != NULL; j++) {
+    for (j = 0; lines[j] != NULL; j++)
+    {
 
-    switch (lines[j][0]) {
-      /* line continuation */
-    case ' ':
-    case '\t':
-    case '+':
-      value = (unsigned char *) lines[j]+1;
-      while(*value != '\0' && isspace(*value)) {
-	value++;
-      }
-      g_string_append(result_buff, "\n+ ");
-      g_string_append(result_buff, (char *)value);
-      break;
+        switch (lines[j][0])
+        {
+            /* line continuation */
+        case ' ':
+        case '\t':
+        case '+':
+            value = (unsigned char *) lines[j] + 1;
+            while (*value != '\0' && isspace(*value))
+            {
+                value++;
+            }
+            g_string_append(result_buff, "\n+ ");
+            g_string_append(result_buff, (char *) value);
+            break;
 
-    default:
-      /* a line of the form "attribute: value" */
-      /* first: close the last line (if there was any, i.e. j>0) */
-      if( j > 0 ) {
-	g_string_append_c(result_buff, '\n');
-      }
+        default:
+            /* a line of the form "attribute: value" */
+            /* first: close the last line (if there was any, i.e. j>0) */
+            if (j > 0)
+            {
+                g_string_append_c(result_buff, '\n');
+            }
 
-      /* get attribute name */
-      attr =  lines[j];
-      colon = (unsigned char *) strchr(lines[j], ':');
-      /* if there's no colon for whatever reason, dump the object
-	 and report the condition */
-      if( colon == NULL ) {
-        LG_log(qi_context, LG_ERROR, " [%s]", lines[0]);
-	goto fast_output_cleanup;
-      }
-      *colon = '\0';
-      for(value = colon+1; *value != '\0' && isspace(*value) ; value++) {
-	;
-      }
+            /* get attribute name */
+            attr = lines[j];
+            colon = (unsigned char *) strchr(lines[j], ':');
+            /* if there's no colon for whatever reason, dump the object
+           and report the condition */
+            if (colon == NULL)
+            {
+                LG_log(qi_context, LG_ERROR, " [%s]", lines[0]);
+                goto fast_output_cleanup;
+            }
+            *colon = '\0';
+            for (value = colon + 1; *value != '\0' && isspace(*value); value++)
+            {
+                ;
+            }
 
-      if( (i = DF_attribute_name2type(attr)) == -1 ) {
-	  /* warning! error in the object format */
-        LG_log(qi_context, LG_ERROR, " [%s]", lines[0]);
-	goto fast_output_cleanup;
+            if ((i = DF_attribute_name2type(attr)) == -1)
+            {
+                /* warning! error in the object format */
+                LG_log(qi_context, LG_ERROR, " [%s]", lines[0]);
+                goto fast_output_cleanup;
 
-      }
-      else {
-	/* This is the juicy bit that converts the likes of; "source: RIPE" to "*so: RIPE" */
-	g_string_append_c(result_buff, '*');
-	g_string_append(result_buff, DF_get_attribute_code(i));
-	g_string_append(result_buff, ": ");
-	g_string_append(result_buff, (char *)value);
-      }
-    } /* switch */
-  } /* for every line */
+            }
+            else
+            {
+                /* This is the juicy bit that converts the likes of; "source: RIPE" to "*so: RIPE" */
+                g_string_append_c(result_buff, '*');
+                g_string_append(result_buff, DF_get_attribute_code(i));
+                g_string_append(result_buff, ": ");
+                g_string_append(result_buff, (char *) value);
+            }
+        } /* switch */
+    } /* for every line */
 
- fast_output_cleanup:
+fast_output_cleanup:
 
-  g_strfreev(lines);
+    g_strfreev(lines);
 
-  g_string_append_c(result_buff, '\n');
-  result = UT_strdup(result_buff->str);
-  dieif(result == NULL);
+    g_string_append_c(result_buff, '\n');
+    result = UT_strdup(result_buff->str);
+    dieif(result == NULL);
 
-  g_string_free(result_buff,/* CONSTCOND */ TRUE);
+    g_string_free(result_buff, /* CONSTCOND */ TRUE);
 
-  return result;
+    return result;
 } /* fast_output() */
 
 
