@@ -655,9 +655,13 @@ void PM_interact(int sock) {
 		/* this call will block if queries are paused */
 		object=PM_get_serial_object(sql_connection, current_serial, &object_type, &timestamp, &operation);
 
+        /* check for invalid object type. Normally, this should never pass, but for some reason, in the practice it did.
+         * My suspicion is that mysql doesn't always do what it was supposed to, but it's hard to prove :(
+         * agoston, 2009-06-02 */
         if (object_type < 0) {
             fprintf(stderr, "object_type < 0 for %d\n", current_serial);
-            if (object) fprintf(stderr, "%s\n\n", object);
+        	LG_log(pm_context, LG_ERROR, "object_type < 0 for %d", current_serial);
+            /* we continue anyway - this is an internal error, not really serious */
         }
 
 		/* Comment left from stone age:
