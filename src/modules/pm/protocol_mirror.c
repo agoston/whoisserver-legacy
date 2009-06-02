@@ -655,15 +655,6 @@ void PM_interact(int sock) {
 		/* this call will block if queries are paused */
 		object=PM_get_serial_object(sql_connection, current_serial, &object_type, &timestamp, &operation);
 
-        /* check for invalid object type. Normally, this should never pass, but for some reason, in the practice it did.
-         * My suspicion is that mysql doesn't always do what it was supposed to, but it's hard to prove :(
-         * agoston, 2009-06-02 */
-        if (object_type < 0) {
-            fprintf(stderr, "object_type < 0 for %d\n", current_serial);
-        	LG_log(pm_context, LG_ERROR, "object_type < 0 for %d", current_serial);
-            /* we continue anyway - this is an internal error, not really serious */
-        }
-
 		/* Comment left from stone age:
 		/* there is a probability that mirroring interferes with HS cleanup */
 		/* in such case serial may be deleted before it is read by mirror client */
@@ -709,9 +700,19 @@ void PM_interact(int sock) {
 						 * agoston, 2008-01-21 */
 						check_history_limit = 0;
 					}
-				}
+                }
 
-				/* dummify private objects */
+                /* check for invalid object type. Normally, this should never pass, but for some reason,
+                 * in the practice it did.
+                 * My suspicion is that mysql doesn't always do what it was supposed to, but it's hard to prove :(
+                 * agoston, 2009-06-02 */
+                if (object_type < 0)
+                {
+                    fprintf(stderr, "object_type < 0 for %d\n", current_serial);
+                    LG_log(pm_context, LG_ERROR, "object_type < 0 for %d", current_serial);
+                }
+
+ 				/* dummify private objects */
 				for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
 					if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
 						char *newobj;
