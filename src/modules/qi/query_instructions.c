@@ -556,7 +556,6 @@ static char *create_query(const Query_t q, Query_command *qc) {
 } /* create_query() */
 
 /* QI_fast_output() */
-
 /*++++++++++++++++++++++++++++++++++++++
   This is for the '-F' flag.
   It assumes lines starting with ' ', '\t' or '+' belong to the prior attribute.
@@ -646,7 +645,7 @@ char *QI_fast_output(const char *str)
                     g_string_append(result_buff, (char *) value);
                 }
             }
-            } /* switch */
+        } /* switch */
     } /* for every line */
 
 fast_output_cleanup:
