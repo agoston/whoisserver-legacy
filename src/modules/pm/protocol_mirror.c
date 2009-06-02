@@ -655,6 +655,11 @@ void PM_interact(int sock) {
 		/* this call will block if queries are paused */
 		object=PM_get_serial_object(sql_connection, current_serial, &object_type, &timestamp, &operation);
 
+        if (object_type < 0) {
+            fprintf(stderr, "object_type < 0 for %d\n", current_serial);
+            if (object) fprintf(stderr, "%s\n\n", object);
+        }
+
 		/* Comment left from stone age:
 		/* there is a probability that mirroring interferes with HS cleanup */
 		/* in such case serial may be deleted before it is read by mirror client */

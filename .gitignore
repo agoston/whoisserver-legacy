@@ -46,7 +46,7 @@ src/defs/*.class
 src/defs/Makefile
 src/defs/Makefile.in
 src/defs/makedefsall
-src/defs/syntax_tab.h
+src/defs/*.h
 src/getvar
 src/loader
 src/modules/rpsl/syntax
