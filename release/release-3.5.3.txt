@@ -1,0 +1,19 @@
+20090602 - version 3.5.3
+
+Changes: 
+- fixed an nrtm-related crash
+- fixed -F query flag that was broken by rev-srv removal
+
+
+Merged:
+bugfix-agoston-broken_nrtm
+bugfix-agoston-broken_fast_flag
+
+
+Installation notes:
+None.
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG
