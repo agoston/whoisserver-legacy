@@ -217,12 +217,13 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
                 }
             }
         }
+
+        /* read remaining rows to work around mysql bug */
+        while (SQ_row_next(sql_result));
     }
     else
         sql_str = NULL;
 
-    /* read remaining rows to work around mysql bug */
-    while (SQ_row_next(sql_result));
 
 	if (sql_result) {
 		SQ_free_result(sql_result);
