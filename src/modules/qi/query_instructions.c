@@ -576,7 +576,7 @@ char *QI_fast_output(const char *str)
     int i, j;
     char *result;
     GString *result_buff = g_string_sized_new(STR_XL);
-    gchar **lines = ut_g_strsplit_v1((char*) str, "\n", 0);
+    gchar **lines = g_strsplit((char*) str, "\n", 0);
     unsigned char *value, *colon;
     char *attr;
 
@@ -619,27 +619,34 @@ char *QI_fast_output(const char *str)
                 goto fast_output_cleanup;
             }
             *colon = '\0';
-            for (value = colon + 1; *value != '\0' && isspace(*value); value++)
-            {
-                ;
-            }
+            for (value = colon + 1; *value != '\0' && isspace(*value); value++);
 
-            if ((i = DF_attribute_name2type(attr)) == -1)
+            /* rev-srv hack, remove this after rev-srv deprecation project is done 
+             * agoston, 2009-05-29 */
+            if (!strcmp(attr, "rev-srv"))
             {
-                /* warning! error in the object format */
-                LG_log(qi_context, LG_ERROR, " [%s]", lines[0]);
-                goto fast_output_cleanup;
-
+                g_string_append(result_buff, "*rz: ");
+                g_string_append(result_buff, (char *) value);
             }
             else
             {
-                /* This is the juicy bit that converts the likes of; "source: RIPE" to "*so: RIPE" */
-                g_string_append_c(result_buff, '*');
-                g_string_append(result_buff, DF_get_attribute_code(i));
-                g_string_append(result_buff, ": ");
-                g_string_append(result_buff, (char *) value);
+                if (((i = DF_attribute_name2type(attr)) == -1))
+                {
+                    /* warning! error in the object format */
+                    LG_log(qi_context, LG_ERROR, " [%s]", lines[0]);
+                    goto fast_output_cleanup;
+
+                }
+                else
+                {
+                    /* This is the juicy bit that converts the likes of; "source: RIPE" to "*so: RIPE" */
+                    g_string_append_c(result_buff, '*');
+                    g_string_append(result_buff, DF_get_attribute_code(i));
+                    g_string_append(result_buff, ": ");
+                    g_string_append(result_buff, (char *) value);
+                }
             }
-        } /* switch */
+            } /* switch */
     } /* for every line */
 
 fast_output_cleanup:
