@@ -124,6 +124,9 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 	/* reset timestamp */
 	if (timestamp) *timestamp = 0;
 
+    /* clear object_type */
+    if (object_type) *object_type = -1;
+
 	switch (location) {
 		/* history */
 		case 0:
@@ -189,23 +192,34 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 	if (sql_err) {
 		LG_log(pm_context, LG_SEVERE, "%s[%s]", SQ_error(sql_connection), query);
 		die;
-	}
+    }
 
-	if ((sql_row = SQ_row_next(sql_result)) != NULL) {
-		sql_str = SQ_get_column_string(sql_result, sql_row, 0);
-		if (location < 2) {
-			if (object_type && SQ_get_column_int(sql_result, sql_row, 1, object_type)) {
-				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
-				die;
-			}
-			/* (*timestamp) is left at zero if timestamp is NULL */
-			if (timestamp && (SQ_get_column_unsigned(sql_result, sql_row, 2, timestamp) < -1)) {
-				LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
-				die;
-			}
-		}
-	} else
-		sql_str=NULL;
+    if ((sql_row = SQ_row_next(sql_result)) != NULL)
+    {
+        sql_str = SQ_get_column_string(sql_result, sql_row, 0);
+        if (location < 2)
+        {
+            if (object_type)
+            {
+                if (SQ_get_column_int(sql_result, sql_row, 1, object_type))
+                {
+                    LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+                    die;
+                }
+            }
+            /* (*timestamp) is left at zero if timestamp is NULL */
+            if (timestamp)
+            {
+                if (SQ_get_column_unsigned(sql_result, sql_row, 2, timestamp) < -1)
+                {
+                    LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+                    die;
+                }
+            }
+        }
+    }
+    else
+        sql_str = NULL;
 
     /* read remaining rows to work around mysql bug */
     while (SQ_row_next(sql_result));
