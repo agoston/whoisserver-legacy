@@ -1,0 +1,18 @@
+20090603 - version 3.5.4
+
+Changes: 
+- fixed -F query flag returning double lines as object separator instead of
+single lines, which broke asused tools
+
+
+Merged:
+bugfix-agoston-fast_flag_double_lines
+
+
+Installation notes:
+None.
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG
