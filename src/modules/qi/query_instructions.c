@@ -651,8 +651,6 @@ char *QI_fast_output(const char *str)
 fast_output_cleanup:
 
     g_strfreev(lines);
-
-    g_string_append_c(result_buff, '\n');
     result = UT_strdup(result_buff->str);
     dieif(result == NULL);
 
