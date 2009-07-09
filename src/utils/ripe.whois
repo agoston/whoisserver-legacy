@@ -1,26 +1,13 @@
 #!/bin/bash
+#    ________ .___ ___________
+#   /  _____/ |   |\__    ___/
+#  /   \  ___ |   |  |    |   
+#  \    \_\  \|   |  |    |   
+#   \______  /|___|  |____|   
+#          \/                 
+# git clone git:whoisserver
+# src/utils/ripe.whois
 # ****************************************
-# * This file is under version control
-# ****************************************
-#
-#  _aa,     _aa,   .awwwa,    .awwwwc.   
-#  )WWm     QQW`  <QQWQQQQf  <QWWWQWWW   
-#   WWQ;   =QQE  <QQQDT?$Qf _QQQT??9QW   
-#   ]QQL   jQQ[  mQQF    ?f ]QQf    -9   
-#   -QQm   QQW  =QQW        ]QQQc.       
-#    $QQ; <WQF  ]QQE        )QQQWQQw,    
-#    ]QQL jQQ(  ]QQk         ?QQQQWWQL   
-#    -QQQ QQ@   ]QQk          -?VQQQQQ;  
-#     4QWuQQf   =QQQ.     .       "QWQ[  
-#     )QQQQQ'    $QQ6.  .jf ja.    dQQ(  
-#      QWQQD     )WQQQwwQWf jQQgwayQQ@   
-#      ]QQQ[      )$QQWQWQ[ ]QQQWQQQD`   
-#      -"""`        "?T?!`   -!?T??^     
-#
-# ****************************************
-# * This file is under version control
-# ****************************************
-# svn export https://new-ncc/svn/db/whoisserver/trunk/src/utils/ripe.whois
 
 ##############################################################################################
 # determine service name before anything else
@@ -37,11 +24,19 @@ fi
 export BASEDIR=/home/dbase/services/$SERVICE
 # E-mail address where crash notifications are sent
 #export NOTIFY=dbase24-7@ripe.net
-export NOTIFY=agoston@ripe.net
+export NOTIFY=dbint@ripe.net
 # PID file
 export PIDFILE=$BASEDIR/var/tmp/whois-server.pid
 # ERR file (startup log and stderr of whois-server is redirected here)
 export ERRLOG=$BASEDIR/var/log/whois-server.err.log
+# number of consecutive crashes before giving up
+export MAX_CRASHES=5
+# time between crashes to consider them consecutive (in seconds)
+# after this amount of seconds, the crash counter is reset to the default,
+# and dynamic mode is enabled on restart.
+# if whois-server crashes within this timeframe, though, crash counter will be
+# decreased until it reaches 0, and the dynamic mode will not be enabled, either
+export CRASH_IGNORE_TIMEOUT=86400
 
 ##############################################################################################
 # event handlers - change them according to current failover setup
@@ -124,7 +119,7 @@ check_server() {
 	
 	# only enable updates if the last startup was more than 24 hours ago
 	CURRENT_DATE=`date +%s`
-	if [ $[CURRENT_DATE - LAST_START_DATE] -gt 86400 ]; then
+	if [ $[CURRENT_DATE - LAST_START_DATE] -gt $CRASH_IGNORE_TIMEOUT ]; then
 		my_log 'Executing "set dynamic start"...'
 		send_command 'set dynamic start' &>/dev/null
 	fi
@@ -154,14 +149,16 @@ start_server () {
 		if [ $CRASHES -gt 0 ]; then
 			# only start check_server thread if this is our second start
 			# (because first start went to the stdout to give feedback to user)
-			if [ $CRASHES -lt 10 ]; then
+			if [ ! $FIRST_RUN ]; then
 				my_panic "$SERVICE crashed & restarted on $HOSTNAME" "$HOSTNAME whois-server crashed & restarted"
+				export FIRST_RUN=0
 				check_server </dev/null >/dev/null 2>&1 &
 				CHECK_THREAD_PID=$!
 			else
 				CHECK_THREAD_PID=
 			fi
 
+			PREV_LAST_START_DATE=$LAST_START_DATE
 			export LAST_START_DATE=`date +%s`
 			$BASEDIR/bin/whois-server -p $PIDFILE -c $BASEDIR/conf/rip.config  </dev/null >> $ERRLOG 2>&1
 
@@ -181,11 +178,15 @@ start_server () {
 			fi
     
 			rm -f $PIDFILE
-    
-			export CRASHES=$[CRASHES-1]
-  		
+
+			# check if it is a consecutive crash or not
+			if [ $[LAST_START_DATE - PREV_LAST_START_DATE] -gt $CRASH_IGNORE_TIMEOUT ]; then
+				export CRASHES=$MAX_CRASHES
+			else
+				export CRASHES=$[CRASHES-1]
+			fi
   		else
-			my_panic "ERROR:URGENT: $HOSTNAME $SERVICE is stopped and not restarted" "Number of whois-server crashes exceeded 10"
+			my_panic "ERROR:URGENT: $HOSTNAME $SERVICE is stopped and not restarted" "Number of whois-server crashes exceeded $MAX_CRASHES"
 			return
 		fi
 	done
@@ -244,12 +245,14 @@ stop_server() {
 # Safeguard (relative paths, ...)
 cd $BASEDIR
 
-# Default number of crashes before loop is stopped
-# check_server expects this to be 10 at startup
-export CRASHES=10
+# number of remaining crashes
+export CRASHES=$MAX_CRASHES
 
 # hostname, used only as a shortcut for `hostname`
 export HOSTNAME=`hostname`
+
+# first time run marker
+export FIRST_RUN=1
 
 # get the config port from the config file
 export CONFIG_PORT=`grep ^SVCONFIG_PORT $BASEDIR/conf/rip.config | awk '{print $2}'`
