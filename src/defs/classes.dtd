@@ -262,3 +262,9 @@
 <!ATTLIST dbase_code
             value   NMTOKEN   #REQUIRED
 >
+
+<!ELEMENT dummify EMPTY>
+<!ATTLIST dummify
+	type		CDATA	#IMPLIED
+	singleton	CDATA	#IMPLIED
+>

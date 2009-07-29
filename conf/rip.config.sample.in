@@ -527,9 +527,52 @@ QI_FILTER_BANNER % Note: this output has been filtered.
 ## Dummification config
 ##
 
-# A list of attributes which are mandatory RPSL attributes, but contain    
-# personal data and thus should be replaced with a generated value. The    
-# values are going to be fed to a sprintf(), with the primary key of the   
+# Dummification is the process of removing information to protect privacy.
+# There are 3 levels of dummification implemented:
+#
+# 1. Remove object type (DUMMY_PLACEHOLDER)
+# In this case, we remove all occurances of an object type, and replace all
+# references to it with a dummy placeholder object (thus, we keep referential
+# integrity).
+#
+# 2. Dummify object
+# In this case, we keep all objects of an object type, but we mask some of their
+# attributes. This is similar in result to #1, but end user retains the
+# possibility to look up the dummified object in the RIPE DB. Also, because of
+# referential integrity, the IDs of all such objects have to be kept, which
+# might not be preferred in some cases (e.g. nic-hdls are personal data).
+#
+# 3. Leave alone
+# These objects themselves are not to be changed, they don't contain any data
+# that should be masked. However, they might still contain reference to such
+# data (like tech-c or admin-c attributes that contain nic-hdls). As such,
+# these objects still have to be scanned and slightly dummified.
+
+
+# Definition of dummy placeholders (#1)
+#
+# syntax: <object_type> <object_type.attr_name=value>(,<object_type.attr_name=value>)*
+# You can use '*' as a wildcard for all object types
+
+DUMMY_PLACEHOLDER person *.tech_c=PH4239-RIPE,*.admin_c=PH4239-RIPE
+
+# You can add a message to all objects that have been changed to remove reference
+# to a completely removed object type here
+
+DUMMY_PLACEHOLDER_MSG ****************************************************************
+DUMMY_PLACEHOLDER_MSG * THIS OBJECT HAS BEEN CHANGED
+DUMMY_PLACEHOLDER_MSG * Please note that references to personal data have been removed
+DUMMY_PLACEHOLDER_MSG * from this object.
+DUMMY_PLACEHOLDER_MSG * To view the original object, please query the RIPE Database at:
+DUMMY_PLACEHOLDER_MSG * http://www.ripe.net/whois
+DUMMY_PLACEHOLDER_MSG ****************************************************************
+
+
+# Definition of dummified objects (#2)
+# syntax: <object_type> <attr_name=value>(,attr_name=value)*
+# A list of attributes which are mandatory RPSL attributes, but contain
+# personal data and thus should be replaced with a generated value. The
+# values are going to be fed to a sprintf(), with the primary key of the
 # object as an argument. This can be used to give more meaningful dummified
 # attributes.
 #
@@ -537,37 +580,14 @@ QI_FILTER_BANNER % Note: this output has been filtered.
 # This feature can be used for referential attributes, which do not contain personal
 # data, just reference other objects.
 #
-# The first word is the attribute name (lowercase), then comes an = as a     
-# separator, and the rest of the string until the end of line is passed to   
+# The first word is the attribute name (lowercase), then comes an = as a
+# separator, and the rest of the string until the end of line is passed to
 # sprintf(). Note that neither keys nor values are chomped anywhere, so don't
 # leave whitespaces around.
-#
-# FIXME: This should go to the syntax.xml if we wanted to implement it correctly.   
-# That would involve a major change, however, so this task should be done during the
-# refactorisation of the rpsl module. - agoston, 2007-10-31
-#
+DUMMY_ATTRS organisation
 
-DUMMY_ATTR admin-c=
-DUMMY_ATTR tech-c=
-DUMMY_ATTR mnt-by=
-DUMMY_ATTR mnt-ref=
-DUMMY_ATTR referral-by=
-DUMMY_ATTR source=
-DUMMY_ATTR org-type=
-DUMMY_ATTR irt=
-DUMMY_ATTR mntner=
-DUMMY_ATTR organisation=
-DUMMY_ATTR nic-hdl=
-DUMMY_ATTR person=Dummy name for %s
-DUMMY_ATTR role=Dummy role for %s
-DUMMY_ATTR address=Dummy address for %s
-DUMMY_ATTR changed=unread@ripe.net 20000101
-DUMMY_ATTR phone=+31205354444
-DUMMY_ATTR e-mail=unread@ripe.net
-DUMMY_ATTR upd-to=unread@ripe.net
-DUMMY_ATTR descr=Dummy description for %s
-DUMMY_ATTR auth=MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/
-DUMMY_ATTR org-name=Dummy organisation name for %s
+
+
 
 # Additional remarks to be added to the end of the dummified object.
 
@@ -584,6 +604,8 @@ DUMMY_ADD_ATTR ****************************
 # Default is 2 weeks (=1209600 seconds). Value of 0 disables this feature.
 
 NRTM_HISTORY_ACCESS_LIMIT 1209600
+
+
 
 ######################
 ###

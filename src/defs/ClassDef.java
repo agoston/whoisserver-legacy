@@ -21,7 +21,6 @@
 
 import java.util.*;
 import org.w3c.dom.*;
-//import org.w3c.dom.traversal.*;
 
 /**
  * RIPE class.
@@ -34,6 +33,10 @@ public class ClassDef {
 
   public static final int EXTRA_BIT=11;
 
+    public static final int DUMMIFY_NONE = 0;
+    public static final int DUMMIFY_PLACEHOLDER = 1;
+    public static final int DUMMIFY_FILTER = 2;
+
   private String    name;
   private String    enumeration;
   private String    code;
@@ -45,6 +48,8 @@ public class ClassDef {
   private Vector    rollback_tables;
   private Vector    delete_invquery_tables;
   private int       dbaseCode;
+  private int       dummifyType;
+  private String    dummifySingleton;
 
   private int       width;        // The longest attribute name.
   private Hashtable foreignAttrs;
@@ -88,6 +93,16 @@ public class ClassDef {
             rollback_tables = getTableList(search);
         } else if (nodeName.equals("delete-invquery-tables")) {
             delete_invquery_tables = getTableList(search);
+        } else if (nodeName.equals("dummify")) {
+            String dummifyTypeStr = search.getAttributes().getNamedItem("type").getNodeValue();
+            if (dummifyTypeStr.equals("placeholder")) {
+                dummifyType = DUMMIFY_PLACEHOLDER;
+                dummifySingleton = search.getAttributes().getNamedItem("singleton").getNodeValue();
+            } else if (dummifyTypeStr.equals("filter")) {
+                dummifyType = DUMMIFY_FILTER;
+            } else {
+                throw new RuntimeException("Unknown dummification type '"+dummifyTypeStr+"'");
+            }
         } else if (nodeName.equals("dbase_code")) {
             // Get the dbase_code.
             String dbaseCodeStr = 
