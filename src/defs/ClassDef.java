@@ -361,6 +361,14 @@ public class ClassDef {
     return foreignAttrs;
   } // getForeignAttrs()
 
+    public String getDummifySingleton() {
+        return dummifySingleton;
+    }
+
+    public int getDummifyType() {
+        return dummifyType;
+    }
+  
   public String getEnumeration() {
     return enumeration;
   } // getEnum()

@@ -828,6 +828,8 @@ public class Defs {
             out.println("        /* num_attr */");
             out.println("        0,");
             out.println("        /* attr_hash (set by class_init()) */");
+            out.println("        NULL,");
+            out.println("        DUMMIFY_NONE,");
             out.println("        NULL");
             return;
         }
@@ -877,7 +879,25 @@ public class Defs {
         }
         out.println("        },");
         out.println("        /* attr_hash (set by class_init()) */");
-        out.println("        NULL");
+        out.println("        NULL,");
+
+        // dummification info
+        switch (cd.getDummifyType()) {
+            case ClassDef.DUMMIFY_NONE:
+                out.println("        DUMMIFY_NONE,");
+                out.println("        NULL");
+                break;
+
+            case ClassDef.DUMMIFY_FILTER:
+                out.println("        DUMMIFY_FILTER,");
+                out.println("        NULL");
+                break;
+
+            case ClassDef.DUMMIFY_PLACEHOLDER:
+                out.println("        DUMMIFY_PLACEHOLDER,");
+                out.println("        \""+cd.getDummifySingleton()+"\"");
+                break;
+        }
     }
 
     // create class_tab.h
