@@ -295,6 +295,7 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  * - if filter, iterate through the attributes
  *    - remove all non-mandatory attributes
  *    - replace all attributes marked as placeholder with class' placeholder object
+ *    - replace all attributes marked as filter with attributes filter settings
  *    - return;
  * - if neither, iterate through the attributes
  *    - replace all attributes marked as placeholder with class' placeholder object
