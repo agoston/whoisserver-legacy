@@ -26,10 +26,7 @@
 
 <!ELEMENT syntax        ((list|ripe-list)?, CDATA)>
 
-<!ELEMENT dummify EMPTY>
-<!ATTLIST dummify
-            filter   CDATA   #IMPLIED
->
+<!ELEMENT dummify (filter | placeholder)>
 
 <!ELEMENT list  EMPTY>
 

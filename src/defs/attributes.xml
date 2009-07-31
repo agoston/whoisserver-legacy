@@ -41,7 +41,9 @@
       Full postal address of a contact.
     </description>
     <syntax>free-form</syntax>
-    <dummify filter="Dummy address for %s"/>
+    <dummify>
+        <filter>Dummy address for %s</filter>
+    </dummify>
   </ripe_attribute>
 
   <ripe_attribute name="admin-c" code="ac">

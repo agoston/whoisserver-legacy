@@ -94,15 +94,13 @@ public class ClassDef {
         } else if (nodeName.equals("delete-invquery-tables")) {
             delete_invquery_tables = getTableList(search);
         } else if (nodeName.equals("dummify")) {
-            for (Node dummifyNode : search.getChildNodes()) {
+            for (Node dummifyNode = search.getFirstChild(); dummifyNode != null; dummifyNode = dummifyNode.getNextSibling()) {
                 String dummifyTypeStr = dummifyNode.getNodeName();
                 if (dummifyTypeStr.equals("placeholder")) {
                     dummifyType = DUMMIFY_PLACEHOLDER;
-                    dummifySingleton = dummifyNode.getNodeValue();
+                    dummifySingleton = dummifyNode.getFirstChild().getNodeValue();
                 } else if (dummifyTypeStr.equals("filter")) {
                     dummifyType = DUMMIFY_FILTER;
-                } else {
-                    throw new RuntimeException("Unknown dummification type '"+dummifyTypeStr+"'");
                 }
             }
         } else if (nodeName.equals("dbase_code")) {
