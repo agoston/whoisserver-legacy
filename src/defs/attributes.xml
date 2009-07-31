@@ -1631,6 +1631,9 @@
         </sqlquery>
       </queries>
     </keys>
+    <dummify>
+        <filter>Dummy organisation name for %s</filter>
+    </dummify>
   </ripe_attribute>
 
   <ripe_attribute name="phone" code="ph">
@@ -1638,6 +1641,9 @@
    Specifies a telephone number of the contact.
     </description>
     <syntax>telephone-number</syntax>
+    <dummify>
+        <filter>+31205354444</filter>
+    <dummify>
   </ripe_attribute>
 
   <ripe_attribute name="referral-by" code="rb">
@@ -2035,7 +2041,9 @@
         </sqlquery>
       </queries>
     </keys>
-
+    <dummify>
+        <filter>unread@ripe.net</filter>
+    </dummify>
   </ripe_attribute>
 
   <ripe_attribute name="zone-c" code="zc">
