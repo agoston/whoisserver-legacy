@@ -94,6 +94,9 @@
         </sqlquery>
       </queries>
     </keys>
+    <dummify>
+        <placeholder>person</placeholder>
+    </dummify>
   </ripe_attribute>
 
   <ripe_attribute name="aggr-mtd" code="ag">
@@ -192,7 +195,9 @@
         </sqlquery>
       </queries>
     </keys>
-
+    <dummify>
+        <filter>MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/</filter>
+    </dummify>
   </ripe_attribute>
 
   <ripe_attribute name="author" code="ah">
@@ -257,6 +262,9 @@
    This attribute is filtered from the default whois output.
     </description>
     <syntax>changed</syntax>
+    <dummify>
+        <filter>unread@ripe.net 20000101</filter>
+    </dummify>
   </ripe_attribute>
 
   <ripe_attribute xmlname="components-rt" name="components" code="co">
@@ -301,6 +309,9 @@
    A short decription related to the object.
     </description>
     <syntax>free-form</syntax>
+    <dummify>
+        <filter>Dummy description for %s</filter>
+    </dummify>
   </ripe_attribute>
 
   <ripe_attribute name="dom-net" code="di">
@@ -431,6 +442,9 @@
         </sqlquery>
       </queries>
     </keys>
+    <dummify>
+        <filter>unread@ripe.net</filter>
+    </dummify>
   </ripe_attribute>
 
   <ripe_attribute name="export" code="ex">

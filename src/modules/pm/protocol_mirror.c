@@ -290,9 +290,15 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  * This will normally not be a problem as we also don't want to give object history through public NRTM stream. Any
  * attempt to try to go back more than two weeks into the past should give an error.
  *
- * After having the processed object structure, we iterate through the attributes. We discard any non-mandatory
- * attributes. From the mandatory ones, we keep the ones which maintain referential integrity. The remaining
- * attributes are dummified based on the corresponding entries in the rip.config file (read comments there).
+ * After having the processed object structure, we check the object class dummify settings, and:
+ * - if placeholder, replace object with placeholder object and return;
+ * - if filter, iterate through the attributes
+ *    - remove all non-mandatory attributes
+ *    - replace all attributes marked as placeholder with class' placeholder object
+ *    - return;
+ * - if neither, iterate through the attributes
+ *    - replace all attributes marked as placeholder with class' placeholder object
+ *    - return;
  *
  * After finishing the dummification, we return the flat object for the nrtm server to send to the client or NULL
  * on dummification error.
