@@ -1,0 +1,27 @@
+# basic-auth pn-mnt tests
+#
+# CASE 1: Create a person and a role object
+#         neither with a mnt-by
+#
+# create person and role objects
+#
+#FAILURE
+#
+# RESULT 1: The creations will fail
+
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+role:         Test Role1
+address:      Singel
+e-mail:       dbtest@ripe.net
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+nic-hdl:      TR1-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST

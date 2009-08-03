@@ -1,0 +1,26 @@
+# basic-auth pn-mnt tests
+#
+# CASE 12: Create an inetnum object
+#          references maintained person
+#          and role objects 
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 12: The creation will succeed
+
+
+password: hostmaster
+
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+admin-c:      TP2-DB-TEST
+tech-c:       TR1-DB-TEST
+status:       ASSIGNED PI
+mnt-by:       RIPE-NCC-HM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

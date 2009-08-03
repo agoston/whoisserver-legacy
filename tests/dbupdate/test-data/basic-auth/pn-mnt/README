@@ -1,0 +1,186 @@
+# basic-auth tests - pn-mnt
+
+
+# CASE 1: Create a person and a role object
+#         neither with an mnt-by
+#
+# create person and role objects
+#
+#FAILURE
+#
+# RESULT 1: The creations will fail
+
+
+# CASE 2: Modify a person and a role object
+#         neither with a mnt-by
+#
+# modify person and role objects
+#
+#FAILURE
+#
+# RESULT 2: The modify will fail
+
+
+# CASE 3: Create a person and a role object
+#         with a mnt-by and correct password
+#
+# create person and role objects
+#
+#SUCCESS
+#
+# RESULT 3: The creations will succeed
+
+
+# CASE 4: Modify a person and a role object
+#         with a mnt-by and correct password
+#
+# modify person and role objects
+#
+#SUCCESS
+#
+# RESULT 4: The modifications will succeed
+
+
+# CASE 5: Modify a person and a role object
+#         without a mnt-by and add one
+#
+# modify person and role objects
+#
+#SUCCESS
+#
+# RESULT 5: The modifications will succeed
+
+
+# CASE 6: Modify a person and a role object
+#         with a mnt-by and remove the mnt-by
+#
+# modify person and role objects
+#
+#FAILURE
+#
+# RESULT 6: The modify will fail
+
+
+# CASE 7: Create a person and a mntner object
+#         with a mnt-by 
+#         and mutually referencing
+#
+# create person and mntner objects
+#
+#FAILURE
+#
+# RESULT 7: The creations will fail
+
+
+# CASE 8: Create a role and a mntner object
+#         with a mnt-by 
+#         and mutually referencing
+#
+# create role and mntner objects
+#
+#FAILURE
+#
+# RESULT 8: The creations will fail
+
+
+# CASE 9: Delete a person and a role object
+#         with a mnt-by and correct password
+#
+# delete person and role objects
+#
+#SUCCESS
+#
+# RESULT 9: The deletions will succeed
+
+
+# CASE 10: Delete a person and a mntner object
+#          with a mnt-by 
+#          and mutually referencing
+#
+# delete person and mntner objects
+#
+#FAILURE
+#
+# RESULT 10: The deletions will fail
+
+
+# CASE 11: Create an inetnum object
+#          references unmaintained person
+#          and role objects 
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 11: The creation will succeed
+
+
+# CASE 12: Create an inetnum object
+#          references maintained person
+#          and role objects 
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 12: The creation will succeed
+
+
+# CASE 13: Create an inetnum object
+#          references maintained person
+#          and role objects 
+#          references mntner with
+#          unmaintained person and role
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 13: The creation will succeed
+
+
+# CASE 14: create inetnum object 80.16.151.184 - 80.16.151.191
+#          having mnt-routes with extensions which references
+#          unmaintained person 
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 14: The creation will succeed.
+
+
+# CASE 15: Create an inetnum object
+#          references unmaintained person objects 
+#          references mntner with
+#          unmaintained person object
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 15: The creation will succeed
+
+
+# CASE 16: Modify an inetnum object
+#          references unmaintained person objects 
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 16: The creation will succeed
+
+
+# CASE 17: Create an inetnum object
+#          references 2 unmaintained person objects TP1 and TP2
+#          references 2 mntner objects each of which reference
+#          same 2 unmaintained person objects TP1 and TP2
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 17: The creation will succeed
+
+

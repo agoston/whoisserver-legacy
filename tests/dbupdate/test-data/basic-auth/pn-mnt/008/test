@@ -1,0 +1,35 @@
+# basic-auth pn-mnt tests
+#
+# CASE 8: Create a role and a mntner object
+#         with a mnt-by 
+#         and mutually referencing
+#
+# create role and mntner objects
+#
+#FAILURE
+#
+# RESULT 8: The creations will fail
+
+
+password: test
+
+role:         Test Role1
+address:      Singel
+e-mail:       dbtest@ripe.net
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+nic-hdl:      TR1-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+mntner:       TEST-MNT
+descr:        Mntner
+admin-c:      TR1-DB-TEST
+tech-c:       TR1-DB-TEST
+auth:         MD5-PW $1$12345678$oEitTZYQtRHfNGmsFvTBA/   # test
+upd-to:       dbtest@ripe.net
+mnt-by:       TEST-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
