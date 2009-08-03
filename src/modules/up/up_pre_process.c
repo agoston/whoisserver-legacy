@@ -2109,6 +2109,7 @@ int UP_generate_keycert_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 int up_normalise_nserver(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *preproc_obj)
 {
+  int retval = UP_OK;
   gchar *elm = NULL;
   gchar *p = NULL;
   GList *nservers_list = NULL;
