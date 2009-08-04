@@ -172,7 +172,7 @@
 
 
 # CASE 14: Modify a person object to add an "org:" attribute, 
-#          but the password is missing
+#          but the organisation password is missing
 #
 # modify person object
 #
@@ -182,7 +182,7 @@
 
 
 # CASE 15: Create a person object with an "org:" attribute, 
-#          but the password is missing for it
+#          but the organisation password is missing
 #
 # create person object
 #
@@ -192,7 +192,7 @@
 
 
 # CASE 16: Modify a person object to add an "org:" attribute, 
-#          password is provided
+#          organisation password is provided
 #
 # modify person object
 #
@@ -202,7 +202,7 @@
 
 
 # CASE 17: Create a person object with an "org:" attribute, 
-#          password is provided
+#          organisation password is provided
 #
 # create person object
 #
