@@ -84,7 +84,7 @@
 
 
 # CASE 9: Delete a person and a role object
-#         with a mnt-by and correct password
+#         without a mnt-by
 #
 # delete person and role objects
 #

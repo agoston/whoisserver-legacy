@@ -1,7 +1,7 @@
 # basic-auth pn-mnt tests
 #
 # CASE 9: Delete a person and a role object
-#         with a mnt-by and correct password
+#         without a mnt-by
 #
 # delete person and role objects
 #
@@ -10,7 +10,6 @@
 # RESULT 9: The deletions will succeed
 
 
-password:  test
 
 person:       Test Person2
 address:      Singel
