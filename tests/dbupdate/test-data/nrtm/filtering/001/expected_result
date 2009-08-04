@@ -28,6 +28,7 @@ person:         Dummy name for TP1-DB-TEST
 address:        Dummy address for TP1-DB-TEST
 phone:          +31205354444
 nic-hdl:        TP1-DB-TEST
+mnt-by:         TEST-DBM-MNT
 changed:        unread@ripe.net 20000101
 source:         DB-TEST
 remarks:        ****************************
@@ -63,6 +64,7 @@ e-mail:         unread@ripe.net
 admin-c:        TP1-DB-TEST
 tech-c:         TP1-DB-TEST
 nic-hdl:        TR1-DB-TEST
+mnt-by:         TEST-DBM-MNT
 changed:        unread@ripe.net 20000101
 source:         DB-TEST
 remarks:        ****************************
