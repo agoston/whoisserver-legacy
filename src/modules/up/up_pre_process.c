@@ -397,6 +397,7 @@ int up_get_nics(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             LG context
             hash
             parsed object
+ *          mntner (for the hash)
    Returns  UP_OK always
             (adds entries to hash)
  */
