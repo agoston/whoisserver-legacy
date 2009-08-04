@@ -351,7 +351,6 @@ GList *up_get_referenced_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     return ret_obj_list;
 }
 
-
 /* Get a unique list of nic-hdls from the attribute list.
    Receives RT context
             LG context
@@ -360,39 +359,38 @@ GList *up_get_referenced_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             mntner name
    Returns  UP_OK always
             (adds entries to hash)
-*/
+ */
 
 int up_get_nics(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                    GList *attrs, GHashTable *nic_hash, char *mntner)
+                GList *attrs, GHashTable *nic_hash, char *mntner)
 {
-  int retval = UP_OK; 
-  char *nic;
-  GList *item;
+    int retval = UP_OK;
+    char *nic;
+    GList *item;
 
-  LG_log(lg_ctx, LG_FUNC,">up_get_nics: entered\n");
+    LG_log(lg_ctx, LG_FUNC, ">up_get_nics: entered\n");
 
-  for ( item = attrs; item != NULL; item = g_list_next(item) )
-  {
-    nic = rpsl_attr_get_clean_value( (rpsl_attr_t *)(item->data) );
-    if (g_hash_table_lookup(nic_hash, nic) == NULL)
-	{ 
-      /* it is not already in the hash table,
-         add to the hash with mntner name (or "") */
-      LG_log(lg_ctx, LG_DEBUG,"up_get_nics: add [%s] to hash", nic);
-      g_hash_table_insert(nic_hash, nic, strdup(mntner));
+    for (item = attrs; item != NULL; item = g_list_next(item))
+    {
+        nic = rpsl_attr_get_clean_value((rpsl_attr_t *) (item->data));
+        if (g_hash_table_lookup(nic_hash, nic) == NULL)
+        {
+            /* it is not already in the hash table,
+               add to the hash with mntner name (or "") */
+            LG_log(lg_ctx, LG_DEBUG, "up_get_nics: add [%s] to hash", nic);
+            g_hash_table_insert(nic_hash, nic, strdup(mntner));
+        }
+        else
+        {
+            /* nic already there */
+            LG_log(lg_ctx, LG_DEBUG, "up_get_nics: [%s] already in hash", nic);
+            free(nic);
+        }
     }
-	else
-	{  
-      /* nic already there */
-      LG_log(lg_ctx, LG_DEBUG,"up_get_nics: [%s] already in hash", nic);
-	  free(nic);
-	}
-  }
 
-  LG_log(lg_ctx, LG_FUNC,"<up_get_nics: exiting\n");
-  return retval;
+    LG_log(lg_ctx, LG_FUNC, "<up_get_nics: exiting\n");
+    return retval;
 }
-
 
 /* Get a list of nic-hdls from the object.
    Receives RT context
@@ -401,30 +399,30 @@ int up_get_nics(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             parsed object
    Returns  UP_OK always
             (adds entries to hash)
-*/
+ */
 
 int up_get_referenced_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                               GHashTable *nic_hash, rpsl_object_t *object, char *mntner)
+                              GHashTable *nic_hash, rpsl_object_t *object, char *mntner)
 {
-  int retval = UP_OK; 
-  /* list of attributes that can reference a person or role object */
-  char *attr_list[] = {"admin-c","tech-c","zone-c",NULL};
-  GList *pn_attrs = NULL;
+    int retval = UP_OK;
+    /* list of attributes that can reference a person or role object */
+    char *attr_list[] = {"admin-c", "tech-c", "zone-c", NULL};
+    GList *pn_attrs = NULL;
 
-  LG_log(lg_ctx, LG_FUNC,">up_get_referenced_persons: entered\n");
+    LG_log(lg_ctx, LG_FUNC, ">up_get_referenced_persons: entered\n");
 
-  /* get the list of all attributes referencing person/role objects */
-  /* then extract a unified list of nic-hdls */
-  LG_log(lg_ctx, LG_DEBUG,"up_get_referenced_persons: get list of person/role attrs");
-  if ( (pn_attrs = up_get_referenced_attrs(rt_ctx, lg_ctx, attr_list, object)) )
-  {
-    rpsl_attr_split_multiple(&pn_attrs);
-    retval = up_get_nics(rt_ctx, lg_ctx, pn_attrs, nic_hash, mntner);
-    rpsl_attr_delete_list(pn_attrs);
-  }
+    /* get the list of all attributes referencing person/role objects */
+    /* then extract a unified list of nic-hdls */
+    LG_log(lg_ctx, LG_DEBUG, "up_get_referenced_persons: get list of person/role attrs");
+    if ((pn_attrs = up_get_referenced_attrs(rt_ctx, lg_ctx, attr_list, object)))
+    {
+        rpsl_attr_split_multiple(&pn_attrs);
+        retval = up_get_nics(rt_ctx, lg_ctx, pn_attrs, nic_hash, mntner);
+        rpsl_attr_delete_list(pn_attrs);
+    }
 
-  LG_log(lg_ctx, LG_FUNC,"<up_get_referenced_persons: exiting\n");
-  return retval;
+    LG_log(lg_ctx, LG_FUNC, "<up_get_referenced_persons: exiting\n");
+    return retval;
 }
 
 
