@@ -317,7 +317,6 @@ int UP_check_organisation(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   return retval;
 }
 
-
 /* Get a list of attributes from the object matching the attribute types in the
    input list.
    Receives RT context
@@ -326,31 +325,30 @@ int UP_check_organisation(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             parsed object
    Returns  list of attributes (or NULL)
             (list needs to be freed by calling routine with rpsl_attr_delete_list)
-*/
-
+ */
 GList *up_get_referenced_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                                   char **attr_list, rpsl_object_t *preproc_obj)
+                               char **attr_list, rpsl_object_t *preproc_obj)
 {
-  int index=0;
-  char *attr;
-  GList *ref_objs = NULL;
-  GList *ret_obj_list = NULL;
+    int index = 0;
+    char *attr;
+    GList *ref_objs = NULL;
+    GList *ret_obj_list = NULL;
 
-  LG_log(lg_ctx, LG_FUNC,">up_get_referenced_attrs: entered\n");
-  
-  while ( (attr=attr_list[index++]) != NULL )
-  {
-    ref_objs = rpsl_object_get_attr(preproc_obj, attr);
-    if ( ref_objs )
+    LG_log(lg_ctx, LG_FUNC, ">up_get_referenced_attrs: entered\n");
+
+    while ((attr = attr_list[index++]) != NULL)
     {
-      ret_obj_list = g_list_concat(ret_obj_list, ref_objs);
+        ref_objs = rpsl_object_get_attr(preproc_obj, attr);
+        if (ref_objs)
+        {
+            ret_obj_list = g_list_concat(ret_obj_list, ref_objs);
+        }
     }
-  }
-  LG_log(lg_ctx, LG_DEBUG,"up_get_referenced_attrs: [%d] referenced attrs found",
-             g_list_length(ret_obj_list) );
+    LG_log(lg_ctx, LG_DEBUG, "up_get_referenced_attrs: [%d] referenced attrs found",
+           g_list_length(ret_obj_list));
 
-  LG_log(lg_ctx, LG_FUNC,"<up_get_referenced_attrs: exiting\n");
-  return ret_obj_list;
+    LG_log(lg_ctx, LG_FUNC, "<up_get_referenced_attrs: exiting\n");
+    return ret_obj_list;
 }
 
 
