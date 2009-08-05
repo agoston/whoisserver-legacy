@@ -351,18 +351,20 @@ GList *up_get_referenced_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     return ret_obj_list;
 }
 
-/* Get a unique list of nic-hdls from the attribute list.
+/* Get a unique list of attribute values from the attribute list.
    Receives RT context
             LG context
             list of attributes
             hash
-            mntner name
+            hash value
    Returns  UP_OK always
             (adds entries to hash)
+ 
+   Makes copy of hash_value before putting it in hash
  */
 
-int up_get_nics(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                GList *attrs, GHashTable *nic_hash, char *mntner)
+int up_get_unique_values(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                GList *attrs, GHashTable *hash, char *hash_value)
 {
     int retval = UP_OK;
     char *nic;
@@ -373,12 +375,12 @@ int up_get_nics(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     for (item = attrs; item != NULL; item = g_list_next(item))
     {
         nic = rpsl_attr_get_clean_value((rpsl_attr_t *) (item->data));
-        if (g_hash_table_lookup(nic_hash, nic) == NULL)
+        if (g_hash_table_lookup(hash, nic) == NULL)
         {
             /* it is not already in the hash table,
                add to the hash with mntner name (or "") */
             LG_log(lg_ctx, LG_DEBUG, "up_get_nics: add [%s] to hash", nic);
-            g_hash_table_insert(nic_hash, nic, strdup(mntner));
+            g_hash_table_insert(hash, nic, strdup(hash_value));
         }
         else
         {
@@ -418,7 +420,7 @@ int up_get_referenced_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     if ((pn_attrs = up_get_referenced_attrs(rt_ctx, lg_ctx, attr_list, object)))
     {
         rpsl_attr_split_multiple(&pn_attrs);
-        retval = up_get_nics(rt_ctx, lg_ctx, pn_attrs, nic_hash, mntner);
+        retval = up_get_unique_values(rt_ctx, lg_ctx, pn_attrs, nic_hash, mntner);
         rpsl_attr_delete_list(pn_attrs);
     }
 
