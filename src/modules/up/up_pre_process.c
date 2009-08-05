@@ -616,15 +616,15 @@ int up_report_unmaintained(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         key = ((nic_info_t *) (item->data))->nic;
         mntner = ((nic_info_t *) (item->data))->mntner;
         /* perform lookup (can be person or role object) */
-        object = up_get_object(rt_ctx, lg_ctx, options, server,
-                               obj_source, "pn,ro", key);
-
+        object = up_get_object(rt_ctx, lg_ctx, options, server, obj_source, "pn,ro", key);
+        mb = rpsl_object_get_attr(object, "mnt-by");
+        
         /* check for "mnt-by:" attribute */
-        if (object && !(mb = rpsl_object_get_attr(object, "mnt-by")))
+        if (object && !mb)
         {
             /* this person/role object is not maintained */
             type = rpsl_object_get_class(object);
-            if (mntner && !*mntner))
+            if (*mntner))
             {
                 LG_log(lg_ctx, LG_DEBUG, "up_report_unmaintained: [%s] referenced in mntner [%s] is not maintained",
                        key, mntner);
@@ -649,9 +649,6 @@ int up_report_unmaintained(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         /* else
              This referenced person object does not exist.
              This error will be handled later by ref integrity checks in server code */
-        free(key);
-        free(mntner);
-        free(item->data);
     }
 
     LG_log(lg_ctx, LG_FUNC, "<up_report_unmaintained: exiting\n");
