@@ -569,6 +569,7 @@ int up_get_referenced_persons_in_mntners(RT_context_t *rt_ctx, LG_context_t *lg_
 void up_get_nic_hash_data(char *key, char *value, void *data_ptr)
 {
     nic_info_t *nic_info = (nic_info_t *) malloc(sizeof (nic_info_t));
+    nic_list_info_t *nic_list_ptr = (nic_list_info_t *)data_ptr;
 
     /* save the key/value info */
     /* they are already both malloced memory */
@@ -579,13 +580,11 @@ void up_get_nic_hash_data(char *key, char *value, void *data_ptr)
     if (strcmp(value, "") == 0)
     {
         /* no mntner with this nic-hdl */
-        *(((nic_list_info_t *) data_ptr)->nic_list) =
-            g_list_append((GList *) (*(((nic_list_info_t *) data_ptr)->nic_list)), nic_info);
+        nic_list_ptr->nic_list = g_list_append(nic_list_ptr->nic_list, nic_info);
     }
     else
     {
-        *(((nic_list_info_t *) data_ptr)->nic_mnt_list) =
-            g_list_append((GList *) (*(((nic_list_info_t *) data_ptr)->nic_mnt_list)), nic_info);
+        nic_list_ptr->nic_mnt_list = g_list_append(nic_list_ptr->nic_mnt_list, nic_info);
     }
 }
 
@@ -676,27 +675,25 @@ int up_check_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                      LU_server_t *server, char *obj_source)
 {
     int retval = UP_OK;
-    GList *nic_hash_data = NULL;
-    GList *nic_mnt_hash_data = NULL;
     nic_list_info_t nic_list_info;
 
     LG_log(lg_ctx, LG_FUNC, ">up_check_persons: entered\n");
     /* get the hash data into a usable form */
     /* one list of nic-hdls directly referenced,
        second list of nic-hdls indirectly referenced in a mntner */
-    nic_list_info.nic_list = &nic_hash_data;
-    nic_list_info.nic_mnt_list = &nic_mnt_hash_data;
+    nic_list_info.nic_list = NULL;
+    nic_list_info.nic_mnt_list = NULL;
     g_hash_table_foreach(nic_hash, (GHFunc) up_get_nic_hash_data, &nic_list_info);
     /* destroy the hash, the data is now in nic_hash_data list */
     g_hash_table_destroy(nic_hash);
 
     /* check for mnt-by and report to user if none found */
-    retval |= up_report_unmaintained(rt_ctx, lg_ctx, options, nic_hash_data,
+    retval |= up_report_unmaintained(rt_ctx, lg_ctx, options, nic_list_info.nic_list,
                                      server, obj_source);
-    retval |= up_report_unmaintained(rt_ctx, lg_ctx, options, nic_mnt_hash_data,
+    retval |= up_report_unmaintained(rt_ctx, lg_ctx, options, nic_list_info.nic_mnt_list,
                                      server, obj_source);
-    g_list_free(nic_hash_data);
-    g_list_free(nic_mnt_hash_data);
+    g_list_free(nic_list_info.nic_list);
+    g_list_free(nic_list_info.nic_mnt_list);
 
     LG_log(lg_ctx, LG_FUNC, "<up_check_persons: exiting\n");
     return retval;

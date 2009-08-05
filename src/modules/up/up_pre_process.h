@@ -36,8 +36,8 @@ typedef struct {
 } nic_info_t;
 
 typedef struct {
-  GList **nic_list;
-  GList **nic_mnt_list;
+  GList *nic_list;
+  GList *nic_mnt_list;
 } nic_list_info_t;
 
 
