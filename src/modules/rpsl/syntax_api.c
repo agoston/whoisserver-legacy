@@ -812,7 +812,7 @@ rpsl_attr_get_split_list (const rpsl_attr_t *attr)
  * (note that admin-c is not a list or ripe-list attribute at the moment, though)
  *
  * Receives GList* of rpsl_attr_t
- * Returns  nothing; modifies received list properly
+ * Returns  nothing; modifies received GList properly
  */
 void
 rpsl_attr_split_multiple (GList **attrs)

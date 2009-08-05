@@ -469,7 +469,7 @@ char *up_get_mnt_name(RT_context_t *rt_ctx, LG_context_t *lg_ctx, GList *item)
             object source
             object type (class)
             object key
-   Returns  object structure
+   Returns  object structure (to be freed by caller)
  */
 rpsl_object_t *up_get_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options, LU_server_t *server,
@@ -489,11 +489,15 @@ rpsl_object_t *up_get_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     LG_log(lg_ctx, LG_FUNC, "<up_get_object: exiting\n");
     return ret_obj;
 }
+
 /* Get a list of nic-hdls from the mntners referenced in the object.
    Receives RT context
             LG context
-            hash
+            nic-hdl hash
             parsed object
+            lookup server structure
+            lookup server source
+            current update operation (UP_CREATE or something else)
    Returns  UP_OK always
             (adds entries to hash)
  */
@@ -535,8 +539,8 @@ int up_get_referenced_persons_in_mntners(RT_context_t *rt_ctx, LG_context_t *lg_
                 mnt_obj = NULL;
             }
                 /* check for possible startup condition */
-            else if (strcasecmp(type, "person") == 0 && operation == UP_CREATE
-                && g_list_length(mntners) == 1)
+            else if (operation == UP_CREATE && strcasecmp(type, "person") == 0 &&
+                g_list_length(mntners) == 1)
             {
                 /* In general a referenced mntner object that does not exist
                    will be handled later by ref integrity checks in server code */
@@ -563,7 +567,6 @@ int up_get_referenced_persons_in_mntners(RT_context_t *rt_ctx, LG_context_t *lg_
             data pointer - &pointer to hold hash data
    Returns  none
 */
-
 void up_get_nic_hash_data(char *key, char *value, void *data_ptr)
 {
   nic_info_t *nic_info = (nic_info_t *)malloc(sizeof(nic_info_t));
