@@ -577,17 +577,16 @@ void up_get_nic_hash_data(char *key, char *value, void *data_ptr)
     nic_info->mntner = value;
 
     /* add data from hash to data_ptr GLists */
-    if (strcmp(value, "") == 0)
+    if (*value)
+    {
+        nic_list_ptr->nic_mnt_list = g_list_append(nic_list_ptr->nic_mnt_list, nic_info);
+    }
+    else
     {
         /* no mntner with this nic-hdl */
         nic_list_ptr->nic_list = g_list_append(nic_list_ptr->nic_list, nic_info);
     }
-    else
-    {
-        nic_list_ptr->nic_mnt_list = g_list_append(nic_list_ptr->nic_mnt_list, nic_info);
-    }
 }
-
 /* Report any maintained person objects found
    Receives RT context
             LG context
@@ -621,12 +620,11 @@ int up_report_unmaintained(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                                obj_source, "pn,ro", key);
 
         /* check for "mnt-by:" attribute */
-        if (object &&
-            !(mb = rpsl_object_get_attr(object, "mnt-by")))
+        if (object && !(mb = rpsl_object_get_attr(object, "mnt-by")))
         {
             /* this person/role object is not maintained */
             type = rpsl_object_get_class(object);
-            if (mntner && strcmp(mntner, ""))
+            if (mntner && !*mntner))
             {
                 LG_log(lg_ctx, LG_DEBUG, "up_report_unmaintained: [%s] referenced in mntner [%s] is not maintained",
                        key, mntner);
@@ -691,9 +689,8 @@ int up_check_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval |= up_report_unmaintained(rt_ctx, lg_ctx, options, nic_list_info.nic_mnt_list,
                                      server, obj_source);
 
-    /* destroy the hash, freeing allocated keys and values pairs */
-    g_hash_table_destroy(nic_hash);
-    /* free glist memory - free allocated nic_info_t's first*/
+    /* free glist memory - free allocated nic_info_t's first
+     * The key/value pairs taken from the hash should *NOT* be freed here */
     wr_clear_list(&nic_list_info.nic_list);
     wr_clear_list(&nic_list_info.nic_mnt_list);
 
@@ -744,6 +741,9 @@ int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
     /* check for unmaintained person/role objects in the list of nic-hdls */
     retval |= up_check_persons(rt_ctx, lg_ctx, options, nic_hash, server, obj_source);
+
+    /* destroy the hash, freeing allocated keys and values pairs */
+    g_hash_table_destroy(nic_hash);
 
     LG_log(lg_ctx, LG_FUNC, "<UP_check_mnt_by: exiting with value [%s]\n", UP_ret2str(retval));
     return retval;
