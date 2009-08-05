@@ -589,7 +589,6 @@ void up_get_nic_hash_data(char *key, char *value, void *data_ptr)
     }
 }
 
-
 /* Report any maintained person objects found
    Receives RT context
             LG context
@@ -599,70 +598,68 @@ void up_get_nic_hash_data(char *key, char *value, void *data_ptr)
             object source
    Returns  UP_OK always for now (with or without warnings)
             when it becomes an error it will return UP_FAIL if an error occurs
-*/
-
+ */
 int up_report_unmaintained(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                                   options_struct_t *options, GList *nic_data,
-                                   LU_server_t *server, char *obj_source)
+                           options_struct_t *options, GList *nic_data,
+                           LU_server_t *server, char *obj_source)
 {
-  int retval = UP_OK; 
-  char *key;
-  char *mntner;
-  const char *type = NULL;
-  GList *item;
-  GList *mb = NULL;
-  rpsl_object_t *object = NULL;
+    int retval = UP_OK;
+    char *key;
+    char *mntner;
+    const char *type = NULL;
+    GList *item;
+    GList *mb = NULL;
+    rpsl_object_t *object = NULL;
 
-  LG_log(lg_ctx, LG_FUNC,">up_report_unmaintained: entered\n");
+    LG_log(lg_ctx, LG_FUNC, ">up_report_unmaintained: entered\n");
 
-  for ( item = nic_data; item != NULL; item = g_list_next(item) )
-  {
-    key = ((nic_info_t *)(item->data))->nic;
-    mntner = ((nic_info_t *)(item->data))->mntner;
-    /* perform lookup (can be person or role object) */
-    object = up_get_object(rt_ctx, lg_ctx, options, server,
+    for (item = nic_data; item != NULL; item = g_list_next(item))
+    {
+        key = ((nic_info_t *) (item->data))->nic;
+        mntner = ((nic_info_t *) (item->data))->mntner;
+        /* perform lookup (can be person or role object) */
+        object = up_get_object(rt_ctx, lg_ctx, options, server,
                                obj_source, "pn,ro", key);
 
-    /* check for "mnt-by:" attribute */
-    if ( object &&
-         ! (mb = rpsl_object_get_attr(object, "mnt-by")) )
-    {
-      /* this person/role object is not maintained */
-      type = rpsl_object_get_class(object);
-      if ( mntner && strcmp(mntner,"")  )
-      {
-        LG_log(lg_ctx, LG_DEBUG,"up_report_unmaintained: [%s] referenced in mntner [%s] is not maintained", 
-                                    key, mntner);
-        RT_unmaintained_person_in_mntner(rt_ctx, key, type, mntner);
-      }
-      else
-      {
-        LG_log(lg_ctx, LG_DEBUG,"up_report_unmaintained: [%s] is not maintained", key);
-        RT_unmaintained_person(rt_ctx, key, type);
-      }
-      /* uncomment next line if this becomes an error instead of a warning
-         and change RT_unmaintained* function text */
-//      retval = UP_FAIL;
-      rpsl_object_delete(object);
+        /* check for "mnt-by:" attribute */
+        if (object &&
+            !(mb = rpsl_object_get_attr(object, "mnt-by")))
+        {
+            /* this person/role object is not maintained */
+            type = rpsl_object_get_class(object);
+            if (mntner && strcmp(mntner, ""))
+            {
+                LG_log(lg_ctx, LG_DEBUG, "up_report_unmaintained: [%s] referenced in mntner [%s] is not maintained",
+                       key, mntner);
+                RT_unmaintained_person_in_mntner(rt_ctx, key, type, mntner);
+            }
+            else
+            {
+                LG_log(lg_ctx, LG_DEBUG, "up_report_unmaintained: [%s] is not maintained", key);
+                RT_unmaintained_person(rt_ctx, key, type);
+            }
+            /* uncomment next line if this becomes an error instead of a warning
+               and change RT_unmaintained* function text */
+            //      retval = UP_FAIL;
+            rpsl_object_delete(object);
+        }
+        else if (object && mb)
+        {
+            rpsl_attr_delete_list(mb);
+            mb = NULL;
+            rpsl_object_delete(object);
+        }
+        /* else
+             This referenced person object does not exist.
+             This error will be handled later by ref integrity checks in server code */
+        free(key);
+        free(mntner);
+        free(item->data);
     }
-    else if ( object && mb )
-    {
-      rpsl_attr_delete_list(mb);
-      mb = NULL;
-      rpsl_object_delete(object);
-    }
-    /* else 
-         This referenced person object does not exist.
-         This error will be handled later by ref integrity checks in server code */
-    free(key);
-    free(mntner);
-    free(item->data);
-  }
 
-  LG_log(lg_ctx, LG_FUNC,"<up_report_unmaintained: exiting\n");
-  return retval;
+    LG_log(lg_ctx, LG_FUNC, "<up_report_unmaintained: exiting\n");
+    return retval;
 }
-
 
 /* Check the list of persons/roles to see if they are maintained
    Receives RT context
@@ -673,39 +670,37 @@ int up_report_unmaintained(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             object source
    Returns  UP_OK always for now (with or without warnings)
             when it becomes an error it will return UP_FAIL if an error occurs
-*/
-
+ */
 int up_check_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                                   options_struct_t *options, GHashTable *nic_hash,
-                                   LU_server_t *server, char *obj_source)
+                     options_struct_t *options, GHashTable *nic_hash,
+                     LU_server_t *server, char *obj_source)
 {
-  int retval = UP_OK; 
-  GList *nic_hash_data = NULL;
-  GList *nic_mnt_hash_data = NULL;
-  nic_list_info_t nic_list_info;
+    int retval = UP_OK;
+    GList *nic_hash_data = NULL;
+    GList *nic_mnt_hash_data = NULL;
+    nic_list_info_t nic_list_info;
 
-  LG_log(lg_ctx, LG_FUNC,">up_check_persons: entered\n");
-  /* get the hash data into a usable form */
-  /* one list of nic-hdls directly referenced,
-     second list of nic-hdls indirectly referenced in a mntner */
-  nic_list_info.nic_list = &nic_hash_data;
-  nic_list_info.nic_mnt_list = &nic_mnt_hash_data;
-  g_hash_table_foreach(nic_hash, (GHFunc)up_get_nic_hash_data, &nic_list_info);
-  /* destroy the hash, the data is now in nic_hash_data list */
-  g_hash_table_destroy(nic_hash);
+    LG_log(lg_ctx, LG_FUNC, ">up_check_persons: entered\n");
+    /* get the hash data into a usable form */
+    /* one list of nic-hdls directly referenced,
+       second list of nic-hdls indirectly referenced in a mntner */
+    nic_list_info.nic_list = &nic_hash_data;
+    nic_list_info.nic_mnt_list = &nic_mnt_hash_data;
+    g_hash_table_foreach(nic_hash, (GHFunc) up_get_nic_hash_data, &nic_list_info);
+    /* destroy the hash, the data is now in nic_hash_data list */
+    g_hash_table_destroy(nic_hash);
 
-  /* check for mnt-by and report to user if none found */
-  retval |= up_report_unmaintained(rt_ctx, lg_ctx, options, nic_hash_data,
-                                    server, obj_source);
-  retval |= up_report_unmaintained(rt_ctx, lg_ctx, options, nic_mnt_hash_data,
-                                    server, obj_source);
-  g_list_free(nic_hash_data);
-  g_list_free(nic_mnt_hash_data);
+    /* check for mnt-by and report to user if none found */
+    retval |= up_report_unmaintained(rt_ctx, lg_ctx, options, nic_hash_data,
+                                     server, obj_source);
+    retval |= up_report_unmaintained(rt_ctx, lg_ctx, options, nic_mnt_hash_data,
+                                     server, obj_source);
+    g_list_free(nic_hash_data);
+    g_list_free(nic_mnt_hash_data);
 
-  LG_log(lg_ctx, LG_FUNC,"<up_check_persons: exiting\n");
-  return retval;
+    LG_log(lg_ctx, LG_FUNC, "<up_check_persons: exiting\n");
+    return retval;
 }
-
 
 /* checks directly referenced person/role objects to see if any are not maintained.
    checks referenced mntner objects to see if any person/role objects referenced 
@@ -721,39 +716,38 @@ int up_check_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             object source
    Returns  UP_OK always for now (with or without warnings)
             when it becomes an error it will return UP_FAIL if an error occurs
-*/
-
+ */
 int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                     options_struct_t *options, rpsl_object_t *preproc_obj, 
-                     int operation, LU_server_t *server, char *obj_source)
+                    options_struct_t *options, rpsl_object_t *preproc_obj,
+                    int operation, LU_server_t *server, char *obj_source)
 {
-  int retval = UP_OK; 
-  GHashTable *nic_hash = NULL;
+    int retval = UP_OK;
+    GHashTable *nic_hash = NULL;
 
-  LG_log(lg_ctx, LG_FUNC,">UP_check_mnt_by: entered\n");
+    LG_log(lg_ctx, LG_FUNC, ">UP_check_mnt_by: entered\n");
 
-  /* if the operation is a delete, then return OK */
-  if (operation == UP_DELETE)
-  {
-    LG_log(lg_ctx, LG_FUNC,"<UP_check_mnt_by: exiting with value [%s]\n", UP_ret2str(retval));
-    return retval;
-  }
+    /* if the operation is a delete, then return OK */
+    if (operation == UP_DELETE)
+    {
+        LG_log(lg_ctx, LG_FUNC, "<UP_check_mnt_by: exiting with value [%s]\n", UP_ret2str(retval));
+        return retval;
+    }
 
-  /* initialize the hash to be used for a unified list of nic-hdls */
-  nic_hash = g_hash_table_new(g_str_hash, g_str_equal);
+    /* initialize the hash to be used for a unified list of nic-hdls */
+    nic_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
-  /* get a unique list of nic-hdls directly referenced by the object */
-  retval |= up_get_referenced_persons(rt_ctx, lg_ctx, nic_hash, preproc_obj, "");
+    /* get a unique list of nic-hdls directly referenced by the object */
+    retval |= up_get_referenced_persons(rt_ctx, lg_ctx, nic_hash, preproc_obj, "");
 
-  /* add a unique list of nic-hdls referenced in mntners referenced by the object */
-  retval |= up_get_referenced_persons_in_mntners(rt_ctx, lg_ctx, options, nic_hash, preproc_obj,
+    /* add a unique list of nic-hdls referenced in mntners referenced by the object */
+    retval |= up_get_referenced_persons_in_mntners(rt_ctx, lg_ctx, options, nic_hash, preproc_obj,
                                                    server, obj_source, operation);
 
-  /* check for unmaintained person/role objects in the list of nic-hdls */
-  retval |= up_check_persons(rt_ctx, lg_ctx, options, nic_hash, server, obj_source);
+    /* check for unmaintained person/role objects in the list of nic-hdls */
+    retval |= up_check_persons(rt_ctx, lg_ctx, options, nic_hash, server, obj_source);
 
-  LG_log(lg_ctx, LG_FUNC,"<UP_check_mnt_by: exiting with value [%s]\n", UP_ret2str(retval));
-  return retval;
+    LG_log(lg_ctx, LG_FUNC, "<UP_check_mnt_by: exiting with value [%s]\n", UP_ret2str(retval));
+    return retval;
 }
 
 /* checks for a valid suffix at the end of a 'nic-hdl' attributes 
