@@ -731,7 +731,7 @@ int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     }
 
     /* initialize the hash to be used for a unified list of nic-hdls */
-    nic_hash = g_hash_table_new(g_str_hash, g_str_equal);
+    nic_hash = g_hash_table_new_full(g_str_hash, g_str_equal, free, free);
 
     /* get a unique list of nic-hdls directly referenced by the object */
     retval |= up_get_referenced_persons(rt_ctx, lg_ctx, nic_hash, preproc_obj, "");
