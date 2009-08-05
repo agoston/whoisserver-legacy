@@ -557,7 +557,6 @@ int up_get_referenced_persons_in_mntners(RT_context_t *rt_ctx, LG_context_t *lg_
     return retval;
 }
 
-
 /* To be used with g_hash_table_foreach in up_check_persons.
    This is a horrible hack because our OLD glib does not
    have any functions for getting a list of keys and values
@@ -566,28 +565,28 @@ int up_get_referenced_persons_in_mntners(RT_context_t *rt_ctx, LG_context_t *lg_
             value
             data pointer - &pointer to hold hash data
    Returns  none
-*/
+ */
 void up_get_nic_hash_data(char *key, char *value, void *data_ptr)
 {
-  nic_info_t *nic_info = (nic_info_t *)malloc(sizeof(nic_info_t));
-  
-  /* save the key/value info */
-  /* they are already both malloced memory */
-  nic_info->nic = key;
-  nic_info->mntner = value;
-  
-  /* add data from hash to data_ptr GLists */
-  if ( strcmp(value, "") == 0 )
-  {
-    /* no mntner with this nic-hdl */
-    *(((nic_list_info_t *)data_ptr)->nic_list) = 
-            g_list_append((GList *)(*(((nic_list_info_t *)data_ptr)->nic_list)), nic_info);
-  }
-  else
-  {
-    *(((nic_list_info_t *)data_ptr)->nic_mnt_list) = 
-            g_list_append((GList *)(*(((nic_list_info_t *)data_ptr)->nic_mnt_list)), nic_info);
-  }
+    nic_info_t *nic_info = (nic_info_t *) malloc(sizeof (nic_info_t));
+
+    /* save the key/value info */
+    /* they are already both malloced memory */
+    nic_info->nic = key;
+    nic_info->mntner = value;
+
+    /* add data from hash to data_ptr GLists */
+    if (strcmp(value, "") == 0)
+    {
+        /* no mntner with this nic-hdl */
+        *(((nic_list_info_t *) data_ptr)->nic_list) =
+            g_list_append((GList *) (*(((nic_list_info_t *) data_ptr)->nic_list)), nic_info);
+    }
+    else
+    {
+        *(((nic_list_info_t *) data_ptr)->nic_mnt_list) =
+            g_list_append((GList *) (*(((nic_list_info_t *) data_ptr)->nic_mnt_list)), nic_info);
+    }
 }
 
 
