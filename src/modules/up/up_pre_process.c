@@ -362,7 +362,6 @@ GList *up_get_referenced_attrs(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
  
    Makes copy of hash_value before putting it in hash
  */
-
 int up_get_unique_values(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                 GList *attrs, GHashTable *hash, char *hash_value)
 {
@@ -403,7 +402,6 @@ int up_get_unique_values(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  UP_OK always
             (adds entries to hash)
  */
-
 int up_get_referenced_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                               GHashTable *nic_hash, rpsl_object_t *object, char *mntner)
 {
@@ -428,43 +426,43 @@ int up_get_referenced_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     return retval;
 }
 
-
 /* Get the clean name of a mntner from the attribute structure.
    Receives RT context
             LG context
             attribute structure
-   Returns  mntner clean name
-*/
-
+   Returns  mntner clean name (to be freed by caller)
+ */
 char *up_get_mnt_name(RT_context_t *rt_ctx, LG_context_t *lg_ctx, GList *item)
 {
-  char *mnt = NULL;
-  char *attr_name;
-  gchar *p;
+    char *mnt = NULL;
+    char *attr_name;
+    gchar *p;
 
-  LG_log(lg_ctx, LG_FUNC,">up_get_mnt_name: entered\n");
-  mnt = rpsl_attr_get_clean_value( (rpsl_attr_t *)(item->data) );
-  attr_name = (char *)rpsl_attr_get_name( (rpsl_attr_t *)(item->data) );
-  if ( strcmp(attr_name, "mnt-routes") == 0 )
-  {
-    /* This is a mnt-routes attribute. It may have {.+} appended to the value.
-       With or without a single space before this string. This must be removed. */
-    p = strchr(mnt, ' '); 
-    if (p != NULL) {
-      *p = '\0';
-    } else {
-      p = strchr(mnt, '{'); 
-      if (p != NULL) *p = '\0';
+    LG_log(lg_ctx, LG_FUNC, ">up_get_mnt_name: entered\n");
+    mnt = rpsl_attr_get_clean_value((rpsl_attr_t *) (item->data));
+    attr_name = (char *) rpsl_attr_get_name((rpsl_attr_t *) (item->data));
+    if (strcmp(attr_name, "mnt-routes") == 0)
+    {
+        /* This is a mnt-routes attribute. It may have {.+} appended to the value.
+           With or without a single space before this string. This must be removed. */
+        p = strchr(mnt, ' ');
+        if (p != NULL)
+        {
+            *p = '\0';
+        }
+        else
+        {
+            p = strchr(mnt, '{');
+            if (p != NULL) *p = '\0';
+        }
     }
-  }
 
-  LG_log(lg_ctx, LG_FUNC,"<up_get_mnt_name: exiting with name [%s]\n", mnt);
-  return mnt;
+    LG_log(lg_ctx, LG_FUNC, "<up_get_mnt_name: exiting with name [%s]\n", mnt);
+    return mnt;
 }
 
-
 /* Lookup an object in the DB.
-   Receives RT context
+    Receives RT context
             LG context
             options structure
             server structure for lookups
@@ -472,27 +470,25 @@ char *up_get_mnt_name(RT_context_t *rt_ctx, LG_context_t *lg_ctx, GList *item)
             object type (class)
             object key
    Returns  object structure
-*/
-
+ */
 rpsl_object_t *up_get_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                               options_struct_t *options, LU_server_t *server,
-                               char *obj_source, char *obj_type, char *obj_key)
+                             options_struct_t *options, LU_server_t *server,
+                             char *obj_source, char *obj_type, char *obj_key)
 {
-  rpsl_object_t *ret_obj = NULL;
+    rpsl_object_t *ret_obj = NULL;
 
-  LG_log(lg_ctx, LG_FUNC,">up_get_object: entered\n");
-  /* perform lookup for object */
-  if ( LU_lookup(server, &ret_obj, obj_type, obj_key, obj_source) != LU_OKAY )
-  {
-    /* any lookup error is considered a fatal error */
-    LG_log(lg_ctx, LG_FATAL,"up_get_object: lookup error on [%s]", obj_key);
-    UP_internal_error(rt_ctx, lg_ctx, options, "up_get_object: lookup error\n", 0);
-  }
+    LG_log(lg_ctx, LG_FUNC, ">up_get_object: entered\n");
+    /* perform lookup for object */
+    if (LU_lookup(server, &ret_obj, obj_type, obj_key, obj_source) != LU_OKAY)
+    {
+        /* any lookup error is considered a fatal error */
+        LG_log(lg_ctx, LG_FATAL, "up_get_object: lookup error on [%s]", obj_key);
+        UP_internal_error(rt_ctx, lg_ctx, options, "up_get_object: lookup error\n", 0);
+    }
 
-  LG_log(lg_ctx, LG_FUNC,"<up_get_object: exiting\n");
-  return ret_obj;
+    LG_log(lg_ctx, LG_FUNC, "<up_get_object: exiting\n");
+    return ret_obj;
 }
-
 
 /* Get a list of nic-hdls from the mntners referenced in the object.
    Receives RT context
