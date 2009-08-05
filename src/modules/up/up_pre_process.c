@@ -684,16 +684,18 @@ int up_check_persons(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     nic_list_info.nic_list = NULL;
     nic_list_info.nic_mnt_list = NULL;
     g_hash_table_foreach(nic_hash, (GHFunc) up_get_nic_hash_data, &nic_list_info);
-    /* destroy the hash, the data is now in nic_hash_data list */
-    g_hash_table_destroy(nic_hash);
 
     /* check for mnt-by and report to user if none found */
     retval |= up_report_unmaintained(rt_ctx, lg_ctx, options, nic_list_info.nic_list,
                                      server, obj_source);
     retval |= up_report_unmaintained(rt_ctx, lg_ctx, options, nic_list_info.nic_mnt_list,
                                      server, obj_source);
-    g_list_free(nic_list_info.nic_list);
-    g_list_free(nic_list_info.nic_mnt_list);
+
+    /* destroy the hash, freeing allocated keys and values pairs */
+    g_hash_table_destroy(nic_hash);
+    /* free glist memory - free allocated nic_info_t's first*/
+    wr_clear_list(&nic_list_info.nic_list);
+    wr_clear_list(&nic_list_info.nic_mnt_list);
 
     LG_log(lg_ctx, LG_FUNC, "<up_check_persons: exiting\n");
     return retval;
