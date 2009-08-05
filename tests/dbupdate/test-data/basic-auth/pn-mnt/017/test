@@ -1,9 +1,9 @@
 # basic-auth pn-mnt tests
 #
 # CASE 17: Create an inetnum object
-#          references 2 unmaintained person objects TP1 and TP2
+#          references 2 unmaintained person objects TP2 and TP3
 #          references 2 mntner objects each of which reference
-#          same 2 unmaintained person objects TP1 and TP2
+#          same 2 unmaintained person objects TP2 and TP3
 #
 # create inetnum object 
 #

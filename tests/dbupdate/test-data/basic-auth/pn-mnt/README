@@ -84,7 +84,7 @@
 
 
 # CASE 9: Delete a person and a role object
-#         with a mnt-by and correct password
+#         without a mnt-by
 #
 # delete person and role objects
 #
@@ -173,9 +173,9 @@
 
 
 # CASE 17: Create an inetnum object
-#          references 2 unmaintained person objects TP1 and TP2
+#          references 2 unmaintained person objects TP2 and TP3
 #          references 2 mntner objects each of which reference
-#          same 2 unmaintained person objects TP1 and TP2
+#          same 2 unmaintained person objects TP2 and TP3
 #
 # create inetnum object 
 #
