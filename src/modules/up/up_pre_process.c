@@ -503,7 +503,7 @@ int up_get_referenced_persons_in_mntners(RT_context_t *rt_ctx, LG_context_t *lg_
                                          char *obj_source, int operation)
 {
     int retval = UP_OK;
-    char *type;
+    const char *type;
     char *mnt = NULL;
     GList *mntners = NULL;
     GList *item;
@@ -512,7 +512,7 @@ int up_get_referenced_persons_in_mntners(RT_context_t *rt_ctx, LG_context_t *lg_
     char *attr_list[] = {"mnt-by", "mnt-lower", "mnt-routes", "mnt-domains", "mnt-ref", NULL};
 
     LG_log(lg_ctx, LG_FUNC, ">up_get_referenced_persons_in_mntners: entered\n");
-    type = (char *) rpsl_object_get_class(object);
+    type = rpsl_object_get_class(object);
 
     /* get the list of all attributes referencing mntner objects */
     LG_log(lg_ctx, LG_DEBUG, "up_get_referenced_persons_in_mntners: get list of mntners");
