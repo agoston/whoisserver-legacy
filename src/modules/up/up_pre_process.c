@@ -618,13 +618,14 @@ int up_report_unmaintained(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         /* perform lookup (can be person or role object) */
         object = up_get_object(rt_ctx, lg_ctx, options, server, obj_source, "pn,ro", key);
         mb = rpsl_object_get_attr(object, "mnt-by");
-        
+
         /* check for "mnt-by:" attribute */
         if (object && !mb)
         {
             /* this person/role object is not maintained */
             type = rpsl_object_get_class(object);
-            if (*mntner))
+
+            if (*mntner)
             {
                 LG_log(lg_ctx, LG_DEBUG, "up_report_unmaintained: [%s] referenced in mntner [%s] is not maintained",
                        key, mntner);
