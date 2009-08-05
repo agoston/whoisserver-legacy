@@ -489,7 +489,6 @@ rpsl_object_t *up_get_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     LG_log(lg_ctx, LG_FUNC, "<up_get_object: exiting\n");
     return ret_obj;
 }
-
 /* Get a list of nic-hdls from the mntners referenced in the object.
    Receives RT context
             LG context
@@ -497,62 +496,61 @@ rpsl_object_t *up_get_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             parsed object
    Returns  UP_OK always
             (adds entries to hash)
-*/
-
+ */
 int up_get_referenced_persons_in_mntners(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                               options_struct_t *options, GHashTable *nic_hash,
-                               rpsl_object_t *object, LU_server_t *server,
-                               char *obj_source, int operation)
+                                         options_struct_t *options, GHashTable *nic_hash,
+                                         rpsl_object_t *object, LU_server_t *server,
+                                         char *obj_source, int operation)
 {
-  int retval = UP_OK; 
-  char *type;
-  char *mnt = NULL;
-  GList *mntners = NULL;
-  GList *item;
-  rpsl_object_t *mnt_obj = NULL;
-  /* list of attributes that can reference a mntner */
-  char *attr_list[] = {"mnt-by","mnt-lower","mnt-routes","mnt-domains","mnt-ref",NULL};
+    int retval = UP_OK;
+    char *type;
+    char *mnt = NULL;
+    GList *mntners = NULL;
+    GList *item;
+    rpsl_object_t *mnt_obj = NULL;
+    /* list of attributes that can reference a mntner */
+    char *attr_list[] = {"mnt-by", "mnt-lower", "mnt-routes", "mnt-domains", "mnt-ref", NULL};
 
-  LG_log(lg_ctx, LG_FUNC,">up_get_referenced_persons_in_mntners: entered\n");
-  type = (char *)rpsl_object_get_class(object);
+    LG_log(lg_ctx, LG_FUNC, ">up_get_referenced_persons_in_mntners: entered\n");
+    type = (char *) rpsl_object_get_class(object);
 
-  /* get the list of all attributes referencing mntner objects */
-  LG_log(lg_ctx, LG_DEBUG,"up_get_referenced_persons_in_mntners: get list of mntners");
-  if ( (mntners = up_get_referenced_attrs(rt_ctx, lg_ctx, attr_list, object)) )
-  {
-    rpsl_attr_split_multiple(&mntners);
-
-    /* check all person/role references in the mntners */
-    for ( item = mntners; item != NULL; item = g_list_next(item) )
+    /* get the list of all attributes referencing mntner objects */
+    LG_log(lg_ctx, LG_DEBUG, "up_get_referenced_persons_in_mntners: get list of mntners");
+    if ((mntners = up_get_referenced_attrs(rt_ctx, lg_ctx, attr_list, object)))
     {
-      mnt = up_get_mnt_name(rt_ctx, lg_ctx, item);
-      mnt_obj = up_get_object(rt_ctx, lg_ctx, options, server,
-                               obj_source, "mntner", mnt);
+        rpsl_attr_split_multiple(&mntners);
 
-      /* get the list of all person/role referenced in the mntner object */
-      if ( mnt_obj  )
-      {
-        retval |= up_get_referenced_persons(rt_ctx, lg_ctx, nic_hash, mnt_obj, mnt);
-        rpsl_object_delete(mnt_obj);
-        mnt_obj = NULL;
-      }
-      /* check for possible startup condition */
-      else if ( strcasecmp(type, "person") == 0 && operation == UP_CREATE
-                  && g_list_length(mntners) == 1 )
-      {
-        /* In general a referenced mntner object that does not exist
-           will be handled later by ref integrity checks in server code */
-        /* if we have a person creation referencing a single non existant mntner
-           maybe they need to use the startup cgi script */
-        RT_startup(rt_ctx);
-      }
-      free(mnt);
+        /* check all person/role references in the mntners */
+        for (item = mntners; item != NULL; item = g_list_next(item))
+        {
+            mnt = up_get_mnt_name(rt_ctx, lg_ctx, item);
+            mnt_obj = up_get_object(rt_ctx, lg_ctx, options, server,
+                                    obj_source, "mntner", mnt);
+
+            /* get the list of all person/role referenced in the mntner object */
+            if (mnt_obj)
+            {
+                retval |= up_get_referenced_persons(rt_ctx, lg_ctx, nic_hash, mnt_obj, mnt);
+                rpsl_object_delete(mnt_obj);
+                mnt_obj = NULL;
+            }
+                /* check for possible startup condition */
+            else if (strcasecmp(type, "person") == 0 && operation == UP_CREATE
+                && g_list_length(mntners) == 1)
+            {
+                /* In general a referenced mntner object that does not exist
+                   will be handled later by ref integrity checks in server code */
+                /* if we have a person creation referencing a single non existant mntner
+                   maybe they need to use the startup cgi script */
+                RT_startup(rt_ctx);
+            }
+            free(mnt);
+        }
+        rpsl_attr_delete_list(mntners);
     }
-    rpsl_attr_delete_list(mntners);
-  }
 
-  LG_log(lg_ctx, LG_FUNC,"<up_get_referenced_persons_in_mntners: exiting\n");
-  return retval;
+    LG_log(lg_ctx, LG_FUNC, "<up_get_referenced_persons_in_mntners: exiting\n");
+    return retval;
 }
 
 
