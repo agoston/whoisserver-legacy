@@ -14,18 +14,18 @@
     <attributes>
       <domain      choice="mandatory" number="single"   />
       <descr       choice="mandatory" number="multiple" />
-      <org         choice="optional"  number="multiple" />
-      <admin-c     choice="mandatory" number="multiple" />
-      <tech-c      choice="mandatory" number="multiple" />
-      <zone-c      choice="mandatory" number="multiple" />
+      <org         choice="optional"  number="multiple" foreignkey="organisation"/>
+      <admin-c     choice="mandatory" number="multiple" foreignkey="person"/>
+      <tech-c      choice="mandatory" number="multiple" foreignkey="person"/>
+      <zone-c      choice="mandatory" number="multiple" foreignkey="person"/>
       <nserver     choice="optional"  number="multiple" />
       <ds-rdata    choice="optional"  number="multiple" />
       <sub-dom     choice="optional"  number="multiple" />
       <dom-net     choice="optional"  number="multiple" />
       <remarks     choice="optional"  number="multiple" />
       <notify      choice="optional"  number="multiple" />
-      <mnt-by      choice="mandatory" number="multiple" />
-      <mnt-lower   choice="optional"  number="multiple" />
+      <mnt-by      choice="mandatory" number="multiple" foreignkey="mntner"/>
+      <mnt-lower   choice="optional"  number="multiple" foreignkey="mntner"/>
       <refer       choice="optional"  number="single"   />
       <changed     choice="mandatory" number="multiple" />
       <source      choice="mandatory" number="single"   />
@@ -65,9 +65,9 @@
       <netname     choice="mandatory" number="single"   />
       <descr       choice="mandatory" number="multiple" />
       <country     choice="mandatory" number="multiple" />
-      <org         choice="optional"  number="single"   />
-      <admin-c     choice="mandatory" number="multiple" />
-      <tech-c      choice="mandatory" number="multiple" />
+      <org         choice="optional"  number="single"   foreignkey="organisation"/>
+      <admin-c     choice="mandatory" number="multiple" foreignkey="person"/>
+      <tech-c      choice="mandatory" number="multiple" foreignkey="person"/>
       <status-in   choice="mandatory" number="single"   />
       <remarks     choice="optional"  number="multiple" />
       <notify      choice="optional"  number="multiple" />
@@ -369,7 +369,7 @@
       <e-mail       choice="mandatory" number="multiple" />
       <org          choice="optional"  number="multiple" />
       <admin-c      choice="optional"  number="multiple" foreignkey="person"/>
-      <tech-c       choice="optional"  number="multiple" />
+      <tech-c       choice="optional"  number="multiple" foreignkey="person"/>
       <ref-nfy      choice="optional"  number="multiple" />
       <mnt-ref      choice="mandatory" number="multiple" />
       <notify       choice="optional"  number="multiple" />
