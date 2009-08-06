@@ -263,4 +263,4 @@
             value   NMTOKEN   #REQUIRED
 >
 
-<!ELEMENT dummify (filter?, placeholder?)>
+<!ELEMENT dummify (filter)>

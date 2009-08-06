@@ -94,9 +94,6 @@
         </sqlquery>
       </queries>
     </keys>
-    <dummify>
-        <placeholder>person</placeholder>
-    </dummify>
   </ripe_attribute>
 
   <ripe_attribute name="aggr-mtd" code="ag">
@@ -1643,7 +1640,7 @@
     <syntax>telephone-number</syntax>
     <dummify>
         <filter>+31205354444</filter>
-    <dummify>
+    </dummify>
   </ripe_attribute>
 
   <ripe_attribute name="referral-by" code="rb">

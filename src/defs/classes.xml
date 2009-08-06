@@ -368,7 +368,7 @@
       <fax-no       choice="optional"  number="multiple" />
       <e-mail       choice="mandatory" number="multiple" />
       <org          choice="optional"  number="multiple" />
-      <admin-c      choice="optional"  number="multiple" />
+      <admin-c      choice="optional"  number="multiple" foreignkey="person"/>
       <tech-c       choice="optional"  number="multiple" />
       <ref-nfy      choice="optional"  number="multiple" />
       <mnt-ref      choice="mandatory" number="multiple" />
