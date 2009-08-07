@@ -94,6 +94,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>person</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="aggr-mtd" code="ag">
@@ -243,6 +244,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>person</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="certif" code="ce">
@@ -841,6 +843,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute xmlname="members-as" name="members" code="ms">
@@ -926,6 +929,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="mnt-lower" code="ml">
@@ -973,6 +977,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="mnt-ref" code="mz">
@@ -1015,6 +1020,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="mnt-domains" code="md">
@@ -1060,6 +1066,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="mnt-nfy" code="mn">
@@ -1180,6 +1187,7 @@
         </sqlquery>
       </queries>
     </keys>  
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute xmlname="mnt-routes6" name="mnt-routes" code="mu">
@@ -1228,6 +1236,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute xmlname="mnt-routes-an" name="mnt-routes" code="mu">
@@ -1276,6 +1285,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="mntner" code="mt">
@@ -1954,6 +1964,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>person</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="org" code="og">
@@ -1996,6 +2007,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>organisation</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="text" code="tx">
@@ -2092,6 +2104,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>person</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="inet-rtr" code="ir">
@@ -2548,6 +2561,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>irt</foreignkey>
  </ripe_attribute>
 
   <ripe_attribute name="irt" code="it">
