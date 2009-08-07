@@ -26,8 +26,6 @@
 
 <!ELEMENT syntax        ((list|ripe-list)?, CDATA)>
 
-<!ELEMENT dummify (filter | placeholder)>
-
 <!ELEMENT list  EMPTY>
 
 <!ELEMENT ripe-list EMPTY>

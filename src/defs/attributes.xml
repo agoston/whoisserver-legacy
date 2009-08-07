@@ -41,9 +41,7 @@
       Full postal address of a contact.
     </description>
     <syntax>free-form</syntax>
-    <dummify>
-        <filter>Dummy address for %s</filter>
-    </dummify>
+    <dummify>Dummy address for %s</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="admin-c" code="ac">
@@ -193,9 +191,7 @@
         </sqlquery>
       </queries>
     </keys>
-    <dummify>
-        <filter>MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/</filter>
-    </dummify>
+    <dummify>MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="author" code="ah">
@@ -261,9 +257,7 @@
    This attribute is filtered from the default whois output.
     </description>
     <syntax>changed</syntax>
-    <dummify>
-        <filter>unread@ripe.net 20000101</filter>
-    </dummify>
+    <dummify>unread@ripe.net 20000101</dummify>
   </ripe_attribute>
 
   <ripe_attribute xmlname="components-rt" name="components" code="co">
@@ -308,9 +302,7 @@
    A short decription related to the object.
     </description>
     <syntax>free-form</syntax>
-    <dummify>
-        <filter>Dummy description for %s</filter>
-    </dummify>
+    <dummify>Dummy description for %s</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="dom-net" code="di">
@@ -441,9 +433,7 @@
         </sqlquery>
       </queries>
     </keys>
-    <dummify>
-        <filter>unread@ripe.net</filter>
-    </dummify>
+    <dummify>unread@ripe.net</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="export" code="ex">
@@ -1638,9 +1628,7 @@
         </sqlquery>
       </queries>
     </keys>
-    <dummify>
-        <filter>Dummy organisation name for %s</filter>
-    </dummify>
+    <dummify>Dummy organisation name for %s</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="phone" code="ph">
@@ -1648,9 +1636,7 @@
    Specifies a telephone number of the contact.
     </description>
     <syntax>telephone-number</syntax>
-    <dummify>
-        <filter>+31205354444</filter>
-    </dummify>
+    <dummify>+31205354444</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="referral-by" code="rb">
@@ -2050,9 +2036,7 @@
         </sqlquery>
       </queries>
     </keys>
-    <dummify>
-        <filter>unread@ripe.net</filter>
-    </dummify>
+    <dummify>unread@ripe.net</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="zone-c" code="zc">
