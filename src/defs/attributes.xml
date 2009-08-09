@@ -1680,6 +1680,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="remarks" code="rm">

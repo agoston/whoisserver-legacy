@@ -756,13 +756,17 @@ public class Defs {
         } else {
             out.println("        0,");
         }
-        out.println("        /* foreign_code */");
-        String foreign = ad.getForeign();
-        if ((foreign == null) || (foreign.length() == 0)) {
-            out.println("        NULL,");
-        } else {
-            out.println("        \"" + foreign + "\"");
-        }
+
+        // unused; commented out by agoston, 2009-08-07
+//        out.println("        /* foreign_code */");
+//        String foreign = ad.getForeign();
+//        if ((foreign == null) || (foreign.length() == 0)) {
+//            out.println("        NULL,");
+//        } else {
+//            out.println("        \"" + foreign + "\"");
+//        }
+        
+        
     }
 
     // create attribute_tab.h
@@ -891,6 +895,7 @@ public class Defs {
         out.println("        NULL,");
 
         // dummification info
+        out.println("        /* dummification type, placeholder */");
         switch (cd.getDummifyType()) {
             case ClassDef.DUMMIFY_NONE:
                 out.println("        DUMMIFY_NONE,");
