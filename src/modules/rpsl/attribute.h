@@ -42,6 +42,7 @@ typedef struct {
     //                            "mnt-by" or "mnt-lower" */
 
     int foreignkey_class_offset;       /* index into class_tab[] for class definition */
+    char *dummify;              /* string to dummify attribute into */
 } attribute_t;
 
 /* functions */

@@ -765,8 +765,27 @@ public class Defs {
 //        } else {
 //            out.println("        \"" + foreign + "\"");
 //        }
-        
-        
+
+        out.println("        /*  foreignkey */");
+        if (ad.getForeignkey() != null) {
+            // look up the class ID
+            int index = ripeClassAliases.indexOf(ad.getForeignkey());
+            if (index >= 0) {
+                out.println("        "+index+",");
+            } else {
+                System.err.println("Attribute "+ad.getName()+" has invalid foreign key specified!");
+                System.exit(1);
+            }
+        } else {
+            out.println("        -1,");
+        }
+
+        out.println("        /* dummify */");
+        if (ad.getDummify() != null) {
+            out.println("        \""+ad.getDummify()+"\",");
+        } else {
+            out.println("        NULL,");
+        }
     }
 
     // create attribute_tab.h
