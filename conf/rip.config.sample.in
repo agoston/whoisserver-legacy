@@ -528,68 +528,10 @@ QI_FILTER_BANNER % Note: this output has been filtered.
 ##
 
 # Dummification is the process of removing information to protect privacy.
-# There are 3 levels of dummification implemented:
-#
-# 1. Remove object type (DUMMY_PLACEHOLDER)
-# In this case, we remove all occurances of an object type, and replace all
-# references to it with a dummy placeholder object (thus, we keep referential
-# integrity).
-#
-# 2. Dummify object
-# In this case, we keep all objects of an object type, but we mask some of their
-# attributes. This is similar in result to #1, but end user retains the
-# possibility to look up the dummified object in the RIPE DB. Also, because of
-# referential integrity, the IDs of all such objects have to be kept, which
-# might not be preferred in some cases (e.g. nic-hdls are personal data).
-#
-# 3. Leave alone
-# These objects themselves are not to be changed, they don't contain any data
-# that should be masked. However, they might still contain reference to such
-# data (like tech-c or admin-c attributes that contain nic-hdls). As such,
-# these objects still have to be scanned and slightly dummified.
+# see src/modules/pm/protocol_mirror.c for design documentation.
 
-
-# Definition of dummy placeholders (#1)
-#
-# syntax: <object_type> <object_type.attr_name=value>(,<object_type.attr_name=value>)*
-# You can use '*' as a wildcard for all object types
-
-DUMMY_PLACEHOLDER person *.tech_c=PH4239-RIPE,*.admin_c=PH4239-RIPE
-
-# You can add a message to all objects that have been changed to remove reference
-# to a completely removed object type here
-
-DUMMY_PLACEHOLDER_MSG ****************************************************************
-DUMMY_PLACEHOLDER_MSG * THIS OBJECT HAS BEEN CHANGED
-DUMMY_PLACEHOLDER_MSG * Please note that references to personal data have been removed
-DUMMY_PLACEHOLDER_MSG * from this object.
-DUMMY_PLACEHOLDER_MSG * To view the original object, please query the RIPE Database at:
-DUMMY_PLACEHOLDER_MSG * http://www.ripe.net/whois
-DUMMY_PLACEHOLDER_MSG ****************************************************************
-
-
-# Definition of dummified objects (#2)
-# syntax: <object_type> <attr_name=value>(,attr_name=value)*
-# A list of attributes which are mandatory RPSL attributes, but contain
-# personal data and thus should be replaced with a generated value. The
-# values are going to be fed to a sprintf(), with the primary key of the
-# object as an argument. This can be used to give more meaningful dummified
-# attributes.
-#
-# If you leave a value for an attribute empty, it will not be modified at all.
-# This feature can be used for referential attributes, which do not contain personal
-# data, just reference other objects.
-#
-# The first word is the attribute name (lowercase), then comes an = as a
-# separator, and the rest of the string until the end of line is passed to
-# sprintf(). Note that neither keys nor values are chomped anywhere, so don't
-# leave whitespaces around.
-DUMMY_ATTRS organisation
-
-
-
-
-# Additional remarks to be added to the end of the dummified object.
+# You can add a message to all objects that have been changed by dummification
+# The below lines will be added to the end of every such object
 
 DUMMY_ADD_ATTR ****************************
 DUMMY_ADD_ATTR * THIS OBJECT IS NOT VALID

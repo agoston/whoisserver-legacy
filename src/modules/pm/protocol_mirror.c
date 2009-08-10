@@ -269,14 +269,36 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 
 /* PUBLIC NRTM STREAM DESIGN
  *
- * Instead of simply dropping private objects from the public nrtm stream, we decided to send dummified objects.
- * It has the following adventages:
- * - We can add a nice 'this is a dummy object, for the real stuff, use whois.ripe.net blabla' message to each
- *   dummified object, thus spare us *a lot* of support trouble
- * - There will be no gaps in serials
- * - 3rd party software interpreting the nrtm streams do not need modification to handle special cases
- * - We won't create a special case which will bite into our asses when we do some change
- * - All referential integrity will be maintained
+ * The RIPE DB contains quite a bit of personal data. So far, NRTM access gave full access to all private
+ * data, and all history. DP-TF found this is not acceptable. We had to limit access to private data
+ * and history.
+ *
+ * Limiting history is easier: we simply look up if the beginning of the NRTM requested range has been added within
+ * a limited amount of time (NRTM_HISTORY_ACCESS_LIMIT in rip.config). If not, we simply refuse the NRTM request.
+ *
+ * Limiting personal data is a lot more complicated.
+ * Ideally, we only want to drop data fields, and keep primary/foreign keys like mntner or nic-hdl.
+ * But since even the keys identifying personal data are considered personal, we have to have 3 levels of
+ * dummification:
+ *
+ * 1. Remove object type
+ * In this case, we remove all occurances of an object type, and replace all
+ * references to it with a dummy placeholder object (thus, we keep referential
+ * integrity). In this case, we send a NOOP NRTM command to keep the serials
+ * in sync.
+ *
+ * 2. Dummify object
+ * In this case, we keep all objects of an object type, but we replace all
+ * mandatory, non-key attributes with a dummified string, while dropping all
+ * optional attributes.
+ * This is similar in result to #1, but end user retains the possibility to look
+ * up the dummified object in the RIPE DB.
+ *
+ * 3. Leave alone
+ * These objects themselves are not to be changed, they don't contain any data
+ * that should be masked. However, they might still contain reference to such
+ * data (like tech-c or admin-c attributes that contain nic-hdls). As such,
+ * these objects still have to be scanned and slightly dummified.
  *
  * We do the dummification in a generic way. For each object, we first parse it using the RPSL module. This sucks
  * big time performance-wise, as it does a lot of surplus processing and error checking, however, we are more flexible
@@ -286,23 +308,26 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  *
  * This also means that objects which have been stuffed into the database earlier, not passing the current syntax
  * rules will produce an error. On such rpsl parser errors, we return NULL, which marks that the object could not
- * be dummified. In this case, the NRTM server will return an error message with all the necessary debug info.
+ * be dummified. In this case, the NRTM server will return a NOOP NRTM command and log the fact.
  * This will normally not be a problem as we also don't want to give object history through public NRTM stream. Any
  * attempt to try to go back more than two weeks into the past should give an error.
  *
  * After having the processed object structure, we check the object class dummify settings, and:
- * - if placeholder, replace object with placeholder object and return;
+ * - if placeholder, send NOOP and return;
  * - if filter, iterate through the attributes
  *    - remove all non-mandatory attributes
- *    - replace all attributes marked as placeholder with class' placeholder object
- *    - replace all attributes marked as filter with attributes filter settings
+ *    - replace all attributes that have a foreign key set pointing to a placeholder object with the placeholder value
+ *    - replace all attributes marked as filter with attribute's filter settings
  *    - return;
  * - if neither, iterate through the attributes
- *    - replace all attributes marked as placeholder with class' placeholder object
+ *    - replace all attributes that have a foreign key set pointing to a placeholder object with the placeholder value
  *    - return;
  *
  * After finishing the dummification, we return the flat object for the nrtm server to send to the client or NULL
  * on dummification error.
+ *
+ * There is also option to add a message to objects that have been filtered. See DUMMY_ADD_ATTR in rip.config
+ * for details.
  *
  * Note that dummify_init() must be called before any calls are made to dummify_object().
  *
