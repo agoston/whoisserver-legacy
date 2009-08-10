@@ -771,7 +771,7 @@ public class Defs {
             // look up the class ID
             int index = ripeClassAliases.indexOf(ad.getForeignkey());
             if (index >= 0) {
-                out.println("        "+index+",");
+                out.println("        "+index+",    /* "+ad.getForeignkey()+" */");
             } else {
                 System.err.println("Attribute "+ad.getName()+" has invalid foreign key specified!");
                 System.exit(1);
