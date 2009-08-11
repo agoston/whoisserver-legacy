@@ -2145,7 +2145,6 @@ search_errors (const GList *errors, int error_level)
     return FALSE;
 }
 
-
 gboolean
 rpsl_attr_has_error (const rpsl_attr_t *attr, int error_level)
 {

@@ -33,9 +33,6 @@
 #include "rip.h"
 #include "class.h"
 
-/* defined in PM module */
-extern const int PM_PRIVATE_OBJECT_TYPES[5];
-
 /* global variables */
 char *Program_Name;
 int Verbose = 0;

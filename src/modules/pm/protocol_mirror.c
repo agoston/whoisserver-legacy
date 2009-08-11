@@ -36,6 +36,7 @@
 
 #include "rip.h"
 #include "class.h"
+#include "attribute.h"
 
 #define MIN_ARG_LENGTH  6
 #define NRTM_DELIM "-:"
@@ -52,80 +53,25 @@
 
 LG_context_t *pm_context;
 
-/* object types considered private, in order: mntner, person, role, irt, organisation
- * This is extern'd from text_export as well, watch out if you change this! */
-const int PM_PRIVATE_OBJECT_TYPES[5] = { 9, 10, 11, 17, 18 };
-
 /* CA_NRTM_HISTORY_ACCESS_LIMIT */
 unsigned history_access_limit = 0;
 
 gchar **PM_DUMMY_ADD_ATTR = NULL;
-GHashTable *PM_DUMMY_ATTR = NULL;
 
 /* Initializes variables to use in dummify_object().
  * Need to be executed before any calls to dummify_object() are made.
  *
- * Also checks if all private object's mandatory attributes are covered in the rip.config file DUMMY_ATTR options
- * (and only those).
- *
- * agoston, 2007-10-31 */
+ * agoston, 2009-08-11 */
 static void dummify_init() {
-	gchar **lines, **actline;
-	char *dummy_attr = ca_get_dummy_attr;
-	char *dummy_add_attr = ca_get_dummy_add_attr;
-	GHashTable *mandatory_attribs;
-	int i;
-
-	void collect_mandatory_attribs_callback(gpointer key, gpointer value, gpointer data) {
-		class_attr_t *actattr = (class_attr_t *)value;
-		if (actattr->choice == ATTR_MANDATORY) {
-			g_hash_table_insert(mandatory_attribs, key, value);
-		}
-	}
-
-	void log_leftover_mandatory_attribs_callback(gpointer key, gpointer value, gpointer data) {
-		fprintf(stderr, "Attribute %s is defined as mandatory RPSL attribute of a private object type, but there is no DUMMY_ATTR configured for it in rip.config!\n", key);
-	}
-
-	/* collect all mandatory options of private objects to perform sanity check during config parsing */
-	mandatory_attribs = g_hash_table_new(g_str_hash, g_str_equal);
-	for (i = 0; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
-		const class_t *actclass = class_lookup_id(PM_PRIVATE_OBJECT_TYPES[i]);
-		g_hash_table_foreach(actclass->attr_hash, collect_mandatory_attribs_callback, NULL);
-	}
-
 	/* parse dummify config options
 	 * it is required during the full lifespan of the whoisserver process, so there is no mechanism to
 	 * free() the structures allocated here - agoston, 2007-10-31 */
-	PM_DUMMY_ADD_ATTR = g_strsplit(dummy_add_attr, "\n", 0);
-	PM_DUMMY_ATTR = g_hash_table_new(g_str_hash, g_str_equal);
-
-	lines = g_strsplit(ca_get_dummy_attr, "\n", 0);
-	for (actline = lines; *actline && **actline; actline++) {
-		gchar *equal = strchr(*actline, '=');
-		if (!equal) {
-			fprintf(stderr, "No = sign found in one of the DUMMY_ATTR lines in the rip.config file\n");
-			die;
-		}
-
-		*equal = 0;
-		if (!g_hash_table_remove(mandatory_attribs, *actline)) {
-			fprintf(stderr, "Attribute %s is not mandatory - there is no use of defining a DUMMY_ATTR line for it in rip.config!\n", *actline);
-			die;
-		}
-		g_hash_table_insert(PM_DUMMY_ATTR, *actline, equal+1);
-	}
-
-	if (g_hash_table_size(mandatory_attribs) > 0) {
-		g_hash_table_foreach(mandatory_attribs, log_leftover_mandatory_attribs_callback, NULL);
-		die;
-	}
-
-	free(dummy_attr);
-	free(dummy_add_attr);
-	g_hash_table_destroy(mandatory_attribs);
-
+	char *dummy_add_attr = ca_get_dummy_add_attr;
 	history_access_limit = ca_get_nrtm_history_access_limit;
+
+	PM_DUMMY_ADD_ATTR = g_strsplit(dummy_add_attr, "\n", 0);
+	free(dummy_add_attr);
+
 }
 
 void PM_init(LG_context_t *ctx) {
@@ -286,6 +232,8 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  * references to it with a dummy placeholder object (thus, we keep referential
  * integrity). In this case, we send a NOOP NRTM command to keep the serials
  * in sync.
+ * You can set this in attributes.xml, element foreignkey and classes.xml,
+ * element dummify/placeholder.
  *
  * 2. Dummify object
  * In this case, we keep all objects of an object type, but we replace all
@@ -293,6 +241,8 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  * optional attributes.
  * This is similar in result to #1, but end user retains the possibility to look
  * up the dummified object in the RIPE DB.
+ * You can set this in classes.xml, element dummify/filter, and attributes.xml,
+ * element dummify.
  *
  * 3. Leave alone
  * These objects themselves are not to be changed, they don't contain any data
@@ -317,7 +267,8 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  * - if filter, iterate through the attributes
  *    - remove all non-mandatory attributes
  *    - replace all attributes that have a foreign key set pointing to a placeholder object with the placeholder value
- *    - replace all attributes marked as filter with attribute's filter settings
+ *    - replace all attributes marked as filter with attribute's filter settings (if both dummify and foreignkey has
+ *          been defined for an attribute in attributes.xml, foreignkey takes precedence)
  *    - return;
  * - if neither, iterate through the attributes
  *    - replace all attributes that have a foreign key set pointing to a placeholder object with the placeholder value
@@ -331,110 +282,135 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  *
  * Note that dummify_init() must be called before any calls are made to dummify_object().
  *
- * agoston, 2007-10-18
+ * agoston, 2009-08-10
  * */
-char *PM_dummify_object(char *object) {
-	const GList *errors = NULL;
-	gboolean quit = FALSE;
-	rpsl_error_t error;
-	rpsl_object_t *obj = NULL;
-	int i, actoff;
-	GList *gli = NULL;
-	gchar *prim_val = NULL;
-	char **actline;
-	char *ret = NULL;
-	GHashTable *dummified_attribs = NULL;
+char *PM_dummify_object(char *object)
+{
+    const GList *errors = NULL;
+    gboolean quit = FALSE;
+    rpsl_error_t error;
+    rpsl_object_t *obj = NULL;
+    int actoff = 0;
+    GList *gli = NULL;
+    gchar *prim_val = NULL;
+    char **actline;
+    char *ret = NULL;
+    GHashTable *dummified_attribs = NULL;
+    class_t *classinfo = NULL;
 
-	/* parse the object */
-	obj = rpsl_object_init(object);
-	errors = rpsl_object_errors(obj);
+    /* parse the object */
+    obj = rpsl_object_init(object);
+    errors = rpsl_object_errors(obj);
 
-	for (; errors; errors = errors->next) {
-		rpsl_error_t *acterr = (rpsl_error_t *)errors->data;
-		if (acterr->level >= RPSL_ERRLVL_ERROR) {
-			LG_log(pm_context, LG_ERROR, "rpsl_object_init failed: %s (at attribute %d)", acterr->descr, acterr->attr_num);
-			quit = TRUE;
-		}
-	}
+    for (; errors; errors = errors->next)
+    {
+        rpsl_error_t *acterr = (rpsl_error_t *) errors->data;
+        if (acterr->level >= RPSL_ERRLVL_ERROR)
+        {
+            LG_log(pm_context, LG_ERROR, "rpsl_object_init failed: %s (at attribute %d)", acterr->descr, acterr->attr_num);
+            quit = TRUE;
+        }
+    }
 
-	/* if there *was* an rpsl error, but not major (meaning the data structures are still filled),
-	 * let's continue running.
-	/* if there's a serious error, we skip this object */
-	if (quit && !(obj && obj->attributes && obj->attributes->data)) {
-		goto dummify_abort;
-	} else {
-		quit = FALSE;
-	}
+    /* if there *was* an rpsl error, but not major (meaning the data structures are still filled),
+     * let's continue running.
+     * if there's a serious error, we skip this object */
+    if (quit && !(obj && obj->attributes && obj->attributes->data))
+    {
+        goto dummify_abort;
+    }
+    else
+    {
+        quit = FALSE;
+    }
 
-	/* init hash containing the already dummified attribs (so we don't have
-	 * hundreds of the same changed: lines, for example */
-	dummified_attribs = g_hash_table_new(g_str_hash, g_str_equal);
+    /* get the class info - this is bad, but it also doesn't make much sense to include
+     * dummification info into librpsl */
+    classinfo = (class_t *) obj->class_info;
+    if (classinfo->dummify_type == DUMMIFY_PLACEHOLDER)
+    {
+        /* we return nothing; NOOP will be returned via the NRTM stream */
+        goto dummify_abort;
+    }
 
-	/* the primary key is not necessarily the first attribute of the object, e.g. person */
-	prim_val = rpsl_object_get_key_value(obj);
+    /* init hash containing the already dummified attribs (so we don't have
+     * hundreds of the same changed: lines, for example */
+    dummified_attribs = g_hash_table_new(g_str_hash, g_str_equal);
 
-	/* iterate through the attributes */
-	actoff = 0;
-	for (gli = g_list_first(obj->attributes); gli; actoff++, gli = g_list_next(gli)) {
-		rpsl_attr_t *act_attr = (rpsl_attr_t *)gli->data;
+    /* the primary key is not necessarily the first attribute of the object, e.g. person */
+    prim_val = rpsl_object_get_key_value(obj);
 
-		if (!g_hash_table_lookup(dummified_attribs, act_attr->lcase_name) && rpsl_attr_is_required(obj, act_attr->lcase_name)) {
-			gchar *dummy_attr = g_hash_table_lookup(PM_DUMMY_ATTR, act_attr->lcase_name);
+    /* for classes we need to filter */
+    for (gli = g_list_first(obj->attributes); gli; actoff++, gli = g_list_next(gli))
+    {
+        rpsl_attr_t *act_attr = (rpsl_attr_t *) gli->data;
+        /* get the attribute info - this is bad, but it also doesn't make much sense to include
+         * dummification info into librpsl */
+        attribute_t *attrinfo = (attribute_t *) act_attr->attr_info;
 
-			if (dummy_attr) { /* exists in hash table */
-				if (*dummy_attr) { /* value is not empty */
-					char buf[STR_L];
-					snprintf(buf, STR_L, dummy_attr, prim_val);
-					rpsl_attr_replace_value(act_attr, buf);
-					g_hash_table_insert(dummified_attribs, act_attr->lcase_name, act_attr);		/* don't mind the value */
-				}
-				/* if dummy_attr is empty, we leave the rpsl attrib alone */
-			} else {
-				/* mandatory attribute is not listed in config file - this is already checked in the
-				 * init routine, so we die here */
-				die;
-			}
-		} else {
-			/* We use the _internal call as the normal one does some extra, and, in this case, surplus
-			 * checking.
-			 *
-			 * During call, the only possible error is trying to remove a mandatory attribute - but since
-			 * we already checked that, we don't care about errors here. - agoston, 2007-10-29 */
-			gli = gli->prev;
-			rpsl_attr_delete(rpsl_object_remove_attr_internal(obj, actoff, NULL));
-			actoff--;
-		}
-	}
+        /* first check if it's a foreign key */
+        if (attrinfo->foreignkey_class_offset >= 0) {
+            const char *placeholder = class_lookup_id(attrinfo->foreignkey_class_offset)->dummify_singleton;
+            rpsl_attr_replace_value(act_attr, placeholder);
+        }
+        else if (classinfo->dummify_type == DUMMIFY_FILTER) /* then filter classes marked for filtering */
+        {
+            if (!g_hash_table_lookup(dummified_attribs, act_attr->lcase_name) && rpsl_attr_is_required(obj, act_attr->lcase_name))
+            {
+                if (attrinfo->dummify)
+                { /* exists in hash table */
+                    char buf[STR_L];
+                    snprintf(buf, STR_L, attrinfo->dummify, prim_val);
+                    rpsl_attr_replace_value(act_attr, buf);
+                    g_hash_table_insert(dummified_attribs, act_attr->lcase_name, act_attr); /* don't mind the value */
+                }
+                /* if dummy_attr is empty, we leave the rpsl attrib alone */
+            }
+            else
+            {
+                /* We use the _internal call as the normal one does some extra, and, in this case, surplus
+                 * checking.
+                 *
+                 * During call, the only possible error is trying to remove a mandatory attribute - but since
+                 * we already checked that, we don't care about errors here. - agoston, 2007-10-29 */
+                gli = gli->prev;
+                rpsl_attr_delete(rpsl_object_remove_attr_internal(obj, actoff, NULL));
+                actoff--;
+            }
+        }
+    }
 
-	/* append the additional attributes */
-	for (actline = PM_DUMMY_ADD_ATTR; *actline && **actline; actline++) {
-		rpsl_attr_t *newattr;
-		char buf[STR_L];
+    /* append the additional attributes */
+    for (actline = PM_DUMMY_ADD_ATTR; *actline && **actline; actline++)
+    {
+        rpsl_attr_t *newattr;
+        char buf[STR_L];
 
-		snprintf(buf, STR_L, "remarks: %s", *actline);
-		newattr = rpsl_attr_init(buf, NULL);
-		if (!rpsl_object_append_attr(obj, newattr, &error)) {
-			fprintf(stderr, "Error in dummify_object()::rpsl_object_append_attr(): %s\n", error.descr);
-			LG_log(pm_context, LG_FATAL, "Error in dummify_object()::rpsl_object_append_attr(): %s", error.descr);
-			rpsl_error_free(&error);
-			goto dummify_abort;
-		}
-	}
+        snprintf(buf, STR_L, "remarks: %s", *actline);
+        newattr = rpsl_attr_init(buf, NULL);
+        if (!rpsl_object_append_attr(obj, newattr, &error))
+        {
+            fprintf(stderr, "Error in dummify_object()::rpsl_object_append_attr(): %s\n", error.descr);
+            LG_log(pm_context, LG_FATAL, "Error in dummify_object()::rpsl_object_append_attr(): %s", error.descr);
+            rpsl_error_free(&error);
+            goto dummify_abort;
+        }
+    }
 
-	ret = rpsl_object_get_text(obj, RPSL_STD_COLUMN);
+    ret = rpsl_object_get_text(obj, RPSL_STD_COLUMN);
 
-	dummify_abort:
+dummify_abort:
 
-	if (dummified_attribs)
-		g_hash_table_destroy(dummified_attribs);
+    if (dummified_attribs)
+        g_hash_table_destroy(dummified_attribs);
 
-	if (prim_val)
-		free(prim_val);
+    if (prim_val)
+        free(prim_val);
 
-	if (obj)
-		rpsl_object_delete(obj);
+    if (obj)
+        rpsl_object_delete(obj);
 
-	return ret;
+    return ret;
 }
 
 /* PM_interact() */
@@ -687,7 +663,7 @@ void PM_interact(int sock) {
 		/* this call will block if queries are paused */
 		object=PM_get_serial_object(sql_connection, current_serial, &object_type, &timestamp, &operation);
 
-		/* Comment left from stone age:
+		/* Comment left from stone age: */
 		/* there is a probability that mirroring interferes with HS cleanup */
 		/* in such case serial may be deleted before it is read by mirror client */
 		/* null object will be returned in this case and we need to break the loop */
