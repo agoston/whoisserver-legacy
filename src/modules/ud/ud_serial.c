@@ -77,140 +77,152 @@ int sql_err;
  return(sql_err);
 }
 
-
 /************************************************************
-* UD_create_serial()                                        *     
-*                                                           *
-* Creates a serial record for given transaction             *
-*                                                           *
-* Important fields of transaction are:                      *
-* tr->action        TR_CREATE/TR_UPDATE/TR_DELETE           *
-* tr->object_id     should be filled in                     *
-* tr->sequence_id   should be set to object updated         *
-*                                                           *
-* So given object with id=k and seq=n                       *
-* Create:  ADD(k,n)                                         *
-* Update:  ~S(k,n), ADD(k,n+1)                              *
-* Delete:  ~S(k,n), DEL(k,n)                                *
-*                                                           *
-* Returns:                                                  *
-*  current serial number.                                    *
-*  -1 in case of an error                                   *
-*                                                           *
-*************************************************************/
+ * UD_create_serial()                                        *
+ *                                                           *
+ * Creates a serial record for given transaction             *
+ *                                                           *
+ * Important fields of transaction are:                      *
+ * tr->action        TR_CREATE/TR_UPDATE/TR_DELETE           *
+ * tr->object_id     should be filled in                     *
+ * tr->sequence_id   should be set to object updated         *
+ *                                                           *
+ * So given object with id=k and seq=n                       *
+ * Create:  ADD(k,n)                                         *
+ * Update:  ~S(k,n), ADD(k,n+1)                              *
+ * Delete:  ~S(k,n), DEL(k,n)                                *
+ *                                                           *
+ * Returns:                                                  *
+ *  current serial number.                                    *
+ *  -1 in case of an error                                   *
+ *                                                           *
+ *************************************************************/
 
 long UD_create_serial(Transaction_t *tr)
 {
-int sql_err;
-int operation;
-long timestamp;
-long sequence_id;
-   
- /* Calculate the object_id - should be max+1 */
- /* XXX we cannot use autoincrement with MyISAM tables */
- /* XXX because they keep the max inserted id even if  */
- /* XXX it was deleted later, thus causing gaps we don't want */
-    tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") +1;
+    int sql_err;
+    int operation;
+    long timestamp;
+    long sequence_id;
 
-  /* if the transaction failed store it in transaction table */
-  if(tr->succeeded==0){
-    if(ACT_DELETE(tr->action))operation=OP_DEL; else operation=OP_ADD;
-    
-    g_string_sprintf(tr->query, "INSERT serials SET "
-                   "thread_id=%d, serial_id=%ld, object_id=%ld, sequence_id=0, "
-		   "atlast=2, "
-		   "operation=%d ", tr->thread_ins, tr->serial_id, tr->object_id, operation);
-    
-    sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
+    /* Calculate the object_id - should be max+1 */
+    /* XXX we cannot use autoincrement with MyISAM tables */
+    /* XXX because they keep the max inserted id even if  */
+    /* XXX it was deleted later, thus causing gaps we don't want */
+    tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") + 1;
 
-    if (sql_err) { 
-	LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
-	die;
+    /* if the transaction failed store it in transaction table */
+    if (tr->succeeded == 0)
+    {
+        if (ACT_DELETE(tr->action))operation = OP_DEL;
+        else operation = OP_ADD;
+
+        g_string_sprintf(tr->query, "INSERT serials SET "
+                         "thread_id=%d, serial_id=%ld, object_id=%ld, sequence_id=0, "
+                         "atlast=2, "
+                         "operation=%d ", tr->thread_ins, tr->serial_id, tr->object_id, operation);
+
+        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
+
+        if (sql_err)
+        {
+            LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
+            die;
+        }
+        else
+        {
+            timestamp = time(NULL);
+            g_string_sprintf(tr->query, "INSERT failed_transaction SET "
+                             "thread_id=%d, serial_id=%ld, timestamp=%ld, "
+                             "object='%s' ", tr->thread_ins, tr->serial_id, timestamp, tr->object_txt);
+            /* make a record in transaction table */
+            sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
+            if (sql_err)
+            {
+                LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
+                die;
+            }
+        }
+        return (tr->serial_id);
     }
-    else {
-       timestamp=time(NULL);
-       g_string_sprintf(tr->query, "INSERT failed_transaction SET "
-                   "thread_id=%d, serial_id=%ld, timestamp=%ld, "
-		   "object='%s' ", tr->thread_ins, tr->serial_id, timestamp, tr->object_txt);
-       /* make a record in transaction table */
-       sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
-       if (sql_err) { 
-	 LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
-	 die;
-       }
+
+
+    /* if the transaction has succeeded */
+    sequence_id = tr->sequence_id;
+    /* If this is an update or delete */
+    if (!ACT_CREATE(tr->action))
+    {
+        /* Increase the sequence_id so we insert correct ADD serial in case of Update */
+        sequence_id = tr->sequence_id + 1;
+
+        /* set the atlast field of the latest record for this object to 0 */
+        /* because it is moved to history */
+        g_string_sprintf(tr->query, "UPDATE serials SET atlast=0, thread_id=%d "
+                         "WHERE object_id=%ld "
+                         "AND sequence_id=%ld ", tr->thread_upd, tr->object_id, sequence_id - 1);
+
+        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
+        if (sql_err)
+        { // we can have empty updates, but not errors
+            LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
+            die;
+        }
     }
-    return(tr->serial_id);
-  }  
+    /* XXX below is a code for protocol v2, where updates are atomic */
+    /* XXX this is fine (and should always be used) for NRTM, since we */
+    /* XXX store failed transactions and playback stream exactly as it comes */
+    /* XXX However, for update this may be configurable option */
+    /* XXX In case v1 protocol both sections (DEL + ADD) should be executed */
+
+    /* get the next serial_id */
+    /* XXX we cannot use autoincrement with MyISAM tables */
+    /* XXX because they keep the max inserted id even if  */
+    /* XXX it was deleted later, thus causing gaps we don't want */
+    tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") + 1;
+
+    /* if this a DEL */
 
 
-  /* if the transaction has succeeded */
-  sequence_id=tr->sequence_id;
-  /* If this is an update or delete */    
-  if(!ACT_CREATE(tr->action)) { 
-    /* Increase the sequence_id so we insert correct ADD serial in case of Update */
-    sequence_id=tr->sequence_id + 1;
-    
-    /* set the atlast field of the latest record for this object to 0 */
-    /* because it is moved to history */
-    g_string_sprintf(tr->query, "UPDATE serials SET atlast=0, thread_id=%d "
-                   "WHERE object_id=%ld "
-                   "AND sequence_id=%ld ", tr->thread_upd, tr->object_id, sequence_id-1);
-    
-    sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
-    if (sql_err) { // we can have empty updates, but not errors
-	LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
-	die;
+    if (ACT_DELETE(tr->action))
+    {
+        /* generate DEL serial */
+
+        g_string_sprintf(tr->query, "INSERT serials SET "
+                         "thread_id=%d, serial_id=%ld, object_id=%ld, "
+                         "sequence_id=%ld, "
+                         "atlast=0, "
+                         "operation=%d ", tr->thread_ins, tr->serial_id, tr->object_id, sequence_id - 1, OP_DEL);
+
+        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
+        if (sql_err)
+        {
+            LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
+            die;
+        }
+
     }
-  }  
-  /* XXX below is a code for protocol v2, where updates are atomic */
-  /* XXX this is fine (and should always be used) for NRTM, since we */
-  /* XXX store failed transactions and playback stream exactly as it comes */
-  /* XXX However, for update this may be configurable option */
-  /* XXX In case v1 protocol both sections (DEL + ADD) should be executed */
-  
-  /* get the next serial_id */
-  /* XXX we cannot use autoincrement with MyISAM tables */
-  /* XXX because they keep the max inserted id even if  */
-  /* XXX it was deleted later, thus causing gaps we don't want */
-  tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") +1;
-  
-  /* if this a DEL */ 
-  
-  
-  if(ACT_DELETE(tr->action)) {   
-    /* generate DEL serial */
-        
-    g_string_sprintf(tr->query, "INSERT serials SET "
-                   "thread_id=%d, serial_id=%ld, object_id=%ld, "
-                   "sequence_id=%ld, "
-                   "atlast=0, "
-                   "operation=%d ", tr->thread_ins, tr->serial_id, tr->object_id, sequence_id-1, OP_DEL);
-    
-    sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
-    if (sql_err) {
-	LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
-	die;
-    }    
-    
-  }
-  else { /* otherwise this is an ADD */
+    else
+    { /* otherwise this is an ADD */
 
-   /* now insert creation serial */
-   g_string_sprintf(tr->query, "INSERT serials SET "
-                  "thread_id=%d, serial_id=%ld, object_id=%ld, "
-                  "sequence_id=%ld, "
-                  "atlast=1, "
-                  "operation=%d ", tr->thread_ins, tr->serial_id, tr->object_id, sequence_id, OP_ADD);
-    
-   sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
-   if (sql_err) {
-	LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
-	die;
-   }    
+        /* now insert creation serial */
+        g_string_sprintf(tr->query, "INSERT serials SET "
+                         "thread_id=%d, serial_id=%ld, object_id=%ld, "
+                         "sequence_id=%ld, "
+                         "atlast=1, "
+                         "operation=%d ", tr->thread_ins, tr->serial_id, tr->object_id, sequence_id, OP_ADD);
 
-  }
-  return(tr->serial_id);
+        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
+        if (sql_err)
+        {
+            LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
+            die;
+        }
+
+    }
+    return (tr->serial_id);
 }
+
+
 /************************************************************
 * UD_comrol_serial()                                        *     
 *                                                           *
