@@ -483,11 +483,6 @@ void PM_interact(int sock) {
 	/* Read input */
 	read_result = SK_cd_gets(&(condat), input, MAX_PM_INPUT_SIZE);
 
-	/* read_result < 0 is an error and connection should be closed */
-	if (read_result < 0) {
-		/* log the fact, rtc was set */
-	}
-
 	parse_result = parse_request(input, &nrtm_q);
 
 	if (parse_result < 0) {

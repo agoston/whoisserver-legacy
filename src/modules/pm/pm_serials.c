@@ -104,9 +104,9 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
 char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, long *object_type, unsigned *timestamp,
         int *operation) {
 
-	SQ_result_set_t * sql_result;
-	SQ_row_t *sql_row;
-	char *sql_str;
+	SQ_result_set_t *sql_result = NULL;
+	SQ_row_t *sql_row = NULL;
+	char *sql_str = NULL;
 	char query[STR_L];
 	int sql_err;
 	int location;
@@ -184,7 +184,7 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 			break;
 
 		default:
-			return (NULL);
+            goto PM_get_serial_object_abort;
 	}
 
 	sql_err = SQ_execute_query(sql_connection, query, &sql_result);
@@ -224,7 +224,7 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
     else
         sql_str = NULL;
 
-
+PM_get_serial_object_abort:
 	if (sql_result) {
 		SQ_free_result(sql_result);
 		sql_result=NULL;

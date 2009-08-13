@@ -93,7 +93,7 @@ int sql_err;
  * Delete:  ~S(k,n), DEL(k,n)                                *
  *                                                           *
  * Returns:                                                  *
- *  current serial number.                                    *
+ *  current serial number.                                   *
  *  -1 in case of an error                                   *
  *                                                           *
  *************************************************************/
@@ -110,6 +110,25 @@ long UD_create_serial(Transaction_t *tr)
     /* XXX because they keep the max inserted id even if  */
     /* XXX it was deleted later, thus causing gaps we don't want */
     tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") + 1;
+
+    /* for NOOP we simply create a new entry in the serials table as placeholder */
+    if (tr->action == OP_NOOP) {
+        /* FIXME: instead of -1, we should use NULL here, but that would mean major change
+         * to DB format, which is not feasible now - agoston, 2009-08-13 */
+        g_string_sprintf(tr->query, "INSERT serials SET "
+                         "thread_id=%d, serial_id=%ld, object_id=-1, sequence_id=-1, "
+                         "atlast=-1, "
+                         "operation=%d ", tr->thread_ins, tr->object_id, operation);
+
+        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
+
+        if (sql_err)
+        {
+            LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
+            die;
+        }
+        return (tr->serial_id);
+    }
 
     /* if the transaction failed store it in transaction table */
     if (tr->succeeded == 0)

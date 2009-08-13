@@ -58,7 +58,8 @@ typedef enum _Line_Type_t {
 	LINE_OVERRIDE_ADD,
 	LINE_OVERRIDE_UPD,
 	LINE_OVERRIDE_DEL,
-	LINE_ACK
+	LINE_ACK,
+    LINE_NOOP
 } Line_Type_t;
 
 /* Maximum number of objects(serials) we can consume at a time */
@@ -390,18 +391,6 @@ static Line_Type_t line_type(const char *line, long *transaction_id) {
 		*transaction_id = atol(line+3);
 		return (LINE_ACK);
 	}
-	if (strncmp(line, "ADD_OVERRIDE", 12) == 0) {
-		*transaction_id = atol(line+12);
-		return (LINE_OVERRIDE_ADD);
-	}
-	if (strncmp(line, "UPD_OVERRIDE", 12) == 0) {
-		*transaction_id = atol(line+12);
-		return (LINE_OVERRIDE_UPD);
-	}
-	if (strncmp(line, "DEL_OVERRIDE", 12) == 0) {
-		*transaction_id = atol(line+12);
-		return (LINE_OVERRIDE_DEL);
-	}
 
 	if (strncmp(line, "ADD", 3) == 0) {
 		*transaction_id = atol(line+3);
@@ -415,8 +404,25 @@ static Line_Type_t line_type(const char *line, long *transaction_id) {
 		*transaction_id = atol(line+3);
 		return (LINE_DEL);
 	}
+	if (strncmp(line, "NOOP", 4) == 0) {
+		*transaction_id = atol(line+4);
+		return (LINE_DEL);
+	}
 
-	/* Otherwise this is an attribute */
+	if (strncmp(line, "ADD_OVERRIDE", 12) == 0) {
+		*transaction_id = atol(line+12);
+		return (LINE_OVERRIDE_ADD);
+	}
+	if (strncmp(line, "UPD_OVERRIDE", 12) == 0) {
+		*transaction_id = atol(line+12);
+		return (LINE_OVERRIDE_UPD);
+	}
+	if (strncmp(line, "DEL_OVERRIDE", 12) == 0) {
+		*transaction_id = atol(line+12);
+		return (LINE_OVERRIDE_DEL);
+	}
+
+    /* Otherwise this is an attribute */
 	return (LINE_ATTRIBUTE);
 
 } /* line_type() */
@@ -1190,7 +1196,6 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 	int result=0;
 	int operation=0;
 	int interrupt=0;
-	int do_update;
 	int default_ud_mode = ud_stream->ud_mode;
 	Line_Type_t linetype;
 	Transaction_t *tr;
@@ -1263,6 +1268,19 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 				ud_stream->ud_mode=default_ud_mode|B_DUMMY;
 				break;
 
+            /* we handle this as a special case, as we don't have an object */
+            case LINE_NOOP:
+                tr = transaction_new(ud_stream->db_connection, 0, src_ctx);
+                tr->action = OP_NOOP;
+                UD_lock_serial(tr);
+                transaction_id = UD_create_serial(tr);
+                UD_commit_serial(tr);
+                UD_unlock_serial(tr);
+                // disabled, it gives no real info but would break current log format
+                //LG_log(src_ctx, LG_INFO, "[%ld] %.2fs OK", transaction_id, (float)0, class_name);
+                transaction_free(tr);
+                break;
+
 			case LINE_EMPTY:
 				/* start processing the object */
 				/* escape apostrophes, otherwise sql will be confused */
@@ -1288,12 +1306,7 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 					g_obj_buff = g_string_truncate(g_obj_buff, 0);
 				}
 				/* this is a good place for quick interrupt */
-				do_update=CO_get_do_update();
-				if (do_update)
-					interrupt=0;
-				else
-					interrupt=1;
-
+				interrupt = !CO_get_do_update();
 				break;
 
 			default:
