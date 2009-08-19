@@ -165,7 +165,13 @@ public class Defs {
 //        ripeClasses.addElement(od);
         if (ripeClasses.size() <= od.getDbaseCode()) {
             ripeClasses.setSize(od.getDbaseCode()+1);
-        } 
+        }
+
+        // check if there is a single dbase code for each class
+        if (ripeClasses.get(od.getDbaseCode()) != null) {
+            System.err.println("Dbase code "+od.getDbaseCode()+" is assigned to more than 1 class!");
+            System.exit(1);
+        }
         ripeClasses.setElementAt(od, od.getDbaseCode());
 
         // set the index to map to.
