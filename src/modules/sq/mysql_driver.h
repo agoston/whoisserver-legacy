@@ -41,6 +41,7 @@
 /* errors */
 #define SQ_OK       0
 #define SQ_CTCONN   1
+#define SQ_NORES    2
 
 #define SQ_connection_t MYSQL
 #define SQ_result_set_t MYSQL_RES

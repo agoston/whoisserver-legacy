@@ -460,8 +460,13 @@ char *get_field_str(SQ_connection_t *sql_connection, const char *field, const ch
  * Executes a query and returns the first row as an integer array
  * caller must preallocate buffer
  * dies on sql errors
- *************************************************************/
-void get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_query, long *sql_res) {
+ *
+ * Returns:
+ * SQ_OK    - no error
+ * SQ_NORES - no results returned by query
+ ************************************************************/
+int get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_query, long *sql_res) {
+    int retval = SQ_OK;
 	SQ_result_set_t *sql_result;
 	SQ_row_t *sql_row;
 	char *sql_str;
@@ -483,12 +488,15 @@ void get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_que
 				die;
 			}
 		}
-	}
+	} else {
+        retval = SQ_NORES;
+    }
 
 	if (sql_result) {
 		SQ_free_result(sql_result);
 		sql_result=NULL;
 	}
+    return retval;
 }
 
 /************************************************************
