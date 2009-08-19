@@ -342,16 +342,16 @@ char *PM_dummify_object(char *object)
     /* for classes we need to filter */
     for (gli = g_list_first(obj->attributes); gli; actoff++, gli = g_list_next(gli))
     {
+        const class_t *actclass;
         rpsl_attr_t *act_attr = (rpsl_attr_t *) gli->data;
         /* get the attribute info - this is bad, but it also doesn't make much sense to include
          * dummification info into librpsl */
         attribute_t *attrinfo = (attribute_t *) act_attr->attr_info;
 
-        /* first check if it's a foreign key */
-        if (attrinfo->foreignkey_class_offset >= 0) {
+        /* first check if it's a foreign key AND the foreign object type is placeholder */
+        if (attrinfo->foreignkey_class_offset >= 0 &&
+            (actclass = class_lookup_id(attrinfo->foreignkey_class_offset))->dummify_type == DUMMIFY_PLACEHOLDER) {
             const char *placeholder = class_lookup_id(attrinfo->foreignkey_class_offset)->dummify_singleton;
-            const char *debug_name = class_lookup_id(attrinfo->foreignkey_class_offset)->name;
-            const char *debug_name2 = attrinfo->name;
             rpsl_attr_replace_value(act_attr, placeholder);
         }
         else if (classinfo->dummify_type == DUMMIFY_FILTER) /* then filter classes marked for filtering */
