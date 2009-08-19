@@ -94,7 +94,7 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
  *
  * Returns:
  *  operation (ADD/DEL) and text object
- *  NULL in case of an error
+ *  NULL in case of an error or missing
  *
  * Fills *object_type, *operation, *timestamp if not NULL
  *
@@ -112,12 +112,10 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 	int location;
 	long locop[2]; // array to hold location and operation
 
-	/* get the lock to ensure that queries are not stopped */
-	/* which means access to the database is allowed */
-	PW_record_query_start();
-
 	sprintf(query, "SELECT atlast,operation FROM serials WHERE serial_id = %d", serial_number);
-	get_fields_int_noalloc(sql_connection, query, locop);
+	if (get_fields_int_noalloc(sql_connection, query, locop) != SQ_OK) {
+        goto PM_get_serial_object_abort;
+    }
 	location = locop[0];
 	if (operation)
 		*operation = locop[1];
@@ -229,9 +227,6 @@ PM_get_serial_object_abort:
 		SQ_free_result(sql_result);
 		sql_result=NULL;
 	}
-
-	/* release the lock */
-	PW_record_query_end();
 
 	return sql_str;
 }
