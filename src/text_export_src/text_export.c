@@ -53,6 +53,7 @@ struct class {
 	char *name;
 	FILE *fp;
 	FILE *dummy_fp;
+    const class_t *classinfo;
 };
 
 /* output functions which track amount of data written */
@@ -139,7 +140,7 @@ int load_classes(struct class **c) {
 	char* const*class_names;
 	int num_classes;
 	struct class *tmp;
-	int i,j;
+	int i;
 	char fname[256];
 
 	class_names = DF_get_class_names();
@@ -160,21 +161,18 @@ int load_classes(struct class **c) {
 		}
 		num_files++;
 
-		/* this is kinda crap, but it's init, so performance doesn't matter,
-		 * and we should not rely on the order DF_get_class_names() returns class names
-		 * agoston, 2008-01-28 */
-		const class_t *actclass = class_lookup(class_names[i]);
-		for (j = 0; j < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); j++) {
-			if (PM_PRIVATE_OBJECT_TYPES[j] == actclass->id) {
-				strcpy(fname, "dummy.");
-				strcat(fname, tmp[i].name);
-				tmp[i].dummy_fp = fopen(fname, "w+");
-				if (tmp[i].dummy_fp == NULL) {
-					fprintf(stderr, "%s: error opening file \"%s\": %s\n", Program_Name, fname, strerror(errno));
-					exit(1);
-				}
-				num_files++;
-			}
+        /* get class definition struct and based on that, create a dummy file handle as well
+         * if needed */
+		tmp[i].classinfo = class_lookup(class_names[i]);
+        if (tmp[i].classinfo->dummify_type == DUMMIFY_FILTER) {
+            strcpy(fname, "dummy.");
+            strcat(fname, tmp[i].name);
+            tmp[i].dummy_fp = fopen(fname, "w+");
+            if (tmp[i].dummy_fp == NULL) {
+                fprintf(stderr, "%s: error opening file \"%s\": %s\n", Program_Name, fname, strerror(errno));
+                exit(1);
+            }
+            num_files++;
 		}
 	}
 
@@ -194,8 +192,9 @@ void output_object(char *object, struct class *c, int num_classes) {
 	}
 	*p = '\0';
 
+    /* we are deliberately not using last.object_type field because we don't trust it */
 	for (i=0; i<num_classes; i++) {
-		if (strcmp(c[i].name, object) == 0) {
+        if (strcmp(c[i].name, object) == 0) {
 			*p = ':';
 			dump_fputs(object, c[i].fp);
 			dump_putc('\n', c[i].fp);
@@ -236,7 +235,6 @@ void seperate_time_t(int n, int *hours, int *minutes, int *seconds) {
 int main(int argc, char **argv) {
 	struct database_info db;
 	char *rip_conf = NULL;
-	int ret;
 	SQ_connection_t *sql = NULL, *sql2 = NULL;
 	SQ_result_set_t *rs = NULL, *rs2 = NULL;
 	SQ_row_t *row = NULL, *row2 = NULL;
@@ -247,8 +245,8 @@ int main(int argc, char **argv) {
 	const struct tm *now;
 	char buf[1024];
 	double runtime;
-	int h, m, s;
-	long first_serial, qlast, last_serial;
+	int i, h, m, s;
+	long first_serial, last_serial;
 	FILE *serial_file;
 	LG_context_t *ctx, *null_ctx;
 
@@ -333,11 +331,48 @@ int main(int argc, char **argv) {
 	PM_get_minmax_serial(sql, &first_serial, &last_serial);
 
 	if (Verbose) {
-		printf("Min serial: %d\nMax serial:%d\n\n", first_serial, last_serial);
+		printf("Min serial: %ld\nMax serial:%ld\n\n", first_serial, last_serial);
 		printf("Dumping objects (each . marks 10000 object dumped):\n");
-	}
+    }
 
-	/* Outer query, crawling through the last table */
+    /* first emit placeholder objects */
+    for (i = 0; i < num_classes; i++)
+    {
+        if (classes[i].classinfo->dummify_type == DUMMIFY_PLACEHOLDER)
+        {
+            sprintf(buf, "SELECT object FROM last WHERE pkey = '%s'", classes[i].classinfo->dummify_singleton);
+            if (SQ_execute_query(sql, buf, &rs) != 0)
+            {
+                fprintf(stderr, "%s: error executing placeholder query; %s\n", Program_Name, SQ_error(sql));
+                exit(1);
+            }
+
+            /* decide if we want to skip this object */
+            if ((row = SQ_row_next(rs)))
+            {
+                char *ph_obj;
+                if ((ph_obj = SQ_get_column_string_nocopy(rs2, row2, 0)))
+                {
+                    fprintf(stderr, "%s: error getting placeholder object; %s\n", Program_Name, SQ_error(sql));
+                    exit(1);
+                }
+
+                dump_fputs(ph_obj, classes[i].dummy_fp);
+                dump_putc('\n', classes[i].dummy_fp);
+            }
+
+            if (rs) SQ_free_result(rs);
+            rs = NULL;
+        }
+    }
+
+    /* roll back to free all locks */
+    if (SQ_execute_query(sql, "ROLLBACK", NULL)) {
+        fprintf(stderr, "%s: error executing ROLLBACK; %s\n", Program_Name, SQ_error(sql));
+        exit(1);
+    }
+
+    /* Outer query, crawling through the last table */
 	sprintf(buf, "SELECT last.object, last.object_id, last.sequence_id FROM last "
 		"WHERE last.thread_id=0 AND last.object_type<>100 AND last.object<>\"\"");
 
@@ -364,14 +399,14 @@ int main(int argc, char **argv) {
 		}
 
 		/* lookup serial_id */
-		sprintf(buf, "SELECT serial_id FROM serials WHERE object_id = %d AND sequence_id = %d", object_id, sequence_id);
+		sprintf(buf, "SELECT serial_id FROM serials WHERE object_id = %ld AND sequence_id = %ld", object_id, sequence_id);
 		if (SQ_execute_query(sql2, buf, &rs2) != 0) {
 			fprintf(stderr, "%s: error executing internal query; %s\n", Program_Name, SQ_error(sql));
 			exit(1);
 		}
 
 		/* decide if we want to skip this object */
-		if (row2 = SQ_row_next(rs2)) {
+		if ((row2 = SQ_row_next(rs2))) {
 			long serial_id;
 			if (SQ_get_column_int(rs2, row2, 0, &serial_id)) {
 				fprintf(stderr, "%s: error getting serial_id; %s\n", Program_Name, SQ_error(sql));
@@ -399,12 +434,12 @@ int main(int argc, char **argv) {
 
 		/* rollback */
 		num_queries++;
-		if (num_queries > 200) {
+		if (num_queries > 100) {
 			num_queries = 0;
 
 			/* release locks */
 			if (SQ_execute_query(sql2, "ROLLBACK", NULL)) {
-				fprintf(stderr, "%s: error executing ROLLBACK; %s\n", Program_Name, SQ_error(sql));
+				fprintf(stderr, "%s: error executing ROLLBACK; %s\n", Program_Name, SQ_error(sql2));
 				exit(1);
 			}
 		}
@@ -427,11 +462,11 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
-	fprintf(serial_file, "%d\n", last_serial);
+	fprintf(serial_file, "%ld\n", last_serial);
 	fclose(serial_file);
 
 	if (Verbose) {
-		printf("Dumped last serial value (%d)\n", last_serial);
+		printf("Dumped last serial value (%ld)\n", last_serial);
 	}
 
 	/* close up shop */
