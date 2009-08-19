@@ -774,10 +774,17 @@ public class Defs {
 
         out.println("        /*  foreignkey */");
         if (ad.getForeignkey() != null) {
-            // look up the class ID
-            int index = ripeClassAliases.indexOf(ad.getForeignkey());
-            if (index >= 0) {
-                out.println("        "+(index+1)+",    /* "+ad.getForeignkey()+" */");
+            // look up the class ID based on the class name
+            int classid = -1;
+            for (int i = 0; i < ripeClasses.size(); i++) {
+                ClassDef actcd = (ClassDef)ripeClasses.get(i);
+                if (actcd.getName().equals(ad.getForeignkey())) {
+                    classid = actcd.getDbaseCode();
+                    break;
+                }
+            }
+            if (classid >= 0) {
+                out.println("        "+classid+",    /* "+ad.getForeignkey()+" */");
             } else {
                 System.err.println("Attribute "+ad.getName()+" has invalid foreign key specified!");
                 System.exit(1);
@@ -854,28 +861,30 @@ public class Defs {
         return -1;
     }
 
-    private void writeClassInfo(PrintStream out, ClassDef cd, int id)
+    private void writeClassInfo(PrintStream out, ClassDef cd)
     {
         /* leave an empty structure if we don't have a class here */
         if (cd == null) {
-            out.println("        /* XXX: missing class */");
-            out.println("        /* name */");
-            out.println("        \"\",");
-            out.println("        /* id */");
-            out.println("        " + id + ",");
-            out.println("        /* num_attr */");
-            out.println("        0,");
-            out.println("        /* attr_hash (set by class_init()) */");
-            out.println("        NULL,");
-            out.println("        DUMMIFY_NONE,");
-            out.println("        NULL");
-            return;
+            System.err.println("writeClassInfo called with ClassDef = null!");
+            System.exit(1);
+//            out.println("        /* XXX: missing class */");
+//            out.println("        /* name */");
+//            out.println("        \"\",");
+//            out.println("        /* id */");
+//            out.println("        " + id + ",");
+//            out.println("        /* num_attr */");
+//            out.println("        0,");
+//            out.println("        /* attr_hash (set by class_init()) */");
+//            out.println("        NULL,");
+//            out.println("        DUMMIFY_NONE,");
+//            out.println("        NULL");
+//            return;
         }
 
         out.println("        /* name */");
         out.println("        \"" + cd.getName() + "\",");
         out.println("        /* id */");
-        out.println("        " + id + ",");
+        out.println("        " + cd.getDbaseCode() + ",");
         out.println("        /* num_attr */");
         Vector attributes = cd.getAttributes();
         out.println("        " + attributes.size() + ",");
@@ -954,14 +963,12 @@ public class Defs {
             out.println("    {");
             Enumeration e = ripeClasses.elements();
             ClassDef cd = (ClassDef)e.nextElement();
-            int id = 0;
-            writeClassInfo(out, cd, id);
+            writeClassInfo(out, cd);
             while (e.hasMoreElements()) {
                 out.println("    },");
                 out.println("    {");
                 cd = (ClassDef)e.nextElement();
-                id++;
-                writeClassInfo(out, cd, id);
+                writeClassInfo(out, cd);
             }
             out.println("    }");
         }
