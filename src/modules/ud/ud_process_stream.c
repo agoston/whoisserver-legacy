@@ -864,21 +864,15 @@ static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int oper
 } /* process_updates() */
 
 /************************************************************
- *                                                           *
- * int process_transaction()                                 *
- *                                                           *
- * Processes the transaction                                 *
- *                                                           *
- * ud_stream - pointer to UD_stream_t structure              *
- *                                                           *
- * Returns:                                                  *
- * 0 - no error                                              *
- * <0- number of failed objects                              *
- *                                                           *
+ * Processes the transaction
+ *
+ * ud_stream - pointer to UD_stream_t structure
+ *
+ * Returns:
+ * 0 - no error
+ * <0- number of failed objects
+ * It frees the obj
  ************************************************************/
-
-/* It frees the obj */
-
 static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int operation, long transaction_id,
         LG_context_t *src_ctx) {
 	Transaction_t *tr= NULL;
