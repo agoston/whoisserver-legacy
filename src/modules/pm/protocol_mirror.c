@@ -350,6 +350,8 @@ char *PM_dummify_object(char *object)
         /* first check if it's a foreign key */
         if (attrinfo->foreignkey_class_offset >= 0) {
             const char *placeholder = class_lookup_id(attrinfo->foreignkey_class_offset)->dummify_singleton;
+            const char *debug_name = class_lookup_id(attrinfo->foreignkey_class_offset)->name;
+            const char *debug_name2 = attrinfo->name;
             rpsl_attr_replace_value(act_attr, placeholder);
         }
         else if (classinfo->dummify_type == DUMMIFY_FILTER) /* then filter classes marked for filtering */
@@ -709,8 +711,8 @@ void PM_interact(int sock)
                  * agoston, 2009-06-02 */
                 if (object_type < 0)
                 {
-                    fprintf(stderr, "object_type < 0 for %d\n", current_serial);
-                    LG_log(pm_context, LG_ERROR, "object_type < 0 for %d", current_serial);
+                    fprintf(stderr, "object_type < 0 for %ld\n", current_serial);
+                    LG_log(pm_context, LG_ERROR, "object_type < 0 for %ld", current_serial);
                 }
 
                 /* dummify private objects */
@@ -733,14 +735,14 @@ void PM_interact(int sock)
             switch (operation)
             {
             case OP_ADD:
-                sprintf(buff, "ADD %d\n\n", current_serial);
+                sprintf(buff, "ADD %ld\n\n", current_serial);
                 SK_cd_puts(&condat, buff);
                 SK_cd_puts(&condat, object);
                 SK_cd_puts(&condat, "\n");
                 break;
 
             case OP_DEL:
-                sprintf(buff, "DEL %d\n\n", current_serial);
+                sprintf(buff, "DEL %ld\n\n", current_serial);
                 SK_cd_puts(&condat, buff);
                 SK_cd_puts(&condat, object);
                 SK_cd_puts(&condat, "\n");
