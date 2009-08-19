@@ -76,7 +76,6 @@ int sql_err;
     }
  return(sql_err);
 }
-
 /************************************************************
  * UD_create_serial()                                        *
  *                                                           *
@@ -111,23 +110,20 @@ long UD_create_serial(Transaction_t *tr)
     /* XXX it was deleted later, thus causing gaps we don't want */
     tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") + 1;
 
-    /* for NOOP we simply create a new entry in the serials table as placeholder */
-    if (tr->action == OP_NOOP) {
-        /* FIXME: instead of -1, we should use NULL here, but that would mean major change
-         * to DB format, which is not feasible now - agoston, 2009-08-13 */
-        g_string_sprintf(tr->query, "INSERT serials SET "
-                         "thread_id=%d, serial_id=%ld, object_id=-1, sequence_id=-1, "
-                         "atlast=-1, "
-                         "operation=%d ", tr->thread_ins, tr->object_id, operation);
-
-        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
-
-        if (sql_err)
+    /* if we have a transaction_id provided, try using that instead of coming up with one */
+    if (tr->transaction_id > 0)
+    {
+        if (tr->serial_id >= tr->transaction_id)
         {
-            LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
+            /* the serial_id we received is lower than the one already in the database - serious problem!
+             * we shouldn't continue this operation */
+            LG_log(ud_context, LG_FATAL, "UD_create_serial(): got transaction_id %ld, but already got %ld in the DB\n",
+                   tr->transaction_id, tr->serial_id);
             die;
         }
-        return (tr->serial_id);
+
+        /* overrule normal serial_id */
+        tr->serial_id = tr->transaction_id;
     }
 
     /* if the transaction failed store it in transaction table */
