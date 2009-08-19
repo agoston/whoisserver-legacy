@@ -55,7 +55,6 @@ LG_context_t *pm_context;
 
 /* CA_NRTM_HISTORY_ACCESS_LIMIT */
 unsigned history_access_limit = 0;
-
 gchar **PM_DUMMY_ADD_ATTR = NULL;
 
 /* Initializes variables to use in dummify_object().
@@ -275,7 +274,7 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  *    - return;
  *
  * After finishing the dummification, we return the flat object for the nrtm server to send to the client or NULL
- * on dummification error.
+ * on dummification error or when we don't want to return anything.
  *
  * There is also option to add a message to objects that have been filtered. See DUMMY_ADD_ATTR in rip.config
  * for details.
@@ -329,7 +328,7 @@ char *PM_dummify_object(char *object)
     classinfo = (class_t *) obj->class_info;
     if (classinfo->dummify_type == DUMMIFY_PLACEHOLDER)
     {
-        /* we return nothing; NOOP will be returned via the NRTM stream */
+        /* we skip it and let the caller take care of proper action toward the client */
         goto dummify_abort;
     }
 
@@ -364,7 +363,7 @@ char *PM_dummify_object(char *object)
                     rpsl_attr_replace_value(act_attr, buf);
                     g_hash_table_insert(dummified_attribs, act_attr->lcase_name, act_attr); /* don't mind the value */
                 }
-                /* if dummy_attr is empty, we leave the rpsl attrib alone */
+                /* if attr_info->dummify is empty, we leave the rpsl attrib alone */
             }
             else
             {
@@ -414,6 +413,7 @@ dummify_abort:
 }
 
 /* PM_interact() */
+
 /*++++++++++++++++++++++++++++++++++++++
  Interact with the client.
 
@@ -431,278 +431,276 @@ dummify_abort:
  +html+ </UL></DL>
 
  ++++++++++++++++++++++++++++++++++++++*/
-void PM_interact(int sock) {
-	char input[MAX_PM_INPUT_SIZE+1];
-	char buff[STR_L];
-	ca_dbSource_t *source_hdl;
-	int read_result;
-	int parse_result;
-	ip_addr_t address;
+void PM_interact(int sock)
+{
+    char input[MAX_PM_INPUT_SIZE + 1];
+    char buff[STR_L];
+    ca_dbSource_t *source_hdl;
+    int read_result;
+    int parse_result;
+    ip_addr_t address;
 
-	char *hostaddress=NULL;
-	sk_conn_st condat;
-	nrtm_q_t nrtm_q;
-	long current_serial;
-	long oldest_serial;
-	long object_type;
-	unsigned timestamp;
-	aa_mirror_right mirror_perm;
-	int check_history_limit = 1;
+    char *hostaddress = NULL;
+    sk_conn_st condat;
+    nrtm_q_t nrtm_q;
+    long current_serial;
+    long oldest_serial;
+    long object_type;
+    unsigned timestamp;
+    aa_mirror_right mirror_perm;
+    int check_history_limit = 1;
 
-	char *object;
-	int operation;
+    char *object;
+    int operation;
 
-	char *db_host;
-	int db_port;
-	char *db_name;
-	char *db_user;
-	char *db_pswd;
-	int protocol_version;
+    char *db_host;
+    int db_port;
+    char *db_name;
+    char *db_user;
+    char *db_pswd;
+    int protocol_version;
 
-	GString *gbuff;
+    GString *gbuff;
 
-	SQ_connection_t *sql_connection;
-	int persistent_connection;
+    SQ_connection_t *sql_connection;
+    int persistent_connection;
 
-	/* make a record for thread accounting */
-	TA_add(sock, "nrtm_srv");
+    /* make a record for thread accounting */
+    TA_add(sock, "nrtm_srv");
 
-	/* Get the IP of the client */
-	hostaddress = SK_getpeername(sock);
+    /* Get the IP of the client */
+    hostaddress = SK_getpeername(sock);
 
-	/* initialise the connection structure */
-	memset( &condat, 0, sizeof(sk_conn_st));
-	/* initialise the nrtm structure */
-	memset( &nrtm_q, 0, sizeof(nrtm_q_t));
-	/* set the connection data: both rIP and eIP to real IP */
-	condat.sock = sock;
-	condat.ip = hostaddress;
-	SK_getpeerip(sock, &(condat.rIP));
-	memcpy( &(condat.eIP), &(condat.rIP), sizeof(ip_addr_t));
+    /* initialise the connection structure */
+    memset(&condat, 0, sizeof (sk_conn_st));
+    /* initialise the nrtm structure */
+    memset(&nrtm_q, 0, sizeof (nrtm_q_t));
+    /* set the connection data: both rIP and eIP to real IP */
+    condat.sock = sock;
+    condat.ip = hostaddress;
+    SK_getpeerip(sock, &(condat.rIP));
+    memcpy(&(condat.eIP), &(condat.rIP), sizeof (ip_addr_t));
 
-	/* Read input */
-	read_result = SK_cd_gets(&(condat), input, MAX_PM_INPUT_SIZE);
+    /* Read input */
+    read_result = SK_cd_gets(&(condat), input, MAX_PM_INPUT_SIZE);
 
-	parse_result = parse_request(input, &nrtm_q);
+    parse_result = parse_request(input, &nrtm_q);
 
-	if (parse_result < 0) {
-		LG_log(pm_context, LG_DEBUG, "[%s] -- Garbage received: %s", hostaddress, input);
-		/* log the fact and exit */
-		/* Free the hostaddress */
-		sprintf(buff, "\n%%ERROR:405: syntax error\n\n\n");
-		SK_cd_puts(&condat, buff);
-		/*      SK_cd_close(&(condat)); */
-		UT_free(hostaddress);
-		UT_free(nrtm_q.source);
-		return;
-	}
+    if (parse_result < 0)
+    {
+        LG_log(pm_context, LG_DEBUG, "[%s] -- Garbage received: %s", hostaddress, input);
+        /* log the fact and exit */
+        /* Free the hostaddress */
+        sprintf(buff, "\n%%ERROR:405: syntax error\n\n\n");
+        SK_cd_puts(&condat, buff);
+        /*      SK_cd_close(&(condat)); */
+        UT_free(hostaddress);
+        UT_free(nrtm_q.source);
+        return;
+    }
 
-	LG_log(pm_context, LG_DEBUG, "[%s] -- input: [%s]", hostaddress, input);
+    LG_log(pm_context, LG_DEBUG, "[%s] -- input: [%s]", hostaddress, input);
 
-	/* this is -q sources query  - answer and return */
-	if (IS_Q_QUERY(parse_result)) {
+    /* this is -q sources query  - answer and return */
+    if (IS_Q_QUERY(parse_result))
+    {
 
-		gbuff=PM_get_nrtm_sources(&(condat.rIP), nrtm_q.source);
-		SK_cd_puts(&condat, gbuff->str);
-		/* end-of-result one extra line (2 in total) */
-		SK_cd_puts(&condat, "\n");
-		/* Free allocated memory  */
-		g_string_free(gbuff, TRUE);
-		UT_free(hostaddress);
-		UT_free(nrtm_q.source);
-		/*      SK_cd_close(&(condat)); */
-		return;
-	} else if (IS_G_QUERY(parse_result)) {
-		if (IS_PERSISTENT(parse_result))
-			persistent_connection=1;
-		else
-			persistent_connection=0;
-	} else {
-		LG_log(pm_context, LG_DEBUG, "[%s] -- Syntax error: %s", hostaddress, input);
-		/* log the fact and exit */
-		/* Free the hostaddress */
-		sprintf(buff, "\n%%ERROR:405: syntax error\n\n\n");
-		SK_cd_puts(&condat, buff);
-		/*      SK_cd_close(&(condat)); */
-		UT_free(hostaddress);
-		UT_free(nrtm_q.source);
-		return;
+        gbuff = PM_get_nrtm_sources(&(condat.rIP), nrtm_q.source);
+        SK_cd_puts(&condat, gbuff->str);
+        /* end-of-result one extra line (2 in total) */
+        SK_cd_puts(&condat, "\n");
+        /* Free allocated memory  */
+        g_string_free(gbuff, TRUE);
+        UT_free(hostaddress);
+        UT_free(nrtm_q.source);
+        /*      SK_cd_close(&(condat)); */
+        return;
+    }
+    else if (IS_G_QUERY(parse_result))
+    {
+        if (IS_PERSISTENT(parse_result))
+            persistent_connection = 1;
+        else
+            persistent_connection = 0;
+    }
+    else
+    {
+        LG_log(pm_context, LG_DEBUG, "[%s] -- Syntax error: %s", hostaddress, input);
+        /* log the fact and exit */
+        /* Free the hostaddress */
+        sprintf(buff, "\n%%ERROR:405: syntax error\n\n\n");
+        SK_cd_puts(&condat, buff);
+        /*      SK_cd_close(&(condat)); */
+        UT_free(hostaddress);
+        UT_free(nrtm_q.source);
+        return;
 
-	}
+    }
 
-	/* otherwise this is -g query */
+    /* otherwise this is -g query */
 
-	LG_log(pm_context, LG_DEBUG, "[%s] -- input parsed: %s:%d:%ld-%ld", hostaddress, nrtm_q.source, nrtm_q.version,
-	        nrtm_q.first, nrtm_q.last);
+    LG_log(pm_context, LG_DEBUG, "[%s] -- input parsed: %s:%d:%ld-%ld", hostaddress, nrtm_q.source, nrtm_q.version,
+           nrtm_q.first, nrtm_q.last);
 
-	/* check if source exists */
-	source_hdl = ca_get_SourceHandleByName(nrtm_q.source);
-	if (source_hdl == NULL) {
-		LG_log(pm_context, LG_DEBUG, "[%s] --  Unknown source %s", hostaddress, nrtm_q.source);
-		sprintf(buff, "\n%%ERROR:403: unknown source %s\n\n\n", nrtm_q.source);
-		SK_cd_puts(&condat, buff);
-		UT_free(hostaddress);
-		UT_free(nrtm_q.source);
-		return;
-	}
+    /* check if source exists */
+    source_hdl = ca_get_SourceHandleByName(nrtm_q.source);
+    if (source_hdl == NULL)
+    {
+        LG_log(pm_context, LG_DEBUG, "[%s] --  Unknown source %s", hostaddress, nrtm_q.source);
+        sprintf(buff, "\n%%ERROR:403: unknown source %s\n\n\n", nrtm_q.source);
+        SK_cd_puts(&condat, buff);
+        UT_free(hostaddress);
+        UT_free(nrtm_q.source);
+        return;
+    }
 
-	/* check if the client is authorized to mirror */
-	SK_getpeerip(sock, &address);
-	if (!(mirror_perm = AA_can_mirror(&address, nrtm_q.source))) {
-		LG_log(pm_context, LG_DEBUG, "[%s] --  Not authorized to mirror the source %s", hostaddress, nrtm_q.source);
-		sprintf(buff, "\n%%ERROR:402: not authorized to mirror the database\n\n\n");
-		SK_cd_puts(&condat, buff);
-		UT_free(hostaddress);
-		UT_free(nrtm_q.source);
-		return;
-	}
+    /* check if the client is authorized to mirror */
+    SK_getpeerip(sock, &address);
+    if (!(mirror_perm = AA_can_mirror(&address, nrtm_q.source)))
+    {
+        LG_log(pm_context, LG_DEBUG, "[%s] --  Not authorized to mirror the source %s", hostaddress, nrtm_q.source);
+        sprintf(buff, "\n%%ERROR:402: not authorized to mirror the database\n\n\n");
+        SK_cd_puts(&condat, buff);
+        UT_free(hostaddress);
+        UT_free(nrtm_q.source);
+        return;
+    }
 
-	/* get protocol version of the source */
-	protocol_version = ca_get_srcnrtmprotocolvers(source_hdl);
+    /* get protocol version of the source */
+    protocol_version = ca_get_srcnrtmprotocolvers(source_hdl);
 
-	/* get database */
-	db_name = ca_get_srcdbname(source_hdl);
-	/* get database host*/
-	db_host = ca_get_srcdbmachine(source_hdl);
-	/* get database port*/
-	db_port = ca_get_srcdbport(source_hdl);
-	/* get database user*/
-	db_user = ca_get_srcdbuser(source_hdl);
-	/* get database password*/
-	db_pswd = ca_get_srcdbpassword(source_hdl);
+    /* get database */
+    db_name = ca_get_srcdbname(source_hdl);
+    /* get database host*/
+    db_host = ca_get_srcdbmachine(source_hdl);
+    /* get database port*/
+    db_port = ca_get_srcdbport(source_hdl);
+    /* get database user*/
+    db_user = ca_get_srcdbuser(source_hdl);
+    /* get database password*/
+    db_pswd = ca_get_srcdbpassword(source_hdl);
 
-	sql_connection = SQ_get_connection(db_host, db_port, db_name, db_user, db_pswd);
-	if (!sql_connection) {
-		LG_log(pm_context, LG_ERROR, " database='%s' [%d] %s", db_name, SQ_errno(sql_connection),
-		        SQ_error(sql_connection));
-		return;
-	}
-	LG_log(pm_context, LG_DEBUG, "[%s] --  Made SQL connection to %s@%s", hostaddress, db_name, db_host);
+    sql_connection = SQ_get_connection(db_host, db_port, db_name, db_user, db_pswd);
+    if (!sql_connection)
+    {
+        LG_log(pm_context, LG_ERROR, " database='%s' [%d] %s", db_name, SQ_errno(sql_connection),
+               SQ_error(sql_connection));
+        return;
+    }
+    LG_log(pm_context, LG_DEBUG, "[%s] --  Made SQL connection to %s@%s", hostaddress, db_name, db_host);
 
-	/* free copies of the variables */
-	UT_free(db_host);
-	UT_free(db_name);
-	UT_free(db_user);
-	UT_free(db_pswd);
+    /* free copies of the variables */
+    UT_free(db_host);
+    UT_free(db_name);
+    UT_free(db_user);
+    UT_free(db_pswd);
 
-	PM_get_minmax_serial(sql_connection, &oldest_serial, &current_serial);
-	/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial
-	 * agoston, 2007-12-21 */
-	/*current_serial -= SAFE_BACKLOG; */
+    PM_get_minmax_serial(sql_connection, &oldest_serial, &current_serial);
+    /* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial
+     * agoston, 2007-12-21 */
+    /*current_serial -= SAFE_BACKLOG; */
 
-	if ((current_serial==-1) || (oldest_serial==-1)) {
-		LG_log(pm_context, LG_ERROR, " database='%s' [%d] %s", db_name, SQ_errno(sql_connection),
-		        SQ_error(sql_connection));
-		/* Free the hostaddress */
-		/*      SK_cd_close(&(condat)); */
-		/* close the connection to SQL server */
-		SQ_close_connection(sql_connection);
-		UT_free(hostaddress);
-		UT_free(nrtm_q.source);
-		return;
-	}
+    if ((current_serial == -1) || (oldest_serial == -1))
+    {
+        LG_log(pm_context, LG_ERROR, " database='%s' [%d] %s", db_name, SQ_errno(sql_connection),
+               SQ_error(sql_connection));
+        /* Free the hostaddress */
+        /*      SK_cd_close(&(condat)); */
+        /* close the connection to SQL server */
+        SQ_close_connection(sql_connection);
+        UT_free(hostaddress);
+        UT_free(nrtm_q.source);
+        return;
+    }
 
-	/* zero indicates that LAST keyword has been used */
-	if (nrtm_q.last==0)
-		nrtm_q.last=current_serial;
-	/* for persistent connections end of range has no meaning */
-	if (persistent_connection)
-		nrtm_q.last=current_serial;
+    /* zero indicates that LAST keyword has been used */
+    if (nrtm_q.last == 0)
+        nrtm_q.last = current_serial;
+    /* for persistent connections end of range has no meaning */
+    if (persistent_connection)
+        nrtm_q.last = current_serial;
 
-	if ((nrtm_q.first>nrtm_q.last) || (nrtm_q.first<oldest_serial)|| (nrtm_q.last>current_serial)||(nrtm_q.first<=0)
-	        || (nrtm_q.last<=0)) {
-		LG_log(pm_context, LG_DEBUG, "[%s] --  Invalid range: %ld-%ld [%ld-%ld]", hostaddress, nrtm_q.first,
-		        nrtm_q.last, oldest_serial, current_serial);
-		/* write error message back to the client */
-		sprintf(buff, "\n%%ERROR:401: invalid range: Not within %ld-%ld\n\n\n", oldest_serial, current_serial);
-		SK_cd_puts(&condat, buff);
-		/*      SK_cd_close(&(condat)); */
+    if ((nrtm_q.first > nrtm_q.last) || (nrtm_q.first < oldest_serial) || (nrtm_q.last > current_serial) || (nrtm_q.first <= 0)
+        || (nrtm_q.last <= 0))
+    {
+        LG_log(pm_context, LG_DEBUG, "[%s] --  Invalid range: %ld-%ld [%ld-%ld]", hostaddress, nrtm_q.first,
+               nrtm_q.last, oldest_serial, current_serial);
+        /* write error message back to the client */
+        sprintf(buff, "\n%%ERROR:401: invalid range: Not within %ld-%ld\n\n\n", oldest_serial, current_serial);
+        SK_cd_puts(&condat, buff);
+        /*      SK_cd_close(&(condat)); */
 
-		/* close the connection to SQL server */
-		SQ_close_connection(sql_connection);
+        /* close the connection to SQL server */
+        SQ_close_connection(sql_connection);
 
-		/* Free the hostaddress */
-		UT_free(hostaddress);
-		UT_free(nrtm_q.source);
-		return;
-	}
+        /* Free the hostaddress */
+        UT_free(hostaddress);
+        UT_free(nrtm_q.source);
+        return;
+    }
 
-	current_serial=nrtm_q.first;
+    current_serial = nrtm_q.first;
 
-	/* print banner */
-	{
-		/* get the header string */
-		char *resp_header = ca_get_pw_resp_header;
-		SK_cd_puts(&condat, "\n");
-		SK_cd_puts(&condat, resp_header);
-		UT_free(resp_header);
-		SK_cd_puts(&condat, "\n");
-	}
+    /* print banner */
+    {
+        /* get the header string */
+        char *resp_header = ca_get_pw_resp_header;
+        SK_cd_puts(&condat, "\n");
+        SK_cd_puts(&condat, resp_header);
+        UT_free(resp_header);
+        SK_cd_puts(&condat, "\n");
+    }
 
-	sprintf(buff, "%%START Version: %d %s %ld-%ld%s\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last,
-	        (mirror_perm < AA_MIRROR_FULL) ? " FILTERED" : "");
-	SK_cd_puts(&condat, buff);
+    sprintf(buff, "%%START Version: %d %s %ld-%ld%s\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last,
+            (mirror_perm < AA_MIRROR_FULL) ? " FILTERED" : "");
+    SK_cd_puts(&condat, buff);
 
-	/* make a record for thread accounting */
-	TA_setactivity(buff);
+    /* make a record for thread accounting */
+    TA_setactivity(buff);
 
-	/* FIXME: This is the most basic solution possible (i.e. crap). There's a lot of room for optimization.
-	 * Let's see how it works in real world first. If we would encounter performance problems, this is the
-	 * entry point for nrtm optimizations.
-	 * agoston, 2007-11-15 */
-	/*************************** MAIN LOOP ****************************/
-	/* now start feeding client with data */
-	do {
+    /* FIXME: This is the most basic solution possible. There's a lot of room for optimization.
+     * If we would encounter performance problems, this is the entry point for nrtm optimizations.
+     * agoston, 2007-11-15 */
+    /*************************** MAIN LOOP ****************************/
+    do
+    {
 
-		/************ ACTUAL PROCESSING IS HERE ***********/
-		/* this call will block if queries are paused */
-		object=PM_get_serial_object(sql_connection, current_serial, &object_type, &timestamp, &operation);
+        /* get the object corresponding to current serial */
+        object = PM_get_serial_object(sql_connection, current_serial, &object_type, &timestamp, &operation);
 
-		/* Comment left from stone age: */
-		/* there is a probability that mirroring interferes with HS cleanup */
-		/* in such case serial may be deleted before it is read by mirror client */
-		/* null object will be returned in this case and we need to break the loop */
+        /* if we can't get it for any reason (error, missing), we skip this serial */
+        if (object != NULL)
+        {
 
-		/* whatever the reason was for this, it's left here as if there indeed was a problem
-		 * getting an object from the DB, we shouldn't continue, as it would pollute the DB or screw
-		 * up the serials - agoston, 2008-01-30 */
-		if (object==NULL) {
-			/* The first serial, being only present so that the serials table is not empty, is set to
-			 * OP_NOOP, as it serves no information - agoston, 2008-01-17 */
-			if (operation != OP_NOOP) {
-				SK_cd_puts(&condat, "%% INTERNAL ERROR. TERMINATING NRTM CONNECTION.\n");
-				sprintf(buff, "%% SOURCE: %s; SERIAL: %d; PERMISSION: %d; IP: %s; TIME: %d\n\n", nrtm_q.source,
-				        current_serial, mirror_perm, hostaddress, time(NULL));
-				SK_cd_puts(&condat, buff);
-				break;
-			}
+            /* filter private object types if it is not authorized */
+            if (mirror_perm == AA_MIRROR_PUBLIC)
+            {
+                int i = 0;
 
-		} else {
-
-			/* filter private object types if it is not authorized */
-			if (mirror_perm == AA_MIRROR_PUBLIC) {
-				int i = 0;
-
-				/* check access history limit only if we actually been able to get a timestamp from the DB
-				 * for DBs filled by NRTM, timestamp of delete operation is lost due to a bug, check
-				 * PM_get_serial_object() for more info
-				 * agoston, 2008-01-30 */
-				if (timestamp) {
-					/* check if timestamp is within the limits set in rip.config */
-					if (check_history_limit && history_access_limit && (time(NULL) - timestamp > history_access_limit)) {
-						sprintf(buff, "%% Your request has been denied to protect private data.\n"
-							"%% (Requesting serials older than %d days will be rejected)\n", history_access_limit/86400);
-						SK_cd_puts(&condat, buff);
-						free(object);
-						break;
-					} else {
-						/* we don't want to let user start the nrtm stream, and then, at some point (because of a buggy
-						 * timestamp for example) deny him a few of the objects, making the slave database completely
-						 * out of sync. The decision to (dis)allow the user should be consistent throughout the nrtm
-						 * connection.
-						 * agoston, 2008-01-21 */
-						check_history_limit = 0;
-					}
+                /* check access history limit only if we actually been able to get a timestamp from the DB
+                 * for DBs filled by NRTM, timestamp of delete operation is lost due to a bug, check
+                 * PM_get_serial_object() for more info
+                 * agoston, 2008-01-30 */
+                if (timestamp)
+                {
+                    /* check if timestamp is within the limits set in rip.config */
+                    if (check_history_limit && history_access_limit && (time(NULL) - timestamp > history_access_limit))
+                    {
+                        sprintf(buff, "%% Your request has been denied to protect private data.\n"
+                                "%% (Requesting serials older than %d days will be rejected)\n", history_access_limit / 86400);
+                        SK_cd_puts(&condat, buff);
+                        free(object);
+                        break;
+                    }
+                    else
+                    {
+                        /* we don't want to let user start the nrtm stream, and then, at some point (because of a buggy
+                         * timestamp for example) deny him a few of the objects, making the slave database completely
+                         * out of sync. The decision to (dis)allow the user should be consistent throughout the nrtm
+                         * connection.
+                         * agoston, 2008-01-21 */
+                        check_history_limit = 0;
+                    }
                 }
 
                 /* check for invalid object type. Normally, this should never pass, but for some reason,
@@ -715,90 +713,76 @@ void PM_interact(int sock) {
                     LG_log(pm_context, LG_ERROR, "object_type < 0 for %d", current_serial);
                 }
 
- 				/* dummify private objects */
-				for (; i < sizeof(PM_PRIVATE_OBJECT_TYPES)/sizeof(*PM_PRIVATE_OBJECT_TYPES); i++) {
-					if (object_type == PM_PRIVATE_OBJECT_TYPES[i]) {
-						char *newobj;
+                /* dummify private objects */
+                char *newobj;
+                newobj = PM_dummify_object(object);
+                free(object);
 
-						newobj = PM_dummify_object(object);
-						free(object);
+                if (newobj)
+                {
+                    object = newobj;
+                }
+                else
+                {
+                    object = NULL;
+                    operation = -1;
+                }
+            }
 
-						if (newobj) {
-							object = newobj;
-						} else {
-							object = NULL;
-							operation = -1;
-						}
+            /* OP_UPD is a defined operation, but not used in serials table - left unhandled here, too */
+            switch (operation)
+            {
+            case OP_ADD:
+                sprintf(buff, "ADD %d\n\n", current_serial);
+                SK_cd_puts(&condat, buff);
+                SK_cd_puts(&condat, object);
+                SK_cd_puts(&condat, "\n");
+                break;
 
-						break;
-					}
-				}
-			}
-		}
+            case OP_DEL:
+                sprintf(buff, "DEL %d\n\n", current_serial);
+                SK_cd_puts(&condat, buff);
+                SK_cd_puts(&condat, object);
+                SK_cd_puts(&condat, "\n");
+                break;
 
-		/* OP_UPD is a defined operation, but not used in serials table - left unhandled here, too */
-		switch (operation) {
-			case OP_ADD:
-				SK_cd_puts(&condat, "ADD\n\n");
-				SK_cd_puts(&condat, object);
-				SK_cd_puts(&condat, "\n");
-				break;
+            default:
+                /* in this case, don't send back anything and skip serial.
+                 * the possible reasons are: rpsl error, missing object or invalid operation */
+                break;
+            }
 
-			case OP_DEL:
-				SK_cd_puts(&condat, "DEL\n\n");
-				SK_cd_puts(&condat, object);
-				SK_cd_puts(&condat, "\n");
-				break;
+            if (object) free(object);
+        }
 
-			case OP_NOOP:
-				/* In this case, don't do anything.
-				 * The reason is that the first serial, which is used to set the auto_increment pkey
-				 * in mysql has an opcode of 4 (OP_NOOP). We don't send anything for this serial,
-				 * as this has no data-holding functionality.
-				 *
-				 * More importantly, if a client requests an nrtm stream, that means it's starting serial is already
-				 * set up, so not sending this one will make sure that the serials will be the same.
-				 * agoston, 2008-01-21 */
-				break;
+        current_serial++;
 
-			default:
-			case -1:
-				SK_cd_puts(&condat, "%% INTERNAL ERROR. TERMINATING NRTM CONNECTION.\n");
-				sprintf(buff, "%% SOURCE: %s; SERIAL: %d; PERMISSION: %d; IP: %s; TIME: %d\n\n", nrtm_q.source,
-				        current_serial, mirror_perm, hostaddress, time(NULL));
-				SK_cd_puts(&condat, buff);
-				condat.rtc = SK_NOTEXT;
-		}
+        /* for real-time mirroring we need some piece of code */
+        if (persistent_connection && (condat.rtc == 0))
+        {
+            while (((nrtm_q.last = SQ_get_max_id(sql_connection, "serial_id", "serials")) < current_serial)
+                && (CO_get_do_server() == 1))
+                sleep(1);
+        }
 
-		if (object)
-			free(object);
-		current_serial++;
+    } /* do while there are more serials, connection was not reset and XXX do_server is on*/
+    while ((current_serial <= nrtm_q.last) && (condat.rtc == 0) && (CO_get_do_server() == 1));
+    /*******************************************************************/
 
-		/* for real-time mirroring we need some piece of code */
-		if (persistent_connection && (condat.rtc == 0)) {
-			while (((nrtm_q.last = SQ_get_max_id(sql_connection, "serial_id", "serials")) < current_serial)
-			        && (CO_get_do_server()==1))
-				sleep(1);
-		}
+    sprintf(buff, "%%END %s\n\n\n", nrtm_q.source);
+    SK_cd_puts(&condat, buff);
+    SK_cd_close(&condat);
 
-	} /* do while there are more serials, connection was not reset and XXX do_server is on*/
-	while ((current_serial<=nrtm_q.last) && (condat.rtc == 0)&& (CO_get_do_server()==1));
-	/*******************************************************************/
+    LG_log(pm_context, LG_INFO, "[%s] -- <%s:%ld-%ld (%ld)> ", hostaddress, nrtm_q.source, nrtm_q.first, nrtm_q.last,
+           nrtm_q.last - nrtm_q.first + 1);
 
-	sprintf(buff, "%%END %s\n\n\n", nrtm_q.source);
-	SK_cd_puts(&condat, buff);
-	SK_cd_close(&condat);
+    /* make a record for thread accounting */
+    TA_delete();
 
-	LG_log(pm_context, LG_INFO, "[%s] -- <%s:%ld-%ld (%ld)> ", hostaddress, nrtm_q.source, nrtm_q.first, nrtm_q.last,
-	        nrtm_q.last-nrtm_q.first+1);
-
-	/* make a record for thread accounting */
-	TA_delete();
-
-	/* close the connection to SQL server */
-	SQ_close_connection(sql_connection);
-	/* Free the hostaddress */
-	UT_free(hostaddress);
-	UT_free(nrtm_q.source);
+    /* close the connection to SQL server */
+    SQ_close_connection(sql_connection);
+    /* Free the hostaddress */
+    UT_free(hostaddress);
+    UT_free(nrtm_q.source);
 
 } /* PM_interact() */
