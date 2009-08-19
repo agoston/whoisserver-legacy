@@ -58,8 +58,7 @@ typedef enum _Line_Type_t {
 	LINE_OVERRIDE_ADD,
 	LINE_OVERRIDE_UPD,
 	LINE_OVERRIDE_DEL,
-	LINE_ACK,
-    LINE_NOOP
+	LINE_ACK
 } Line_Type_t;
 
 /* Maximum number of objects(serials) we can consume at a time */
@@ -402,10 +401,6 @@ static Line_Type_t line_type(const char *line, long *transaction_id) {
 	}
 	if (strncmp(line, "DEL", 3) == 0) {
 		*transaction_id = atol(line+3);
-		return (LINE_DEL);
-	}
-	if (strncmp(line, "NOOP", 4) == 0) {
-		*transaction_id = atol(line+4);
 		return (LINE_DEL);
 	}
 
@@ -1267,19 +1262,6 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 				operation=OP_DEL;
 				ud_stream->ud_mode=default_ud_mode|B_DUMMY;
 				break;
-
-            /* we handle this as a special case, as we don't have an object */
-            case LINE_NOOP:
-                tr = transaction_new(ud_stream->db_connection, 0, src_ctx);
-                tr->action = OP_NOOP;
-                UD_lock_serial(tr);
-                transaction_id = UD_create_serial(tr);
-                UD_commit_serial(tr);
-                UD_unlock_serial(tr);
-                // disabled, it gives no real info but would break current log format
-                //LG_log(src_ctx, LG_INFO, "[%ld] %.2fs OK", transaction_id, (float)0, class_name);
-                transaction_free(tr);
-                break;
 
 			case LINE_EMPTY:
 				/* start processing the object */
