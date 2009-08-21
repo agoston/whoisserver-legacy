@@ -1174,7 +1174,6 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
  * total number of object processed                          *
  *                                                           *
  ************************************************************/
-
 int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 	char line_buff[STR_XXL];
 	SQ_connection_t *sql_connection;
@@ -1264,20 +1263,12 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 				/*	 print_object(obj); */
 				/* check if we have collected something */
 				if (g_obj_buff->len >0) {
-#if 0
-					/* no operation suggest a garbage in the stream - just ignore it */
-					if(IS_NRTM_CLNT(ud_stream->ud_mode) && (operation==OP_NOOP)) {
-						ER_inf_va(FAC_UD, ASP_UD_UPDLOG, "garbage in NRTM stream");
-					} else
-#endif
-					{
-						/* start new transaction now */
-						result=process_transaction(ud_stream, g_obj_buff, operation, transaction_id, src_ctx);
-						/* process_transaction() frees tr and obj structures, */
-						/* so make sure we'll not reference these objects in the future */
-						operation=OP_NOOP;
-						transaction_id=0;
-					}
+                    /* start new transaction now */
+                    result=process_transaction(ud_stream, g_obj_buff, operation, transaction_id, src_ctx);
+                    /* process_transaction() frees tr and obj structures, */
+                    /* so make sure we'll not reference these objects in the future */
+                    operation=OP_NOOP;
+                    transaction_id=0;
 					ud_stream->ud_mode=default_ud_mode;
 					g_obj_buff = g_string_truncate(g_obj_buff, 0);
 				}

@@ -211,7 +211,6 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 		return (res);
 
 }
-
 /* PUBLIC NRTM STREAM DESIGN
  *
  * The RIPE DB contains quite a bit of personal data. So far, NRTM access gave full access to all private
@@ -350,8 +349,9 @@ char *PM_dummify_object(char *object)
 
         /* first check if it's a foreign key AND the foreign object type is placeholder */
         if (attrinfo->foreignkey_class_offset >= 0 &&
-            (actclass = class_lookup_id(attrinfo->foreignkey_class_offset))->dummify_type == DUMMIFY_PLACEHOLDER) {
-            const char *placeholder = class_lookup_id(attrinfo->foreignkey_class_offset)->dummify_singleton;
+            (actclass = class_lookup_id(attrinfo->foreignkey_class_offset))->dummify_type == DUMMIFY_PLACEHOLDER)
+        {
+            const char *placeholder = actclass->dummify_singleton;
             rpsl_attr_replace_value(act_attr, placeholder);
         }
         else if (classinfo->dummify_type == DUMMIFY_FILTER) /* then filter classes marked for filtering */
