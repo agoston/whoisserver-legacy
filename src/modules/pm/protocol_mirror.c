@@ -280,17 +280,17 @@ int pm_dummify_replace_placeholder_attribute(rpsl_attr_t *act_attr, class_t *cla
  *
  * This also means that objects which have been stuffed into the database earlier, not passing the current syntax
  * rules will produce an error. On such rpsl parser errors, we return NULL, which marks that the object could not
- * be dummified. In this case, the NRTM server will return a NOOP NRTM command and log the fact.
+ * be dummified. In this case, the NRTM server will skip the object.
  * This will normally not be a problem as we also don't want to give object history through public NRTM stream. Any
  * attempt to try to go back more than two weeks into the past should give an error.
  *
  * After having the processed object structure, we check the object class dummify settings, and:
- * - if placeholder, send NOOP and return;
+ * - if placeholder, return NULL;
  * - if filter, iterate through the attributes
  *    - remove all non-mandatory attributes
- *    - replace all attributes that have a foreign key set pointing to a placeholder object with the placeholder value
  *    - replace all attributes marked as filter with attribute's filter settings (if both dummify and foreignkey has
- *          been defined for an attribute in attributes.xml, foreignkey takes precedence)
+ *          been defined for an attribute in attributes.xml, dummification takes precedence)
+ *    - replace all attributes that have a foreign key set pointing to a placeholder object with the placeholder value
  *    - return;
  * - if neither, iterate through the attributes
  *    - replace all attributes that have a foreign key set pointing to a placeholder object with the placeholder value
