@@ -11,8 +11,6 @@ org-name:       Dummy organisation name for ORG-ET1-DB-TEST
 org-type:       OTHER
 address:        Dummy address for ORG-ET1-DB-TEST
 e-mail:         unread@ripe.net
-admin-c:        PH4239-RIPE
-tech-c:         PH4239-RIPE
 mnt-ref:        TEST-DBM-MNT
 mnt-by:         TEST-DBM-MNT
 changed:        unread@ripe.net 20000101
@@ -29,7 +27,6 @@ ADD 3
 mntner:         TEST-DBM-MNT
 descr:          Dummy description for TEST-DBM-MNT
 admin-c:        PH4239-RIPE
-tech-c:         PH4239-RIPE
 upd-to:         unread@ripe.net
 auth:           MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/
 mnt-by:         TEST-DBM-MNT
