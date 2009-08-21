@@ -218,16 +218,18 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
  * Returns:
  *      0 if no replacement was done
  *      1 if attribute was replaced with placeholder value */
-int pm_dummify_replace_placeholder_attribute(rpsl_attr_t *act_attr, class_t *classinfo)
+int pm_dummify_replace_placeholder_attribute(rpsl_attr_t *act_attr)
 {
+    const class_t *actclass;
     /* get the attribute info - this is bad, but it also doesn't make much sense to include
      * dummification info into librpsl */
     attribute_t *attrinfo = (attribute_t *) act_attr->attr_info;
 
     /* first check if it's a foreign key AND the foreign object type is placeholder */
-    if (attrinfo->foreignkey_class_offset >= 0 && (classinfo->dummify_type == DUMMIFY_PLACEHOLDER))
+    if (attrinfo->foreignkey_class_offset >= 0 &&
+        (actclass = class_lookup_id(attrinfo->foreignkey_class_offset))->dummify_type == DUMMIFY_PLACEHOLDER)
     {
-        const char *placeholder = classinfo->dummify_singleton;
+        const char *placeholder = actclass->dummify_singleton;
         rpsl_attr_replace_value(act_attr, placeholder);
         return 1;
     }
@@ -383,7 +385,7 @@ char *PM_dummify_object(char *object)
                     g_hash_table_insert(dummified_attribs, act_attr->lcase_name, act_attr); /* don't mind the value */
                 } else {
                     /* check & replace if it's a placeholder attribute */
-                    pm_dummify_replace_placeholder_attribute(act_attr, classinfo);
+                    pm_dummify_replace_placeholder_attribute(act_attr);
                 }
                 /* if attr_info->dummify is empty, we leave the rpsl attrib alone */
             }
@@ -400,7 +402,7 @@ char *PM_dummify_object(char *object)
             }
         } else {
             /* check & replace if it's a placeholder attribute */
-            pm_dummify_replace_placeholder_attribute(act_attr, classinfo);
+            pm_dummify_replace_placeholder_attribute(act_attr);
         }
     }
 
