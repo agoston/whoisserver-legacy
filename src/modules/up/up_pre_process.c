@@ -464,6 +464,79 @@ int UP_check_nicsuffixes(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 }
 
 
+/* checks the 'nic-hdl' to see if it is available
+   Receives RT context
+            LG context
+            options structure
+            parsed object
+            source data structure
+   Returns  UP_OK if the nic suffix is valid
+            UP_FAIL otherwise
+*/
+
+int UP_check_available_nichdl(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                             options_struct_t *options,
+                             rpsl_object_t *preproc_obj,
+                             source_data_t *source_data)
+{
+    int retval = UP_FAIL;
+    char *name;
+    GList *list;
+    SQ_connection_t *sql_connection;
+    nic_handle_t *nh_ptr;
+
+    LG_log(lg_ctx, LG_FUNC,">UP_check_available_nichdl: entered\n");
+
+    /* get the nic-hdl from the object, there should always be one */
+    list = rpsl_object_get_attr(preproc_obj, "nic-hdl");
+    if ( ! list )
+    {
+        LG_log(lg_ctx, LG_DEBUG,"UP_check_available_nichdl: no nic-hdl found");
+        LG_log(lg_ctx, LG_FUNC,"<UP_check_available_nichdl: exiting with value [%s]\n", UP_ret2str(retval));
+        return retval;
+    }
+
+    name = rpsl_attr_get_clean_value( (rpsl_attr_t *)(list->data) );
+    LG_log(lg_ctx, LG_DEBUG,"UP_check_available_nichdl: nic-hdl [%s]", name);
+
+    if ( ! strncasecmp(name,"AUTO-",strlen("AUTO-")) )
+    {
+        /* the nic-hdl is an AUTO- nic-hdl, the next available number will be assigned */
+        retval = UP_OK;
+        LG_log(lg_ctx, LG_FUNC,"<UP_check_available_nichdl: exiting with value [%s]\n", UP_ret2str(retval));
+        return retval;
+    }
+
+    sql_connection = SQ_get_connection(source_data->DBhost, source_data->DBport,
+                                          source_data->DBname, source_data->DBuser,
+                                          source_data->DBpasswd);
+    if (!sql_connection)
+    {
+      /* No SQL connection is fatal */
+      LG_log(lg_ctx, LG_FATAL,"UP_check_available_nichdl: No SQL connection");
+      UP_internal_error(rt_ctx, lg_ctx, options, "UP_check_available_nichdl: ERROR No SQL connection\n", 0);
+    }
+
+    /* now check availability of this nic-hdl */
+    if ( ! NH_parse(name, &nh_ptr) )
+    {
+        if ( NH_check(nh_ptr, sql_connection) != 1 )
+            /* this nic-hdl has already been used */
+            RT_nichdl_not_available(rt_ctx, name);
+        else
+            retval = UP_OK;
+
+        free_nh(nh_ptr);
+    }
+    else
+        RT_nichdl_not_valid(rt_ctx, name);
+
+    SQ_close_connection(sql_connection);
+
+    LG_log(lg_ctx, LG_FUNC,"<UP_check_available_nichdl: exiting with value [%s]\n", UP_ret2str(retval));
+    return retval;
+}
+
 
 /* obtains a list of dates from the given list of attributes
    Receives LG context
