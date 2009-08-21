@@ -97,7 +97,7 @@ abuse-mailbox: bitbucket@ripe.net
 signature:    PGPKEY-AABBCCDD
 encryption:   PGPKEY-AABBCCDD
 org:          AUTO-1
-admin-c:      TP1-DB-TEST
+admin-c:      TR1-DB-TEST
 tech-c:       TP1-DB-TEST
 auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 remarks:      ZOH

@@ -4,7 +4,7 @@
 
 %START Version: 0 DB-TEST 1-6
 
-ADD
+ADD 2
 
 organisation:   ORG-ET1-DB-TEST
 org-name:       EXAMPLE TTTTTT
@@ -28,7 +28,7 @@ abuse-mailbox:  dbtest@ripe.net
 changed:        dbtest@ripe.net 20070102
 source:         DB-TEST
 
-ADD
+ADD 3
 
 person:         test person
 address:        Singel
@@ -44,7 +44,7 @@ mnt-by:         TEST-DBM-MNT
 changed:        dbtest@ripe.net 20070101
 source:         DB-TEST
 
-ADD
+ADD 4
 
 mntner:         TEST-DBM-MNT
 descr:          Mntner for RIPE DBM objects.
@@ -62,7 +62,7 @@ referral-by:    TEST-DBM-MNT
 changed:        dbtest@ripe.net 20070101
 source:         DB-TEST
 
-ADD
+ADD 5
 
 role:           Little Gnome
 address:        Address
@@ -80,7 +80,7 @@ mnt-by:         TEST-DBM-MNT
 changed:        dbtest@ripe.net 20070505
 source:         DB-TEST
 
-ADD
+ADD 6
 
 irt:            IRT-TEST
 address:        Address
@@ -91,7 +91,7 @@ abuse-mailbox:  bitbucket@ripe.net
 signature:      PGPKEY-AABBCCDD
 encryption:     PGPKEY-AABBCCDD
 org:            ORG-ET1-DB-TEST
-admin-c:        TP1-DB-TEST
+admin-c:        TR1-DB-TEST
 tech-c:         TP1-DB-TEST
 auth:           MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 remarks:        ZOH

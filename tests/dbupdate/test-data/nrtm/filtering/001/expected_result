@@ -4,13 +4,15 @@
 
 %START Version: 0 DB-TEST 1-6 FILTERED
 
-ADD
+ADD 2
 
 organisation:   ORG-ET1-DB-TEST
 org-name:       Dummy organisation name for ORG-ET1-DB-TEST
 org-type:       OTHER
 address:        Dummy address for ORG-ET1-DB-TEST
 e-mail:         unread@ripe.net
+admin-c:        PH4239-RIPE
+tech-c:         PH4239-RIPE
 mnt-ref:        TEST-DBM-MNT
 mnt-by:         TEST-DBM-MNT
 changed:        unread@ripe.net 20000101
@@ -22,26 +24,12 @@ remarks:        * To view the original object, please query the RIPE Database at
 remarks:        * http://www.ripe.net/whois
 remarks:        ****************************
 
-ADD
-
-person:         Dummy name for TP1-DB-TEST
-address:        Dummy address for TP1-DB-TEST
-phone:          +31205354444
-nic-hdl:        TP1-DB-TEST
-changed:        unread@ripe.net 20000101
-source:         DB-TEST
-remarks:        ****************************
-remarks:        * THIS OBJECT IS NOT VALID
-remarks:        * Please note that all personal data has been removed from this object.
-remarks:        * To view the original object, please query the RIPE Database at:
-remarks:        * http://www.ripe.net/whois
-remarks:        ****************************
-
-ADD
+ADD 4
 
 mntner:         TEST-DBM-MNT
 descr:          Dummy description for TEST-DBM-MNT
-admin-c:        TP1-DB-TEST
+admin-c:        PH4239-RIPE
+tech-c:         PH4239-RIPE
 upd-to:         unread@ripe.net
 auth:           MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/
 mnt-by:         TEST-DBM-MNT
@@ -55,33 +43,25 @@ remarks:        * To view the original object, please query the RIPE Database at
 remarks:        * http://www.ripe.net/whois
 remarks:        ****************************
 
-ADD
-
-role:           Dummy role for TR1-DB-TEST
-address:        Dummy address for TR1-DB-TEST
-e-mail:         unread@ripe.net
-admin-c:        TP1-DB-TEST
-tech-c:         TP1-DB-TEST
-nic-hdl:        TR1-DB-TEST
-changed:        unread@ripe.net 20000101
-source:         DB-TEST
-remarks:        ****************************
-remarks:        * THIS OBJECT IS NOT VALID
-remarks:        * Please note that all personal data has been removed from this object.
-remarks:        * To view the original object, please query the RIPE Database at:
-remarks:        * http://www.ripe.net/whois
-remarks:        ****************************
-
-ADD
+ADD 6
 
 irt:            IRT-TEST
-address:        Dummy address for IRT-TEST
-e-mail:         unread@ripe.net
-admin-c:        TP1-DB-TEST
-tech-c:         TP1-DB-TEST
-auth:           MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/
+address:        Address
+phone:          +123456789
+fax-no:         +0123456789
+e-mail:         bitbucket@ripe.net
+abuse-mailbox:  bitbucket@ripe.net
+signature:      PGPKEY-AABBCCDD
+encryption:     PGPKEY-AABBCCDD
+org:            ORG-ET1-DB-TEST
+admin-c:        PH4239-RIPE
+tech-c:         PH4239-RIPE
+auth:           MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
+remarks:        ZOH
+irt-nfy:        bitbucket@ripe.net
+notify:         bitbucket@ripe.net
 mnt-by:         TEST-DBM-MNT
-changed:        unread@ripe.net 20000101
+changed:        dbtest@ripe.net 20070505
 source:         DB-TEST
 remarks:        ****************************
 remarks:        * THIS OBJECT IS NOT VALID
