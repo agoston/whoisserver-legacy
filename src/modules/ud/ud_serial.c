@@ -110,8 +110,8 @@ long UD_create_serial(Transaction_t *tr)
     /* XXX it was deleted later, thus causing gaps we don't want */
     tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") + 1;
 
-    /* if we have a transaction_id provided, try using that instead of coming up with one */
-    if (tr->transaction_id > 0)
+    /* if we have a transaction_id provided in NRTM mode, try using that instead of coming up with one */
+    if (IS_NRTM_CLNT(tr->mode) && (tr->transaction_id > 0))
     {
         if (tr->serial_id >= tr->transaction_id)
         {
