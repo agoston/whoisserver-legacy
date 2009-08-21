@@ -211,6 +211,30 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 		return (res);
 
 }
+
+/* Replaces an rpsl attribute with its proper placeholder value if needed
+ * Behavior can be configured in the xml files in src/defs/
+ *
+ * Returns:
+ *      0 if no replacement was done
+ *      1 if attribute was replaced with placeholder value */
+int pm_dummify_replace_placeholder_attribute(rpsl_attr_t *act_attr, class_t *classinfo)
+{
+    /* get the attribute info - this is bad, but it also doesn't make much sense to include
+     * dummification info into librpsl */
+    attribute_t *attrinfo = (attribute_t *) act_attr->attr_info;
+
+    /* first check if it's a foreign key AND the foreign object type is placeholder */
+    if (attrinfo->foreignkey_class_offset >= 0 && (classinfo->dummify_type == DUMMIFY_PLACEHOLDER))
+    {
+        const char *placeholder = classinfo->dummify_singleton;
+        rpsl_attr_replace_value(act_attr, placeholder);
+        return 1;
+    }
+    
+    return 0;
+}
+
 /* PUBLIC NRTM STREAM DESIGN
  *
  * The RIPE DB contains quite a bit of personal data. So far, NRTM access gave full access to all private
@@ -341,29 +365,25 @@ char *PM_dummify_object(char *object)
     /* for classes we need to filter */
     for (gli = g_list_first(obj->attributes); gli; actoff++, gli = g_list_next(gli))
     {
-        const class_t *actclass;
         rpsl_attr_t *act_attr = (rpsl_attr_t *) gli->data;
         /* get the attribute info - this is bad, but it also doesn't make much sense to include
          * dummification info into librpsl */
         attribute_t *attrinfo = (attribute_t *) act_attr->attr_info;
 
-        /* first check if it's a foreign key AND the foreign object type is placeholder */
-        if (attrinfo->foreignkey_class_offset >= 0 &&
-            (actclass = class_lookup_id(attrinfo->foreignkey_class_offset))->dummify_type == DUMMIFY_PLACEHOLDER)
-        {
-            const char *placeholder = actclass->dummify_singleton;
-            rpsl_attr_replace_value(act_attr, placeholder);
-        }
-        else if (classinfo->dummify_type == DUMMIFY_FILTER) /* then filter classes marked for filtering */
+        /* first filter classes marked for filtering */
+        if (classinfo->dummify_type == DUMMIFY_FILTER)
         {
             if (!g_hash_table_lookup(dummified_attribs, act_attr->lcase_name) && rpsl_attr_is_required(obj, act_attr->lcase_name))
             {
                 if (attrinfo->dummify)
-                { /* exists in hash table */
+                {
                     char buf[STR_L];
                     snprintf(buf, STR_L, attrinfo->dummify, prim_val);
                     rpsl_attr_replace_value(act_attr, buf);
                     g_hash_table_insert(dummified_attribs, act_attr->lcase_name, act_attr); /* don't mind the value */
+                } else {
+                    /* check & replace if it's a placeholder attribute */
+                    pm_dummify_replace_placeholder_attribute(act_attr, classinfo);
                 }
                 /* if attr_info->dummify is empty, we leave the rpsl attrib alone */
             }
@@ -378,6 +398,9 @@ char *PM_dummify_object(char *object)
                 rpsl_attr_delete(rpsl_object_remove_attr_internal(obj, actoff, NULL));
                 actoff--;
             }
+        } else {
+            /* check & replace if it's a placeholder attribute */
+            pm_dummify_replace_placeholder_attribute(act_attr, classinfo);
         }
     }
 
@@ -677,8 +700,6 @@ void PM_interact(int sock)
             /* filter private object types if it is not authorized */
             if (mirror_perm == AA_MIRROR_PUBLIC)
             {
-                int i = 0;
-
                 /* check access history limit only if we actually been able to get a timestamp from the DB
                  * for DBs filled by NRTM, timestamp of delete operation is lost due to a bug, check
                  * PM_get_serial_object() for more info
