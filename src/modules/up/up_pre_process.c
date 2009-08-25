@@ -518,7 +518,7 @@ int UP_check_available_nichdl(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     }
 
     /* now check availability of this nic-hdl */
-    if ( ! NH_parse(name, &nh_ptr) )
+    if ( NH_parse(name, &nh_ptr) >= 0 )
     {
         if ( NH_check(nh_ptr, sql_connection) != 1 )
             /* this nic-hdl has already been used */
