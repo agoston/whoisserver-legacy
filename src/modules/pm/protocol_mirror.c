@@ -212,13 +212,32 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 
 }
 
-/* Replaces an rpsl attribute with its proper placeholder value if needed
+/* Internal helper function to delete attributes from an rpsl object during dummification.
+ *
+ * Takes: rpsl object
+ *        rpsl attribute
+ *        GList pointer to current attribute in attribute list*/
+void pm_dummify_delete_attr(rpsl_object_t *obj, rpsl_attr_t *act_attr, GList **gli) {
+    /* We use the _internal call as the normal one does some extra, and, in this case, surplus
+     * checking.
+     *
+     * During call, the only possible error is trying to remove a mandatory attribute - but since
+     * we already checked that, we don't care about errors here. - agoston, 2007-10-29 */
+    *gli = (*gli)->prev;
+    rpsl_attr_delete(rpsl_object_remove_attr_internal(obj, act_attr->num, NULL));
+}
+
+/* Replaces a placeholder rpsl attribute with its proper value (or removes if optional)
  * Behavior can be configured in the xml files in src/defs/
  *
+ * Takes: rpsl object
+ *        rpsl attribute
+ *        GList pointer to current attribute in attribute list
+ * 
  * Returns:
  *      0 if no replacement was done
  *      1 if attribute was replaced with placeholder value */
-int pm_dummify_replace_placeholder_attribute(rpsl_attr_t *act_attr)
+int pm_dummify_replace_placeholder_attribute(rpsl_object_t *obj, rpsl_attr_t *act_attr, GList **gli)
 {
     const class_t *actclass;
     /* get the attribute info - this is bad, but it also doesn't make much sense to include
@@ -229,12 +248,80 @@ int pm_dummify_replace_placeholder_attribute(rpsl_attr_t *act_attr)
     if (attrinfo->foreignkey_class_offset >= 0 &&
         (actclass = class_lookup_id(attrinfo->foreignkey_class_offset))->dummify_type == DUMMIFY_PLACEHOLDER)
     {
-        const char *placeholder = actclass->dummify_singleton;
-        rpsl_attr_replace_value(act_attr, placeholder);
+        /* if mandatory attribute, replace with placeholder; if not, remove */
+        if (rpsl_attr_is_required(obj, act_attr->lcase_name)) {
+            const char *placeholder = actclass->dummify_singleton;
+            rpsl_attr_replace_value(act_attr, placeholder);
+        } else {
+            pm_dummify_delete_attr(obj, act_attr, gli);
+        }
         return 1;
     }
     
     return 0;
+}
+
+/* Replaces an rpsl attribute with its filtered counterpart (or removes if optional)
+ * Behavior can be configured in the xml files in src/defs/
+ *
+ * Takes: rpsl object
+ *        rpsl attribute
+ *        primary attribute value (aka key) of the rpsl object (for printf()ing)
+ *        GList pointer to current attribute in attribute list
+ *
+ * Returns: 0 if no replacement was done
+ *          1 if attribute was filtered properly */
+int pm_dummify_replace_filtered_attribute(rpsl_object_t *obj, rpsl_attr_t *act_attr, char *prim_val, GList **gli)
+{
+    /* get the attribute info - this is bad, but it also doesn't make much sense to include
+     * dummification info into librpsl */
+    attribute_t *attrinfo = (attribute_t *) act_attr->attr_info;
+
+    /* check if this attribute is marked for filtering */
+    if (rpsl_attr_is_required(obj, act_attr->lcase_name))
+    {
+        if (attrinfo->dummify)
+        {
+            char buf[STR_L];
+            snprintf(buf, STR_L, attrinfo->dummify, prim_val);
+            rpsl_attr_replace_value(act_attr, buf);
+            return 1;
+        }
+    } else {
+        pm_dummify_delete_attr(obj, act_attr, gli);
+        return 1;
+    }
+    return 0;
+}
+
+/* adds the text defined as DUMMY_ADD_ATTR in rip.config to the rpsl object as remarks
+ * 
+ * Takes: rpsl object
+ * 
+ * Returns: NULL on OK
+ *          rpsl_error_t* on error (should be freed by caller using rpsl_error_free()) */
+rpsl_error_t *pm_dummify_add_attr(rpsl_object_t *obj)
+{
+    rpsl_error_t error;
+    char **actline;
+
+    for (actline = PM_DUMMY_ADD_ATTR; *actline && **actline; actline++)
+    {
+        rpsl_attr_t *newattr;
+        char buf[STR_L];
+
+        snprintf(buf, STR_L, "remarks: %s", *actline);
+        newattr = rpsl_attr_init(buf, NULL);
+        if (!rpsl_object_append_attr(obj, newattr, &error))
+        {
+            /* we make a copy, as this should never happen and we want to avoid
+             * surplus heap allocation in often-called function */
+            rpsl_error_t *retval = malloc(sizeof (rpsl_error_t));
+            memcpy(retval, &error, sizeof (rpsl_error_t));
+            return retval;
+        }
+    }
+    return NULL;
 }
 
 /* PUBLIC NRTM STREAM DESIGN
@@ -312,15 +399,13 @@ char *PM_dummify_object(char *object)
 {
     const GList *errors = NULL;
     gboolean quit = FALSE;
-    rpsl_error_t error;
     rpsl_object_t *obj = NULL;
-    int actoff = 0;
     GList *gli = NULL;
     gchar *prim_val = NULL;
-    char **actline;
     char *ret = NULL;
     GHashTable *dummified_attribs = NULL;
     class_t *classinfo = NULL;
+    rpsl_error_t *error;
 
     /* parse the object */
     obj = rpsl_object_init(object);
@@ -364,63 +449,49 @@ char *PM_dummify_object(char *object)
     /* the primary key is not necessarily the first attribute of the object, e.g. person */
     prim_val = rpsl_object_get_key_value(obj);
 
-    /* for classes we need to filter */
-    for (gli = g_list_first(obj->attributes); gli; actoff++, gli = g_list_next(gli))
+    /* iterate through attributes 
+     * OPTME: this could be speeded up considerably if we wouldn't do metadata examination for every
+     * dummified object, but on whois-server startup store what decision to make on each attribute of each class,
+     * and simply execute that code path here - agoston, 2009-08-25
+     */
+    for (gli = g_list_first(obj->attributes); gli; gli = g_list_next(gli))
     {
         rpsl_attr_t *act_attr = (rpsl_attr_t *) gli->data;
-        /* get the attribute info - this is bad, but it also doesn't make much sense to include
-         * dummification info into librpsl */
-        attribute_t *attrinfo = (attribute_t *) act_attr->attr_info;
 
-        /* first filter classes marked for filtering */
-        if (classinfo->dummify_type == DUMMIFY_FILTER)
+        /* MAIN DUMMIFICATION ALGORITHM */
+        if (g_hash_table_lookup(dummified_attribs, act_attr->lcase_name))
         {
-            if (!g_hash_table_lookup(dummified_attribs, act_attr->lcase_name) && rpsl_attr_is_required(obj, act_attr->lcase_name))
+            /* if we already replaced this attribute with its placeholder value, then remove */
+            pm_dummify_delete_attr(obj, act_attr, &gli);
+        }
+        else
+        {
+            if (pm_dummify_replace_placeholder_attribute(obj, act_attr, &gli))
             {
-                if (attrinfo->dummify)
+                /* if we replaced the attribute with placeholder, mark it in the dummified attributes hash,
+                 * so we will remove any more occurences of this attribute in the future */
+                g_hash_table_insert(dummified_attribs, act_attr->lcase_name, act_attr); /* don't mind the value */
+            }
+            else if (classinfo->dummify_type == DUMMIFY_FILTER)
+            {
+                if (pm_dummify_replace_filtered_attribute(obj, act_attr, prim_val, &gli))
                 {
-                    char buf[STR_L];
-                    snprintf(buf, STR_L, attrinfo->dummify, prim_val);
-                    rpsl_attr_replace_value(act_attr, buf);
+                    /* if we dummified an attribute, mark it in the dummified attributes hash,
+                     * so we will remove any more occurences of this attribute in the future */
                     g_hash_table_insert(dummified_attribs, act_attr->lcase_name, act_attr); /* don't mind the value */
-                } else {
-                    /* check & replace if it's a placeholder attribute */
-                    pm_dummify_replace_placeholder_attribute(act_attr);
                 }
-                /* if attr_info->dummify is empty, we leave the rpsl attrib alone */
             }
-            else
-            {
-                /* We use the _internal call as the normal one does some extra, and, in this case, surplus
-                 * checking.
-                 *
-                 * During call, the only possible error is trying to remove a mandatory attribute - but since
-                 * we already checked that, we don't care about errors here. - agoston, 2007-10-29 */
-                gli = gli->prev;
-                rpsl_attr_delete(rpsl_object_remove_attr_internal(obj, actoff, NULL));
-                actoff--;
-            }
-        } else {
-            /* check & replace if it's a placeholder attribute */
-            pm_dummify_replace_placeholder_attribute(act_attr);
         }
     }
 
     /* append the additional attributes */
-    for (actline = PM_DUMMY_ADD_ATTR; *actline && **actline; actline++)
+    if ((error = pm_dummify_add_attr(obj)))
     {
-        rpsl_attr_t *newattr;
-        char buf[STR_L];
-
-        snprintf(buf, STR_L, "remarks: %s", *actline);
-        newattr = rpsl_attr_init(buf, NULL);
-        if (!rpsl_object_append_attr(obj, newattr, &error))
-        {
-            fprintf(stderr, "Error in dummify_object()::rpsl_object_append_attr(): %s\n", error.descr);
-            LG_log(pm_context, LG_FATAL, "Error in dummify_object()::rpsl_object_append_attr(): %s", error.descr);
-            rpsl_error_free(&error);
-            goto dummify_abort;
-        }
+        fprintf(stderr, "Error in dummify_object()::rpsl_object_append_attr(): %s\n", error->descr);
+        LG_log(pm_context, LG_FATAL, "Error in dummify_object()::rpsl_object_append_attr(): %s", error->descr);
+        rpsl_error_free(error);
+        free(error);
+        goto dummify_abort;
     }
 
     ret = rpsl_object_get_text(obj, RPSL_STD_COLUMN);

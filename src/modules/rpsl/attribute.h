@@ -36,12 +36,7 @@ typedef struct {
     int is_primary;          /* flag whether is a primary key or not */
     int is_list;             /* flag whether is a list-valued attribute */
     int is_ripe_list;        /* flag whether is a RIPE-styled attribute */
-
-    // unused; commented out by agoston, 2009-08-07
-    //char *foreign_code;      /* code of attribute referenced, e.g. "mt" for
-    //                            "mnt-by" or "mnt-lower" */
-
-    int foreignkey_class_offset;       /* index into class_tab[] for class definition */
+    int foreignkey_class_offset;       /* foreign key's class ID */
     char *dummify;              /* string to dummify attribute into */
 } attribute_t;
 

@@ -161,19 +161,16 @@ int load_classes(struct class **c) {
 		}
 		num_files++;
 
-        /* get class definition struct and based on that, create a dummy file handle as well
-         * if needed */
+        /* get class definition struct and based on that, create a dummy file handle as well */
 		tmp[i].classinfo = class_lookup(class_names[i]);
-        if (tmp[i].classinfo->dummify_type == DUMMIFY_FILTER) {
-            strcpy(fname, "dummy.");
-            strcat(fname, tmp[i].name);
-            tmp[i].dummy_fp = fopen(fname, "w+");
-            if (tmp[i].dummy_fp == NULL) {
-                fprintf(stderr, "%s: error opening file \"%s\": %s\n", Program_Name, fname, strerror(errno));
-                exit(1);
-            }
-            num_files++;
-		}
+        strcpy(fname, "dummy.");
+        strcat(fname, tmp[i].name);
+        tmp[i].dummy_fp = fopen(fname, "w+");
+        if (tmp[i].dummy_fp == NULL) {
+            fprintf(stderr, "%s: error opening file \"%s\": %s\n", Program_Name, fname, strerror(errno));
+            exit(1);
+        }
+        num_files++;
 	}
 
 	*c = tmp;
@@ -198,23 +195,22 @@ void output_object(char *object, struct class *c, int num_classes) {
 			*p = ':';
 			dump_fputs(object, c[i].fp);
 			dump_putc('\n', c[i].fp);
-			if (c[i].dummy_fp) {
-				char *dummy = PM_dummify_object(object);
-				if (dummy) {
-					dump_fputs(dummy, c[i].dummy_fp);
-					dump_putc('\n', c[i].dummy_fp);
-					free(dummy);
-				} else {
-					fprintf(stderr, "%s: The following object failed to dummify:\n\n%s\n", Program_Name, object);
-					/*UT_alarm_operator("ERROR: text_export failed objects", "The following object failed to dummify:\n\n%s\n", Program_Name, object); */
 
-					/* omit object if dummification failed
-					 * the idea is that we should still produce the dumps, it's critical, but at the same time,
-					 * spam the operator so that the object will get fixed at some point
-					 * agoston, 2008-01-29 */
-					/* exit(1) */
-				}
-			}
+            char *dummy = PM_dummify_object(object);
+            if (dummy) {
+                dump_fputs(dummy, c[i].dummy_fp);
+                dump_putc('\n', c[i].dummy_fp);
+                free(dummy);
+            } else {
+                //fprintf(stderr, "%s: The following object failed to dummify:\n\n%s\n", Program_Name, object);
+                /*UT_alarm_operator("ERROR: text_export failed objects", "The following object failed to dummify:\n\n%s\n", Program_Name, object); */
+
+                /* omit object if dummification failed
+                 * the idea is that we should still produce the dumps, it's critical, but at the same time,
+                 * spam the operator so that the object will get fixed at some point
+                 * agoston, 2008-01-29 */
+                /* exit(1) */
+            }
 			return;
 		}
 	}
@@ -351,7 +347,7 @@ int main(int argc, char **argv) {
             if ((row = SQ_row_next(rs)))
             {
                 char *ph_obj;
-                if ((ph_obj = SQ_get_column_string_nocopy(rs2, row2, 0)))
+                if (!(ph_obj = SQ_get_column_string_nocopy(rs, row, 0)))
                 {
                     fprintf(stderr, "%s: error getting placeholder object; %s\n", Program_Name, SQ_error(sql));
                     exit(1);
