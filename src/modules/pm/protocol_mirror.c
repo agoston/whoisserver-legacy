@@ -244,6 +244,12 @@ int pm_dummify_replace_placeholder_attribute(rpsl_object_t *obj, rpsl_attr_t *ac
      * dummification info into librpsl */
     attribute_t *attrinfo = (attribute_t *) act_attr->attr_info;
 
+    if (!attrinfo) {
+        /* this happens if there was an rpsl error parsing this attribute, for example, the attribute was
+         * deprecated :) */
+        return 0;
+    }
+
     /* first check if it's a foreign key AND the foreign object type is placeholder */
     if (attrinfo->foreignkey_class_offset >= 0 &&
         (actclass = class_lookup_id(attrinfo->foreignkey_class_offset))->dummify_type == DUMMIFY_PLACEHOLDER)
@@ -276,6 +282,12 @@ int pm_dummify_replace_filtered_attribute(rpsl_object_t *obj, rpsl_attr_t *act_a
     /* get the attribute info - this is bad, but it also doesn't make much sense to include
      * dummification info into librpsl */
     attribute_t *attrinfo = (attribute_t *) act_attr->attr_info;
+
+    if (!attrinfo) {
+        /* this happens if there was an rpsl error parsing this attribute, for example, the attribute was
+         * deprecated :) */
+        return 0;
+    }
 
     /* check if this attribute is marked for filtering */
     if (rpsl_attr_is_required(obj, act_attr->lcase_name))
