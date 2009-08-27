@@ -463,7 +463,7 @@ char *PM_dummify_object(char *object)
 
     /* init hash containing the already dummified attribs (so we don't have
      * hundreds of the same changed: lines, for example */
-    dummified_attribs = g_hash_table_new(g_str_hash, g_str_equal);
+    dummified_attribs = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
 
     /* the primary key is not necessarily the first attribute of the object, e.g. person */
     prim_val = rpsl_object_get_key_value(obj);
@@ -485,11 +485,15 @@ char *PM_dummify_object(char *object)
         }
         else
         {
+            /* make a copy of the attribute name, as the attribute could end up deleted during the dummification
+             * process, and then we would have nothing to use as a key to the dummified_attribs hash */
+            gchar *attr_name = strdup(act_attr->lcase_name);
+
             if (pm_dummify_replace_placeholder_attribute(obj, act_attr, &gli))
             {
                 /* if we replaced the attribute with placeholder, mark it in the dummified attributes hash,
                  * so we will remove any more occurences of this attribute in the future */
-                g_hash_table_insert(dummified_attribs, act_attr->lcase_name, act_attr); /* don't mind the value */
+                g_hash_table_insert(dummified_attribs, attr_name, attr_name);
             }
             else if (classinfo->dummify_type == DUMMIFY_FILTER)
             {
@@ -497,8 +501,16 @@ char *PM_dummify_object(char *object)
                 {
                     /* if we dummified an attribute, mark it in the dummified attributes hash,
                      * so we will remove any more occurences of this attribute in the future */
-                    g_hash_table_insert(dummified_attribs, act_attr->lcase_name, act_attr); /* don't mind the value */
+                    g_hash_table_insert(dummified_attribs, attr_name, attr_name);
                 }
+                else
+                {
+                    free(attr_name);
+                }
+            }
+            else
+            {
+                free(attr_name);
             }
         }
     }
