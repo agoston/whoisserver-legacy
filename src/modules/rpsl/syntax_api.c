@@ -978,12 +978,7 @@ rpsl_object_init (const gchar *s)
 
     /* p is the beginning of the current attribute, q searches for the end */
     p = s;
-    for (;;) {
-        /* done with string, finish */
-        if (*p == '\0') {
-            break;
-        }
-
+    for (; *p;) {
         /* search for end of attribute */
         q = strchr(p, '\n');
         while ((q != NULL) && is_rpsl_line_cont(q[1])) {
