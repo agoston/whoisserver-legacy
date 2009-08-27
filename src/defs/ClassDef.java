@@ -368,7 +368,7 @@ public class ClassDef {
     public int getDummifyType() {
         return dummifyType;
     }
-  
+
   public String getEnumeration() {
     return enumeration;
   } // getEnum()

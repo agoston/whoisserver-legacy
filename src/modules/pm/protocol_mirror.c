@@ -233,7 +233,7 @@ void pm_dummify_delete_attr(rpsl_object_t *obj, rpsl_attr_t *act_attr, GList **g
  * Takes: rpsl object
  *        rpsl attribute
  *        GList pointer to current attribute in attribute list
- * 
+ *
  * Returns:
  *      0 if no replacement was done
  *      1 if attribute was replaced with placeholder value or was deleted */
@@ -314,9 +314,9 @@ int pm_dummify_replace_filtered_attribute(rpsl_object_t *obj, rpsl_attr_t *act_a
 }
 
 /* adds the text defined as DUMMY_ADD_ATTR in rip.config to the rpsl object as remarks
- * 
+ *
  * Takes: rpsl object
- * 
+ *
  * Returns: NULL on OK
  *          rpsl_error_t* on error (should be freed by caller using rpsl_error_free()) */
 rpsl_error_t *pm_dummify_add_attr(rpsl_object_t *obj)
@@ -468,7 +468,7 @@ char *PM_dummify_object(char *object)
     /* the primary key is not necessarily the first attribute of the object, e.g. person */
     prim_val = rpsl_object_get_key_value(obj);
 
-    /* iterate through attributes 
+    /* iterate through attributes
      * OPTME: this could be speeded up considerably if we wouldn't do metadata examination for every
      * dummified object, but on whois-server startup store what decision to make on each attribute of each class,
      * and simply execute that previously made decision here - agoston, 2009-08-25

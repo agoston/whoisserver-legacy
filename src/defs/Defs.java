@@ -19,15 +19,6 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
   ***************************************/
 
-/* FIXME:
- * Foreign key relations are not mapped in classes.xml+attributes.xml.
- * Thus, when we declared person+role objects as 'placeholder', there was
- * no way of knowing which attribute will actually hold a nic-hdl (pkey for above
- * objects), and as such, we had to replicate placeholder info in all attributes
- * as well. This is bad and should be fixed someday.
- * agoston, 2009-07-31 */
-
-
 import java.io.*;
 import java.util.*;
 import org.xml.sax.*;
