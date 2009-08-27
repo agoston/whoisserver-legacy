@@ -236,7 +236,7 @@ void pm_dummify_delete_attr(rpsl_object_t *obj, rpsl_attr_t *act_attr, GList **g
  * 
  * Returns:
  *      0 if no replacement was done
- *      1 if attribute was replaced with placeholder value */
+ *      1 if attribute was replaced with placeholder value or was deleted */
 int pm_dummify_replace_placeholder_attribute(rpsl_object_t *obj, rpsl_attr_t *act_attr, GList **gli)
 {
     const class_t *actclass;
@@ -244,7 +244,8 @@ int pm_dummify_replace_placeholder_attribute(rpsl_object_t *obj, rpsl_attr_t *ac
      * dummification info into librpsl */
     attribute_t *attrinfo = (attribute_t *) act_attr->attr_info;
 
-    if (!attrinfo) {
+    if (!attrinfo)
+    {
         /* this happens if there was an rpsl error parsing this attribute, for example, the attribute was
          * deprecated :) */
         return 0;
@@ -255,15 +256,18 @@ int pm_dummify_replace_placeholder_attribute(rpsl_object_t *obj, rpsl_attr_t *ac
         (actclass = class_lookup_id(attrinfo->foreignkey_class_offset))->dummify_type == DUMMIFY_PLACEHOLDER)
     {
         /* if mandatory attribute, replace with placeholder; if not, remove */
-        if (rpsl_attr_is_required(obj, act_attr->lcase_name)) {
+        if (rpsl_attr_is_required(obj, act_attr->lcase_name))
+        {
             const char *placeholder = actclass->dummify_singleton;
             rpsl_attr_replace_value(act_attr, placeholder);
-        } else {
+        }
+        else
+        {
             pm_dummify_delete_attr(obj, act_attr, gli);
         }
         return 1;
     }
-    
+
     return 0;
 }
 
@@ -276,14 +280,15 @@ int pm_dummify_replace_placeholder_attribute(rpsl_object_t *obj, rpsl_attr_t *ac
  *        GList pointer to current attribute in attribute list
  *
  * Returns: 0 if no replacement was done
- *          1 if attribute was filtered properly */
+ *          1 if attribute was filtered or deleted */
 int pm_dummify_replace_filtered_attribute(rpsl_object_t *obj, rpsl_attr_t *act_attr, char *prim_val, GList **gli)
 {
     /* get the attribute info - this is bad, but it also doesn't make much sense to include
      * dummification info into librpsl */
     attribute_t *attrinfo = (attribute_t *) act_attr->attr_info;
 
-    if (!attrinfo) {
+    if (!attrinfo)
+    {
         /* this happens if there was an rpsl error parsing this attribute, for example, the attribute was
          * deprecated :) */
         return 0;
@@ -299,7 +304,9 @@ int pm_dummify_replace_filtered_attribute(rpsl_object_t *obj, rpsl_attr_t *act_a
             rpsl_attr_replace_value(act_attr, buf);
             return 1;
         }
-    } else {
+    }
+    else
+    {
         pm_dummify_delete_attr(obj, act_attr, gli);
         return 1;
     }
@@ -464,7 +471,7 @@ char *PM_dummify_object(char *object)
     /* iterate through attributes 
      * OPTME: this could be speeded up considerably if we wouldn't do metadata examination for every
      * dummified object, but on whois-server startup store what decision to make on each attribute of each class,
-     * and simply execute that code path here - agoston, 2009-08-25
+     * and simply execute that previously made decision here - agoston, 2009-08-25
      */
     for (gli = g_list_first(obj->attributes); gli; gli = g_list_next(gli))
     {

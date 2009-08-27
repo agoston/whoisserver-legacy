@@ -326,7 +326,7 @@ int main(int argc, char **argv) {
 	 * update will make its way into tomorrow's dump */
 	PM_get_minmax_serial(sql, &first_serial, &last_serial);
 
-	if (Verbose) {
+    if (Verbose) {
 		printf("Min serial: %ld\nMax serial:%ld\n\n", first_serial, last_serial);
 		printf("Dumping objects (each . marks 10000 object dumped):\n");
     }
