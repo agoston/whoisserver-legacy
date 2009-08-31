@@ -712,6 +712,8 @@ void PM_interact(int sock)
     {
         LG_log(pm_context, LG_ERROR, " database='%s' [%d] %s", db_name, SQ_errno(sql_connection),
                SQ_error(sql_connection));
+        UT_free(hostaddress);
+        UT_free(nrtm_q.source);
         return;
     }
     LG_log(pm_context, LG_DEBUG, "[%s] --  Made SQL connection to %s@%s", hostaddress, db_name, db_host);
