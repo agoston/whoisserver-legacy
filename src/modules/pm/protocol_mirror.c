@@ -628,18 +628,6 @@ void PM_interact(int sock)
 
     LG_log(pm_context, LG_DEBUG, "[%s] -- input: [%s]", hostaddress, input);
 
-    if (nrtm_q.version < 1 || nrtm_q.version > 3)
-    {
-        LG_log(pm_context, LG_DEBUG, "[%s] -- NRTM version mismatch: %s", hostaddress, input);
-        sprintf(buff, "\n%%ERROR:406: NRTM version mismatch\n\n\n");
-        SK_cd_puts(&condat, buff);
-        /*      SK_cd_close(&(condat)); */
-        UT_free(hostaddress);
-        UT_free(nrtm_q.source);
-        return;
-    }
-
-
     /* this is -q sources query  - answer and return */
     if (IS_Q_QUERY(parse_result))
     {
@@ -699,6 +687,18 @@ void PM_interact(int sock)
         LG_log(pm_context, LG_DEBUG, "[%s] --  Not authorized to mirror the source %s", hostaddress, nrtm_q.source);
         sprintf(buff, "\n%%ERROR:402: not authorized to mirror the database\n\n\n");
         SK_cd_puts(&condat, buff);
+        UT_free(hostaddress);
+        UT_free(nrtm_q.source);
+        return;
+    }
+
+    /* check if requested nrtm version is supported */
+    if (nrtm_q.version < 1 || nrtm_q.version > 3)
+    {
+        LG_log(pm_context, LG_DEBUG, "[%s] -- NRTM version mismatch: %s", hostaddress, input);
+        sprintf(buff, "\n%%ERROR:406: NRTM version mismatch\n\n\n");
+        SK_cd_puts(&condat, buff);
+        /*      SK_cd_close(&(condat)); */
         UT_free(hostaddress);
         UT_free(nrtm_q.source);
         return;
