@@ -78,7 +78,7 @@ int sql_err;
 }
 /* if we have a transaction_id provided in NRTM mode, try using that instead of coming up with one
  *
- * Returns: 1 if nrtm mode and serial was updated
+ * Returns: 1 if nrtm mode and serial was updated from transaction_id
  *          0 otherwise */
 int ud_adjust_nrtm_serial(Transaction_t *tr)
 {
