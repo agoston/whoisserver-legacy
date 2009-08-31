@@ -50,7 +50,7 @@ extern int SV_update_sock[];
 extern int SV_shutdown_recv_fd;
 
 /* Response time to swtching updates on and off */
-#define TIMEOUT 60
+#define TIMEOUT 30
 
 /* timeout between successive attempts to establish connection with server */
 #define PM_CONNECTION_TIMEOUT 10
