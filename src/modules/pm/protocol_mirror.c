@@ -542,7 +542,6 @@ dummify_abort:
 }
 
 /* PM_interact() */
-
 /*++++++++++++++++++++++++++++++++++++++
  Interact with the client.
 
@@ -587,7 +586,6 @@ void PM_interact(int sock)
     char *db_name;
     char *db_user;
     char *db_pswd;
-    int protocol_version;
 
     GString *gbuff;
 
@@ -630,6 +628,18 @@ void PM_interact(int sock)
 
     LG_log(pm_context, LG_DEBUG, "[%s] -- input: [%s]", hostaddress, input);
 
+    if (nrtm_q.version < 1 || nrtm_q.version > 3)
+    {
+        LG_log(pm_context, LG_DEBUG, "[%s] -- NRTM version mismatch: %s", hostaddress, input);
+        sprintf(buff, "\n%%ERROR:406: NRTM version mismatch\n\n\n");
+        SK_cd_puts(&condat, buff);
+        /*      SK_cd_close(&(condat)); */
+        UT_free(hostaddress);
+        UT_free(nrtm_q.source);
+        return;
+    }
+
+
     /* this is -q sources query  - answer and return */
     if (IS_Q_QUERY(parse_result))
     {
@@ -663,7 +673,6 @@ void PM_interact(int sock)
         UT_free(hostaddress);
         UT_free(nrtm_q.source);
         return;
-
     }
 
     /* otherwise this is -g query */
@@ -694,9 +703,6 @@ void PM_interact(int sock)
         UT_free(nrtm_q.source);
         return;
     }
-
-    /* get protocol version of the source */
-    protocol_version = ca_get_srcnrtmprotocolvers(source_hdl);
 
     /* get database */
     db_name = ca_get_srcdbname(source_hdl);
@@ -860,14 +866,32 @@ void PM_interact(int sock)
             switch (operation)
             {
             case OP_ADD:
-                sprintf(buff, "ADD %ld\n\n", current_serial);
+                switch (nrtm_q.version)
+                {
+                case 3:
+                    sprintf(buff, "ADD %ld\n\n", current_serial);
+                    break;
+
+                default:
+                    sprintf(buff, "ADD\n\n");
+                    break;
+                }
                 SK_cd_puts(&condat, buff);
                 SK_cd_puts(&condat, object);
                 SK_cd_puts(&condat, "\n");
                 break;
 
             case OP_DEL:
-                sprintf(buff, "DEL %ld\n\n", current_serial);
+                switch (nrtm_q.version)
+                {
+                case 3:
+                    sprintf(buff, "DEL %ld\n\n", current_serial);
+                    break;
+
+                default:
+                    sprintf(buff, "DEL\n\n");
+                    break;
+                }
                 SK_cd_puts(&condat, buff);
                 SK_cd_puts(&condat, object);
                 SK_cd_puts(&condat, "\n");

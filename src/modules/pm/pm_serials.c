@@ -250,7 +250,7 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
 	char *db_name = ca_get_srcdbname(source_hdl);
 	char *db_user = ca_get_srcdbuser(source_hdl);
 	char *db_passwd = ca_get_srcdbpassword(source_hdl);
-	int version = ca_get_srcnrtmprotocolvers(source_hdl);
+	int version = 3;    /* at the moment this is the only version number we provide */
 	SQ_connection_t *db_connection;
 	long min_serial, max_serial;
 	char can_mirror;
@@ -292,11 +292,12 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
 }
 
 /************************************************************
- * Fills supplied buffer with information about the sources  *
- *                                                           *
- *                                                           *
- * Note:                                                     *
- *  returned GString should be freed by the caller           *
+ * Fills supplied buffer with information about the sources
+ * the current whois-server instance provides (not to be confused with
+ * the NRTMs this whois-server instance queries from as a client!)
+ *
+ * Note:
+ *  returned GString should be freed by the caller
  *************************************************************/
 GString *PM_get_nrtm_sources(ip_addr_t *client_address, char *source) {
     GString *gbuff=g_string_sized_new(STR_L);
