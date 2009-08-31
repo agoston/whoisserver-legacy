@@ -383,6 +383,8 @@ static Line_Type_t line_type(const char *line, long *transaction_id) {
 		return (LINE_EOF);
 	if (strncmp(line, "#", 1) == 0)
 		return (LINE_COMMENT);
+	if (strncmp(line, "%", 1) == 0)
+		return (LINE_COMMENT);
 	if (strcmp(line, "\n") == 0)
 		return (LINE_EMPTY);
 
