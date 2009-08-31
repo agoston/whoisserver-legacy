@@ -903,7 +903,7 @@ void PM_interact(int sock)
         {
             while (((nrtm_q.last = SQ_get_max_id(sql_connection, "serial_id", "serials")) < current_serial)
                 && (CO_get_do_server() == 1))
-                sleep(1);
+                sleep(2);
         }
 
     } /* do while there are more serials, connection was not reset and XXX do_server is on*/
