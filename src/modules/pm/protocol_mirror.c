@@ -616,11 +616,8 @@ void PM_interact(int sock)
     if (parse_result < 0)
     {
         LG_log(pm_context, LG_DEBUG, "[%s] -- Garbage received: %s", hostaddress, input);
-        /* log the fact and exit */
-        /* Free the hostaddress */
         sprintf(buff, "\n%%ERROR:405: syntax error\n\n\n");
         SK_cd_puts(&condat, buff);
-        /*      SK_cd_close(&(condat)); */
         UT_free(hostaddress);
         UT_free(nrtm_q.source);
         return;
@@ -640,7 +637,6 @@ void PM_interact(int sock)
         g_string_free(gbuff, TRUE);
         UT_free(hostaddress);
         UT_free(nrtm_q.source);
-        /*      SK_cd_close(&(condat)); */
         return;
     }
     else if (IS_G_QUERY(parse_result))
@@ -653,11 +649,8 @@ void PM_interact(int sock)
     else
     {
         LG_log(pm_context, LG_DEBUG, "[%s] -- Syntax error: %s", hostaddress, input);
-        /* log the fact and exit */
-        /* Free the hostaddress */
         sprintf(buff, "\n%%ERROR:405: syntax error\n\n\n");
         SK_cd_puts(&condat, buff);
-        /*      SK_cd_close(&(condat)); */
         UT_free(hostaddress);
         UT_free(nrtm_q.source);
         return;
@@ -698,7 +691,6 @@ void PM_interact(int sock)
         LG_log(pm_context, LG_DEBUG, "[%s] -- NRTM version mismatch: %s", hostaddress, input);
         sprintf(buff, "\n%%ERROR:406: NRTM version mismatch\n\n\n");
         SK_cd_puts(&condat, buff);
-        /*      SK_cd_close(&(condat)); */
         UT_free(hostaddress);
         UT_free(nrtm_q.source);
         return;
@@ -739,9 +731,6 @@ void PM_interact(int sock)
     {
         LG_log(pm_context, LG_ERROR, " database='%s' [%d] %s", db_name, SQ_errno(sql_connection),
                SQ_error(sql_connection));
-        /* Free the hostaddress */
-        /*      SK_cd_close(&(condat)); */
-        /* close the connection to SQL server */
         SQ_close_connection(sql_connection);
         UT_free(hostaddress);
         UT_free(nrtm_q.source);
@@ -763,7 +752,6 @@ void PM_interact(int sock)
         /* write error message back to the client */
         sprintf(buff, "\n%%ERROR:401: invalid range: Not within %ld-%ld\n\n\n", oldest_serial, current_serial);
         SK_cd_puts(&condat, buff);
-        /*      SK_cd_close(&(condat)); */
 
         /* close the connection to SQL server */
         SQ_close_connection(sql_connection);
@@ -922,7 +910,6 @@ void PM_interact(int sock)
 
     sprintf(buff, "%%END %s\n\n\n", nrtm_q.source);
     SK_cd_puts(&condat, buff);
-    SK_cd_close(&condat);
 
     LG_log(pm_context, LG_INFO, "[%s] -- <%s:%ld-%ld (%ld)> ", hostaddress, nrtm_q.source, nrtm_q.first, nrtm_q.last,
            nrtm_q.last - nrtm_q.first + 1);
