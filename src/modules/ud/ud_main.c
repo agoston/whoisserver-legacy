@@ -88,14 +88,9 @@ void UD_init(LG_context_t *ctx) {
  ************************************************************/
 int get_NRTM_fd(struct _nrtm *nrtm, int upto_last, char *source) {
 	int sockfd;
-	struct hostent *hptr;
-	struct sockaddr_in serv_addr;
-	struct in_addr *paddr;
-	char host_info[STR_XXL];
 	GString *line_buff;
 	int fd;
 	int ret;
-	struct hostent result;
 	int error;
 	int network;
 
