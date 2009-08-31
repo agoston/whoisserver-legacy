@@ -76,6 +76,31 @@ int sql_err;
     }
  return(sql_err);
 }
+/* if we have a transaction_id provided in NRTM mode, try using that instead of coming up with one
+ *
+ * Returns: 1 if nrtm mode and serial was updated
+ *          0 otherwise */
+int ud_adjust_nrtm_serial(Transaction_t *tr)
+{
+    if (IS_NRTM_CLNT(tr->mode) && (tr->transaction_id > 0))
+    {
+        if (tr->serial_id >= tr->transaction_id)
+        {
+            /* the serial_id we received is lower than the one already in the database - serious problem!
+             * we shouldn't continue this operation */
+            LG_log(ud_context, LG_FATAL, "UD_create_serial(): got transaction_id %ld, but already got %ld in the DB\n",
+                   tr->transaction_id, tr->serial_id);
+            die;
+        }
+
+        /* overrule normal serial_id */
+        tr->serial_id = tr->transaction_id;
+        return 1;
+    }
+    return 0;
+}
+
+
 /************************************************************
  * UD_create_serial()                                        *
  *                                                           *
@@ -96,7 +121,6 @@ int sql_err;
  *  -1 in case of an error                                   *
  *                                                           *
  *************************************************************/
-
 long UD_create_serial(Transaction_t *tr)
 {
     int sql_err;
@@ -104,26 +128,13 @@ long UD_create_serial(Transaction_t *tr)
     long timestamp;
     long sequence_id;
 
-    /* Calculate the object_id - should be max+1 */
-    /* XXX we cannot use autoincrement with MyISAM tables */
-    /* XXX because they keep the max inserted id even if  */
-    /* XXX it was deleted later, thus causing gaps we don't want */
-    tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") + 1;
-
-    /* if we have a transaction_id provided in NRTM mode, try using that instead of coming up with one */
-    if (IS_NRTM_CLNT(tr->mode) && (tr->transaction_id > 0))
+    if (!ud_adjust_nrtm_serial(tr))
     {
-        if (tr->serial_id >= tr->transaction_id)
-        {
-            /* the serial_id we received is lower than the one already in the database - serious problem!
-             * we shouldn't continue this operation */
-            LG_log(ud_context, LG_FATAL, "UD_create_serial(): got transaction_id %ld, but already got %ld in the DB\n",
-                   tr->transaction_id, tr->serial_id);
-            die;
-        }
-
-        /* overrule normal serial_id */
-        tr->serial_id = tr->transaction_id;
+        /* Calculate the object_id - should be max+1 */
+        /* XXX we cannot use autoincrement with MyISAM tables */
+        /* XXX because they keep the max inserted id even if  */
+        /* XXX it was deleted later, thus causing gaps we don't want */
+        tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") + 1;
     }
 
     /* if the transaction failed store it in transaction table */
@@ -189,15 +200,7 @@ long UD_create_serial(Transaction_t *tr)
     /* XXX However, for update this may be configurable option */
     /* XXX In case v1 protocol both sections (DEL + ADD) should be executed */
 
-    /* get the next serial_id */
-    /* XXX we cannot use autoincrement with MyISAM tables */
-    /* XXX because they keep the max inserted id even if  */
-    /* XXX it was deleted later, thus causing gaps we don't want */
-    tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") + 1;
-
     /* if this a DEL */
-
-
     if (ACT_DELETE(tr->action))
     {
         /* generate DEL serial */
