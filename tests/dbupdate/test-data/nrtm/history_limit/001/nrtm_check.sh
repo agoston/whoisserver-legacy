@@ -33,7 +33,7 @@ fi
 FILE1=$DATADIR/nrtm/history_limit/001/expected_result
 FILE2=$DATADIR/nrtm/history_limit/001/nrtm_result
 
-get_nrtm '-g DB-TEST:0:1-5' >>$FILE2
+get_nrtm '-g DB-TEST:3:1-5' >>$FILE2
 
 diff $FILE1 $FILE2 &>/dev/null
 RET=$?
