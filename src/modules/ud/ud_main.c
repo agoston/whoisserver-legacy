@@ -206,7 +206,7 @@ void UD_do_nrtm(void *arg) {
 		LG_ctx_add_appender(src_ctx, app);
 	}
 
-	/* load the dictionary */
+	/* switch the RPSL syntax check from the default front-end to the more relaex back-end rules */
 	rpsl_load_dictionary(RPSL_DICT_CORE);
 
 	nrtm = UT_calloc(1, sizeof(struct _nrtm));
@@ -234,7 +234,7 @@ void UD_do_nrtm(void *arg) {
 	else if (IS_NRTM_CLNT(ud_stream.ud_mode)) {
 
 		if (IS_PERSIST_MIRR(ud_stream.ud_mode))
-			fprintf(stderr, "* NRTM: persistent conection\n");
+			fprintf(stderr, "* NRTM: persistent connection\n");
 		else
 			fprintf(stderr, "* NRTM\n");
 	} else
