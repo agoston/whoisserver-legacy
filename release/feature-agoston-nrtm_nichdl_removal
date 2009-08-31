@@ -1,0 +1,8 @@
+- Changed dummification procedure to better reflect data protection laws
+- Introduced NRTM version 3
+- ... FIXME: during review some more details could be added, as there were a
+lot of smaller, out-of-scope changes!
+
+Installation notes:
+- Change nrtm version from 2 to 3 during installation to make use of the new
+nrtm protocol
