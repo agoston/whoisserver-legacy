@@ -1,6 +1,6 @@
 /***************************************
 
-  Functions for handling serials  
+  Functions for handling serials
 
   Status: NOT REVUED, NOT TESTED
 
@@ -11,9 +11,9 @@
         andrei (08/02/2000) Created.
   ******************/ /******************
   Copyright (c) 2000                              RIPE NCC
- 
+
   All Rights Reserved
-  
+
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
   provided that the above copyright notice appear in all copies and that
@@ -21,7 +21,7 @@
   supporting documentation, and that the name of the author not be
   used in advertising or publicity pertaining to distribution of the
   software without specific, written prior permission.
-  
+
   THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
   ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
   AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
@@ -55,10 +55,10 @@ int UD_lock_serial(Transaction_t *tr)
 {
 int sql_err;
 
-/* lock all tables we are going to update and commit */	
+/* lock all tables we are going to update and commit */
 /* this also includes transaction_rec table, as we update the status */
    sql_err=SQ_execute_query(tr->sql_connection, "LOCK TABLES serials WRITE, failed_transaction WRITE, transaction_rec WRITE ", NULL);
-   if (sql_err) { 
+   if (sql_err) {
 	LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), "LOCK TABLES serials WRITE, failed_transaction WRITE, transaction_rec WRITE ");
         die;
     }
@@ -68,38 +68,14 @@ int sql_err;
 int UD_unlock_serial(Transaction_t *tr)
 {
 int sql_err;
-	
+
    sql_err=SQ_execute_query(tr->sql_connection, "UNLOCK TABLES ", NULL);
-   if (sql_err) { 
+   if (sql_err) {
 	LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), "UNLOCK TABLES");
         die;
     }
  return(sql_err);
 }
-/* if we have a transaction_id provided in NRTM mode, try using that instead of coming up with one
- *
- * Returns: 1 if nrtm mode and serial was updated from transaction_id
- *          0 otherwise */
-int ud_adjust_nrtm_serial(Transaction_t *tr)
-{
-    if (IS_NRTM_CLNT(tr->mode) && (tr->transaction_id > 0))
-    {
-        if (tr->serial_id >= tr->transaction_id)
-        {
-            /* the serial_id we received is lower than the one already in the database - serious problem!
-             * we shouldn't continue this operation */
-            LG_log(ud_context, LG_FATAL, "UD_create_serial(): got transaction_id %ld, but already got %ld in the DB\n",
-                   tr->transaction_id, tr->serial_id);
-            die;
-        }
-
-        /* overrule normal serial_id */
-        tr->serial_id = tr->transaction_id;
-        return 1;
-    }
-    return 0;
-}
-
 
 /************************************************************
  * UD_create_serial()                                        *
@@ -128,13 +104,25 @@ long UD_create_serial(Transaction_t *tr)
     long timestamp;
     long sequence_id;
 
-    if (!ud_adjust_nrtm_serial(tr))
+    /* Calculate the object_id - should be max+1 */
+    /* XXX we cannot use autoincrement with MyISAM tables */
+    /* XXX because they keep the max inserted id even if  */
+    /* XXX it was deleted later, thus causing gaps we don't want */
+    tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") + 1;
+
+    if (IS_NRTM_CLNT(tr->mode) && (tr->transaction_id > 0))
     {
-        /* Calculate the object_id - should be max+1 */
-        /* XXX we cannot use autoincrement with MyISAM tables */
-        /* XXX because they keep the max inserted id even if  */
-        /* XXX it was deleted later, thus causing gaps we don't want */
-        tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") + 1;
+        if (tr->serial_id > tr->transaction_id)
+        {
+            /* the serial_id we received is lower than the one already in the database - serious problem!
+             * we shouldn't continue this operation */
+            LG_log(ud_context, LG_FATAL, "UD_create_serial(): got transaction_id %ld, but already got %ld in the DB\n",
+                   tr->transaction_id, tr->serial_id);
+            die;
+        }
+        
+        /* overrule normal serial_id */
+        tr->serial_id = tr->transaction_id;
     }
 
     /* if the transaction failed store it in transaction table */
@@ -171,7 +159,6 @@ long UD_create_serial(Transaction_t *tr)
         }
         return (tr->serial_id);
     }
-
 
     /* if the transaction has succeeded */
     sequence_id = tr->sequence_id;
@@ -242,7 +229,7 @@ long UD_create_serial(Transaction_t *tr)
 
 
 /************************************************************
-* UD_comrol_serial()                                        *     
+* UD_comrol_serial()                                        *
 *                                                           *
 * Commits/Rollbacks a serial record for given transaction   *
 * Returns:                                                  *
@@ -265,7 +252,7 @@ int sql_err;
 char *Q_transaction;
 
    /* check if something is left in serials from the crash */
-   
+
    /* compose the appropriate query depending on operation (commit/rollback) */
    if(commit) {
 	   /* commit changes to serials table */
@@ -284,16 +271,16 @@ char *Q_transaction;
 	     LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
              die;
            }
-	   /* restore modified atlast */ 
+	   /* restore modified atlast */
            g_string_sprintf(tr->query, Q_rollback_serial2, tr->thread_upd);
 	   sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
            if (sql_err) {
 	     LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
              die;
-           } 
+           }
 	   Q_transaction=Q_rollback_transaction;
    }
-   
+
     /* clean up transaction  table */
     g_string_sprintf(tr->query, Q_transaction, tr->thread_ins);
     sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
@@ -302,6 +289,6 @@ char *Q_transaction;
         die;
     }
  return(0);
-} 
-    
+}
+
 
