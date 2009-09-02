@@ -60,10 +60,6 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
 	SQ_row_t *sql_row;
 	int sql_err;
 
-	/* get the lock to ensure that queries are not stopped */
-	/* which means access to the database is allowed */
-	PW_record_query_start();
-
 	sprintf(query, "SELECT min(serial_id),max(serial_id) FROM serials");
 	sql_err = SQ_execute_query(sql_connection, query, &sql_result);
 
@@ -84,9 +80,6 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
 		SQ_free_result(sql_result);
 		sql_result=NULL;
 	}
-
-	/* release the lock */
-	PW_record_query_end();
 }
 
 /************************************************************
