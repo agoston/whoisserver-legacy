@@ -543,7 +543,34 @@ dummify_abort:
 
 /* PM_interact() */
 /*++++++++++++++++++++++++++++++++++++++
- Interact with the client. For design notes, peek into the code below.
+ Interact with the client.
+
+NRTM is a very simple protocol - the client requests a range of serials,
+to which the server responds with the corresponding amount of changes in
+the RIPE Database, each prepended with 'ADD' or 'DEL'.
+
+When we introduced massive filtering of NRTM data, we introduced object
+types that are never to be sent to the public. At the moment, these are
+person and role. All references to these objects have been replaced with a
+placeholder object (PH4239-RIPE), and the object themselves are never sent
+to the public.
+
+But this new implementation conflicted with NRTM. Since the NRTM stream
+does not include the serials, a client asking for persistent connection
+has no idea which serials the server passed to it, and as such, it has no
+way of known from which serial it should resume next time it asks for an
+NRTM range.
+
+To solve this, we introduces NRTM v3, with a backward compatibility to v1
+and v2 that work as usual, so regular users will not see any difference in
+the NRTM protocol until they specifically ask for a v3 NRTM stream. Of
+course the objects+operations that are passed down the stream are going to
+be the same.
+
+NRTM v3 adds a serial ID after the operation ('ADD' or 'DEL'). This way,
+an NRTM client will know if there are gaps in the stream, and has the
+correct serials in its own database which it can base future nrtm requests on.
+
 
  int sock Socket that client is connected to.
 
@@ -855,13 +882,8 @@ void PM_interact(int sock)
             /* OP_UPD is a defined operation, but not used in serials table - left unhandled here, too.
              *
              * NRTM versions have slighly different formats. v1 and v2 look exactly the same, but (according
-             * to a comment in whois source code) updates are atomic (whatever that means).
-             *
-             * NRTM v3 appends the serial to the end of the NRTM command. The reason for this is that NRTM streams
-             * do not necessarily include all of the updates anymore - massive filtering is done on public nrtm
-             * streams. However, if we do not pass down the actual serial ID of the current object, remote software
-             * would have no idea what serial it should assign to the local update, which would means the databases
-             * would get out of sync quickly. */
+             * to a comment in whois source code) updates are atomic (whatever that means). v3 has the serial id
+             * appended to the operation. See design notes in the function header comment. */
             switch (operation)
             {
             case OP_ADD:
