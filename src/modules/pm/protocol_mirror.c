@@ -543,7 +543,7 @@ dummify_abort:
 
 /* PM_interact() */
 /*++++++++++++++++++++++++++++++++++++++
- Interact with the client.
+ Interact with the client. For design notes, peek into the code below.
 
  int sock Socket that client is connected to.
 
@@ -852,7 +852,16 @@ void PM_interact(int sock)
                 }
             }
 
-            /* OP_UPD is a defined operation, but not used in serials table - left unhandled here, too */
+            /* OP_UPD is a defined operation, but not used in serials table - left unhandled here, too.
+             *
+             * NRTM versions have slighly different formats. v1 and v2 look exactly the same, but (according
+             * to a comment in whois source code) updates are atomic (whatever that means).
+             *
+             * NRTM v3 appends the serial to the end of the NRTM command. The reason for this is that NRTM streams
+             * do not necessarily include all of the updates anymore - massive filtering is done on public nrtm
+             * streams. However, if we do not pass down the actual serial ID of the current object, remote software
+             * would have no idea what serial it should assign to the local update, which would means the databases
+             * would get out of sync quickly. */
             switch (operation)
             {
             case OP_ADD:
