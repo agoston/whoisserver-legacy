@@ -278,6 +278,14 @@ key-cert operation OK
 ***Error: Unknown NIC handle suffix used: <xsl:apply-templates/>
   </xsl:template>
 
+  <xsl:template match="nichdl_not_available">
+***Error: The nic-hdl '<xsl:value-of select="text()"/>' is not available.
+  </xsl:template>
+
+  <xsl:template match="nichdl_not_valid">
+***Error: The nic-hdl '<xsl:value-of select="text()"/>' is not valid.
+  </xsl:template>
+
   <xsl:template match="object_exists">
 ***Error: Object exists: <xsl:apply-templates/>
   </xsl:template>
