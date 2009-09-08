@@ -1,0 +1,19 @@
+20090908 - version 3.6
+
+Changes:
+- The nic-hdls can not be reused after deletion
+
+
+Merged:
+- feature-nichdl-preservation
+
+
+Installation notes:
+- Need to regenerate nic-hdl table using external one-shot script
+
+
+Affected stakeholders:
+- Anyone who tries to re-create a deleted nic-hdl, or create one currently
+in use, in person and role objects
+- NCC Services WG
+- DB WG
