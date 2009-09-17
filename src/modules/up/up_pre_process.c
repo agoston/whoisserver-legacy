@@ -617,34 +617,38 @@ int up_report_unmaintained(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         mntner = ((nic_info_t *) (item->data))->mntner;
         /* perform lookup (can be person or role object) */
         object = up_get_object(rt_ctx, lg_ctx, options, server, obj_source, "pn,ro", key);
-        mb = rpsl_object_get_attr(object, "mnt-by");
-
-        /* check for "mnt-by:" attribute */
-        if (object && !mb)
+        if (object)
         {
-            /* this person/role object is not maintained */
-            type = rpsl_object_get_class(object);
+            /* referenced person object exists */
+            mb = rpsl_object_get_attr(object, "mnt-by");
 
-            if (*mntner)
+            /* check for "mnt-by:" attribute */
+            if (!mb)
             {
-                LG_log(lg_ctx, LG_DEBUG, "up_report_unmaintained: [%s] referenced in mntner [%s] is not maintained",
-                       key, mntner);
-                RT_unmaintained_person_in_mntner(rt_ctx, key, type, mntner);
+                /* this person/role object is not maintained */
+                type = rpsl_object_get_class(object);
+
+                if (*mntner)
+                {
+                    /* this person/role was referenced in a maintainer */
+                    LG_log(lg_ctx, LG_DEBUG, "up_report_unmaintained: [%s] referenced in mntner [%s] is not maintained",
+                           key, mntner);
+                    RT_unmaintained_person_in_mntner(rt_ctx, key, type, mntner);
+                }
+                else
+                {
+                    LG_log(lg_ctx, LG_DEBUG, "up_report_unmaintained: [%s] is not maintained", key);
+                    RT_unmaintained_person(rt_ctx, key, type);
+                }
+                /* uncomment next line if this becomes an error instead of a warning
+                            and change RT_unmaintained* function text */
+                //      retval = UP_FAIL;
             }
             else
             {
-                LG_log(lg_ctx, LG_DEBUG, "up_report_unmaintained: [%s] is not maintained", key);
-                RT_unmaintained_person(rt_ctx, key, type);
+                rpsl_attr_delete_list(mb);
+                mb = NULL;
             }
-            /* uncomment next line if this becomes an error instead of a warning
-               and change RT_unmaintained* function text */
-            //      retval = UP_FAIL;
-            rpsl_object_delete(object);
-        }
-        else if (object && mb)
-        {
-            rpsl_attr_delete_list(mb);
-            mb = NULL;
             rpsl_object_delete(object);
         }
         /* else
