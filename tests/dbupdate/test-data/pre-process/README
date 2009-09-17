@@ -547,3 +547,16 @@
 # RESULT 44: create will fail
 
 
+# CASE 45: Delete a person object
+#          create a person object with same nic-hdl
+#
+# delete then (re)create person object 
+#
+#SUCCESS
+#
+# RESULT 45: The deletion will succeed, the creation will fail
+#
+# note all filters must be under 'object: all'
+# otherwise the testing system will fail the test
+
+

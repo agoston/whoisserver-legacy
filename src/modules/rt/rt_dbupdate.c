@@ -563,6 +563,38 @@ void RT_unknown_nic_suffix(RT_context_t* ctx) { //
 
 
 /*+
+  RT_nichdl_not_available - Reports nic-hdl has already been used and is not available.
+
+  RT_context_t* ctx - Context.
+
+  gchar* - nichdl.
+  +*/
+void RT_nichdl_not_available(RT_context_t *ctx, const gchar *nichdl) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"nichdl_not_available");
+  rt_xml_node_add_content(node, (xmlChar*)nichdl);
+  rt_prepare_node(ctx, node);
+}
+
+
+/*+
+  RT_nichdl_not_valid - Reports nic-hdl syntax not valid.
+
+  RT_context_t* ctx - Context.
+
+  gchar* - nichdl.
+  +*/
+void RT_nichdl_not_valid(RT_context_t *ctx, const gchar *nichdl) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"nichdl_not_valid");
+  rt_xml_node_add_content(node, (xmlChar*)nichdl);
+  rt_prepare_node(ctx, node);
+}
+
+
+/*+
   RT_auth_failure - Reports an authorization failure.
 
   RT_context_t* ctx - Context.

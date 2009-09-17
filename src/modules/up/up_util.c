@@ -1012,6 +1012,7 @@ int up_external_checks(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             int handle_auto_keys (Handle AUTO keys if handle_auto_keys==1)
             reason pointer to policy check fail string
             list of credentials
+            source data structure
    Returns  UP_OK if successful
             UP_FAIL, UP_FWD otherwise
 */
@@ -1021,7 +1022,7 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                            rpsl_object_t *preproc_obj,int operation,
                            char *auto_key, char *obj_source, LU_server_t *server,
                            int handle_auto_keys, char **reason,
-                           GList *credentials)
+                           GList *credentials, source_data_t *source_data)
 {
   int retval = UP_OK;
   int key_status;
@@ -1124,6 +1125,11 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval |= UP_check_country_attr(rt_ctx, lg_ctx, preproc_obj, countries);
 
     retval |= UP_check_nicsuffixes(rt_ctx, lg_ctx, options, preproc_obj, countries);
+
+    if ( operation == UP_CREATE && 
+         (! strcasecmp(type, "person") || ! strcasecmp(type, "role")) )
+        retval |= UP_check_available_nichdl(rt_ctx, lg_ctx, options, preproc_obj,
+                                            source_data);
 
     /* free the countries list */
     for (ctry_idx=0; countries[ctry_idx] != NULL; ctry_idx++)
@@ -1969,7 +1975,8 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   auto_key = (char *)calloc(AUTO_KEY_LENGTH, sizeof(char));
   retval = up_pre_process_object(rt_ctx, lg_ctx, options, &key_info, preproc_obj,
                                     operation, auto_key, obj_source, current_server,
-                                    handle_auto_keys, &reason, credentials);
+                                    handle_auto_keys, &reason, credentials,
+                                    &source_data);
 
   if ( retval != UP_OK )
   {
