@@ -1,3 +1,12 @@
+BUGS:
+- nrtm client has a design problem when replicating from a v3 client! it is
+because, for some reason, nrtm client does a delete/add operation on every
+modify, thus serials get out of sync, etc... This should be investigated and
+fixed before even thinking about a release!
+
+
+---
+
 - Changed dummification procedure to better reflect data protection laws
 - Introduced NRTM version 3
 - ... FIXME: during review some more details could be added, as there were a
