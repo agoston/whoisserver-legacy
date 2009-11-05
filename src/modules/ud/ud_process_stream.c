@@ -503,7 +503,8 @@ static int process_nrtm(UD_stream_t *ud_stream, Transaction_t *tr, int operation
 	/* this is done to allow deletion of person objects referenced by name  */
 
 	tr->mode|=B_DUMMY;
-	if (IS_NO_NHR(tr->mode))
+        /* nic-hdls are not removed when an object is deleted */
+	if ( IS_NO_NHR(tr->mode) || operation == OP_DEL )
 		ta_upd_nhr=0;
 	else
 		ta_upd_nhr = TA_UPD_NHR;
@@ -759,7 +760,8 @@ static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int oper
 
 	/* Start timer for statistics */
 	UT_timeget(&sotime);
-	if (IS_NO_NHR(tr->mode))
+        /* nic-hdls are not removed when an object is deleted */
+	if ( IS_NO_NHR(tr->mode) || operation == OP_DEL )
 		ta_upd_nhr = 0;
 	else
 		ta_upd_nhr = TA_UPD_NHR;

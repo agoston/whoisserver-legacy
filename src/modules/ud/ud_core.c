@@ -2037,24 +2037,6 @@ int object_process(Transaction_t *tr) {
 		LG_log(tr->src_ctx, LG_DEBUG, "%s object: delete", UD_TAG);
 		/* check referential integrity of deletion */
 		UD_check_ref(tr);
-		/* for person & role - free the nic-handle in the NHR */
-		/* Note: For organisation objects we don't need to free the orgID because
-		 we don't want to reuse the orgIDs */
-		if (ACT_UPD_NHR(tr->action) && tr->succeeded && ((tr->class_type==C_PN) || (tr->class_type==C_RO)) && tr->nh) {
-			res = NH_free(tr->nh, tr->sql_connection, commit_now);
-
-			if (res == -1) {
-				tr->succeeded=0;
-				tr->error |= ERROR_U_DBS;
-				LG_log(ud_context, LG_SEVERE, "cannot delete nic handle");
-				die;
-			} else if (res == 0) {
-				tr->succeeded=0;
-				tr->error |= ERROR_U_OBJ;
-				LG_log(ud_context, LG_SEVERE, "nic handle not found");
-				die;
-			}
-		}
 		/* if everything is Ok we are ready to commit */
 		if (tr->succeeded) {
 			/* update object_id and sequence_id fields */
@@ -2080,12 +2062,6 @@ int object_process(Transaction_t *tr) {
 			/* we need to update sequence_id because it was changed during update */
 			CP_DELETE_PASSED(tr->action);
 			TR_update_id(tr);
-			TR_update_status(tr);
-
-			/* Commit nic-handle deletion to the repository */
-			NH_commit(tr->sql_connection);
-
-			CP_COMMIT_NH_PASSED(tr->action);
 			TR_update_status(tr);
 		}
 		/* send an ack */

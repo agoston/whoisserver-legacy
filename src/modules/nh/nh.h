@@ -74,7 +74,6 @@ typedef struct _nic_handle_t {
 
 int NH_check(nic_handle_t *pnh, SQ_connection_t *sql_connection);
 int NH_check_org(nic_handle_t *pnh, SQ_connection_t *sql_connection);
-int NH_free(nic_handle_t *pnh, SQ_connection_t *sql_connection, int commit_now);
 int NH_register(nic_handle_t *pnh, SQ_connection_t *sql_connection, int commit_now);
 int NH_register_keycert_id(long keycert_id, SQ_connection_t *sql_connection, int commit_now);
 int NH_register_org(nic_handle_t *pnh, SQ_connection_t *sql_connection, int commit_now);
