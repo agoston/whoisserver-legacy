@@ -449,7 +449,15 @@ int main(int argc, char **argv) {
 	SQ_close_connection(sql);
 	SQ_close_connection(sql2);
 
-	if (Verbose) printf("\n\n");
+    /* close the files */
+    for (i = 0; i < num_classes; i++) {
+        if (fclose(classes[i].fp) || fclose(classes[i].dummy_fp)) {
+				perror("fclose");
+				exit(1);
+        }
+    }
+
+    if (Verbose) printf("\n\n");
 
 	/* create last serial file */
 	serial_file = fopen("CURRENTSERIAL", "w+");
