@@ -150,6 +150,7 @@ int load_classes(struct class **c) {
 
 	for (i=0; i<num_classes; i++) {
 		tmp[i].name = class_names[i];
+		tmp[i].classinfo = class_lookup(class_names[i]);
 
 		assert(strlen(tmp[i].name) < 200);
 		strcpy(fname, "db.");
@@ -161,8 +162,6 @@ int load_classes(struct class **c) {
 		}
 		num_files++;
 
-        /* get class definition struct and based on that, create a dummy file handle as well */
-		tmp[i].classinfo = class_lookup(class_names[i]);
         strcpy(fname, "dummy.");
         strcat(fname, tmp[i].name);
         tmp[i].dummy_fp = fopen(fname, "w+");
@@ -352,6 +351,7 @@ int main(int argc, char **argv) {
                     fprintf(stderr, "%s: error getting placeholder object; %s\n", Program_Name, SQ_error(sql));
                     exit(1);
                 }
+
 
                 dump_fputs(ph_obj, classes[i].dummy_fp);
                 dump_putc('\n', classes[i].dummy_fp);
