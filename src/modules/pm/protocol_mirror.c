@@ -552,7 +552,7 @@ the RIPE Database, each prepended with 'ADD' or 'DEL'.
 When we introduced massive filtering of NRTM data, we introduced object
 types that are never to be sent to the public. At the moment, these are
 person and role. All references to these objects have been replaced with a
-placeholder object (PH4239-RIPE), and the object themselves are never sent
+placeholder object (DUMY-RIPE), and the object themselves are never sent
 to the public.
 
 But this new implementation conflicted with NRTM. Since the NRTM stream

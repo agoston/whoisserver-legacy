@@ -293,7 +293,7 @@
       <table name="author"/>
     </delete-invquery-tables>
     <dummify>
-        <placeholder>PH4239-RIPE</placeholder>
+        <placeholder>DUMY-RIPE</placeholder>
     </dummify>
   </ripe_class>
 
@@ -346,7 +346,7 @@
       <table name="org"/>
     </affected-tables>
     <dummify>
-        <placeholder>PH4239-RIPE</placeholder>
+        <placeholder>DUMY-RIPE</placeholder>
     </dummify>
   </ripe_class>
 

@@ -26,7 +26,7 @@ ADD
 
 mntner:         TEST-DBM-MNT
 descr:          Dummy description for TEST-DBM-MNT
-admin-c:        PH4239-RIPE
+admin-c:        DUMY-RIPE
 upd-to:         unread@ripe.net
 auth:           MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/
 mnt-by:         TEST-DBM-MNT
@@ -51,8 +51,8 @@ abuse-mailbox:  bitbucket@ripe.net
 signature:      PGPKEY-AABBCCDD
 encryption:     PGPKEY-AABBCCDD
 org:            ORG-ET1-DB-TEST
-admin-c:        PH4239-RIPE
-tech-c:         PH4239-RIPE
+admin-c:        DUMY-RIPE
+tech-c:         DUMY-RIPE
 auth:           MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
 remarks:        ZOH
 irt-nfy:        bitbucket@ripe.net
