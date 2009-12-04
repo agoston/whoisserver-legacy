@@ -28,7 +28,7 @@ export NOTIFY=dbint@ripe.net
 # PID file
 export PIDFILE=$BASEDIR/var/tmp/whois-server.pid
 # ERR file (startup log and stderr of whois-server is redirected here)
-export ERRLOG=$BASEDIR/var/log/whois-server.err.log
+export ERRLOG=$BASEDIR/var/whois-server.out
 # number of consecutive crashes before giving up
 export MAX_CRASHES=5
 # time between crashes to consider them consecutive (in seconds)
