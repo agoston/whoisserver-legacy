@@ -97,7 +97,7 @@ check_server() {
 	my_log 'Waiting for rx_load thread to finish...'
 	RX_LOAD="Init"
 	NUM=0
-	while [ $NUM -lt 30 ]; do
+	while [ $NUM -lt 15 ]; do
 		RX_LOAD=`send_command 'show threads' | grep '^rx load' | awk '{printf("%s %s %s", $10, $11, $12);}'`
 		echo -en "\r${RX_LOAD}                              "
 		if [ "$RX_LOAD" ]; then
@@ -149,13 +149,13 @@ start_server () {
 		if [ $CRASHES -gt 0 ]; then
 			# only start check_server thread if this is our second start
 			# (because first start went to the stdout to give feedback to user)
-			if [ ! $FIRST_RUN ]; then
-				my_panic "$SERVICE crashed & restarted on $HOSTNAME" "$HOSTNAME whois-server crashed & restarted"
+			if [ $FIRST_RUN -eq 1 ]; then
 				export FIRST_RUN=0
+				CHECK_THREAD_PID=
+			else
+				my_panic "$SERVICE crashed & restarted on $HOSTNAME" "$HOSTNAME whois-server crashed & restarted"
 				check_server </dev/null >/dev/null 2>&1 &
 				CHECK_THREAD_PID=$!
-			else
-				CHECK_THREAD_PID=
 			fi
 
 			PREV_LAST_START_DATE=$LAST_START_DATE
