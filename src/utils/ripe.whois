@@ -160,7 +160,7 @@ start_server () {
 
 			PREV_LAST_START_DATE=$LAST_START_DATE
 			export LAST_START_DATE=`date +%s`
-			$BASEDIR/bin/whois-server -p $PIDFILE -c $BASEDIR/conf/rip.config  </dev/null >> $ERRLOG 2>&1
+			$BASEDIR/bin/whois-server -p $PIDFILE -c $BASEDIR/conf/rip.config </dev/null >>$ERRLOG 2>&1
 
 			# kill existing whois-server-start check thread (so that it won't accidentally start event handler)
 			if [ $CHECK_THREAD_PID ]; then
@@ -186,7 +186,7 @@ start_server () {
 				export CRASHES=$[CRASHES-1]
 			fi
   		else
-			my_panic "ERROR:URGENT: $HOSTNAME $SERVICE is stopped and not restarted" "Number of whois-server crashes exceeded $MAX_CRASHES"
+			my_panic "ERROR:URGENT: $HOSTNAME $SERVICE is stopped and not restarted" "Number of consecutive whois-server crashes exceeded $MAX_CRASHES"
 			return
 		fi
 	done
@@ -254,6 +254,9 @@ export HOSTNAME=`hostname`
 # first time run marker
 export FIRST_RUN=1
 
+# set last start date
+export LAST_START_DATE=0
+
 # get the config port from the config file
 export CONFIG_PORT=`grep ^SVCONFIG_PORT $BASEDIR/conf/rip.config | awk '{print $2}'`
 if [ -z $CONFIG_PORT ]; then
@@ -285,7 +288,7 @@ case "$1" in
 		fi
 		
 		my_log "Starting $SERVICE: "
-		start_server </dev/null &
+		start_server </dev/null >/dev/null 2>&1 &
 		check_server
 	;;
 
