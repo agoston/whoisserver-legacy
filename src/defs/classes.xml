@@ -193,8 +193,6 @@
       (pronounced "maintainer") objects.  A mntner object specifies
       authentication information required to authorise creation,
       deletion or modification of the objects protected by the mntner.
-      Mntner objects are not created automatically, but are forwarded
-      to RIPE Database Administration (ripe-dbm@ripe.net).
     </description>
     <attributes>
       <mntner       choice="mandatory" number="single"   />

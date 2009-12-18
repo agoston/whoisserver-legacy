@@ -1006,7 +1006,7 @@
   <ripe_attribute name="mnt-domains" code="md">
     <description>
    Specifies the identifier of a registered mntner object used for
-   reverse domain authorization. Protects domain objects. The
+   reverse domain authorisation. Protects domain objects. The
    authentication method of this maintainer object will be used for
    any encompassing reverse domain object.
     </description>
