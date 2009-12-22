@@ -76,8 +76,7 @@ p)       CONFPORT=$OPTARG;;
 t)       TOPDIR=$OPTARG;;
 c)       CARG=$OPTARG;;
 s)       SARG=$OPTARG;;
-l)       LOAD_FILE=$OPTARG;;
-f)           LIST=$OPTARG;;
+f)       LIST=$OPTARG;;
 0)       NPASSES=0;;
 1)       NPASSES=1;;
 2)       NPASSES=2;;
@@ -95,7 +94,7 @@ export NPASSES=${NPASSES:?" number of passes is not specified. Usage: $USAGE"}
 # check whether the configuration file exists
 ls $PROPERTIES >/dev/null 2>&1 || error_exit "cannot find config file $PROPERTIES"
 
-# Directory where the load_file.sh script is located
+# Directory where the resetdata script is located
 export SCRIPTDIR=$TOPDIR/bin
 
 #################### LOCATION OF THE UTILITIES #####################################
