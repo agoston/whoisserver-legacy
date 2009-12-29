@@ -97,13 +97,14 @@ protocolVersion: 1
 #	4 NRTM client.
 # 16 no nic-handle repository (loading foreign databases)
 # 20 NRTM without nic-handle repository( mirrored foreign databases)
+#
 # definition of mode bits (taken from ud.h):
-#define B_DUMMY                 0x01
-#define B_UPDATE                0x02
-#define B_NRTM_CLNT             0x04
-#define B_STANDALONE            0x08
-#define B_NO_NHR                0x10   /* no NHR store - when mirroring foreign db */
-#define B_PERSIST_MIRR          0x20   /* invitation includes -k */
+# #define B_DUMMY                 0x01
+# #define B_UPDATE                0x02
+# #define B_NRTM_CLNT             0x04
+# #define B_STANDALONE            0x08
+# #define B_NO_NHR                0x10   /* no NHR store - when mirroring foreign db */
+# #define B_PERSIST_MIRR          0x20   /* invitation includes -k */
 #
 # updPort: the update port, i.e. the port on which the RIP server listens for
 # 	updates to this source via dbupdate.
