@@ -574,7 +574,6 @@ static int process_nrtm(UD_stream_t *ud_stream, Transaction_t *tr, int operation
  * <0- number of failed objects                              *
  *                                                           *
  ************************************************************/
-
 static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int operation) {
 	int result = 0;
 	Log_t *log_ptr = &(ud_stream->log);
@@ -915,7 +914,7 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
 	}
 
 	/* normalize the object (reorder and split attributes */
-	sql_object = rpsl_object_copy_flattened(submitted_object);
+    sql_object = rpsl_object_copy_flattened(submitted_object);
 
 	/* put nic-hdl and mnt-by at the top of the list */
 	ud_reorder_attributes(sql_object);
@@ -1013,7 +1012,7 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 	Line_Type_t linetype;
 	Transaction_t *tr;
 	long transaction_id=0; /* transaction_id (to be supplied by DBupdate and stored in Database) */
-	GString *g_obj_buff;
+    GString *g_obj_buff;
 
 	nrtm=ud_stream->nrtm;
 
