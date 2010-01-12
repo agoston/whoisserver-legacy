@@ -109,6 +109,7 @@ long UD_create_serial(Transaction_t *tr)
     /* XXX because they keep the max inserted id even if  */
     /* XXX it was deleted later, thus causing gaps we don't want */
     tr->serial_id = SQ_get_max_id(tr->sql_connection, "serial_id", "serials") + 1;
+    //fprintf(stderr, " >>> UD_create_serial(): serial_id: %d, transaction_id: %d\n", tr->serial_id, tr->transaction_id);
 
     if (IS_NRTM_CLNT(tr->mode) && (tr->transaction_id > 0))
     {
@@ -117,6 +118,8 @@ long UD_create_serial(Transaction_t *tr)
             /* the serial_id we received is lower than the one already in the database - serious problem!
              * we shouldn't continue this operation */
             LG_log(ud_context, LG_FATAL, "UD_create_serial(): got transaction_id %ld, but already got %ld in the DB\n",
+                   tr->transaction_id, tr->serial_id);
+            fprintf(stderr, "UD_create_serial(): got transaction_id %ld, but already got %ld in the DB\n",
                    tr->transaction_id, tr->serial_id);
             die;
         }
@@ -224,6 +227,7 @@ long UD_create_serial(Transaction_t *tr)
         }
 
     }
+
     return (tr->serial_id);
 }
 
