@@ -52,14 +52,12 @@
 #define B_NO_NHR                0x10
 /* invitation includes -k */
 #define B_PERSIST_MIRR          0x20
-
  
 /* macros for update mode operation */
 #define IS_DUMMY_ALLOWED(a)     ((a)&(B_DUMMY))
 #define IS_UPDATE(a)            ((a)&(B_UPDATE))
 #define IS_NRTM_CLNT(a)         ((a)&(B_NRTM_CLNT))
 #define IS_STANDALONE(a)        ((a)&(B_STANDALONE))
-
 #define IS_PERSIST_MIRR(a)      ((a)&(B_PERSIST_MIRR))
 #define IS_NO_NHR(a)            ((a)&(B_NO_NHR))
 
