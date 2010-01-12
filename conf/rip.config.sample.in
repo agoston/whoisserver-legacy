@@ -535,7 +535,8 @@ QI_FILTER_BANNER % Note: this output has been filtered.
 
 DUMMY_ADD_ATTR ****************************
 DUMMY_ADD_ATTR * THIS OBJECT IS NOT VALID
-DUMMY_ADD_ATTR * Please note that all personal data has been removed from this object.
+DUMMY_ADD_ATTR * Please note that all data that is generally regarded as personal 
+DUMMY_ADD_ATTR * data has been removed from this object.
 DUMMY_ADD_ATTR * To view the original object, please query the RIPE Database at:
 DUMMY_ADD_ATTR * http://www.ripe.net/whois
 DUMMY_ADD_ATTR ****************************
