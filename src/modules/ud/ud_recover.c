@@ -371,37 +371,37 @@ Transaction_t *TR_get_record(SQ_connection_t *sql_connection, long transaction_i
 * int TR_delete_record()                                    *
 *                                                           *
 * Deletes all associated sql records                        *
-*                                                           *
-*                                                           *
 ************************************************************/
 void TR_delete_record(Transaction_t *tr)
 {
-GString *query;
-int sql_err;
+    GString *query;
+    int sql_err;
 
-  if(IS_STANDALONE(tr->mode)) return; /* for loader just return */
-  
-  /* Delete a record from SQL DB */
-  query = g_string_sized_new(STR_L);
- 
-  /* compose query */
-  g_string_sprintf(query, "DELETE FROM dummy_rec WHERE transaction_id=%ld", tr->transaction_id);
-  sql_err=SQ_execute_query(tr->sql_connection, query->str, NULL);
-  /* in case of an error copy error code and return */ 
-  if(sql_err) {
-   LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), query->str);
-   die;
-  }
-  g_string_sprintf(query, "DELETE FROM transaction_rec WHERE transaction_id=%ld", tr->transaction_id);
-  sql_err=SQ_execute_query(tr->sql_connection, query->str, NULL);
-  /* in case of an error copy error code and return */ 
-  if(sql_err) {
-   LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), query->str);
-   die;
-  }
+    if (IS_STANDALONE(tr->mode)) return; /* for loader just return */
 
-  g_string_free(query, TRUE);
- 
+    /* Delete a record from SQL DB */
+    query = g_string_sized_new(STR_L);
+
+    /* compose query */
+    g_string_sprintf(query, "DELETE FROM dummy_rec WHERE transaction_id=%ld", tr->transaction_id);
+    sql_err = SQ_execute_query(tr->sql_connection, query->str, NULL);
+    /* in case of an error copy error code and return */
+    if (sql_err)
+    {
+        LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), query->str);
+        die;
+    }
+    g_string_sprintf(query, "DELETE FROM transaction_rec WHERE transaction_id=%ld",
+        tr->transaction_id);
+    sql_err = SQ_execute_query(tr->sql_connection, query->str, NULL);
+    /* in case of an error copy error code and return */
+    if (sql_err)
+    {
+        LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), query->str);
+        die;
+    }
+
+    g_string_free(query, TRUE);
 }
 
 /************************************************************
