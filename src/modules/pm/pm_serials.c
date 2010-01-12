@@ -251,9 +251,6 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
 	/* Connect to the database */
 	db_connection=SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
 	PM_get_minmax_serial(db_connection, &min_serial, &max_serial);
-	/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial
-	 * agoston, 2007-12-21 */
-	/* max_serial -= SAFE_BACKLOG; */
 
 	/* If it cannot be mirrored at all - N, but range starts with 0 */
 	/* If the client is allowed to mirror - Y         */
