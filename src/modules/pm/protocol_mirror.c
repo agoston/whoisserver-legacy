@@ -752,9 +752,6 @@ void PM_interact(int sock)
     UT_free(db_pswd);
 
     PM_get_minmax_serial(sql_connection, &oldest_serial, &current_serial);
-    /* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial
-     * agoston, 2007-12-21 */
-    /*current_serial -= SAFE_BACKLOG; */
 
     if ((current_serial == -1) || (oldest_serial == -1))
     {
