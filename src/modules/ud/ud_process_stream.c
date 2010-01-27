@@ -476,7 +476,7 @@ static int report_transaction(Transaction_t *tr, long transaction_id, Log_t *log
  * It is essentially the same as process_updates(), but adjusted to the nrtm client's requirements:
  * - no nic-hdl repository
  * - no standalone mode
- * - no difference between UPD/DEL
+ * - no difference between UPD/ADD
  * - no reporting back the result through the socket
  *
  * FIXME: this is some heavy code duplication, but this is how it was designed and fixing it
