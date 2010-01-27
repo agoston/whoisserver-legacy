@@ -823,6 +823,7 @@ void SQ_close_connection(SQ_connection_t *sql_connection) {
   ++++++++++++++++++++++++++++++++++++++*/
 int SQ_num_rows(SQ_result_set_t *result) {
 	if (result != NULL) return mysql_num_rows(result);
+	return -1;
 }
 
 /* SQ_info_to_string() */
