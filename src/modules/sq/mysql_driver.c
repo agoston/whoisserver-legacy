@@ -225,8 +225,6 @@ int SQ_execute_query(SQ_connection_t *sql_connection, const char *query,
     int err;
     SQ_result_set_t *result;
 
-    //	fprintf(stderr, " ### %s\n", query);
-
     err = mysql_query(sql_connection, query);
 
     /* log the time and result of the query */
