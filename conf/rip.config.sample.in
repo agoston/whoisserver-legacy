@@ -24,8 +24,6 @@
 ## if you don't use a part of the software (e.g. dbupdate).
 ## Please don't forget to also modify your $SOURCEFILE.
 
-#
-
 ######################
 ###
 ### GENERIC VARIABLES
@@ -290,7 +288,8 @@ PW_FMT_LIMIT_REACHED %% Continued attempts to return excessive amounts of contac
 PW_FMT_LIMIT_REACHED %% information will result in permanent denial of service.
 PW_FMT_LIMIT_REACHED %% Please do not try to use CONTACT information in
 PW_FMT_LIMIT_REACHED %% My Database for non-operational purposes.
-PW_FMT_LIMIT_REACHED %% Refer to http://www.mydb.net/db/support/db-terms-conditions.pdf for more information.
+PW_FMT_LIMIT_REACHED %% Refer to http://www.mydb.net/db/support/db-terms-conditions.pdf
+PW_FMT_LIMIT_REACHED %% for more information.
 
 #
 # Access denied permanently
@@ -520,7 +519,7 @@ QI_FMT_GROUP_BANNER %% Information related to '%s'
 # Banner for filtering (by default)
 
 QI_FILTER_BANNER % Note: this output has been filtered.
-
+QI_FILTER_BANNER %       To receive output for a database update, use the "-B" flag.
 
 ###########
 ##
