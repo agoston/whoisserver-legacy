@@ -684,9 +684,9 @@ void PM_interact(int sock) {
 				 * for DBs filled by NRTM, timestamp of delete operation is lost due to a bug, check
 				 * PM_get_serial_object() for more info
 				 * agoston, 2008-01-30 */
-				if (timestamp) {
+				if (check_history_limit && timestamp) {
 					/* check if timestamp is within the limits set in rip.config */
-					if (check_history_limit && history_access_limit && (time(NULL) - timestamp > history_access_limit)) {
+					if (history_access_limit && (time(NULL) - timestamp > history_access_limit)) {
 						sprintf(buff, "%% Your request has been denied to protect private data.\n"
 							"%% (Requesting serials older than %d days will be rejected)\n", history_access_limit/86400);
 						SK_cd_puts(&condat, buff);
