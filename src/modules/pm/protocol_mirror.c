@@ -827,10 +827,10 @@ void PM_interact(int sock)
                  * for DBs filled by NRTM, timestamp of delete operation is lost due to a bug, check
                  * PM_get_serial_object() for more info
                  * agoston, 2008-01-30 */
-                if (timestamp)
+                if (check_history_limit && timestamp)
                 {
                     /* check if timestamp is within the limits set in rip.config */
-                    if (check_history_limit && history_access_limit && (time(NULL) - timestamp > history_access_limit))
+                    if (history_access_limit && (time(NULL) - timestamp > history_access_limit))
                     {
                         sprintf(buff, "%% Your request has been denied to protect private data.\n"
                                 "%% (Requesting serials older than %d days will be rejected)\n", history_access_limit / 86400);
@@ -851,7 +851,7 @@ void PM_interact(int sock)
 
                 /* check for invalid object type. Normally, this should never pass, but for some reason,
                  * in the practice it did.
-                 * My suspicion is that mysql doesn't always do what it was supposed to, but it's hard to prove :(
+                 * My suspicion is that mysql 4.0.24 on cello doesn't always do what it was supposed to, but it's hard to prove :(
                  * agoston, 2009-06-02 */
                 if (object_type < 0)
                 {
