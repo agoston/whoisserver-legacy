@@ -28,7 +28,7 @@ export NOTIFY=dbint@ripe.net
 # PID file
 export PIDFILE=$BASEDIR/var/tmp/whois-server.pid
 # ERR file (startup log and stderr of whois-server is redirected here)
-export ERRLOG=$BASEDIR/var/log/whois-server.err.log
+export ERRLOG=$BASEDIR/var/whois-server.out
 # number of consecutive crashes before giving up
 export MAX_CRASHES=5
 # time between crashes to consider them consecutive (in seconds)
@@ -97,7 +97,7 @@ check_server() {
 	my_log 'Waiting for rx_load thread to finish...'
 	RX_LOAD="Init"
 	NUM=0
-	while [ $NUM -lt 30 ]; do
+	while [ $NUM -lt 15 ]; do
 		RX_LOAD=`send_command 'show threads' | grep '^rx load' | awk '{printf("%s %s %s", $10, $11, $12);}'`
 		echo -en "\r${RX_LOAD}                              "
 		if [ "$RX_LOAD" ]; then
@@ -149,18 +149,18 @@ start_server () {
 		if [ $CRASHES -gt 0 ]; then
 			# only start check_server thread if this is our second start
 			# (because first start went to the stdout to give feedback to user)
-			if [ ! $FIRST_RUN ]; then
-				my_panic "$SERVICE crashed & restarted on $HOSTNAME" "$HOSTNAME whois-server crashed & restarted"
+			if [ $FIRST_RUN -eq 1 ]; then
 				export FIRST_RUN=0
+				CHECK_THREAD_PID=
+			else
+				my_panic "$SERVICE crashed & restarted on $HOSTNAME" "$HOSTNAME whois-server crashed & restarted"
 				check_server </dev/null >/dev/null 2>&1 &
 				CHECK_THREAD_PID=$!
-			else
-				CHECK_THREAD_PID=
 			fi
 
 			PREV_LAST_START_DATE=$LAST_START_DATE
 			export LAST_START_DATE=`date +%s`
-			$BASEDIR/bin/whois-server -p $PIDFILE -c $BASEDIR/conf/rip.config  </dev/null >> $ERRLOG 2>&1
+			$BASEDIR/bin/whois-server -p $PIDFILE -c $BASEDIR/conf/rip.config </dev/null >>$ERRLOG 2>&1
 
 			# kill existing whois-server-start check thread (so that it won't accidentally start event handler)
 			if [ $CHECK_THREAD_PID ]; then
@@ -186,7 +186,7 @@ start_server () {
 				export CRASHES=$[CRASHES-1]
 			fi
   		else
-			my_panic "ERROR:URGENT: $HOSTNAME $SERVICE is stopped and not restarted" "Number of whois-server crashes exceeded $MAX_CRASHES"
+			my_panic "ERROR:URGENT: $HOSTNAME $SERVICE is stopped and not restarted" "Number of consecutive whois-server crashes exceeded $MAX_CRASHES"
 			return
 		fi
 	done
@@ -254,6 +254,9 @@ export HOSTNAME=`hostname`
 # first time run marker
 export FIRST_RUN=1
 
+# set last start date
+export LAST_START_DATE=0
+
 # get the config port from the config file
 export CONFIG_PORT=`grep ^SVCONFIG_PORT $BASEDIR/conf/rip.config | awk '{print $2}'`
 if [ -z $CONFIG_PORT ]; then
@@ -285,7 +288,7 @@ case "$1" in
 		fi
 		
 		my_log "Starting $SERVICE: "
-		start_server </dev/null &
+		start_server </dev/null >/dev/null 2>&1 &
 		check_server
 	;;
 

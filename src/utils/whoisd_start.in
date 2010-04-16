@@ -1,5 +1,5 @@
 #!/bin/sh
-trap '' 1 2 3 15			# we shouldn't let anyone kill us
+trap '' 1 2 3 15            # we shouldn't let anyone kill us
 
 parse_arguments() {
   for arg do
@@ -10,7 +10,7 @@ parse_arguments() {
       --crashes=*) CRSH=`echo "$arg" | sed -e "s;--crashes=;;"` ;;
       --notify=*) NOTIFY=`echo "$arg" | sed -e "s;--notify=;;"` ;;
       --library_path=*) LIBRARY_PATH=`echo "$arg" | sed -e "s;--library_path=;;"` ;;
-      *) echo "Unrecognized option $arg" >&2; exit 1;; 
+      *) echo "Unrecognized option $arg" >&2; exit 1;;
     esac
   done
 }
@@ -31,7 +31,7 @@ MAIL=mailx
 WHOISD=whois-server
 
 ####################
-#Directory layout 
+#Directory layout
 
 BINDIR=@bindir@
 CONFDIR=@confdir@
@@ -41,7 +41,7 @@ WHOISRIP=@bindir@/$WHOISD
 
 
 # some tests of the directory layout
-if test ! -d $BINDIR 
+if test ! -d $BINDIR
 then
  echo $0 ":$BINDIR does not exist";
  exit 1;
@@ -67,7 +67,7 @@ LIBS_PATH=
 for lib in @GLIB_LIBS@ @MYSQL_R_LIBS@
 do
     case "$lib" in
-	-L*) LIBS_PATH="${LIBS_PATH} `echo \"$lib\" | sed -e 's/-L//'`";;
+    -L*) LIBS_PATH="${LIBS_PATH} `echo \"$lib\" | sed -e 's/-L//'`";;
     esac
 done
 LD_LIBRARY_PATH=`echo $LIBS_PATH | sed -e 's/ /:/g'`
@@ -130,20 +130,20 @@ do
 
   if [ $num_crashes -le $CRASHES ]
   then
-  
+
     # start the main server
-    echo "`date +'%y%m%d %H:%M:%S'`" "$WHOISRIP -p $pid_file -c ${CONFIG}" >>$err_log 
+    echo "`date +'%y%m%d %H:%M:%S'`" "$WHOISRIP -p $pid_file -c ${CONFIG}" >>$err_log
     $NOHUP_NICENESS $WHOISRIP -p $pid_file -c ${CONFIG}  >> $err_log 2>&1
-    
+
     # if pid file exists - that was a crash - restart the server
     # otherwise - exit
-    if test ! -f $pid_file		# This is removed if normal shutdown
+    if test ! -f $pid_file        # This is removed if normal shutdown
     then
       break
     fi
-    
+
     rm -f $pid_file
-    
+
     # Shane reported that in some versions of sh this causes to fail in loops. oops Test!
     num_crashes=`expr 1 + $num_crashes`
 
@@ -152,7 +152,7 @@ do
     | ${MAIL} -s "ERROR:$WHOISRIP crashed & restarted" $NOTIFY
     echo `date +'%y%m%d %H:%M:%S'` " whoisd crashed & restarted\n${WHOISRIP} -c ${CONFIG}\n" >>$err_log
     sleep 1
-      
+
   else
     echo `date +'%y%m%d %H:%M:%S'` " Number of whoisd crashes exceeded $CRASHES\n${WHOISRIP} -c ${CONFIG}" \
      | ${MAIL} -s "ERROR:URGENT: $WHOISRIP is stopped and not restarted" $NOTIFY
@@ -161,8 +161,8 @@ do
     break
   fi
 
-	    
+
 done
 
-echo "`date +'%y%m%d %H:%M:%S  $WHOISD ended'`" | tee -a $err_log
+echo `date +'%y%m%d %H:%M:%S'` "$WHOISD ended" | tee -a $err_log
 echo "" | tee -a $err_log
