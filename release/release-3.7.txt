@@ -1,0 +1,20 @@
+20100416 - version 3.7
+
+Changes:
+- Changed dummification procedure to better reflect data protection laws
+- Introduced NRTM version 3
+- Added foreign key and dummification information to the schema definition XML files
+- Various minor bugfixes
+
+Installation notes:
+- Change nrtm version from 2 to 3 during installation to make use of the new nrtm protocol
+
+
+Merged:
+- feature-agoston-nrtm_nichdl_removal
+- mntner_text_change
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG
