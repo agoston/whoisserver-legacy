@@ -70,7 +70,6 @@ static void dummify_init() {
 
 	PM_DUMMY_ADD_ATTR = g_strsplit(dummy_add_attr, "\n", 0);
 	free(dummy_add_attr);
-
 }
 
 void PM_init(LG_context_t *ctx) {
@@ -360,8 +359,7 @@ rpsl_error_t *pm_dummify_add_attr(rpsl_object_t *obj)
  * 1. Remove object type
  * In this case, we remove all occurances of an object type, and replace all
  * references to it with a dummy placeholder object (thus, we keep referential
- * integrity). In this case, we send a NOOP NRTM command to keep the serials
- * in sync.
+ * integrity).
  * You can set this in attributes.xml, element foreignkey and classes.xml,
  * element dummify/placeholder.
  *
