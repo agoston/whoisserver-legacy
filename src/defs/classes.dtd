@@ -11,7 +11,7 @@
             author    CDATA     #IMPLIED
 >
 
-<!ELEMENT ripe_class    (description, attributes, dbase_code)>
+<!ELEMENT ripe_class    (description, attributes, dbase_code, dummify?)>
 <!ATTLIST ripe_class 
             name      CDATA     #REQUIRED
             code      ID        #REQUIRED
@@ -262,3 +262,5 @@
 <!ATTLIST dbase_code
             value   NMTOKEN   #REQUIRED
 >
+
+<!ELEMENT dummify (filter)>

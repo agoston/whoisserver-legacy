@@ -13,7 +13,7 @@
 
 <!ENTITY % Status_t '(deprecated | valid | proposed)'>
 
-<!ELEMENT ripe_attribute   (description, syntax, representation?, keys?)>
+<!ELEMENT ripe_attribute   (description, syntax, representation?, keys?, foreignkey?, dummify?)>
 <!ATTLIST ripe_attribute
             name      CDATA       #REQUIRED
             xmlname   CDATA       #IMPLIED
@@ -24,7 +24,7 @@
 
 <!ELEMENT description   (#PCDATA)> 
 
-<!ELEMENT syntax        ((list|ripe-list)?, CDATA)> 
+<!ELEMENT syntax        ((list|ripe-list)?, CDATA)>
 
 <!ELEMENT list  EMPTY>
 

@@ -248,7 +248,7 @@ if( $SetupConfig or $All ) {
                                      qq[localhost,].($DbPort+1).q[,].($DbPort+4) ],
     
         ### access to the ripadmin db
-        [ q[^RIPADMIN.*]          => qq[RIPADMIN $SQLHost,$SQLPort,$SQLUser,$SQLPass,$DbName] ], 
+        [ q[^RIPADMIN.*]          => qq[RIPADMIN $SQLHost,$SQLPort,$SQLUser,$SQLPass,$DbAdminName] ], 
         
         ### path to the config file
         [ q[^SOURCEFILE .*]       => qq[SOURCEFILE $DbPrefix/conf/sources.config] ],

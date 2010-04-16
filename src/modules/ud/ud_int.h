@@ -163,7 +163,7 @@ char *get_field_str(SQ_connection_t *sql_connection, const char *field, const ch
         const char * attr_value, const char *condition);
 char *get_qresult_str(SQ_connection_t *sql_connection, char *query);
 long *get_fields_int(SQ_connection_t *sql_connection, const char *sql_query);
-void get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_query, long *sql_res);
+int get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_query, long *sql_res);
 
 int ud_build_lock_query(Transaction_t *tr, char **common_tables);
 

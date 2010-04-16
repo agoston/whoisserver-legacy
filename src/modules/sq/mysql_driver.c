@@ -219,35 +219,26 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
   +html+ </UL></DL>
 
   ++++++++++++++++++++++++++++++++++++++*/
-int SQ_execute_query(SQ_connection_t *sql_connection, const char *query, SQ_result_set_t **result_ptr) {
-	int err;
-	SQ_result_set_t *result;
+int SQ_execute_query(SQ_connection_t *sql_connection, const char *query,
+    SQ_result_set_t **result_ptr)
+{
+    int err;
+    SQ_result_set_t *result;
 
-//	there's no need to measure every f***ing query
-//	float seconds;
-//	ut_timer_t start_time, stop_time;
-//	UT_timeget(&start_time);
+    err = mysql_query(sql_connection, query);
 
-	err = mysql_query(sql_connection, query);
+    /* log the time and result of the query */
+    if (err == 0)
+    {
+        result = mysql_store_result(sql_connection);
 
-	/* log the time and result of the query */
-	if (err == 0) {
-		result = mysql_store_result(sql_connection);
-
-//	there's no need to measure every f***ing query
-//		UT_timeget(&stop_time);
-//		seconds = UT_timediff( &start_time, &stop_time);
-//
-//		LG_log(sq_context, LG_DEBUG, "spent %.2f sec; got %d rows from [%s: %s]", seconds,
-//		        SQ_get_affected_rows(sql_connection), sql_connection->db, query);
-
-		if (result_ptr)
-			*result_ptr=result;
-		else if (result)
-			mysql_free_result(result);
-		return (0);
-	} else
-		return (-1);
+        if (result_ptr)
+            *result_ptr = result;
+        else if (result) mysql_free_result(result);
+        return (0);
+    }
+    else
+        return (-1);
 
 } /* SQ_execute_query() */
 
@@ -830,6 +821,7 @@ void SQ_close_connection(SQ_connection_t *sql_connection) {
   ++++++++++++++++++++++++++++++++++++++*/
 int SQ_num_rows(SQ_result_set_t *result) {
 	if (result != NULL) return mysql_num_rows(result);
+	return -1;
 }
 
 /* SQ_info_to_string() */

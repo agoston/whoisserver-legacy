@@ -24,8 +24,6 @@
 ## if you don't use a part of the software (e.g. dbupdate).
 ## Please don't forget to also modify your $SOURCEFILE.
 
-#
-
 ######################
 ###
 ### GENERIC VARIABLES
@@ -290,7 +288,8 @@ PW_FMT_LIMIT_REACHED %% Continued attempts to return excessive amounts of contac
 PW_FMT_LIMIT_REACHED %% information will result in permanent denial of service.
 PW_FMT_LIMIT_REACHED %% Please do not try to use CONTACT information in
 PW_FMT_LIMIT_REACHED %% My Database for non-operational purposes.
-PW_FMT_LIMIT_REACHED %% Refer to http://www.mydb.net/db/support/db-terms-conditions.pdf for more information.
+PW_FMT_LIMIT_REACHED %% Refer to http://www.mydb.net/db/support/db-terms-conditions.pdf
+PW_FMT_LIMIT_REACHED %% for more information.
 
 #
 # Access denied permanently
@@ -520,60 +519,23 @@ QI_FMT_GROUP_BANNER %% Information related to '%s'
 # Banner for filtering (by default)
 
 QI_FILTER_BANNER % Note: this output has been filtered.
-
+QI_FILTER_BANNER %       To receive output for a database update, use the "-B" flag.
 
 ###########
 ##
 ## Dummification config
 ##
 
-# A list of attributes which are mandatory RPSL attributes, but contain    
-# personal data and thus should be replaced with a generated value. The    
-# values are going to be fed to a sprintf(), with the primary key of the   
-# object as an argument. This can be used to give more meaningful dummified
-# attributes.
-#
-# If you leave a value for an attribute empty, it will not be modified at all.
-# This feature can be used for referential attributes, which do not contain personal
-# data, just reference other objects.
-#
-# The first word is the attribute name (lowercase), then comes an = as a     
-# separator, and the rest of the string until the end of line is passed to   
-# sprintf(). Note that neither keys nor values are chomped anywhere, so don't
-# leave whitespaces around.
-#
-# FIXME: This should go to the syntax.xml if we wanted to implement it correctly.   
-# That would involve a major change, however, so this task should be done during the
-# refactorisation of the rpsl module. - agoston, 2007-10-31
-#
+# Dummification is the process of removing information to protect privacy.
+# see src/modules/pm/protocol_mirror.c for design documentation.
 
-DUMMY_ATTR admin-c=
-DUMMY_ATTR tech-c=
-DUMMY_ATTR mnt-by=
-DUMMY_ATTR mnt-ref=
-DUMMY_ATTR referral-by=
-DUMMY_ATTR source=
-DUMMY_ATTR org-type=
-DUMMY_ATTR irt=
-DUMMY_ATTR mntner=
-DUMMY_ATTR organisation=
-DUMMY_ATTR nic-hdl=
-DUMMY_ATTR person=Dummy name for %s
-DUMMY_ATTR role=Dummy role for %s
-DUMMY_ATTR address=Dummy address for %s
-DUMMY_ATTR changed=unread@ripe.net 20000101
-DUMMY_ATTR phone=+31205354444
-DUMMY_ATTR e-mail=unread@ripe.net
-DUMMY_ATTR upd-to=unread@ripe.net
-DUMMY_ATTR descr=Dummy description for %s
-DUMMY_ATTR auth=MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/
-DUMMY_ATTR org-name=Dummy organisation name for %s
-
-# Additional remarks to be added to the end of the dummified object.
+# You can add a message to all objects that have been changed by dummification
+# The below lines will be added to the end of every such object
 
 DUMMY_ADD_ATTR ****************************
 DUMMY_ADD_ATTR * THIS OBJECT IS NOT VALID
-DUMMY_ADD_ATTR * Please note that all personal data has been removed from this object.
+DUMMY_ADD_ATTR * Please note that all data that is generally regarded as personal 
+DUMMY_ADD_ATTR * data has been removed from this object.
 DUMMY_ADD_ATTR * To view the original object, please query the RIPE Database at:
 DUMMY_ADD_ATTR * http://www.ripe.net/whois
 DUMMY_ADD_ATTR ****************************
@@ -584,6 +546,8 @@ DUMMY_ADD_ATTR ****************************
 # Default is 2 weeks (=1209600 seconds). Value of 0 disables this feature.
 
 NRTM_HISTORY_ACCESS_LIMIT 1209600
+
+
 
 ######################
 ###

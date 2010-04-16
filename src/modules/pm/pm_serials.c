@@ -60,10 +60,6 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
 	SQ_row_t *sql_row;
 	int sql_err;
 
-	/* get the lock to ensure that queries are not stopped */
-	/* which means access to the database is allowed */
-	PW_record_query_start();
-
 	sprintf(query, "SELECT min(serial_id),max(serial_id) FROM serials");
 	sql_err = SQ_execute_query(sql_connection, query, &sql_result);
 
@@ -84,9 +80,6 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
 		SQ_free_result(sql_result);
 		sql_result=NULL;
 	}
-
-	/* release the lock */
-	PW_record_query_end();
 }
 
 /************************************************************
@@ -94,7 +87,7 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
  *
  * Returns:
  *  operation (ADD/DEL) and text object
- *  NULL in case of an error
+ *  NULL in case of an error or missing
  *
  * Fills *object_type, *operation, *timestamp if not NULL
  *
@@ -104,20 +97,18 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
 char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, long *object_type, unsigned *timestamp,
         int *operation) {
 
-	SQ_result_set_t * sql_result;
-	SQ_row_t *sql_row;
-	char *sql_str;
+	SQ_result_set_t *sql_result = NULL;
+	SQ_row_t *sql_row = NULL;
+	char *sql_str = NULL;
 	char query[STR_L];
 	int sql_err;
 	int location;
 	long locop[2]; // array to hold location and operation
 
-	/* get the lock to ensure that queries are not stopped */
-	/* which means access to the database is allowed */
-	PW_record_query_start();
-
 	sprintf(query, "SELECT atlast,operation FROM serials WHERE serial_id = %d", serial_number);
-	get_fields_int_noalloc(sql_connection, query, locop);
+	if (get_fields_int_noalloc(sql_connection, query, locop) != SQ_OK) {
+        goto PM_get_serial_object_abort;
+    }
 	location = locop[0];
 	if (operation)
 		*operation = locop[1];
@@ -184,7 +175,7 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 			break;
 
 		default:
-			return (NULL);
+            goto PM_get_serial_object_abort;
 	}
 
 	sql_err = SQ_execute_query(sql_connection, query, &sql_result);
@@ -224,14 +215,11 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
     else
         sql_str = NULL;
 
-
+PM_get_serial_object_abort:
 	if (sql_result) {
 		SQ_free_result(sql_result);
 		sql_result=NULL;
 	}
-
-	/* release the lock */
-	PW_record_query_end();
 
 	return sql_str;
 }
@@ -255,7 +243,7 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
 	char *db_name = ca_get_srcdbname(source_hdl);
 	char *db_user = ca_get_srcdbuser(source_hdl);
 	char *db_passwd = ca_get_srcdbpassword(source_hdl);
-	int version = ca_get_srcnrtmprotocolvers(source_hdl);
+	int version = 3;    /* at the moment this is the only version number we provide */
 	SQ_connection_t *db_connection;
 	long min_serial, max_serial;
 	char can_mirror;
@@ -263,9 +251,6 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
 	/* Connect to the database */
 	db_connection=SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
 	PM_get_minmax_serial(db_connection, &min_serial, &max_serial);
-	/* We don't need this anymore - just don't start dynamic mode if the server crashes on a serial
-	 * agoston, 2007-12-21 */
-	/* max_serial -= SAFE_BACKLOG; */
 
 	/* If it cannot be mirrored at all - N, but range starts with 0 */
 	/* If the client is allowed to mirror - Y         */
@@ -297,11 +282,12 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
 }
 
 /************************************************************
- * Fills supplied buffer with information about the sources  *
- *                                                           *
- *                                                           *
- * Note:                                                     *
- *  returned GString should be freed by the caller           *
+ * Fills supplied buffer with information about the sources
+ * the current whois-server instance provides (not to be confused with
+ * the NRTMs this whois-server instance queries from as a client!)
+ *
+ * Note:
+ *  returned GString should be freed by the caller
  *************************************************************/
 GString *PM_get_nrtm_sources(ip_addr_t *client_address, char *source) {
     GString *gbuff=g_string_sized_new(STR_L);

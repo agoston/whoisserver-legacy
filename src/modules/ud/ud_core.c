@@ -460,8 +460,13 @@ char *get_field_str(SQ_connection_t *sql_connection, const char *field, const ch
  * Executes a query and returns the first row as an integer array
  * caller must preallocate buffer
  * dies on sql errors
- *************************************************************/
-void get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_query, long *sql_res) {
+ *
+ * Returns:
+ * SQ_OK    - no error
+ * SQ_NORES - no results returned by query
+ ************************************************************/
+int get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_query, long *sql_res) {
+    int retval = SQ_OK;
 	SQ_result_set_t *sql_result;
 	SQ_row_t *sql_row;
 	char *sql_str;
@@ -483,12 +488,15 @@ void get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_que
 				die;
 			}
 		}
-	}
+	} else {
+        retval = SQ_NORES;
+    }
 
 	if (sql_result) {
 		SQ_free_result(sql_result);
 		sql_result=NULL;
 	}
+    return retval;
 }
 
 /************************************************************
@@ -588,28 +596,29 @@ static long get_ref_id(Transaction_t *tr, const char *ref_tbl_name, const char *
  * -1 - sql error or object does not exist
  *
  ***********************************************************/
+int isdummy(Transaction_t *tr)
+{
+    char *sql_str;
+    char str_id[STR_M];
+    int object_type = -1;
 
-int isdummy(Transaction_t *tr) {
-	char *sql_str;
-	char str_id[STR_M];
-	int object_type=-1;
+    sprintf(str_id, "%ld", tr->object_id);
+    sql_str = get_field_str(tr->sql_connection, "object_type", "last", "object_id", str_id, NULL);
+    if (sql_str)
+    {
+        object_type = atoi(sql_str);
+        UT_free(sql_str);
+    }
 
-	sprintf(str_id, "%ld", tr->object_id);
-	sql_str= get_field_str(tr->sql_connection, "object_type", "last", "object_id", str_id, NULL);
-	if (sql_str) {
-		object_type = atoi(sql_str);
-		UT_free(sql_str);
-	}
-
-	if (object_type==-1) {
-		LG_log(ud_context, LG_SEVERE, "cannot get object type\n");
-		die;
-	}
-	if (object_type==DUMMY_TYPE)
-		return (1);
-	else
-		return (0);
-
+    if (object_type == -1)
+    {
+        LG_log(ud_context, LG_SEVERE, "cannot get object type for object_id %s", str_id);
+        die;
+    }
+    if (object_type == DUMMY_TYPE)
+        return (1);
+    else
+        return (0);
 }
 
 /************************************************************

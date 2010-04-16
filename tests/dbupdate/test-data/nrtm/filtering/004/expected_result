@@ -2,9 +2,9 @@
 % The RIPE Database is subject to Terms and Conditions.
 % See http://www.ripe.net/db/support/db-terms-conditions.pdf
 
-%START Version: 3 DB-TEST 1-5 FILTERED
+%START Version: 2 DB-TEST 1-5 FILTERED
 
-ADD 1
+ADD
 
 organisation:   ORG-ET1-DB-TEST
 org-name:       Dummy organisation name for ORG-ET1-DB-TEST
@@ -23,7 +23,7 @@ remarks:        * To view the original object, please query the RIPE Database at
 remarks:        * http://www.ripe.net/whois
 remarks:        ****************************
 
-ADD 3
+ADD
 
 mntner:         TEST-DBM-MNT
 descr:          Dummy description for TEST-DBM-MNT
@@ -42,7 +42,7 @@ remarks:        * To view the original object, please query the RIPE Database at
 remarks:        * http://www.ripe.net/whois
 remarks:        ****************************
 
-ADD 5
+ADD
 
 irt:            IRT-TEST
 address:        Address

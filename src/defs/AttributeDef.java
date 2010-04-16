@@ -21,7 +21,6 @@
 
 import java.util.*;
 import org.w3c.dom.*;
-import org.xml.sax.*;
 
 /**
  * RIPE attribute.
@@ -76,6 +75,9 @@ public class AttributeDef implements Cloneable {
   private String load_ipv6; // query to load the ipv6 tree
 
   private Vector queries;
+
+  private String dummify;
+  private String foreignkey;
 
   // -----------------oOo-----------------
   //              Constructors
@@ -139,8 +141,7 @@ public class AttributeDef implements Cloneable {
     Node kn = null;
 
     // loop to retrieve elements
-    Node search = obj.getFirstChild();
-    while (search != null) {
+    for (Node search = obj.getFirstChild(); search != null; search = search.getNextSibling()) {
         String nodeName = search.getNodeName();
         if (nodeName.equals("description")) {
             // Get the "description" node.
@@ -161,8 +162,11 @@ public class AttributeDef implements Cloneable {
             rp = search;
         } else if (nodeName.equals("keys")) {
             kn = search;
+        } else if (nodeName.equals("dummify")) {
+            dummify = search.getFirstChild().getNodeValue();
+        } else if (nodeName.equals("foreignkey")) {
+            foreignkey = search.getFirstChild().getNodeValue();
         }
-        search = search.getNextSibling();
     }
 
     // find representation details
@@ -571,6 +575,14 @@ private String getTextFromNode( Node q ) {
   public boolean getRipeList() {
       return ripeList;
   }
+
+    public String getDummify() {
+        return dummify;
+    }
+
+    public String getForeignkey() {
+        return foreignkey;
+    }
 
   public Vector getQueries() {
     return queries;
