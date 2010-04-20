@@ -29,11 +29,6 @@
  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ***************************************/
 
-/* FIXME: NRTM protocol is basically undocumented and unspecified.
- * The only doc I could find googling 'site:ripe.net' is this proposal email:
- * http://ripe.net/ripe/maillists/archives/db-wg/2000/msg00201.html
- * agoston, 2007-10-10 */
-
 #include "rip.h"
 #include "class.h"
 #include "attribute.h"
@@ -344,51 +339,48 @@ rpsl_error_t *pm_dummify_add_attr(rpsl_object_t *obj)
 
 /* PUBLIC NRTM STREAM DESIGN
  *
- * The RIPE DB contains quite a bit of personal data. So far, NRTM access gave full access to all private
- * data, and all history. DP-TF found this is not acceptable. We had to limit access to private data
- * and history.
+ * The RIPE DB contains quite a bit of personal data. So far, NRTM access gave full access to all private data, and all
+ * history.  DP-TF found this is not acceptable.  We had to limit access to private data and history.
  *
- * Limiting history is easier: we simply look up if the beginning of the NRTM requested range has been added within
- * a limited amount of time (NRTM_HISTORY_ACCESS_LIMIT in rip.config). If not, we simply refuse the NRTM request.
+ * Limiting history is easier: we simply look up if the beginning of the NRTM requested range has been added within a
+ * limited amount of time (NRTM_HISTORY_ACCESS_LIMIT in rip.config).  If not, we simply refuse the NRTM request.
  *
- * Limiting personal data is a lot more complicated.
- * Ideally, we only want to drop data fields, and keep primary/foreign keys like mntner or nic-hdl.
- * But since even the keys identifying personal data are considered personal, we have to have 3 levels of
- * dummification:
+ * Limiting personal data is a lot more complicated.  Ideally, we only want to drop data fields, and keep
+ * primary/foreign keys like mntner or nic-hdl.  But since even the keys identifying personal data are considered
+ * personal, we have to have 3 levels of dummification:
  *
  * 1. Remove object type
- * In this case, we remove all occurances of an object type, and replace all
- * references to it with a dummy placeholder object (thus, we keep referential
- * integrity).
- * You can set this in attributes.xml, element foreignkey and classes.xml,
- * element dummify/placeholder.
+ *
+ * In this case, we remove all occurances of an object type, and replace all references to it with a dummy placeholder
+ * object (thus, we keep referential integrity).
+ *
+ * You can set this in attributes.xml, element foreignkey and classes.xml, element dummify/placeholder.
  *
  * 2. Dummify object
- * In this case, we keep all objects of an object type, but we replace all
- * mandatory, non-key attributes with a dummified string, while dropping all
- * optional attributes.
- * This is similar in result to #1, but end user retains the possibility to look
- * up the dummified object in the RIPE DB.
- * You can set this in classes.xml, element dummify/filter, and attributes.xml,
- * element dummify.
+ *
+ * In this case, we keep all objects of an object type, but we replace all mandatory, non-key attributes with a
+ * dummified string, while dropping all optional attributes.  This is similar in result to #1, but end user retains the
+ * possibility to look up the dummified object in the RIPE DB.
+ *
+ * You can set this in classes.xml, element dummify/filter, and attributes.xml, element dummify.
  *
  * 3. Leave alone
- * These objects themselves are not to be changed, they don't contain any data
- * that should be masked. However, they might still contain reference to such
- * data (like tech-c or admin-c attributes that contain nic-hdls). As such,
- * these objects still have to be scanned and slightly dummified.
  *
- * We do the dummification in a generic way. For each object, we first parse it using the RPSL module. This sucks
- * big time performance-wise, as it does a lot of surplus processing and error checking, however, we are more flexible
- * about future changes, handling outdated/erronous objects in the database, and also, we handle corner cases like
- * line continuation out of the box, error-free. Note however that the RPSL library's API is horrible, but there
- * was also no point in re-implementing one from scratch (I'd very much liked that, though).
+ * These objects themselves are not to be changed, they don't contain any data that should be masked.  However, they
+ * might still contain reference to such data (like tech-c or admin-c attributes that contain nic-hdls).  As such,
+ * these objects have to be scanned and the references replaced to point to the placeholder object.
  *
- * This also means that objects which have been stuffed into the database earlier, not passing the current syntax
- * rules will produce an error. On such rpsl parser errors, we return NULL, which marks that the object could not
- * be dummified. In this case, the NRTM server will skip the object.
- * This will normally not be a problem as we also don't want to give object history through public NRTM stream. Any
- * attempt to try to go back more than two weeks into the past should give an error.
+ * We do the dummification in a generic way. For each object, we first parse it using the RPSL module. This hurts
+ * performance big time, as it does a lot of surplus processing and error checking, however, we are more flexible about
+ * future changes, handling outdated/erronous objects in the database, and also, we handle corner cases like line
+ * continuation out of the box, error-free.  Side note: the RPSL library is somewhat dated, so don't be surprised on
+ * some quirks in the code below.
+ *
+ * Using the RPSL module also means that objects which have been stuffed into the database earlier, not passing the
+ * current syntax rules will produce an error.  On such rpsl parser errors, we return NULL, which marks that the object
+ * could not be dummified.  These cases must be handled by the caller; for example, the NRTM server will skip the
+ * object.  This will normally not be a problem as we also don't want to give object history through public NRTM
+ * stream.  Any attempt to try to go back more than two weeks into the past should give an error.
  *
  * After having the processed object structure, we check the object class dummify settings, and:
  * - if placeholder, return NULL;
@@ -410,7 +402,7 @@ rpsl_error_t *pm_dummify_add_attr(rpsl_object_t *obj)
  *
  * Note that dummify_init() must be called before any calls are made to dummify_object().
  *
- * agoston, 2009-08-10
+ * agoston, 2010-04-19
  * */
 char *PM_dummify_object(char *object)
 {
@@ -538,51 +530,35 @@ dummify_abort:
     return ret;
 }
 
-/* PM_interact() */
-/*++++++++++++++++++++++++++++++++++++++
- Interact with the client.
+/* Interact with the client.
 
-    NRTM is a very simple protocol - the client requests a range of serials,
-    to which the server responds with the corresponding amount of changes in
-    the RIPE Database, each prepended with 'ADD' or 'DEL'.
+    NRTM is a very simple protocol - the client requests a range of serials, to which the server responds with the
+    corresponding amount of changes in the RIPE Database, each prepended with 'ADD' or 'DEL'.
 
-    When we introduced massive filtering of NRTM data, we introduced object
-    types that are never to be sent to the public. At the moment, these are
-    person and role. All references to these objects have been replaced with a
-    placeholder object (DUMY-RIPE), and the object themselves are never sent
-    to the public.
+    When we introduced massive filtering of NRTM data, we introduced object types that are never to be sent to the
+    public.  These can be adjusted in the schema description located in src/defs.  At the moment, these are person and
+    role.  All references to these objects have been replaced with a placeholder object (DUMY-RIPE), and the object
+    themselves are never sent to the public.
 
-    But this new implementation conflicted with NRTM. Since the NRTM stream
-    does not include the serials, a client asking for persistent connection
-    has no idea which serials the server passed to it, and as such, it has no
-    way of known from which serial it should resume next time it asks for an
-    NRTM range.
+    But this new implementation conflicted with NRTM version 2. Since this old version of the NRTM stream does not
+    include the serials, a client asking for persistent connection would have no idea which serials the server passed
+    to it, rendering NRTM v2 unusable.  To circumvent this, we implemented a backwards compatibility that would replace
+    all person and role objects with an 'update' against DUMY-RIPE.  This will help keeping the serials in sync, and
+    gives time to end users to switch to NRTM v3.
 
-    To solve this, we introduced NRTM v3, with a backward compatibility to v1
-    and v2 that work as usual, so regular users will not see any difference in
-    the NRTM protocol until they specifically ask for a v3 NRTM stream. Of
-    course the objects+operations that are passed down the stream are going to
-    be the same.
+    NRTM v3 adds a serial ID after the operation ('ADD' or 'DEL'). This way, an NRTM client will know if there are gaps
+    in the stream, and has the correct serials in its own database which it can base future nrtm requests on.
+    
+    Users are encouraged to exclusively use NRTM v3.
+    
+    Note that there is also a very old version 1 supported still, but it is considered to be exactly the same as
+    version 2 in this code.
+    
+    agoston, 2010-04-19
 
-    NRTM v3 adds a serial ID after the operation ('ADD' or 'DEL'). This way,
-    an NRTM client will know if there are gaps in the stream, and has the
-    correct serials in its own database which it can base future nrtm requests on.
-
-
- int sock Socket that client is connected to.
-
- More:
- +html+ <PRE>
- Authors:
- ottrey
- andrei
-
- +html+ </PRE><DL COMPACT>
- +html+ <DT>Online References:
- +html+ <DD><UL>
- +html+ </UL></DL>
-
- ++++++++++++++++++++++++++++++++++++++*/
+Arguments:
+    int sock		Socket that client is connected to
+*/
 void PM_interact(int sock)
 {
     char input[MAX_PM_INPUT_SIZE + 1];
@@ -718,6 +694,13 @@ void PM_interact(int sock)
         UT_free(hostaddress);
         UT_free(nrtm_q.source);
         return;
+    }
+    
+    /* check for deprecated NRTM version */
+    if (nrtm_q.version < 3)
+    {
+        sprintf(buff, "%%WARNING: NRTM version %d is deprecated, please consider migrating to version 3!\n\n", nrtm_q.version);
+        SK_cd_puts(&condat, buff);
     }
 
     /* get database */
