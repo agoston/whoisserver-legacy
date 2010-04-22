@@ -52,19 +52,77 @@ LG_context_t *pm_context;
 unsigned history_access_limit = 0;
 gchar **PM_DUMMY_ADD_ATTR = NULL;
 
+/* hash to store placeholder object per class; key = classname (char *), value = placeholder object blob (char *) */
+/* FIXME: The RPSL implementation support a single RPSL schema definition only. This means that NRTM can dummify only
+ * one source, and that is the main source. Hence, dummification should never be called for any other source than
+ * the main source, for which the RPSL schema is defined. The main source is defined as RPSL_VARIANT in config.h
+ * agoston, 2010-04-20 */
+GHashTable *placeholders = NULL;
+
 /* Initializes variables to use in dummify_object().
  * Need to be executed before any calls to dummify_object() are made.
  *
  * agoston, 2009-08-11 */
 static void dummify_init() {
-	/* parse dummify config options
-	 * it is required during the full lifespan of the whoisserver process, so there is no mechanism to
-	 * free() the structures allocated here - agoston, 2007-10-31 */
-	char *dummy_add_attr = ca_get_dummy_add_attr;
-	history_access_limit = ca_get_nrtm_history_access_limit;
+    /* parse dummify config options
+     * it is required during the full lifespan of the whoisserver process, so there is no mechanism to
+     * free() for the structures allocated here - agoston, 2007-10-31 */
+    char *dummy_add_attr = ca_get_dummy_add_attr;
+    history_access_limit = ca_get_nrtm_history_access_limit;
 
-	PM_DUMMY_ADD_ATTR = g_strsplit(dummy_add_attr, "\n", 0);
-	free(dummy_add_attr);
+    PM_DUMMY_ADD_ATTR = g_strsplit(dummy_add_attr, "\n", 0);
+    free(dummy_add_attr);
+
+    /* Load all placeholder objects for quick returning in backwards compatibility (nrtm v1, v2 mode)
+     no free() hooks defined, as all values are coming directly, without making a copy */
+    placeholders = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, NULL);
+
+    /* get DB connection - only main (RPSL variant) DB is supported, see FIXME above */
+    SQ_connection_t *db_connection = SQ_get_connection_by_source_name(RPSL_VARIANT);
+
+    int i;
+    char **class_names = DF_get_class_names();
+    for (i = 0; class_names[i]; i++) {
+        const class_t *classinfo = class_lookup(class_names[i]);
+        if (classinfo->dummify_type == DUMMIFY_PLACEHOLDER) {
+            /* get the singleton from the DB (for the major DB only, see above) */
+            char query[STR_M];
+            SQ_result_set_t *sql_result;
+            SQ_row_t *sql_row;
+            int sql_err;
+
+            /* FIXME: person and role share the exact same nic-hdl repo, and are interchangable, but there is no metadata or interface
+             * to get this info. So now I'll just hack this info here, but should we do a major schema change that touches this area,
+             * and/or such metadata/api would become available, that should be introduced here - agoston, 2010-04-21 */
+            if (!strcmp(classinfo->name, "person") || !strcmp(classinfo->name, "role")) {
+                sprintf(query, "SELECT object FROM last WHERE pkey = '%s' and (object_type = 10 or object_type = 11)", classinfo->dummify_singleton);
+            } else {
+                sprintf(query, "SELECT object FROM last WHERE pkey = '%s' and object_type = %d", classinfo->dummify_singleton, classinfo->id);
+            }
+            sql_err = SQ_execute_query(db_connection, query, &sql_result);
+
+            if (sql_err) {
+                LG_log(pm_context, LG_SEVERE, "%s[%s]", SQ_error(db_connection), query);
+                die;
+            }
+
+            if ((sql_row = SQ_row_next(sql_result)) != NULL) {
+                char *object_blob = SQ_get_column_string(sql_result, sql_row, 0);
+                g_hash_table_insert(placeholders, (gpointer)&(classinfo->id), object_blob);
+            } else {
+                fprintf(stderr, "Placeholder object for class %s, %s, was not found in source %s (meaning, the following query gave no results: %s)\n",
+                        class_names[i], classinfo->dummify_singleton, RPSL_VARIANT, query);
+                die;
+            }
+
+            if (sql_result) {
+                SQ_free_result(sql_result);
+                sql_result=NULL;
+            }
+        }
+    }
+
+    SQ_close_connection(db_connection);
 }
 
 void PM_init(LG_context_t *ctx) {
@@ -93,8 +151,7 @@ static int parse_request(char *input, nrtm_q_t *nrtm_q) {
 	opt_argv = g_strsplit(input, " ", MAX_OPT_ARG_C+1);
 
 	/* Determine the number of arguments. */
-	for (opt_argc=0; opt_argv[opt_argc] != NULL; opt_argc++)
-		;
+	for (opt_argc=0; opt_argv[opt_argc]; opt_argc++);
 
 	dieif( (gst = mg_new(0)) == NULL);
 
@@ -609,9 +666,7 @@ void PM_interact(int sock)
         LG_log(pm_context, LG_DEBUG, "[%s] -- Garbage received: %s", hostaddress, input);
         sprintf(buff, "\n%%ERROR:405: syntax error\n\n\n");
         SK_cd_puts(&condat, buff);
-        UT_free(hostaddress);
-        UT_free(nrtm_q.source);
-        return;
+        goto error_return;
     }
 
     LG_log(pm_context, LG_DEBUG, "[%s] -- input: [%s]", hostaddress, input);
@@ -626,9 +681,7 @@ void PM_interact(int sock)
         SK_cd_puts(&condat, "\n");
         /* Free allocated memory  */
         g_string_free(gbuff, TRUE);
-        UT_free(hostaddress);
-        UT_free(nrtm_q.source);
-        return;
+        goto error_return;
     }
     else if (IS_G_QUERY(parse_result))
     {
@@ -642,9 +695,7 @@ void PM_interact(int sock)
         LG_log(pm_context, LG_DEBUG, "[%s] -- Syntax error: %s", hostaddress, input);
         sprintf(buff, "\n%%ERROR:405: syntax error\n\n\n");
         SK_cd_puts(&condat, buff);
-        UT_free(hostaddress);
-        UT_free(nrtm_q.source);
-        return;
+        goto error_return;
     }
 
     /* otherwise this is -g query */
@@ -659,9 +710,7 @@ void PM_interact(int sock)
         LG_log(pm_context, LG_DEBUG, "[%s] --  Unknown source %s", hostaddress, nrtm_q.source);
         sprintf(buff, "\n%%ERROR:403: unknown source %s\n\n\n", nrtm_q.source);
         SK_cd_puts(&condat, buff);
-        UT_free(hostaddress);
-        UT_free(nrtm_q.source);
-        return;
+        goto error_return;
     }
 
     /* check if the client is authorized to mirror */
@@ -671,9 +720,16 @@ void PM_interact(int sock)
         LG_log(pm_context, LG_DEBUG, "[%s] --  Not authorized to mirror the source %s", hostaddress, nrtm_q.source);
         sprintf(buff, "\n%%ERROR:402: not authorized to mirror the database\n\n\n");
         SK_cd_puts(&condat, buff);
-        UT_free(hostaddress);
-        UT_free(nrtm_q.source);
-        return;
+        goto error_return;
+    }
+
+    /* Check if requested dummification of non-main database
+     * See FIXME of variable placeholders for further details */
+    if (mirror_perm == AA_MIRROR_PUBLIC && !strcmp(RPSL_VARIANT, nrtm_q.source)) {
+        LG_log(pm_context, LG_DEBUG, "[%s] --  Dummified mirroring of source %s is not supported", hostaddress, nrtm_q.source);
+        sprintf(buff, "\n%%ERROR:404: Dummified mirroring of source %s is not supported\n\n\n", nrtm_q.source);
+        SK_cd_puts(&condat, buff);
+        goto error_return;
     }
 
     /* check if requested nrtm version is supported */
@@ -682,9 +738,7 @@ void PM_interact(int sock)
         LG_log(pm_context, LG_DEBUG, "[%s] -- NRTM version mismatch: %s", hostaddress, input);
         sprintf(buff, "\n%%ERROR:406: NRTM version mismatch\n\n\n");
         SK_cd_puts(&condat, buff);
-        UT_free(hostaddress);
-        UT_free(nrtm_q.source);
-        return;
+        goto error_return;
     }
     
     /* check for deprecated NRTM version */
@@ -697,15 +751,11 @@ void PM_interact(int sock)
     sql_connection = SQ_get_connection_by_source_hdl(source_hdl);
 
     PM_get_minmax_serial(sql_connection, &oldest_serial, &current_serial);
-
     if ((current_serial == -1) || (oldest_serial == -1))
     {
-        LG_log(pm_context, LG_ERROR, " database='%s' [%d] %s", db_name, SQ_errno(sql_connection),
-               SQ_error(sql_connection));
+        LG_log(pm_context, LG_ERROR, " source='%s' [%d] %s", nrtm_q.source, SQ_errno(sql_connection), SQ_error(sql_connection));
         SQ_close_connection(sql_connection);
-        UT_free(hostaddress);
-        UT_free(nrtm_q.source);
-        return;
+        goto error_return;
     }
 
     /* zero indicates that LAST keyword has been used */
@@ -726,11 +776,7 @@ void PM_interact(int sock)
 
         /* close the connection to SQL server */
         SQ_close_connection(sql_connection);
-
-        /* Free the hostaddress */
-        UT_free(hostaddress);
-        UT_free(nrtm_q.source);
-        return;
+        goto error_return;
     }
 
     current_serial = nrtm_q.first;
@@ -863,6 +909,19 @@ void PM_interact(int sock)
             default:
                 /* in this case, don't send back anything and skip serial.
                  * the possible reasons are: rpsl error, missing object or invalid operation */
+
+                /* compatibility mode for NRTM v1 and v2: we send back the placeholder object as an ADD,
+                 * to avoid holes in the serials - agoston, 2010-04-21 */
+                if (nrtm_q.version < 3) {
+                    int id = (int)object_type;
+                    char *object = (char *)g_hash_table_lookup(placeholders, &id);
+                    if (object) {
+                        sprintf(buff, "ADD\n\n");
+                        SK_cd_puts(&condat, buff);
+                        SK_cd_puts(&condat, object);
+                        SK_cd_puts(&condat, "\n");
+                    }
+                }
                 break;
             }
 
@@ -886,7 +945,7 @@ void PM_interact(int sock)
     sprintf(buff, "%%END %s\n\n\n", nrtm_q.source);
     SK_cd_puts(&condat, buff);
 
-    LG_log(pm_context, LG_INFO, "[%s] -- <%s:%ld-%ld (%ld)> ", hostaddress, nrtm_q.source, nrtm_q.first, nrtm_q.last,
+    LG_log(pm_context, LG_INFO, "[%s] -- <%s:%d:%ld-%ld (%ld)> ", hostaddress, nrtm_q.source, nrtm_q.version, nrtm_q.first, nrtm_q.last,
            nrtm_q.last - nrtm_q.first + 1);
 
     /* make a record for thread accounting */
@@ -894,8 +953,9 @@ void PM_interact(int sock)
 
     /* close the connection to SQL server */
     SQ_close_connection(sql_connection);
+
+error_return:
     /* Free the hostaddress */
     UT_free(hostaddress);
     UT_free(nrtm_q.source);
-
-} /* PM_interact() */
+}
