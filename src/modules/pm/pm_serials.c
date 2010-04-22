@@ -73,7 +73,6 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
 			LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
 			die;
 		}
-		(*min)++;		/* this is the old behavior - it seems sort of stupid, but it doesn't matter after all */
 	}
 
 	if (sql_result) {

@@ -727,9 +727,9 @@ void PM_interact(int sock)
 
     /* Check if requested dummification of non-main database
      * See FIXME of variable placeholders for further details */
-    if (mirror_perm == AA_MIRROR_PUBLIC && !strcmp(RPSL_VARIANT, nrtm_q.source)) {
-        LG_log(pm_context, LG_DEBUG, "[%s] --  Dummified mirroring of source %s is not supported", hostaddress, nrtm_q.source);
-        sprintf(buff, "\n%%ERROR:404: Dummified mirroring of source %s is not supported\n\n\n", nrtm_q.source);
+    if ((mirror_perm == AA_MIRROR_PUBLIC) && strcmp(RPSL_VARIANT, nrtm_q.source)) {
+        LG_log(pm_context, LG_DEBUG, "[%s] --  Dummified mirroring of source %s is not supported (try source %s)", hostaddress, nrtm_q.source, RPSL_VARIANT);
+        sprintf(buff, "\n%%ERROR:404: Dummified mirroring of source %s is not supported (try source %s)\n\n\n", nrtm_q.source, RPSL_VARIANT);
         SK_cd_puts(&condat, buff);
         goto error_return;
     }

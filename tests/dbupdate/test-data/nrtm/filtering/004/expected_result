@@ -1,3 +1,5 @@
+%WARNING: NRTM version 2 is deprecated, please consider migrating to version 3!
+
 
 % The RIPE Database is subject to Terms and Conditions.
 % See http://www.ripe.net/db/support/db-terms-conditions.pdf
@@ -25,6 +27,25 @@ remarks:        ****************************
 
 ADD
 
+person:         Placeholder Person Object
+address:        RIPE Network Coordination Centre
+address:        P.O. Box 10096
+address:        1001 EB Amsterdam
+address:        The Netherlands
+phone:          +31 20 535 4444
+nic-hdl:        DUMY-RIPE
+mnt-by:         TEST-DBM-MNT
+remarks:        **********************************************************
+remarks:        * This is a placeholder object to protect personal data.
+remarks:        * To view the original object, please query the RIPE
+remarks:        * Database at:
+remarks:        * http://www.ripe.net/whois
+remarks:        **********************************************************
+changed:        ripe-dbm@ripe.net 20090724
+source:         DB-TEST
+
+ADD
+
 mntner:         TEST-DBM-MNT
 descr:          Dummy description for TEST-DBM-MNT
 admin-c:        DUMY-RIPE
@@ -41,6 +62,25 @@ remarks:        * data has been removed from this object.
 remarks:        * To view the original object, please query the RIPE Database at:
 remarks:        * http://www.ripe.net/whois
 remarks:        ****************************
+
+ADD
+
+person:         Placeholder Person Object
+address:        RIPE Network Coordination Centre
+address:        P.O. Box 10096
+address:        1001 EB Amsterdam
+address:        The Netherlands
+phone:          +31 20 535 4444
+nic-hdl:        DUMY-RIPE
+mnt-by:         TEST-DBM-MNT
+remarks:        **********************************************************
+remarks:        * This is a placeholder object to protect personal data.
+remarks:        * To view the original object, please query the RIPE
+remarks:        * Database at:
+remarks:        * http://www.ripe.net/whois
+remarks:        **********************************************************
+changed:        ripe-dbm@ripe.net 20090724
+source:         DB-TEST
 
 ADD
 
