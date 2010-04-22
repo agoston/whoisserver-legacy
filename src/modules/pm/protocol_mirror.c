@@ -52,8 +52,10 @@ LG_context_t *pm_context;
 unsigned history_access_limit = 0;
 gchar **PM_DUMMY_ADD_ATTR = NULL;
 
-/* hash to store placeholder object per class; key = classname (char *), value = placeholder object blob (char *) */
-/* FIXME: The RPSL implementation support a single RPSL schema definition only. This means that NRTM can dummify only
+/* hash to store placeholder object per class (used in nrtm v1 and v2 backward compatibility mode only)
+ * key = classname (char *), value = placeholder object blob (char *)
+ *
+ * FIXME: The RPSL implementation support a single RPSL schema definition only. This means that NRTM can dummify only
  * one source, and that is the main source. Hence, dummification should never be called for any other source than
  * the main source, for which the RPSL schema is defined. The main source is defined as RPSL_VARIANT in config.h
  * agoston, 2010-04-20 */
