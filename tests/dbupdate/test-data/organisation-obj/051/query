@@ -3,7 +3,7 @@
 % Information related to 'ORG-pE1-DB-TEST'
 
 organisation:   ORG-pE1-DB-TEST
-org-name:       person EXAMPLE1
+org-name:       personnel EXAMPLE1
 org-type:       OTHER
 address:        Address
 e-mail:         dbtest@ripe.net
@@ -17,7 +17,7 @@ source:         DB-TEST
 
 % Information related to 'TP1-DB-TEST'
 
-person:         test person
+person:         test personnel
 address:        Singel
 phone:          +0123456789
 nic-hdl:        TP1-DB-TEST
