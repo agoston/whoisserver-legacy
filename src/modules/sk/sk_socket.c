@@ -123,8 +123,8 @@ int SK_clearsockflags(int socket, int flags) {
 int SK_getsock(const char *node, unsigned port, int socket_type, int backlog)
 {
 	struct addrinfo hints, *res, *ai_iter;
-	gint error, sock = -1, sock_opt, flags;
-	char portbuf[16], hostnamebuf[256];
+	gint error, sock = -1, sock_opt;
+	char portbuf[16];
 
 	/* Prepare addrinfo struct for getaddrinfo */
 	memset(&hints, 0, sizeof(hints));
@@ -247,6 +247,73 @@ int SK_accept_connection(int listening_socket)
 	}
 }
 
+/* Helper function for SK_connect
+ * Does the actual connecting based on *res
+ * hostname and port is only used for logging
+ *
+ * Returns: SK_* error code, SK_OK if everything went fine,
+ *                  in which case it fills *retsock */
+int SK_connect_inner(int *retsock, struct addrinfo *res, int timeout, char *hostname, int port)
+{
+    int sock, sel, gs, er;
+    socklen_t erlen = sizeof(er);
+    struct timeval ptm;
+    fd_set rset, wset;
+
+    sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    if (sock < 0) {
+        LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): socket(): %d (%s)", hostname, port, errno, strerror(errno));
+        return SK_SOCKET;
+    }
+
+    if (SK_setsockflags(sock, O_NONBLOCK) < 0) {
+        LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): setsockflags(): %d (%s)", hostname, port, errno, strerror(errno));
+        close(sock);
+        return SK_SOCKET;
+    }
+
+    if ((connect(sock, res->ai_addr, res->ai_addrlen)) < 0 && errno != EINPROGRESS) {
+        LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): connect(): %d (%s)", hostname, port, errno, strerror(errno));
+        close(sock);
+        return SK_CONNECT;
+    }
+
+    /* waiting for timeout */
+    FD_ZERO(&rset);
+    FD_SET(sock, &rset);
+    wset = rset;
+    ptm.tv_usec = 0;
+    ptm.tv_sec = timeout;
+
+    if ((sel = select(sock + 1, &rset, &wset, NULL, &ptm)) == 0) {  /* timeout */
+        LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): connect(): timeout", hostname, port);
+        close(sock);
+        return SK_TIMEOUT;
+    }
+
+    if (sel < 0) {
+        LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): select(): %d (%s)", hostname, port, errno, strerror(errno));
+        close(sock);
+        return SK_CONNECT;
+    }
+
+    gs = getsockopt(sock, SOL_SOCKET, SO_ERROR, &er, &erlen);
+
+    if (gs < 0 || er) {
+        LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): select(): %d (%s)", hostname, port, er, strerror(er));
+        close(sock);
+        return SK_CONNECT;
+    }
+
+    if (SK_clearsockflags(sock, O_NONBLOCK) < 0) {
+        LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): clearsockflags(): %d (%s)", hostname, port, errno, strerror(errno));
+        close(sock);
+        return SK_SOCKET;
+    }
+
+    *retsock = sock;
+    return SK_OK;
+}
 
 /*++++++++++++++++++++++++++++++++++++++
   int SK_connect       wrapper around connect(), doing non-blocking
@@ -309,74 +376,6 @@ int SK_connect(int *sock, char *hostname, unsigned int port, unsigned int timeou
 	freeaddrinfo(res);
 	return SK_CONNECT;
 }
-
-/* Helper function for SK_connect
- * Does the actual connecting based on *res
- * hostname and port is only used for logging
- *
- * Returns: SK_* error code, SK_OK if everything went fine,
- * 					in which case it fills *retsock */
-int SK_connect_inner(int *retsock, struct addrinfo *res, int timeout, char *hostname, int port)
-{
-	int sock, flags, sel, gs, er, erlen = sizeof(er);
-	struct timeval ptm;
-	fd_set rset, wset;
-
-	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-	if (sock < 0) {
-		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): socket(): %d (%s)", hostname, port, errno, strerror(errno));
-		return SK_SOCKET;
-	}
-
-	if (SK_setsockflags(sock, O_NONBLOCK) < 0) {
-		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): setsockflags(): %d (%s)", hostname, port, errno, strerror(errno));
-		close(sock);
-		return SK_SOCKET;
-	}
-
-	if ((connect(sock, res->ai_addr, res->ai_addrlen)) < 0 && errno != EINPROGRESS) {
-		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): connect(): %d (%s)", hostname, port, errno, strerror(errno));
-		close(sock);
-		return SK_CONNECT;
-	}
-
-	/* waiting for timeout */
-	FD_ZERO(&rset);
-	FD_SET(sock, &rset);
-	wset = rset;
-	ptm.tv_usec = 0;
-	ptm.tv_sec = timeout;
-
-	if ((sel = select(sock + 1, &rset, &wset, NULL, &ptm)) == 0) {	/* timeout */
-		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): connect(): timeout", hostname, port);
-		close(sock);
-		return SK_TIMEOUT;
-	}
-
-	if (sel < 0) {
-		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): select(): %d (%s)", hostname, port, errno, strerror(errno));
-		close(sock);
-		return SK_CONNECT;
-	}
-
-	gs = getsockopt(sock, SOL_SOCKET, SO_ERROR, &er, &erlen);
-
-	if (gs < 0 || er) {
-		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): select(): %d (%s)", hostname, port, er, strerror(er));
-		close(sock);
-		return SK_CONNECT;
-	}
-
-	if (SK_clearsockflags(sock, O_NONBLOCK) < 0) {
-		LG_log(sk_context, LG_ERROR, "SK_connect(%s, %d): clearsockflags(): %d (%s)", hostname, port, errno, strerror(errno));
-		close(sock);
-		return SK_SOCKET;
-	}
-
-	*retsock = sock;
-	return SK_OK;
-}
-
 
 
 /* XXX: deprecated SK_read(), SK_gets(), and SK_getc(), since these
@@ -708,7 +707,7 @@ char *SK_getpeername(int  sockfd) {
 int SK_getpeerip(int sockfd, ip_addr_t * ip)
 {
 	struct sockaddr_storage ss;
-	int namelen = sizeof(ss);
+	socklen_t namelen = sizeof(ss);
 	int ret = -1;
 
 	memset(&ss, 0, sizeof(ss));

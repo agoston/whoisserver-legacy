@@ -1699,7 +1699,7 @@ char * ca_srchandle2Strelement(ca_SrcHdl_t * ah, int srcAttrib)
  * -- a string or NULL                              *
  *******************************************************************/
 {
-    char *myStr;
+    char *myStr = NULL;
 
     if (ah == NULL) {
         fprintf(stderr, "ca_srchandle2Strelement(): Cannot dereference NULL pointer\n");
@@ -1773,7 +1773,6 @@ char * ca_srchandle2Strelement(ca_SrcHdl_t * ah, int srcAttrib)
 
         default:
             puts("Cannot find this source attribute");
-            myStr = NULL;
     }
     pthread_mutex_unlock(&Lock);
 

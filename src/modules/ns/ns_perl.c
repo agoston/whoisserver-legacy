@@ -6,6 +6,7 @@
 #include <perl.h>               /* from the Perl distribution     */
 #include "ns_perl.h"
 #include "ns_rir.h"
+#include "ns_util.h"
 
 /*
  * Stuff that makes dynamic loading in Perl tick (or so I'm told)

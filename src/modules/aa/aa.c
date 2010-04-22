@@ -91,7 +91,7 @@ void AA_load() {
 
 			dieif(sscanf(SQ_get_column_string_nocopy(result, row, 0), "%u", &rights->ripupdate) < 1);
 			dieif(sscanf(SQ_get_column_string_nocopy(result, row, 1), "%u", &rights->mirror) < 1);
-			dieif(sscanf(SQ_get_column_string_nocopy(result, row, 2), "%s", &rights->source) < 1);
+			dieif(sscanf(SQ_get_column_string_nocopy(result, row, 2), "%s", rights->source) < 1);
 
 			/* now comes the prefix */
 			switch (i) {

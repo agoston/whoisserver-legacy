@@ -1500,7 +1500,6 @@ static void write_radix_immediate(GList *datlist,
           )
 {
   GList    *qitem;
-  char print_buf[25];
 
   for( qitem = g_list_first(datlist); qitem != NULL; qitem = g_list_next(qitem)) {
     rx_datcpy_t *datcpy = qitem->data;

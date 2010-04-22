@@ -597,7 +597,6 @@ int SV_start(char *pidfile) {
 	SQ_connection_t *db_connection;
 	int shutdown_pipe[2];
 	int retval = 1;
-	struct rlimit rlim;
 	struct pollfd ufds;
 	struct rlimit myrlimit = { RLIM_INFINITY, RLIM_INFINITY };
 
@@ -629,7 +628,7 @@ int SV_start(char *pidfile) {
         if (IS_UPDATE(update_mode)) {
             update_port = ca_get_srcupdateport(source_hdl);
             SV_update_sock[source] = SK_getsock(NULL, update_port, SOCK_STREAM, 128);
-            fprintf(stderr, "Update port: %d for %s\n", update_port, source_hdl);
+            fprintf(stderr, "Update port: %d for %s\n", update_port, source_hdl->name);
         } else {
             SV_update_sock[source] = 0;
         }

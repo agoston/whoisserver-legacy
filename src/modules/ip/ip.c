@@ -37,7 +37,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/param.h>
 #include <stdlib.h>
@@ -365,7 +364,7 @@ int IP_revd_t2b(ip_prefix_t *prefptr, const char *domstr, ip_exp_t expf) {
     int err = IP_OK;
     gchar **domains;
     int i, j;
-    int zeros_to_add;
+    int zeros_to_add = -1;
 
     dieif(expf != IP_PLAIN && expf != IP_EXPN);
 
@@ -513,7 +512,7 @@ int IP_revd_t2b(ip_prefix_t *prefptr, const char *domstr, ip_exp_t expf) {
 /*+ convert a range string into a binary range struct.
  +*/
 int IP_rang_t2b(ip_range_t *rangptr, const char *rangstr, ip_exp_t expf) {
-    char *ips, *dash;
+    char *dash = NULL;
     int err;
 
     if (expf != IP_PLAIN && expf != IP_EXPN) {
@@ -700,7 +699,11 @@ gboolean IP_addr_isnull(ip_addr_t *addrptr) {
             }
             return TRUE;
         }
+
+        default:
+            die;
     }
+    return FALSE;   /* should never reach, but gcc whines */
 }
 
 /******** prefix **********/
@@ -1758,7 +1761,7 @@ int IP_pref_in_prefrang(ip_prefix_t *prefix, ip_prefix_range_t *prefixrange) {
 
 /* true if overlap, false otherwise */
 int IP_rang_overlap(ip_range_t *range1, ip_range_t *range2) {
-    int begin1, end1, begin2, end2;
+    unsigned begin1, end1, begin2, end2;
 
     IP_rang_b2v4(range1, &begin1, &end1);
     IP_rang_b2v4(range2, &begin2, &end2);
@@ -1782,6 +1785,7 @@ inline guint ip_addr_t_pointer_hash(gconstpointer key) {
         default:
             die;
     }
+    return -1;  /* should never reach here, but gcc whines */
 }
 
 /* Equal function of *ip_addr_t for GLib */

@@ -83,7 +83,7 @@ typedef struct {
 #ifdef RP_IMPL
 #define EXTDEF(a,b) a = b;
 /* forest read write lock */
-rw_lock_t rx_forest_rwlock = { PTHREAD_MUTEX_INITIALIZER, PTHREAD_COND_INITIALIZER, PTHREAD_COND_INITIALIZER, 0, 0 };
+rw_lock_t rx_forest_rwlock = { PTHREAD_MUTEX_INITIALIZER, PTHREAD_COND_INITIALIZER, PTHREAD_COND_INITIALIZER, PTHREAD_COND_INITIALIZER, 0, 0, 0 };
 #else
 #define EXTDEF(a,b) extern a;
 extern rw_lock_t rx_forest_rwlock; 

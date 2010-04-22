@@ -147,17 +147,18 @@ extern "C" {
 
 
 /* prototypes */
-int AC_build(void);
+int AC_build();
 int AC_fetch_acc( ip_addr_t *, acc_st * );
 int AC_check_acl( ip_addr_t *, acc_st *, acl_st *);
 void AC_acc_addup(acc_st *, acc_st *, int);
 int AC_commit(ip_addr_t *, acc_st *,acl_st * );
-int AC_acc_load(void);
-int AC_decay(void);
+int AC_acc_load();
+int AC_decay();
 
-int AC_persistence_init(void);
-int AC_persistence_daemon(void);
-int AC_persistence_save(void);
+int AC_persistence_init();
+int AC_persistence_daemon();
+int AC_persistence_save();
+void AC_persistence_load();
 
 /* interface to modifications on the fly */
 /* er_ret_t AC_asc_ban_set(char *addrstr, char *text, int denyflag); */
@@ -176,7 +177,7 @@ int AC_get_higher_limit(acc_st    *acc_credit, acl_st    *acl);
 int AC_asc_acl_command_set( char *command, char *comment );
 int AC_asc_set_nodeny(char *ip);
 int AC_set_access_command(char *command);
-SQ_connection_t *AC_dbopen_admin(void);
+SQ_connection_t *AC_dbopen_admin();
 
 #ifdef __cplusplus
 }

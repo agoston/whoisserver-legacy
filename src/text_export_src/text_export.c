@@ -144,7 +144,7 @@ int load_classes(struct class **c) {
 	char fname[256];
 
 	class_names = DF_get_class_names();
-	for (num_classes = 0; class_names[num_classes] != NULL; num_classes++);
+	for (num_classes = 0; class_names[num_classes]; num_classes++);
 
 	tmp = calloc(num_classes, sizeof(struct class));
 

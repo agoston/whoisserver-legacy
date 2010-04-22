@@ -4,6 +4,7 @@
 #include "sk.h"
 #include "memwrap.h"
 #include "lu_whois.h"
+#include "ut.h"
 
 const char *person =
     "person: Shane Kerr\n"

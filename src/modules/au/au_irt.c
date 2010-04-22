@@ -61,7 +61,6 @@ au_irt_authenticate(RT_context_t * ctx, const gchar * irt_name, LU_server_t * lu
 {
 	AU_ret_t ret_val;
 	GList *auth_attrs;
-	GList *p;
 
 	LG_log(au_context, LG_FUNC, ">au_irt_authenticate: entering");
 

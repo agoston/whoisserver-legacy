@@ -86,7 +86,7 @@ int convert_if(const char *avalue, unsigned int *pif_address) {
 
 /* Expand interface attribute. */
 int convert_ie(const char *avalue, unsigned int *pif_address, ip_v6word_t *high, ip_v6word_t *low) {
-	char *delim, *token, *ipv6_prefix;
+	char *ipv6_prefix;
 	char *attribute_value, *interface_address;
 	gchar **words;
 	int ret;
@@ -206,8 +206,8 @@ int convert_as(const char *as, unsigned long *asnum) {
 	char *ptr, *endptr, *finptr;
 	unsigned long res;
 
-	/* discard the letters and leading whitespace) */
-	for (ptr = as; *ptr && !isdigit(*ptr); ptr++);
+	/* discard the letters and leading whitespace); we do a cast here, but we indeed won't change the contents of char *as */
+	for (ptr = (char *)as; *ptr && !isdigit(*ptr); ptr++);
 	/* walk through the digits */
 	for (endptr = ptr; *endptr && isdigit(*endptr); endptr++);
 	/* check if the end only contains whitespace */
@@ -469,7 +469,6 @@ int get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_quer
     int retval = SQ_OK;
 	SQ_result_set_t *sql_result;
 	SQ_row_t *sql_row;
-	char *sql_str;
 	int sql_err;
 	int ret_size, i;
 
@@ -510,10 +509,9 @@ int get_fields_int_noalloc(SQ_connection_t *sql_connection, const char *sql_quer
 long *get_fields_int(SQ_connection_t *sql_connection, const char *sql_query) {
 	SQ_result_set_t *sql_result;
 	SQ_row_t *sql_row;
-	char *sql_str;
 	int sql_err;
 	int ret_size, i;
-	long *ret;
+	long *ret = NULL;
 
 	sql_err = SQ_execute_query(sql_connection, sql_query, &sql_result);
 
@@ -656,7 +654,7 @@ static int process_reverse_domain(Transaction_t *tr, ip_prefix_t *prefptr, int o
 			IP_revd_b2v6(prefptr, &msb, &lsb, &prefix_length);
 			sprintf(query,
 			        "INSERT INTO ip6int SET thread_id=%d, object_id=%ld, msb='%llu', lsb='%llu', prefix_length=%d ",
-			        tr->thread_ins, tr->object_id, msb, lsb, prefix_length);
+			        tr->thread_ins, tr->object_id, (long long unsigned int)msb, (long long unsigned int)lsb, prefix_length);
 		} else {
 			/* update record */
 			sprintf(query, "UPDATE ip6int SET thread_id=%d WHERE object_id=%ld ", tr->thread_upd, tr->object_id);
@@ -1239,7 +1237,6 @@ static int create_attr(const rpsl_attr_t *attribute, Transaction_t *tr) {
 	int rf_type, rf_port;
 	char *a_value;
 	char *mu_mntner;
-	char *afi_value;
 	int sql_err;
 	int res;
 	char *token;

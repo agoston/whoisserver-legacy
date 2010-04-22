@@ -1130,6 +1130,7 @@ int SQ_ping(SQ_connection_t **sql_connection) {
 	    SQ_close_connection(*sql_connection);
 	    *sql_connection = contemp;
 	}
+	return 0;
 }
 
 /* SQ_escape_string() */

@@ -490,7 +490,7 @@ int NH_check_org(nic_handle_t *nh_ptr, SQ_connection_t *sql_connection) {
  *                                                           *
  ************************************************************/
 int NH_assign_org_id(nic_handle_t *nh_ptr, SQ_connection_t *sql_connection) {
-	range_t range;
+	range_t range = {-1, -1, NULL, NULL};
 	long range_id;
 	long nic_id=nh_ptr->nic_id;
 
@@ -564,7 +564,7 @@ int NH_register(nic_handle_t *nh_ptr, SQ_connection_t *sql_connection, int commi
 
 	range_id = get_range(nic_id, &range, sql_connection);
 	if (range_id <0) {
-		fprintf(stderr, "NIC_ID %d failure point #1", nic_id);
+//		fprintf(stderr, "NIC_ID %ld failure point #1", nic_id);
 		return (-1);
 	} /* in case of an error */
 	if (range_id!=0) {
@@ -574,7 +574,7 @@ int NH_register(nic_handle_t *nh_ptr, SQ_connection_t *sql_connection, int commi
 	/* check if we can attach to existing next range */
 	range_id = get_range(nic_id+1, &range, sql_connection);
 	if (range_id <0) {
-		fprintf(stderr, "NIC_ID %d failure point #2", nic_id);
+//		fprintf(stderr, "NIC_ID %ld failure point #2", nic_id);
 		return (-1);
 	} /* in case of an error */
 
@@ -583,7 +583,7 @@ int NH_register(nic_handle_t *nh_ptr, SQ_connection_t *sql_connection, int commi
 		range.start-=1;
 		range_id=update_range(range_id, &range, sql_connection, commit_now);
 		if (range_id<=0) {
-			fprintf(stderr, "NIC_ID %d failure point #3", nic_id);
+//			fprintf(stderr, "NIC_ID %ld failure point #3", nic_id);
 			return (-1);
 		}
 	} else {
@@ -593,7 +593,7 @@ int NH_register(nic_handle_t *nh_ptr, SQ_connection_t *sql_connection, int commi
 		else
 			range_id=0; /* there is no previous range in this case (nic_id==0) */
 		if (range_id <0) {
-			fprintf(stderr, "NIC_ID %d failure point #4", nic_id);
+//			fprintf(stderr, "NIC_ID %ld failure point #4", nic_id);
 			return (-1);
 		} /* in case of an error */
 		if (range_id>0) {
@@ -601,7 +601,7 @@ int NH_register(nic_handle_t *nh_ptr, SQ_connection_t *sql_connection, int commi
 			range.end+=1;
 			range_id=update_range(range_id, &range, sql_connection, commit_now);
 			if (range_id<=0) {
-				fprintf(stderr, "NIC_ID %d failure point #5", nic_id);
+//				fprintf(stderr, "NIC_ID %ld failure point #5", nic_id);
 				return (-1);
 			}
 		} else {
@@ -609,7 +609,7 @@ int NH_register(nic_handle_t *nh_ptr, SQ_connection_t *sql_connection, int commi
 			range.end=range.start=nic_id;
 			range_id=create_range(&range, sql_connection, commit_now);
 			if (range_id <=0) {
-				fprintf(stderr, "NIC_ID %d failure point #6", nic_id);
+//				fprintf(stderr, "NIC_ID %ld failure point #6", nic_id);
 				return (-1);
 			} /* in case of an error */
 		}

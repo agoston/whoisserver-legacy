@@ -92,7 +92,7 @@ void ep_password_clean(ep_authenticated_data_t *a_data, GList **credentials) {
   gchar **dirty;
   gchar **current_dirty;
   CR_type type;
-  gchar *password_pos;
+  gchar *password_pos = NULL;
 
   LG_log(ep_ctx, LG_FUNC, ">ep_password_clean: entered");
 
