@@ -2386,42 +2386,18 @@ int QI_execute(ca_dbSource_t *dbhdl,
 		    )
 {
   /* those things must be freed after use! */
-  char *dbhost = ca_get_srcdbmachine(dbhdl);
-  char *dbname = ca_get_srcdbname(dbhdl);
-  char *dbuser = ca_get_srcdbuser(dbhdl);
-  char *dbpass = ca_get_srcdbpassword(dbhdl);
   char *srcnam;
-  unsigned dbport = ca_get_srcdbport(dbhdl);
   char id_table[64];
   char sql_command[STR_XL];
   GList *datlist=NULL;
   SQ_connection_t *sql_connection=NULL;
-  int sql_error;
+  int sql_error = 0;
   int irt_inet_id;
   int irt_gid;
 
-  sql_connection = SQ_get_connection( dbhost, dbport,
-				      dbname, dbuser, dbpass );
-  /* free parameters when done */
-  UT_free(dbhost);
-  UT_free(dbuser);
-  UT_free(dbpass);
+  sql_connection = SQ_get_connection_by_source_hdl(dbhdl);
 
-  /* return error if occurred */
-  if (sql_connection == NULL) {
-    LG_log(qi_context, LG_ERROR, " database='%s' [%d] %s",
-	      dbname, SQ_errno(sql_connection), SQ_error(sql_connection));
-    UT_free(dbname);
-    return QI_CANTDB;
-  }
-  UT_free(dbname);
-
-  /* from here on out, we use the sql_error flag to verify our
-     connection to the SQL database is still good */
-  sql_error = 0;
-
-  sprintf(id_table, "ID_%lu_%u",   mysql_thread_id(sql_connection),
-  pthread_self());
+  sprintf(id_table, "ID_%lu_%u", mysql_thread_id(sql_connection), (unsigned int)pthread_self());
 
   /* see if there was a leftover table from a crashed session
    * (assume the ID cannot be currently in use)

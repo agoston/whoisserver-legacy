@@ -31,6 +31,7 @@
 #include "mysql.h"
 #include "mysqld_error.h"
 #include "lg.h"
+#include "ca_defs.h"
 
 /* types for mysql_info */
 #define SQL_RECORDS 0
@@ -100,7 +101,8 @@ void SQ_init (LG_context_t *ctx);
 #define SQ_get_max_id(conn, id, table) sq_get_minmax_id(conn, id, table, 1)
 #define SQ_get_min_id(conn, id, table) sq_get_minmax_id(conn, id, table, 0)
 
-void SQ_init (LG_context_t *);
+SQ_connection_t *SQ_get_connection_by_source_name(char *source);
+SQ_connection_t *SQ_get_connection_by_source_hdl(ca_dbSource_t *source_hdl);
 
 
 #ifdef __cplusplus

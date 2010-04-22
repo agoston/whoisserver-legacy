@@ -592,8 +592,6 @@ int SV_start(char *pidfile) {
 	ca_dbSource_t *source_hdl;
 	char *source_name;
 	int source;
-	char *db_host, *db_name, *db_user, *db_passwd;
-	int db_port;
 	SQ_connection_t *db_connection;
 	int shutdown_pipe[2];
 	int retval = 1;
@@ -743,20 +741,11 @@ int SV_start(char *pidfile) {
 	for (source = 0; (source_hdl = ca_get_SourceHandleByPosition(source)) != NULL; source++) {
 		/* check for crash and recover if needed */
 		/* make a connection to a database */
-		db_host = ca_get_srcdbmachine(source_hdl);
-		db_port = ca_get_srcdbport(source_hdl);
-		db_name = ca_get_srcdbname(source_hdl);
-		db_user = ca_get_srcdbuser(source_hdl);
-		db_passwd = ca_get_srcdbpassword(source_hdl);
-		db_connection = SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
+		db_connection = SQ_get_connection_by_source_hdl(source_hdl);
 		/* now check TR record */
 		TR_recover(db_connection, source_hdl, sv_context);
 		/* free resources */
 		SQ_close_connection(db_connection);
-		UT_free(db_host);
-		UT_free(db_name);
-		UT_free(db_user);
-		UT_free(db_passwd);
 	}
 	SV_update_sock[source + 1] = -1; /* end of socket array */
 

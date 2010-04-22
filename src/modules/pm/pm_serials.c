@@ -238,18 +238,13 @@ PM_get_serial_object_abort:
  *************************************************************/
 void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source, ca_dbSource_t *source_hdl) {
 
-	char *db_host = ca_get_srcdbmachine(source_hdl);
-	int db_port = ca_get_srcdbport(source_hdl);
-	char *db_name = ca_get_srcdbname(source_hdl);
-	char *db_user = ca_get_srcdbuser(source_hdl);
-	char *db_passwd = ca_get_srcdbpassword(source_hdl);
 	int version = 3;    /* at the moment this is the only version number we provide */
 	SQ_connection_t *db_connection;
 	long min_serial, max_serial;
 	char can_mirror;
 
 	/* Connect to the database */
-	db_connection=SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
+	db_connection = SQ_get_connection_by_source_hdl(source_hdl);
 	PM_get_minmax_serial(db_connection, &min_serial, &max_serial);
 
 	/* If it cannot be mirrored at all - N, but range starts with 0 */
@@ -274,10 +269,6 @@ void pm_get_source_info(GString *gbuff, ip_addr_t *client_address, char *source,
 	}
 	g_string_sprintfa(gbuff, "%s:%d:%c:%lu-%lu\n", source, version, can_mirror, min_serial, max_serial);
 
-	UT_free(db_host);
-	UT_free(db_name);
-	UT_free(db_user);
-	UT_free(db_passwd);
 	SQ_close_connection(db_connection);
 }
 

@@ -250,16 +250,10 @@ RP_sql_load_reg(rp_regid_t reg_id)
   
   int err;
   SQ_connection_t *con;
-  char *dbhost = ca_get_srcdbmachine(reg_id);
-  char *dbname = ca_get_srcdbname(reg_id);
-  char *dbuser = ca_get_srcdbuser(reg_id);
-  char *dbpass = ca_get_srcdbpassword(reg_id);
-  char *srcnam = ca_get_srcname(reg_id);
-  unsigned dbport = ca_get_srcdbport(reg_id);
 
   TA_add( 0, "rx load");
 
-  con = SQ_get_connection( dbhost, dbport, dbname, dbuser, dbpass );
+  con = SQ_get_connection_by_source_hdl(reg_id);
 
   dieif ( SQ_execute_query(con, "LOCK TABLES     " 
      "route READ, inetnum READ, inet6num READ,   "
@@ -299,13 +293,6 @@ RP_sql_load_reg(rp_regid_t reg_id)
   SQ_close_connection(con);
 
   TA_delete();
-
-  /* free junk */
-  UT_free(dbhost);
-  UT_free(dbname);
-  UT_free(dbuser);
-  UT_free(dbpass);
-  UT_free(srcnam);
   return err;
 }
 

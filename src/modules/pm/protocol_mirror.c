@@ -573,22 +573,13 @@ void PM_interact(int sock)
     nrtm_q_t nrtm_q;
     long current_serial;
     long oldest_serial;
-    long object_type;
+    long object_type = -1;
     unsigned timestamp;
     aa_mirror_right mirror_perm;
     int check_history_limit = 1;
-
     char *object;
     int operation;
-
-    char *db_host;
-    int db_port;
-    char *db_name;
-    char *db_user;
-    char *db_pswd;
-
     GString *gbuff;
-
     SQ_connection_t *sql_connection;
     int persistent_connection;
 
@@ -703,33 +694,7 @@ void PM_interact(int sock)
         SK_cd_puts(&condat, buff);
     }
 
-    /* get database */
-    db_name = ca_get_srcdbname(source_hdl);
-    /* get database host*/
-    db_host = ca_get_srcdbmachine(source_hdl);
-    /* get database port*/
-    db_port = ca_get_srcdbport(source_hdl);
-    /* get database user*/
-    db_user = ca_get_srcdbuser(source_hdl);
-    /* get database password*/
-    db_pswd = ca_get_srcdbpassword(source_hdl);
-
-    sql_connection = SQ_get_connection(db_host, db_port, db_name, db_user, db_pswd);
-    if (!sql_connection)
-    {
-        LG_log(pm_context, LG_ERROR, " database='%s' [%d] %s", db_name, SQ_errno(sql_connection),
-               SQ_error(sql_connection));
-        UT_free(hostaddress);
-        UT_free(nrtm_q.source);
-        return;
-    }
-    LG_log(pm_context, LG_DEBUG, "[%s] --  Made SQL connection to %s@%s", hostaddress, db_name, db_host);
-
-    /* free copies of the variables */
-    UT_free(db_host);
-    UT_free(db_name);
-    UT_free(db_user);
-    UT_free(db_pswd);
+    sql_connection = SQ_get_connection_by_source_hdl(source_hdl);
 
     PM_get_minmax_serial(sql_connection, &oldest_serial, &current_serial);
 

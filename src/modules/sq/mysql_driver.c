@@ -1163,3 +1163,38 @@ char *SQ_escape_string(SQ_connection_t *sql_connection, char *str) {
 	return new_str;
 }
 
+/* get DB connection to a source by a source handle
+ * always returns a connection, or dies
+ * agoston, 2010-04-20 */
+SQ_connection_t *SQ_get_connection_by_source_hdl(ca_dbSource_t *source_hdl) {
+    char *db_host = ca_get_srcdbmachine(source_hdl);
+    int db_port = ca_get_srcdbport(source_hdl);
+    char *db_name = ca_get_srcdbname(source_hdl);
+    char *db_user = ca_get_srcdbuser(source_hdl);
+    char *db_passwd = ca_get_srcdbpassword(source_hdl);
+
+    /* never fails (... dies if it would ...), so no error handling is necessary */
+    SQ_connection_t *db_connection = SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
+
+    /* free resources */
+    UT_free(db_host);
+    UT_free(db_name);
+    UT_free(db_user);
+    UT_free(db_passwd);
+
+    return db_connection;
+}
+
+/* get DB connection to a source by a source name
+ * always returns a connection, or dies
+ * agoston, 2010-04-20 */
+SQ_connection_t *SQ_get_connection_by_source_name(char *source) {
+    ca_dbSource_t *source_hdl = ca_get_SourceHandleByName(source);
+    if (source_hdl) {
+        return SQ_get_connection_by_source_hdl(source_hdl);
+    } else {
+        fprintf(stderr, "Source %s is undefined", source);
+        die;
+    }
+    return NULL;    /* should never reach this, but gcc whines */
+}
