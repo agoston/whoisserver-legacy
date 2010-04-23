@@ -1705,7 +1705,7 @@ sub count_objects($) {
 # Args:      $_[0]            the relative filename for the loader file
 # Output:   nothing or error reports
 # Return:   1 if everything went ok, reports errors otherwise.
-
+my $global_loader_object_count;
 sub run_loader($$) {
     my $source  = $_[0];
     my $file    = $_[1];
@@ -1733,7 +1733,7 @@ sub run_loader($$) {
     }
 
     # how many objects we need to load into the DB? - based on "source" line
-    my $object_expected = count_objects($tmpfile);
+    my $object_expected = count_objects($tmpfile) + $global_loader_object_count;
 
     $SIG{'CHLD'} = 'DEFAULT';
     my $commandline = "/bin/sh "
@@ -2730,6 +2730,9 @@ sub get_signal_numbers {
             if ( !getvar('STDERR') );
         die('You MUST set -o flag, or some of the tests will fail!')
             if ( !getvar('STDOUT') );
+
+            # cache number of object in global loader file
+            $global_loader_object_count = count_objects(getvar('CONFDIR') . '/loader');
 
         # set up the log file names - fully qualified
         sleep(20) if ( strftime( "%H%M%S", localtime ) >= 235945 );

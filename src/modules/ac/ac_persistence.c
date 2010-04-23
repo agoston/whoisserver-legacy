@@ -187,6 +187,7 @@ int AC_persistence_get_resultset(SQ_connection_t* sql_conn, int space, SQ_result
 		default:
 			die;
   }
+  return -1;    /* should never reach this point, but gcc whines */
 }
 /*
   AC_persistence_load:
@@ -216,7 +217,7 @@ int AC_persistence_get_resultset(SQ_connection_t* sql_conn, int space, SQ_result
   close DB
 
 */
-void AC_persistence_load(void)
+void AC_persistence_load()
 {
 	SQ_connection_t *sql_conn;
 	SQ_result_set_t *rs;
@@ -314,7 +315,7 @@ void AC_persistence_load(void)
 /* insert/update the acc element into DB
  * handle both v4 and v6 addresses */
 int AC_persistence_store_record(SQ_connection_t *sql_conn, ip_prefix_t *ip, acc_st *acc) {
-	char *fieldnames, *tablename, actvalues[64], sql[512];
+	char *fieldnames = NULL, *tablename = NULL, actvalues[64], sql[512];
 	switch (ip->ip.space) {
 		case IP_V4: {
 			fieldnames = "prefix";
@@ -409,7 +410,7 @@ static void AC_persistence_walk_l(GList *list) {
 
 */
 
-static void AC_persistence_save_l(void)
+static void AC_persistence_save_l()
 {
 	GList *leaves;
 
@@ -442,7 +443,7 @@ static void AC_persistence_save_l(void)
    release saving rights
    return AC_OK
 */
-int AC_persistence_save(void) {
+int AC_persistence_save() {
 
 
   /* Let's see if a save is already running... */
@@ -480,7 +481,7 @@ int AC_persistence_save(void) {
    3. If required by user loads SQL accounting data.
    4. Sets auto save.
 */
-int AC_persistence_init(void) {
+int AC_persistence_init() {
 	int i;
 
   TH_init_read_write_lock(&save_lock);
@@ -511,7 +512,7 @@ int AC_persistence_init(void) {
       Dumps the current version of the act_runtime tree to the persistence
         store.
 */
-int AC_persistence_daemon(void) {
+int AC_persistence_daemon() {
 
   TA_add(0, "persistence");
 

@@ -85,19 +85,6 @@ NPASSES=${NPASSES:?" number of passes is not specified. Usage: $USAGE"}
 ls $PROPERTIES >/dev/null 2>&1 || error_exit "cannot find config file $PROPERTIES"
 
 ##################### DIRECTORY LAYOUT #############################################
-# Directory where the object files reside
-# **** Don't forget to download the object files and CURRENTSERIAL file ****
-# I don't care for now.
-
-# List of object files (wildcards are allowed)
-# LIST=$OBJDIR/sample.db.gz
-
-# The current serial
-# we have 1-step DB, so we don't care about serials for now.
-DEFCURRENTSERIAL=`cat ${OBJDIR}/${SOURCE}.CURRENTSERIAL` || \
-                ( echo; echo "*** WARNING: no CURRENTSERIAL file is found, CURRENTSERIAL=1"; echo )
-CURRENTSERIAL=${DEFCURRENTSERIAL:=1}
-
 # Directory where the load_file.sh script is located
 SCRIPTDIR=$TOPDIR/bin; export SCRIPTDIR
 # Location of the loader binary

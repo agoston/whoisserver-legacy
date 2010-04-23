@@ -2,6 +2,7 @@
 #define AU_PLUGINS_H
 
 #include <glib.h>
+#include <string.h>
 
 #include "pg.h"
 #include "au.h"

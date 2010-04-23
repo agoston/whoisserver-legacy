@@ -73,7 +73,7 @@ au_check_authentications (GList *auth_attrs, GList *cred)
   GList *p;
   const gchar *auth;
   gboolean known_auth;
-  CR_type auth_type;
+  CR_type auth_type = -1;
   const gchar *auth_val = NULL;
 
   LG_log(au_context, LG_FUNC, ">au_check_authentications: entering");

@@ -219,35 +219,26 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
   +html+ </UL></DL>
 
   ++++++++++++++++++++++++++++++++++++++*/
-int SQ_execute_query(SQ_connection_t *sql_connection, const char *query, SQ_result_set_t **result_ptr) {
-	int err;
-	SQ_result_set_t *result;
+int SQ_execute_query(SQ_connection_t *sql_connection, const char *query,
+    SQ_result_set_t **result_ptr)
+{
+    int err;
+    SQ_result_set_t *result;
 
-//	there's no need to measure every f***ing query
-//	float seconds;
-//	ut_timer_t start_time, stop_time;
-//	UT_timeget(&start_time);
+    err = mysql_query(sql_connection, query);
 
-	err = mysql_query(sql_connection, query);
+    /* log the time and result of the query */
+    if (err == 0)
+    {
+        result = mysql_store_result(sql_connection);
 
-	/* log the time and result of the query */
-	if (err == 0) {
-		result = mysql_store_result(sql_connection);
-
-//	there's no need to measure every f***ing query
-//		UT_timeget(&stop_time);
-//		seconds = UT_timediff( &start_time, &stop_time);
-//
-//		LG_log(sq_context, LG_DEBUG, "spent %.2f sec; got %d rows from [%s: %s]", seconds,
-//		        SQ_get_affected_rows(sql_connection), sql_connection->db, query);
-
-		if (result_ptr)
-			*result_ptr=result;
-		else if (result)
-			mysql_free_result(result);
-		return (0);
-	} else
-		return (-1);
+        if (result_ptr)
+            *result_ptr = result;
+        else if (result) mysql_free_result(result);
+        return (0);
+    }
+    else
+        return (-1);
 
 } /* SQ_execute_query() */
 
@@ -830,6 +821,7 @@ void SQ_close_connection(SQ_connection_t *sql_connection) {
   ++++++++++++++++++++++++++++++++++++++*/
 int SQ_num_rows(SQ_result_set_t *result) {
 	if (result != NULL) return mysql_num_rows(result);
+	return -1;
 }
 
 /* SQ_info_to_string() */
@@ -1138,6 +1130,7 @@ int SQ_ping(SQ_connection_t **sql_connection) {
 	    SQ_close_connection(*sql_connection);
 	    *sql_connection = contemp;
 	}
+	return 0;
 }
 
 /* SQ_escape_string() */
@@ -1170,3 +1163,38 @@ char *SQ_escape_string(SQ_connection_t *sql_connection, char *str) {
 	return new_str;
 }
 
+/* get DB connection to a source by a source handle
+ * always returns a connection, or dies
+ * agoston, 2010-04-20 */
+SQ_connection_t *SQ_get_connection_by_source_hdl(ca_dbSource_t *source_hdl) {
+    char *db_host = ca_get_srcdbmachine(source_hdl);
+    int db_port = ca_get_srcdbport(source_hdl);
+    char *db_name = ca_get_srcdbname(source_hdl);
+    char *db_user = ca_get_srcdbuser(source_hdl);
+    char *db_passwd = ca_get_srcdbpassword(source_hdl);
+
+    /* never fails (... dies if it would ...), so no error handling is necessary */
+    SQ_connection_t *db_connection = SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
+
+    /* free resources */
+    UT_free(db_host);
+    UT_free(db_name);
+    UT_free(db_user);
+    UT_free(db_passwd);
+
+    return db_connection;
+}
+
+/* get DB connection to a source by a source name
+ * always returns a connection, or dies
+ * agoston, 2010-04-20 */
+SQ_connection_t *SQ_get_connection_by_source_name(char *source) {
+    ca_dbSource_t *source_hdl = ca_get_SourceHandleByName(source);
+    if (source_hdl) {
+        return SQ_get_connection_by_source_hdl(source_hdl);
+    } else {
+        fprintf(stderr, "Source %s is undefined", source);
+        die;
+    }
+    return NULL;    /* should never reach this, but gcc whines */
+}

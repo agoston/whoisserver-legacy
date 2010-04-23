@@ -35,6 +35,12 @@ typedef enum {
     ATTR_MULTIPLE
 } attr_number_t;
 
+typedef enum {
+    DUMMIFY_NONE,
+    DUMMIFY_PLACEHOLDER,
+    DUMMIFY_FILTER
+} dummify_type_t;
+
 /* info about attributes used by this class
  *  
  * FIXME: if we got into this structure by class_attr_t attr, we have no easy way to find out
@@ -57,6 +63,9 @@ typedef struct {
     class_attr_t attr[MAX_CLASS_ATTR];  /* attribute information (in-order) */
     GHashTable *attr_hash;              /* hash of attribute name -> 
                                             class_attr_t */
+    dummify_type_t dummify_type;        /* type of dummification required for this class */
+    char *dummify_singleton;            /* the name of the singleton object
+                                            (only used for 'placeholder' dummify_type */
 } class_t;
 
 /* functions */

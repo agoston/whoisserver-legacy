@@ -193,8 +193,6 @@
       (pronounced "maintainer") objects.  A mntner object specifies
       authentication information required to authorise creation,
       deletion or modification of the objects protected by the mntner.
-      Mntner objects are not created automatically, but are forwarded
-      to RIPE Database Administration (ripe-dbm@ripe.net).
     </description>
     <attributes>
       <mntner       choice="mandatory" number="single"   />
@@ -244,6 +242,9 @@
       <table name="referral_by"/>
       <table name="mnt_ref"/>
     </delete-invquery-tables>
+    <dummify>
+        <filter/>
+    </dummify>
   </ripe_class>
 
   <ripe_class name="person" main_sql_table="person_role" code="pn">
@@ -289,6 +290,9 @@
       <table name="zone_c"/>
       <table name="author"/>
     </delete-invquery-tables>
+    <dummify>
+        <placeholder>DUMY-RIPE</placeholder>
+    </dummify>
   </ripe_class>
 
   <ripe_class name="role" main_sql_table="person_role" code="ro">
@@ -339,6 +343,9 @@
       <table name="mnt_by"/>
       <table name="org"/>
     </affected-tables>
+    <dummify>
+        <placeholder>DUMY-RIPE</placeholder>
+    </dummify>
   </ripe_class>
 
   <ripe_class name="organisation" main_sql_table="organisation" code="oa">
@@ -393,7 +400,9 @@
     <delete-invquery-tables>
       <table name="org"/>
     </delete-invquery-tables>
-
+    <dummify>
+        <filter/>
+    </dummify>
   </ripe_class>
 
   <ripe_class name="route-set" main_sql_table="route_set" code="rs">

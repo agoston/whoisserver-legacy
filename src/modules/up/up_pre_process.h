@@ -76,4 +76,5 @@ int UP_check_filter_set_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_
 int UP_check_peering_set_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *preproc_obj);
 int up_check_as_block(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char *key_value);
 
+int UP_check_available_nichdl(RT_context_t *rt_ctx, LG_context_t *lg_ctx, options_struct_t *options, rpsl_object_t *preproc_obj, source_data_t *source_data);
 #endif

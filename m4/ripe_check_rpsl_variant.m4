@@ -16,53 +16,6 @@ AC_ARG_WITH(rpslvariant,
      rpslvariant=RIPE
   ])
   AC_MSG_NOTICE([setting rpsl variant $rpslvariant])
-  case $rpslvariant in
-    RIPE )
-      AC_DEFINE_UNQUOTED(RIPE,, [RPSL variant])
-      ;;
-    * )
-      AC_MSG_ERROR([$rpslvariant is invalid])
-      ;;
-  esac
-  echo "$rpslvariant" > ./rpslvariant
-  AC_CONFIG_COMMANDS(rpslvariant,
-  [
-      rpslvariant=`cat ./rpslvariant`
-      if test x$rpslvariant = x
-      then
-        rpslvariant=RIPE
-      fi
-      mkdir -p $ac_abs_builddir/src/defs
-      OPWD=`pwd`
-      cd $ac_abs_builddir/src/defs
-      for file in $ac_abs_srcdir/src/defs/variants/$rpslvariant/*.xml \
-                  $ac_abs_srcdir/src/defs/variants/$rpslvariant/*.h
-      do
-        echo "---> $file"
-        if test -f $file
-        then
-          if ! test -f `basename $file`
-          then
-            echo ln -sf $file
-            ln -sf $file
-          fi
-        fi
-      done
-      mkdir -p $ac_abs_builddir/include
-      cd $ac_abs_builddir/include
-      for file in $ac_abs_srcdir/src/defs/variants/$rpslvariant/*.def
-      do
-        echo "---> $file"
-        if test -f $file
-        then
-          if ! test -f `basename $file`
-          then
-            echo ln -sf $file
-            ln -sf $file
-          fi
-        fi
-      done
-      cd $OPWD
-  ])
+  AC_DEFINE_UNQUOTED(RPSL_VARIANT, "$rpslvariant", [RPSL variant])
 dnl end defun
 ])

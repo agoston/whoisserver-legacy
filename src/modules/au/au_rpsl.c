@@ -75,7 +75,7 @@ static void au_rpsl_object_delete (gpointer data, gpointer user_data)
 }
 
 static char *CHECK_MNT_BY[]                 = { "mnt-by", NULL };
-static char *CHECK_MNT_LOWER[]              = { "mnt-lower", NULL };
+/* static char *CHECK_MNT_LOWER[]              = { "mnt-lower", NULL }; */
 static char *CHECK_MNT_LOWER_THEN_MNT_BY[]  = { "mnt-lower", "mnt-by", NULL };
 static char *CHECK_MNT_ROUTES_THEN_MNT_BY[] = { "mnt-routes", "mnt-by", NULL };
 static char *CHECK_MNT_ROUTES_THEN_MNT_LOWER_THEN_MNT_BY[] = { "mnt-routes",
@@ -331,7 +331,7 @@ set_rpsl_create (au_plugin_callback_info_t *info)
     else
     {
       /* There is no need to force an exit at this point. We can exit gracefully.
-      assert(g_list_next(parents) == NULL);  /* must only be a single parent */
+      assert(g_list_next(parents) == NULL);   must only be a single parent */
       if ( g_list_next(parents) == NULL )
       {
         parent = parents->data;
@@ -759,7 +759,7 @@ aut_num_rpsl_create (au_plugin_callback_info_t *info)
   else
   {
     /* There is no need to force an exit at this point. We can exit gracefully.
-    assert(g_list_next(parents) == NULL);  /* must only be a single parent */
+    assert(g_list_next(parents) == NULL);   must only be a single parent */
     if ( g_list_next(parents) == NULL )
     {
       parent = parents->data;

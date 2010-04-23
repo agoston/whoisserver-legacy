@@ -214,35 +214,32 @@ AU_ret_t ns_find_rir(au_plugin_callback_info_t * info, gchar * domain)
 /*
  * Check if the domain is an erx range, return false if not
  */
-gboolean ns_is_erx(gchar * domain)
-{
-  gboolean ret_val;             /* return value */
-  GTree *erx_tree;              /* erx tree */
-  gchar *erx_val;               /* erx value in the tree */
+gboolean ns_is_erx(gchar * domain) {
+    gboolean ret_val; /* return value */
+    GTree *erx_tree; /* erx tree */
+    gchar *erx_val; /* erx value in the tree */
 
-  LG_log(au_context, LG_DEBUG, "reading delegations file for erx");
-  erx_tree =
-      rdns_read_erx_delegations(au_context, ca_get_ns_delegationsfile);
-  if (erx_tree == NULL) {
-    LG_log(au_context, LG_DEBUG, "can't populate erx delegations tree");
-    ret_val = FALSE;            /* failsafe, we assume it's not erx */
-  } else {
-    erx_val =
-        erx_val =
-        g_strdup(rdns_who_delegates(au_context, erx_tree, domain));
-    LG_log(au_context, LG_DEBUG, "erx value: %s", erx_val);
-    if (erx_val[0] != '1') {
-      LG_log(au_context, LG_DEBUG, "not ERX range");
-      ret_val = FALSE;
+    LG_log(au_context, LG_DEBUG, "reading delegations file for erx");
+    erx_tree = rdns_read_erx_delegations(au_context, ca_get_ns_delegationsfile);
+    if (erx_tree == NULL) {
+        LG_log(au_context, LG_DEBUG, "can't populate erx delegations tree");
+        ret_val = FALSE; /* failsafe, we assume it's not erx */
     } else {
-      LG_log(au_context, LG_DEBUG, "ERX range");
-      ret_val = TRUE;
+        erx_val = g_strdup(rdns_who_delegates(au_context, erx_tree, domain));
+        LG_log(au_context, LG_DEBUG, "erx value: %s", erx_val);
+        if (erx_val[0] != '1') {
+            LG_log(au_context, LG_DEBUG, "not ERX range");
+            ret_val = FALSE;
+        } else {
+            LG_log(au_context, LG_DEBUG, "ERX range");
+            ret_val = TRUE;
+        }
+        g_free(erx_val);
     }
-    g_free(erx_val);
-  }
-  rdns_done_delegations(erx_tree);
-  return ret_val;
+    rdns_done_delegations(erx_tree);
+    return ret_val;
 }
+
 gboolean ns_ds_accepted(gchar * domain)
 {
   gboolean ret_val;             /* return value */

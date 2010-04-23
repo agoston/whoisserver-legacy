@@ -138,8 +138,6 @@ int save_access_tree(char *input, GString * output, sk_conn_st * condat)
 
 int save_acl_tree(char *input, GString * output, sk_conn_st * condat)
 {
-	int ret_err;
-
 	g_string_append(output, "No need to save ACL tree. It's always done right after any change "
 		"(which are automatic ban and the 'set acl' console command).");
 	return 0;

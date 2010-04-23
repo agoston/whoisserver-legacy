@@ -51,7 +51,7 @@ void ns_report_warnings(gpointer data, gpointer user_data)
 {
   au_plugin_callback_info_t *info = user_data;
   xmlChar *problem_node_template =
-      "//DELCHECK_REPORT/PROBLEM_ENTITY[attribute::name=\"%s\"]/PROBLEM/SHORT";
+      (xmlChar *)"//DELCHECK_REPORT/PROBLEM_ENTITY[attribute::name=\"%s\"]/PROBLEM/SHORT";
   gchar *entity = g_strdup(data);       /* must be cast to char */
   gchar *problem_node;          /* created from template */
   gchar *warning_str;           /* formatted warning string */
@@ -61,7 +61,7 @@ void ns_report_warnings(gpointer data, gpointer user_data)
   gint i;                       /* generic temporary int */
   xmlChar *keyword;             /* string format of each xpath query match */
 
-  problem_node = g_strdup_printf(problem_node_template, entity);
+  problem_node = g_strdup_printf((char*)problem_node_template, entity);
   result = getnodeset(xml_doc, (xmlChar *) problem_node);
   if (result) {
     nodeset = result->nodesetval;
@@ -93,9 +93,9 @@ AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info,
                             gchar * delcheck_conf_file)
 {
   xmlChar *severity_node =
-      "//DELCHECK_REPORT/PROBLEM_ENTITY/PROBLEM/attribute::severity";
+      (xmlChar *)"//DELCHECK_REPORT/PROBLEM_ENTITY/PROBLEM/attribute::severity";
   xmlChar *entity_node =
-      "//DELCHECK_REPORT/PROBLEM_ENTITY/attribute::name";
+      (xmlChar *)"//DELCHECK_REPORT/PROBLEM_ENTITY/attribute::name";
 
   gint i;                       /* generic temporary int */
   xmlChar *keyword;             /* string format of each xpath query match */
@@ -156,7 +156,7 @@ AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info,
               xmlNodeListGetString(xml_doc,
                                    nodeset->nodeTab[i]->xmlChildrenNode,
                                    1);
-          current_severity = strtol(keyword, (char **) NULL, 10);
+          current_severity = strtol((char *)keyword, (char **) NULL, 10);
           if (errno == ERANGE) {
             LG_log(au_context, LG_DEBUG,
                    "severity \"%s\" is not a valid integer", keyword);
@@ -178,7 +178,7 @@ AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info,
               xmlNodeListGetString(xml_doc,
                                    nodeset->nodeTab[i]->xmlChildrenNode,
                                    1);
-          entities = g_slist_append(entities, strdup(keyword));
+          entities = g_slist_append(entities, strdup((char *)keyword));
         }
         xmlXPathFreeObject(result);
         xmlCleanupParser();

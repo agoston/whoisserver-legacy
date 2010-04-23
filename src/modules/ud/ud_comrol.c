@@ -139,7 +139,7 @@ int ud_build_lock_query(Transaction_t *tr, char **common_tables) {
 	g_hash_table_foreach(tables_unique, _collect_tables, &lock_tables);
 
 	/* Start building the query */
-	g_string_sprintf(tr->query, "LOCK TABLES %s WRITE", lock_tables->data);
+	g_string_sprintf(tr->query, "LOCK TABLES %s WRITE", (char*)(lock_tables->data));
 
 	/* Add all tables on our list to the query */
 	for (cur_table = g_slist_next(lock_tables); cur_table != NULL; cur_table = g_slist_next(cur_table)) {

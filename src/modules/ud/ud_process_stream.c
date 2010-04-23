@@ -383,24 +383,14 @@ static Line_Type_t line_type(const char *line, long *transaction_id) {
 		return (LINE_EOF);
 	if (strncmp(line, "#", 1) == 0)
 		return (LINE_COMMENT);
+	if (strncmp(line, "%", 1) == 0)
+		return (LINE_COMMENT);
 	if (strcmp(line, "\n") == 0)
 		return (LINE_EMPTY);
 
 	if (strncmp(line, "ACK", 3) == 0) {
 		*transaction_id = atol(line+3);
 		return (LINE_ACK);
-	}
-	if (strncmp(line, "ADD_OVERRIDE", 12) == 0) {
-		*transaction_id = atol(line+12);
-		return (LINE_OVERRIDE_ADD);
-	}
-	if (strncmp(line, "UPD_OVERRIDE", 12) == 0) {
-		*transaction_id = atol(line+12);
-		return (LINE_OVERRIDE_UPD);
-	}
-	if (strncmp(line, "DEL_OVERRIDE", 12) == 0) {
-		*transaction_id = atol(line+12);
-		return (LINE_OVERRIDE_DEL);
 	}
 
 	if (strncmp(line, "ADD", 3) == 0) {
@@ -416,7 +406,20 @@ static Line_Type_t line_type(const char *line, long *transaction_id) {
 		return (LINE_DEL);
 	}
 
-	/* Otherwise this is an attribute */
+	if (strncmp(line, "ADD_OVERRIDE", 12) == 0) {
+		*transaction_id = atol(line+12);
+		return (LINE_OVERRIDE_ADD);
+	}
+	if (strncmp(line, "UPD_OVERRIDE", 12) == 0) {
+		*transaction_id = atol(line+12);
+		return (LINE_OVERRIDE_UPD);
+	}
+	if (strncmp(line, "DEL_OVERRIDE", 12) == 0) {
+		*transaction_id = atol(line+12);
+		return (LINE_OVERRIDE_DEL);
+	}
+
+    /* Otherwise this is an attribute */
 	return (LINE_ATTRIBUTE);
 
 } /* line_type() */
@@ -468,268 +471,90 @@ static int report_transaction(Transaction_t *tr, long transaction_id, Log_t *log
 	return (result);
 }/* report_transaction() */
 
-/************************************************************
- * process_nrtm()                                            *
- *                                                           *
- * Process object in NRTM client mode                        *
- *                                                           *
- * nrtm - pointer to _nrtm structure                         *
- * log - pointer to Log_t structure                          *
- * object_name - name of the object                          *
- * operation - operation code (OP_ADD/OP_DEL)                *
- *                                                           *
- * Returns:                                                  *
- * 1  - okay                                                 *
- * <0 - error                                                *
- *                                                           *
- ************************************************************/
 
+/* Function to process an nrtm update.
+ * It is essentially the same as process_updates(), but adjusted to the nrtm client's requirements:
+ * - no nic-hdl repository
+ * - no standalone mode
+ * - no difference between UPD/ADD
+ * - no reporting back the result through the socket
+ *
+ * FIXME: this is some heavy code duplication, but this is how it was designed and fixing it
+ *        would take a disproportionate amount of time
+ */
 static int process_nrtm(UD_stream_t *ud_stream, Transaction_t *tr, int operation) {
-	int result=0;
-	int dummy=0;
-	struct _nrtm *nrtm = ud_stream->nrtm;
-	long serial_id;
-	Log_t *log_ptr= &(ud_stream->log);
-	ut_timer_t sotime;
-	int ta_upd_nhr;
+    int result = 0;
+    Log_t *log_ptr = &(ud_stream->log);
+    int dummy = 0;
+    ut_timer_t sotime;
+    char *reason;
 
-	/* Start timer for statistics */
-	UT_timeget(&sotime);
+    /* Start timer for statistics */
+    UT_timeget(&sotime);
 
-	/* We allow NRTM updates for some inconsistent objects                  */
-	/* One of the examples is reference by name which looks like nic-handle */
-	/* For this purpose we allow dummy creation when updating an object     */
-	/* We also check for dummy allowance when deleting an object            */
-	/* this is done to allow deletion of person objects referenced by name  */
+    switch (operation) {
+        /* Compare operations and report an error if they do not match */
+        case OP_UPD:
+        case OP_ADD:
+            if (tr->object_id != 0) { /* trying to create, but object exists */
+                tr->action = TA_UPDATE;
+                reason = "U:UPD";
+            } else {
+                /* Action: create the object */
+                tr->action = TA_CREATE;
+                reason = "U:ADD";
+            }
+            break;
 
-	tr->mode|=B_DUMMY;
-        /* nic-hdls are not removed when an object is deleted */
-	if ( IS_NO_NHR(tr->mode) || operation == OP_DEL )
-		ta_upd_nhr=0;
-	else
-		ta_upd_nhr = TA_UPD_NHR;
+        case OP_DEL:
+            if (tr->object_id == 0) { /* trying t delete non-existing object */
+                tr->succeeded = 0;
+                tr->error |= ERROR_U_COP;
+                reason = "U:DEL:non-existing object";
+            } else {
+                tr->action = TA_DELETE;
+                reason = "U:DEL";
+            }
+            break;
 
-	switch (operation) {
+        default:
+            /* bad operation for this mode if not standalone */
+            tr->succeeded = 0;
+            tr->error |= ERROR_U_BADOP;
+            reason = "U:bad operation";
+            break;
+    }
 
-		case OP_ADD:
-			if (nrtm->tr) { /* DEL ADD => saved*/
-				if (tr->object_id==0) {
-					/* object does not exist in the DB */
-					/* delete the previous(saved) object*/
-					object_process(nrtm->tr);
-					/* create DEL serial */
-					UD_lock_serial(nrtm->tr);
-					serial_id = UD_create_serial(nrtm->tr);
-					CP_CREATE_S_PASSED(nrtm->tr->action);
-					TR_update_status(nrtm->tr);
-					UD_commit_serial(nrtm->tr);
-					UD_unlock_serial(nrtm->tr);
-					/* Mark TR as clean */
-					TR_mark_clean(nrtm->tr);
-					/* log the transaction */
-					result=report_transaction(nrtm->tr, serial_id, log_ptr, &sotime, "M:DEL");
+    if (tr->succeeded) {
+        object_process(tr);
+        /* special case from dummy cleanup project:
+         * if updating an existing dummy object, we change it to a creating with following the sequence_id
+         * as we don't want to generate DEL serial for dummy replacement */
+        if ((tr->action == TA_UPDATE) && (tr->object_id > 0)) {
+            dummy = isdummy(tr);
+            if (dummy == 1) {
+                tr->action = TA_CREATE;
+                tr->sequence_id++;
+            }
+        }
+        UD_lock_serial(tr);
+        UD_create_serial(tr);
+        CP_CREATE_S_PASSED(tr->action);
+        TR_update_status(tr);
+        UD_commit_serial(tr);
+        UD_unlock_serial(tr);
+        /* Mark the TR as clean */
+        TR_mark_clean(tr);
+        TR_delete_record(tr);
+    }
 
-					transaction_free(nrtm->tr);
-					nrtm->tr=NULL;
+    /* Make a report. U stands for update stream */
+    result = report_transaction(tr, tr->transaction_id, log_ptr, &sotime, reason);
 
-					/* Create an object and update NHR */
-					tr->action=(TA_CREATE | ta_upd_nhr);
-					/* restart the timer for statistics */
-					UT_timeget(&sotime);
-					object_process(tr); /* create a new one*/
-					/* create ADD serial */
-					UD_lock_serial(tr);
-					serial_id = UD_create_serial(tr);
-					CP_CREATE_S_PASSED(tr->action);
-					TR_update_status(tr);
-					UD_commit_serial(tr);
-					UD_unlock_serial(tr);
-					/* Mark TR as clean */
-					TR_mark_clean(tr);
-					/* log the transaction */
-					result=report_transaction(tr, serial_id, log_ptr, &sotime, "M:ADD");
-				} else {
-					/* object already exists in the DB - update or dummy replacement*/
-					/*compare the two, may be we may collapse operations*/
-					if (tr->object_id==nrtm->tr->object_id) {
-						/* DEL-ADD ->> UPDATE */
-						transaction_free(nrtm->tr);
-						nrtm->tr=NULL;
-						tr->action=TA_UPD_CLLPS;
-						object_process(tr);
-						/* create DEL+ADD serial records */
-						UD_lock_serial(tr);
-						tr->action=TA_DELETE;
-						serial_id = UD_create_serial(tr);
-						result=report_transaction(tr, serial_id, log_ptr, &sotime, "M:DEL(UPD)");
+    /* Free resources */
+    transaction_free(tr);
 
-						/* restart the timer for statistics */
-						UT_timeget(&sotime);
-						tr->sequence_id++;
-						tr->action=TA_CREATE;
-						serial_id = UD_create_serial(tr);
-						CP_CREATE_S_PASSED(tr->action);
-						TR_update_status(tr);
-						UD_commit_serial(tr);
-						UD_unlock_serial(tr);
-						/* Mark TR as clean */
-						TR_mark_clean(tr);
-						result=report_transaction(tr, serial_id, log_ptr, &sotime, "M:ADD(UPD)");
-					} else { /* this should be a dummy object in the database(that we are going to replace with the real one */
-						/* or an interleaved operation*/
-						object_process(nrtm->tr); /* delete the previous(saved) object*/
-						/* create a DEL serial record */
-						UD_lock_serial(nrtm->tr);
-						serial_id = UD_create_serial(nrtm->tr);
-						CP_CREATE_S_PASSED(nrtm->tr->action);
-						TR_update_status(nrtm->tr);
-						UD_commit_serial(nrtm->tr);
-						UD_unlock_serial(nrtm->tr);
-						/* Mark TR as clean */
-						TR_mark_clean(nrtm->tr);
-						/* log the transaction */
-						result=report_transaction(nrtm->tr, serial_id, log_ptr, &sotime, "M:DEL");
-
-						transaction_free(nrtm->tr);
-						nrtm->tr=NULL;
-
-						/* restart the timer for statistics */
-						UT_timeget(&sotime);
-
-						tr->action=TA_UPDATE;
-						/* check if we are replacing a dummy object */
-						dummy=isdummy(tr);
-						if (dummy==1)
-							tr->action = TA_UPD_DUMMY;
-						object_process(tr); /* create a new one*/
-						/* For serials this is CREATE operation. Increase sequence to have it correct in serals */
-						if (dummy==1) {
-							tr->action=TA_CREATE;
-							tr->sequence_id++;
-						}
-						/* create ADD serial record */
-						UD_lock_serial(tr);
-						serial_id = UD_create_serial(tr);
-						CP_CREATE_S_PASSED(tr->action);
-						TR_update_status(tr);
-						UD_commit_serial(tr);
-						UD_unlock_serial(tr);
-						/* Mark TR as clean */
-						TR_mark_clean(tr);
-						/* log the transaction */
-						result=report_transaction(tr, serial_id, log_ptr, &sotime, "M:ADD");
-
-					}
-				}
-			} else { /* ADD ADD =>brand new object*/
-				if (tr->object_id==0) {
-					/*      fprintf(stderr,"CREATE new\n");*/
-					/* Create an object and update NHR */
-					tr->action=(TA_CREATE | ta_upd_nhr);
-					object_process(tr);
-					/* create ADD serial */
-					UD_lock_serial(tr);
-					serial_id = UD_create_serial(tr);
-					CP_CREATE_S_PASSED(tr->action);
-					TR_update_status(tr);
-					UD_commit_serial(tr);
-					UD_unlock_serial(tr);
-
-					/* Mark TR as clean */
-					TR_mark_clean(tr);
-					/* log the transaction */
-					result=report_transaction(tr, serial_id, log_ptr, &sotime, "M:ADD");
-				} else { /* object already exists in the database */
-					/* this may happen because of dummies*/
-					/* or with some implementations of mirroring protocol that have atomic update */
-					/* instead of add + del */
-					tr->action=TA_UPDATE;
-					dummy=isdummy(tr);
-					if (dummy==1)
-						tr->action = TA_UPD_DUMMY;
-					object_process(tr);
-					/* For serials this is CREATE operation. Increase sequence to have it correct in serals */
-					if (dummy==1) {
-						tr->action=TA_CREATE;
-						tr->sequence_id++;
-					}
-					/* create ADD serial record */
-					UD_lock_serial(tr);
-					serial_id = UD_create_serial(tr);
-					CP_CREATE_S_PASSED(tr->action);
-					TR_update_status(tr);
-					UD_commit_serial(tr);
-					UD_unlock_serial(tr);
-					/* Mark TR as clean */
-					TR_mark_clean(tr);
-					/* log the transaction */
-					result=report_transaction(tr, serial_id, log_ptr, &sotime, "M:ADD");
-
-				}
-			}
-			break;
-
-		case OP_DEL:
-			if (nrtm->tr) { /*DEL DEL =>saved */
-				/* check this is not a deletion of the same object twice */
-				/* this should not happen but we cannot trust foreign sources */
-				/* in such case process saved transaction but fail the current one */
-				if (nrtm->tr->object_id == tr->object_id)
-					tr->object_id=0;
-
-				object_process(nrtm->tr); /* delete the previous(saved) object*/
-				/* create DEL serial record */
-				UD_lock_serial(nrtm->tr);
-				serial_id = UD_create_serial(nrtm->tr);
-				CP_CREATE_S_PASSED(nrtm->tr->action);
-				TR_update_status(nrtm->tr);
-				UD_commit_serial(nrtm->tr);
-				UD_unlock_serial(nrtm->tr);
-				/* Mark TR as clean */
-				TR_mark_clean(nrtm->tr);
-				/* log the transaction */
-				result=report_transaction(nrtm->tr, serial_id, log_ptr, &sotime, "M:DEL");
-
-				transaction_free(nrtm->tr);
-				nrtm->tr=NULL;
-			}
-			/* save the real object (not a dummy one ) */
-			if (tr->object_id>0 && !isdummy(tr)) {
-				/* save the object*/
-				tr->action=(TA_DELETE | ta_upd_nhr);
-				nrtm->tr=tr;
-				return (0);
-			} else { /* this is an error - Trying to DEL non-existing object*/
-				tr->succeeded=0;
-				tr->error|=ERROR_U_COP;
-				tr->action=(TA_DELETE | ta_upd_nhr);
-				/* create and initialize TR record for crash recovery */
-				TR_create_record(tr);
-				/* create DEL serial record anyway */
-				UD_lock_serial(tr);
-				serial_id = UD_create_serial(tr);
-				CP_CREATE_S_PASSED(tr->action);
-				TR_update_status(tr);
-				UD_commit_serial(tr);
-				UD_unlock_serial(tr);
-				/* Mark TR as clean */
-				TR_mark_clean(tr);
-				/* log the transaction */
-				result=report_transaction(tr, serial_id, log_ptr, &sotime, "M:DEL: non-existing object");
-
-			}
-			break;
-
-		default:
-			tr->succeeded=0;
-			tr->error |=ERROR_U_BADOP;
-			break;
-	}
-
-	/* Free resources */
-	transaction_free(tr);
-
-	return (result);
+    return (result);
 } /* process_nrtm() */
 
 /************************************************************
@@ -749,7 +574,6 @@ static int process_nrtm(UD_stream_t *ud_stream, Transaction_t *tr, int operation
  * <0- number of failed objects                              *
  *                                                           *
  ************************************************************/
-
 static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int operation) {
 	int result = 0;
 	Log_t *log_ptr = &(ud_stream->log);
@@ -865,21 +689,15 @@ static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int oper
 } /* process_updates() */
 
 /************************************************************
- *                                                           *
- * int process_transaction()                                 *
- *                                                           *
- * Processes the transaction                                 *
- *                                                           *
- * ud_stream - pointer to UD_stream_t structure              *
- *                                                           *
- * Returns:                                                  *
- * 0 - no error                                              *
- * <0- number of failed objects                              *
- *                                                           *
+ * Processes the transaction
+ *
+ * ud_stream - pointer to UD_stream_t structure
+ *
+ * Returns:
+ * 0 - no error
+ * <0- number of failed objects
+ * It frees the obj
  ************************************************************/
-
-/* It frees the obj */
-
 static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int operation, long transaction_id,
         LG_context_t *src_ctx) {
 	Transaction_t *tr= NULL;
@@ -1097,7 +915,7 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
 	}
 
 	/* normalize the object (reorder and split attributes */
-	sql_object = rpsl_object_copy_flattened(submitted_object);
+    sql_object = rpsl_object_copy_flattened(submitted_object);
 
 	/* put nic-hdl and mnt-by at the top of the list */
 	ud_reorder_attributes(sql_object);
@@ -1181,7 +999,6 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
  * total number of object processed                          *
  *                                                           *
  ************************************************************/
-
 int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 	char line_buff[STR_XXL];
 	SQ_connection_t *sql_connection;
@@ -1192,12 +1009,11 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 	int result=0;
 	int operation=0;
 	int interrupt=0;
-	int do_update;
 	int default_ud_mode = ud_stream->ud_mode;
 	Line_Type_t linetype;
 	Transaction_t *tr;
 	long transaction_id=0; /* transaction_id (to be supplied by DBupdate and stored in Database) */
-	GString *g_obj_buff;
+    GString *g_obj_buff;
 
 	nrtm=ud_stream->nrtm;
 
@@ -1272,30 +1088,17 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 				/*	 print_object(obj); */
 				/* check if we have collected something */
 				if (g_obj_buff->len >0) {
-#if 0
-					/* no operation suggest a garbage in the stream - just ignore it */
-					if(IS_NRTM_CLNT(ud_stream->ud_mode) && (operation==OP_NOOP)) {
-						ER_inf_va(FAC_UD, ASP_UD_UPDLOG, "garbage in NRTM stream");
-					} else
-#endif
-					{
-						/* start new transaction now */
-						result=process_transaction(ud_stream, g_obj_buff, operation, transaction_id, src_ctx);
-						/* process_transaction() frees tr and obj structures, */
-						/* so make sure we'll not reference these objects in the future */
-						operation=OP_NOOP;
-						transaction_id=0;
-					}
+                    /* start new transaction now */
+                    result=process_transaction(ud_stream, g_obj_buff, operation, transaction_id, src_ctx);
+                    /* process_transaction() frees tr and obj structures, */
+                    /* so make sure we'll not reference these objects in the future */
+                    operation=OP_NOOP;
+                    transaction_id=0;
 					ud_stream->ud_mode=default_ud_mode;
 					g_obj_buff = g_string_truncate(g_obj_buff, 0);
 				}
 				/* this is a good place for quick interrupt */
-				do_update=CO_get_do_update();
-				if (do_update)
-					interrupt=0;
-				else
-					interrupt=1;
-
+				interrupt = !CO_get_do_update();
 				break;
 
 			default:

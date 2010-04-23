@@ -10,6 +10,7 @@
 #include "lg.h"
 #include "memwrap.h"
 #include "lu_whois.h"
+#include "ut_string.h"
 
 /* XXX: no "-k" flag */
 
@@ -751,7 +752,7 @@ lu_whois_check_overlap (LU_server_t *server, GList **overlap,
 
   /* construct new ranges */
   range = rpsl_object_get_key_value(obj);
-  split = (gchar**)ut_g_strsplit_v1(range, " - ", 0);
+  split = ut_g_strsplit_v1(range, " - ", 0);
 
   /* query for overlap candidates */
   query = g_strdup_printf("-G -B -s %s -r -T %s -L %s", lookup_source, class, split[0]);

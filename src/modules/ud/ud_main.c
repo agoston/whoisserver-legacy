@@ -50,7 +50,7 @@ extern int SV_update_sock[];
 extern int SV_shutdown_recv_fd;
 
 /* Response time to swtching updates on and off */
-#define TIMEOUT 60
+#define TIMEOUT 30
 
 /* timeout between successive attempts to establish connection with server */
 #define PM_CONNECTION_TIMEOUT 10
@@ -88,14 +88,9 @@ void UD_init(LG_context_t *ctx) {
  ************************************************************/
 int get_NRTM_fd(struct _nrtm *nrtm, int upto_last, char *source) {
 	int sockfd;
-	struct hostent *hptr;
-	struct sockaddr_in serv_addr;
-	struct in_addr *paddr;
-	char host_info[STR_XXL];
 	GString *line_buff;
 	int fd;
 	int ret;
-	struct hostent result;
 	int error;
 	int network;
 
@@ -181,8 +176,6 @@ void UD_do_nrtm(void *arg) {
 	int upto_last;
 	GString *ta_activity;
 	ca_dbSource_t *source_hdl = ca_get_SourceHandleByPosition(source);
-	char *db_host, *db_name, *db_user, *db_passwd;
-	int db_port;
 	/* get source we are going to mirror */
 	char *source_name = ca_get_srcname(source_hdl);
 	LG_context_t *src_ctx;
@@ -206,7 +199,7 @@ void UD_do_nrtm(void *arg) {
 		LG_ctx_add_appender(src_ctx, app);
 	}
 
-	/* load the dictionary */
+	/* switch the RPSL syntax check from the default front-end to the more relaex back-end rules */
 	rpsl_load_dictionary(RPSL_DICT_CORE);
 
 	nrtm = UT_calloc(1, sizeof(struct _nrtm));
@@ -234,7 +227,7 @@ void UD_do_nrtm(void *arg) {
 	else if (IS_NRTM_CLNT(ud_stream.ud_mode)) {
 
 		if (IS_PERSIST_MIRR(ud_stream.ud_mode))
-			fprintf(stderr, "* NRTM: persistent conection\n");
+			fprintf(stderr, "* NRTM: persistent connection\n");
 		else
 			fprintf(stderr, "* NRTM\n");
 	} else
@@ -260,23 +253,9 @@ void UD_do_nrtm(void *arg) {
 	/* get mirror version */
 	nrtm->version = ca_get_srcnrtmprotocolvers(source_hdl);
 
-	/* get error log facility */
-	/*   logfilename=ca_get_srcnrtmlog(source_hdl); */
-
-	db_host = ca_get_srcdbmachine(source_hdl);
-	db_port = ca_get_srcdbport(source_hdl);
-	db_name = ca_get_srcdbname(source_hdl);
-	db_user = ca_get_srcdbuser(source_hdl);
-	db_passwd = ca_get_srcdbpassword(source_hdl);
-
 	/* Connect to the database */
-	LG_log(ud_context, LG_DEBUG, "%s making SQL connection to %s@%s ...", UD_TAG, db_name, db_host);
-	ud_stream.db_connection = SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
-
-	if (!ud_stream.db_connection) {
-		LG_log(ud_context, LG_SEVERE, "no connection to SQL server");
-		die;
-	}
+	LG_log(ud_context, LG_DEBUG, "%s making SQL connection to source %s ...", UD_TAG, source_name);
+	ud_stream.db_connection = SQ_get_connection_by_source_hdl(source_hdl);
 
 	ud_stream.num_skip = 0;
 	ud_stream.load_pass = 0;
@@ -378,10 +357,6 @@ void UD_do_nrtm(void *arg) {
 
 	/* That's all. Close connection to the DB */
 	SQ_close_connection(ud_stream.db_connection);
-	UT_free(db_host);
-	UT_free(db_name);
-	UT_free(db_user);
-	UT_free(db_passwd);
 
 	LG_log(src_ctx, LG_DEBUG, "%s NRTM client stopped", UD_TAG);
 
@@ -407,8 +382,6 @@ void UD_do_updates(void *arg) {
 	int do_update=1;
 	int num_ok;
 	ca_dbSource_t *source_hdl = ca_get_SourceHandleByPosition(source);
-	char *db_host, *db_name, *db_user, *db_passwd;
-	int db_port;
 	ip_addr_t address;
 	char *source_name;
 	LG_context_t *src_ctx;
@@ -477,16 +450,9 @@ void UD_do_updates(void *arg) {
 	else
 		fprintf(stderr, "* running as a server\n");
 
-	/* get the database */
-	db_host = ca_get_srcdbmachine(source_hdl);
-	db_port = ca_get_srcdbport(source_hdl);
-	db_name = ca_get_srcdbname(source_hdl);
-	db_user = ca_get_srcdbuser(source_hdl);
-	db_passwd = ca_get_srcdbpassword(source_hdl);
-
 	/* Connect to the database */
-	LG_log(src_ctx, LG_DEBUG, "%s making SQL connection to %s@%s ...", UD_TAG, db_name, db_host);
-	ud_stream.db_connection=SQ_get_connection(db_host, db_port, db_name, db_user, db_passwd);
+	LG_log(src_ctx, LG_DEBUG, "%s making SQL connection to source %s ...", UD_TAG, source_name);
+	ud_stream.db_connection = SQ_get_connection_by_source_hdl(source_hdl);
 
 	if (!ud_stream.db_connection) {
 		LG_log(ud_context, LG_SEVERE, "no connection to SQL server\n");
@@ -600,10 +566,6 @@ void UD_do_updates(void *arg) {
 	/*   fclose(ud_stream.log.logfile); */
 	/* That's all. Close connection to the DB */
 	SQ_close_connection(ud_stream.db_connection);
-	UT_free(db_host);
-	UT_free(db_name);
-	UT_free(db_user);
-	UT_free(db_passwd);
 	UT_free(source_name);
 
 	LG_ctx_free(src_ctx);

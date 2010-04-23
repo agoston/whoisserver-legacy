@@ -1,5 +1,5 @@
-# CASE 001: create 3, modify 2 objects, and then query for the  private object types through NRTM
-#           check if we filter them properly, also if the serials are right, using version 3 of NRTM
+# CASE 004: create 3, modify 2 objects, and then query for the  private object types through NRTM
+#           check if we filter them properly, also if the serials are right, using version 2 of NRTM
 #           In this test, we have filtered nrtm access rights
 #           We also check for dummification to remove multiple dummified attribs (like address: or changed:)
 #
@@ -7,9 +7,9 @@
 #
 #SUCCESS
 #
-# RESULT 001: The query will succeed.
-$EXEC_AFTER=$DATADIR/nrtm/filtering/001/nrtm_check.sh
-$EXEC_BEFORE=$DATADIR/nrtm/filtering/001/nrtm_setup.sh
+# RESULT 004: The query will succeed.
+$EXEC_AFTER=$DATADIR/nrtm/filtering/004/nrtm_check.sh
+$EXEC_BEFORE=$DATADIR/nrtm/filtering/004/nrtm_setup.sh
 
 password: test-dbm
 password: hostmaster

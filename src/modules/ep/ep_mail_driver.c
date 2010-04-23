@@ -166,7 +166,6 @@ GList *ep_x509_signed_process(MM_content_t *content, GList *credentials) {
   const gchar *ep_FP = NULL;
   gchar *bulk;
   gchar *signature;
-  GString *prepared_bulk;
   GList *returned_content;
   KM_key_return_t *key_data = NULL;
   GString *mess;

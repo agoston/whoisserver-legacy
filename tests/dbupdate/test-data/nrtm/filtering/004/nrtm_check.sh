@@ -19,10 +19,10 @@ fi
 
 # check if the objects look like they should
 # if you changed ANY of the DUMMY_* options in the rip.config, this part will fail
-FILE1=$DATADIR/nrtm/filtering/001/expected_result
-FILE2=$DATADIR/nrtm/filtering/001/nrtm_result
+FILE1=$DATADIR/nrtm/filtering/004/expected_result
+FILE2=$DATADIR/nrtm/filtering/004/nrtm_result
 
-get_nrtm '-g DB-TEST:3:1-5' >>$FILE2
+get_nrtm '-g DB-TEST:2:1-5' >>$FILE2
 
 diff $FILE1 $FILE2 &>/dev/null
 RET=$?

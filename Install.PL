@@ -43,6 +43,7 @@ my $DbPort      = $< . 0;
 my $User        = scalar getpwuid($<);
 my $DbName      = "ripe_".$User;
 my $DbAdminName = "ripadmin_".$User;
+my $RPSLVariant = "RIPE";
 
 ### All options passed;
 GetOptions( 
@@ -95,7 +96,7 @@ Options:
   --help                Print this message
   --verbose             Print diagnostic messages (recommended)
   --debug               Print output from all childprocesses (recommended for developers)
-  --for-development     Compile the whoisserver with debug symbols.
+  --for-development     Compile the whoisserver with -O0
     
   ### configuration options
   --prefix=%s           Installation prefix to use. Ie, /usr/local/whoisserver. Defaults
@@ -175,13 +176,17 @@ my $DbTempDir;
     ### "relocation R_X86_64_32 against `a local symbol' can not be used when 
     ### making a shared object; recompile with -fPIC"
     $ENV{'CFLAGS'} .= ' -fPIC';
-
+    
     ### show the include paths when building
     $ENV{'CFLAGS'} .= ' -v' if $Verbose;
 
-    ### set CFLAGS for development mode, if needed
-    ### -O2 is default, which is production mode
-    $ENV{'CFLAGS'} .= ' -O0 -g' if $DevelMode;
+    ### set development/production mode
+    if ($DevelMode) {
+      $ENV{'CFLAGS'} .= ' -O0 -g';
+      $RPSLVariant = "DB-TEST";
+    } else {
+      $ENV{'CFLAGS'} .= ' -O2 -g';
+    }
                     
     ### need to make sure java is in our path
     {   my $java = `locate javac | grep bin | head -1 | xargs dirname`;
@@ -201,7 +206,7 @@ if( $RunConfigure or $All ) {
     _system( q[sh ./build.sh] );
     
     ### configure it to install into $HOME/projects/$name_of_branch
-    _system( qq[sh ./configure --with-rdns --prefix=$DbPrefix --with-perl=$^X] );
+    _system( qq[sh ./configure --with-rdns --prefix=$DbPrefix --with-perl=$^X --with-rpslvariant=$RPSLVariant] );
 }
 
 if( $SetupDb or $All ) {
@@ -248,7 +253,7 @@ if( $SetupConfig or $All ) {
                                      qq[localhost,].($DbPort+1).q[,].($DbPort+4) ],
     
         ### access to the ripadmin db
-        [ q[^RIPADMIN.*]          => qq[RIPADMIN $SQLHost,$SQLPort,$SQLUser,$SQLPass,$DbName] ], 
+        [ q[^RIPADMIN.*]          => qq[RIPADMIN $SQLHost,$SQLPort,$SQLUser,$SQLPass,$DbAdminName] ], 
         
         ### path to the config file
         [ q[^SOURCEFILE .*]       => qq[SOURCEFILE $DbPrefix/conf/sources.config] ],

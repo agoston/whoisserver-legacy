@@ -1025,7 +1025,7 @@ int AC_asc_acl_command_set(char *command, char *comment)
   +++++++++++++++++++++++++++++++++++++++*/
 int AC_asc_set_nodeny(char *ip)
 {
-	ip_prefix_t *prefix;
+	ip_prefix_t *prefix = NULL;
 	int ret_err;
 	acc_st *ac_ptr;
 	GList *preflist = NULL;
@@ -1479,6 +1479,7 @@ int AC_access_control_get_resultset(SQ_connection_t* sql_conn, int space, SQ_res
 		default:
 			die;
   }
+  return -1;    /* should never reach this point, but gcc whines */
 }
 
 /*++++++++++++++++++++++++++++++++++++++

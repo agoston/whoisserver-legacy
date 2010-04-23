@@ -1,0 +1,25 @@
+% Standard set of data, attached to the each loader file before executing
+% loader
+%
+% Use this to add a standard set of data to each test without repeating it
+% over and over again
+%
+% agoston, 2010-04-21
+
+person:         Placeholder Person Object
+address:        RIPE Network Coordination Centre
+address:        P.O. Box 10096
+address:        1001 EB Amsterdam
+address:        The Netherlands
+phone:          +31 20 535 4444
+nic-hdl:        DUMY-RIPE
+mnt-by:         TEST-DBM-MNT
+remarks:        **********************************************************
+remarks:        * This is a placeholder object to protect personal data.
+remarks:        * To view the original object, please query the RIPE
+remarks:        * Database at:
+remarks:        * http://www.ripe.net/whois
+remarks:        **********************************************************
+changed:        ripe-dbm@ripe.net 20090724
+source:         DB-TEST
+

@@ -19,8 +19,13 @@ loadpass()
     echo Loading by $LOADER -L $1 -p ${PROPERTIES} -s ${SOURCE} ${object_file}
     test -f ${object_file}
     check_error "${object_file} not found" $?
-    $LOADER -L $1 -p ${PROPERTIES} -s ${SOURCE} ${object_file}
+    
+    # make a copy of the to-be-loaded file and attach the standard objects to it
+    cp -f $object_file ${object_file}.tmp
+    cat $CONFDIR/loader >>${object_file}.tmp
+    $LOADER -L $1 -p ${PROPERTIES} -s ${SOURCE} ${object_file}.tmp
     check_error "Loader failure" $?
+    rm ${object_file}.tmp
   done
 }
 

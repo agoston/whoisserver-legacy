@@ -41,6 +41,7 @@
       Full postal address of a contact.
     </description>
     <syntax>free-form</syntax>
+    <dummify>Dummy address for %s</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="admin-c" code="ac">
@@ -91,6 +92,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>person</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="aggr-mtd" code="ag">
@@ -189,7 +191,7 @@
         </sqlquery>
       </queries>
     </keys>
-
+    <dummify>MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="author" code="ah">
@@ -238,6 +240,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>person</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="certif" code="ce">
@@ -254,6 +257,7 @@
    This attribute is filtered from the default whois output.
     </description>
     <syntax>changed</syntax>
+    <dummify>unread@ripe.net 20000101</dummify>
   </ripe_attribute>
 
   <ripe_attribute xmlname="components-rt" name="components" code="co">
@@ -298,6 +302,7 @@
    A short decription related to the object.
     </description>
     <syntax>free-form</syntax>
+    <dummify>Dummy description for %s</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="dom-net" code="di">
@@ -428,6 +433,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <dummify>unread@ripe.net</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="export" code="ex">
@@ -827,6 +833,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute xmlname="members-as" name="members" code="ms">
@@ -912,6 +919,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="mnt-lower" code="ml">
@@ -959,6 +967,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="mnt-ref" code="mz">
@@ -1001,12 +1010,13 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="mnt-domains" code="md">
     <description>
    Specifies the identifier of a registered mntner object used for
-   reverse domain authorization. Protects domain objects. The
+   reverse domain authorisation. Protects domain objects. The
    authentication method of this maintainer object will be used for
    any encompassing reverse domain object.
     </description>
@@ -1046,6 +1056,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="mnt-nfy" code="mn">
@@ -1166,6 +1177,7 @@
         </sqlquery>
       </queries>
     </keys>  
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute xmlname="mnt-routes6" name="mnt-routes" code="mu">
@@ -1214,6 +1226,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute xmlname="mnt-routes-an" name="mnt-routes" code="mu">
@@ -1262,6 +1275,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="mntner" code="mt">
@@ -1614,6 +1628,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <dummify>Dummy organisation name for %s</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="phone" code="ph">
@@ -1621,6 +1636,7 @@
    Specifies a telephone number of the contact.
     </description>
     <syntax>telephone-number</syntax>
+    <dummify>+31205354444</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="referral-by" code="rb">
@@ -1664,6 +1680,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>mntner</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="remarks" code="rm">
@@ -1934,6 +1951,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>person</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="org" code="og">
@@ -1976,6 +1994,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>organisation</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="text" code="tx">
@@ -2018,7 +2037,7 @@
         </sqlquery>
       </queries>
     </keys>
-
+    <dummify>unread@ripe.net</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="zone-c" code="zc">
@@ -2070,6 +2089,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>person</foreignkey>
   </ripe_attribute>
 
   <ripe_attribute name="inet-rtr" code="ir">
@@ -2526,6 +2546,7 @@
         </sqlquery>
       </queries>
     </keys>
+    <foreignkey>irt</foreignkey>
  </ripe_attribute>
 
   <ripe_attribute name="irt" code="it">
