@@ -39,15 +39,6 @@ int Verbose = 0;
 long long Amt_Dumped = 0;
 int num_files = 0;
 
-/* structure holding information used to connect to SQL server */
-struct database_info {
-	char *hostname;
-	int port;
-	char *database;
-	char *user;
-	char *password;
-};
-
 /* structure for class */
 struct class {
 	char *name;
@@ -84,36 +75,18 @@ void get_program_name(int argc, char **argv) {
 }
 
 void syntax() {
-	fprintf(stderr, "Syntax: %s -c rip.config [-v] [-h hostname] [-P port] [-u user] [-p password] database\n", Program_Name);
+	fprintf(stderr, "Syntax: %s [-v] -c <rip.config> <source>\n", Program_Name);
 }
 
 /* exits on error */
-void parse_options(int argc, char **argv, struct database_info *db, char **rip_conf) {
+void parse_options(int argc, char **argv, char **rip_conf, char **source) {
 	int opt;
 
-	/* defaults */
-	db->hostname = "localhost";
-	db->port = 0;
-	db->user = "";
-	db->password = "";
-
 	/* parse command line arguments with the ever-handy getopt() */
-	while ((opt = getopt(argc, argv, "vh:u:p:P:c:")) != -1) {
+	while ((opt = getopt(argc, argv, "vc:")) != -1) {
 		switch (opt) {
 			case 'v':
 				Verbose++;
-				break;
-			case 'h':
-				db->hostname = optarg;
-				break;
-			case 'P':
-				db->port = atoi(optarg);
-				break;
-			case 'u':
-				db->user = optarg;
-				break;
-			case 'p':
-				db->password = optarg;
 				break;
 			case 'c':
 				*rip_conf = optarg;
@@ -133,7 +106,7 @@ void parse_options(int argc, char **argv, struct database_info *db, char **rip_c
 	}
 
 	/* remaining argument should be database name */
-	db->database = argv[0];
+	*source = argv[0];
 }
 
 int load_classes(struct class **c) {
@@ -228,7 +201,7 @@ void seperate_time_t(int n, int *hours, int *minutes, int *seconds) {
 
 /* program entry point */
 int main(int argc, char **argv) {
-	struct database_info db;
+	char *source = NULL;
 	char *rip_conf = NULL;
 	SQ_connection_t *sql = NULL, *sql2 = NULL;
 	SQ_result_set_t *rs = NULL, *rs2 = NULL;
@@ -249,20 +222,36 @@ int main(int argc, char **argv) {
 	get_program_name(argc, argv);
 
 	/* parse our command line */
-	parse_options(argc, argv, &db, &rip_conf);
+	parse_options(argc, argv, &rip_conf, &source);
+    ca_dbSource_t *source_hdl = ca_get_SourceHandleByName(source);
+    if (!source_hdl) {
+        fprintf(stderr, "Source %s is undefined", source);
+        exit(1);
+    }
+
 	if (Verbose) {
-		printf("\n");
-		printf("Command line options\n");
-		printf("   database: %s\n", db.database);
-		printf("   hostname: %s\n", db.hostname);
-		if (db.port) {
-			printf("       port: %d\n", db.port);
-		} else {
-			printf("       port: <default>\n");
-		}
-		printf("       user: %s\n", (*db.user == '\0') ? "<default>" : db.user);
+	    /* get data related to source and print it to the user */
+	    char *db_host = ca_get_srcdbmachine(source_hdl);
+	    int db_port = ca_get_srcdbport(source_hdl);
+	    char *db_name = ca_get_srcdbname(source_hdl);
+	    char *db_user = ca_get_srcdbuser(source_hdl);
+	    char *db_passwd = ca_get_srcdbpassword(source_hdl);
+
+        printf("\n");
+		printf("Dump starts with the following parameters:\n");
+        printf("     source: %s\n", source);
+		printf("   database: %s\n", db_name);
+		printf("   hostname: %s\n", db_host);
+		printf("       port: %d\n", db_port);
+		printf("       user: %s\n", db_user);
 		printf("   password: <hidden>\n");
 		printf(" rip.config: %s\n", rip_conf);
+
+        /* free resources */
+        UT_free(db_host);
+        UT_free(db_name);
+        UT_free(db_user);
+        UT_free(db_passwd);
 	}
 
 	/* init logging. we also create a null_ctx as we don't need log output on stdout from the
@@ -291,15 +280,8 @@ int main(int argc, char **argv) {
 	 * This is required as joining serials table would result in a shared-mode row-level lock on serials,
 	 * which is also locked by a LOCK TABLES command by dbupdate, thus stalling dbupdate processes for the
 	 * period of the dump, which is unacceptable - agoston, 2008-02-18 */
-	if (SQ_try_connection(&sql, db.hostname, db.port, db.database, db.user, db.password)) {
-		fprintf(stderr, "%s: error connecting to database; %s\n", Program_Name, SQ_error(sql));
-		exit(1);
-	}
-
-	if (SQ_try_connection(&sql2, db.hostname, db.port, db.database, db.user, db.password)) {
-		fprintf(stderr, "%s: error connecting to database; %s\n", Program_Name, SQ_error(sql));
-		exit(1);
-	}
+	sql = SQ_get_connection_by_source_hdl(source_hdl);
+	sql2 = SQ_get_connection_by_source_hdl(source_hdl);
 
 	if (Verbose) {
 		printf("Connected.\n");
