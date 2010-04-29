@@ -276,6 +276,15 @@ int main(int argc, char **argv) {
 	SQ_init(ctx);
 	UT_init(ctx);
 	ca_init(rip_conf);
+
+	/* update main database entries in CA module - bad, but text_export is a special case */
+	ca_dbSource_t *source_hdl = ca_get_SourceHandleByName(RPSL_VARIANT);
+    strcpy(source_hdl->db.dbName, db.database);
+    strcpy(source_hdl->db.host, db.hostname);
+    source_hdl->db.port = db.port;
+    strcpy(source_hdl->db.user, db.user);
+    strcpy(source_hdl->db.password, db.password);
+
 	PM_init(null_ctx);
 
 	/* turn off stdout buffering */
