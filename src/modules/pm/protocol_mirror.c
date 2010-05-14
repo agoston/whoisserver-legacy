@@ -51,13 +51,13 @@ LG_context_t *pm_context;
 /* CA_NRTM_HISTORY_ACCESS_LIMIT */
 unsigned history_access_limit = 0;
 gchar **PM_DUMMY_ADD_ATTR = NULL;
+char *main_source = NULL;
 
 /* hash to store placeholder object per class (used in nrtm v1 and v2 backward compatibility mode only)
  * key = classname (char *), value = placeholder object blob (char *)
  *
  * FIXME: The RPSL implementation support a single RPSL schema definition only. This means that NRTM can dummify only
- * one source, and that is the main source. Hence, dummification should never be called for any other source than
- * the main source, for which the RPSL schema is defined. The main source is defined as RPSL_VARIANT in config.h
+ * one source, and that is the main source (first UPDSOURCE). Hence, dummification should never be called for any other source.
  * agoston, 2010-04-20 */
 GHashTable *placeholders = NULL;
 
@@ -79,8 +79,16 @@ static void dummify_init() {
      no free() hooks defined, as all values are coming directly, without making a copy */
     placeholders = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, NULL);
 
-    /* get DB connection - only main (RPSL variant) DB is supported, see FIXME above */
-    SQ_connection_t *db_connection = SQ_get_connection_by_source_name(RPSL_VARIANT);
+    /* get DB connection - only main (first UPDSOURCE) DB is supported, see FIXME above */
+    ca_updDbSource_t **upd_source_hdl;
+    upd_source_hdl = ca_get_UpdSourceHandle(CA_UPDSOURCE);
+    if (upd_source_hdl[0] == NULL) {
+        LG_log(pm_context, LG_FATAL,"dummify_init(): There must be at least one updsource defined in the config file");
+        die;
+    }
+
+    main_source =  upd_source_hdl[0]->name;
+    SQ_connection_t *db_connection = SQ_get_connection_by_source_name(main_source);
 
     int i;
     char **class_names = DF_get_class_names();
@@ -113,7 +121,7 @@ static void dummify_init() {
                 g_hash_table_insert(placeholders, (gpointer)&(classinfo->id), object_blob);
             } else {
                 fprintf(stderr, "Placeholder object for class %s, %s, was not found in source %s (meaning, the following query gave no results: %s)\n",
-                        class_names[i], classinfo->dummify_singleton, RPSL_VARIANT, query);
+                        class_names[i], classinfo->dummify_singleton, main_source, query);
                 die;
             }
 
@@ -727,9 +735,9 @@ void PM_interact(int sock)
 
     /* Check if requested dummification of non-main database
      * See FIXME of variable placeholders for further details */
-    if ((mirror_perm == AA_MIRROR_PUBLIC) && strcmp(RPSL_VARIANT, nrtm_q.source)) {
-        LG_log(pm_context, LG_DEBUG, "[%s] --  Dummified mirroring of source %s is not supported (try source %s)", hostaddress, nrtm_q.source, RPSL_VARIANT);
-        sprintf(buff, "\n%%ERROR:404: Dummified mirroring of source %s is not supported (try source %s)\n\n\n", nrtm_q.source, RPSL_VARIANT);
+    if ((mirror_perm == AA_MIRROR_PUBLIC) && strcmp(main_source, nrtm_q.source)) {
+        LG_log(pm_context, LG_DEBUG, "[%s] --  Dummified mirroring of source %s is not supported (try source %s)", hostaddress, nrtm_q.source, main_source);
+        sprintf(buff, "\n%%ERROR:404: Dummified mirroring of source %s is not supported (try source %s)\n\n\n", nrtm_q.source, main_source);
         SK_cd_puts(&condat, buff);
         goto error_return;
     }
