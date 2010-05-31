@@ -5,12 +5,12 @@
 #  \    \_\  \|   |  |    |   
 #   \______  /|___|  |____|   
 #          \/                 
-# git clone git:whois-server
+# git clone git:whoisserver
 # src/utils/wrapper.sh
 # ****************************************
 #
 # wrapper around dbupdate to:
-# - process STOPUPDATES
+# - process STOPUPDATES (mailupdates has its own; syncupdates, override, ... is relying on this one)
 # - handle dbupdate crash
 #
 # agoston, 2010-05-31
@@ -35,6 +35,7 @@ fi
 ${DBUPDATE} "$@"
 RET=$?
 
+# send email on non-zero return code
 if [ $RET -gt 0 ]; then
 	echo "${DBUPDATE} exited with code ${RET} on ${HOSTNAME}
 Command line: ${DBUPDATE} $@" | mail -s "${DBUPDATE} execution problem" $ERRORS_TO
