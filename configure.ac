@@ -373,7 +373,6 @@ AC_CONFIG_FILES([
   src/opl-perl/Makefile.PL
   Makefile
   src/Makefile
-  src/utils/wrapper
   src/utils/make_mysql_user
   src/utils/remadmin.pl
   src/utils/ripe2rpsl
