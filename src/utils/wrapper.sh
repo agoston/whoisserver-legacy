@@ -31,8 +31,10 @@ if [ -f $STOPUPDATES ]; then
 	exit 1
 fi
 
-# wrap dbupdate call
-${DBUPDATE} "$@"
+# wrap dbupdate call - note that this is delibaretly using $*, and not "$@", as some arguments passed
+# from perl over ssh "might" get concatenated, and this is the only change to separate them.
+# We never have spaces in any of the arguments here, so it's fine - agoston, 2010-06-07
+${DBUPDATE} $*
 RET=$?
 
 # send email on non-zero return code
