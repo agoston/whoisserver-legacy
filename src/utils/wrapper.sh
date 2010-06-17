@@ -46,13 +46,13 @@ cat $ERRFILE 1>&2
 # send email on non-zero return code
 if [ $RET -gt 0 ]; then
 	echo "${DBUPDATE} exited with code ${RET} on ${HOSTNAME}
-Command line: ${DBUPDATE} $@
+Command line: ${DBUPDATE} $*
 
-STDIN: `cat $INFILE`
+STDIN: >>>`cat $INFILE`<<<
 
-STDOUT: `cat $OUTFILE`
+STDOUT: >>>`cat $OUTFILE`<<<
 
-STDERR: `cat $ERRFILE`
+STDERR: >>>`cat $ERRFILE`<<<
 " | mail -s "${DBUPDATE} execution problem" $ERRORS_TO
 fi
 
