@@ -9,7 +9,6 @@ alter table aut_num add index (aut_num);
 alter table aut_num add index (thread_id);
 alter table route add index origin (origin,prefix,prefix_length);
 alter table route6 add index origin (origin,r6_msb,r6_lsb,prefix_length);
-alter table aut_num add index (thread_id);
 alter table as_set add index (as_set(25));
 alter table as_set add index (thread_id);
 alter table route_set add index (route_set(25));
@@ -23,7 +22,9 @@ alter table filter_set add index (filter_set(25));
 alter table filter_set add index (thread_id);
 alter table peering_set add index (peering_set(25));
 alter table peering_set add index (thread_id);
-#alter table as_block add index ?
+alter table as_block add index (begin_as);
+alter table as_block add index (end_as);
+alter table as_block add index (thread_id);
 alter table inetnum add index (netname(8));
 alter table inetnum add index begin_in (begin_in);
 alter table inetnum add index end_in (end_in);
@@ -39,5 +40,5 @@ alter table domain add index (thread_id);
 alter table limerick add index (limerick);
 alter table limerick add index (thread_id);
 alter table irt add index (irt(25));
-alter table organisation add index (organisation);
+/* surplus, as first element of primary key covers this alter table organisation add index (organisation);*/
 alter table organisation add index (thread_id);
