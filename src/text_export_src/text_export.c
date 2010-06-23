@@ -412,7 +412,14 @@ int main(int argc, char **argv) {
 
 			skip = (serial_id > last_serial);
 
-		} else {	/* zero serials - buggy DB, emit object */
+		} else {
+		    /* check for error */
+		    if (SQ_errno(sql2)) {
+		        fprintf(stderr, "%s: mysql error: %s\n", Program_Name, SQ_error(sql));
+		        exit(1);
+		    }
+
+		    /* zero serials - buggy DB, emit object */
 			skip = 0;
 		}
 
@@ -441,6 +448,11 @@ int main(int argc, char **argv) {
 			}
 		}
 
+	}
+
+	if (SQ_errno(sql)) {
+	    fprintf(stderr, "%s: mysql error: %s\n", Program_Name, SQ_error(sql));
+	    exit(1);
 	}
 
 	if (rs) SQ_free_result(rs);
