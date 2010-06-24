@@ -112,7 +112,8 @@ static void dummify_init() {
             sql_err = SQ_execute_query(db_connection, query, &sql_result);
 
             if (sql_err) {
-                LG_log(pm_context, LG_SEVERE, "%s[%s]", SQ_error(db_connection), query);
+                LG_log(pm_context, LG_SEVERE, "%s [%s]", SQ_error(db_connection), query);
+                fprintf(stderr, "%s [%s]", SQ_error(db_connection), query);
                 die;
             }
 
