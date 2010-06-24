@@ -227,7 +227,7 @@ stop_server() {
 			done
 			
 			# in case of a leftover/daemon whois process, kill it
-			if ps uxaw |  egrep "^dbase *$PID .*whois-server" &>/dev/null; then
+			if ps uxaw | egrep "^dbase *$PID .*whois-server" &>/dev/null; then
 				my_log "whois-server ($PID) failed to stop graciously; sending KILL signal"
 				kill -9 $PID
 			fi
