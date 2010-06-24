@@ -43,7 +43,7 @@
 
 void segfault_handler(int sig) {
 	// we print a nice message, including sig, to make things absolutely clear
-	fprintf(stderr, " *** Signal %d caught, segfault handler starting\n", sig);
+	fprintf(stderr, " *** Signal %d caught by PID %d, segfault handler starting\n", sig, getpid());
 	die;
 }
 
@@ -180,7 +180,10 @@ int main(int argc, char **argv)
 	ca_init(prop_file_name);
 	g_free(prop_file_name);
 
-	sv_init_modules();
+    /* get command on die value as early as possible, and cache it in a variable so there are no external dependencies when die()ing */
+    SV_command_on_die = ca_get_command_on_die;
+
+    sv_init_modules();
 
 	/*  Start the server */
 	ret = SV_start(pid_file_name);
