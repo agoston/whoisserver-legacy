@@ -22,11 +22,13 @@ BASEDIR=/home/dbase/services/whois-update
 STOPUPDATES=${BASEDIR}/var/STOPUPDATES
 DBUPDATE=${BASEDIR}/bin/dbupdate.real
 ERRORS_TO="dbint@ripe.net"
+TIMELOG=$BASEDIR/var/log/time/timelog.$(date +%Y%m%d)
+TIME="/usr/bin/time --append --quiet --format %e --output ${TIMELOG}"
 
 # check for STOPUPDATES
 if [ -f $STOPUPDATES ]; then
 	echo "Updates are down for maintenance at the moment. Please try again later."
-	echo "Please also check out the RIPE NCC Service Announcements page for further information:"
+	echo "For further information, please visit the RIPE NCC Service Announcements at"
 	echo "http://ripe.net/news/status.html"
 	exit 1
 fi
@@ -38,7 +40,7 @@ INFILE=`tempfile`
 OUTFILE=`tempfile`
 ERRFILE=`tempfile`
 cat >$INFILE
-${DBUPDATE} $* <$INFILE >$OUTFILE 2>$ERRFILE
+${TIME} ${DBUPDATE} $* <$INFILE >$OUTFILE 2>$ERRFILE
 RET=$?
 cat $OUTFILE
 cat $ERRFILE 1>&2
