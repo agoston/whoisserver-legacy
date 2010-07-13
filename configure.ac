@@ -1,10 +1,10 @@
 M4PATH=m4
 
 AC_PREREQ(2.59)
-AC_INIT([Whois Server], [3.7],
+AC_INIT([Whois Server], [3.7.0.1],
         [RIPE Database Management <ripe-dbm@ripe.net>],
         [whoisserver])
-AM_INIT_AUTOMAKE([whoisserver],[3.7])
+AM_INIT_AUTOMAKE([whoisserver],[3.7.0.1])
 
 PRODUCT=$PACKAGE_NAME
 VERSION=$PACKAGE_VERSION
@@ -373,7 +373,6 @@ AC_CONFIG_FILES([
   src/opl-perl/Makefile.PL
   Makefile
   src/Makefile
-  src/utils/wrapper
   src/utils/make_mysql_user
   src/utils/remadmin.pl
   src/utils/ripe2rpsl
