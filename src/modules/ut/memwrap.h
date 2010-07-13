@@ -53,11 +53,7 @@ char *UT_strdup_real(const char *str, const char *file, int line);
 #define UT_free(ptr)          UT_free_real((ptr),           __FILE__, __LINE__)
 #define UT_strdup(str)        UT_strdup_real((str),         __FILE__, __LINE__)
 
-void wr_log_set(int value);
-
-void wr_real_clear_list(GList **list, const char *file, int line);
-
-#define wr_clear_list(a)  wr_real_clear_list(a,   __FILE__ ,__LINE__)
+void wr_clear_list(GList **list);
 
 #ifdef __cplusplus
 }

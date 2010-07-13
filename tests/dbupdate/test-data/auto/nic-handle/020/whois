@@ -4,6 +4,7 @@ e-mail:       dbtest@ripe.net
 admin-c:      TP2-DB-TEST
 tech-c:       TP3-DB-TEST
 nic-hdl:      TR1-DB-TEST
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 
@@ -13,6 +14,7 @@ e-mail:       dbtest@ripe.net
 admin-c:      TP3-DB-TEST
 tech-c:       TP2-DB-TEST
 nic-hdl:      TR2-DB-TEST
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 
@@ -20,6 +22,7 @@ person:       Test Person2
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP2-DB-TEST
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 
@@ -27,5 +30,6 @@ person:       Test Person3
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP3-DB-TEST
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST

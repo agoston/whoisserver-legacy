@@ -8,6 +8,8 @@
 # RESULT 21: The circular creations will fail
 
 
+password: test-person
+
 role:         TEST ROLE
 address:      Singel
 phone:        +0123456789
@@ -16,6 +18,7 @@ org:          AUTO-1
 admin-c:      TP1-DB-TEST
 tech-c:       AUTO-3
 nic-hdl:      AUTO-2
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20040102
 source:       DB-TEST
 
@@ -35,5 +38,6 @@ person:        Test Person2
 address:       Singel
 phone:         +0123456789
 nic-hdl:       AUTO-3
+mnt-by:        PERSON-MNT
 changed:       dbtest@ripe.net 20040102
 source:        DB-TEST

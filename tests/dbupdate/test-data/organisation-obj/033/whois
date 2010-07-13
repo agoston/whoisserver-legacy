@@ -2,6 +2,7 @@ person:       test person
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP2-DB-TEST
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20020101
 changed:      changed@ripe.net 20030101
 org:          ORG-EOOF1-DB-TEST

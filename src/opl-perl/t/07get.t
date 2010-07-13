@@ -1,9 +1,9 @@
-use Test::More tests => 40;
+use Test::More tests => 43;
 
 BEGIN { use_ok('Net::Whois::RIPE::RPSL') }
 
 
-use constant ATTR_COUNT => 11;
+use constant ATTR_COUNT => 12;
 
 my @EXPECTED = (
 	['person',     '       Fred Bloggs '],     # note the extra white space!
@@ -14,6 +14,7 @@ my @EXPECTED = (
 	['fax-no',     '       +23 04 4534534'],
 	['e-mail',     '       bloggs@fred.uk'],
 	['nic-hdl',    '      FB934-RIPE'],
+	['mnt-by',     '       RIPE-DBM-MNT'],
 	['changed',    '      hostmaster@fred.uk 19990427'],
 	['changed',    '      hostmaster@nic.uk 20000404'],
 	['source',     '       RIPE'],
@@ -29,6 +30,7 @@ phone:        +23 04 4444444
 fax-no:       +23 04 4534534
 e-mail:       bloggs\@fred.uk
 nic-hdl:      FB934-RIPE
+mnt-by:       RIPE-DBM-MNT
 changed:      hostmaster\@fred.uk 19990427
 changed:      hostmaster\@nic.uk 20000404
 source:       RIPE

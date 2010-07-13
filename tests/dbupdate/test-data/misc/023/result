@@ -35,8 +35,9 @@ e-mail:          dbtest@ripe.net
 admin-c:         NAN1-RIPE
 tech-c:          NAN1-RIPE
 nic-hdl:         TR123-RIPE
+mnt-by:          PERSON-MNT
 changed:         dbtest@ripe.net 20050819
-source:        DB-TEST
+source:          DB-TEST
 ***Error: Unknown object referenced
     
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

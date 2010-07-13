@@ -19,11 +19,14 @@ From: dbtest@ripe.net
 Subject: diff
 
 
+password: test-person
+
 person:  Test Person
 address: Singel 258
 address: Amsterdam
 phone:   +31 20 535 4444
 nic-hdl: TP10-DB-TEST
+mnt-by:  PERSON-MNT
 changed: dbtest@ripe.net 20020101
 changed: dbtest@ripe.net 20040101
 notify:  case040-2@ripe.net

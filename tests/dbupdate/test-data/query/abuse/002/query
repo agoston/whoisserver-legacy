@@ -6,6 +6,7 @@ person:       test person
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP2-DB-TEST
+mnt-by:       PERSON-MNT
 notify:       dbtest@ripe.net
 e-mail:       dbtest@ripe.net
 changed:      dbtest@ripe.net 20020101

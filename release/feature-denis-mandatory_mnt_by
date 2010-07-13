@@ -1,0 +1,23 @@
+20090908 - version 3.6
+
+Changes:
+- mnt-by attribute is now mandatory in newly created or modified person and
+role objects. This change means that all objects sent in for update have to
+have one or more mnt-by attributes defined (unless it is a deletion).
+
+
+Merged:
+- feature-nichdl-preservation
+
+
+Installation notes:
+- Since person/role and maintainer objects cross-reference each other, the 
+only way for a new user to create their first pair of objects is by using a
+separate helper tool, new-user-startup.cgi
+
+
+Affected stakeholders:
+- Anyone who tries to create person/role objects
+- First-time users who try to create their first person and maintainer
+- NCC Services WG
+- DB WG

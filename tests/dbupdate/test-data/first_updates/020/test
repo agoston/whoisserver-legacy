@@ -8,9 +8,12 @@
 # RESULT 20: syntax error in person: attribute
 
 
+password: test-person
+
 person:       Test PerýŸson2
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP2-DB-TEST
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST

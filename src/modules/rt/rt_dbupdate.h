@@ -86,8 +86,10 @@ void RT_clean_object(RT_context_t* ctx, char *msg);
 void RT_invalid_source(RT_context_t* ctx);
 void RT_filtered_source(RT_context_t* ctx);
 
+void RT_unmaintained_person(RT_context_t* ctx, gchar* key, const char *type);
+void RT_unmaintained_person_in_mntner(RT_context_t* ctx, gchar* key, const char *type, gchar* mntner);
+void RT_startup(RT_context_t* ctx);
 void RT_unknown_country(RT_context_t* ctx, gchar* country);
-
 void RT_unknown_nic_suffix(RT_context_t* ctx);
 void RT_nichdl_not_available(RT_context_t *ctx, const gchar *nichdl);
 void RT_nichdl_not_valid(RT_context_t *ctx, const gchar *nichdl);

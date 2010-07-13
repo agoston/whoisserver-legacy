@@ -1,0 +1,27 @@
+# basic-auth pn-mnt tests
+#
+# CASE 15: Create an inetnum object
+#          references unmaintained person objects 
+#          references mntner with
+#          unmaintained person object
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 15: The creation will succeed
+
+
+password: test
+password: hostmaster
+
+inetnum:      192.168.128.0 - 192.168.255.255
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+admin-c:      TP2-DB-TEST
+tech-c:       TP3-DB-TEST
+status:       ASSIGNED PI
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

@@ -12,6 +12,7 @@ person:       test person
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP1-DB-TEST
+mnt-by:       TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
@@ -94,15 +95,6 @@ auth:         MD5-PW $1$12345678$oEitTZYQtRHfNGmsFvTBA/   # test
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-MNT
 referral-by:  TEST-DBM-MNT
-changed:      dbtest@ripe.net 20030101
-source:       DB-TEST
-
-
-person:       Test Person2
-address:      Singel
-phone:        +0123456789
-nic-hdl:      TP2-DB-TEST
-mnt-by:       TEST-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 

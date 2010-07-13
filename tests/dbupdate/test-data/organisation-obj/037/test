@@ -56,8 +56,10 @@ person:      Test Person
 address:     Test Adress
 phone:       +1234
 nic-hdl:     AUTO-2
+mnt-by:      PERSON-MNT
 changed:     dbtest@ripe.net 20030102
 source:      DB-TEST
 
 password: test-dbm
 password: hostmaster
+password: test-person

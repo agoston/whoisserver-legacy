@@ -16,11 +16,14 @@ $DBUPDATE_FLAGS_EXT= -c $RIP_CONFIG -mr -f
 From: dbtest@ripe.net
 
 
+password: test-person
+
 person:  Test Person
 address: Singel 258
 address: Amsterdam
 phone:   +31 20 535 4444
 nic-hdl: TP10-DB-TEST
+mnt-by:  PERSON-MNT
 changed: dbtest@ripe.net 20020101
 notify:  case002-2@ripe.net
 source:  DB-TEST

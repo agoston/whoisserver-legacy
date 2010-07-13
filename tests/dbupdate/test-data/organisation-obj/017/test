@@ -1,6 +1,6 @@
 # organisation object tests
 # CASE 17: Create a person object with an "org:" attribute, 
-#          password is provided
+#          organisation password is provided
 #
 # create person object
 #
@@ -13,8 +13,10 @@ person:       test person
 org:          ORG-EOOF1-DB-TEST
 address:      Singel
 phone:        +0123456789
-nic-hdl:  AUTO-1
+nic-hdl:      AUTO-1
+mnt-by:       TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
 password: test-dbm
+password: test-person

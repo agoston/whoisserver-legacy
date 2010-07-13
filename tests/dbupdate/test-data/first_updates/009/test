@@ -10,11 +10,14 @@
 #           and garbage reported as not looking like an object.
 
 
+password: test-person
+
 person:  test person2
 address: here
 phone:   123
 changed: dbtest@ripe.net
 nic-hdl: TP2-DB-TEST
+mnt-by:       PERSON-MNT
 source:  db-test
 
 
@@ -28,4 +31,5 @@ address: here
 phone:   456
 changed: dbtest@ripe.net
 nic-hdl: TP3-DB-TEST
+mnt-by:       PERSON-MNT
 source:  db-test

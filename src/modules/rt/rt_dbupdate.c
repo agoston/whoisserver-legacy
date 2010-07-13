@@ -705,6 +705,50 @@ void RT_kc_gen_diff(RT_context_t* ctx, GList* attributes) {
 }
 
 /*+
+  RT_unmaintained_person - This person/role object is not maintained
+  RT_context_t* ctx - Context.
+  gchar* key - nic-hdl
+  gchar* type - person or role
+ +*/
+void RT_unmaintained_person(RT_context_t* ctx, gchar* key, const char *type) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"unmaintained_person");
+  rt_add_text_node(node, "key", key);
+  rt_add_text_node(node, "type", type);
+  rt_prepare_node(ctx, node);
+}
+
+/*+
+  RT_unmaintained_person_in_mntner - This person/role object referenced in the mntner
+                                     is not maintained
+  RT_context_t* ctx - Context.
+  gchar* key - nic-hdl
+  gchar* type - person or role
+  gchar* mntner - mntner name
+ +*/
+void RT_unmaintained_person_in_mntner(RT_context_t* ctx, gchar* key, const char *type, gchar* mntner) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"unmaintained_person_in_mntner");
+  rt_add_text_node(node, "key", key);
+  rt_add_text_node(node, "type", type);
+  rt_add_text_node(node, "mntner", mntner);
+  rt_prepare_node(ctx, node);
+}
+
+/*+
+  RT_startup - Person creation references a non existant mntner
+  RT_context_t* ctx - Context.
+ +*/
+void RT_startup(RT_context_t* ctx) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"startup");
+  rt_prepare_node(ctx, node);
+}
+
+/*+
   RT_inetnum_prefix_converted - The prefix on an inetnum range was converted to range (WARNING)
   RT_context_t* ctx - Context.
 

@@ -12,6 +12,7 @@ person:       test person
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP1-DB-TEST
+mnt-by:       TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
@@ -87,11 +88,25 @@ source:       DB-TEST
 %  Additional objects required for this test
 
 
+% person maintainer
+
+mntner:       PERSON-MNT
+descr:        Mntner for person objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         MD5-PW $1$NsvagbHL$tY49rj3wFgWpsbSySQBEc/   # test-person
+upd-to:       dbtest@ripe.net
+mnt-by:       PERSON-MNT
+referral-by:  PERSON-MNT
+changed:      dbtest@ripe.net 20081113
+source:       DB-TEST
+
 person:  Test Person
 address: Singel 258
 address: Amsterdam
 phone:   +31 20 535 4444
 nic-hdl: TP10-DB-TEST
+mnt-by:  PERSON-MNT
 changed: dbtest@ripe.net 20020101
 notify:  case002-1@ripe.net
 source:  DB-TEST

@@ -13,6 +13,7 @@ person:       test person
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP1-DB-TEST
+mnt-by:       TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
@@ -115,11 +116,25 @@ notify:       dbtest@ripe.net
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
+% person maintainer
+
+mntner:       PERSON-MNT
+descr:        Mntner for person objects.
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         MD5-PW $1$NsvagbHL$tY49rj3wFgWpsbSySQBEc/   # test-person
+upd-to:       dbtest@ripe.net
+mnt-by:       PERSON-MNT
+referral-by:  PERSON-MNT
+changed:      dbtest@ripe.net 20081113
+source:       DB-TEST
+
 person:       test person2
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP2-DB-TEST
-e-mail:				dbtest@ripe.net
+mnt-by:       PERSON-MNT
+e-mail:	      dbtest@ripe.net
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
@@ -127,6 +142,7 @@ person:       test person3
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP3-DB-TEST
+mnt-by:       PERSON-MNT
 e-mail:       dbtest@ripe.net
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST

@@ -3,7 +3,7 @@
 
   dbupdate
 
-  Status: NOT REVIEWED, NOT TESTED
+  Status: NOT REVIEWED
 
   Author(s):       Denis Walker
 

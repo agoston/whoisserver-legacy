@@ -1,0 +1,30 @@
+# basic-auth pn-mnt tests
+#
+# CASE 14: create inetnum object 80.16.151.184 - 80.16.151.191
+#          having mnt-routes with extensions which references
+#          unmaintained person 
+#
+# create inetnum object 
+#
+#SUCCESS
+#
+# RESULT 14: The creation will succeed.
+
+
+inetnum:      80.16.151.184 - 80.16.151.191
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+status:       ASSIGNED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-routes:   TEST-MNT {80.16.0.0/16^+, 80.16.0.0/16^-, 80.16.0.0/16^16, 80.16.0.0/16^16-24, 80.16.0.0/24}
+mnt-routes:   TEST-MNT ANY
+mnt-routes:   TEST-MNT {80.16.0.0/16, 80.16.0.0/16^+}
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20021111
+source:       DB-TEST
+
+
+password: hostmaster

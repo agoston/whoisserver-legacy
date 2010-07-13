@@ -19,6 +19,7 @@ person:       Test Person2
 address:      Singel
 phone:        +0123456789
 nic-hdl:      AUTO-1
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 
@@ -70,4 +71,5 @@ source:       DB-TEST
 
 
 password: auth
+password: test-person
 

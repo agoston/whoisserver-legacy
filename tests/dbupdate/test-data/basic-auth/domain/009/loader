@@ -12,6 +12,7 @@ person:       test person
 address:      Singel
 phone:        +0123456789
 nic-hdl:      TP1-DB-TEST
+mnt-by:       TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
@@ -121,13 +122,6 @@ nserver:      ns2.some.net
 mnt-by:       TEST-MNT
 mnt-lower:    TEST-MNT
 changed:      dbtest@ripe.net 20010101
-source:       DB-TEST
-
-person:       test person2
-address:      Singel
-phone:        +0123456789
-nic-hdl:      TP10-DB-TEST
-changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
 % End of loader data file

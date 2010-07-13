@@ -14,12 +14,15 @@
 #            will take the created nic-hdl from the second AUTO-1
 
 
+password: test-person
+
 role:         Test Role
 address:      Singel
 e-mail:       dbtest@ripe.net
 admin-c:      AUTO-1
 tech-c:       AUTO-1
 nic-hdl:      TR1-DB-TEST
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 
@@ -28,6 +31,7 @@ person:       Test Person2
 address:      Singel
 phone:        +0123456789
 nic-hdl:      AUTO-1
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 
@@ -36,5 +40,6 @@ person:       Test Person3
 address:      Singel
 phone:        +0123456789
 nic-hdl:      AUTO-1
+mnt-by:       PERSON-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST

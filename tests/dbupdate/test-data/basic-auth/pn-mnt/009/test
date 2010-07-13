@@ -1,0 +1,30 @@
+# basic-auth pn-mnt tests
+#
+# CASE 9: Delete a person and a role object
+#         without a mnt-by
+#
+# delete person and role objects
+#
+#SUCCESS
+#
+# RESULT 9: The deletions will succeed
+
+
+
+person:       Test Person2
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+delete:
+
+role:         Test Role1
+address:      Singel
+e-mail:       dbtest@ripe.net
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+nic-hdl:      TR1-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+delete:

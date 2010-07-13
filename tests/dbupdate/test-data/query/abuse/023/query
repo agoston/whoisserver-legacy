@@ -29,6 +29,7 @@ person:         test person2
 address:        Singel
 phone:          +0123456789
 nic-hdl:        TP2-DB-TEST
+mnt-by:       PERSON-MNT
 source:         DB-TEST
 
 
