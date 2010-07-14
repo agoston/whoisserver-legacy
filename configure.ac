@@ -368,6 +368,7 @@ AC_CONFIG_FILES([
   src/SQL/main.index.1
   src/SQL/create.last-history-indexes.sql.patch
   src/SQL/create.tables.sql.patch
+  src/SQL/dummification.sql.patch
   src/SQL/create.RIPADMIN.sql
   src/SQL/create.third-stage
   src/opl-perl/Makefile.PL
