@@ -1,4 +1,4 @@
-20090908 - version 3.6
+20100714 - version 3.8
 
 Changes:
 - mnt-by attribute is now mandatory in newly created or modified person and
@@ -7,7 +7,7 @@ have one or more mnt-by attributes defined (unless it is a deletion).
 
 
 Merged:
-- feature-nichdl-preservation
+- feature-denis-mandatory_mnt_by
 
 
 Installation notes:
