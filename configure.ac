@@ -1,10 +1,10 @@
 M4PATH=m4
 
 AC_PREREQ(2.59)
-AC_INIT([Whois Server], [3.7.0.1],
+AC_INIT([Whois Server], [3.8],
         [RIPE Database Management <ripe-dbm@ripe.net>],
         [whoisserver])
-AM_INIT_AUTOMAKE([whoisserver],[3.7.0.1])
+AM_INIT_AUTOMAKE([whoisserver],[3.8])
 
 PRODUCT=$PACKAGE_NAME
 VERSION=$PACKAGE_VERSION

@@ -1,4 +1,4 @@
-20100714 - version 3.8
+20100715 - version 3.8
 
 Changes:
 - mnt-by attribute is now mandatory in newly created or modified person and
