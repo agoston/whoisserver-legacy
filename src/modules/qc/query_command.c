@@ -1026,11 +1026,11 @@ Query_environ *QC_environ_new(char *ip, int sock) {
         ca_dbSource_t *hdl;
 
         for (i = 0; (hdl = ca_get_SourceHandleByPosition(i)) != NULL; i++) {
-            char *amrmrulez = ca_get_srcdeflook(hdl);
-            if (strcmp(amrmrulez, "y") == 0) {
+            char *deflook = ca_get_srcdeflook(hdl);
+            if (strcmp(deflook, "y") == 0) {
                 qe->sources_list = g_list_append(qe->sources_list, (void *) hdl);
             }
-            UT_free(amrmrulez);
+            UT_free(deflook);
         }
     }
 

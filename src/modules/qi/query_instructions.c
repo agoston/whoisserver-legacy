@@ -1376,7 +1376,7 @@ static void write_radix_immediate(GList *datlist, sk_conn_st *condat, acc_st *ac
 
         UT_free(datcpy->leafcpy.data_ptr);
 
-        AC_count_object(acc_credit, acl, 0 /* public object (private=0) */);
+        AC_count_object(acc_credit, acl, 0); /* public object (private=0) */
 
         if (condat->rtc != 0) {
             break;
@@ -1647,8 +1647,8 @@ static int qi_collect_domain(char *sourcename, SQ_connection_t *sql_connection, 
     int foundcount = 0;
     GString *sql_command;
 
-    /* we MUST NOT have a diconnection from the server here */
-    dieif(qe->condat.rtc != 0);
+    /* disconnection from the server */
+    if (qe->condat.rtc != 0) return 0;
 
     /* create a string for our queries */
     sql_command = g_string_sized_new(STR_XL);
@@ -2224,7 +2224,7 @@ int QI_execute(ca_dbSource_t *dbhdl, Query_instructions *qis, Query_environ *qe,
     } /* if recursive */
 
     /* find the irt objects (for -c) */
-    if (!sql_error && (qis->qc->c_irt_search == 1) && irt_inet_id) {
+    if (!sql_error && (qis->qc->c_irt_search) && irt_inet_id) {
         sql_error = qi_find_refs(&sql_connection, qe, Q_REC_IRT, "mnt_irt", "", id_table, irt_inet_id, irt_gid);
     }
 
