@@ -55,29 +55,29 @@
 #define RP_NOYETI  2
 #define RP_BADKEY  3
 
+/* generic data holder for radix trees */
 typedef struct {
-  rx_fam_t   fam;
-  ip_space_t space;
-  union {
-    ip_prefix_t rt;
-    ip_range_t  in;
-  } u;
+    rx_fam_t fam;       /* family: prefix, range, address */
+    ip_space_t space;   /* v4 or v6 */
+    union {
+        ip_prefix_t rt;
+        ip_range_t in;
+    } u;                /* data */
 } rp_uni_t;
 
 
-
-typedef ca_dbSource_t *  rp_regid_t;
-typedef A_Type_t  rp_attr_t;
+typedef ca_dbSource_t *rp_regid_t;
+typedef A_Type_t rp_attr_t;
 
 
 typedef struct {
-  rp_attr_t  type;
-  rp_uni_t   uni;  
-  sql_key_t  key;
-  union {
-      char *origin;
-      char *domain;
-  } d;
+    rp_attr_t type;     /* attribute type */
+    rp_uni_t uni;       /* data */
+    sql_key_t key;      /* object_id */
+    union {
+        char *origin;
+        char *domain;
+    } d;                /* ascii blob representation of data */
 } rp_upd_pack_t;
 
 #ifdef RP_IMPL

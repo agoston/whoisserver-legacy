@@ -2018,161 +2018,132 @@ exit_qi_collect_domain:
 
   ++++++++++++++++++++++++++++++++++++++*/
 static
-int
-qi_collect_ids(ca_dbSource_t *dbhdl,
-	       char *sourcename,
-	       SQ_connection_t **sql_connection,
-	       Query_instructions *qis,
-	       Query_environ *qe,
-	       char *id_table,
-	       GList **datlist,
-	       acc_st *acc_credit,
-	       acl_st *acl
-	       )
-{
-  Query_instruction **ins=NULL;
-  int i;
-  int  count, errors=0;
-  GString *sql_command;
-  int err;
-  char sub_table[64];
-  int limit ;
-             /* a limit on the max number of objects to be returned
-             from a single search. For some queries the object types
-             are not known at this stage, so the limit must be
-             the higher number of the two: private / public,
-             or unlimited if any of them is 'unlimited'.
-             */
-  char limit_str[32];
-  int sql_error;
+int qi_collect_ids(ca_dbSource_t *dbhdl, char *sourcename, SQ_connection_t **sql_connection, Query_instructions *qis, Query_environ *qe, char *id_table,
+        GList **datlist, acc_st *acc_credit, acl_st *acl) {
+    Query_instruction **ins = NULL;
+    int i;
+    int count, errors = 0;
+    GString *sql_command;
+    int err;
+    char sub_table[64];
+    int limit;
+    /* a limit on the max number of objects to be returned
+     from a single search. For some queries the object types
+     are not known at this stage, so the limit must be
+     the higher number of the two: private / public,
+     or unlimited if any of them is 'unlimited'.
+     */
+    char limit_str[32];
+    int sql_error;
 
-  /* use a nice resizing GString for our command */
-  sql_command = g_string_sized_new(STR_XL);
+    /* use a nice resizing GString for our command */
+    sql_command = g_string_sized_new(STR_XL);
 
-  if( (limit = AC_get_higher_limit(acc_credit,acl)) == -1) {
-    strcpy(limit_str,"");
-  } else {
-    sprintf(limit_str," LIMIT %d", limit+1); /* make sure we collect more
-						so that the client hits
-						the limit */
-  }
-
-  sprintf(sub_table, "%s_S ", id_table);
-
-  /* see if there was a leftover table from a crashed session
-   * (assume the ID cannot be currently in use)
-   *
-   * update: this can't ever happen with TEMPORARY tables, but we're going to
-   *         check for it anyway  - shane
-   */
-  g_string_sprintf(sql_command, "DROP TABLE IF EXISTS %s", sub_table);
-  if( SQ_execute_query(*sql_connection, sql_command->str, NULL) == -1 ) {
-      report_sql_error(&qe->condat, *sql_connection, sql_command->str);
-      return SQ_errno(*sql_connection);
-  }
-
-  /* create a table for special subqueries (domain only for now) */
-  g_string_sprintf(sql_command,
-                   "CREATE " TEMPORARY " TABLE %s ( id int ) TYPE=HEAP",
-                   sub_table);
-  if( SQ_execute_query(*sql_connection, sql_command->str, NULL) == -1 ) {
-      report_sql_error(&qe->condat, *sql_connection, sql_command->str);
-      return SQ_errno(*sql_connection);
-  }
-
-  /* Iterate through query instructions */
-  ins = qis->instruction;
-  sql_error = 0;
-  for (i=0; ins[i] != NULL && errors == 0; i++) {
-    Query_instruction *qi = ins[i];
-
-    /* check if the client is still there */
-    if( qe->condat.rtc ) {
-      break;
+    if ((limit = AC_get_higher_limit(acc_credit, acl)) == -1) {
+        strcpy(limit_str,"");
+    } else {
+        sprintf(limit_str," LIMIT %d", limit+1); /* make sure we collect more
+         so that the client hits
+         the limit */
     }
 
-    switch ( qi->search_type ) {
-    case R_SQL:
-      count = 0;
-      if ( qi->query_str != NULL ) {
+    sprintf(sub_table, "%s_S ", id_table);
 
-	/* handle special cases first */
-	if( Query[qi->queryindex].class == C_DN
-	    && Query[qi->queryindex].querytype == Q_LOOKUP ) {
+    /* see if there was a leftover table from a crashed session
+     * (assume the ID cannot be currently in use)
+     *
+     * update: this can't ever happen with TEMPORARY tables, but we're going to
+     *         check for it anyway  - shane
+     */
+    g_string_sprintf(sql_command, "DROP TABLE IF EXISTS %s", sub_table);
+    if (SQ_execute_query(*sql_connection, sql_command->str, NULL) == -1) {
+        report_sql_error(&qe->condat, *sql_connection, sql_command->str);
+        return SQ_errno(*sql_connection);
+    }
 
-	  /* if any more cases than just domain appear, we will be
-	     cleaning the _S table from the previous query here
+    /* create a table for special subqueries (domain only for now) */
+    g_string_sprintf(sql_command, "CREATE " TEMPORARY " TABLE %s ( id int ) TYPE=HEAP", sub_table);
+    if (SQ_execute_query(*sql_connection, sql_command->str, NULL) == -1) {
+        report_sql_error(&qe->condat, *sql_connection, sql_command->str);
+        return SQ_errno(*sql_connection);
+    }
 
-	     "DELETE FROM %s_S"
-	  */
+    /* Iterate through query instructions */
+    ins = qis->instruction;
+    sql_error = 0;
+    for (i = 0; ins[i] != NULL && errors == 0; i++) {
+        Query_instruction *qi = ins[i];
 
-	  count = qi_collect_domain(sourcename, *sql_connection, id_table,
-				    sub_table, qis, qe, qi, acc_credit,
-				    &sql_error);
-	} /* if class DN and Straight lookup */
-	else {
-	  /* any other class of query */
+        /* check if the client is still there */
+        if (qe->condat.rtc) {
+            break;
+        }
 
-	  g_string_sprintf(sql_command, "INSERT IGNORE INTO %s %s %s",
-		  id_table, qi->query_str, limit_str);
+        switch (qi->search_type) {
+        case R_SQL:
+            count = 0;
+            if (qi->query_str != NULL) {
 
-	  if(sql_execute_watched( &(qe->condat), sql_connection,
-				  sql_command->str, NULL) == -1 ) {
-	    errors++;
-	    sql_error = SQ_errno(*sql_connection);
-	    report_sql_error(&qe->condat, *sql_connection, sql_command->str);
-	  }
-	  count = SQ_get_affected_rows(*sql_connection);
-	} /* not DN */
-      } /* if SQL query not NULL */
+                /* handle special cases first */
+                if (Query[qi->queryindex].class == C_DN && Query[qi->queryindex].querytype == Q_LOOKUP) {
 
-      LG_log(qi_context, LG_DEBUG,
-		"%d entries added in %s query for %s",
-		count, Query[qi->queryindex].descr, qis->qc->keys
-		);
-      break;
+                    /* if any more cases than just domain appear, we will be
+                     cleaning the _S table from the previous query here
 
-    case R_RADIX:
+                     "DELETE FROM %s_S"
+                     */
 
+                    count = qi_collect_domain(sourcename, *sql_connection, id_table, sub_table, qis, qe, qi, acc_credit, &sql_error);
+                } /* if class DN and Straight lookup */
+                else {
+                    /* any other class of query */
 
-      err = RP_asc_search(qi->rx_srch_mode, qi->rx_par_a, 0,
-			  qi->rx_keys, dbhdl,
-			  Query[qi->queryindex].attribute,
-			  datlist, limit);
+                    g_string_sprintf(sql_command, "INSERT IGNORE INTO %s %s %s", id_table, qi->query_str, limit_str);
 
+                    if (sql_execute_watched(&(qe->condat), sql_connection, sql_command->str, NULL) == -1) {
+                        errors++;
+                        sql_error = SQ_errno(*sql_connection);
+                        report_sql_error(&qe->condat, *sql_connection, sql_command->str);
+                    }
+                    count = SQ_get_affected_rows(*sql_connection);
+                } /* not DN */
+            } /* if SQL query not NULL */
 
-      if( NOERR(err)) {
-        LG_log(qi_context, LG_DEBUG,
-		    "%d entries after %s (mode %d par %d reg %d) query for %s",
-		    g_list_length(*datlist),
-		    Query[qi->queryindex].descr,
-		    qi->rx_srch_mode, qi->rx_par_a,
-		    dbhdl,
-		    qi->rx_keys);
-      } /* NOERR */
-      else {
-        LG_log(qi_context, LG_INFO,
-		  "RP_asc_search returned %x ", err);
-      }
-      break;
+            LG_log(qi_context, LG_DEBUG, "%d entries added in %s query for %s", count, Query[qi->queryindex].descr, qis->qc->keys);
+            break;
 
-    default: die;
-    } /* switch */
+        case R_RADIX:
 
-  } /* for <every instruction> */
+            err = RP_asc_search(qi->rx_srch_mode, qi->rx_par_a, 0, qi->rx_keys, dbhdl, Query[qi->queryindex].attribute, datlist, limit);
 
-  /* Now drop the _S table */
-  g_string_sprintf(sql_command, "DROP TABLE IF EXISTS %s", sub_table);
-  if(SQ_execute_query(*sql_connection, sql_command->str, NULL) == -1 ) {
-      report_sql_error(&qe->condat, *sql_connection, sql_command->str);
-      sql_error = SQ_errno(*sql_connection);
-  }
+            if (NOERR(err)) {
+                LG_log(qi_context, LG_DEBUG, "%d entries after %s (mode %d par %d reg %d) query for %s", g_list_length(*datlist), Query[qi->queryindex].descr,
+                        qi->rx_srch_mode, qi->rx_par_a, dbhdl, qi->rx_keys);
+            } /* NOERR */
+            else {
+                LG_log(qi_context, LG_INFO, "RP_asc_search returned %x ", err);
+            }
+            break;
 
-  /* free our command buffer */
-  g_string_free(sql_command, TRUE);
+        default:
+            die
+            ;
+        } /* switch */
 
-  /* return success */
-  return sql_error;
+    } /* for <every instruction> */
+
+    /* Now drop the _S table */
+    g_string_sprintf(sql_command, "DROP TABLE IF EXISTS %s", sub_table);
+    if (SQ_execute_query(*sql_connection, sql_command->str, NULL) == -1) {
+        report_sql_error(&qe->condat, *sql_connection, sql_command->str);
+        sql_error = SQ_errno(*sql_connection);
+    }
+
+    /* free our command buffer */
+    g_string_free(sql_command, TRUE);
+
+    /* return success */
+    return sql_error;
 }
 
 

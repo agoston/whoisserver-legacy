@@ -339,17 +339,14 @@ int DF_attrcode_has_radix_lookup(A_Type_t attr)
 
 /* return the sql query to load the radix ipv4 tree for this attribute
    or NULL if no ipv4 radix is used for this attribute */
-char * DF_attrcode_radix_load_v4(A_Type_t attr)
-{
+char *DF_attrcode_radix_load_v4(A_Type_t attr) {
     int i;
 
-    for(i=0;
-	DF_radix_load[i].attr != -1 && DF_radix_load[i].family != -1;
-	i++) {
+    for (i = 0; DF_radix_load[i].attr != -1 && DF_radix_load[i].family != -1; i++) {
 
-	if( DF_radix_load[i].attr == attr ) {
-	    return DF_radix_load[i].ipv4_load;
-	}
+        if (DF_radix_load[i].attr == attr) {
+            return DF_radix_load[i].ipv4_load;
+        }
     }
     return NULL;
 }

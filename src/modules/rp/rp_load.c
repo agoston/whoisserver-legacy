@@ -174,13 +174,7 @@ static int RP_sql_load_attr_space(rp_attr_t attr, ip_space_t space, rp_regid_t r
 	const char *attr_code;
 	char *activity;
 
-	dieif(vu == NULL /* loading query undefined */ );
-#if 0
-	if (attr == A_IN && space == IP_V4) {
-		vu = "SELECT  object_id,begin_in,end_in FROM    inetnum WHERE   thread_id = 0 AND begin_in >= 3238002688 AND end_in < 3254779904 ";
-	}
-#endif
-
+	dieif(vu == NULL);  /* loading query undefined */
 	dieif(RP_tree_get(&mytree, reg_id, space, attr) != RP_OK);
 
 	LG_log(rp_context, LG_INFO, "loading using %s", vu);
