@@ -54,8 +54,8 @@ typedef enum _Q_Type_t {
 #include "rxroutines.h"
 
 typedef struct {
-  R_Type_t refer;
-  Q_Type_t querytype;
+  R_Type_t refer;       /* SQL, RADIX */
+  Q_Type_t querytype;   /* INVERSE, LOOKUP */
   WK_Type keytype;
   A_Type_t attribute;
   C_Type_t class;
