@@ -257,7 +257,7 @@ void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl
 		}
 			break;
 		case QC_Q_VERSION:
-			SK_cd_puts(&(qe->condat), "% RIP version " VERSION "\n\n");
+			SK_cd_puts(&(qe->condat), "% whois-server-" VERSION "\n\n");
 			break;
 		default:
 			/* EMPTY */
