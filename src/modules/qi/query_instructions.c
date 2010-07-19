@@ -2335,8 +2335,6 @@ static int valid_query(const Query_command *qc, const Query_t q) {
             switch (q.querytype) {
             case Q_INVERSE:
                 if (MA_isset(qc->inv_attrs_bitmap, q.attribute) && (q.class == C_ANY || MA_isset(qc->object_type_bitmap, (unsigned) q.class))) {
-                    /* EG 24/07/2003 Solved an inverse query problem, bug #200 */
-
                     result = 1;
                 }
                 break;
@@ -2450,12 +2448,13 @@ Query_instructions *QI_new(Query_command *qc, const Query_environ *qe) {
     }
     qis->instruction[i_no++] = NULL;
 
+//#if 0
     { /* tracing */
         char *descrstr = QI_queries_to_string(qis);
-
-        LG_log(qi_context, LG_DEBUG, "Queries: %s", descrstr);
+        fprintf(stderr, "Queries: %s\n", descrstr);
         UT_free( descrstr );
     }
+//#endif
 
     return qis;
 

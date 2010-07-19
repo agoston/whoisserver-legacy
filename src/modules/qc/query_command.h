@@ -94,7 +94,7 @@ typedef struct Query_command_t {
   int d;
   int fast;
   int g;
-  mask_t inv_attrs_bitmap;
+  mask_t inv_attrs_bitmap;      /* bitmap for -i flag */
   int recursive;
   int l;
   int m;
@@ -106,8 +106,8 @@ typedef struct Query_command_t {
   int L;
   int M;
   int R;
-  mask_t object_type_bitmap;
-  mask_t keytypes_bitmap;
+  mask_t object_type_bitmap;    /* bitmap for -T flag */
+  mask_t keytypes_bitmap;       /* bitmap for possible types for query key */
   char *keys;
 
   /* messages to return to the user about parsing problems */
