@@ -1336,12 +1336,12 @@ ip_rangesize_t IP_rang_span(ip_range_t *rangptr) {
 #define ad(which) (rangptr->which)
 
 /**************************************************************************/
-/*+ Decomposes a binary range into prefixes and appends them to the list.
+/* Decomposes a binary range into prefixes and appends them to the list.
  Allocates prefix structures and list elements, they must be freed
  after use.
 
  returns a bitmask of prefix lengths used.
- +*/
+*/
 unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist) {
     unsigned prefmask=0;
     register int slash=0;
@@ -1390,8 +1390,7 @@ unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist) {
 
         c_dif += 1; /* was not done earlier to protect from overflow */
 
-        for (slash=1; slash<32 && ((blk=((unsigned)0x80000000>>(slash-1))) & c_dif) == 0; slash++) {
-        }
+        for (slash=1; slash<32 && ((blk=((unsigned)0x80000000>>(slash-1))) & c_dif) == 0; slash++);
 
         /* clear all digits in a and b under the blk one. */
         ff=blk-1;
@@ -1437,14 +1436,11 @@ unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist) {
 
 /***************************************************************************/
 
-/*+ Similar name, slightly different code, totally different functionality.
-
+/*
  finds the smallest canonical block encompassing the whole given range,
  then MODIFIES the range pointed to by the argument
  so that it's equal to this block.
-
- +*/
-
+*/
 void IP_rang_encomp(ip_range_t *rangptr) {
     int slash=0;
     unsigned c_dif, blk, ff, t_dif;

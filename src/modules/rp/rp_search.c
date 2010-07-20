@@ -518,9 +518,10 @@ int
 	ip_prefix_t beginpref;
 
 	/*  abort on error (but unlock the tree) */
-	LG_log(rp_context, LG_DEBUG,
-		"RP_NEW_asc_search:  query %s : mode %d (%s) (par %d) for %s",
+//#if 0
+	fprintf(stderr, "RP_NEW_asc_search:  query %s : mode %d (%s) (par %d) for %s\n",
 		DF_get_attribute_name(attr), search_mode, RX_text_srch_mode(search_mode), par_a, key);
+//#endif
 
 	/* parse the key into a prefix list */
 	if (!NOERR(err = IP_smart_conv(key, 0, 0, &preflist, IP_EXPN, &key_type))) {

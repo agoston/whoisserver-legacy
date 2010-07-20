@@ -1416,7 +1416,7 @@ static int map_qc2rx(Query_instruction *qi, const Query_command *qc) {
     if (allflags > 1) {
         /* user error  (this should have been checked before) */
 
-        LG_log(qi_context, LG_INFO, "ERROR in qc2rx mapping: bad combination of flags");
+        LG_log(qi_context, LG_ERROR, "ERROR in qc2rx mapping: bad combination of flags");
         result = 0;
     }
     if (allflags == 0) {
@@ -2427,7 +2427,6 @@ Query_instructions *QI_new(Query_command *qc, const Query_environ *qe) {
                         Query_instruction *qij = qis->instruction[j];
 
                         if (qij->search_type == R_RADIX && Query[qij->queryindex].attribute == Query[tmp_qi.queryindex].attribute) {
-
                             found = 1;
                             break;
                         }
