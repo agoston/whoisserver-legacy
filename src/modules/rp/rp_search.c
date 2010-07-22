@@ -446,7 +446,7 @@ int max_count /*+ max # of answers. RX_ALLANS == unlimited + */
 
     /*  abort on error (but unlock the tree) */
     //#if 0
-    fprintf(stderr, "RP_NEW_asc_search:  query %s : mode %d (%s) (par %d) for %s\n", DF_get_attribute_name(attr), search_mode, RX_text_srch_mode(search_mode),
+    fprintf(stderr, "RP_asc_search:  query %s : mode %d (%s) (par %d) for %s\n", DF_get_attribute_name(attr), search_mode, RX_text_srch_mode(search_mode),
             par_a, key);
     //#endif
 

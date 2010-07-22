@@ -145,7 +145,7 @@ display_file(sk_conn_st *condat, char *filename)
 
   ++++++++++++++++++++++++++++++++++++++*/
 static
-void pw_log_query( Query_environ *qe,
+void pw_log_query(Query_environ *qe,
 		   Query_command *qc,
 		   acc_st *copy_credit,
 		   ut_timer_t begintime,
@@ -155,9 +155,11 @@ void pw_log_query( Query_environ *qe,
 {
   char *qrystat = AC_credit_to_string(copy_credit);
   float elapsed;
-  char *qrytypestr =
-    qc->query_type == QC_REAL ? "" : QC_get_qrytype(qc->query_type);
+  char *qrytypestr = "";
 
+  if (qc && (qc->query_type != QC_REAL)) {
+      qrytypestr = QC_get_qrytype(qc->query_type);
+  }
 
   elapsed = UT_timediff( &begintime, &endtime);
 
@@ -497,11 +499,7 @@ void PW_log_denied_query(Query_environ *qe, Query_command *qc, char *hostaddress
   ut_timer_t begintime;
   ut_timer_t endtime;
 
-  /* this is to determine if query command structure was passed or not */
-  Query_command *qc_pass = NULL;
-
   /* denied queries are so short! - count begin time and enrd time. */
-
   UT_timeget(&begintime);
   UT_timeget(&endtime);
 
@@ -511,26 +509,8 @@ void PW_log_denied_query(Query_environ *qe, Query_command *qc, char *hostaddress
   /* this will give us <0+0+0 **DENIED **>, as we return NO objects */
   tmp_acc.denials = 1;
 
-  /* is query command structure passed as argument? */
-  if (qc == NULL)  {
-    /* no, create a new structure */
-    qc = QC_create(input, qe);
-  }
-  else  {
-   /* yes, use the passed one */
-   qc_pass = qc;
-  }
-
   /* LOG */
   pw_log_query(qe, qc, &tmp_acc, begintime, endtime, hostaddress, input);
-
-  /* free memory if it was allocated in this function */
-  /* nothing passed? free local structure qc */
-  if (qc_pass == NULL)  {
-    QC_free(qc);
-  }
-  /* otherwise qc is freed in the upper function */
-
 }
 
 

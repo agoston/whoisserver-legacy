@@ -34,7 +34,7 @@
 If any IP reg exps change - check whois cgi which has a copy
 *******************************************/
 
-#define WK_REXP_DOMAINNAME "^[ ]*[a-zA-Z0-9/-]*(\\.[a-zA-Z0-9-]+)*\\.?[ ]*$"
+#define WK_REXP_DOMAINNAME "^[a-zA-Z0-9/-]*(\\.[a-zA-Z0-9-]+)*\\.?$"
 /* add a constraint: there must be at least one character in the domain name
    because the TLD must not be composed of digits only */
 #define WK_REXP_DOMAINALPHA  "[a-zA-Z]"

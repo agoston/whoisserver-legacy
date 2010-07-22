@@ -355,7 +355,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
     int num_flags;
     int num_client_ip;
 
-    gboolean is_ip_key;
+    gboolean is_ip_key, is_rdns_key;
     gboolean fixed_lookup;
     char lookup[64];
 
@@ -876,15 +876,30 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
 
         /* XXX: missing checks for "-i" and "-T" versus key types */
 
-        is_ip_key = MA_isset(query_command->keytypes_bitmap, WK_IPADDRESS) || MA_isset(query_command->keytypes_bitmap,
-                                                                                       WK_IPRANGE)
-                || MA_isset(query_command->keytypes_bitmap, WK_IPPREFIX) || MA_isset(query_command->keytypes_bitmap,
-                                                                                     WK_IP6PREFIX);
+        is_ip_key = MA_isset(query_command->keytypes_bitmap, WK_IPADDRESS)
+                || MA_isset(query_command->keytypes_bitmap, WK_IPRANGE)
+                || MA_isset(query_command->keytypes_bitmap, WK_IPPREFIX)
+                || MA_isset(query_command->keytypes_bitmap, WK_IP6PREFIX);
+
+        {   /* determine if is_rdns_key */
+            ip_prefix_t ign;
+
+            is_rdns_key = MA_isset(query_command->keytypes_bitmap, WK_DOMAIN);
+
+            if (IP_revd_t2b(&ign, query_command->keys, IP_EXPN) != IP_OK)
+                is_rdns_key = FALSE;
+        }
 
         /* check for use of IP flags on non-IP lookups */
-        if ((ip_flag_used || query_command->d) && !is_ip_key) {
+        if ((ip_flag_used || query_command->d) && !(is_ip_key || is_rdns_key)) {
             /* WARNING:902, meaningless IP flag */
             query_command->parse_messages = g_list_append(query_command->parse_messages, ca_get_qc_uselessipflag);
+        }
+
+        /* check for use of -d flag on revd lookups */
+        if (query_command->d && is_rdns_key) {
+            /* WARNING:903, meaningless -d flag */
+            query_command->parse_messages = g_list_append(query_command->parse_messages, ca_get_qc_uselessdflag);
         }
 
         /* check for "fixed" lookups on IP addresses */
@@ -937,14 +952,10 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
              get returned from radix tree. EG 2003-08-07 */
             UT_free(query_command->keys);
             query_command->keys = g_strdup(lookup);
-
             UT_free(fmt);
         }
 
-        /* -d handling: if the keytype is IPv4/v6 address/prefix/range, then
-         exclude the domains unless -d is set
-         XXX this must be kept in sync with new types */
-        /* XXX: do we want this?  what's the point?!?!? - shane */
+        /* exclude revdns if no -d is used */
         if (is_ip_key && !query_command->d) {
             MA_set(&(query_command->object_type_bitmap), C_DN, 0);
         }
@@ -954,9 +965,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
             query_command->parse_messages = g_list_append(query_command->parse_messages, ca_get_qc_uselessnorefflag);
         }
 
-        /* check if the domain query contains a dot at the end, remove if
-         * any
-         * WARNING:906 */
+        /* check if the domain query contains a dot at the end, remove if any WARNING:906 */
         if (MA_isset(query_command->keytypes_bitmap, WK_DOMAIN)) {
             char *domain_dot = strrchr(query_command->keys, '.');
             if ((domain_dot != NULL) && (strcmp(domain_dot, ".") == 0)) {
