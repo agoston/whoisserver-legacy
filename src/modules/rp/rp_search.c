@@ -437,7 +437,6 @@ int max_count /*+ max # of answers. RX_ALLANS == unlimited + */
     int err;
     ip_range_t testrang;
     int locked = 0;
-    ip_keytype_t key_type;
     ip_space_t spc_id;
     rx_fam_t fam_id = RP_attr2fam(attr);
     rx_tree_t *mytree;
@@ -451,13 +450,13 @@ int max_count /*+ max # of answers. RX_ALLANS == unlimited + */
     //#endif
 
     /* parse the key into a prefix list */
-    if (!NOERR(err = IP_smart_conv(key, 0, 0, &preflist, IP_EXPN, &key_type))) {
+    if (!NOERR(err = IP_smart_conv(key, 0, 0, &preflist, IP_EXPN, NULL))) {
         /* operational trouble (UT_*) or invalid key (IP_INVARG) */
         return err;
     }
 
     /* set the test values */
-    IP_smart_range(key, &testrang, IP_EXPN, &key_type);
+    IP_smart_range(key, &testrang, IP_EXPN, NULL);
 
     /* find the tree */
     /* I took out the surrounding "if" because it is always taken when
