@@ -1534,34 +1534,6 @@ int IP_pref_2_rang(ip_range_t * rangptr, ip_prefix_t * prefptr) {
 
 #undef ad
 
-/* IP_OK assumes a classful range!!! */
-int IP_rang_2_pref(ip_range_t * rangptr, ip_prefix_t * prefptr) {
-    /* begin ^ end = inverted mask */
-    //
-    //	ip_addr_t res;
-    //	int i;
-    //	int k;
-    //	unsigned len = 0;
-    //
-    //	prefptr->ip = rangptr->begin;
-    //
-    //	for (i = 3; i >= 0; i--) {
-    //		for (k = 31; k >= 0; k--) {
-    //			/* check bit number k */
-    //			if (((rangptr->begin.words[i] >> k) & 1) ^ ((rangptr->end.words[i] >> k) & 1) == 0) {
-    //				len++;
-    //			}
-    //		}
-    //	}
-    //
-    //	prefptr->bits = len;
-    //	return IP_OK;
-
-    /* I decided to deprecate this function as it's unoptimized, unused and buggy - agoston, 2006-09-13 */
-    die;
-    return IP_OK;
-}
-
 /***************************************************************************/
 
 /*+

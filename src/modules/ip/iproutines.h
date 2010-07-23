@@ -202,7 +202,6 @@ int IP_pref_b2a(ip_prefix_t * prefptr, char *ascaddr, unsigned strmax);
 int IP_rang_b2a(ip_range_t * rangptr, char *ascaddr, unsigned strmax);
 int IP_rang_classful(ip_range_t * rangptr, ip_addr_t * addrptr);
 int IP_pref_2_rang(ip_range_t * rangptr, ip_prefix_t * prefptr);
-int IP_rang_2_pref(ip_range_t * rangptr, ip_prefix_t * prefptr);
 int IP_addr_b2a_uncompress(ip_addr_t * binaddr, char *ascaddr, unsigned strmax);
 
 /* utility functions: testers/converters */
