@@ -1625,17 +1625,19 @@ int IP_rang_classful(ip_range_t *rangptr, ip_addr_t *addrptr) {
     return IP_OK;
 }
 
-/***************************************************************************/
-/*+
- Trying to be smart :-) and convert a query search term into prefix(es),
- regardless of whether specified as IP address, prefix or range.
+/*
+Convert a query search term into prefix(es),
+regardless of whether specified as IP address, prefix, range or reverse domain.
 
- justcheck - if just checking the syntax (justcheck == 1),
- then the prefixes are freed before the function returns,
- otherwise it is the responsibility of the caller to free the list.
+key          input string (or query key)
+justcheck    no return value, just checking syntax
+encomp       range should be encompassed by smallest possible prefix (results in a single prefix returned)
+preflist     returned GList consisting of ip_prefix_t
+expf         IP expansion mode
+keytype      identified key type (can be NULL)
 
- +*/
-
+It is the responsibility of the caller to free preflist (unless justcheck is set)
+*/
 int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp_t expf, ip_keytype_t *keytype) {
     int free_it;
     int err=IP_OK; /* let's be optimistic :-) */
@@ -1653,9 +1655,9 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
     /*XXX inconsistent perfix/length is excused. Later we will warn people */
     err = IP_pref_t2b(querypref, key, expf);
     if (NOERR(err)) {
-        *keytype = IPK_PREFIX;
+        if (keytype) *keytype = IPK_PREFIX;
 
-        if (justcheck == 0) {
+        if (!justcheck) {
             *preflist = g_list_append(*preflist, querypref);
         }
     } else {
@@ -1663,13 +1665,12 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
         /* Maybe an IP ? */
         err = IP_addr_t2b( &(querypref->ip), key, expf);
         if (NOERR(err)) {
-
-            *keytype = IPK_IP;
+            if (keytype) *keytype = IPK_IP;
 
             /*convert to a /32 or /128*/
             querypref->bits = IP_sizebits(querypref->ip.space);
 
-            if (justcheck == 0) {
+            if (!justcheck) {
                 *preflist = g_list_append(*preflist, querypref);
             }
         } else {
@@ -1681,25 +1682,33 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
 
             err = IP_rang_t2b(&myrang, key, expf);
             if (NOERR(err)) {
-                /* Wow. Great.  */
-
-                *keytype = IPK_RANGE;
+                if (keytype) *keytype = IPK_RANGE;
 
                 /* sometimes (exless match) we look for the first bigger(shorter)  */
                 /* prefix containing this range. */
-
                 if (encomp) {
                     IP_rang_encomp(&myrang);
                 }
+
                 /* OK, now we can let the engine happily find that there's just one */
                 /* prefix in range */
-
-                if (justcheck == 0) {
+                if (!justcheck) {
                     IP_rang_decomp(&myrang, preflist);
                 }
             } else {
-                *keytype = IPK_UNDEF;
-                err = IP_INVARG; /* "conversion error" */
+                /* check for reverse domain */
+                err = IP_revd_t2b(querypref, key, expf);
+                if (NOERR(err)) {
+                    if (keytype) *keytype = IPK_REVD;
+
+                    if (!justcheck) {
+                        *preflist = g_list_append(*preflist, querypref);
+                    }
+                } else {
+                    /* unknown key */
+                    *keytype = IPK_UNDEF;
+                    err = IP_INVARG; /* "conversion error" */
+                }
             }
         }
     }
@@ -1711,7 +1720,8 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
     return err;
 }
 
-/* convert whatever comes into a range */
+/* convert whatever comes into a range
+ * keytype can be NULL */
 int IP_smart_range(char *key, ip_range_t * rangptr, ip_exp_t expf, ip_keytype_t * keytype) {
     int err = IP_OK;
     GList *preflist= NULL;
@@ -1719,7 +1729,7 @@ int IP_smart_range(char *key, ip_range_t * rangptr, ip_exp_t expf, ip_keytype_t 
     /* first : is it a range ? */
 
     if (NOERR(err = IP_rang_t2b(rangptr, key, expf))) {
-        *keytype = IPK_RANGE;
+        if (keytype) *keytype = IPK_RANGE;
     } else {
         /* OK, this must be possible to convert it to prefix and from there
          to a range. */
