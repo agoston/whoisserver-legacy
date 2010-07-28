@@ -200,14 +200,24 @@ parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj, ...)
   }
 }
 
-gboolean
-has_rir_mntner (const rpsl_object_t *obj)
+/* Find all the mntners in the mnt-by attributes of the object.
+   Get a list of the RIR mntners from the config file.
+   Compare the lists.
+   If we find a match then this object does have an RIR mntner.
+   Then check if an RIR mntner has authorised this update.
+   Return AU_AURTHORISED or not
+ */
+
+AU_ret_t
+has_rir_mntner (au_plugin_callback_info_t *info, const rpsl_object_t *obj)
 {
+  AU_ret_t ret_val;
   char *alloc_mntner_str;
   char **alloc_mntner_list = NULL;
   int alloc_idx;
 
   GList *mntners;
+  GList *rir_mntner_list = NULL;
   GList *p;
 
   gboolean rir_mntner_found;
@@ -218,33 +228,48 @@ has_rir_mntner (const rpsl_object_t *obj)
   mntners = rpsl_object_get_attr(obj, "mnt-by");
   rpsl_attr_split_multiple(&mntners);
 
+  /* make the mntner list unique */
+  rpsl_attr_uniq_list(&mntners);
+
   /* get the list of ALLOCMNT mntner names */
   alloc_mntner_str = ca_get_allocmnt;
   assert(alloc_mntner_str != NULL);  /* there should always be at least one */
   /* split the alloc_mntner_str on comma */
   alloc_mntner_list = g_strsplit_set(alloc_mntner_str, ",\n", 0);
 
-  /* compare the two lists and look for a match */
+  /* compare all elements of the two lists and look for a match */
   rir_mntner_found = FALSE;
-  for (alloc_idx = 0; alloc_mntner_list[alloc_idx] != NULL && !rir_mntner_found; alloc_idx++)
+  for (alloc_idx = 0; alloc_mntner_list[alloc_idx] != NULL; alloc_idx++)
   {
     g_strstrip(alloc_mntner_list[alloc_idx]);
-    for (p=mntners; (p != NULL) && !rir_mntner_found; p = g_list_next(p))
+    for (p=mntners; p != NULL; p = g_list_next(p))
     {
       LG_log(au_context, LG_DEBUG, "has_rir_mntner: comparing mnt-by: %s with ALLOCMNT %s",
         rpsl_attr_get_value(p->data), alloc_mntner_list[alloc_idx]);
       if (strcasecmp(rpsl_attr_get_value(p->data), alloc_mntner_list[alloc_idx]) == 0)
       {
+        LG_log(au_context, LG_DEBUG, "has_rir_mntner: valid rir mntner found");
         rir_mntner_found = TRUE;
+        rir_mntner_list = g_list_prepend(rir_mntner_list, p->data);
       }
     }
   }
+
+  ret_val = AU_UNAUTHORISED_CONT; /* the default */
+  if (rir_mntner_found)
+  {
+    /* now check the authorisation is by one of the rir mntners */
+    ret_val = au_rir_auth_check(info, obj, rir_mntner_list);
+  }
+  /* rir_mntner_list elements are pointers to elements of mntners,
+     so only free one of them */
   rpsl_attr_delete_list(mntners);
   g_strfreev(alloc_mntner_list);
 
+  /* return the result */
   LG_log(au_context, LG_FUNC, "<has_rir_mntner: exiting with value [%s]",
-            rir_mntner_found ? "TRUE" : "FALSE");
-  return rir_mntner_found;
+         AU_ret2str(ret_val));
+  return ret_val;
 }
 
 
@@ -311,14 +336,9 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
         (strncmp(old_status, "ALLOCATED ", 10) != 0))
     {
       LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: ALLOCATED");
-      if (has_rir_mntner(info->obj))
-      {
-        ret_val = AU_AUTHORISED;
-      }
-      else
+      if ( (ret_val=has_rir_mntner(info, info->obj)) != AU_AUTHORISED )
       {
         RT_status_check_failed_allocated(info->ctx);
-        ret_val = AU_UNAUTHORISED_CONT;
         LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: status ALLOCATED can only be set by hostmaster");
       }
     }
@@ -385,36 +405,34 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
       if ( strcmp(old_status, "") != 0 )
       {
         /* ASSIGNED ANYCAST can only be set on object creation,
-	   not on modification */
-        RT_status_check_failed_anycast_modify(info->ctx);
+        not on modification */
         ret_val = AU_UNAUTHORISED_CONT;
+        RT_status_check_failed_anycast_modify(info->ctx);
         LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status to ASSIGNED ANYCAST");
       }
       else
       {
-	if ( ! has_rir_mntner(info->obj))
-	{
+        if ( (ret_val=has_rir_mntner(info, info->obj)) != AU_AUTHORISED)
+        {
           RT_status_check_failed_anycast_rir(info->ctx);
-          ret_val = AU_UNAUTHORISED_CONT;
           LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: status ASSIGNED ANYCAST can only be set by hostmaster");
-	}
-	else
-	{
-	  parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
+        }
+        else
+        {
+          parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
                              "ALLOCATED PI", "ALLOCATED UNSPECIFIED", NULL);
 
-	  if (parent_status_ok)
-	  {
-            ret_val = AU_AUTHORISED;
-            LG_log(au_context, LG_ERROR, "ripe_inetnum_checks: parent status check ok");
-	  }
-	  else
-	  {
+          if (parent_status_ok)
+          {
+             LG_log(au_context, LG_ERROR, "ripe_inetnum_checks: parent status check ok");
+          }
+          else
+          {
             /* note that the RT logging is done by parent_status_is_valid() */
             ret_val = AU_UNAUTHORISED_CONT;
             LG_log(au_context, LG_ERROR, "ripe_inetnum_checks: parent status check failed");
-	  }
-	}
+          }
+        }
       }
     }
     /* changing to EARLY-REGISTRATION */
@@ -503,7 +521,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
 /**
  * \brief IPv6 Address Assignment Business Logic Checks
  *
- * Check that the status is only set on creation;
+ * Check that the status is only set on creation (ASSIGNED ANYCAST or ASSIGNED PI);
  * Check that the object is only created by the hostmaster;
  * Check that the parent status is ALLOCATED-BY-RIR;
  *
@@ -518,11 +536,11 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
  * \returns AU_UNAUTHORISED_CONT in case the desired change is against some of those business rules.
  *
  */
-gboolean
+AU_ret_t
 au_v6_assigned_check ( RT_context_t * rt_context, LG_context_t *au_context, char* old_status, 
-                       char* new_status, rpsl_object_t * object, char* status )
+                       char* new_status, rpsl_object_t * object, char* status, au_plugin_callback_info_t *info )
 {
-  int ret_val = AU_AUTHORISED;
+  AU_ret_t ret_val = AU_UNAUTHORISED_CONT;
   gboolean parent_status_ok;
 
   LG_log(au_context, LG_FUNC, ">au_v6_assigned_check: entered.");
@@ -532,15 +550,13 @@ au_v6_assigned_check ( RT_context_t * rt_context, LG_context_t *au_context, char
   {
     /* status can only be set on object creation, not on modification */
     RT_status_check_failed_modify( rt_context, status );
-    ret_val = AU_UNAUTHORISED_CONT;
     LG_log(au_context, LG_DEBUG, "au_v6_assigned_check: trying to modify status to %s", status );
   }
   else
   {
-    if ( ! has_rir_mntner(object))
+    if ( (ret_val=has_rir_mntner(info, object)) != AU_AUTHORISED )
     {
       RT_status_check_failed_rir(rt_context, status);
-      ret_val = AU_UNAUTHORISED_CONT;
       LG_log(au_context, LG_DEBUG, "au_v6_assigned_check: status %s can only be set by hostmaster", status);
     }
     else
@@ -549,7 +565,6 @@ au_v6_assigned_check ( RT_context_t * rt_context, LG_context_t *au_context, char
 
       if (parent_status_ok)
       {
-        ret_val = AU_AUTHORISED;
         LG_log(au_context, LG_ERROR, "au_v6_assigned_check: parent status check ok");
       }
       else
@@ -561,7 +576,8 @@ au_v6_assigned_check ( RT_context_t * rt_context, LG_context_t *au_context, char
     }
   }
 
-  LG_log(au_context, LG_FUNC, "<au_v6_assigned_check: exiting.");
+  LG_log(au_context, LG_FUNC, "<au_v6_assigned_check: exiting with value [%s]",
+         AU_ret2str(ret_val));
   return ret_val;
 }
 
@@ -633,7 +649,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
       }
     }
 
-    /// XXX: This must be transformed in a assertion list, so we can get rid of the if-else-if chain
+    /// XXX: This must be transformed in a case statement, so we can get rid of the if-else-if chain
 
     /* changing from ASSIGNED ANYCAST not allowed */
     if ((strcmp(new_status, "ASSIGNED ANYCAST") != 0) &&
@@ -641,13 +657,13 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
     {
       RT_status_check_failed_anycast_modify(info->ctx);
       ret_val = AU_UNAUTHORISED_CONT;
-      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED ANYCAST");
+      LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: trying to modify status from ASSIGNED ANYCAST");
     }
     /* changing to ASSIGNED ANYCAST */
     else if ((strcmp(new_status, "ASSIGNED ANYCAST") == 0) &&
              (strcmp(old_status, "ASSIGNED ANYCAST") != 0))
     {
-      ret_val = au_v6_assigned_check( info->ctx, au_context, old_status, new_status, info->obj, "ASSIGNED ANYCAST" );
+      ret_val = au_v6_assigned_check( info->ctx, au_context, old_status, new_status, info->obj, "ASSIGNED ANYCAST", info );
     }
     /* changing from ASSIGNED PI not allowed */
     else if ((strcmp(new_status, "ASSIGNED PI") != 0) &&
@@ -655,23 +671,22 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
     {
       RT_status_check_failed_modify(info->ctx, "ASSIGNED PI");
       ret_val = AU_UNAUTHORISED_CONT;
-      LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED PI");
+      LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: trying to modify status from ASSIGNED PI");
     }
     /* changing to ASSIGNED PI */
     else if ((strcmp(new_status, "ASSIGNED PI") == 0) &&
              (strcmp(old_status, "ASSIGNED PI") != 0))
     {
-      ret_val = au_v6_assigned_check( info->ctx, au_context, old_status, new_status, info->obj, "ASSIGNED PI" );
+      ret_val = au_v6_assigned_check( info->ctx, au_context, old_status, new_status, info->obj, "ASSIGNED PI", info );
     }
     /* changing to ALLOCATED-BY-RIR */
     else if ((strcmp(new_status, "ALLOCATED-BY-RIR") == 0) &&
         (strcmp(old_status, "ALLOCATED-BY-RIR") != 0))
     {
       LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: ALLOCATED-BY-RIR");
-      if ( ! has_rir_mntner(info->obj) )
+      if ( (ret_val=has_rir_mntner(info, info->obj)) !=  AU_AUTHORISED )
       {
         RT_status_check_failed_allocbyrir(info->ctx);
-        ret_val = AU_UNAUTHORISED_CONT;
         LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: status ALLOCATED-BY-RIR can only be set by hostmaster");
       }
       else
@@ -679,11 +694,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
         LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: has RIPE NCC maintainer");
         parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
           "ALLOCATED-BY-RIR", NULL);
-        if (parent_status_ok)
-        {
-          ret_val = AU_AUTHORISED;
-        }
-        else
+        if ( ! parent_status_ok )
         {
           /* note that the RT logging is done by parent_status_is_valid() */
           ret_val = AU_UNAUTHORISED_CONT;

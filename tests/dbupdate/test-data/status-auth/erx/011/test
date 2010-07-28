@@ -4,14 +4,12 @@
 # and change the
 # status from EARLY-REGISTRATION to ALLOCATED PA 
 # no override and no HM password
-%
-% requires initial objects to be loaded
 #
 # modify inetnum object
 #
-#SUCCESS
+#Failure
 #
-# RESULT 11: modification will succeed
+# RESULT 11: modification will fail
 
 inetnum:      192.168.128.0 - 192.168.255.255
 netname:      RIPE-NET1

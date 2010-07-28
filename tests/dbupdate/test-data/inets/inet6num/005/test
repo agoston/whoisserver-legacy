@@ -2,7 +2,7 @@
 # with some spaces
 # should be rejected to syntax error
 #
-# create inetnum object 
+# create inet6num object 
 #
 #FAILURE
 #

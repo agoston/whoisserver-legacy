@@ -323,3 +323,14 @@
 # rir AFRINIC
 
 
+# CASE 29: We try to modify inetnum object 80.16.151.184 - 80.16.151.184
+# with status ASSIGNED PA and change it to status ALLOCATED PA
+# with hostmaster mntner added but not with hostmaster password
+#
+# modify inetnum object 
+#
+#FAILURE
+#
+# RESULT 29: The modification will fail.
+
+
