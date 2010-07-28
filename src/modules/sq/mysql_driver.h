@@ -44,6 +44,11 @@
 #define SQ_CTCONN   1
 #define SQ_NORES    2
 
+/* Error codes for SQ_errno() - currently maps to MySQL error codes */
+// Message: Duplicate entry '%s' for key %d
+#define SQ_ERR_DUPLICATE_ENTRY 1062
+
+
 #define SQ_connection_t MYSQL
 #define SQ_result_set_t MYSQL_RES
 

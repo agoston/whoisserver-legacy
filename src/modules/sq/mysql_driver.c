@@ -931,28 +931,10 @@ char *SQ_error(SQ_connection_t *sql_connection) {
 	return (char*)mysql_error(sql_connection);
 } /* SQ_error() */
 
-/* SQ_errno() */
-/*++++++++++++++++++++++++++++++++++++++
-  Get the error number for the last error.
-
-  SQ_connection_t *sql_connection The connection to the database.
-
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+     <LI><A HREF="http://www.tcx.se/Manual/manual.html#mysql_free_result">mysql_free_result()</A>
-  +html+ </UL></DL>
-
-  ++++++++++++++++++++++++++++++++++++++*/
+/* Get the error number for the last SQL statement. */
 int SQ_errno(SQ_connection_t *sql_connection) {
-
   return mysql_errno(sql_connection);
-
-} /* SQ_errno() */
+}
 
 /************************************************************
  * get_minmax_id()                                           *
