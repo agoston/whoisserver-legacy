@@ -43,7 +43,7 @@
 struct {
     int key_type;		/* identifier for key, e.g. WK_RTRSET */
     char *pattern;		/* string for regular expression */
-    regex_t regex;		/* regular expression */
+    regex_t regex;		/* compiled regular expression */
 } wk_regex_list[] = {
     { WK_NIC_HDL,       WK_REXP_NICHANDLE },
     { WK_EMAIL,         WK_REXP_EMAIL },
@@ -69,136 +69,60 @@ struct {
     { WK_FINGERPR,      WK_REXP_FINGERPR },
     { WK_ORG_ID,        WK_REXP_ORG_ID },
     { WK_DS_RDATA,      WK_REXP_DS_RDATA },
-    { WK_AUTH,          WK_REXP_AUTH }
+    { WK_AUTH,          WK_REXP_AUTH },
+    { WK_REVDOMAIN,     WK_REXP_REVDOMAINNAME }
 };
 #define WK_REGEX_LIST_LEN  (sizeof(wk_regex_list)/sizeof(wk_regex_list[0]))
-
-/* regular expressions used by wk_is_name() */
-static regex_t ipaddress;
-static regex_t ipprefix;
-static regex_t validip6prefix;
-
-/* regular expressions used by WK_is_aut_num() */
-static regex_t aut_num;
 
 /* regular expression used by isdomname() */
 static regex_t domainname;
 static regex_t domainalpha;
 
 /* initialize regular expressions */
-void wk_regex_init ()
-{
+void wk_regex_init() {
     int i;
     int errcode;
 
     /* initialize our table */
-    for (i=0; i<WK_REGEX_LIST_LEN; i++) {
-        errcode = regcomp(&wk_regex_list[i].regex,
-	                  wk_regex_list[i].pattern,
-		          REG_EXTENDED|REG_NOSUB);
+    for (i = 0; i < WK_REGEX_LIST_LEN; i++) {
+        errcode = regcomp(&wk_regex_list[i].regex, wk_regex_list[i].pattern, REG_EXTENDED | REG_NOSUB);
         dieif(errcode != 0);
     }
 
     /* add some special cases used by our other functions */
-    errcode = regcomp(&ipaddress, WK_REXP_IPADDRESS, REG_EXTENDED|REG_NOSUB);
+    errcode = regcomp(&domainname, WK_REXP_DOMAINNAME, REG_EXTENDED | REG_NOSUB);
     dieif(errcode != 0);
-    errcode = regcomp(&ipprefix, WK_REXP_IPPREFIX, REG_EXTENDED|REG_NOSUB);
-    dieif(errcode != 0);
-    errcode = regcomp(&validip6prefix, WK_REXP_VALIDIP6PREFIX, REG_EXTENDED|REG_NOSUB);
-    dieif(errcode != 0);
-    errcode = regcomp(&aut_num, WK_REXP_ASNUM, REG_EXTENDED|REG_NOSUB);
-    dieif(errcode != 0);
-    errcode = regcomp(&domainname, WK_REXP_DOMAINNAME, REG_EXTENDED|REG_NOSUB);
-    dieif(errcode != 0);
-    errcode = regcomp(&domainalpha, WK_REXP_DOMAINALPHA, REG_EXTENDED|REG_NOSUB);
-    dieif(errcode != 0);
-    errcode = regcomp(&aut_num, WK_REXP_ASNUM, REG_EXTENDED|REG_NOSUB);
+    errcode = regcomp(&domainalpha, WK_REXP_DOMAINALPHA, REG_EXTENDED | REG_NOSUB);
     dieif(errcode != 0);
 }
 
 
-/* see if the key looks like it could be a name */
-static unsigned int
-wk_is_name (char *key)
-{
-    /* if it's an address, it cannot be a name */
-    if (regexec(&ipaddress, key, 0, NULL, 0) == 0) {
-        return 0;
-    }
-    if (regexec(&ipprefix, key, 0, NULL, 0) == 0) {
-        return 0;
-    }
-    if (regexec(&validip6prefix, key, 0, NULL, 0) == 0) {
-        return 0;
-    }
-
-    /* Everything apart from addresses matches to name */
-    return 1;
-} /* wk_is_name() */
-
 /* check for domain name */
-static unsigned int
-wk_is_domain (char *key)
-{
+static unsigned int wk_is_domain(char *key) {
     /* if it matches the general domain name search, and contains an */
     /* alphabetic character, consider it a possible domain name */
     if (regexec(&domainname, key, 0, NULL, 0) == 0) {
         if (regexec(&domainalpha, key, 0, NULL, 0) == 0) {
-	    return 1;
-	}
+            return 1;
+        }
     }
     return 0;
 }
 
-/* check for a host name (could be a domain, or an IP) */
-static unsigned int
-wk_is_hostname (char *key)
-{
-    /* Fix - should check for IPADDRESS, not IPRANGE.  - Shane */
-    return (wk_is_domain(key) || (regexec(&ipaddress, key, 0, NULL, 0) == 0));
-} /* wk_is_hostname() */
+/* Convert the which keytypes bitmap into a string */
+char *WK_to_string(mask_t wk) {
+    return MA_to_string(wk, Keytypes);
+}
 
-/*
-  determine if the key represents an aut-num
-
-  key      - object key, e.g. "AS123" or "AS2.456"
-
-  return   - 1 or 0
-
- */
+/* check if key looks like an aut-num primary key (or, matches aut-num regexp) */
 int WK_is_aut_num(char *key) {
-    if (regexec(&aut_num, (const char *) key, 0, NULL, 0) == 0) {
+    if (regexec(&wk_regex_list[WK_AUTNUM].regex, (const char *) key, 0, NULL, 0) == 0) {
         return 1;
     }
     return 0;
 }
 
-/* WK_to_string() */
-/*++++++++++++++++++++++++++++++++++++++
-  Convert the which keytypes bitmap into a string.
-
-  mask_t wk The which keytypes mask to be converted.
-
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+ </UL></DL>
-
-  ++++++++++++++++++++++++++++++++++++++*/
-char *
-WK_to_string (mask_t wk)
-{
-
-  return MA_to_string(wk, Keytypes);
-
-} /* WK_to_string() */
-
-/* WK_new() */
-/*++++++++++++++++++++++++++++++++++++++
+/*
   Create a new which keytypes bitmap.
 
   This checks the string to see which keys it looks like.  This helps
@@ -206,40 +130,26 @@ WK_to_string (mask_t wk)
   match.
 
   char *key The key to be examined.
+*/
+mask_t WK_new(char *key) {
+    mask_t wk;
+    int i;
 
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-	shane
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+ </UL></DL>
+    /* empty bitmask */
+    wk = MA_new(MA_END);
 
-  ++++++++++++++++++++++++++++++++++++++*/
-mask_t
-WK_new (char *key)
-{
-  mask_t wk;
-  int i;
+    /* search regular expressions in the list */
+    for (i = 0; i < WK_REGEX_LIST_LEN; i++) {
+        if (regexec(&wk_regex_list[i].regex, key, 0, NULL, 0) == 0) {
+            MA_set(&wk, wk_regex_list[i].key_type, 1);
+        }
+    }
 
-  /* empty bitmask */
-  wk = MA_new(MA_END);
+    /* check our more complicated key patterns */
+    MA_set(&wk, WK_NAME, !MA_isset(wk, WK_IPADDRESS) && !MA_isset(wk, WK_IPPREFIX) && !MA_isset(wk, WK_IP6PREFIX));
+    MA_set(&wk, WK_DOMAIN, wk_is_domain(key));
+    MA_set(&wk, WK_HOSTNAME, MA_isset(wk, WK_DOMAIN) || MA_isset(wk, WK_IPADDRESS));
 
-  /* search regular expressions in the list */
-  for (i=0; i<WK_REGEX_LIST_LEN; i++) {
-      if (regexec(&wk_regex_list[i].regex, key, 0, NULL, 0) == 0) {
-          MA_set(&wk, wk_regex_list[i].key_type, 1);
-      }
-  }
-
-  /* check our more complicated key patterns */
-  MA_set(&wk, WK_NAME,         wk_is_name(key));
-  MA_set(&wk, WK_DOMAIN,       wk_is_domain(key));
-  MA_set(&wk, WK_HOSTNAME,     wk_is_hostname(key));
-
-  /* return resulting bitmask */
-  return wk;
-
-} /* WK_new() */
+    /* return resulting bitmask */
+    return wk;
+}
