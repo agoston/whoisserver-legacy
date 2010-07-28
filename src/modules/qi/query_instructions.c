@@ -1001,13 +1001,6 @@ static int write_results(SQ_result_set_t *result, Query_instructions *qis, sk_co
     return retrieved_objects;
 } /* write_results() */
 
-/* generic SQL error message - it could be a configurable parameter, but
- it also shouldn't happen! */
-static const char *sql_error_text = "% An internal database error has occurred.\n"
-    "% It has been logged, and an adminstrator should look at it shorly.\n"
-    "% Please try your query again.\n"
-    "\n"
-    "\n";
 
 /* use a macro so we can get our file and line number */
 #define report_sql_error(condat,sql_connection,sql_command) \
@@ -1025,7 +1018,9 @@ static const char *sql_error_text = "% An internal database error has occurred.\
 
 void __report_sql_error(sk_conn_st *condat, SQ_connection_t *sql_connection, const char *sql_command, const char *file, int line, pthread_t tid) {
     /* first, let user know what has happened */
+    char *sql_error_text = ca_get_qi_internal_error;
     SK_cd_puts(condat, sql_error_text);
+    free(sql_error_text);
 
     /* next, log this error */
     LG_log(sql_context, LG_ERROR, "at %s:%d, tid:%lu [%d] %s sql='%s'", file, line, (unsigned long) tid, SQ_errno(sql_connection), SQ_error(sql_connection),

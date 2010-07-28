@@ -446,6 +446,9 @@
 #define ca_get_qi_reftrailer ca_get_string(CA_QI_REFTRAILER)
 #define ca_set_qi_reftrailer ca_set_string(CA_QI_REFTRAILER)
 
+#define ca_get_qi_internal_error ca_get_string(CA_QI_INTERNAL_ERROR)
+#define ca_set_qi_internal_error ca_set_string(CA_QI_INTERNAL_ERROR)
+
 #define ca_get_ns_rir      ca_get_string(CA_NS_RIR)
 #define ca_set_ns_rir      ca_set_string(CA_NS_RIR)
 

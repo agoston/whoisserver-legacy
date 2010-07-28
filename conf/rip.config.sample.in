@@ -528,6 +528,15 @@ QI_FMT_GROUP_BANNER %% Information related to '%s'
 QI_FILTER_BANNER % Note: this output has been filtered.
 QI_FILTER_BANNER %       To receive output for a database update, use the "-B" flag.
 
+#
+# Internal error
+
+QI_INTERNAL_ERROR % An internal database error has occurred.
+QI_INTERNAL_ERROR % It has been logged.
+QI_INTERNAL_ERROR % Please contact <my-dbm@mydb.net> if the problem persists.
+QI_INTERNAL_ERROR
+
+
 ###########
 ##
 ## Dummification config
