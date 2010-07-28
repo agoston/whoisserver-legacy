@@ -1,0 +1,40 @@
+# CASE 29: We try to modify inetnum object 80.16.151.184 - 80.16.151.184
+# with status ASSIGNED PA and change it to status ALLOCATED PA
+# with hostmaster mntner added but not with hostmaster password
+#
+# modify inetnum object 
+#
+#FAILURE
+#
+# RESULT 29: The modification will fail.
+
+
+inetnum:      80.16.151.184 - 80.16.151.184
+netname:      TEST-NET-NAME
+descr:        TEST network
+org:          ORG-ET1-DB-TEST
+country:      NL
+status:       ALLOCATED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20100101
+source:       DB-TEST
+
+organisation:  ORG-ET1-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      LIR
+address:       Address
+e-mail:        dbtest@ripe.net
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-MNT
+mnt-by:        TEST-MNT
+mnt-by:        RIPE-NCC-HM-MNT
+changed:       dbtest@ripe.net 20100102
+source:        DB-TEST
+
+
+password: auth
