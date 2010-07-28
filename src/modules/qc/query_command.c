@@ -884,10 +884,18 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
         {   /* determine if is_rdns_key */
             ip_prefix_t ign;
 
-            is_rdns_key = MA_isset(query_command->keytypes_bitmap, WK_DOMAIN);
+            is_rdns_key = MA_isset(query_command->keytypes_bitmap, WK_REVDOMAIN);
 
             if (IP_revd_t2b(&ign, query_command->keys, IP_EXPN) != IP_OK)
                 is_rdns_key = FALSE;
+        }
+
+        /* remove domain search if IP flag + revdomain key was used
+         * this is needed to avoid searching the domain table AND the domain radix tree
+         * FIXME: there should be a clear separation between forward and reverse domain in the WK module and all across whois code */
+        if (ip_flag_used && is_rdns_key) {
+            // it must have WK_DOMAIN set also, as it is a lot more relaxed than WK_REVDOMAIN
+            MA_set(&query_command->keytypes_bitmap, WK_DOMAIN, 0);
         }
 
         /* check for use of IP flags on non-IP lookups */
@@ -955,12 +963,13 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
             UT_free(fmt);
         }
 
-        /* exclude revdns if no -d is used */
+        /* exclude revdomain if no -d is used */
         if (is_ip_key && !query_command->d) {
             MA_set(&(query_command->object_type_bitmap), C_DN, 0);
         }
 
-        if (query_command->R && !MA_isset(query_command->keytypes_bitmap, WK_DOMAIN)) {
+        /* if -R on anything else than a forward domain (revdomain is a subset of domain, hence we need to explicitly deny it) */
+        if (query_command->R && (!MA_isset(query_command->keytypes_bitmap, WK_DOMAIN) || MA_isset(query_command->keytypes_bitmap, WK_REVDOMAIN))) {
             /* WARNING:904, meaningless no-referral flag */
             query_command->parse_messages = g_list_append(query_command->parse_messages, ca_get_qc_uselessnorefflag);
         }
