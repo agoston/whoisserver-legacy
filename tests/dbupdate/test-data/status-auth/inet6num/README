@@ -91,11 +91,11 @@
 
 # CASE 10: change an inet6num from ALLOCATED-BY-LIR to ALLOCATED-BY-RIR 
 #
-# update inet6num object 
+# modify inet6num object 
 #
 #FAILURE
 #
-# RESULT 10: The update will fail
+# RESULT 10: The modify will fail
 
 
 # CASE 11: create an inet6num with ASSIGNED 

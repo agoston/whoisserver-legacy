@@ -1,7 +1,4 @@
-% ipv6 status tests
-% load objects for Case 10 test
-%
-
+% per type tests
 
 %----------------------------------------------------------------
 %        Standard Template Objects
@@ -89,76 +86,62 @@ source:       DB-TEST
 %  Additional objects required for this test
 
 
+% create maintainer for successful authorisation
 
-mntner:       LIR-MNT
-descr:        Test maintainer for ipv6 status
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-auth:         MD5-PW $1$12345678$ctXe/33SiImj97lXBf4Mw0   # LIR
-mnt-by:       LIR-MNT
-referral-by:  TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101 
-source:       DB-TEST
+mntner:  TEST-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net
+referral-by: TEST-DBM-MNT
+mnt-by:  TEST-MNT
+auth:    MD5-PW $1$12345678$Y5n.GDFOxpXd2S1etuHFa/  # auth
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
 
+% create an encompassing as-block 
 
-mntner:       END-USER-MNT
-descr:        Test maintainer for ipv6 status
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-auth:         MD5-PW $1$12345678$mvVg2qg9mfB9tlQoFo2W//   # END-USER
-mnt-by:       END-USER-MNT
-referral-by:  TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101 
-source:       DB-TEST
-
-
-inet6num:     2001:0600::/25
-netname:      EU-ZZ-2001-0600
-descr:        European Regional Registry
-country:      EU
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-mnt-by:       RIPE-NCC-HM-MNT
-mnt-lower:    LIR-MNT
-status:       ALLOCATED-BY-RIR
-changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
-
-
-inet6num:     2001:0610::/35
-netname:      NL-SURF
-descr:        The Netherlands
-country:      NL
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-mnt-by:       LIR-MNT
-mnt-lower:    LIR-MNT
-status:       ALLOCATED-BY-LIR
-changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
-
-
-inet6num:     2001:0610:0240::/42
-netname:      RIPE-NCC-IPv6
-descr:        RIPE NCC
-country:      NL
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-mnt-by:       LIR-MNT
-mnt-lower:    LIR-MNT
-status:       ALLOCATED-BY-LIR
-changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
-
-organisation:  ORG-Eoof1-DB-TEST
-org-name:      EXAMPLE organisation object for tests
-org-type:      LIR
+organisation:  ORG-ET1-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
 address:       Address
 e-mail:        dbtest@ripe.net
 admin-c:       TP1-DB-TEST
 tech-c:        TP1-DB-TEST
-mnt-ref:       TEST-DBM-MNT
-mnt-by:        RIPE-NCC-HM-MNT
+mnt-ref:       TEST-MNT
+mnt-by:        TEST-MNT
 changed:       dbtest@ripe.net 20030102
 source:        DB-TEST
 
+as-block: AS1 - AS65534
+admin-c: TP1-DB-TEST
+tech-c: TP1-DB-TEST
+mnt-by: TEST-MNT
+changed: dbtest@ripe.net 20020101
+source: DB-TEST
+
+inetnum:      80.16.0.0 - 80.16.255.255
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+status:       ALLOCATED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+inetnum:      80.16.151.184 - 80.16.151.184
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+status:       ASSIGNED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       TEST-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+% End of loader data file

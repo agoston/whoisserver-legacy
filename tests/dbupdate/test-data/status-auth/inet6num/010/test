@@ -1,13 +1,13 @@
 # ipv6 status tests
-# CASE 10: change an inet6num from ALLOCATED-BY-LIR to ALLOCATED-BY-RIR 
-%
-% requires initial objects to be loaded
+# CASE 10: modify an inet6num
+# change status from ALLOCATED-BY-LIR to ALLOCATED-BY-RIR
+# no hostmaster auth provided
 #
-# update inet6num object 
+# modify inet6num object 
 #
 #FAILURE
 #
-# RESULT 10: The update will fail
+# RESULT 10: The modify will fail
 
 inet6num:     2001:0610:0240::/42
 netname:      RIPE-NCC-IPv6
@@ -16,6 +16,7 @@ country:      NL
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 mnt-by:       LIR-MNT
+mnt-by:       RIPE-NCC-HM-MNT
 mnt-lower:    END-USER-MNT
 status:       ALLOCATED-BY-RIR
 org:          ORG-Eoof1-DB-TEST
