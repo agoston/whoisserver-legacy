@@ -432,10 +432,10 @@ QC_USELESSIPFLAG % An IP flag (-l, -L, -m, -M, -x, -d, -b, -C or -c) used withou
 
 #
 # Useless '-d' flag
+
 QC_USELESSDFLAG %WARNING:903: useless '-d' flag passed
 QC_USELESSDFLAG %
 QC_USELESSDFLAG % '-d' flag has no meaning with a reverse domain key.
-
 
 #
 # Useless no-referral flag
