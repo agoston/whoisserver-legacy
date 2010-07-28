@@ -1286,45 +1286,37 @@ void mnt_irt_filter(sk_conn_st *condat, SQ_connection_t *sql_connection, GList *
     *datlist = new_datlist;
 }
 
-/* insert_radix_serials() */
-/*++++++++++++++++++++++++++++++++++++++
+/*
  Insert the radix serial numbers into a temporary table in the database.
 
- mask_t bitmap The bitmap of attribute to be converted.
+ condat             Client connection descriptor
 
- SQ_connection_t *sql_connection The connection to the database.
+ sql_connection     The connection to the database.
 
- char *id_table The id of the temporary table (This is a result of the hacky
- way we've tried to get MySQL to do sub-selects.)
+ id_table           The id of the temporary table (This is a result of the hacky way we've tried to get MySQL to do sub-selects.)
 
- GList *datlist The list of data from the radix tree.
-
- More:
- +html+ <PRE>
- Authors:
- ottrey,
- marek
- +html+ </PRE>
-
- ++++++++++++++++++++++++++++++++++++++*/
+ datlist            The list of data from the radix tree.
+*/
 static int insert_radix_serials(sk_conn_st *condat, SQ_connection_t *sql_connection, char *id_table, GList *datlist) {
     GList *qitem;
     GString *sql_command;
-    int serial;
+    int object_id;
     int sql_error;
 
     sql_error = 0;
     for (qitem = g_list_first(datlist); qitem != NULL; qitem = g_list_next(qitem)) {
         rx_datcpy_t *datcpy = qitem->data;
 
-        serial = datcpy->leafcpy.data_key;
+        object_id = datcpy->leafcpy.data_key;
 
         /* don't bother to insert values into our temporary table */
         /* if we've lost the client connection */
         if ((condat->rtc == 0) && !sql_error) {
             sql_command = g_string_sized_new(STR_S);
-            g_string_sprintf(sql_command, "INSERT INTO %s values (%d,0)", id_table, serial);
+            g_string_sprintf(sql_command, "INSERT INTO %s values (%d,0)", id_table, object_id);
             if (SQ_execute_query(sql_connection, sql_command->str, NULL) == -1) {
+                /* it seems to be a design decision to gracefully fail here - for performance and sanity reasons,
+                 * there should never be two query instructions returning the same object_id twice */
                 sql_error = SQ_errno(sql_connection);
                 report_sql_error(condat, sql_connection, sql_command->str);
             }
@@ -1336,12 +1328,10 @@ static int insert_radix_serials(sk_conn_st *condat, SQ_connection_t *sql_connect
 
     wr_clear_list(&datlist);
 
-    /* return error, if any */
     return sql_error;
+}
 
-} /* insert_radix_serials() */
 
-/* write_radix_immediate() */
 /*++++++++++++++++++++++++++++++++++++++
  Display the immediate data carried with the objects returned by the
  radix tree.
@@ -2219,7 +2209,7 @@ int QI_execute(ca_dbSource_t *dbhdl, Query_instructions *qis, Query_environ *qe,
     /* fetch recursive objects (ac,tc,zc,ah,org,irt(if -c)) */
     if (!sql_error && qis->recursive && (qe->condat.rtc == 0)) {
         sql_error = qi_fetch_references(&sql_connection, qe, id_table);
-    } /* if recursive */
+    }
 
     /* find the irt objects (for -c) */
     if (!sql_error && (qis->qc->c_irt_search) && irt_inet_id) {
