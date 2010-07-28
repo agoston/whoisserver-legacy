@@ -1611,20 +1611,12 @@ keytype      identified key type (can be NULL)
 It is the responsibility of the caller to free preflist (unless justcheck is set)
 */
 int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp_t expf, ip_keytype_t *keytype) {
-    int free_it;
-    int err=IP_OK; /* let's be optimistic :-) */
-    ip_prefix_t *querypref;
+    int free_it = justcheck;
+    int err = IP_OK;
+    ip_prefix_t *querypref = (ip_prefix_t *)UT_malloc(sizeof(ip_prefix_t));;
 
-    /* if just checking the syntax (justcheck == 1),
-     then free_it = 1,
-     else 0, but may be modified later (in range conversion)
-     */
-
-    free_it = justcheck;
-
-    querypref = (ip_prefix_t *)UT_malloc(sizeof(ip_prefix_t));
-
-    /*XXX inconsistent perfix/length is excused. Later we will warn people */
+    /*XXX inconsistent prefix/length is excused. Later we will warn people */
+    /* check for prefix */
     err = IP_pref_t2b(querypref, key, expf);
     if (NOERR(err)) {
         if (keytype) *keytype = IPK_PREFIX;
@@ -1633,8 +1625,7 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
             *preflist = g_list_append(*preflist, querypref);
         }
     } else {
-        /* not a prefix.  */
-        /* Maybe an IP ? */
+        /* check for IP */
         err = IP_addr_t2b( &(querypref->ip), key, expf);
         if (NOERR(err)) {
             if (keytype) *keytype = IPK_IP;
@@ -1646,39 +1637,39 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
                 *preflist = g_list_append(*preflist, querypref);
             }
         } else {
-            /* hm, maybe a range then ? */
-            ip_range_t myrang;
-
-            /* won't use the querypref anymore, mark it for freeing later */
-            free_it = 1;
-
-            err = IP_rang_t2b(&myrang, key, expf);
+            /* check for reverse domain */
+            err = IP_revd_t2b(querypref, key, expf);
             if (NOERR(err)) {
-                if (keytype) *keytype = IPK_RANGE;
+                if (keytype) *keytype = IPK_REVD;
 
-                /* sometimes (exless match) we look for the first bigger(shorter)  */
-                /* prefix containing this range. */
-                if (encomp) {
-                    IP_rang_encomp(&myrang);
-                }
-
-                /* OK, now we can let the engine happily find that there's just one */
-                /* prefix in range */
                 if (!justcheck) {
-                    IP_rang_decomp(&myrang, preflist);
+                    *preflist = g_list_append(*preflist, querypref);
                 }
             } else {
-                /* check for reverse domain */
-                err = IP_revd_t2b(querypref, key, expf);
-                if (NOERR(err)) {
-                    if (keytype) *keytype = IPK_REVD;
+                /* check for range */
+                ip_range_t myrang;
 
+                /* won't use the querypref anymore, mark it for freeing later */
+                free_it = 1;
+
+                err = IP_rang_t2b(&myrang, key, expf);
+                if (NOERR(err)) {
+                    if (keytype) *keytype = IPK_RANGE;
+
+                    /* sometimes (exless match) we look for the first bigger(shorter)  */
+                    /* prefix containing this range. */
+                    if (encomp) {
+                        IP_rang_encomp(&myrang);
+                    }
+
+                    /* OK, now we can let the engine happily find that there's just one */
+                    /* prefix in range */
                     if (!justcheck) {
-                        *preflist = g_list_append(*preflist, querypref);
+                        IP_rang_decomp(&myrang, preflist);
                     }
                 } else {
                     /* unknown key */
-                    *keytype = IPK_UNDEF;
+                    if (keytype) *keytype = IPK_UNDEF;
                     err = IP_INVARG; /* "conversion error" */
                 }
             }
@@ -1696,10 +1687,9 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
  * keytype can be NULL */
 int IP_smart_range(char *key, ip_range_t * rangptr, ip_exp_t expf, ip_keytype_t * keytype) {
     int err = IP_OK;
-    GList *preflist= NULL;
+    GList *preflist = NULL;
 
     /* first : is it a range ? */
-
     if (NOERR(err = IP_rang_t2b(rangptr, key, expf))) {
         if (keytype) *keytype = IPK_RANGE;
     } else {
