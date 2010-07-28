@@ -975,9 +975,6 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
             }
         }
 
-        /* tracing */
-        log_command(query_str, query_command);
-
         /* "keep connection" processing:
          when opening connection, -k may be alone or with a query
          later -k must appear alone (or there must be an empty line,

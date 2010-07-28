@@ -1924,20 +1924,23 @@ int qi_collect_ids(ca_dbSource_t *dbhdl, char *sourcename, SQ_connection_t **sql
             err = RP_asc_search(qi->rx_srch_mode, qi->rx_par_a, 0, qi->rx_keys, dbhdl, Query[qi->queryindex].attribute, datlist, limit);
 
             if (NOERR(err)) {
-                LG_log(qi_context, LG_DEBUG, "%d entries after %s (mode %d par %d reg %d) query for %s", g_list_length(*datlist), Query[qi->queryindex].descr,
-                        qi->rx_srch_mode, qi->rx_par_a, dbhdl, qi->rx_keys);
-            } /* NOERR */
-            else {
+#ifdef DEBUG_QUERY
+                fprintf(stderr, "%d entries after %s (mode %d par %d reg %s) query for %s:\n", g_list_length(*datlist), Query[qi->queryindex].descr,
+                        qi->rx_srch_mode, qi->rx_par_a, dbhdl->name, qi->rx_keys);
+                GList *pp = *datlist;
+                for (; pp; pp = pp->next) {
+                    fprintf(stderr, "%s", (char *)(((rx_datcpy_t *)(pp->data))->leafcpy.data_ptr));
+                }
+#endif
+            } else {
                 LG_log(qi_context, LG_INFO, "RP_asc_search returned %x ", err);
             }
             break;
 
         default:
-            die
-            ;
-        } /* switch */
-
-    } /* for <every instruction> */
+            die;
+        }
+    }
 
     /* Now drop the _S table */
     g_string_sprintf(sql_command, "DROP TABLE IF EXISTS %s", sub_table);
@@ -2442,13 +2445,13 @@ Query_instructions *QI_new(Query_command *qc, const Query_environ *qe) {
     }
     qis->instruction[i_no++] = NULL;
 
-//#if 0
+#ifdef DEBUG_QUERY
     { /* tracing */
         char *descrstr = QI_queries_to_string(qis);
-        fprintf(stderr, "Queries: %s\n", descrstr);
+        fprintf(stderr, "Query Instructions to execute: %s\n", descrstr);
         UT_free( descrstr );
     }
-//#endif
+#endif
 
     return qis;
 

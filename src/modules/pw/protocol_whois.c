@@ -283,6 +283,17 @@ void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl
 	}
 		/* FALLTROUGH */
 	case QC_REAL:
+
+	    /* Log query instructions */
+#ifdef DEBUG_QUERY
+	    {
+	        char *temp = QC_query_command_to_string(qc);
+	        fprintf(stderr, "\n---\nRunning query: %s\n", temp);
+	        free(temp);
+	    }
+#endif
+
+	    /* *** Query Instructions are created here *** */
 		qis = QI_new(qc, qe);
 
 		/* go through all sources,
