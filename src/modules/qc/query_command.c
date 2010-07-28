@@ -184,34 +184,6 @@ char *QC_query_command_to_string(Query_command *query_command) {
 
 } /* QC_query_command_to_string() */
 
-/* log_command() */
-/*++++++++++++++++++++++++++++++++++++++
- Log the command.
- This is more to do with Tracing.  And should/will get merged with a tracing
- module (when it is finalized.)
-
- char *query_str
-
- Query_command *query_command
-
- More:
- +html+ <PRE>
- Authors:
- ottrey
- +html+ </PRE><DL COMPACT>
- +html+ <DT>Online References:
- +html+ <DD><UL>
- +html+ </UL></DL>
-
- ++++++++++++++++++++++++++++++++++++++*/
-static void log_command(const char *query_str, Query_command *query_command) {
-    char *str;
-
-    str = QC_query_command_to_string(query_command);
-    LG_log(qc_context, LG_DEBUG, "query=[%s]   %s", query_str, str);
-    UT_free(str);
-} /* log_command() */
-
 /* QC_environ_free() */
 /*++++++++++++++++++++++++++++++++++++++
  Free the query_environ.
