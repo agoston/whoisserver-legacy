@@ -323,6 +323,9 @@
 #define ca_get_svmirror_port	ca_get_int(CA_SVMIRROR_PORT)
 #define ca_set_svmirror_port	ca_set_int(CA_SVMIRROR_PORT)
 
+#define ca_get_svlookup_port	ca_get_int(CA_SVLOOKUP_PORT)
+#define ca_set_svlookup_port	ca_set_int(CA_SVLOOKUP_PORT)
+
 #define ca_get_sourcefile ca_get_dirlist(CA_SOURCEFILE)
 #define ca_set_sourcefile ca_set_dirlist(CA_SOURCEFILE)
 

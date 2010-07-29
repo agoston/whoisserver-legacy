@@ -195,5 +195,7 @@ int RP_asc_load(char *filename, int maxobj, int operation,
 int RP_attr2spc(rp_attr_t type, ip_space_t space);
 
 void RP_init (LG_context_t *ctx);
+
+void RP_interact(int socket);
 #undef EXTDEF
 #endif /* RP_H */

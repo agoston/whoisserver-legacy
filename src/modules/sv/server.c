@@ -57,6 +57,7 @@
 int SV_whois_sock;
 int SV_config_sock;
 int SV_mirror_sock;
+int SV_lookup_sock;
 
 /* each updatable source has its own update thread and its own socket */
 #define MAX_SOURCES 100
@@ -582,6 +583,7 @@ int SV_start(char *pidfile) {
 	int whois_port = -1;
 	int config_port = -1;
 	int mirror_port = -1;
+	int lookup_port = -1;
 	int update_port = -1;
 	int update_mode = 0;
 	int pid_fd;
@@ -617,6 +619,10 @@ int SV_start(char *pidfile) {
     mirror_port = ca_get_svmirror_port;
     SV_mirror_sock = SK_getsock(NULL, mirror_port, SOCK_STREAM, 128);
     fprintf(stderr, "Mirror port: %d\n", mirror_port);
+    /* radix tree lookup port */
+    lookup_port = ca_get_svlookup_port;
+    SV_lookup_sock = SK_getsock(NULL, lookup_port, SOCK_STREAM, 128); // looks like a good backlog number for now
+    fprintf(stderr, "Lookup port: %d\n", lookup_port);
     /* per source update ports */
     for (source = 0; (source_hdl = ca_get_SourceHandleByPosition(source)) != NULL; source++) {
         update_mode = ca_get_srcmode(source_hdl);
@@ -768,6 +774,9 @@ int SV_start(char *pidfile) {
 	/* Create master thread for mirror threads */
 	SV_concurrent_server(SV_mirror_sock, 128, "mirror", PM_interact);
 
+	/* Create master thread for radix lookup threads */
+	SV_concurrent_server(SV_lookup_sock, 64, "rx_lookup", RP_interact);
+
 	/* Walk through the sources and */
 	/* run update thread for every source with CANUPD == 'y' */
 
@@ -914,6 +923,7 @@ void SV_shutdown() {
 	close(SV_whois_sock);
 	close(SV_config_sock);
 	close(SV_mirror_sock);
+	close(SV_lookup_sock);
 	for (source = 0; SV_update_sock[source] != -1; source++)
 	if (SV_update_sock[source] != 0)
 	close(SV_update_sock[source]);

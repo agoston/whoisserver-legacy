@@ -120,7 +120,7 @@ libqc_a_SOURCES = modules/qc/mg_getopt.c modules/qc/query_command.c
 libqi_a_SOURCES = modules/qi/query_instructions.c
 librp_a_SOURCES = modules/rp/rp_convert.c modules/rp/rp_load.c \
                   modules/rp/rp_search.c modules/rp/rp_tree.c \
-                  modules/rp/rp_update.c
+                  modules/rp/rp_update.c modules/rp/rp_interact.c
 librt_a_SOURCES = modules/rt/rt_core.c modules/rt/rt_dbupdate.c
 librx_a_SOURCES = modules/rx/rx_node.c modules/rx/rx_print.c \
                   modules/rx/rx_search.c modules/rx/rx_tree.c
