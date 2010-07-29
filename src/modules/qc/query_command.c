@@ -327,7 +327,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
     int num_flags;
     int num_client_ip;
 
-    gboolean is_ip_key, is_rdns_key;
+    gboolean is_ip_key, is_rdns_key, is_inverse;
     gboolean fixed_lookup;
     char lookup[64];
 
@@ -858,14 +858,20 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
 
             is_rdns_key = MA_isset(query_command->keytypes_bitmap, WK_REVDOMAIN);
 
-            if (IP_revd_t2b(&ign, query_command->keys, IP_EXPN) != IP_OK)
+            if (is_rdns_key && IP_revd_t2b(&ign, query_command->keys, IP_EXPN) != IP_OK) {
+                MA_set(&query_command->keytypes_bitmap, WK_REVDOMAIN, 0);
                 is_rdns_key = FALSE;
+            }
         }
 
-        /* remove domain search if IP flag + revdomain key was used
+        /* determine if inverse query */
+        is_inverse = MA_bitcount(query_command->inv_attrs_bitmap) > 0;
+
+        /* remove domain keytype if revdomain key was used in forward lookup
          * this is needed to avoid searching the domain table AND the domain radix tree
+         * Note: in reverse lookup, we don't do this, as there are many inverse searchable attributes with domain syntax
          * FIXME: there should be a clear separation between forward and reverse domain in the WK module and all across whois code */
-        if (ip_flag_used && is_rdns_key) {
+        if (!is_inverse && is_rdns_key) {
             // it must have WK_DOMAIN set also, as it is a lot more relaxed than WK_REVDOMAIN
             MA_set(&query_command->keytypes_bitmap, WK_DOMAIN, 0);
         }
