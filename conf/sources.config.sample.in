@@ -116,7 +116,7 @@ protocolVersion: 1
 SOURCE    SAMPLE
 database: SAMPLEDB
 opMode:   2
-updPort:  43004
+updPort:  43005
 canupd:   y
 deflook:  y
 nrtm:     SAMPLEM

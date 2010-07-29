@@ -189,6 +189,11 @@ SVCONFIG_PORT 43002
 
 SVMIRROR_PORT 43003
 
+#
+# Port for the radix lookup interface
+
+SVLOOKUP_PORT 43004
+
 
 ###########
 ##

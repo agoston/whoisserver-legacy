@@ -185,6 +185,10 @@ SVCONFIG_PORT 43002
 
 SVMIRROR_PORT 43003
 
+#
+# Port for the radix lookup interface
+
+SVLOOKUP_PORT 43004
 
 ###########
 ##
@@ -578,7 +582,7 @@ NRTM_HISTORY_ACCESS_LIMIT 1209600
 #
 # DB-details = MySQL_Host,MySQL_Port,MySQL_User,MySQL_Password,MySQL_DB
 
-UPDSOURCE SAMPLE sqlhost,3306,dbuser,dbpsw,SAMPLEDB whois.mydb.net,43001,43004
+UPDSOURCE SAMPLE sqlhost,3306,dbuser,dbpsw,SAMPLEDB whois.mydb.net,43001,43005
 
 
 ###########
