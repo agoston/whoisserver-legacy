@@ -1,34 +1,44 @@
 #include <ctype.h>
 #include "rip.h"
 
-void destroy_list_entry(rx_datcpy_t *data, void* nullptr) {
-  if (data != NULL) {
-    if (data->leafcpy.data_ptr != NULL) {
-      UT_free(data->leafcpy.data_ptr);
-    }
-    UT_free(data);
-  }
-}
+/****************************
+ * The intention here is to provide a means of externally
+ * accessing the radix tree of the server.
+ *
+ * Later on this can be expanded into a variety of uses
+ *
+ ****************************/
 
+
+/****************************
+ * print_answers is called for each item of an answer list
+ * returned by the radix search function (RP_asc_search).
+ *
+ * It's task is to output the object_id from the radix node
+ * to the user's connection.
+ *
+ ****************************/
 void print_answers(rx_datcpy_t *data, sk_conn_st *condat) {
-  if (condat == NULL) return;
+  if (data == NULL || condat == NULL) return;
 
-  if (data != NULL) {
-    SK_cd_printf(condat, "%ld\n", (long)data->leafcpy.data_key);
-  } else {
-    SK_cd_printf(condat, "# bad entry\n");
-  }
+  // print the object_id
+  SK_cd_printf(condat, "%ld\n", (long)data->leafcpy.data_key);
   
-  /* temp location */
+  // now we're finished with the node copy
+  // destroy any node pointers
   if (data->leafcpy.data_ptr != NULL) {
     UT_free(data->leafcpy.data_ptr);
+    data->leafcpy.data_ptr = NULL;
   }
 }
 
-/************
- * Allows incoming queries for the internal radix tree structures
- ***********/
+/****************************
+ * RP_interact handles a single server connection by taking/parsing
+ * input, performing a radix tree search using the provided information,
+ * and returning a list of object_id's as a result.
+ ****************************/
 
+/* The maximum input buffer size */
 #define MAX_INPUT_SIZE	1024
 
 void RP_interact(int socket) {
@@ -45,7 +55,8 @@ void RP_interact(int socket) {
   SK_cd_make(&condat, socket, (unsigned) ca_get_keepopen);
 
   /* grab the input string - leave if no input*/
-  if (SK_cd_gets(&condat, input, MAX_INPUT_SIZE) <= 0) return;
+  if (SK_cd_gets(&condat, input, MAX_INPUT_SIZE) <= 0)
+    goto cleanup;
 
   /* break the input into it's seperate parts */
   pos = input;				// start at the begining
@@ -120,63 +131,60 @@ void RP_interact(int socket) {
   /* check/convert the source string */
   if ((regid=ca_get_SourceHandleByName(source_str)) == NULL) {
     //SK_cd_printf(&condat, ca_get_qc_fmt_badsource );
-    SK_cd_printf(&condat, "bad source\n" );
-    return;
+    SK_cd_printf(&condat, "%%ERROR:102: unknown source\n" );
+    goto cleanup;
   }
 
   /* check/convert the attribute string */
-  if ((attrid=DF_attribute_name2type(attr_str)) == -1)
-    goto invalid_input;
+  if ((attrid=DF_attribute_name2type(attr_str)) == -1) {
+    SK_cd_printf(&condat, "%%ERROR:104: unknown attribute\n");
+    goto cleanup;
+  }
 
   /* check the key string */
   if (key_str == NULL || strlen(key_str) == 0) {
     //SK_cd_printf(&condat, ca_get_pw_err_nokey );
-    SK_cd_printf(&condat, "no key\n" );
-    return;
+    SK_cd_printf(&condat, "%%ERROR:106: no search key specified\n" );
+    goto cleanup;
   }
 
   /* make sure the attribute has a lookup tree */
   /* no tree = null response */
   if (!DF_attrcode_has_radix_lookup(attrid)) {
     // for now we send an error - maybe use invalid input error
-    SK_cd_printf(&condat, "%%ERROR:xxx: invalid attribute\n\n");
-    return;
+    SK_cd_printf(&condat, "%%ERROR:105: attribute is not searchable\n");
+    goto cleanup;
   }
 
+  /* perform the radix tree lookup */
   if (!NOERR(RP_asc_search(search_mode, search_depth, 0, key_str, regid, attrid, &answers, RX_ANS_ALL))) {
-    SK_cd_printf(&condat, "%%ERROR:xxx: bad search\n\n");
-    return;
+    SK_cd_printf(&condat, "%%ERROR:509: error during search\n");
+    goto cleanup;
   }
   
+  /* double check we actually have answers */
   if (answers == NULL) {
     //SK_cd_printf(&condat, ca_get_pw_notfound );
-    SK_cd_printf(&condat, "not found\n" );
-    return;
+    SK_cd_printf(&condat, "%%ERROR:101: no entries found\n" );
+    goto cleanup;
   }
 
-  g_list_foreach(answers, print_answers, &condat);
+  /* print the output list to the user         */
+  g_list_foreach(answers, print_answers, &condat);  
 
   /* free the list */
   wr_clear_list(&answers);
 
-  SK_cd_printf(&condat, "\n\n# Done!\n");
+  /* and we're done */
+  SK_cd_printf(&condat, "\n\n");
 
-#if 0
-  /***** testing/debug stuff ******/
-  SK_cd_printf(&condat, "Input parsed ok\n");
-  SK_cd_printf(&condat, "Search Mode: %s\n", RX_text_srch_mode(search_mode));
-  SK_cd_printf(&condat, "Search Depth: %d\n", search_depth);
-  SK_cd_printf(&condat, "Source String: %s\n", regid->name);
-  SK_cd_printf(&condat, "Attribute String: %s\n", DF_get_attribute_name(attrid));
-  SK_cd_printf(&condat, "Key string: [%s]\n", key_str);
-  SK_cd_printf(&condat, "Other details:\n");
-  SK_cd_printf(&condat, "  Has radix lookup: %d\n", DF_attrcode_has_radix_lookup(attrid));
-#endif
-
+  /* cleanup the connection structure and leave */
+cleanup:
+  SK_cd_free(&condat);
   return;
 
+  /* oops - the input has bad syntax */
 invalid_input:
   SK_cd_printf(&condat, "%%ERROR:405: syntax error\n");
-  return;
+  goto cleanup;
 }
-
