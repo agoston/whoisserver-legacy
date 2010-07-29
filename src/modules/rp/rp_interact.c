@@ -18,6 +18,11 @@ void print_answers(rx_datcpy_t *data, sk_conn_st *condat) {
   } else {
     SK_cd_printf(condat, "# bad entry\n");
   }
+  
+  /* temp location */
+  if (data->leafcpy.data_ptr != NULL) {
+    UT_free(data->leafcpy.data_ptr);
+  }
 }
 
 /************
@@ -114,7 +119,8 @@ void RP_interact(int socket) {
 
   /* check/convert the source string */
   if ((regid=ca_get_SourceHandleByName(source_str)) == NULL) {
-    SK_cd_printf(&condat, ca_get_qc_fmt_badsource());
+    //SK_cd_printf(&condat, ca_get_qc_fmt_badsource );
+    SK_cd_printf(&condat, "bad source\n" );
     return;
   }
 
@@ -124,7 +130,8 @@ void RP_interact(int socket) {
 
   /* check the key string */
   if (key_str == NULL || strlen(key_str) == 0) {
-    SK_cd_printf(&condat, ca_get_pw_err_nokey());
+    //SK_cd_printf(&condat, ca_get_pw_err_nokey );
+    SK_cd_printf(&condat, "no key\n" );
     return;
   }
 
@@ -142,15 +149,15 @@ void RP_interact(int socket) {
   }
   
   if (answers == NULL) {
-    SK_cd_printf(&condat, ca_get_pw_notfound());
+    //SK_cd_printf(&condat, ca_get_pw_notfound );
+    SK_cd_printf(&condat, "not found\n" );
     return;
   }
 
   g_list_foreach(answers, print_answers, &condat);
 
   /* free the list */
-  g_list_foreach(answers, destroy_list_entry, NULL);
-  g_list_free(answers);
+  wr_clear_list(&answers);
 
   SK_cd_printf(&condat, "\n\n# Done!\n");
 
