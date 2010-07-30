@@ -157,6 +157,7 @@ void RP_interact(int socket) {
   }
 
   /* perform the radix tree lookup */
+  answers = NULL;
   if (!NOERR(RP_asc_search(search_mode, search_depth, 0, key_str, regid, attrid, &answers, RX_ANS_ALL))) {
     SK_cd_printf(&condat, "%%ERROR:509: error during search\n");
     goto cleanup;
