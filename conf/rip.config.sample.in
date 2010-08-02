@@ -201,6 +201,10 @@ SVLOOKUP_PORT 43004
 
 PW_HELP_FILE @docdir@/WHOIS-HELP
 
+#
+# Location of the help file for radix lookup queries
+
+PL_HELP_FILE @docdir@/LOOKUP-HELP
 
 #
 # Shell command to be executed on die()

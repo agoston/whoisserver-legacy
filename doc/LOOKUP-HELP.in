@@ -1,0 +1,33 @@
+% -l <ip-lookup>   Returns first level less specific inetnum, 
+%                  inet6num or route objects, excluding exact matches.
+% -L <ip-lookup>   Returns all level less specific inetnum, 
+%                  inet6num or route objects, including exact matches.
+% -m <ip-lookup>   Returns first level more specific inetnum, 
+%                  inet6num or route objects, excluding exact matches.
+% -M <ip-lookup>   Returns all level more specific inetnum, 
+%                  inet6num or route objects, excluding exact matches.
+% -x <ip-lookup>   Requests that only an exact match on a prefix be
+%                  performed.  If no exact match is found no objects are
+%                  returned.
+%
+% -k (optional normal query) Requests a persistent connection. After
+%                  returning the result the connection will not be closed by
+%                  the server and a client may issue multiple queries on the
+%                  same connection. 
+%                  Note, that server implements 'stop-and-wait' protocol,
+%                  when no next query can be sent before receiving a reply
+%                  for the previous one.  Use RIPE whois3 client to be able
+%                  to send queries in batch mode. 
+%                  Except the first -k query, -k without an argument closes
+%                  the persistent connection.  
+% 
+% -T (comma separated list of object types, no white space is allowed)
+%                  Restricts the types of objects to lookup in the query.
+% -a               Specifies that the server should perform lookups in all
+%                  available sources.
+% -s (comma separated list of sources, no white space is allowed) Specifies
+%                  which sources and in which order are to be looked up when
+%                  performing a query.
+% 
+% [REF] RIPE Database Reference Manual.
+%       http://www.ripe.net/ripe/docs/databaseref-manual.html

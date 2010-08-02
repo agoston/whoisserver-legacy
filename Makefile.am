@@ -32,6 +32,7 @@ EXTRA_DIST = README \
 	     conf/sources.config.sample.in \
 	     doc/AUTO-DBM-HELP.in \
 	     doc/WHOIS-HELP.in \
+	     doc/LOOKUP-HELP.in \
              doc/DIFF-320-330.sql \
              doc/mysql-fine-tuning.txt \
 	     src/utils/wrapper.in \
@@ -450,6 +451,7 @@ uninstall-local:
 	rm -f $(DESTDIR)/${confdir}/notif_text
 	rm -f $(DESTDIR)/${docdir}/AUTO-DBM-HELP
 	rm -f $(DESTDIR)/${docdir}/WHOIS-HELP
+	rm -f $(DESTDIR)/${docdir}/LOOKUP-HELP
 	rm -f $(DESTDIR)/${tmpdir}/load/SAMPLE/sample.db.gz
 	rm -f $(DESTDIR)/${tmpdir}/load/SAMPLE/SAMPLE.CURRENTSERIAL
 

@@ -356,6 +356,9 @@
 #define ca_get_pw_help_file	ca_get_dirlist(CA_PW_HELP_FILE)
 #define ca_set_pw_help_file	ca_set_dirlist(CA_PW_HELP_FILE)
 
+#define ca_get_pl_help_file	ca_get_dirlist(CA_PL_HELP_FILE)
+#define ca_set_pl_help_file	ca_set_dirlist(CA_PL_HELP_FILE)
+
 #define ca_get_pw_k_filter	ca_get_string(CA_PW_K_FILTER)
 #define ca_set_pw_k_filter	ca_set_string(CA_PW_K_FILTER)
 

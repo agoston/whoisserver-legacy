@@ -206,6 +206,11 @@ SVLOOKUP_PORT 43004
 
 PW_HELP_FILE /export/db/doc/WHOIS-HELP
 
+#
+# Location of the help file for radix lookup queries
+
+PL_HELP_FILE /export/db/doc/LOOKUP-HELP
+
 
 #
 # Shell command to be executed on die()
