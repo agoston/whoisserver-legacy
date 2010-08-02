@@ -775,7 +775,7 @@ int SV_start(char *pidfile) {
 	SV_concurrent_server(SV_mirror_sock, 128, "mirror", PM_interact);
 
 	/* Create master thread for radix lookup threads */
-	SV_concurrent_server(SV_lookup_sock, 64, "rx_lookup", RP_interact);
+	SV_concurrent_server(SV_lookup_sock, 64, "rx_lookup", PL_interact);
 
 	/* Walk through the sources and */
 	/* run update thread for every source with CANUPD == 'y' */
