@@ -363,6 +363,7 @@ EXTRA_DIST = README \
              src/modules/pm/protocol_mirror.h \
              src/modules/pr/properties.h \
              src/modules/pw/protocol_whois.h \
+             src/modules/pl/protocol_lookup.h \
              src/modules/qc/mg_getopt.h \
              src/modules/qc/query_command.h \
              src/modules/qi/query_instructions.h \

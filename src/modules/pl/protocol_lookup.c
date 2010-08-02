@@ -33,7 +33,7 @@ void print_answers(rx_datcpy_t *data, sk_conn_st *condat) {
 }
 
 /****************************
- * RP_interact handles a single server connection by taking/parsing
+ * PL_interact handles a single server connection by taking/parsing
  * input, performing a radix tree search using the provided information,
  * and returning a list of object_id's as a result.
  ****************************/
@@ -41,7 +41,7 @@ void print_answers(rx_datcpy_t *data, sk_conn_st *condat) {
 /* The maximum input buffer size */
 #define MAX_INPUT_SIZE	1024
 
-void RP_interact(int socket) {
+void PL_interact(int socket) {
   sk_conn_st condat;
   char input[MAX_INPUT_SIZE + 1];
   char *pos, *search_str, *source_str, *attr_str, *key_str;
