@@ -2186,6 +2186,25 @@ int QI_execute(ca_dbSource_t *dbhdl, Query_instructions *qis, Query_environ *qe,
 //        SK_watchstop(&(qe->condat));
     }
 
+#ifdef DEBUG_QUERY
+    {
+        SQ_result_set_t *res;
+
+        sprintf(sql_command, "SELECT * from %s", id_table);
+        if (SQ_execute_query(sql_connection, sql_command, &res)) {
+            fprintf(stderr, "ERROR: %s", SQ_error(sql_connection));
+        } else {
+            char *temp = SQ_result_to_string(res);
+            fprintf(stderr, "Contents of table %s:\n%s\n", id_table, temp);
+            free(temp);
+        }
+
+        if (res) {
+            SQ_free_result(res);
+        }
+    }
+#endif
+
     /* change the idtable */
     if (!sql_error) {
         if (qis->qc->G_group_search == TRUE) {
