@@ -350,11 +350,29 @@
 #define ca_get_pl_err_badsource	ca_get_string(CA_PL_ERR_BADSOURCE)
 #define ca_set_pl_err_badsource ca_set_string(CA_PL_ERR_BADSOURCE)
 
+#define ca_get_pl_err_badclass	ca_get_string(CA_PL_ERR_BADCLASS)
+#define ca_set_pl_err_badclass	ca_set_string(CA_PL_ERR_BADCLASS)
+
 #define ca_get_pl_err_nosource	ca_get_string(CA_PL_ERR_NOSOURCE)
 #define ca_set_pl_err_nosource	ca_set_string(CA_PL_ERR_NOSOURCE)
 
 #define ca_get_pl_err_noclass	ca_get_string(CA_PL_ERR_NOCLASS)
 #define ca_set_pl_err_noclass	ca_set_string(CA_PL_ERR_NOCLASS)
+
+#define ca_get_pl_err_nosearchclass	ca_get_string(CA_PL_ERR_NOSEARCHCLASS)
+#define ca_set_pl_err_nosearchclass	ca_set_string(CA_PL_ERR_NOSEARCHCLASS)
+
+#define ca_get_pl_err_dupsearchflag	ca_get_string(CA_PL_ERR_DUPSEARCHFLAG)
+#define	ca_set_pl_err_dupsearchflag	ca_set_string(CA_PL_ERR_DUPSEARCHFLAG)
+
+#define ca_get_pl_err_badsearchkey	ca_get_string(CA_PL_ERR_BADSEARCHKEY)
+#define ca_set_pl_err_badsearchkey	ca_set_string(CA_PL_ERR_BADSEARCHKEY)
+
+#define ca_get_pl_err_notree	ca_get_string(CA_PL_ERR_NOTREE)
+#define ca_set_pl_err_notree	ca_set_string(CA_PL_ERR_NOTREE)
+
+#define ca_get_pl_err_noentries	ca_get_string(CA_PL_ERR_NOENTRIES)
+#define ca_set_pl_err_noentries	ca_set_string(CA_PL_ERR_NOENTRIES)
 
 #define ca_get_pw_resp_header	ca_get_string(CA_PW_RESP_HEADER)
 #define ca_set_pw_resp_header	ca_set_string(CA_PW_RESP_HEADER)

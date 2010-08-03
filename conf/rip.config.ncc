@@ -257,16 +257,42 @@ AC_DECAY_HALFLIFE 43200
 
 # Radix Lookup Messages
 
-# Unknown source error (102)
-PL_ERR_BADSOURCE %%ERROR:102: unknown source
+# Unknown source error
+PL_ERR_BADSOURCE %%ERROR:501: unknown source
 PL_ERR_BADSOURCE %%
 PL_ERR_BADSOURCE %% "%s" is not a known source.
 
+# Unknown class error
+PL_ERR_BADCLASS %%ERROR:502: unknown object type
+PL_ERR_BADCLASS %%
+PL_ERR_BADCLASS %% "%s" is not a known object type
+
 # Missing source error
-PL_ERR_NOSOURCE %%ERROR:502: missing source
+PL_ERR_NOSOURCE %%ERROR:503: missing source
 
 # Missing class error
-PL_ERR_NOCLASS %%ERROR:503: missing object class
+PL_ERR_NOCLASS %%ERROR:504: missing object class
+
+# Non-searchable class error
+PL_ERR_NOSEARCHCLASS %%ERROR:505: class type is not searchable
+PL_ERR_NOSEARCHCLASS %%
+PL_ERR_NOSEARCHCLASS %% There is no lookup tree for "%s" objects
+
+# Duplicate search flag
+PL_ERR_DUPSEARCHFLAG %%ERROR:506: duplicate search flag
+
+# Invalid search key
+PL_ERR_BADSEARCHKEY %%ERROR:507: invalid search key format
+PL_ERR_BADSEARCHKEY %%
+PL_ERR_BADSEARCHKEY %% Search key must be an IP address/range/prefix
+
+# No lookup tree
+PL_ERR_NOTREE %%ERROR:508: missing lookup tree
+PL_ERR_NOTREE %%
+PL_ERR_NOTREE %% Source "%s" does not have a lookup tree for "%s" objects
+
+# No entries found
+PL_ERR_NOENTRIES %%ERROR:101: no entries found
 
 #
 # Banner. This text comes out before the query is answered.

@@ -9,44 +9,42 @@
  *
  ****************************/
 
-// process an input query string
-// NOTE: will trash the input string
-int rpi_parse_input(char *input, GList **source_list, GList **type_list, char **key) {
-  char *p, *s;
-  int f;
-  rp_regid_t source;
+GList *pl_default_sources(void) {
+  GList *sources = NULL;
+  ca_dbSource_t *handle;
+  char *deflook;
+  int	i;
 
-  p = input;
-  while (isspace(*p)) p++;
-  if (!*p) {}// stop
-
-  // start with source(s)
-  f = 1;
-  while (f) {
-    s = p;
-    while (!isspace(*p) && *p != ',') p++;
-    if (*p != ',') f = 0;
-    *p = '\0';
-
-    //ca_get_SourceHandleByName
+  for (i=0; (handle=ca_get_SourceHandleByPosition(i)) != NULL; i++) {
+    deflook = ca_get_srcdeflook(handle);
+    if (strcmp(deflook, "y") == 0) {
+      sources = g_list_append(sources, handle);
+    }
+    UT_free(deflook);
   }
-  
-  return -1;
+
+  return sources;
 }
 
 /****************************
- * print_answers is called for each item of an answer list
+ * pl_print_answers is called for each item of an answer list
  * returned by the radix search function (RP_asc_search).
  *
  * It's task is to output the object_id from the radix node
  * to the user's connection.
  *
  ****************************/
-void print_answers(rx_datcpy_t *data, sk_conn_st *condat) {
+void pl_print_answers(rx_datcpy_t *data, sk_conn_st *condat) {
+  char *str;
+  
   if (data == NULL || condat == NULL) return;
 
   // print the object_id
   SK_cd_printf(condat, "%ld\n", (long)data->leafcpy.data_key);
+  
+  str = g_strndup(data->leafcpy.data_ptr, data->leafcpy.data_len);
+  SK_cd_printf(condat, "  -[%s]\n", str);
+  g_free(str);
   
   // now we're finished with the node copy
   // destroy any node pointers
@@ -74,8 +72,10 @@ void PL_interact(int socket) {
   char **arglist;
   int persistent_connection = 0;
   int k_flag, extra_flag, search_flag_used, dup_search_flag, search_depth;
-  GList *source_list = NULL;
-  rx_srch_mt search_mode = RX_SRCH_EXLESS;
+  GList *source_list = NULL, *cur_source;
+  GList *attr_list = NULL, *cur_attr;
+  GList *answers = NULL;
+  rx_srch_mt search_mode;
   
   int x;
   
@@ -106,24 +106,22 @@ void PL_interact(int socket) {
     }
     else // it's valid input
     {
-      // chomp and parse
+      // chomp and count
       g_strchomp(input);
-
       arglist = g_strsplit_set(input, " \t", -1);
-      
       for (argcount=0; arglist[argcount]; argcount++) ;
-      
+
       // DEBUG
-      rc = 0;
-      while (arglist[rc] != NULL) {
-	SK_cd_printf(&condat, "Arg %d: [%s]\n", rc+1, arglist[rc]);
-	rc++;
-      }
+//      rc = 0;
+//      while (arglist[rc] != NULL) {
+//	SK_cd_printf(&condat, "Arg %d: [%s]\n", rc+1, arglist[rc]);
+//	rc++;
+//      }
       // END-DEBUG
       
       // setup and double-check option state
       opt_state = mg_new(0);
-      dieif(opt_state == NULL );
+      dieif( opt_state == NULL );
       
       // clear the loop state
       err = 0;
@@ -131,16 +129,18 @@ void PL_interact(int socket) {
       extra_flag = 0;
       search_flag_used = 0;
       dup_search_flag = 0;
+      search_mode = RX_SRCH_EXLESS;
+      search_depth = 0;
       
       // process the options
-      while (!err && ((rc=mg_getopt(argcount, arglist, ":ks:T:xlLmM", opt_state)) != EOF)) {
+      while (!err && ((rc=mg_getopt(argcount, arglist, "ks:T:xlLmM", opt_state)) != EOF)) {
 	switch (rc) {
 	  case 'k':
-	    SK_cd_printf(&condat, "k flag : [%s]\n", opt_state->optarg);
+	    //SK_cd_printf(&condat, "k flag : [%s]\n", opt_state->optarg);
 	    k_flag = 1;
 	    break;
 	  case 's':
-	    SK_cd_printf(&condat, "s flag : [%s]\n", opt_state->optarg);
+	    //SK_cd_printf(&condat, "s flag : [%s]\n", opt_state->optarg);
 
 	    extra_flag = 1;	    
 	    // should always get an argument
@@ -151,11 +151,11 @@ void PL_interact(int socket) {
 	      err = 1;
 	    } else {
 	      gchar **source_strings;
-	      rp_regid_t source_handle;
+	      ca_SrcHdl_t *source_handle;
 	      
 	      g_strdown( opt_state->optarg );
-	      
 	      source_strings = ut_g_strsplit_v1(opt_state->optarg, ",", -1);
+
 	      for (rc = 0; source_strings[rc] != NULL; rc++) {
 		source_handle = ca_get_SourceHandleByName(source_strings[rc]);
 		if (source_handle == NULL) {
@@ -176,7 +176,7 @@ void PL_interact(int socket) {
 	    }
 	    break;
 	  case 'T':
-	    SK_cd_printf(&condat, "T flag : [%s]\n", opt_state->optarg);
+	    //SK_cd_printf(&condat, "T flag : [%s]\n", opt_state->optarg);
 	    
 	    extra_flag = 1;
 	    // should always get an argument
@@ -187,29 +187,49 @@ void PL_interact(int socket) {
 	      err = 1;
 	    } else {
 	      gchar **class_strings;
-	      rp_attr_t class_type;
-	      
+	      rp_attr_t attr_type;
+
 	      g_strdown( opt_state->optarg );
-	      
 	      class_strings = ut_g_strsplit_v1(opt_state->optarg, ",", -1);
+
 	      for (rc=0; class_strings[rc] != NULL; rc++) {
-		SK_cd_printf(&condat, "Object class: [%s]\n", class_strings[rc]);
-		
-		x = DF_class_name2type(class_strings[rc]);
-		SK_cd_printf(&condat, "Class type: %d\n", x);
-		
-		x = DF_attribute_name2type(class_strings[rc]);
-		SK_cd_printf(&condat, "Attribute type: %d\n", x);
-		
-		if (x != -1) {
-		  x = DF_attrcode_has_radix_lookup(x);
-		  SK_cd_printf(&condat, "Attribute has radix: %d\n", x);
+		// sorting out the object class is not fun
+		// we first make sure we have been given a class type
+		if (DF_class_name2type(class_strings[rc]) == -1) {
+		  // It's not a class type
+		  str = ca_get_pl_err_badclass;
+		  SK_cd_printf(&condat, str, class_strings[rc]);
+		  UT_free(str);
+		  err = 1;
+		} else {
+		  // So it's a class type, but is it an attribute
+		  // (should always be true - so borrow bad class error)
+		  if ((attr_type=DF_attribute_name2type(class_strings[rc])) == -1) {
+		    // It's not an attribute type
+		    str = ca_get_pl_err_badclass;
+		    SK_cd_printf(&condat, str, class_strings[rc]);
+		    UT_free(str);
+		    err = 1;
+		  } else {
+		    // So it's an attribute, but does it have a radix tree
+		    if (!DF_attrcode_has_radix_lookup(attr_type)) {
+		      // Oops, it's not a searchable class type
+		      str = ca_get_pl_err_nosearchclass;
+		      SK_cd_printf(&condat, str, class_strings[rc]);
+		      UT_free(str);
+		      err = 1;
+		    } else {
+		      // it's a searchable attribute/class name !!
+		      attr_list = g_list_append(attr_list, GINT_TO_POINTER(attr_type));
+		    }
+		  }
 		}
 	      }
+	      g_strfreev(class_strings);
 	    }
 	    break;
 	  case 'x':
-	    SK_cd_printf(&condat, "x flag : [%s]\n", opt_state->optarg);
+	    //SK_cd_printf(&condat, "x flag : [%s]\n", opt_state->optarg);
 	    if (search_flag_used == 0) {
 	      search_flag_used = 'x';
 	      search_mode = RX_SRCH_EXACT;
@@ -218,7 +238,7 @@ void PL_interact(int socket) {
 	    }
 	    break;
 	  case 'l':
-	    SK_cd_printf(&condat, "l flag : [%s]\n", opt_state->optarg);
+	    //SK_cd_printf(&condat, "l flag : [%s]\n", opt_state->optarg);
 	    if (search_flag_used == 0) {
 	      search_flag_used = 'l';
 	      search_mode = RX_SRCH_LESS;
@@ -228,7 +248,7 @@ void PL_interact(int socket) {
 	    }
 	    break;
 	  case 'L':
-	    SK_cd_printf(&condat, "L flag : [%s]\n", opt_state->optarg);
+	    //SK_cd_printf(&condat, "L flag : [%s]\n", opt_state->optarg);
 	    if (search_flag_used == 0) {
 	      search_flag_used = 'L';
 	      search_mode = RX_SRCH_LESS;
@@ -238,7 +258,7 @@ void PL_interact(int socket) {
 	    }
 	    break;
 	  case 'm':
-	    SK_cd_printf(&condat, "m flag : [%s]\n", opt_state->optarg);
+	    //SK_cd_printf(&condat, "m flag : [%s]\n", opt_state->optarg);
 	    if (search_flag_used == 0) {
 	      search_flag_used = 'm';
 	      search_mode = RX_SRCH_MORE;
@@ -248,7 +268,7 @@ void PL_interact(int socket) {
 	    }
 	    break;
 	  case 'M':
-	    SK_cd_printf(&condat, "M flag : [%s]\n", opt_state->optarg);
+	    //SK_cd_printf(&condat, "M flag : [%s]\n", opt_state->optarg);
 	    if (search_flag_used == 0) {
 	      search_flag_used = 'M';
 	      search_mode = RX_SRCH_MORE;
@@ -263,24 +283,112 @@ void PL_interact(int socket) {
 	}
       }
 
+      if (dup_search_flag) {
+	// only one search flag is allowed
+	str = ca_get_pl_err_dupsearchflag;
+	SK_cd_printf(&condat, "%s\n", str);
+	UT_free(str);
+      } else if (!err) {
+	// no errors - let's prep the search
+
+	// we MUST have a source
+	if (source_list == NULL) {
+	  // so we add the default sources
+	  source_list = pl_default_sources();
+	  if (source_list == NULL) {
+	    str = ca_get_pl_err_nosource;
+	    SK_cd_printf(&condat, str);
+	    UT_free(str);
+	    err = 1;
+	  }
+	}
+  
+	// The leftover arguments make the search key
+	search_key = g_strjoinv(" ", arglist + opt_state->optind);
+	//SK_cd_printf(&condat, "Search: [%s]\n", search_key); // DEBUG
+  
+	// check our persistent connection request
+	if (k_flag) {
+	  if (extra_flag || search_flag_used || (search_key != NULL && strlen(search_key) > 0)) {
+	    // The -k flag was used with other search options
+	    // So we enable persistent connection
+	    persistent_connection = 1;
+	  } else {
+	    // The -k flag was used by itself,
+	    // close the persistent connection
+	    persistent_connection = 0;
+	  }
+	}
+	
+	// perform search
+	for (cur_source = g_list_first(source_list); cur_source != NULL; cur_source = g_list_next(cur_source)) {
+	  for (cur_attr = g_list_first(attr_list); cur_attr != NULL; cur_attr = g_list_next(cur_attr)) {
+	    rp_regid_t reg_id = (rp_regid_t)cur_source->data;
+	    rp_attr_t attr_id = (rp_attr_t)GPOINTER_TO_INT(cur_attr->data);
+	    
+	    SK_cd_printf(&condat, "%%SOURCE: %s\n", reg_id->name);
+	    
+	    /* DEBUG
+	    SK_cd_printf(&condat, "Search mode: %s\n", RX_text_srch_mode(search_mode));
+	    SK_cd_printf(&condat, "Search depth: %d\n", search_depth);
+	    SK_cd_printf(&condat, "Search key: [%s]\n", search_key);
+	    SK_cd_printf(&condat, "Source: [%s]\n", reg_id->name);
+	    SK_cd_printf(&condat, "Attribute: [%s]\n", DF_get_attribute_name(attr_id));
+	    */
+	    
+	    rc = RP_asc_search(search_mode, search_depth, 0, search_key, reg_id, attr_id, &answers, RX_ANS_ALL);
+	    
+	    if (rc == IP_INVARG) {
+	      str = ca_get_pl_err_badsearchkey;
+	      SK_cd_printf(&condat, "%s\n", str);
+	      UT_free(str);
+	      err = 1;
+	    } else if (rc == RP_NOTREE) {
+	      str = ca_get_pl_err_notree;
+	      SK_cd_printf(&condat, str, reg_id->name, DF_get_attribute_name(attr_id));
+	      UT_free(str);
+	      err = 1;
+	    } else if (rc != 0) {
+	      // this should never happen, but future error codes might occur
+	      SK_cd_printf(&condat, "%%ERROR:999: unknown error");
+	      err = 1;
+	    } else {
+	      if (answers == NULL) {
+		// nothing was found!
+		str = ca_get_pl_err_noentries;
+		SK_cd_printf(&condat, "%s\n", str);
+		UT_free(str);
+		// note - it's not really an error
+	      } else {
+		// show the answers
+		g_list_foreach(answers, pl_print_answers, &condat);
+		// and clear the list
+		wr_clear_list(&answers);
+	      }
+	    }
+	  }
+	}
+	
+	g_free(search_key);
+
+      } /* no error after processing options */
+
       g_strfreev(arglist);
-
-      search_key = g_strjoinv(" ", arglist + opt_state->optind);
-      SK_cd_printf(&condat, "Search: [%s]\n", search_key); // DEBUG
-
-      g_free(search_key);
 
       if (source_list != NULL) {
 	g_list_free(source_list);
 	source_list = NULL;
       }
+      if (attr_list != NULL) {
+	g_list_free(attr_list);
+	attr_list = NULL;
+      }
 
-    }
+    } /* process valid input */
 
   } while (persistent_connection && condat.rtc == 0
     && CO_get_whois_suspended() == 0);
 
-  SK_cd_printf(&condat, "Done!\n");
   SK_cd_free(&condat);
 
 }
