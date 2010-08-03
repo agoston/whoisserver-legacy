@@ -170,8 +170,8 @@ char *QC_query_command_to_string(Query_command *query_command) {
 
     sprintf(result_buf,
             "Query_command : inv_attrs=%s, recursive=%s, object_type=%s, (c=%s,C=%s,G=%s,B=%s,b=%s,g=%d,l=%d,m=%d,q=%d,t=%d,v=%d,x=%d,F=%d,K=%d,L=%d,M=%d,R=%d), possible keytypes=%s, keys=[%s]",
-            str1, query_command->recursive ? "y" : "n", str2, query_command->c_irt_search ? "TRUE" : "FALSE",
-            query_command->C ? "TRUE" : "FALSE", query_command->G_group_search ? "TRUE" : "FALSE",
+            str1, query_command->recursive ? "y" : "n", str2, query_command->c ? "TRUE" : "FALSE",
+            query_command->C ? "TRUE" : "FALSE", query_command->G ? "TRUE" : "FALSE",
             query_command->B ? "TRUE" : "FALSE", query_command->b ? "TRUE" : "FALSE", query_command->g,
             query_command->l, query_command->m, query_command->q, query_command->t, query_command->v, query_command->x,
             query_command->fast, query_command->filtered, query_command->L, query_command->M, query_command->R, str3,
@@ -252,9 +252,9 @@ void QC_free(Query_command *qc) {
 
 void QC_init_struct(Query_command *query_command) {
     query_command->query_type = QC_SYNERR;
-    query_command->c_irt_search = TRUE; /* IRT search is on by default */
+    query_command->c = TRUE; /* IRT search is on by default */
     query_command->C = FALSE;
-    query_command->G_group_search = TRUE; /* grouping is on by default */
+    query_command->G = TRUE; /* grouping is on by default */
     query_command->B = FALSE; /* "original" output is off by default */
     query_command->b = FALSE;
     query_command->d = 0;
@@ -382,7 +382,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'C':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->C = TRUE;
                 query_command->l = 0;
                 query_command->m = 0;
@@ -396,7 +396,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'c':
-                query_command->c_irt_search = TRUE;
+                query_command->c = TRUE;
                 query_command->l = 0;
                 query_command->m = 0;
                 query_command->x = 0;
@@ -409,7 +409,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'G':
-                query_command->G_group_search = FALSE;
+                query_command->G = FALSE;
                 break;
 
             case 'B':
@@ -418,7 +418,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
 
             case 'b':
                 query_command->b = TRUE;
-                query_command->c_irt_search = TRUE;
+                query_command->c = TRUE;
                 query_command->l = 0;
                 query_command->m = 0;
                 query_command->x = 0;
@@ -504,7 +504,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'l':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->l = 1;
                 query_command->m = 0;
                 query_command->x = 0;
@@ -517,7 +517,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'm':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->l = 0;
                 query_command->m = 1;
                 query_command->x = 0;
@@ -614,7 +614,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'x':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->l = 0;
                 query_command->m = 0;
                 query_command->x = 1;
@@ -636,7 +636,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'L':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->l = 0;
                 query_command->m = 0;
                 query_command->x = 0;
@@ -649,7 +649,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'M':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->l = 0;
                 query_command->m = 0;
                 query_command->x = 0;
@@ -799,7 +799,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
         badparerr++;
     }
 
-    if ((query_command->b == 1) && (query_command->G_group_search == 0)) {
+    if ((query_command->b == 1) && (query_command->G == 0)) {
         /* -G -b is error, we need grouping */
         /* ERROR:109 */
         char *fmt = ca_get_qc_fmt_uncompflag;
@@ -877,7 +877,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
             MA_set(&query_command->keytypes_bitmap, WK_DOMAIN, 0);
             /* no use of irt lookup (the -c query flag) on domain objects, as there is not even an mnt-irt attribute
              * Maybe later we could add some smart lookup feature */
-            query_command->c_irt_search = FALSE;
+            query_command->c = FALSE;
         }
 
         /* check for use of IP flags on non-IP lookups */

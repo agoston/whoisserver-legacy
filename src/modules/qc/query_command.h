@@ -81,11 +81,11 @@ typedef struct Query_command_t {
 
   /* -c: query for the most specific inetnum/inet6num with the "mnt-irt:" 
          attribute set and return the irt object */
-  gboolean c_irt_search;
+  gboolean c;
   /* -C: negates -c */
   gboolean C;
   /* -G: non-grouped ouput (default - grouped) */
-  gboolean G_group_search;
+  gboolean G;
   /* -B: original output (with e-mail, changed and notify attrs */
   gboolean B;
   /* -b: brief output (keys + abuse-mailbox from object/recursive objects) */

@@ -873,7 +873,7 @@ static int write_results(SQ_result_set_t *result, Query_instructions *qis, sk_co
     int abuse_attr_exists = 0;
     unsigned int filtered = qis->filtered; /* if the objects should go through a filter(-K) */
     unsigned int fast = qis->fast; /* fast output */
-    unsigned int grouped = qis->qc->G_group_search; /* grouped output */
+    unsigned int grouped = qis->qc->G; /* grouped output */
     unsigned int original = qis->qc->B; /* original output */
     unsigned int brief = qis->qc->b; /* brief output */
 
@@ -1157,7 +1157,7 @@ static int qi_write_objects(SQ_connection_t **sql_connection, char *id_table, Qu
     int retrieved_objects = 0;
     char sql_command[STR_XL];
     GHashTable *groups = NULL;
-    unsigned int grouped = qis->qc->G_group_search;
+    unsigned int grouped = qis->qc->G;
     unsigned int original = qis->qc->B;
 
     if (grouped == 1) {
@@ -1393,7 +1393,7 @@ static int map_qc2rx(Query_instruction *qi, const Query_command *qc) {
     int result = 1;
     int allflags = (qc->L == 1) + (qc->M == 1) + (qc->l == 1) + (qc->m == 1) + (qc->x == 1);
 
-    allflags += qc->c_irt_search;
+    allflags += qc->c;
 
     qi->rx_keys = qc->keys;
 
@@ -1409,7 +1409,7 @@ static int map_qc2rx(Query_instruction *qi, const Query_command *qc) {
         /* no options active - default search */
         qi->rx_srch_mode = RX_SRCH_EXLESS;
         qi->rx_par_a = 0;
-    } else if (qc->c_irt_search) {
+    } else if (qc->c) {
         /* for grabbing all the less specific objects up the radix tree hierarchy
          * will be filtered later during query processing in mnt_irt_filter(), so end result is exactly like RX_SRCH_EXLESS */
         qi->rx_srch_mode = RX_SRCH_LESS;
@@ -2175,7 +2175,7 @@ int QI_execute(ca_dbSource_t *dbhdl, Query_instructions *qis, Query_environ *qe,
 
             /* if -c selected, find the referencing inet(6)num and remove
              all the less specific inet(6)num object_ids from the list */
-            if (qis->qc->c_irt_search) {
+            if (qis->qc->c) {
                 mnt_irt_filter(&(qe->condat), sql_connection, &datlist, &irt_inet_id, &irt_gid);
             }
 
@@ -2207,7 +2207,7 @@ int QI_execute(ca_dbSource_t *dbhdl, Query_instructions *qis, Query_environ *qe,
 
     /* change the idtable */
     if (!sql_error) {
-        if (qis->qc->G_group_search == TRUE) {
+        if (qis->qc->G == TRUE) {
             sprintf(sql_command, Q_ALTER_TMP_GROUPED, id_table);
         } else {
             sprintf(sql_command, Q_ALTER_TMP, id_table);
@@ -2232,7 +2232,7 @@ int QI_execute(ca_dbSource_t *dbhdl, Query_instructions *qis, Query_environ *qe,
     }
 
     /* find the irt objects (for -c) */
-    if (!sql_error && (qis->qc->c_irt_search) && irt_inet_id) {
+    if (!sql_error && (qis->qc->c) && irt_inet_id) {
         sql_error = qi_find_refs(&sql_connection, qe, Q_REC_IRT, "mnt_irt", "", id_table, irt_inet_id, irt_gid);
     }
 
