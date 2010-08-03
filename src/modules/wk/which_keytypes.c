@@ -74,6 +74,9 @@ struct {
 };
 #define WK_REGEX_LIST_LEN  (sizeof(wk_regex_list)/sizeof(wk_regex_list[0]))
 
+/* index array to map WK_* enum values to index in wk_regex_list */
+int wk_regex_index[WK_END];
+
 /* regular expression used by isdomname() */
 static regex_t domainname;
 static regex_t domainalpha;
@@ -87,6 +90,7 @@ void wk_regex_init() {
     for (i = 0; i < WK_REGEX_LIST_LEN; i++) {
         errcode = regcomp(&wk_regex_list[i].regex, wk_regex_list[i].pattern, REG_EXTENDED | REG_NOSUB);
         dieif(errcode != 0);
+        wk_regex_index[wk_regex_list[i].key_type] = i;
     }
 
     /* add some special cases used by our other functions */
@@ -116,7 +120,7 @@ char *WK_to_string(mask_t wk) {
 
 /* check if key looks like an aut-num primary key (or, matches aut-num regexp) */
 int WK_is_aut_num(char *key) {
-    if (regexec(&wk_regex_list[WK_AUTNUM].regex, (const char *) key, 0, NULL, 0) == 0) {
+    if (regexec(&wk_regex_list[wk_regex_index[WK_AUTNUM]].regex, (const char *) key, 0, NULL, 0) == 0) {
         return 1;
     }
     return 0;
