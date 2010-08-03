@@ -1923,7 +1923,8 @@ int qi_collect_ids(ca_dbSource_t *dbhdl, char *sourcename, SQ_connection_t **sql
                 }
 #endif
             } else {
-                LG_log(qi_context, LG_INFO, "RP_asc_search returned %x ", err);
+                LG_log(qi_context, LG_INFO, "RP_asc_search returned error code %x after %s (mode %d par %d reg %s) query for %s", err,
+                        Query[qi->queryindex].descr, qi->rx_srch_mode, qi->rx_par_a, dbhdl->name, qi->rx_keys);
             }
             break;
 
