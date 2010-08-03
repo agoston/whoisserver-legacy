@@ -1333,7 +1333,7 @@ static int insert_radix_serials(sk_conn_st *condat, SQ_connection_t *sql_connect
 }
 
 
-/*++++++++++++++++++++++++++++++++++++++
+/*
  Display the immediate data carried with the objects returned by the
  radix tree.
 
@@ -1343,14 +1343,7 @@ static int insert_radix_serials(sk_conn_st *condat, SQ_connection_t *sql_connect
 
  acc_st  *acc_credit Accounting struct
 
- More:
- +html+ <PRE>
- Authors:
- marek
- +html+ </PRE>
-
- Also free the list of answers.
- ++++++++++++++++++++++++++++++++++++++*/
+ Also free the list of answers. */
 static void write_radix_immediate(GList *datlist, sk_conn_st *condat, acc_st *acc_credit, acl_st *acl) {
     GList *qitem;
 
@@ -1362,7 +1355,8 @@ static void write_radix_immediate(GList *datlist, sk_conn_st *condat, acc_st *ac
 
         UT_free(datcpy->leafcpy.data_ptr);
 
-        AC_count_object(acc_credit, acl, 0); /* public object (private=0) */
+        /* account it as public object (private=0) */
+        AC_count_object(acc_credit, acl, 0);
 
         if (condat->rtc != 0) {
             break;
@@ -1370,9 +1364,9 @@ static void write_radix_immediate(GList *datlist, sk_conn_st *condat, acc_st *ac
     }
 
     wr_clear_list(&datlist);
-} /* write_radix_immediate() */
+}
 
-/* map_qc2rx() */
+
 /*++++++++++++++++++++++++++++++++++++++
  The mapping between a query_command and a radix query.
 
@@ -2006,9 +2000,7 @@ int qi_find_refs(SQ_connection_t **sql_connection, Query_environ *qe, char *quer
     return 0;
 }
 
-/* qi_fetch_references */
-/*++++++++++++++++++++++++++++++++++++++
-
+/*
  given the list of object ID's collects the references from these objects
  to person, role and organisation objects. Uses its own temporary SQL table (_R)
  and upon completion transfers the results from it to the main
@@ -2025,10 +2017,8 @@ int qi_find_refs(SQ_connection_t **sql_connection, Query_environ *qe, char *quer
  Query_environ *qe                 original query environment structure
 
  char *id_table                    the table with the ID's found
-
- ++++++++++++++++++++++++++++++++++++++*/
-static
-int qi_fetch_references(SQ_connection_t **sql_connection, Query_environ *qe, char *id_table) {
+*/
+static int qi_fetch_references(SQ_connection_t **sql_connection, Query_environ *qe, char *id_table) {
     char rec_table[64];
     char sql_command[STR_XL];
     int sql_error;
@@ -2096,9 +2086,8 @@ int qi_fetch_references(SQ_connection_t **sql_connection, Query_environ *qe, cha
     /* return error, if any */
     return sql_error;
 }
-/* qi_fetch_references */
 
-/* QI_execute() */
+
 /*++++++++++++++++++++++++++++++++++++++
  Execute the query instructions.  This is called for each source.
  This is linked into MySQL by the fact that MySQL doesn't have sub selects
@@ -2268,7 +2257,8 @@ int QI_execute(ca_dbSource_t *dbhdl, Query_instructions *qis, Query_environ *qe,
     } else {
         return QI_OK;
     }
-} /* QI_execute() */
+}
+
 
 /* instruction_free() */
 /*++++++++++++++++++++++++++++++++++++++
