@@ -1,0 +1,7 @@
+# rdns tests
+# CASE 63: Hierarchical lookup on the rdns radix tree
+#
+#FAILURE
+#
+# RESULT 063: the query will fail
+
