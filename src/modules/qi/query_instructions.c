@@ -1410,6 +1410,8 @@ static int map_qc2rx(Query_instruction *qi, const Query_command *qc) {
         qi->rx_srch_mode = RX_SRCH_EXLESS;
         qi->rx_par_a = 0;
     } else if (qc->c_irt_search) {
+        /* for grabbing all the less specific objects up the radix tree hierarchy
+         * will be filtered later during query processing in mnt_irt_filter(), so end result is exactly like RX_SRCH_EXLESS */
         qi->rx_srch_mode = RX_SRCH_LESS;
         qi->rx_par_a = RX_ALL_DEPTHS;
     } else if (qc->L == 1) {
@@ -1883,17 +1885,14 @@ int qi_collect_ids(ca_dbSource_t *dbhdl, char *sourcename, SQ_connection_t **sql
             if (qi->query_str != NULL) {
 
                 /* handle special cases first */
+                /* forward domain - run referral to foreign registry */
                 if (Query[qi->queryindex].class == C_DN && Query[qi->queryindex].querytype == Q_LOOKUP) {
 
-                    /* if any more cases than just domain appear, we will be
-                     cleaning the _S table from the previous query here
-
-                     "DELETE FROM %s_S"
-                     */
-
+                    /* if any more cases than just domain appear, we will be cleaning the _S table from the previous query here
+                      (a.k.a "DELETE FROM %s_S") */
                     count = qi_collect_domain(sourcename, *sql_connection, id_table, sub_table, qis, qe, qi, acc_credit, &sql_error);
-                } /* if class DN and Straight lookup */
-                else {
+
+                } else {
                     /* any other class of query */
 
                     g_string_sprintf(sql_command, "INSERT IGNORE INTO %s %s %s", id_table, qi->query_str, limit_str);
@@ -2167,8 +2166,8 @@ int QI_execute(ca_dbSource_t *dbhdl, Query_instructions *qis, Query_environ *qe,
     /* post-processing */
     if (!sql_error && (qis->filtered == 0)) {
         /* start the watchdog just to set the rtc flag */
-        //SK_watch_setclear(&(qe->condat));
-        //SK_watchstart(&(qe->condat));
+//        SK_watch_setclear(&(qe->condat));
+//        SK_watchstart(&(qe->condat));
 
         /* add radix results (only if -K is not active and still connected) */
         if (qe->condat.rtc == 0) {
@@ -2183,7 +2182,7 @@ int QI_execute(ca_dbSource_t *dbhdl, Query_instructions *qis, Query_environ *qe,
             sql_error = insert_radix_serials(&(qe->condat), sql_connection, id_table, datlist);
         }
 
-        //SK_watchstop(&(qe->condat));
+//        SK_watchstop(&(qe->condat));
     }
 
     /* change the idtable */
