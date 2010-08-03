@@ -344,6 +344,18 @@
 #define ca_get_ac_load ca_get_boolean(CA_AC_LOAD)
 #define ca_set_ac_load ca_set_boolean(CA_AC_LOAD)
 
+#define ca_get_pl_help_file	ca_get_dirlist(CA_PL_HELP_FILE)
+#define ca_set_pl_help_file	ca_set_dirlist(CA_PL_HELP_FILE)
+
+#define ca_get_pl_err_badsource	ca_get_string(CA_PL_ERR_BADSOURCE)
+#define ca_set_pl_err_badsource ca_set_string(CA_PL_ERR_BADSOURCE)
+
+#define ca_get_pl_err_nosource	ca_get_string(CA_PL_ERR_NOSOURCE)
+#define ca_set_pl_err_nosource	ca_set_string(CA_PL_ERR_NOSOURCE)
+
+#define ca_get_pl_err_noclass	ca_get_string(CA_PL_ERR_NOCLASS)
+#define ca_set_pl_err_noclass	ca_set_string(CA_PL_ERR_NOCLASS)
+
 #define ca_get_pw_resp_header	ca_get_string(CA_PW_RESP_HEADER)
 #define ca_set_pw_resp_header	ca_set_string(CA_PW_RESP_HEADER)
 
@@ -355,9 +367,6 @@
 
 #define ca_get_pw_help_file	ca_get_dirlist(CA_PW_HELP_FILE)
 #define ca_set_pw_help_file	ca_set_dirlist(CA_PW_HELP_FILE)
-
-#define ca_get_pl_help_file	ca_get_dirlist(CA_PL_HELP_FILE)
-#define ca_set_pl_help_file	ca_set_dirlist(CA_PL_HELP_FILE)
 
 #define ca_get_pw_k_filter	ca_get_string(CA_PW_K_FILTER)
 #define ca_set_pw_k_filter	ca_set_string(CA_PW_K_FILTER)

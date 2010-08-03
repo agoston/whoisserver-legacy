@@ -255,6 +255,19 @@ AC_DECAY_HALFLIFE 43200
 ## The only things you need to change here are the
 ## pointers to your own URLs and specific site-related information.
 
+# Radix Lookup Messages
+
+# Unknown source error (102)
+PL_ERR_BADSOURCE %%ERROR:102: unknown source
+PL_ERR_BADSOURCE %%
+PL_ERR_BADSOURCE %% "%s" is not a known source.
+
+# Missing source error
+PL_ERR_NOSOURCE %%ERROR:502: missing source
+
+# Missing class error
+PL_ERR_NOCLASS %%ERROR:503: missing object class
+
 #
 # Banner. This text comes out before the query is answered.
 
