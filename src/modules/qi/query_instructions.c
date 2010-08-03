@@ -1313,7 +1313,6 @@ static int insert_radix_serials(sk_conn_st *condat, SQ_connection_t *sql_connect
         /* if we've lost the client connection */
         if ((condat->rtc == 0) && !sql_error) {
             g_string_sprintf(sql_command, "INSERT INTO %s values (%d,0)", id_table, object_id);
-            fprintf(stderr, sql_command->str);
             if (SQ_execute_query(sql_connection, sql_command->str, NULL) == -1) {
                 /* it seems to be a design decision to gracefully fail here - for performance and sanity reasons,
                  * there should never be two query instructions returning the same object_id twice
