@@ -1299,12 +1299,12 @@ void mnt_irt_filter(sk_conn_st *condat, SQ_connection_t *sql_connection, GList *
 */
 static int insert_radix_serials(sk_conn_st *condat, SQ_connection_t *sql_connection, char *id_table, GList *datlist) {
     GList *qitem;
-    GString *sql_command;
+    GString *sql_command = g_string_sized_new(STR_S);
     int object_id;
     int sql_error;
 
     sql_error = 0;
-    for (qitem = g_list_first(datlist); qitem != NULL; qitem = g_list_next(qitem)) {
+    for (qitem = g_list_first(datlist); qitem; qitem = g_list_next(qitem)) {
         rx_datcpy_t *datcpy = qitem->data;
 
         object_id = datcpy->leafcpy.data_key;
@@ -1312,19 +1312,20 @@ static int insert_radix_serials(sk_conn_st *condat, SQ_connection_t *sql_connect
         /* don't bother to insert values into our temporary table */
         /* if we've lost the client connection */
         if ((condat->rtc == 0) && !sql_error) {
-            sql_command = g_string_sized_new(STR_S);
             g_string_sprintf(sql_command, "INSERT INTO %s values (%d,0)", id_table, object_id);
+            fprintf(stderr, sql_command->str);
             if (SQ_execute_query(sql_connection, sql_command->str, NULL) == -1) {
                 /* it seems to be a design decision to gracefully fail here - for performance and sanity reasons,
-                 * there should never be two query instructions returning the same object_id twice */
+                 * there should never be two query instructions returning the same object_id twice
+                 * Note: this is weird, as SQL lookups simply use INSERT IGNORE; maybe this was simply overlooked? - agoston, 2010-07-29 */
                 sql_error = SQ_errno(sql_connection);
                 report_sql_error(condat, sql_connection, sql_command->str);
             }
-            g_string_free(sql_command, TRUE);
         }
-
         UT_free(datcpy->leafcpy.data_ptr);
     }
+
+    g_string_free(sql_command, TRUE);
 
     wr_clear_list(&datlist);
 
