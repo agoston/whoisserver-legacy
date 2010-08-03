@@ -668,96 +668,82 @@ int SQ_get_column_llint(SQ_result_set_t *result, SQ_row_t *current_row, unsigned
 }
 
 
-/* SQ_result_to_string() */
-/*++++++++++++++++++++++++++++++++++++++
-  Convert the result set to a string.
+/*Convert the result set to a string.
 
   SQ_result_set_t *result The results.
 
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+ </UL></DL>
-
-  ++++++++++++++++++++++++++++++++++++++*/
+  Caller is responsible for free()ing return value.*/
 char *SQ_result_to_string(SQ_result_set_t *result) {
-  MYSQL_ROW row;
-  unsigned int no_cols;
-  unsigned int i, j;
-  char str_buffer[STR_XXL];
-  char str_buffer_tmp[STR_L];
-  char border[STR_L];
+    MYSQL_ROW row;
+    unsigned int no_cols;
+    unsigned int i, j;
+    char str_buffer[STR_XXL];
+    char str_buffer_tmp[STR_L];
+    char border[STR_L];
 
-  char *label;
+    char *label;
 
-  unsigned int length[STR_S];
+    unsigned int length[STR_S];
 
-  strcpy(str_buffer, "");
+    strcpy(str_buffer, "");
 
-  no_cols = mysql_num_fields(result);
+    no_cols = mysql_num_fields(result);
 
-  /* Determine the maximum column widths */
-  /* XXX Surely MySQL should keep note of this for me! */
-  strcpy(border, "");
-  for (i=0; i < no_cols; i++) {
-    length[i] = SQ_get_column_max_length(result, i);
-    /* Make sure the lenghts don't get too long */
-    if (length[i] > STR_M) {
-      length[i] = STR_M;
+    /* Determine the maximum column widths */
+    /* XXX Surely MySQL should keep note of this for me! */
+    strcpy(border, "");
+    for (i = 0; i < no_cols; i++) {
+        length[i] = SQ_get_column_max_length(result, i);
+        /* Make sure the lenghts don't get too long */
+        if (length[i] > STR_M) {
+            length[i] = STR_M;
+        }
+        strcat(border, "*");
+        for (j = 0; (j <= length[i]) && (j < STR_L); j++) {
+            strcat(border, "-");
+        }
     }
-    strcat(border, "*");
-    for (j=0; (j <= length[i]) && (j < STR_L); j++) {
-      strcat(border, "-");
-    }
-  }
-  strcat(border, "*\n");
-  /*
-  for (i=0; i < no_cols; i++) {
-    printf("length[%d]=%d\n", i, length[i]);
-  }
-  */
+    strcat(border, "*\n");
+    /*
+     for (i=0; i < no_cols; i++) {
+     printf("length[%d]=%d\n", i, length[i]);
+     }
+     */
 
-  strcat(str_buffer, border);
+    strcat(str_buffer, border);
 
-  for (i=0; i < no_cols; i++) {
-    label = SQ_get_column_label(result, i);
-    if (label != NULL) {
-      sprintf(str_buffer_tmp, "| %-*s", length[i], label);
-      strcat(str_buffer, str_buffer_tmp);
-    }
-  }
-  strcat(str_buffer, "|\n");
-
-  strcat(str_buffer, border);
-
-
-  while ((row = mysql_fetch_row(result)) != NULL) {
-    for (i=0; i < no_cols; i++) {
-      if (row[i] != NULL) {
-        sprintf(str_buffer_tmp, "| %-*s", length[i], row[i]);
-      }
-      else {
-        sprintf(str_buffer_tmp, "| %-*s", length[i], "NuLL");
-      }
-      strcat(str_buffer, str_buffer_tmp);
+    for (i = 0; i < no_cols; i++) {
+        label = SQ_get_column_label(result, i);
+        if (label != NULL) {
+            sprintf(str_buffer_tmp, "| %-*s", length[i], label);
+            strcat(str_buffer, str_buffer_tmp);
+        }
     }
     strcat(str_buffer, "|\n");
 
-    if (strlen(str_buffer) >= (STR_XXL - STR_XL) ) {
-      strcat(str_buffer, "And some more stuff...\n");
-      break;
+    strcat(str_buffer, border);
+
+    while ((row = mysql_fetch_row(result)) != NULL) {
+        for (i = 0; i < no_cols; i++) {
+            if (row[i] != NULL) {
+                sprintf(str_buffer_tmp, "| %-*s", length[i], row[i]);
+            } else {
+                sprintf(str_buffer_tmp, "| %-*s", length[i], "NULL");
+            }
+            strcat(str_buffer, str_buffer_tmp);
+        }
+        strcat(str_buffer, "|\n");
+
+        if (strlen(str_buffer) >= (STR_XXL - STR_XL)) {
+            strcat(str_buffer, "And some more stuff...\n");
+            break;
+        }
     }
-  }
 
-  strcat(str_buffer, border);
+    strcat(str_buffer, border);
 
-  return UT_strdup(str_buffer);
-
-} /* SQ_result_to_string() */
+    return UT_strdup(str_buffer);
+}
 
 /* SQ_free_result() */
 /*++++++++++++++++++++++++++++++++++++++
