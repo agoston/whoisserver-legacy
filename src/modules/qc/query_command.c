@@ -875,6 +875,9 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
         if (!is_inverse && is_rdns_key) {
             // it must have WK_DOMAIN set also, as it is a lot more relaxed than WK_REVDOMAIN
             MA_set(&query_command->keytypes_bitmap, WK_DOMAIN, 0);
+            /* no use of irt lookup (the -c query flag) on domain objects, as there is not even an mnt-irt attribute
+             * Maybe later we could add some smart lookup feature */
+            query_command->c_irt_search = FALSE;
         }
 
         /* check for use of IP flags on non-IP lookups */
