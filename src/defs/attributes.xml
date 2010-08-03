@@ -1499,16 +1499,18 @@
       <primary/>
       <queries>
         <sqlquery keytype="wk_autnum" class="ANY">
-          SELECT object_id,0
-          FROM   route
-          WHERE  origin = '%s'
-          AND    thread_id = 0
+          SELECT i.object_id,0
+          FROM   last i, route
+          WHERE  route.origin = '%s'
+          AND    route.thread_id = 0
+          AND    i.object_id = route.object_id
         </sqlquery>
         <sqlquery keytype="wk_autnum" class="ANY">
-          SELECT object_id,0
-          FROM   route6
-          WHERE  origin = '%s'
-          AND    thread_id = 0
+          SELECT i.object_id,0
+          FROM   last i, route6
+          WHERE  route6.origin = '%s'
+          AND    route6.thread_id = 0
+          AND    i.object_id = route6.object_id
         </sqlquery>
       </queries>
     </keys>
