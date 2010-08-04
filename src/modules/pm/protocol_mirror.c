@@ -56,6 +56,11 @@ char *main_source = NULL;
 /* hash to store placeholder object per class (used in nrtm v1 and v2 backward compatibility mode only)
  * key = classname (char *), value = placeholder object blob (char *)
  *
+ * The dummy object would have a more convenient place in the rip.config file, however, that would mean that the object referenced
+ * from dummified object cannot be queried for in the master database.
+ *
+ * TODO: Once NRTM v1+2 is dropped, we don't need to load this object into memory, so we can drop this cache too. Woohooo!
+ *
  * FIXME: The RPSL implementation support a single RPSL schema definition only. This means that NRTM can dummify only
  * one source, and that is the main source (first UPDSOURCE). Hence, dummification should never be called for any other source.
  * agoston, 2010-04-20 */
