@@ -751,6 +751,121 @@ int UP_check_mnt_by(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     return retval;
 }
 
+/* Takes an attribute as a string and returns the attribute value
+   Returns a memory allocated string containing the value. */
+
+char *up_get_name_from_str(LG_context_t *lg_ctx, gchar *string)
+{
+    char *name = NULL;
+    gchar **tokens;
+
+    LG_log(lg_ctx, LG_FUNC, ">up_get_name_from_str: entered\n");
+
+    tokens = g_strsplit(string, " ", 2);
+    if ( tokens[0] != NULL && tokens[1] != NULL ) { name = strdup(tokens[1]); }
+    else { name = strdup("Unknown"); }
+    g_strfreev(tokens);
+
+    LG_log(lg_ctx, LG_FUNC, "<up_get_name_from_str: exiting with name [%s]\n", name);
+    return name;
+}
+
+/* Takes a list of keys returned from a lookup query and checks if one
+   of them is a domain object.
+ */
+
+int up_check_domain_list(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                          GList *object_key_list, gchar *specifics)
+{
+    int retval = UP_OK;
+    GList *object;
+    const char *type = NULL;
+    gchar *key;
+
+    LG_log(lg_ctx, LG_FUNC, ">up_check_domain_list: entered\n");
+
+    if ( object_key_list != NULL )
+    {
+        LG_log(lg_ctx, LG_DEBUG, "up_check_domain_list: %s specific hierarchy has entries", specifics);
+        for ( object=object_key_list; object!=NULL; object=g_list_next(object) )
+        {
+            type = rpsl_object_get_class(object->data);
+            key = rpsl_object_get_key_value(object->data);
+LG_log(lg_ctx, LG_DEBUG, "up_check_domain_list: type [%s]", type);
+LG_log(lg_ctx, LG_DEBUG, "up_check_domain_list: key [%s]", key);
+            if ( ! strcasecmp(type, "DOMAIN") )
+            {
+                LG_log(lg_ctx, LG_DEBUG, "up_check_domain_list: domain object found in %s specific hierarchy [%s]", specifics, key);
+                RT_rdns_hierarchy(rt_ctx, specifics, key);
+//                free(key);
+                retval = UP_FAIL;
+                break;
+            }
+            free(key);
+        }
+    }
+
+    LG_log(lg_ctx, LG_FUNC, "<up_check_domain_list: exiting with value [%s]\n", UP_ret2str(retval));
+    return retval;
+}
+
+/* checks if any more or less specific domain objects exist
+   relative to the specified domain object.
+   Receives RT context
+            LG context
+            options structure
+            parsed object
+            operation type
+            server structure for lookups
+            object source
+   Returns  UP_OK or UP_FAIL if an error occurs
+ */
+int UP_check_domain(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                    options_struct_t *options, rpsl_object_t *preproc_obj,
+                    int operation, LU_server_t *server, char *obj_source)
+{
+    int retval = UP_OK;
+    const char *type = NULL;
+    char *key = NULL;
+    GList *object;
+    GList *query_result_m = NULL;
+    GList *query_result_l = NULL;
+    gchar *query_str_m = "-rBG -M -Tdomain ";
+    gchar *query_str_l = "-rBG -L -Tdomain ";
+
+    LG_log(lg_ctx, LG_FUNC, ">UP_check_domain: entered\n");
+
+    type = rpsl_object_get_class(preproc_obj);
+    /* if the object is not a domain object, return OK */
+    /* if the operation is not a create, then return OK */
+    if ( (operation != UP_CREATE) || strcasecmp(type, "domain") != 0)
+    {
+        LG_log(lg_ctx, LG_FUNC, "<UP_check_domain: exiting with value [%s]\n", UP_ret2str(retval));
+        return retval;
+    }
+    key = rpsl_object_get_key_value(preproc_obj);
+
+    /* look for any more or less specific domain objects */
+    if ( LU_get(server, query_str_l, obj_source, &query_result_l, key) != LU_OKAY ||
+            LU_get(server, query_str_m, obj_source, &query_result_m, key) != LU_OKAY )
+    {
+        /* any lookup error is considered a fatal error */
+        LG_log(lg_ctx, LG_FATAL, "UP_check_domain: lookup error on [%s]", key);
+        free(key);
+        UP_internal_error(rt_ctx, lg_ctx, options, "UP_check_domain: lookup error\n", 0);
+    }
+    free(key);
+
+    /* if either query found a more or less specific object, this object cannot be created.
+       Don't rely on the query filtering to ONLY return domain objects - check!!
+       'L' also returns exact match, but as this operation is create there cannot be an exact match */
+    retval |= up_check_domain_list(rt_ctx, lg_ctx, query_result_l, "less");
+    retval |= up_check_domain_list(rt_ctx, lg_ctx, query_result_m, "more");
+
+    LG_log(lg_ctx, LG_FUNC, "<UP_check_domain: exiting with value [%s]\n", UP_ret2str(retval));
+    return retval;
+}
+
 /* checks for a valid suffix at the end of a 'nic-hdl' attributes 
    Receives RT context
             LG context

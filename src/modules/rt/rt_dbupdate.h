@@ -272,6 +272,7 @@ void RT_rdns_invalid_range(RT_context_t*,gchar*);
 void RT_rdns_auth_result(RT_context_t* ctx, gboolean result, gboolean override);
 void RT_rdns_ds_not_accepted(RT_context_t* ctx);
 void RT_rdns_size_not_accepted(RT_context_t* ctx);
+void RT_rdns_hierarchy(RT_context_t* ctx, gchar* specifics, gchar* name);
 
 /* status check related */
 void RT_status_check_failed_parentwithoutstatus(RT_context_t*,gchar*,gchar*);

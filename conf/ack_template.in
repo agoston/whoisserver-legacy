@@ -151,6 +151,11 @@
           For delegations less than /24 (IPv4), contact ripe-dbm@ripe.net.
 </xsl:template>
 
+<xsl:template match="rdns_hierarchy">
+
+***Error: Existing '<xsl:value-of select="specifics/text()"/>' specific domain object found '<xsl:value-of select="name/text()"/>'
+</xsl:template>
+
   <xsl:template match="syntax_error">
 <xsl:text>
 ***Error: Syntax error in object
