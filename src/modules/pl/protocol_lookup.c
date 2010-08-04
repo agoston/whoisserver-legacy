@@ -427,11 +427,11 @@ void PL_interact(int socket) {
 	// all the sources are done so write a blank line for termination
 	SK_cd_printf(&answer_info.condat, "\n");
 
-	g_free(search_key);
-
       } /* no error after processing options */
 
       // cleanup the loop memory
+      g_free(search_key);
+
       UT_free(opt_state);
       
       g_strfreev(arglist);
