@@ -93,7 +93,7 @@ void PL_interact(int socket) {
   pl_answer_t      answer_info;
   char             input[MAX_INPUT_SIZE + 1];
   char            *str, *search_key;
-  int              rc, err, argcount, entries_found;
+  int              rc, err, argcount, entries_found, search_key_provided;
   getopt_state_t  *opt_state = NULL;
   char           **arglist;
   int              persistent_connection = 0;
@@ -112,7 +112,7 @@ void PL_interact(int socket) {
   do {
     // produce the banner ??
     //str = ca_get_pw_banner;
-    //rc = SK_cd_printf(&condat, "%s\n", str);
+    //rc = SK_cd_printf(&condat, str);
     //UT_free(str);
 
     // grab the input string
@@ -122,7 +122,7 @@ void PL_interact(int socket) {
     // if the string is too long let them know
     if (rc > 0 && input[rc-1] != '\n') {
       str = ca_get_pw_err_linetoolong;
-      SK_cd_printf(&answer_info.condat, "%s\n\n", str);
+      SK_cd_printf(&answer_info.condat, str);
       UT_free(str);
       // we should exit out of any persistent connection
       // otherwise we will have to slurp up the rest of
@@ -173,7 +173,7 @@ void PL_interact(int socket) {
 	    // should always get an argument
 	    if ( opt_state->optarg == NULL ) {
 	      str = ca_get_pl_err_nosource;
-	      SK_cd_printf(&answer_info.condat, "%s\n", str);
+	      SK_cd_printf(&answer_info.condat, str);
 	      UT_free(str);
 	      err = 1;
 	    } else {
@@ -209,7 +209,7 @@ void PL_interact(int socket) {
 	    // should always get an argument
 	    if ( opt_state->optarg == NULL ) {
 	      str = ca_get_pl_err_noclass;
-	      SK_cd_printf(&answer_info.condat, "%s\n", str);
+	      SK_cd_printf(&answer_info.condat, str);
 	      UT_free(str);
 	      err = 1;
 	    } else {
@@ -313,7 +313,7 @@ void PL_interact(int socket) {
       if (dup_search_flag) {
 	// only one search flag is allowed
 	str = ca_get_pl_err_dupsearchflag;
-	SK_cd_printf(&answer_info.condat, "%s\n", str);
+	SK_cd_printf(&answer_info.condat, str);
 	UT_free(str);
 	err = 1;
       }
@@ -324,7 +324,7 @@ void PL_interact(int socket) {
 	source_list = pl_default_sources();
 	if (source_list == NULL) {
 	  str = ca_get_pl_err_nosource;
-	  SK_cd_printf(&answer_info.condat, "%s\n", str);
+	  SK_cd_printf(&answer_info.condat, str);
 	  UT_free(str);
 	  err = 1;
 	}
@@ -335,7 +335,7 @@ void PL_interact(int socket) {
 	attr_list = pl_default_attributes();
 	if (attr_list == NULL) {
 	  str = ca_get_pl_err_noclass;
-	  SK_cd_printf(&answer_info.condat, "%s\n", str);
+	  SK_cd_printf(&answer_info.condat, str);
 	  UT_free(str);
 	  err = 1;
 	}
@@ -345,9 +345,11 @@ void PL_interact(int socket) {
       search_key = g_strjoinv(" ", &arglist[opt_state->optind]);
       //SK_cd_printf(&answer_info.condat, "Search: [%s]\n", search_key); // DEBUG
 
+      search_key_provided = (search_key != NULL && strlen(search_key) > 0);
+
       // check our persistent connection request
       if (k_flag) {
-	if (extra_flag || search_flag_used || (search_key != NULL && strlen(search_key) > 0)) {
+	if (extra_flag || search_flag_used || search_key_provided > 0) {
 	  // The -k flag was used with other search options
 	  // So we enable persistent connection
 	  persistent_connection = 1;
@@ -359,6 +361,14 @@ void PL_interact(int socket) {
 	  // but this prevents us going through the search/answer loop with no key
 	  err = 1;
 	}
+      }
+
+      if (!err && !search_key_provided) {
+	// we need a search key if we are going to get anywhere
+	str = ca_get_pl_err_nosearchkey;
+	SK_cd_printf(&answer_info.condat, str);
+	UT_free(str);
+	err = 1;
       }
 
       if (!err) {
@@ -388,7 +398,7 @@ void PL_interact(int socket) {
 	      // the search key cannot be converted to an ip range
 	      // theoretically this trashes the entire query
 	      str = ca_get_pl_err_badsearchkey;
-	      SK_cd_printf(&answer_info.condat, "%s\n", str);
+	      SK_cd_printf(&answer_info.condat, str);
 	      UT_free(str);
 	      err = 1;
 	      cur_attr = NULL;
@@ -420,7 +430,7 @@ void PL_interact(int socket) {
 	  // did we find any entries for this source
 	  if (!err && !entries_found) {
 	    str = ca_get_pl_err_noentries;
-	    SK_cd_printf(&answer_info.condat, "%s\n", str);
+	    SK_cd_printf(&answer_info.condat, str);
 	    UT_free(str);
 	  }
 	}

@@ -294,13 +294,18 @@ PL_ERR_NOSEARCHCLASS %% There is no lookup tree for "%s" objects
 # Duplicate search flag
 PL_ERR_DUPSEARCHFLAG %%ERROR:506: duplicate search flag
 
+# Missing search key
+PL_ERR_NOSEARCHKEY %%ERROR:507: no search key specified
+PL_ERR_NOSEARCHKEY %%
+PL_ERR_NOSEARCHKEY %% No search key specified
+
 # Invalid search key
-PL_ERR_BADSEARCHKEY %%ERROR:507: invalid search key format
+PL_ERR_BADSEARCHKEY %%ERROR:508: invalid search key format
 PL_ERR_BADSEARCHKEY %%
 PL_ERR_BADSEARCHKEY %% Search key must be an IP address/range/prefix
 
 # No lookup tree
-PL_ERR_NOTREE %%ERROR:508: missing lookup tree
+PL_ERR_NOTREE %%ERROR:509: missing lookup tree
 PL_ERR_NOTREE %%
 PL_ERR_NOTREE %% Source "%s" does not have a lookup tree for "%s" objects
 

@@ -365,6 +365,9 @@
 #define ca_get_pl_err_dupsearchflag	ca_get_string(CA_PL_ERR_DUPSEARCHFLAG)
 #define	ca_set_pl_err_dupsearchflag	ca_set_string(CA_PL_ERR_DUPSEARCHFLAG)
 
+#define ca_get_pl_err_nosearchkey	ca_get_string(CA_PL_ERR_NOSEARCHKEY)
+#define ca_set_pl_err_nosearchkey	ca_set_string(CA_PL_ERR_NOSEARCHKEY)
+
 #define ca_get_pl_err_badsearchkey	ca_get_string(CA_PL_ERR_BADSEARCHKEY)
 #define ca_set_pl_err_badsearchkey	ca_set_string(CA_PL_ERR_BADSEARCHKEY)
 
