@@ -11,7 +11,7 @@
 
 typedef struct {
   sk_conn_st  condat;
-  char       *attrib;
+  char       *source;
 } pl_answer_t;
 
 /**********************
@@ -59,18 +59,26 @@ GList *pl_default_attributes(void) {
  *
  ****************************/
 void pl_print_answers(rx_datcpy_t *data, pl_answer_t *info) {
-  char buf[256];
+  char *object_class, *primary_key, *ptr;
   
   if (data == NULL || info == NULL) return;
 
-  // stringify the range
-  //buf[0] = '\0';
-  if (IP_rang_b2a(&data->leafcpy.iprange, buf, 256) != IP_OK) {
-    strcpy(buf, "<invalid range>");
-  }
+  // process the data string attached to the node
+  // this will give us the (main) primary key to show
+
+  // (assuming a strict format for the string)
+  object_class = ptr = data->leafcpy.data_ptr;
+  while (*ptr != ':') ptr++;
+  *ptr = '\0';
+  ptr++;
+  while (isspace(*ptr)) ptr++;
+  primary_key = ptr;
+  while (*ptr != '\n') ptr++;
+  *ptr = '\0';
 
   // output the answer
-  SK_cd_printf(&info->condat, "%ld, %s, %s\n", (long)data->leafcpy.data_key, info->attrib, buf);
+  SK_cd_printf(&info->condat, "%s, %s, %ld, %s\n",
+    info->source, (long)data->leafcpy.data_key, object_class, primary_key);
 
   // now we're finished with the node copy
   // destroy any extra node pointers
@@ -375,22 +383,12 @@ void PL_interact(int socket) {
 	// no errors - let's prep the search
 
 	// perform search
+	entries_found = 0;
 	for (cur_source = g_list_first(source_list); cur_source != NULL; cur_source = g_list_next(cur_source)) {
 	  rp_regid_t reg_id = (rp_regid_t)cur_source->data;
 	  
-	  SK_cd_printf(&answer_info.condat, "%%%%SOURCE: %s\n", reg_id->name);
-
-	  entries_found = 0;
 	  for (cur_attr = g_list_first(attr_list); cur_attr != NULL; cur_attr = g_list_next(cur_attr)) {
 	    rp_attr_t attr_id = (rp_attr_t)GPOINTER_TO_INT(cur_attr->data);
-
-	    /* DEBUG
-	    SK_cd_printf(&answer_info.condat, "#Search mode: %s\n", RX_text_srch_mode(search_mode));
-	    SK_cd_printf(&answer_info.condat, "#Search depth: %d\n", search_depth);
-	    SK_cd_printf(&answer_info.condat, "#Search key: [%s]\n", search_key);
-	    SK_cd_printf(&answer_info.condat, "#Source: [%s]\n", reg_id->name);
-	    SK_cd_printf(&answer_info.condat, "#Attribute: [%s]\n", DF_get_attribute_name(attr_id));
-	    */
 
 	    rc = RP_asc_search(search_mode, search_depth, 0, search_key, reg_id, attr_id, &answers, RX_ANS_ALL);
 	    
@@ -404,8 +402,8 @@ void PL_interact(int socket) {
 	      cur_attr = NULL;
 	      cur_source = NULL;
 	    } else if (rc == RP_NOTREE) {
-	      // because there is no tree for this source/attribute combination
-	      // (but there should be), there are no entries to be found
+	      // because there is no tree for this source/attribute
+	      // combination there are no entries to be found
 	    } else if (rc != 0) {
 	      // this should never happen, but future error codes might appear
 	      SK_cd_printf(&answer_info.condat, "%%ERROR:999: unknown error");
@@ -418,22 +416,25 @@ void PL_interact(int socket) {
 		// woohoo - we found some answers
 		entries_found = 1;
 		// show the answers
-		answer_info.attrib = DF_get_attribute_name(attr_id);
+		answer_info.source = reg_id->name;
 		g_list_foreach(answers, (GFunc)pl_print_answers, &answer_info);
 		// and clear the list
 		wr_clear_list(&answers);
 	      }
 	    }
-	    
-	  }
-	  // all the attribute trees have been searched,
-	  // did we find any entries for this source
-	  if (!err && !entries_found) {
-	    str = ca_get_pl_err_noentries;
-	    SK_cd_printf(&answer_info.condat, str);
-	    UT_free(str);
-	  }
+
+	  } /* attributes/object classes */
+
+	} /* sources */
+	
+	// all the attribute trees of all the sources have been searched,
+	// did we find any entries for this source
+	if (!err && !entries_found) {
+	  str = ca_get_pl_err_noentries;
+	  SK_cd_printf(&answer_info.condat, str);
+	  UT_free(str);
 	}
+	
 	// all the sources are done so write a blank line for termination
 	SK_cd_printf(&answer_info.condat, "\n");
 
