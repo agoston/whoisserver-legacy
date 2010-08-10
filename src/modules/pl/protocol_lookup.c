@@ -77,7 +77,7 @@ void pl_print_answers(rx_datcpy_t *data, pl_answer_t *info) {
   *ptr = '\0';
 
   // output the answer
-  SK_cd_printf(&info->condat, "%s, %s, %ld, %s\n",
+  SK_cd_printf(&info->condat, "%s, %ld, %s, %s\n",
     info->source, (long)data->leafcpy.data_key, object_class, primary_key);
 
   // now we're finished with the node copy
@@ -110,8 +110,6 @@ void PL_interact(int socket) {
   GList           *attr_list = NULL, *cur_attr;
   GList           *answers = NULL;
   rx_srch_mt       search_mode;
-
-  //g_mem_profile();
 
   // start by getting the connection information
   SK_cd_make(&answer_info.condat, socket, (unsigned) ca_get_keepopen);
@@ -146,14 +144,6 @@ void PL_interact(int socket) {
       arglist = g_strsplit_set(input, " \t", -1);
       for (argcount=0; arglist[argcount]; argcount++) ;
 
-      // DEBUG
-//      rc = 0;
-//      while (arglist[rc] != NULL) {
-//	SK_cd_printf(&answer_info.condat, "Arg %d: [%s]\n", rc+1, arglist[rc]);
-//	rc++;
-//      }
-      // END-DEBUG
-      
       // setup and double-check option state
       opt_state = mg_new(0);
       dieif( opt_state == NULL );
@@ -171,12 +161,9 @@ void PL_interact(int socket) {
       while (!err && ((rc=mg_getopt(argcount, arglist, "ks:T:xlLmM", opt_state)) != EOF)) {
 	switch (rc) {
 	  case 'k':
-	    //SK_cd_printf(&answer_info.condat, "k flag : [%s]\n", opt_state->optarg);
 	    k_flag = 1;
 	    break;
 	  case 's':
-	    //SK_cd_printf(&answer_info.condat, "s flag : [%s]\n", opt_state->optarg);
-
 	    extra_flag = 1;	    
 	    // should always get an argument
 	    if ( opt_state->optarg == NULL ) {
@@ -211,8 +198,6 @@ void PL_interact(int socket) {
 	    }
 	    break;
 	  case 'T':
-	    //SK_cd_printf(&answer_info.condat, "T flag : [%s]\n", opt_state->optarg);
-	    
 	    extra_flag = 1;
 	    // should always get an argument
 	    if ( opt_state->optarg == NULL ) {
@@ -264,7 +249,6 @@ void PL_interact(int socket) {
 	    }
 	    break;
 	  case 'x':
-	    //SK_cd_printf(&answer_info.condat, "x flag : [%s]\n", opt_state->optarg);
 	    if (search_flag_used == 0) {
 	      search_flag_used = 'x';
 	      search_mode = RX_SRCH_EXACT;
@@ -273,7 +257,6 @@ void PL_interact(int socket) {
 	    }
 	    break;
 	  case 'l':
-	    //SK_cd_printf(&answer_info.condat, "l flag : [%s]\n", opt_state->optarg);
 	    if (search_flag_used == 0) {
 	      search_flag_used = 'l';
 	      search_mode = RX_SRCH_LESS;
@@ -283,7 +266,6 @@ void PL_interact(int socket) {
 	    }
 	    break;
 	  case 'L':
-	    //SK_cd_printf(&answer_info.condat, "L flag : [%s]\n", opt_state->optarg);
 	    if (search_flag_used == 0) {
 	      search_flag_used = 'L';
 	      search_mode = RX_SRCH_LESS;
@@ -293,7 +275,6 @@ void PL_interact(int socket) {
 	    }
 	    break;
 	  case 'm':
-	    //SK_cd_printf(&answer_info.condat, "m flag : [%s]\n", opt_state->optarg);
 	    if (search_flag_used == 0) {
 	      search_flag_used = 'm';
 	      search_mode = RX_SRCH_MORE;
@@ -303,7 +284,6 @@ void PL_interact(int socket) {
 	    }
 	    break;
 	  case 'M':
-	    //SK_cd_printf(&answer_info.condat, "M flag : [%s]\n", opt_state->optarg);
 	    if (search_flag_used == 0) {
 	      search_flag_used = 'M';
 	      search_mode = RX_SRCH_MORE;
@@ -351,7 +331,6 @@ void PL_interact(int socket) {
       
       // The leftover arguments make the search key
       search_key = g_strjoinv(" ", &arglist[opt_state->optind]);
-      //SK_cd_printf(&answer_info.condat, "Search: [%s]\n", search_key); // DEBUG
 
       search_key_provided = (search_key != NULL && strlen(search_key) > 0);
 
@@ -382,11 +361,12 @@ void PL_interact(int socket) {
       if (!err) {
 	// no errors - let's prep the search
 
-	// perform search
+	// perform search - start by looping the selected sources
 	entries_found = 0;
 	for (cur_source = g_list_first(source_list); cur_source != NULL; cur_source = g_list_next(cur_source)) {
 	  rp_regid_t reg_id = (rp_regid_t)cur_source->data;
 	  
+	  // and for each source, loop the selected object classes
 	  for (cur_attr = g_list_first(attr_list); cur_attr != NULL; cur_attr = g_list_next(cur_attr)) {
 	    rp_attr_t attr_id = (rp_attr_t)GPOINTER_TO_INT(cur_attr->data);
 
@@ -462,6 +442,4 @@ void PL_interact(int socket) {
     && CO_get_whois_suspended() == 0);
 
   SK_cd_free(&answer_info.condat);
-  
-  //g_mem_profile();
 }
