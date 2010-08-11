@@ -1,11 +1,11 @@
 # rdns tests
-# CASE 023: 
+# CASE 023: Try to create domain object with dnssec errors
 #
 # create domain object
 #
 #FAILURE
 #
-# RESULT 023: creation will fail with dnssec errors
+# RESULT 023: creation will fail
 
 domain:       0.0.193.in-addr.arpa
 descr:        Test
@@ -19,4 +19,4 @@ mnt-by:       RIPE-NCC-HM-DOM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
-password: test-dbm
+password: host3

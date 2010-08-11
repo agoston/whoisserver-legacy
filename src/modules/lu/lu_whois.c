@@ -229,7 +229,6 @@ LG_log(lu_context, LG_DEBUG, "lu_whois_query: process results");
     }
 
     /* anything else should be an object, so add object to list */
-LG_log(lu_context, LG_DEBUG, "lu_whois_query: adding object to list");
     object = rpsl_object_init(split_reply[i]);
     if (object == NULL)
     {

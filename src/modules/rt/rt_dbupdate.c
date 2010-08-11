@@ -1311,6 +1311,20 @@ void RT_parent_not_exist(RT_context_t* ctx) {
 
 
 /*+
+  RT_no_address_space - Report that rDNS object has no corresponding inet(6)num in the DB
+
+  RT_context_t* ctx - Context.
+  +*/
+void RT_no_address_space(RT_context_t *ctx) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"RDNSno_address_space");
+
+  rt_prepare_node(ctx, node);
+}
+
+
+/*+
   RT_rdns_ds_not_accepted - Report that we don't accept DS records for this zone
 
   RT_context_t* ctx - Context.
@@ -1346,7 +1360,7 @@ void RT_rdns_size_not_accepted(RT_context_t* ctx) {
 
   gchar *name - name of domain object found.
  +*/
-void RT_rdns_hierarchy(RT_context_t* ctx, gchar* specifics, gchar* name) {
+void RT_rdns_hierarchy(RT_context_t *ctx, gchar *specifics, gchar *name) {
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*)"rdns_hierarchy");

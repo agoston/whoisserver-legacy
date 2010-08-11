@@ -15,7 +15,6 @@ under the control of the test suite.
 
 
 
-# rdns tests
 # CASE 1: Delete fails because of wrong password
 #
 # delete domain object
@@ -25,7 +24,6 @@ under the control of the test suite.
 # RESULT 1: deletions will fail
 
 
-# rdns tests
 # CASE 2: Delete succeeds with correct password
 #
 # delete domain object
@@ -35,7 +33,6 @@ under the control of the test suite.
 # RESULT 2: deletion will pass
 
 
-# rdns tests
 # CASE 3: Delete succeeds with correct override password
 #
 # delete domain object
@@ -45,7 +42,6 @@ under the control of the test suite.
 # RESULT 3: deletion will pass
 
 
-# rdns tests
 # CASE 4: Delete fails with incorrect override password
 #
 # delete domain object
@@ -55,7 +51,6 @@ under the control of the test suite.
 # RESULT 4: deletion will fail
 
 
-# rdns tests
 # CASE 5: Delete passes with correct auth from 0/0 mnt-domains
 #
 # delete domain object
@@ -65,7 +60,6 @@ under the control of the test suite.
 # RESULT 5: deletion will pass
 
 
-# rdns tests
 # CASE 6: Modification passes with correct auth from existing object
 #
 # modify domain object
@@ -74,7 +68,6 @@ under the control of the test suite.
 #
 # RESULT 6: modification will pass
 
-# rdns tests
 # CASE 7: Modification passes with correct auth from new object
 #
 # modify domain object
@@ -83,7 +76,6 @@ under the control of the test suite.
 #
 # RESULT 7: modification will pass
 
-# rdns tests
 # CASE 8: Modification fails because it's not the related RIR
 #
 # modify domain object
@@ -92,8 +84,7 @@ under the control of the test suite.
 #
 # RESULT 8: modification will fail
 
-# rdns tests
-# CASE 9: Modification fails because parent is not ours
+# CASE 9: Modification succeeds even though less specific object exists
 #
 # modify domain object
 #
@@ -102,7 +93,6 @@ under the control of the test suite.
 # RESULT 9: modification will fail
 
 
-# rdns tests
 # CASE 10: Modification fails due to excess delcheck errors
 #
 # modify domain object
@@ -112,8 +102,8 @@ under the control of the test suite.
 # RESULT 10: modification will fail
 
 
-# rdns tests
-# CASE 11: Creation passes with correct auth from 0/0 mnt-domains
+# CASE 11: Creation passes with correct auth from mnt-domains
+# in parent inetnum 0/0
 #
 # create domain object
 #
@@ -122,18 +112,16 @@ under the control of the test suite.
 # RESULT 11: creation will pass
 
 
-# rdns tests
-# CASE 12: Creation passes with correct auth from parent domain
+# CASE 12: Creation fails with parent domain existing
 #
 # create domain object
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 12: creation will pass
+# RESULT 12: creation will fail
 
 
-# rdns tests
-# CASE 13: Creation fails with no pass aroung
+# CASE 13: Creation fails with no pass around
 #
 # create domain object
 #
@@ -142,8 +130,7 @@ under the control of the test suite.
 # RESULT 13: creation will fail
 
 
-# rdns tests
-# CASE 14: Creation passes with override
+# CASE 14: Creation of delegation less than a /24 passes with override
 #
 # create domain object
 #
@@ -152,7 +139,6 @@ under the control of the test suite.
 # RESULT 14: creation will pass
 
 
-# rdns tests
 # CASE 15: Creation fails because it's not the related RIR
 #
 # create domain object
@@ -161,17 +147,9 @@ under the control of the test suite.
 #
 # RESULT 15: Creation will fail
 
-# rdns tests
-# CASE 16: Creation fails because parent is not ours
-#
-# create domain object
-#
-#FAILURE
-#
-# RESULT 16: Creation will fail
+# CASE 16 removed
 
 
-# rdns tests
 # CASE 17: Creation fails due to excess delcheck errors
 #
 # create domain object
@@ -181,8 +159,8 @@ under the control of the test suite.
 # RESULT 17: create will fail
 
 
-# rdns tests
 # CASE 18: Creation passes with correct delchecker output
+# parent object under 0::/0
 #
 # create domain object
 # WARNING WARNING WARNING
@@ -195,7 +173,6 @@ under the control of the test suite.
 # RESULT 18: create will pass
 
 
-# rdns tests
 # CASE 19: Modification passes with correct delchecker output
 #
 # modify domain object
@@ -209,7 +186,6 @@ under the control of the test suite.
 # RESULT 19: modification will pass
 
 
-# rdns tests
 # CASE 20: Update fails because the decomposition range is invalid
 #
 # update domain object
@@ -218,8 +194,28 @@ under the control of the test suite.
 #
 # RESULT 20: update will fail
 
+# CASE 21 removed
 
-# rdns tests
+
+# CASE 22: Creation passes with correct auth from 0/0 mnt-domains
+# domain is in capitals
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 22: creation will pass
+
+
+# CASE 023: Try to create domain object with dnssec errors
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 023: creation will fail
+
+
 # CASE 024: 
 #
 # create 1.e164.arpa domain object
@@ -229,7 +225,6 @@ under the control of the test suite.
 # RESULT 024: creation will fail because there is no parent object
 
 
-# rdns tests
 # CASE 024: 
 #
 # create 1.e164.arpa domain object
@@ -238,7 +233,6 @@ under the control of the test suite.
 #
 # RESULT 024: creation will fail because there is no parent object
 
-# rdns tests
 # CASE 025: 
 #
 # create 1.e164.arpa domain object
@@ -247,7 +241,6 @@ under the control of the test suite.
 #
 # RESULT 025: creation will succeed
 
-# rdns tests
 # CASE 026: 
 #
 # create 1.1.e164.arpa domain object
@@ -257,7 +250,6 @@ under the control of the test suite.
 #
 # RESULT 026: creation will fail
 
-# rdns tests
 # CASE 027: 
 #
 # create 1.e164.arpa domain object
@@ -267,7 +259,6 @@ under the control of the test suite.
 #
 # RESULT 027: creation will succeed
 
-# rdns tests
 # CASE 028: 
 #
 # create e164.arpa domain object
@@ -276,7 +267,6 @@ under the control of the test suite.
 #
 # RESULT 028: creation will succeed
 
-# rdns tests
 # CASE 029: 
 #
 # update e164.arpa domain object
@@ -285,7 +275,6 @@ under the control of the test suite.
 #
 # RESULT 029: modification will succeed
 
-# rdns tests
 # CASE 030: 
 #
 # update 1.e164.arpa domain object
@@ -294,7 +283,6 @@ under the control of the test suite.
 #
 # RESULT 030: modification will succeed
 
-# rdns tests
 # CASE 031: 
 #
 # delete 1.e164.arpa domain object
@@ -303,7 +291,6 @@ under the control of the test suite.
 #
 # RESULT 031: deleiton will succeed
 
-# rdns tests
 # CASE 032: 
 #
 # create 1.e164.arpa domain object
@@ -313,7 +300,6 @@ under the control of the test suite.
 #
 # RESULT 032: creation will fail
 
-# rdns tests
 # CASE 033:
 #
 # create 1.e164.arpa domain object
@@ -323,7 +309,6 @@ under the control of the test suite.
 #
 # RESULT 033: creation will fail
 
-# rdns tests
 # CASE 034: 
 #
 # create domain object
@@ -333,7 +318,6 @@ under the control of the test suite.
 #
 # RESULT 034: creation will fail but no "DS rejected" message
 
-# rdns tests
 # CASE 035: 
 #
 # create 1.e164.arpa domain object
@@ -344,7 +328,6 @@ under the control of the test suite.
 #
 # RESULT 035: creation will succeed
 
-# rdns tests
 # CASE 036: 
 #
 # modify 1.e164.arpa domain object
@@ -354,7 +337,6 @@ under the control of the test suite.
 #
 # RESULT 036: modify will fail
 #
-# rdns tests
 # CASE 037:
 #
 # create 1.e164.arpa domain object
@@ -363,7 +345,6 @@ under the control of the test suite.
 #FAILURE
 #
 # RESULT 037: creation will fail
-# rdns tests
 # CASE 38: create /12 domain object
 # inet6num exists and authorised
 # make sure rDNS checks took place
@@ -373,7 +354,6 @@ under the control of the test suite.
 #SUCCESS
 #
 # RESULT 38: creation will pass
-# rdns tests
 # CASE 39: Create succeeds - testing decomposition on /24 level.
 # override used to skip dns checks
 #
@@ -384,7 +364,6 @@ under the control of the test suite.
 # RESULT 39: creation will succeed
 
 
-# rdns tests
 # CASE 40: create /16
 # inet6num exists and authorised
 # make sure rDNS checks took place 
@@ -394,7 +373,6 @@ under the control of the test suite.
 #SUCCESS
 #
 # RESULT 40: creation will pass
-# rdns tests
 # CASE 41: create /20 domain object
 # inet6num exists and authorised
 # make sure rDNS checks took place 
@@ -404,7 +382,6 @@ under the control of the test suite.
 #SUCCESS
 #
 # RESULT 41: creation will pass
-# rdns tests
 # CASE 42: create /24 domain object
 # inet6num exists and authorised
 # make sure rDNS checks took place 
@@ -414,7 +391,6 @@ under the control of the test suite.
 #SUCCESS
 #
 # RESULT 42: creation will pass
-# rdns tests
 # CASE 43: create /28 domain object
 # inet6num exists and authorised
 # make sure rDNS checks took place 
@@ -424,7 +400,6 @@ under the control of the test suite.
 #SUCCESS
 #
 # RESULT 43: creation will pass
-# rdns tests
 # CASE 44: create /32 domain object
 # inet6num exists and authorised
 # make sure rDNS checks took place 
@@ -434,7 +409,6 @@ under the control of the test suite.
 #SUCCESS
 #
 # RESULT 44: creation will pass
-# rdns tests
 # CASE 45: create /48 domain object
 # inet6num exists and authorised
 # make sure rDNS checks took place 
@@ -444,7 +418,6 @@ under the control of the test suite.
 #SUCCESS
 #
 # RESULT 45: creation will pass
-# rdns tests
 # CASE 46: create /64 domain object
 # inet6num exists and authorised
 # make sure rDNS checks took place 
@@ -454,7 +427,6 @@ under the control of the test suite.
 #SUCCESS
 #
 # RESULT 46: creation will pass
-# rdns tests
 # CASE 47: Create /8 domain object ipv4
 # override used to pass dns checks
 #
@@ -463,7 +435,6 @@ under the control of the test suite.
 #SUCCESS
 #
 # RESULT 47: creation will succeed
-# rdns tests
 # CASE 48: Create /16 domain object ipv4
 # override used to pass dns checks
 #
@@ -472,7 +443,6 @@ under the control of the test suite.
 #SUCCESS
 #
 # RESULT 48: creation will succeed
-# rdns tests
 # CASE 49: Create /24 domain object ipv4
 # override used to pass dns checks
 #
@@ -481,7 +451,6 @@ under the control of the test suite.
 #SUCCESS
 #
 # RESULT 49: creation will succeed
-# rdns tests
 # CASE 50: Create /32 domain object ipv4
 # no override
 #
@@ -490,7 +459,6 @@ under the control of the test suite.
 #FAILURE
 #
 # RESULT 50: creation will fail
-# rdns tests
 # CASE 51: create /128 domain object
 # inet6num exists and authorised
 # no override
@@ -500,7 +468,6 @@ under the control of the test suite.
 #FAILURE
 #
 # RESULT 51: creation will fail
-# rdns tests
 # CASE 52: create /44 domain object
 # inet6num exists and authorised
 # no override
@@ -510,7 +477,6 @@ under the control of the test suite.
 #FAILURE
 #
 # RESULT 51: creation will fail
-# rdns tests
 # CASE 53: create /68 domain object
 # inet6num exists and authorised
 # no override
@@ -520,7 +486,6 @@ under the control of the test suite.
 #FAILURE
 #
 # RESULT 53: creation will fail
-# rdns tests
 # CASE 54: create /8 domain object ipv6
 # inet6num exists and authorised
 # no override
@@ -530,7 +495,6 @@ under the control of the test suite.
 #FAILURE
 #
 # RESULT 54: creation will fail
-# rdns tests
 # CASE 55: Create classless ipv4, with a '-' (classless delegation)
 # no override
 #
@@ -539,7 +503,6 @@ under the control of the test suite.
 #FAILURE
 #
 # RESULT 55: creation will fail
-# rdns tests
 # CASE 056: 
 #
 # create 1.e164.arpa domain object
@@ -549,7 +512,6 @@ under the control of the test suite.
 #
 # RESULT 056: creation will fail
 #
-# rdns tests
 # CASE 057: 
 #
 # create 1.e164.arpa domain object
@@ -559,4 +521,13 @@ under the control of the test suite.
 #FAILURE
 #
 # RESULT 057: creation will fail
+
+
+# CASE 064: Try to create a domain object when more specific object exists
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 64: creation will fail
 

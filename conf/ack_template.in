@@ -151,6 +151,11 @@
           For delegations less than /24 (IPv4), contact ripe-dbm@ripe.net.
 </xsl:template>
 
+<xsl:template match="RDNSno_address_space">
+
+***Error: no corresponding inet(6)num object found.
+</xsl:template>
+
 <xsl:template match="rdns_hierarchy">
 
 ***Error: Existing '<xsl:value-of select="specifics/text()"/>' specific domain object found '<xsl:value-of select="name/text()"/>'

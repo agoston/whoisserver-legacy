@@ -1,5 +1,6 @@
 # rdns tests
-# CASE 11: Creation passes with correct auth from 0/0 mnt-domains
+# CASE 11: Creation passes with correct auth from mnt-domains
+# in parent inetnum 0/0
 #
 # create domain object
 #

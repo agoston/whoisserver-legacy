@@ -1,5 +1,5 @@
 # rdns tests
-# CASE 14: Creation passes with override
+# CASE 14: Creation of delegation less than a /24 passes with override
 #
 # create domain object
 #
@@ -18,5 +18,5 @@ mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
-override: password password
+override: password
 
