@@ -2,20 +2,6 @@
 use strict;
 use warnings;
 
-use Data::Dumper qw( Dumper );
-$Data::Dumper::Terse = 1;
-
-sub LOG {
-    my ($format, @args) = @_;
-
-    open my $logfile, '>>', '/home/cac26gk/logfile' or die "No logfile: $!";
-    printf {$logfile} "$format\n", @args;
-    close $logfile;
-
-    printf "$format\n", @args;
-}
-LOG('-----------------------------------------------------------------------------');
-
 use DBI;
 use File::Spec;
 use FindBin;
@@ -27,6 +13,9 @@ use constant EXPECTED_RESULTS => 'lookup';
 my $CONFIG = { };
 
 my $SOURCE_DB;
+
+# print a blank line so output is really on a new line
+print {*STDERR} "\n";
 
 # How-to
 sub usage {
@@ -204,8 +193,6 @@ sub get_expected_results {
 
     close $ERF;
 
-    LOG("Expected results returns:\n%s", Dumper(\@lines));
-
     return \@lines;
 }
 
@@ -226,8 +213,6 @@ sub break_into_objects {
     }
 
     push @objects, $object if scalar @$object;
-
-    LOG("Broken into objects:\n%s", Dumper(\@objects));
 
     return \@objects;
 }
@@ -253,7 +238,7 @@ sub lines_match {
         
         $lineb =~ s/^\s+//;
         $lineb =~ s/\s+$//;
-        
+
         # and now they should be reasonably good to compare
         # so return the index number if they don't match
         return $i if $linea ne $lineb;
@@ -361,35 +346,23 @@ if (scalar grep { $_ =~ /^%/ } @$results) {
     my $expected = get_expected_results();
     # break into objects
     my $objects = break_into_objects($expected);
-    
-    LOG("Expected objects:\n%s", Dumper($objects));
-    
+
     my $seen_object;
 
-    LOG('Query returned ok, checking');
-
     foreach my $result (@$results) {
-        LOG("Result: [$result]");
-        
         # each line should be a specific format
         my ($source, $object_id, $object_type, $primary_key)
             = ($result =~ /^(\S+),\s(\d+),\s(\S+),\s(.*)$/);
         die "Output is not formatted correctly:\n$result"
             unless $source and $object_id and $object_type and $primary_key;
 
-        LOG("Breaks into [$source][$object_id][$object_type][$primary_key]");
-
         # Is it a real object?
         my $db_object = get_object_from_db($source, $object_id);
-
-        LOG("Object from db:\n%s", Dumper($db_object));
 
         # get the real object type and primary key
         my ($real_type, $real_key) = ($db_object->[0] =~ /^(\S+)\:\s+(.*)$/);
         die "Object '$object_id' from '$source' is not formatted properly"
             unless $real_type and $real_key;
-
-        LOG("Real type [$real_type] key [$real_key]");
 
         # compare the object type and key with what was reported
         die "Object type does not match reported object type ('$object_id' in '$source')"
@@ -400,17 +373,18 @@ if (scalar grep { $_ =~ /^%/ } @$results) {
         $primary_key =~ s/^\s+//;
         $primary_key =~ s/\s+$//;
         die "Object primary key does not match reported object key ('$object_id' in '$source')"
-            if $real_key ne $primary_key;
+            if lc($real_key) ne lc($primary_key);
+        # the key comparison must be case-insensitive as ipv6 addresses may
+        # be lowercase in the object blob, but uppercase in the radix dataleaf
 
         # now compare the object with the list of expected objects
         # (sorry, brute force for now)
         my $seen = 0;
         my $index = 0;
         while ($index < @$objects) {
-            if (lines_match($objects->[$index], $db_object)) {
+            if (lines_match($objects->[$index], $db_object) == -1) {
                 $seen = 1;
-                $seen_object->[$index]++;
-                LOG('Object seen');
+                $seen_object->[$index] ++;
                 last;
             }
             $index++;
@@ -419,9 +393,7 @@ if (scalar grep { $_ =~ /^%/ } @$results) {
         die "Object '$object_id' from '$source' is not an expected object"
             unless $seen;
     }
-    
-    LOG('Done0');
-    
+
     # all results have been checked and since we got this far they should be good
     # so now we check that all expected objects were seen
     die "Some expected objects were not seen in the results"
