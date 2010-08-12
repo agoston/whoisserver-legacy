@@ -371,9 +371,6 @@
 #define ca_get_pl_err_badsearchkey	ca_get_string(CA_PL_ERR_BADSEARCHKEY)
 #define ca_set_pl_err_badsearchkey	ca_set_string(CA_PL_ERR_BADSEARCHKEY)
 
-#define ca_get_pl_err_notree	ca_get_string(CA_PL_ERR_NOTREE)
-#define ca_set_pl_err_notree	ca_set_string(CA_PL_ERR_NOTREE)
-
 #define ca_get_pl_err_noentries	ca_get_string(CA_PL_ERR_NOENTRIES)
 #define ca_set_pl_err_noentries	ca_set_string(CA_PL_ERR_NOENTRIES)
 

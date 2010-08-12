@@ -291,11 +291,6 @@ PL_ERR_BADSEARCHKEY %%ERROR:507: invalid search key format
 PL_ERR_BADSEARCHKEY %%
 PL_ERR_BADSEARCHKEY %% Search key must be an IP address/range/prefix
 
-# No lookup tree
-PL_ERR_NOTREE %%ERROR:508: missing lookup tree
-PL_ERR_NOTREE %%
-PL_ERR_NOTREE %% Source "%s" does not have a lookup tree for "%s" objects
-
 # No entries found
 PL_ERR_NOENTRIES %%ERROR:101: no entries found
 
