@@ -128,7 +128,7 @@ void PL_interact(int socket) {
     // if the string is too long let them know
     if (rc > 0 && input[rc-1] != '\n') {
       str = ca_get_pw_err_linetoolong;
-      SK_cd_printf(&answer_info.condat, str);
+      SK_cd_printf(&answer_info.condat, "%s\n", str);
       UT_free(str);
       // we should exit out of any persistent connection
       // otherwise we will have to slurp up the rest of
