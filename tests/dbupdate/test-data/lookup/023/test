@@ -1,0 +1,16 @@
+# radix lookup tests
+#
+# CASE 23: default reverse domain query using ipv6 prefix
+#
+# default query for domain
+# ipv4 domain exists
+# using ipv6 prefix
+#
+#SUCCESS
+#
+# RESULT 23: No entries found
+
+$EXEC_BEFORE=$DATADIR/lookup/reload.sh DB-TEST
+
+$EXEC_AFTER=$DATADIR/lookup/query.pl -- -T domain 2001:610::/32
+

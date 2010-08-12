@@ -1,0 +1,16 @@
+# radix lookup tests
+#
+# CASE 21: default reverse domain query using ipv4 prefix
+#
+# default query for domain
+# ipv6 domain exists
+# using ipv4 prefix
+#
+#SUCCESS
+#
+# RESULT 21: No entries found
+
+$EXEC_BEFORE=$DATADIR/lookup/reload.sh DB-TEST
+
+$EXEC_AFTER=$DATADIR/lookup/query.pl -- -T domain 193.0.0.0/8
+

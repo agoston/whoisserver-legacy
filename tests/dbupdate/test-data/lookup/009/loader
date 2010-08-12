@@ -86,7 +86,19 @@ source:       DB-TEST
 
 %  Additional objects required for this test
 
-% inetnum blocks
+% inet6num blocks
+
+inet6num:     2001:0658:021A::/48
+descr:        test inet6num
+netname:      TEST-INET6NUM
+country:      NL
+status:       ALLOCATED-BY-RIR
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
 
 inetnum:      192.168.0.0 - 192.168.255.255
 netname:      RIPE-NET16

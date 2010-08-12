@@ -1,0 +1,11 @@
+inetnum:        192.168.128.0 - 192.168.255.255
+netname:        TEST-NET-NAME
+descr:          TEST network
+country:        NL
+admin-c:        TP1-DB-TEST
+tech-c:         TP1-DB-TEST
+status:         ALLOCATED PA
+mnt-by:         TEST-DBM-MNT
+mnt-lower:      TEST-DBM-MNT
+changed:        dbtest@ripe.net 20020101
+source:         DB-TEST

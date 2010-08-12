@@ -1,0 +1,15 @@
+# radix lookup tests
+#
+# CASE 4: default inetnum query for close match using ipv4 range
+#
+# default query for close-matching inetnum object
+# using ipv4 range
+#
+#SUCCESS
+#
+# RESULT 4: All expected objects returned
+
+$EXEC_BEFORE=$DATADIR/lookup/reload.sh DB-TEST
+
+$EXEC_AFTER=$DATADIR/lookup/query.pl -- -T inetnum 192.168.128.0 - 192.168.220.255
+

@@ -1,0 +1,15 @@
+# radix lookup tests
+#
+# CASE 9: default inetnum query using ipv6 prefix
+#
+# default search for inetnum
+# using ipv6 prefix
+#
+#SUCCESS
+#
+# RESULT 9: No entries will be found
+
+$EXEC_BEFORE=$DATADIR/lookup/reload.sh DB-TEST
+
+$EXEC_AFTER=$DATADIR/lookup/query.pl -- -T inetnum 2001:0658:021A::/48
+

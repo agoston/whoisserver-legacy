@@ -86,68 +86,6 @@ source:       DB-TEST
 
 %  Additional objects required for this test
 
-% inetnum blocks
-
-inetnum:      192.168.0.0 - 192.168.255.255
-netname:      RIPE-NET16
-descr:        /16 to contain our tests
-country:      NL
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-status:       ALLOCATED PA
-mnt-by:       TEST-DBM-MNT
-mnt-lower:    TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
-
-
-inetnum:      192.168.128.0 - 192.168.255.255
-netname:      TEST-NET-NAME
-descr:        TEST network
-country:      NL
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-status:       ALLOCATED PA
-mnt-by:       TEST-DBM-MNT
-mnt-lower:    TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
-
-
-inetnum:      192.168.200.0 - 192.168.200.255
-netname:      RIPE-NET1
-descr:        /24 with ASSIGNED
-country:      NL
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-status:       ASSIGNED PA
-mnt-by:       TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
-
-
-inetnum:      192.168.201.0 - 192.168.201.255
-netname:      RIPE-NET24
-descr:        /24 to contain our tests
-country:      NL
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-status:       LIR-PARTITIONED PA
-mnt-by:       TEST-DBM-MNT
-mnt-lower:    TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
-
-
-inetnum:      192.168.201.100 - 192.168.201.255
-netname:      RIPE-NET2
-descr:        /nn to contain our tests
-country:      NL
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-status:       ASSIGNED PA
-mnt-by:       TEST-DBM-MNT
-changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
+% none
 
 % End of loader data file

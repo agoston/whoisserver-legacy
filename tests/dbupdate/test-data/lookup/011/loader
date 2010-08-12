@@ -150,4 +150,19 @@ mnt-by:       TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
+% inet6num blocks
+
+inet6num:     2001:658:21A::/48
+descr:        test inet6num
+netname:      TEST-INET6NUM
+country:      NL
+status:       ALLOCATED-BY-RIR
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net
+source:       DB-TEST
+
+
 % End of loader data file
