@@ -279,7 +279,7 @@ PL_ERR_NOSEARCHCLASS %%
 PL_ERR_NOSEARCHCLASS %% There is no lookup tree for "%s" objects
 
 # Duplicate search flag
-PL_ERR_DUPSEARCHFLAG %%ERROR:506: duplicate search flag
+PL_ERR_DUPSEARCHFLAG %%ERROR:506: conflicting search flags
 
 # Missing search key
 PL_ERR_NOSEARCHKEY %%ERROR:507: no search key specified
