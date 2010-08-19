@@ -45,7 +45,7 @@
  * In other words, it HAS TO be parsable by IP_revd_t2b()
  *
  * Note: we skipped classless in-addr.arpa now, as it seems to be impossible to determine their size, making it impossible to stuff in a radix tree */
-#define WK_REXP_REVDOMAINNAME "^[0-9]*(\\.[0-9]+)*\\.(IN-ADDR\\.ARPA|IP6\\.INT|IP6\\.ARPA)\\.?$"
+#define WK_REXP_REVDOMAINNAME "^[0-9A-F]*(\\.[0-9A-F]+)*\\.(IN-ADDR\\.ARPA|IP6\\.INT|IP6\\.ARPA)\\.?$"
 
 
 #define WK_REXP_VALIDIP6PREFIX "^[0-9A-F:]*:[0-9A-F:/]*$"     /* at least one colon */
