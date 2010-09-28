@@ -1,3 +1,8 @@
+/* FIXME: This is a horrible piece of code. There is no sense in even trying to optimize or fix it - it's fubar.
+ * Should be thrown out as it is. See GKeyFile for a 25-liner replacement for this 'something'.
+ * agoston, 2007-11-16 */
+
+
 /***************************************
  $Revision:
 
@@ -33,9 +38,6 @@
  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ***************************************/
 
-/* FIXME: This is a horrible piece of code. There is no sense of even trying to optimize or fix it - it's fubar.
- * Should be thrown out as it is.
- * agoston, 2007-11-16 */
 
 #define DICT_INIT
 #include "rip.h"
@@ -531,9 +533,7 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size) {
 #endif	/* DEBUG */
 
     /* create an aray for the multiple source data pointers */
-    confVars[CA_UPDSOURCE].valPtr = (ca_updDbSource_t **) UT_malloc(CA_MAXSOURCES);
-    /* first entry used to check for at least one valid source found */
-    ((ca_updDbSource_t **) confVars[CA_UPDSOURCE].valPtr)[0] = NULL;
+    confVars[CA_UPDSOURCE].valPtr = calloc(CA_MAXSOURCES, sizeof(ca_updDbSource_t *));
 
     /*
      * Open the configuration file for reading .....
@@ -582,6 +582,17 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size) {
                 value[strlen(value) - 1] = '\0';
             }
 
+            // check if include directive
+            if (!strncmp(name, "INCLUDE", 7)) {
+                int i;
+                fprintf(stderr, "Reading symbols from %s\n", value);
+                ca_readConfig(value, confVars, CA_NUMBEROFSYMBOLS);
+                for (i = 0; i < CA_NUMBEROFSYMBOLS; i++) {
+                    confVars[i].overwrite = TRUE;
+                }
+                goto read_next;     // ouch
+            }
+
             /*
              * From the variable name, find the element of the
              * values array in which to store the value of the
@@ -600,27 +611,14 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size) {
              * if not, then allocate some memory and copy the
              * string into it.
              */
-
-            /*
-             * If this variable already exists, it has a non-zero
-             * value and this 'if' statement returns a "true"
-             * value. Otherwise, it returns a "zero" or "false"
-             * value.
-             */
-            if (confVars[location].strPtr) {
-                /*
-                 * strcat(confVars[location].strPtr, "\n");
-                 * strcat(confVars[location].strPtr, value);
-                 */
+            if (!confVars[location].overwrite && confVars[location].strPtr) {
                 g_string_append(confVars[location].strPtr, "\n");
                 g_string_append(confVars[location].strPtr, value);
             } else {
-                /*
-                 * Store a pointer to the string that
-                 * contains the value This is not necessarily
-                 * the actual value itself.
-                 */
-
+                if (confVars[location].overwrite) {
+                    g_string_free(confVars[location].strPtr, TRUE);
+                    confVars[location].overwrite = FALSE;
+                }
                 confVars[location].strPtr = g_string_new(value);
             }
 
@@ -927,12 +925,12 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size) {
 
             default:
                 fprintf(stderr, "Data type not found for variable \"%s\".\n", name);
-                die
-                ;
+                die;
                 break;
             }
         }
 
+read_next:
         fscanf(confPtr, "%s", name);
         fgets(value, sizeof(value), confPtr);
         g_strstrip(value);
@@ -2777,7 +2775,6 @@ int ca_writeNewValue(int dictSymbol, char *newValue) {
     return (0);
 }
 
-int ca_getStorageLocation(char *confVar, dict_t woordenboek[], int size)
 /*************************************************************
  * ca_getStorageLocation()                        *
  *  - takes the name of a config variable and searches the    *
@@ -2795,6 +2792,7 @@ int ca_getStorageLocation(char *confVar, dict_t woordenboek[], int size)
  *  the location (integer) in the values array.          *
  *                                        *
  *************************************************************/
+int ca_getStorageLocation(char *confVar, dict_t woordenboek[], int size)
 {
     int i, where, found = 0; /* Whether or not the symbol has been
      * found. */
@@ -2862,7 +2860,6 @@ void ca_getConfig(values_t confVars[], int size)
 
 }
 
-int ca_getType(char *confVar, dict_t woordenboek[], int size)
 /****************************************************************
  * ca_getType -- returns the data type of the variable.      *
  *                                          *
@@ -2875,6 +2872,7 @@ int ca_getType(char *confVar, dict_t woordenboek[], int size)
  *    an integer representing the data type of the variable    *
  *                                          *
  ****************************************************************/
+int ca_getType(char *confVar, dict_t woordenboek[], int size)
 {
     int i = 0, /* Counter variable. */
     found = 0; /* Set this == 1 when we find the variable.  */

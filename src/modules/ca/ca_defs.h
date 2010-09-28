@@ -78,17 +78,6 @@
 #define CA_MAXSOURCES  100
 
 /**********************************************
- * Default values for the SOURCE variables		*
- *															*
- **********************************************/
-
-#define CA_DEFHOST "rowan"						
-#define CA_DEFPORT "4343"
-#define CA_DEFUSER "dbase"						
-#define CA_DEFPASSWORD "encrypt1"				
-#define CA_DEFDBNAME	"default-db"			
-
-/**********************************************
  * Defintion of the dictionary structures.		*
  *															*
  **********************************************/
@@ -109,9 +98,10 @@ extern dict_t dictionary[];
  *															*
  **********************************************/
 
-typedef struct values_s {
+typedef struct {
 	GString *strPtr; /* Pointer to the GString that contains the value. */
 	void *valPtr; /* Pointer to the actual value. */
+	gboolean overwrite; // overwrite current value when bumped into in config file
 } values_t;
 
 /*
