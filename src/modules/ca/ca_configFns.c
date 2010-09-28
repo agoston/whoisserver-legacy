@@ -468,20 +468,15 @@ void opSplitsen(FILE * filePtr, gchar ** tokenArray)
 void ca_readConfig(const char *configFile, values_t confVars[], int size) {
     FILE *confPtr; /* Pointer to config file. */
     char name[STRLENGTH_M]; /* The name of the config variable */
-    /* 80 characters */
     char value[STRLENGTH_XXL]; /* The value of the variable */
-    /* 640 characters */
     int location; /* Storage Location of the variable's value. */
-    int type; /* Data type of the variable, represented by an
-     * integer. */
+    int type; /* Data type of the variable, represented by an integer. */
 
-    const char *blankLine = "\n"; /* Declared as a string, not a
-     * character. */
+    const char *blankLine = "\n"; /* Declared as a string, not a character. */
     const char *comment = "#"; /* Declared as a string. */
 
     char source[16]; /* The name of a source. */
     char database[STRLENGTH_M]; /* The elements of a database. */
-    /* 80 characters */
 
     /*
      * UPDSOURCE variables: whoisd host, query-port, update-port.
@@ -491,9 +486,7 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size) {
     /* the query port; */
     /* the update port. */
 
-    gchar **dbcomps; /* Pointer to an array of strings that
-     * represents */
-    /* the components of a db. */
+    gchar **dbcomps; /* Pointer to an array of strings that represents the components of a db. */
 
     gchar **updDbcomps; /* Pointer to an array of strings that */
     /* represents the components of an UPD Source. */
