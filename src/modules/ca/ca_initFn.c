@@ -75,7 +75,7 @@ int ca_init(const char *configFile)
     /*
      * ca_sanityChk(confVars);
      */
-    if (ca_mandVarChk() != 0) {
+    if (ca_mandVarChk()) {
         fprintf(stderr, "Mandatory variable(s) undefined\n\n");
         fprintf(stderr, "<<<<<<<<<<<<<<<     >>>>>>>>>>>\n\n");
         fprintf(stderr, "Continuing ..... \n\n");

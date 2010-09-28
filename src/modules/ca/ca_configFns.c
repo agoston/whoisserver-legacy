@@ -443,7 +443,6 @@ void opSplitsen(FILE * filePtr, gchar ** tokenArray)
 
 } /* End of processing the opened file. */
 
-void ca_readConfig(const char *configFile, values_t confVars[], int size)
 /*******************************************************************
  *                                            *
  * ca_readConfig -- parses the config file and writes the values   *
@@ -466,7 +465,7 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size)
  *
  *
  *******************************************************************/
-{
+void ca_readConfig(const char *configFile, values_t confVars[], int size) {
     FILE *confPtr; /* Pointer to config file. */
     char name[STRLENGTH_M]; /* The name of the config variable */
     /* 80 characters */
@@ -541,7 +540,7 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size)
     /* create an aray for the multiple source data pointers */
     confVars[CA_UPDSOURCE].valPtr = (ca_updDbSource_t **) UT_malloc(CA_MAXSOURCES);
     /* first entry used to check for at least one valid source found */
-    ((ca_updDbSource_t **)confVars[CA_UPDSOURCE].valPtr)[0] = NULL;
+    ((ca_updDbSource_t **) confVars[CA_UPDSOURCE].valPtr)[0] = NULL;
 
     /*
      * Open the configuration file for reading .....
@@ -650,308 +649,302 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size)
              * of the variable in the appropriate way.
              */
             switch (type) {
-                case 11:
+            case 11:
 
 #ifdef DEBUG
-                    puts("Data type is Integer");
+                puts("Data type is Integer");
 #endif	/* DEBUG */
 
-                    confVars[location].valPtr = UT_malloc(sizeof(int));
+                confVars[location].valPtr = UT_malloc(sizeof(int));
 
-                    sscanf(value, "%d", (int *) confVars[location].valPtr);
-                    break;
+                sscanf(value, "%d", (int *) confVars[location].valPtr);
+                break;
 
-                case 12:
+            case 12:
 
 #ifdef DEBUG
-                    puts("Data type is String !!! *** !!!");
+                puts("Data type is String !!! *** !!!");
 #endif	/* DEBUG */
 
+                /*
+                 * Test if this variable has already been
+                 * created. Look for a non-zero i.e. true
+                 * value.
+                 *
+                 * First put a '\n' character at the end of the
+                 * existing string. Then, concatenate the
+                 * additional string.
+                 */
+                if (confVars[location].valPtr) {
+#ifdef DEBUG
+                    printf("\n%s variable already exists\n", name);
+#endif	/* DEBUG */
+                    g_string_append(confVars[location].valPtr, value);
+                    g_string_append(confVars[location].valPtr, "\n");
+                } else {
                     /*
-                     * Test if this variable has already been
-                     * created. Look for a non-zero i.e. true
-                     * value.
-                     *
-                     * First put a '\n' character at the end of the
-                     * existing string. Then, concatenate the
-                     * additional string.
-                     */
-                    if (confVars[location].valPtr) {
-#ifdef DEBUG
-                        printf("\n%s variable already exists\n", name);
-#endif	/* DEBUG */
-                        g_string_append(confVars[location].valPtr, value);
-                        g_string_append(confVars[location].valPtr, "\n");
-                    } else {
-                        /*
-                         * If the variable has not already
-                         * been created, then create it.
-                         */
-#ifdef DEBUG
-                        printf("\n%s variable does not exist\n", name);
-#endif	/* DEBUG */
-
-                        /*
-                         * We use g_string_new() to create a
-                         * new GString. This is a _structure_
-                         * of str and len.  The actual string
-                         * is stored in the str component.
-                         * Thus, when we want to access the
-                         * string, we must look into
-                         * structure.
-                         */
-                        confVars[location].valPtr = g_string_new(value);
-                        g_string_append(confVars[location].valPtr, "\n");
-                    }
-
-                    break;
-
-                case 13:
-#ifdef DEBUG
-                    puts("Data type is Dirlist");
-#endif	/* DEBUG */
-                    confVars[location].valPtr = (char *) UT_malloc(STRLENGTH);
-
-                    strcpy(confVars[location].valPtr, value);
-                    break;
-
-                case 14:
-#ifdef DEBUG
-                    puts("Data type is Boolean");
-#endif	/* DEBUG */
-
-                    confVars[location].valPtr = UT_malloc(sizeof(int));
-
-                    sscanf(value, "%d", (int *) confVars[location].valPtr);
-                    break;
-
-                case 16:
-#ifdef DEBUG
-                    puts("Found the CA_ADMIN stuff !!!");
-#endif	/* DEBUG */
-                    /*
-                     * The elements of the Admin-DB have already
-                     * been read in.
-                     * Now, split up the elements and assign them
-                     * to the
-                     * components of the Admin-DB structure.
-                     *
-                     * First, separate the values in "value",
-                     * using ',' as a
-                     * delimiting character.
-                     */
-                    dbcomps = ut_g_strsplit_v1(value, ",", 0);
-
-#ifdef DEBUG
-                    for (i = 0; dbcomps[i] != NULL; i++)
-                    printf("dbcomps[%d] = %s\n", i, dbcomps[i]);
-#endif	/* DEBUG */
-
-                    /*
-                     * Now, allocate some memory to the
-                     * newAdminPtr.
-                     */
-                    newAdminPtr = UT_calloc(1, sizeof(ca_ripadmin_t));
-
-                    /*
-                     * Now, assign the elements of the dbcomps
-                     * array to the appropriate components of the
-                     * structure to which newAdminPtr points.
-                     */
-
-                    /*
-                     * Strip leading and trailing whitespace from
-                     * dbcomps[0]
-                     */
-                    /*
-                     * g_strstrip( dbcomps[0] );
-                     */
-
-                    strcpy(newAdminPtr->host, dbcomps[0]);
-                    newAdminPtr->port = atoi(dbcomps[1]);
-                    strcpy(newAdminPtr->user, dbcomps[2]);
-                    strcpy(newAdminPtr->password, dbcomps[3]);
-                    strcpy(newAdminPtr->tableName, dbcomps[4]);
-
-                    g_strfreev(dbcomps);
-
-#ifdef DEBUG
-                    puts("Testing the population of the rip-admin db structure:");
-                    printf("\n%s::%d::%s::%s::%s\n", newAdminPtr->host, newAdminPtr->port, newAdminPtr->user, newAdminPtr->password, newAdminPtr->tableName);
-#endif	/* DEBUG */
-
-                    /*
-                     * Now, assign these values into the correct
-                     * long-term storage.
-                     */
-
-                    confVars[location].valPtr = (ca_ripadmin_t *) UT_calloc(1, sizeof(ca_ripadmin_t));
-
-                    memcpy(confVars[location].valPtr, newAdminPtr, sizeof(ca_ripadmin_t));
-
-                    UT_free(newAdminPtr);
-
-#ifdef DEBUG
-                    printf("The ripadmin machine is: %s\n", ((ca_ripadmin_t *) confVars[location].valPtr)->host);
-#endif	/* DEBUG */
-
-                    break;
-
-                case 17:
-                    /*
-                     * Found Update_Source variable.
-                     There may be multiple instances of this
+                     * If the variable has not already
+                     * been created, then create it.
                      */
 #ifdef DEBUG
-                    printf("Found Update_Source variable !!!\n");
-#endif	/* DEBUG */
-
-#ifdef DEBUG
-                    puts(name);
-                    puts(value);
+                    printf("\n%s variable does not exist\n", name);
 #endif	/* DEBUG */
 
                     /*
-                     * Split the value into DB-name, DB-details,
-                     * updDetails. Use blankspace as the
-                     * delimiter between each of these variables.
-                     */
-                    sscanf(value, "%s %s %s", source, database, updDetails);
-#ifdef  DEBUG
-                    puts(source);
-                    puts(database);
-                    puts(updDetails);
-#endif	/* DEBUG */
-
-                    /*
-                     * Using the values in "database", populate a
-                     * ca_database_t structure. Give this
-                     * variable a name.
-                     */
-
-                    /*
-                     * First, separate the values in "database",
-                     * using "," as as a delimiting  character.
-                     */
-                    dbcomps = ut_g_strsplit_v1(database, ",", 0);
-
-#ifdef DEBUG
-                    for (i = 0; dbcomps[i] != NULL; i++)
-                    printf("dbcomps[%d] = %s\n", i, dbcomps[i]);
-#endif	/* DEBUG */
-
-                    /*
-                     * Create a structure for this database.
-                     */
-                    newUpdDbPtr = UT_calloc(1, sizeof(ca_database_t));
-
-                    strcpy(newUpdDbPtr->host, dbcomps[0]);
-                    newUpdDbPtr->port = atoi(dbcomps[1]);
-                    strcpy(newUpdDbPtr->user, dbcomps[2]);
-                    strcpy(newUpdDbPtr->password, dbcomps[3]);
-                    strcpy(newUpdDbPtr->dbName, dbcomps[4]);
-
-                    g_strfreev(dbcomps);
-
-#ifdef DEBUG
-                    puts("Testing the population of the UPD db structure:");
-                    printf("\n%s::%d::%s::%s::%s\n", newUpdDbPtr->host, newUpdDbPtr->port, newUpdDbPtr->user, newUpdDbPtr->password, newUpdDbPtr->dbName);
-#endif	/* DEBUG */
-
-                    /*
-                     * Now, store the values contained in the
-                     * updDetails string.
-                     */
-
-                    /*
-                     * First, separate the values in the
-                     * 'updDetails' string, using "," as a
-                     * delimiting character.
-                     */
-                    updDbcomps = ut_g_strsplit_v1(updDetails, ",", 0);
-
-#ifdef DEBUG
-                    for (i = 0; updDbcomps[i] != NULL; i++)
-                    printf("updDbcomps[%d] = %s\n", i, updDbcomps[i]);
-#endif	/* DEBUG */
-
-                    /*
-                     * Using the above ca_database_t structure,
-                     * the "source" value and the values of
-                     * updDbcomps, populate the ca_updDbSource_t
+                     * We use g_string_new() to create a
+                     * new GString. This is a _structure_
+                     * of str and len.  The actual string
+                     * is stored in the str component.
+                     * Thus, when we want to access the
+                     * string, we must look into
                      * structure.
-                     *
                      */
+                    confVars[location].valPtr = g_string_new(value);
+                    g_string_append(confVars[location].valPtr, "\n");
+                }
 
-                    /*
-                     * Create a new structure for this UPD
-                     * Source.
-                     */
-                    newUpdSrc = UT_calloc(1, sizeof(ca_updDbSource_t));
+                break;
 
+            case 13:
 #ifdef DEBUG
-                    puts("Created a structure for the UPD Source variable");
+                puts("Data type is Dirlist");
+#endif	/* DEBUG */
+                confVars[location].valPtr = (char *) UT_malloc(STRLENGTH);
+
+                strcpy(confVars[location].valPtr, value);
+                break;
+
+            case 14:
+#ifdef DEBUG
+                puts("Data type is Boolean");
 #endif	/* DEBUG */
 
-                    /*
-                     * Now, populate this structure.
-                     */
+                confVars[location].valPtr = UT_malloc(sizeof(int));
 
-                    strcpy(newUpdSrc->name, source);
-                    newUpdSrc->updDb = *newUpdDbPtr;
-                    strcpy(newUpdSrc->whoisd_host, updDbcomps[0]);
-                    newUpdSrc->qryPort = atoi(updDbcomps[1]);
-                    newUpdSrc->updPort = atoi(updDbcomps[2]);
+                sscanf(value, "%d", (int *) confVars[location].valPtr);
+                break;
 
-                    UT_free(newUpdDbPtr); /* Was copied */
-                    g_strfreev(updDbcomps);
+            case 16:
+#ifdef DEBUG
+                puts("Found the CA_ADMIN stuff !!!");
+#endif	/* DEBUG */
+                /*
+                 * The elements of the Admin-DB have already
+                 * been read in.
+                 * Now, split up the elements and assign them
+                 * to the
+                 * components of the Admin-DB structure.
+                 *
+                 * First, separate the values in "value",
+                 * using ',' as a
+                 * delimiting character.
+                 */
+                dbcomps = ut_g_strsplit_v1(value, ",", 0);
 
 #ifdef DEBUG
-                    puts("Testing the population of the ca_updDbSource_t structure:");
-                    printf("Update Source name: %s\n", newUpdSrc->name);
-                    printf("\nUPD-DB == %s::%d::%s::%s::%s\n", (newUpdSrc->updDb).host, (newUpdSrc->updDb).port, (newUpdSrc->updDb).user, (newUpdSrc->updDb).password, (newUpdSrc->updDb).dbName);
-                    printf("\nUpdate Source Machine Details: %s::%d::%d\n", newUpdSrc->whoisd_host, newUpdSrc->qryPort, newUpdSrc->updPort);
+                for (i = 0; dbcomps[i] != NULL; i++)
+                printf("dbcomps[%d] = %s\n", i, dbcomps[i]);
 #endif	/* DEBUG */
 
-                    /*
-                     * Now, assign these values into the correct
-                     * long-term storage.
-                     */
+                newAdminPtr = UT_calloc(1, sizeof(ca_ripadmin_t));
 
-                    if (num_sources < CA_MAXSOURCES) {
-                        ((ca_updDbSource_t **)confVars[location].valPtr)[num_sources]
-                                = (ca_updDbSource_t *) UT_calloc(1, sizeof(ca_updDbSource_t));
+                /*
+                 * Now, assign the elements of the dbcomps
+                 * array to the appropriate components of the
+                 * structure to which newAdminPtr points.
+                 */
 
-                        memcpy(((ca_updDbSource_t **)confVars[location].valPtr)[num_sources++], newUpdSrc,
-                                sizeof(ca_updDbSource_t));
-                    } else {
-                        fprintf(stderr, "Max number of Update Sources exceeded\n");
-                        die;
-                    }
+                /*
+                 * Strip leading and trailing whitespace from
+                 * dbcomps[0]
+                 */
+                /*
+                 * g_strstrip( dbcomps[0] );
+                 */
 
-                    /* No longer needed. */
-                    UT_free(newUpdSrc);
+                strcpy(newAdminPtr->host, dbcomps[0]);
+                newAdminPtr->port = atoi(dbcomps[1]);
+                strcpy(newAdminPtr->user, dbcomps[2]);
+                strcpy(newAdminPtr->password, dbcomps[3]);
+                strcpy(newAdminPtr->tableName, dbcomps[4]);
+
+                g_strfreev(dbcomps);
 
 #ifdef DEBUG
-                    //				printf("UPD-Source/DB-details/user: %s\n", (((ca_updDbSource_t *) (confVars[location].valPtr)[num_sources-1])->updDb).user);
+                puts("Testing the population of the rip-admin db structure:");
+                printf("\n%s::%d::%s::%s::%s\n", newAdminPtr->host, newAdminPtr->port, newAdminPtr->user, newAdminPtr->password, newAdminPtr->tableName);
 #endif	/* DEBUG */
 
-                    break;
+                /*
+                 * Now, assign these values into the correct
+                 * long-term storage.
+                 */
 
-                default:
-                    fprintf(stderr, "Data type not found for variable \"%s\".\n", name);
+                confVars[location].valPtr = (ca_ripadmin_t *) UT_calloc(1, sizeof(ca_ripadmin_t));
+
+                memcpy(confVars[location].valPtr, newAdminPtr, sizeof(ca_ripadmin_t));
+
+                UT_free(newAdminPtr);
+
+#ifdef DEBUG
+                printf("The ripadmin machine is: %s\n", ((ca_ripadmin_t *) confVars[location].valPtr)->host);
+#endif	/* DEBUG */
+
+                break;
+
+            case 17:
+                /*
+                 * Found Update_Source variable.
+                 There may be multiple instances of this
+                 */
+#ifdef DEBUG
+                printf("Found Update_Source variable !!!\n");
+#endif	/* DEBUG */
+
+#ifdef DEBUG
+                puts(name);
+                puts(value);
+#endif	/* DEBUG */
+
+                /*
+                 * Split the value into DB-name, DB-details,
+                 * updDetails. Use blankspace as the
+                 * delimiter between each of these variables.
+                 */
+                sscanf(value, "%s %s %s", source, database, updDetails);
+#ifdef  DEBUG
+                puts(source);
+                puts(database);
+                puts(updDetails);
+#endif	/* DEBUG */
+
+                /*
+                 * Using the values in "database", populate a
+                 * ca_database_t structure. Give this
+                 * variable a name.
+                 */
+
+                /*
+                 * First, separate the values in "database",
+                 * using "," as as a delimiting  character.
+                 */
+                dbcomps = ut_g_strsplit_v1(database, ",", 0);
+
+#ifdef DEBUG
+                for (i = 0; dbcomps[i] != NULL; i++)
+                printf("dbcomps[%d] = %s\n", i, dbcomps[i]);
+#endif	/* DEBUG */
+
+                /*
+                 * Create a structure for this database.
+                 */
+                newUpdDbPtr = UT_calloc(1, sizeof(ca_database_t));
+
+                strcpy(newUpdDbPtr->host, dbcomps[0]);
+                newUpdDbPtr->port = atoi(dbcomps[1]);
+                strcpy(newUpdDbPtr->user, dbcomps[2]);
+                strcpy(newUpdDbPtr->password, dbcomps[3]);
+                strcpy(newUpdDbPtr->dbName, dbcomps[4]);
+
+                g_strfreev(dbcomps);
+
+#ifdef DEBUG
+                puts("Testing the population of the UPD db structure:");
+                printf("\n%s::%d::%s::%s::%s\n", newUpdDbPtr->host, newUpdDbPtr->port, newUpdDbPtr->user, newUpdDbPtr->password, newUpdDbPtr->dbName);
+#endif	/* DEBUG */
+
+                /*
+                 * Now, store the values contained in the
+                 * updDetails string.
+                 */
+
+                /*
+                 * First, separate the values in the
+                 * 'updDetails' string, using "," as a
+                 * delimiting character.
+                 */
+                updDbcomps = ut_g_strsplit_v1(updDetails, ",", 0);
+
+#ifdef DEBUG
+                for (i = 0; updDbcomps[i] != NULL; i++)
+                printf("updDbcomps[%d] = %s\n", i, updDbcomps[i]);
+#endif	/* DEBUG */
+
+                /*
+                 * Using the above ca_database_t structure,
+                 * the "source" value and the values of
+                 * updDbcomps, populate the ca_updDbSource_t
+                 * structure.
+                 *
+                 */
+
+                /*
+                 * Create a new structure for this UPD
+                 * Source.
+                 */
+                newUpdSrc = UT_calloc(1, sizeof(ca_updDbSource_t));
+
+#ifdef DEBUG
+                puts("Created a structure for the UPD Source variable");
+#endif	/* DEBUG */
+
+                /*
+                 * Now, populate this structure.
+                 */
+
+                strcpy(newUpdSrc->name, source);
+                newUpdSrc->updDb = *newUpdDbPtr;
+                strcpy(newUpdSrc->whoisd_host, updDbcomps[0]);
+                newUpdSrc->qryPort = atoi(updDbcomps[1]);
+                newUpdSrc->updPort = atoi(updDbcomps[2]);
+
+                UT_free(newUpdDbPtr); /* Was copied */
+                g_strfreev(updDbcomps);
+
+#ifdef DEBUG
+                puts("Testing the population of the ca_updDbSource_t structure:");
+                printf("Update Source name: %s\n", newUpdSrc->name);
+                printf("\nUPD-DB == %s::%d::%s::%s::%s\n", (newUpdSrc->updDb).host, (newUpdSrc->updDb).port, (newUpdSrc->updDb).user, (newUpdSrc->updDb).password, (newUpdSrc->updDb).dbName);
+                printf("\nUpdate Source Machine Details: %s::%d::%d\n", newUpdSrc->whoisd_host, newUpdSrc->qryPort, newUpdSrc->updPort);
+#endif	/* DEBUG */
+
+                /*
+                 * Now, assign these values into the correct
+                 * long-term storage.
+                 */
+
+                if (num_sources < CA_MAXSOURCES) {
+                    ((ca_updDbSource_t **) confVars[location].valPtr)[num_sources] = (ca_updDbSource_t *) UT_calloc(1, sizeof(ca_updDbSource_t));
+
+                    memcpy(((ca_updDbSource_t **)confVars[location].valPtr)[num_sources++], newUpdSrc,
+                            sizeof(ca_updDbSource_t));
+                } else {
+                    fprintf(stderr, "Max number of Update Sources exceeded\n");
                     die;
-                    break;
+                }
+
+                /* No longer needed. */
+                UT_free(newUpdSrc);
+
+#ifdef DEBUG
+                //				printf("UPD-Source/DB-details/user: %s\n", (((ca_updDbSource_t *) (confVars[location].valPtr)[num_sources-1])->updDb).user);
+#endif	/* DEBUG */
+
+                break;
+
+            default:
+                fprintf(stderr, "Data type not found for variable \"%s\".\n", name);
+                die
+                ;
+                break;
             }
         }
 
         fscanf(confPtr, "%s", name);
         fgets(value, sizeof(value), confPtr);
         g_strstrip(value);
-
-    } /* End of processing the config file. */
-
-} /* End of readConfig() function */
+    }
+}
 
 void ca_getDictionary(dict_t woordenboek[], int size) {
     int k;
