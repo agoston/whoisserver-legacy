@@ -97,7 +97,7 @@ check_server() {
 	my_log 'Waiting for rx_load thread to finish...'
 	RX_LOAD="Init"
 	NUM=0
-	while [ $NUM -lt 15 ]; do
+	while [ $NUM -lt 45 ]; do
 		RX_LOAD=`send_command 'show threads' | grep '^rx load' | awk '{printf("%s %s %s", $10, $11, $12);}'`
 		echo -en "\r${RX_LOAD}                              "
 		if [ "$RX_LOAD" ]; then
