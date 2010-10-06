@@ -585,7 +585,9 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size) {
             // check if include directive
             if (!strncmp(name, "INCLUDE", 7)) {
                 int i;
+#ifdef DEBUG
                 fprintf(stderr, "Reading symbols from %s\n", value);
+#endif
                 ca_readConfig(value, confVars, CA_NUMBEROFSYMBOLS);
                 for (i = 0; i < CA_NUMBEROFSYMBOLS; i++) {
                     confVars[i].overwrite = TRUE;
@@ -605,20 +607,23 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size) {
             printf("The location is: %d\n", location);
 #endif	/* DEBUG */
 
+            /* free() if exists and should be overwritten */
+            if (confVars[location].overwrite && confVars[location].strPtr) {
+                g_string_free(confVars[location].strPtr, TRUE);
+                confVars[location].strPtr = NULL;
+                confVars[location].overwrite = FALSE;
+            }
+
             /*
              * See if the string value has already been stored;
              * if it has, then concatenate the new value to it;
              * if not, then allocate some memory and copy the
              * string into it.
              */
-            if (!confVars[location].overwrite && confVars[location].strPtr) {
+            if (confVars[location].strPtr) {
                 g_string_append(confVars[location].strPtr, "\n");
                 g_string_append(confVars[location].strPtr, value);
             } else {
-                if (confVars[location].overwrite) {
-                    g_string_free(confVars[location].strPtr, TRUE);
-                    confVars[location].overwrite = FALSE;
-                }
                 confVars[location].strPtr = g_string_new(value);
             }
 
@@ -667,33 +672,9 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size) {
                  * additional string.
                  */
                 if (confVars[location].valPtr) {
-#ifdef DEBUG
-                    printf("\n%s variable already exists\n", name);
-#endif	/* DEBUG */
-                    g_string_append(confVars[location].valPtr, value);
-                    g_string_append(confVars[location].valPtr, "\n");
-                } else {
-                    /*
-                     * If the variable has not already
-                     * been created, then create it.
-                     */
-#ifdef DEBUG
-                    printf("\n%s variable does not exist\n", name);
-#endif	/* DEBUG */
-
-                    /*
-                     * We use g_string_new() to create a
-                     * new GString. This is a _structure_
-                     * of str and len.  The actual string
-                     * is stored in the str component.
-                     * Thus, when we want to access the
-                     * string, we must look into
-                     * structure.
-                     */
-                    confVars[location].valPtr = g_string_new(value);
-                    g_string_append(confVars[location].valPtr, "\n");
+                    g_string_free(confVars[location].valPtr, TRUE);
                 }
-
+                confVars[location].valPtr = g_string_new(confVars[location].strPtr->str);
                 break;
 
             case 13:

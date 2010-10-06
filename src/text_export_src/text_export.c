@@ -277,6 +277,18 @@ int main(int argc, char **argv) {
 	UT_init(ctx);
 	ca_init(rip_conf);
 
+	/* FIXME: dirty hack for NRTM v2 + dummification. PM_init() requires to read the placeholder objects into memory,
+	 * After NRTM v2 deprecation, this is not required anymore - agoston @2010-10-01 */
+    ca_updDbSource_t **upd_source_hdl;
+    upd_source_hdl = ca_get_UpdSourceHandle(CA_UPDSOURCE);
+    ca_dbSource_t *source_hdl = ca_get_SourceHandleByName(upd_source_hdl[0]->name);
+
+    strcpy(source_hdl->db.dbName, db.database);
+    strcpy(source_hdl->db.host, db.hostname);
+    strcpy(source_hdl->db.password, db.password);
+    source_hdl->db.port = db.port;
+    strcpy(source_hdl->db.user, db.user);
+
 	PM_init(null_ctx);
 
 	/* turn off stdout buffering */
@@ -292,15 +304,8 @@ int main(int argc, char **argv) {
 	 * This is required as joining serials table would result in a shared-mode row-level lock on serials,
 	 * which is also locked by a LOCK TABLES command by dbupdate, thus stalling dbupdate processes for the
 	 * period of the dump, which is unacceptable - agoston, 2008-02-18 */
-	if (SQ_try_connection(&sql, db.hostname, db.port, db.database, db.user, db.password)) {
-		fprintf(stderr, "%s: error connecting to database; %s\n", Program_Name, SQ_error(sql));
-		exit(1);
-	}
-
-	if (SQ_try_connection(&sql2, db.hostname, db.port, db.database, db.user, db.password)) {
-		fprintf(stderr, "%s: error connecting to database; %s\n", Program_Name, SQ_error(sql));
-		exit(1);
-	}
+	sql = SQ_get_connection(db.hostname, db.port, db.database, db.user, db.password);
+	sql2 = SQ_get_connection(db.hostname, db.port, db.database, db.user, db.password);
 
 	if (Verbose) {
 		printf("Connected.\n");
