@@ -611,8 +611,8 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size) {
             if (confVars[location].overwrite && confVars[location].strPtr) {
                 g_string_free(confVars[location].strPtr, TRUE);
                 confVars[location].strPtr = NULL;
-                confVars[location].overwrite = FALSE;
             }
+            confVars[location].overwrite = FALSE;
 
             /*
              * See if the string value has already been stored;
