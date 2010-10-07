@@ -675,6 +675,8 @@ void ca_readConfig(const char *configFile, values_t confVars[], int size) {
                     g_string_free(confVars[location].valPtr, TRUE);
                 }
                 confVars[location].valPtr = g_string_new(confVars[location].strPtr->str);
+                /* ouch. braindead: newline counted upon at the end of valPtr, but not strPtr OUCH! - agoston @2010-10-07 */
+                g_string_append(confVars[location].valPtr, "\n");
                 break;
 
             case 13:
