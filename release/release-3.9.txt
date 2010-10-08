@@ -1,0 +1,23 @@
+20101008 - version 3.9
+
+Changes:
+
+
+
+Merged:
+- radix_expose (thanks to Gary Kenedy from APNIC)
+- bug_status_change
+- numerous minor bugfixes and feature enhancements backported
+
+
+Installation notes:
+- Because the lookup port has been introduced, you will need to adjust
+your configuration files.
+
+- The lookup port is strictly RIPE NCC-internal only. It is not an interface
+for external users, but for other internal RIPE NCC services.
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG
