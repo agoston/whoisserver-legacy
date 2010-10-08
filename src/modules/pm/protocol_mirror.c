@@ -56,6 +56,11 @@ char *main_source = NULL;
 /* hash to store placeholder object per class (used in nrtm v1 and v2 backward compatibility mode only)
  * key = classname (char *), value = placeholder object blob (char *)
  *
+ * The dummy object would have a more convenient place in the rip.config file, however, that would mean that the object referenced
+ * from dummified object cannot be queried for in the master database.
+ *
+ * TODO: Once NRTM v1+2 is dropped, we don't need to load this object into memory, so we can drop this cache too. Woohooo!
+ *
  * FIXME: The RPSL implementation support a single RPSL schema definition only. This means that NRTM can dummify only
  * one source, and that is the main source (first UPDSOURCE). Hence, dummification should never be called for any other source.
  * agoston, 2010-04-20 */
@@ -123,7 +128,13 @@ static void dummify_init() {
             } else {
                 fprintf(stderr, "Placeholder object for class %s, %s, was not found in source %s (meaning, the following query gave no results: %s)\n",
                         class_names[i], classinfo->dummify_singleton, main_source, query);
-                die;
+                /* die only if main source name can be found at the end of the dummy object
+                 * so whois-server wouldn't whine for a missing placeholder while testing/etc... */
+                if (g_str_has_suffix(classinfo->dummify_singleton, main_source)) {
+                    die;
+                } else {
+                    fprintf(stderr, " *** Ignoring above error for source %s\n", main_source);
+                }
             }
 
             if (sql_result) {

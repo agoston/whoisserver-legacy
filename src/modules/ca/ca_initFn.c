@@ -39,13 +39,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/* #define DEBUG */
-
-/*
- * The initialization function.
- */
-
-int ca_init(const char *configFile)
 /****************************************************************
  * ca_init() -- Initialisation function;                *
  *          - a wrapper for the ca_populateDictionary,`    *
@@ -59,6 +52,7 @@ int ca_init(const char *configFile)
  *    An integer; the return value of ca_mandVarChk().
  *                                          *
  ****************************************************************/
+int ca_init(const char *configFile)
 {
 
     /*
@@ -71,11 +65,12 @@ int ca_init(const char *configFile)
     ca_getDictionary(dictionary, CA_NUMBEROFSYMBOLS);
 #endif /* DEBUG */
 
+    /* initialize confvars array */
+    memset(confVars, 0, sizeof(values_t) * CA_NUMBEROFSYMBOLS);
+
     ca_readConfig(configFile, confVars, CA_NUMBEROFSYMBOLS);
-    /*
-     * ca_sanityChk(confVars);
-     */
-    if (ca_mandVarChk() != 0) {
+
+    if (ca_mandVarChk()) {
         fprintf(stderr, "Mandatory variable(s) undefined\n\n");
         fprintf(stderr, "<<<<<<<<<<<<<<<     >>>>>>>>>>>\n\n");
         fprintf(stderr, "Continuing ..... \n\n");
