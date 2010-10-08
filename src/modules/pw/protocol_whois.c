@@ -48,7 +48,7 @@ LG_context_t *query_context;
 /*++++++++++++++++++++++++++++++++++++++
 
 void
-display_file        opens a file and displays its contents to the
+PW_display_file     opens a file and displays its contents to the
                     connection described in conn. structure.
 
 
@@ -57,8 +57,7 @@ sk_conn_st *condat  pointer to connection structure
 char *filename      file name
 
   ++++++++++++++++++++++++++++++++++++++*/
-static void
-display_file(sk_conn_st *condat, char *filename)
+void PW_display_file(sk_conn_st *condat, char *filename)
 {
   char *buffer;
   struct stat sb;
@@ -113,7 +112,7 @@ display_file(sk_conn_st *condat, char *filename)
 
   /* free the allocated memory */
   UT_free(buffer);
-}/* display_file */
+}/* PW_display_file */
 
 
 /*++++++++++++++++++++++++++++++++++++++
@@ -227,7 +226,7 @@ void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl
 	case QC_HELP:
 	case QC_SYNERR: {
 		char *rep = ca_get_pw_help_file;
-		display_file( &(qe->condat), rep);
+		PW_display_file( &(qe->condat), rep);
 		UT_free(rep);
 	}
 		break;

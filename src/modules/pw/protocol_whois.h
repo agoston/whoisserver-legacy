@@ -56,4 +56,6 @@ void PW_record_query_end();
 void PW_log_denied_query();
 void PW_run_query();
 
+void PW_display_file(sk_conn_st *condat, char *filename);
+
 #endif /* READ_PROTOCOL_WHOIS */

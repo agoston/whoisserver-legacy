@@ -1,0 +1,13 @@
+# radix lookup tests
+#
+# CASE 96: query for object without a search tree
+#
+#
+#SUCCESS
+#
+# RESULT 96: Class type is not searchable
+
+$EXEC_BEFORE=$DATADIR/lookup/reload.sh DB-TEST
+
+$EXEC_AFTER=$DATADIR/lookup/query.pl -- -T person 192.168.0.0
+

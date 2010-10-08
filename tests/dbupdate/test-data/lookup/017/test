@@ -1,0 +1,16 @@
+# radix lookup tests
+#
+# CASE 17: default route6 query for route
+#
+# default query for route
+# closest encompassing route exists
+# using ipv6 prefix
+#
+#SUCCESS
+#
+# RESULT 17: Closest encompassing route(s) returned
+
+$EXEC_BEFORE=$DATADIR/lookup/reload.sh DB-TEST
+
+$EXEC_AFTER=$DATADIR/lookup/query.pl -- -T route6 2001:658:21A:34B::/64
+

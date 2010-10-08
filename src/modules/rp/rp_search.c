@@ -537,9 +537,10 @@ int
 	/*if( NOERR(err) ) { */
 	spc_id = IP_pref_b2_space(g_list_first(preflist)->data);
 	if (!NOERR(err = RP_tree_get(&mytree, reg_id, spc_id, attr))) {
+	    wr_clear_list(&preflist);
 		return err;
 	}
-	/*} */
+
 	/* the point of no return: now we lock the tree. From here, even if errors
 	   occur, we still go through all procedure to unlock the tree at the end */
 

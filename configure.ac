@@ -356,6 +356,7 @@ AC_CONFIG_FILES([
   conf/SAMPLE.CURRENTSERIAL
   doc/AUTO-DBM-HELP
   doc/WHOIS-HELP
+  doc/LOOKUP-HELP
   src/defs/makedefsall
   src/defs/Makefile
   src/SQL/aux.index.2

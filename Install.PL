@@ -107,7 +107,7 @@ Options:
   --sqlhost=%s          MySQL host to connect to (defaults to 'localhost')
   --sqlport=%d          MySQL port to connect to (defaults to 3306)
   --dbport=%d           Starting number of port range to use for this server instance.
-                        Needs 5 consecutive port numbers. Defaults to `id`0.
+                        Needs 6 consecutive port numbers. Defaults to `id`0.
   --dbname=%s           Database name, just in case you need more than one in parallel.
                         Defaults to your effective username (from /etc/passwd).
 
@@ -249,8 +249,9 @@ if( $SetupConfig or $All ) {
         [ q[^SVWHOIS_PORT .*]     => q[SVWHOIS_PORT ]  . ($DbPort+1) ],
         [ q[^SVCONFIG_PORT .*]    => q[SVCONFIG_PORT ] . ($DbPort+2) ],
         [ q[^SVMIRROR_PORT .*]    => q[SVMIRROR_PORT ] . ($DbPort+3) ],
+        [ q[^SVLOOKUP_PORT .*]    => q[SVLOOKUP_PORT ] . ($DbPort+4) ],
         [ q[^UPDSOURCE .*]        => qq[UPDSOURCE DB-TEST $SQLHost,$SQLPort,$SQLUser,$SQLPass,$DbName ].
-                                     qq[localhost,].($DbPort+1).q[,].($DbPort+4) ],
+                                     qq[localhost,].($DbPort+1).q[,].($DbPort+5) ],
     
         ### access to the ripadmin db
         [ q[^RIPADMIN.*]          => qq[RIPADMIN $SQLHost,$SQLPort,$SQLUser,$SQLPass,$DbAdminName] ], 
@@ -297,7 +298,7 @@ password:    $SQLPass
 SOURCE    DB-TEST
 database: $DbName
 opMode:   2                                                                                        
-updPort:  ] . ($DbPort+4). q[
+updPort:  ] . ($DbPort+5). q[
 canupd:   y                                                                                        
 deflook:  y                                                                                        
 #nrtm:     SAMPLEM                                                                                 

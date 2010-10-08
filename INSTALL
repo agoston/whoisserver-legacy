@@ -22,6 +22,7 @@ $BASEDIR
 |   `-- ... (further whois-related binaries like dbupdate)
 |-- conf
 |   |-- WHOIS-HELP
+|   |-- LOOKUP-HELP
 |   |-- gdbcomm
 |   |-- rip.config
 |   |-- sources.config
