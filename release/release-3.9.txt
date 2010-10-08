@@ -5,7 +5,7 @@ Changes:
 
 
 Merged:
-- radix_expose (thanks to Gary Kenedy from APNIC)
+- radix_expose (thanks to Gary Kennedy from APNIC)
 - bug_status_change
 - numerous minor bugfixes and feature enhancements backported
 
