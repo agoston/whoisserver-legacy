@@ -7,6 +7,7 @@ use File::Spec;
 use FindBin;
 use Getopt::Long qw( GetOptions );
 use IO::Socket::INET6;
+use Data::Dumper;
 
 use constant EXPECTED_RESULTS => 'lookup';
 
@@ -212,7 +213,11 @@ sub break_into_objects {
         }
     }
 
-    push @objects, $object if scalar @$object;
+    if (defined $object && scalar @$object) {
+        push @objects, $object;
+    }
+
+    #print Dumper \@objects, $lines;
 
     return \@objects;
 }
@@ -390,8 +395,9 @@ if (scalar grep { $_ =~ /^%/ } @$results) {
             $index++;
         }
 
-        die "Object '$object_id' from '$source' is not an expected object"
+        die "The following object (object_id=$object_id) from '$source' is not an expected object\n".Dumper($db_object)
             unless $seen;
+
     }
 
     # all results have been checked and since we got this far they should be good
