@@ -483,7 +483,7 @@ rx_nod_search (
 	rx_walk_tree( tree->top_ptr, hook_function,
 		      /* RX_WALK_REVERS | */ RX_WALK_SKPGLU, /* skip glue nodes while counting*/
 		      par_a, /* display this many levels */
-		      0, 0, &datstr, &err);
+		      1, 0, &datstr, &err);
 	if( err != RX_OK ) {
 	  return err;
 	}
@@ -502,7 +502,7 @@ rx_nod_search (
 	rx_walk_tree( stack[sps].srcptr,  hook_function,
 		      /* RX_WALK_REVERS | */ RX_WALK_SKPGLU, /* skip glue nodes while counting*/
 		      par_a, /* display up to this max length*/
-		      0, 0, &datstr, &err);
+		      1, 0, &datstr, &err);
 	if( err != RX_OK ) {
 	  return err;
 	}
@@ -524,7 +524,7 @@ rx_nod_search (
 	      rx_walk_tree( stack[sps].cpy.child_ptr[i],  hook_function, 
 			    /* RX_WALK_REVERS | */ RX_WALK_SKPGLU, /* skip glue nodes while counting*/
 			    par_a, /* display this many levels */
-			    0, 0, &datstr, &err);
+			    1, 0, &datstr, &err);
 	      if( err != RX_OK ) {
 		return err;
 	      }
@@ -570,7 +570,7 @@ rx_nod_search (
     rx_walk_tree( stack[i].srcptr,  rx_walk_hook_addnode, 
                   RX_WALK_PRFLEN, /* skip glue nodes while counting*/
                   par_a, /* display up to this max length*/
-                  0, 0, &datstr, &err);
+                  1, 0, &datstr, &err);
     if( err != RX_OK ) {
       return err;
     }
