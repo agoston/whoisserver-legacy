@@ -301,7 +301,7 @@ void PL_interact(int socket) {
             }
 
             // check for help
-            if (!g_ascii_strcasecmp(arglist[opt_state->optind], "help")) {
+            if (arglist[opt_state->optind] && !g_ascii_strcasecmp(arglist[opt_state->optind], "help")) {
                 char *rep = ca_get_pl_help_file;
                 PW_display_file(&answer_info.condat, rep);
                 UT_free(rep);
