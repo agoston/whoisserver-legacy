@@ -1,0 +1,3 @@
+%ERROR:505: class type is not searchable
+%
+% There is no lookup tree for "person" objects

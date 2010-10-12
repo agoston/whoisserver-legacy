@@ -185,6 +185,10 @@ SVCONFIG_PORT 43002
 
 SVMIRROR_PORT 43003
 
+#
+# Port for the radix lookup interface
+
+SVLOOKUP_PORT 43004
 
 ###########
 ##
@@ -197,6 +201,10 @@ SVMIRROR_PORT 43003
 
 PW_HELP_FILE @docdir@/WHOIS-HELP
 
+#
+# Location of the help file for radix lookup queries
+
+PL_HELP_FILE @docdir@/LOOKUP-HELP
 
 #
 # Shell command to be executed on die()
@@ -259,6 +267,45 @@ AC_SAVE_INTERVAL 1200
 
 ## The only things you need to change here are the
 ## pointers to your own URLs and specific site-related information.
+
+# Radix Lookup Messages
+
+# Unknown source error
+PL_ERR_BADSOURCE %%ERROR:501: unknown source
+PL_ERR_BADSOURCE %%
+PL_ERR_BADSOURCE %% "%s" is not a known source.
+
+# Unknown class error
+PL_ERR_BADCLASS %%ERROR:502: unknown object type
+PL_ERR_BADCLASS %%
+PL_ERR_BADCLASS %% "%s" is not a known object type
+
+# Missing source error
+PL_ERR_NOSOURCE %%ERROR:503: missing source
+
+# Missing class error
+PL_ERR_NOCLASS %%ERROR:504: missing object class
+
+# Non-searchable class error
+PL_ERR_NOSEARCHCLASS %%ERROR:505: class type is not searchable
+PL_ERR_NOSEARCHCLASS %%
+PL_ERR_NOSEARCHCLASS %% There is no lookup tree for "%s" objects
+
+# Duplicate search flag
+PL_ERR_DUPSEARCHFLAG %%ERROR:506: conflicting search flags
+
+# Missing search key
+PL_ERR_NOSEARCHKEY %%ERROR:507: no search key specified
+PL_ERR_NOSEARCHKEY %%
+PL_ERR_NOSEARCHKEY %% No search key specified
+
+# Invalid search key
+PL_ERR_BADSEARCHKEY %%ERROR:508: invalid search key format
+PL_ERR_BADSEARCHKEY %%
+PL_ERR_BADSEARCHKEY %% Search key must be an IP address/range/prefix
+
+# No entries found
+PL_ERR_NOENTRIES %%ERROR:101: no entries found
 
 #
 # Banner. This text comes out before the query is answered.
@@ -578,7 +625,7 @@ NRTM_HISTORY_ACCESS_LIMIT 1209600
 #
 # DB-details = MySQL_Host,MySQL_Port,MySQL_User,MySQL_Password,MySQL_DB
 
-UPDSOURCE SAMPLE sqlhost,3306,dbuser,dbpsw,SAMPLEDB whois.mydb.net,43001,43004
+UPDSOURCE SAMPLE sqlhost,3306,dbuser,dbpsw,SAMPLEDB whois.mydb.net,43001,43005
 
 
 ###########

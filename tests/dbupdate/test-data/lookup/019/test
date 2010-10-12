@@ -1,0 +1,15 @@
+# radix lookup tests
+#
+# CASE 19: default route6 query for route using ipv4 prefix
+#
+# default query for route
+# using ipv4 prefix
+#
+#SUCCESS
+#
+# RESULT 19: No entries found
+
+$EXEC_BEFORE=$DATADIR/lookup/reload.sh DB-TEST
+
+$EXEC_AFTER=$DATADIR/lookup/query.pl -- -T route6 20.13.0.0/16
+

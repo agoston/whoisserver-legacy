@@ -1,7 +1,7 @@
 # CASE 3: We try to create inet6num object 2001:0658:021A::/48 - 2001:0658:021A::/48
 # with syntactically incorrect range
 #
-# create inetnum object 
+# create inet6num object 
 #
 #FAILURE
 #

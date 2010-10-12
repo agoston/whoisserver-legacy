@@ -74,6 +74,7 @@
 #include "protocol_config.h"
 #include "protocol_mirror.h"
 #include "protocol_whois.h"
+#include "protocol_lookup.h"
 #include "query_command.h"
 #include "query_instructions.h"
 #include "rp.h"

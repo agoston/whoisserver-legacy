@@ -1,0 +1,15 @@
+# radix lookup tests
+#
+# CASE 12: default route query for existing routes
+#
+# default query for routes
+# using ipv4 prefix
+#
+#SUCCESS
+#
+# RESULT 12: All expected objects returned
+
+$EXEC_BEFORE=$DATADIR/lookup/reload.sh DB-TEST
+
+$EXEC_AFTER=$DATADIR/lookup/query.pl -- -T route 20.13.0.0/16
+

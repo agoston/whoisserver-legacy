@@ -196,6 +196,7 @@ lu_whois_query (LU_whois_info_t *whois_info, const gchar *query,
   whois_info->socket = -1;
 
   /* convert to objects result */
+  LG_log(lu_context, LG_DEBUG, "lu_whois_query: got result [%s]", reply->str);
   split_reply = (gchar**)g_strsplit(reply->str, "\n\n", 0);
   g_string_free(reply, TRUE);
 

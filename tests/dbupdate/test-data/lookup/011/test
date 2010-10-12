@@ -1,0 +1,15 @@
+# radix lookup tests
+#
+# CASE 11: default inet6num query for close matching using ipv6 prefix
+#
+# default search for inet6num
+# using ipv6 prefix
+#
+#SUCCESS
+#
+# RESULT 11: All expected objects returned
+
+$EXEC_BEFORE=$DATADIR/lookup/reload.sh DB-TEST
+
+$EXEC_AFTER=$DATADIR/lookup/query.pl -- -T inet6num 2001:0658:021A:045E::/64
+

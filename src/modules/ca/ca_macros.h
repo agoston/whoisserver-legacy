@@ -323,6 +323,9 @@
 #define ca_get_svmirror_port	ca_get_int(CA_SVMIRROR_PORT)
 #define ca_set_svmirror_port	ca_set_int(CA_SVMIRROR_PORT)
 
+#define ca_get_svlookup_port	ca_get_int(CA_SVLOOKUP_PORT)
+#define ca_set_svlookup_port	ca_set_int(CA_SVLOOKUP_PORT)
+
 #define ca_get_sourcefile ca_get_dirlist(CA_SOURCEFILE)
 #define ca_set_sourcefile ca_set_dirlist(CA_SOURCEFILE)
 
@@ -340,6 +343,36 @@
 
 #define ca_get_ac_load ca_get_boolean(CA_AC_LOAD)
 #define ca_set_ac_load ca_set_boolean(CA_AC_LOAD)
+
+#define ca_get_pl_help_file	ca_get_dirlist(CA_PL_HELP_FILE)
+#define ca_set_pl_help_file	ca_set_dirlist(CA_PL_HELP_FILE)
+
+#define ca_get_pl_err_badsource	ca_get_string(CA_PL_ERR_BADSOURCE)
+#define ca_set_pl_err_badsource ca_set_string(CA_PL_ERR_BADSOURCE)
+
+#define ca_get_pl_err_badclass	ca_get_string(CA_PL_ERR_BADCLASS)
+#define ca_set_pl_err_badclass	ca_set_string(CA_PL_ERR_BADCLASS)
+
+#define ca_get_pl_err_nosource	ca_get_string(CA_PL_ERR_NOSOURCE)
+#define ca_set_pl_err_nosource	ca_set_string(CA_PL_ERR_NOSOURCE)
+
+#define ca_get_pl_err_noclass	ca_get_string(CA_PL_ERR_NOCLASS)
+#define ca_set_pl_err_noclass	ca_set_string(CA_PL_ERR_NOCLASS)
+
+#define ca_get_pl_err_nosearchclass	ca_get_string(CA_PL_ERR_NOSEARCHCLASS)
+#define ca_set_pl_err_nosearchclass	ca_set_string(CA_PL_ERR_NOSEARCHCLASS)
+
+#define ca_get_pl_err_dupsearchflag	ca_get_string(CA_PL_ERR_DUPSEARCHFLAG)
+#define	ca_set_pl_err_dupsearchflag	ca_set_string(CA_PL_ERR_DUPSEARCHFLAG)
+
+#define ca_get_pl_err_nosearchkey	ca_get_string(CA_PL_ERR_NOSEARCHKEY)
+#define ca_set_pl_err_nosearchkey	ca_set_string(CA_PL_ERR_NOSEARCHKEY)
+
+#define ca_get_pl_err_badsearchkey	ca_get_string(CA_PL_ERR_BADSEARCHKEY)
+#define ca_set_pl_err_badsearchkey	ca_set_string(CA_PL_ERR_BADSEARCHKEY)
+
+#define ca_get_pl_err_noentries	ca_get_string(CA_PL_ERR_NOENTRIES)
+#define ca_set_pl_err_noentries	ca_set_string(CA_PL_ERR_NOENTRIES)
 
 #define ca_get_pw_resp_header	ca_get_string(CA_PW_RESP_HEADER)
 #define ca_set_pw_resp_header	ca_set_string(CA_PW_RESP_HEADER)

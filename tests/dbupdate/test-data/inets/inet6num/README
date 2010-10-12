@@ -12,7 +12,7 @@
 # with syntactically incorrect range
 # will now fail because it is not treated as syntax error.
 #
-# create inetnum object 
+# create inet6num object 
 #
 #FAILURE
 #
@@ -22,7 +22,7 @@
 # CASE 3: We try to create inet6num object 2001:0658:021A::/48 - 2001:0658:021A::/48
 # with syntactically incorrect range
 #
-# create inetnum object 
+# create inet6num object 
 #
 #FAILURE
 #
@@ -32,7 +32,7 @@
 # CASE 4: We try to create inet6num object 2001:0658:021A::/128
 # start IP == end IP
 #
-# create inetnum object 
+# create inet6num object 
 #
 #SUCCESS
 #
@@ -43,10 +43,21 @@
 # with some spaces
 # should be rejected to syntax error
 #
-# create inetnum object 
+# create inet6num object 
 #
 #FAILURE
 #
 # RESULT 5: The creation will fail.
+
+
+# CASE 6: We try to modify inet6num object 2001:0658:021A::/128
+# with status ASSIGNED and change it to status ALLOCATED-BY-RIR
+# with hostmaster mntner added but not with hostmaster password
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 6: The modify will fail.
 
 

@@ -120,9 +120,9 @@
 #
 # modify inetnum object
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 11: modification will succeed
+# RESULT 11: modification will fail
 
 # with Authorisation failed
 # inetnum erx status tests

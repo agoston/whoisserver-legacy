@@ -33,7 +33,7 @@ endif
 noinst_LIBRARIES = libaa.a libac.a libau.a libca.a libco.a libcr.a \
                    libdf.a libep.a libip.a libkm.a liblg.a liblu.a \
                    libma.a libnh.a $(LIBNS) libnt.a libpc.a libpg.a \
-                   libpm.a libpr.a libpw.a libqc.a libqi.a librp.a \
+                   libpm.a libpr.a libpw.a libpl.a libqc.a libqi.a librp.a \
                    librt.a librx.a libsk.a libsq.a libsv.a libta.a \
 		   libth.a libud.a libup.a libut.a libwh.a libwk.a \
 		   librip.a
@@ -116,6 +116,7 @@ libpg_a_SOURCES = modules/pg/pg.c
 libpm_a_SOURCES = modules/pm/pm_serials.c modules/pm/protocol_mirror.c
 libpr_a_SOURCES = modules/pr/properties.c
 libpw_a_SOURCES = modules/pw/protocol_whois.c
+libpl_a_SOURCES = modules/pl/protocol_lookup.c
 libqc_a_SOURCES = modules/qc/mg_getopt.c modules/qc/query_command.c
 libqi_a_SOURCES = modules/qi/query_instructions.c
 librp_a_SOURCES = modules/rp/rp_convert.c modules/rp/rp_load.c \
@@ -218,6 +219,7 @@ install-exec-hook:
 	${INSTALL} -m 0644 ../conf/notif_text $(DESTDIR)/${confdir}
 	${INSTALL} -m 0644 ../doc/AUTO-DBM-HELP $(DESTDIR)/${docdir}
 	${INSTALL} -m 0644 ../doc/WHOIS-HELP $(DESTDIR)/${docdir}
+	${INSTALL} -m 0644 ../doc/LOOKUP-HELP $(DESTDIR)/${docdir}
 	${INSTALL} -m 0644 ../conf/sample.db.gz  $(DESTDIR)/${tmpdir}/load/SAMPLE
 	${INSTALL} -m 0644 ../conf/SAMPLE.CURRENTSERIAL  $(DESTDIR)/${tmpdir}/load/SAMPLE
 	${INSTALL} -m 0644 ./SQL/aux.index.2 $(DESTDIR)/${bindir}/SQL

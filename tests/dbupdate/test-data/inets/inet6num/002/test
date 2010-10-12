@@ -2,7 +2,7 @@
 # with syntactically incorrect range
 # will now fail because it is not treated as syntax error.
 #
-# create inetnum object 
+# create inet6num object 
 #
 #FAILURE
 #

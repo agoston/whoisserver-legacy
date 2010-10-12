@@ -1257,7 +1257,7 @@ sub match_query($$) {
 sub parse_rip_config() {
     my $configfile = getvar('RIP_CONFIG');
     my @vars       = (
-        qw/ SVWHOIS_PORT SVCONFIG_PORT SVMIRROR_PORT GPGCMD UPDSOURCE ACKLOG UPDLOG FORWLOG NOTIFLOG TMPDIR RIPADMIN/
+        qw/ SVWHOIS_PORT SVCONFIG_PORT SVMIRROR_PORT SVLOOKUP_PORT GPGCMD UPDSOURCE ACKLOG UPDLOG FORWLOG NOTIFLOG TMPDIR RIPADMIN/
     );
 
     # format is multiline vars, like
@@ -2224,6 +2224,9 @@ sub run_test($) {
     report( "\n%% Running test in directory %s\n", $dir );
     report( "%% Started: %s",                      `date` );
     report( "%% Username: %s\n",                   scalar( getpwuid($>) ) );
+
+    # 0a. set environment
+    $ENV{RUNDIR} = $dir;
 
     # 1. parse local filters, die if not successful.
     my $all = parse_filters( getvar('FILTERS_LOCAL') );

@@ -1,0 +1,7 @@
+route6:       2001:658:21A::/48
+descr:        RIPE-NCC
+origin:       AS3333
+admin-c:      TP1-DB-TEST
+mnt-by:       TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST

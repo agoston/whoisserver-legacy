@@ -1,0 +1,29 @@
+20101008 - version 3.9
+
+Changes:
+Radix interface is exposed. Listening on the SVLOOKUP_PORT, it interprets
+queries in similar format as the whois queries, and runs them against the
+radix trees, returning object_id and pkey of the matching nodes.
+
+It is designed to be used internally, so that external software can use
+the radix trees for its own functions directly.
+
+
+Merged:
+- radix_expose
+- bug_status_change
+- numerous minor bugfixes and feature enhancements backported from
+strong_reg
+
+
+Installation notes:
+- Because the lookup port has been introduced, you will need to adjust
+your configuration files.
+
+- The lookup port is strictly RIPE NCC-internal only. It is not an interface
+for external users, but for other internal RIPE NCC services.
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG

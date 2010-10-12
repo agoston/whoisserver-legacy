@@ -1,0 +1,15 @@
+# radix lookup tests
+#
+# CASE 6: all less-specific inetnum query using ipv4 address
+#
+# all less-specific query for inetnum
+# using ipv4 address
+#
+#SUCCESS
+#
+# RESULT 6: All expected objects returned
+
+$EXEC_BEFORE=$DATADIR/lookup/reload.sh DB-TEST
+
+$EXEC_AFTER=$DATADIR/lookup/query.pl -- -L -T inetnum 192.168.201.145
+

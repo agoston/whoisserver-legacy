@@ -18,6 +18,7 @@ tech-c:       TP1-DB-TEST
 mnt-by:       LIR-MNT
 mnt-lower:    LIR-MNT
 status:       ASSIGNED ANYCAST
+mnt-by:       RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net 20060101
 source:       DB-TEST
 

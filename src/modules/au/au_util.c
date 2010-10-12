@@ -375,8 +375,53 @@ au_check_multiple_authentications (char *attr_to_check[],
     info->mntner_used = NULL;
   }
 
-  /* return the result */
   LG_log(au_context, LG_FUNC, "<check_authentications: exiting with value [%s]",
+         AU_ret2str(ret_val));
+  return ret_val;
+}
+
+
+
+AU_ret_t
+au_rir_auth_check(au_plugin_callback_info_t *info, rpsl_object_t *obj, GList *rir_mntner_list)
+{
+  AU_ret_t ret_val;
+  gchar *value;
+  gchar *source;
+  GList *attr;
+
+  rpsl_object_t *mntner;
+
+  LG_log(au_context, LG_FUNC, ">au_rir_auth_check: entering");
+
+  /* find source */
+  source = get_source(obj);
+  if (source == NULL)
+  {
+    LG_log(au_context, LG_FUNC, "<au_rir_auth_check: exiting with value [AU_ERROR]");
+    return AU_ERROR;
+  }
+
+  /* Check each of the mntners in the list */
+  for (attr = rir_mntner_list; attr != NULL; attr = g_list_next(attr))
+  {
+    value = rpsl_attr_get_clean_value(attr->data);
+    g_strup(value);
+    LG_log(au_context, LG_DEBUG, "au_rir_auth_check: checking mntner %s",
+           value);
+
+    ret_val = au_mntner_authenticate(info->ctx, value, au_lookup, source, info->cred, &mntner);
+    if (ret_val == AU_AUTHORISED)
+    {
+      LG_log(au_context, LG_DEBUG, "au_rir_auth_check: authorised by mntner %s",
+               value);
+      UT_free(value);
+      break;
+    }
+    UT_free(value);
+  }
+
+  LG_log(au_context, LG_FUNC, "<au_rir_auth_check: exiting with value [%s]",
          AU_ret2str(ret_val));
   return ret_val;
 }

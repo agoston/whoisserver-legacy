@@ -2140,19 +2140,18 @@ qi_collect_ids(ca_dbSource_t *dbhdl,
 			  Query[qi->queryindex].attribute,
 			  datlist, limit);
 
-
-      if( NOERR(err)) {
-        LG_log(qi_context, LG_DEBUG,
-		    "%d entries after %s (mode %d par %d reg %d) query for %s",
-		    g_list_length(*datlist),
-		    Query[qi->queryindex].descr,
-		    qi->rx_srch_mode, qi->rx_par_a,
-		    dbhdl,
-		    qi->rx_keys);
-      } /* NOERR */
-      else {
-        LG_log(qi_context, LG_INFO,
-		  "RP_asc_search returned %x ", err);
+      if (NOERR(err)) {
+#ifdef DEBUG_QUERY
+          fprintf(stderr, "%d entries after %s (mode %d par %d reg %s) query for %s:\n", g_list_length(*datlist), Query[qi->queryindex].descr,
+                  qi->rx_srch_mode, qi->rx_par_a, dbhdl->name, qi->rx_keys);
+          GList *pp = *datlist;
+          for (; pp; pp = pp->next) {
+              fprintf(stderr, "%s", (char *)(((rx_datcpy_t *)(pp->data))->leafcpy.data_ptr));
+          }
+#endif
+      } else {
+          LG_log(qi_context, LG_INFO, "RP_asc_search returned error code %x after %s (mode %d par %d reg %s) query for %s", err,
+                  Query[qi->queryindex].descr, qi->rx_srch_mode, qi->rx_par_a, dbhdl->name, qi->rx_keys);
       }
       break;
 
