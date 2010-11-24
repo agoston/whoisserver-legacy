@@ -578,7 +578,6 @@ void log_options(LG_context_t *lg_ctx, options_struct_t *options, char *args_str
             input data structure
    Returns  sets values in options structure
 */
-
 void check_keywords(RT_context_t *rt_ctx, LG_context_t *lg_ctx, options_struct_t *options, ep_input_structure_t *input) {
     int kw_idx, kw_item;
     int invalid = 0;
@@ -598,12 +597,10 @@ void check_keywords(RT_context_t *rt_ctx, LG_context_t *lg_ctx, options_struct_t
      These are returned as a comma seperated list. */
     if (options->mail_input) {
         keyword_str = (char *) EP_get_candidate_keywords(input);
-        //printf("keyword_str [%s]\n", keyword_str);
-        /* if there is a keywords: tag on the subject line,
-         skip past everything up to and including it */
-        if (keyword_str && ((ptrlc = strstr(keyword_str, "keywords:")) || (ptruc = strstr(keyword_str, "KEYWORDS:")))) {
-            keyword_str = ptrlc ? ptrlc + 10 : ptruc + 10; /* yes it is 10, don't forget the comma */
-            //printf("keyword_str [%s]\n", keyword_str);
+        LG_log(lg_ctx, LG_FUNC, "EP_get_candidate_keywords: [%s]", keyword_str);
+        if (keyword_str && (ptrlc = strcasestr(keyword_str, "keywords:"))) {
+            keyword_str = ptrlc + 9;
+            if (*keyword_str == ',') keyword_str++;
         }
     } else
         keyword_str = options->keywords;
