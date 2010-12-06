@@ -261,15 +261,20 @@ static int ac_find_acl_l(rx_srch_mt searchmode, ip_prefix_t * prefix, acl_st **s
 
 	/* it must work */
 	dieif((ret_err = RX_bin_search(searchmode, 0, 0, act_acl[localpref->ip.space], localpref, &datlist, RX_ANS_ALL)) != RX_OK);
+
 	/* In exless mode, something must be found or the acl tree is not configured at all !
 	   There always must be a catch-all record with defaults */
 	dieif(searchmode == RX_SRCH_EXLESS && g_list_length(datlist) == 0);
 
-	datref = (rx_datref_t *) g_list_nth_data(datlist, 0);
-
-	*store_acl = ((acl_st *) datref->leafptr);
-
-	wr_clear_list(&datlist);
+	// check if we found something
+	if (datlist) {
+	    datref = (rx_datref_t *) g_list_nth_data(datlist, 0);
+	    *store_acl = ((acl_st *) datref->leafptr);
+	    wr_clear_list(&datlist);
+	} else {
+	    *store_acl = NULL;
+	    ret_err = RX_DATNOF;
+	}
 
 	/* free malloced area */
 	if (prefix != localpref)
@@ -357,7 +362,7 @@ int AC_findcreate_acl_l(ip_prefix_t * prefix, acl_st ** store_acl)
 
   MT-Note: assumes locked accounting tree
 
-  FIXME: It is called with a write lock on the tree from _EVERYWHERE_. There is no use to do that;
+  FIXME: It is called with a write lock on the tree from _EVERYWHERE_. There is no need to do that;
          a simple read lock is OK, and we only need to fetch a write lock if we create a new node
          I won't fix this now, as a complete thread+locking optimization is needed anyway - Agoston, 2006
   ++++++++++++++++++++++++++++++++++++++*/
