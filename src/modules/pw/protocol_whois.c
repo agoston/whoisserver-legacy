@@ -280,7 +280,17 @@ void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl
 	}
 		/* FALLTROUGH */
 	case QC_REAL:
-		qis = QI_new(qc, qe);
+
+	    /* Log query instructions */
+#ifdef DEBUG_QUERY
+        {
+            char *temp = QC_query_command_to_string(qc);
+            fprintf(stderr, "\n---\nRunning query: %s\n", temp);
+            free(temp);
+        }
+#endif
+
+	    qis = QI_new(qc, qe);
 
 		/* go through all sources,
 		 stop if connection broken - further action is meaningless */

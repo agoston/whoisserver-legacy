@@ -1338,12 +1338,7 @@ qi_write_objects(SQ_connection_t **sql_connection,
 	 The list is replaced with a list containing the last inet(6)num entry,
 	 which is the inet(6)num in the query and any route objects found.
   ++++++++++++++++++++++++++++++++++++++*/
-void
-mnt_irt_filter (sk_conn_st *condat,
-                SQ_connection_t *sql_connection,
-                GList **datlist,
-		int *irt_inet_id, int *irt_gid)
-{
+void mnt_irt_filter(sk_conn_st *condat, SQ_connection_t *sql_connection, GList **datlist, int *irt_inet_id, int *irt_gid) {
     GList *p;
     GList *p_old;
     GList *new_datlist;
@@ -1358,54 +1353,49 @@ mnt_irt_filter (sk_conn_st *condat,
     *irt_gid = 0;
 
     /* search for node with "mnt-irt:" attribute */
-    p=g_list_last(*datlist);
-    while ( p != NULL ) {
+    p = g_list_last(*datlist);
+    while (p != NULL) {
         /* grab the data for this node */
-        rx_data = (rx_datcpy_t *)p->data;
+        rx_data = (rx_datcpy_t *) p->data;
         object_id = rx_data->leafcpy.data_key;
 
         /* see if this is the node we are looking for */
-        if ( ! irt_found &&
-	      object_has_attr(condat, sql_connection, object_id, "mnt_irt")) {
+        if (!irt_found && object_has_attr(condat, sql_connection, object_id, "mnt_irt")) {
             /* save this object_id */
-	    *irt_inet_id = object_id;
-	    irt_found = 1;
+            *irt_inet_id = object_id;
+            irt_found = 1;
         }
 
-	/* save the first inet(6)num found from the end of the list */
-	if ( ! inet_found &&
-	     (object_has_attr(condat, sql_connection, object_id, "inetnum") ||
-	     object_has_attr(condat, sql_connection, object_id, "inet6num")) ) {
-	    /* This is the object the irt object has to be grouped with
-	       when the objects are displayed in the output */
-	    *irt_gid = object_id;
+        /* save the first inet(6)num found from the end of the list */
+        if (!inet_found && (object_has_attr(condat, sql_connection, object_id, "inetnum") || object_has_attr(condat, sql_connection, object_id, "inet6num"))) {
+            /* This is the object the irt object has to be grouped with
+             when the objects are displayed in the output */
+            *irt_gid = object_id;
             /* move this entry to the new list */
             new_datlist = g_list_append(new_datlist, rx_data);
-	    p_old = p;
-            p=g_list_previous(p);
+            p_old = p;
+            p = g_list_previous(p);
             *datlist = g_list_remove_link(*datlist, p_old);
-	    g_list_free_1(p_old);
-	    inet_found = 1;
+            g_list_free_1(p_old);
+            inet_found = 1;
         }
-	/* save any route(6) found in the list */
-	else if ( object_has_attr(condat, sql_connection, object_id, "route") ||
-	          object_has_attr(condat, sql_connection, object_id, "route6") ) {
+        /* save any route(6) found in the list */
+        else if (object_has_attr(condat, sql_connection, object_id, "route") || object_has_attr(condat, sql_connection, object_id, "route6")) {
             /* move this entry to the new list */
             new_datlist = g_list_append(new_datlist, rx_data);
-	    p_old = p;
-            p=g_list_previous(p);
+            p_old = p;
+            p = g_list_previous(p);
             *datlist = g_list_remove_link(*datlist, p_old);
-	    g_list_free_1(p_old);
+            g_list_free_1(p_old);
+        } else {
+            /* otherwise just move on, this entry will be deleted later */
+            p = g_list_previous(p);
         }
-	else {
-	    /* otherwise just move on, this entry will be deleted later */
-            p=g_list_previous(p);
-	}
     }
 
     /* free our old datlist */
-    for (p=*datlist; p != NULL; p = g_list_next(p)) {
-        rx_data = (rx_datcpy_t *)p->data;
+    for (p = *datlist; p != NULL; p = g_list_next(p)) {
+        rx_data = (rx_datcpy_t *) p->data;
         UT_free(rx_data->leafcpy.data_ptr);
     }
     wr_clear_list(datlist);
@@ -2441,6 +2431,17 @@ int QI_execute(ca_dbSource_t *dbhdl,
 				 &datlist, &irt_inet_id, &irt_gid);
 	  }
 
+#ifdef DEBUG_QUERY
+	  {
+	      fprintf(stderr, "After mnt_irt_filter:\n");
+          GList *pp = datlist;
+          for (; pp; pp = pp->next) {
+              fprintf(stderr, "%s", (char *)(((rx_datcpy_t *)(pp->data))->leafcpy.data_ptr));
+          }
+	  }
+#endif
+
+
           /* add radix results to the table and destroy the datlist */
           sql_error = insert_radix_serials( &(qe->condat),
                                              sql_connection,
@@ -2450,6 +2451,25 @@ int QI_execute(ca_dbSource_t *dbhdl,
 
       //SK_watchstop(&(qe->condat));
   }
+
+#ifdef DEBUG_QUERY
+       {
+        SQ_result_set_t *res;
+
+        sprintf(sql_command, "SELECT * from %s", id_table);
+        if (SQ_execute_query(sql_connection, sql_command, &res)) {
+            fprintf(stderr, "ERROR: %s", SQ_error(sql_connection));
+        } else {
+            char *temp = SQ_result_to_string(res);
+            fprintf(stderr, "Contents of table %s:\n%s\n", id_table, temp);
+            free(temp);
+        }
+
+        if (res) {
+            SQ_free_result(res);
+        }
+    }
+#endif
 
   /* change the idtable */
   if (!sql_error) {
@@ -2722,12 +2742,13 @@ Query_instructions *QI_new(Query_command *qc, const Query_environ *qe) {
   qis->instruction[i_no++] = NULL;
 
 
-  {  /* tracing */
-      char *descrstr = QI_queries_to_string(qis);
-
-      LG_log(qi_context, LG_DEBUG, "Queries: %s", descrstr );
-      UT_free( descrstr );
-  }
+#ifdef DEBUG_QUERY
+     { /* tracing */
+        char *descrstr = QI_queries_to_string(qis);
+        fprintf(stderr, "Query Instructions to execute: %s\n", descrstr);
+        UT_free( descrstr );
+    }
+#endif
 
   return qis;
 
