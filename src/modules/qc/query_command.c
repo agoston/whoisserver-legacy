@@ -42,6 +42,9 @@
 /* logging */
 LG_context_t *qc_context;
 
+/* cache of default sources list */
+GList *deflook_sources_list;
+
 /*
  note on errors:
  QC_SYNERR returns a full help text
@@ -999,20 +1002,9 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
     }
 } /* QC_fill() */
 
-/* QC_environ_new() */
-/*++++++++++++++++++++++++++++++++++++++
- Create a new query environment.
 
- More:
- +html+ <PRE>
- Authors:
- ottrey
- +html+ </PRE><DL COMPACT>
- +html+ <DT>Online References:
- +html+ <DD><UL>
- +html+ </UL></DL>
 
- ++++++++++++++++++++++++++++++++++++++*/
+/* Create a new query environment */
 Query_environ *QC_environ_new(char *ip, int sock) {
     Query_environ *qe;
 
@@ -1020,23 +1012,11 @@ Query_environ *QC_environ_new(char *ip, int sock) {
     qe->condat.ip = ip;
     qe->condat.sock = sock;
 
-    /* The source is initialized to include only the deflook sources */
-    {
-        int i;
-        ca_dbSource_t *hdl;
-
-        for (i = 0; (hdl = ca_get_SourceHandleByPosition(i)) != NULL; i++) {
-            char *amrmrulez = ca_get_srcdeflook(hdl);
-            if (strcmp(amrmrulez, "y") == 0) {
-                qe->sources_list = g_list_append(qe->sources_list, (void *) hdl);
-            }
-            UT_free(amrmrulez);
-        }
-    }
+    qe->sources_list = g_list_copy(deflook_sources_list);
 
     return qe;
+}
 
-} /* QC_environ_new() */
 
 /* QC_create() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -1125,5 +1105,19 @@ char *QC_get_qrytype(qc_qtype_t qrytype) {
 }
 
 void QC_init(LG_context_t *ctx) {
+    int i;
+    ca_dbSource_t *hdl;
+
+    /* init logging context */
     qc_context = ctx;
+
+    /* init default sources list */
+    deflook_sources_list = NULL;
+    for (i = 0; (hdl = ca_get_SourceHandleByPosition(i)) != NULL; i++) {
+        char *isdeflook = ca_get_srcdeflook(hdl);
+        if (strcmp(isdeflook, "y") == 0) {
+            deflook_sources_list = g_list_append(deflook_sources_list, (void *) hdl);
+        }
+        UT_free(isdeflook);
+    }
 }
