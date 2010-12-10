@@ -188,32 +188,28 @@ void ta_print_header(char *buf, unsigned length)
   ut_timer_t *reftime  current time 
 
   ++++++++++++++++++++++++++++++++++++++*/
-static
-void ta_printone_l(ta_str_t *tas, char *buf, unsigned length, 
-		   ut_timer_t *reftime)
-{
-  float session, task;  /* duration of the session/task */
-  char *address = SK_getpeername(tas->sock); /* allocated! */
-  /* can be NULL for example if the socket has just closed
+static void ta_printone_l(ta_str_t *tas, char *buf, unsigned length, ut_timer_t *reftime) {
+    ip_addr_t localaddr;
+    char address[IP_ADDRSTR_MAX];
+    float session, task; /* duration of the session/task */
+    SK_getpeerip(tas->sock, &localaddr, &address);
+
+    /* can be NULL for example if the socket has just closed
      or the file descriptor is not a socket */
 
-  session = UT_timediff( &tas->sessionstart, reftime );
-  task    = UT_timediff( &tas->taskstart, reftime );
+    session = UT_timediff(&tas->sessionstart, reftime);
+    task = UT_timediff(&tas->taskstart, reftime);
 
-  snprintf(buf, length, TA_FORMAT ,
-	   tas->type,
-	   address ? address : "", 
-	   tas->sock, 
-	   (long unsigned)tas->thread_id, 
-	   session,
-	   task,
-	   tas->tasks,
-	   (tas->tasks > 0) ? session / tas->tasks : 0,
-	   tas->activity);
-  
-  if (address) {
-    UT_free(address);
-  }
+    snprintf(buf, length, TA_FORMAT ,
+            tas->type,
+            address ? address : "",
+            tas->sock,
+            (long unsigned)tas->thread_id,
+            session,
+            task,
+            tas->tasks,
+            (tas->tasks > 0) ? session / tas->tasks : 0,
+            tas->activity);
 }
 
 
