@@ -73,8 +73,7 @@ typedef struct {
 
   unsigned char  lasterr;      /* timeout, interrupt, etc. */
   ip_addr_t rIP;               /* real IP */
-  ip_addr_t eIP;               /* effective IP */
-  char *ip;                    /* text of the eIP */
+  char rIPs[IP_ADDRSTR_MAX];   /* real IP string */
 
   char rd_buf[INPUT_BUF_LEN];  /* buffer for input */
   int rd_buf_len;              /* number of characters in input buffer */
@@ -114,8 +113,7 @@ int SK_write(int sockfd,
 	     int *count_sent);
 int SK_puts(int  sockfd, const char *str, const struct timeval *timeout);
 int SK_putc(int  sockfd, char ch, const struct timeval *timeout);
-char *SK_getpeername(int sockfd);
-int SK_getpeerip(int sockfd, ip_addr_t *ip);
+int SK_getpeerip(int sockfd, ip_addr_t *ip, char *text);
 
 void SK_cd_make(sk_conn_st *condat, int sock, unsigned  timeout);
 void SK_cd_free(sk_conn_st *condat);

@@ -60,21 +60,14 @@ extern LG_context_t *sk_context;
   unsigned timeout      Read timeout (used in SK_cd_gets) in seconds.
                         Value of 0 disables the timeout.
   ++++++++++++++++++++++++++++++++++++++*/
-void SK_cd_make(sk_conn_st *condat, int  sock, unsigned timeout)
-{
-  memset(condat, 0, sizeof(sk_conn_st));
+void SK_cd_make(sk_conn_st *condat, int sock, unsigned timeout) {
+    memset(condat, 0, sizeof(sk_conn_st));
 
-  condat->sock = sock;
-
-  condat->ip = SK_getpeername(sock); 
-  dieif(condat->ip == NULL);
-
-  SK_getpeerip(sock, &(condat->rIP));
-  condat->eIP =  condat->rIP;
-
-  condat->rd_timeout.tv_sec = timeout;
-
-  condat->rd_buf_len = 0;
+    condat->sock = sock;
+    SK_getpeerip(sock, &(condat->rIP), &(condat->rIPs));
+    condat->rd_timeout.tv_sec = timeout;
+    condat->wr_timeout.tv_sec = timeout;
+    condat->rd_buf_len = 0;
 }
 
 
@@ -86,7 +79,6 @@ void SK_cd_make(sk_conn_st *condat, int  sock, unsigned timeout)
   ++++++++++++++++++++++++++++++++++++++*/
 void SK_cd_free(sk_conn_st *condat)
 {
-  UT_free(condat->ip);
 }
 
 /* SK_cd_puts() */

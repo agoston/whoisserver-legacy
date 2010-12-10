@@ -643,69 +643,17 @@ SK_putc(int sockfd, char ch, const struct timeval *timeout)
   return count_sent;
 }/* SK_putc() */
 
-#if 0
-/*++++++++++++++++++++++++++++++++++++++
-
-   This function reads a single character from a socket.
-
-   returns EOF when no character can be read.
-
-  ++++++++++++++++++++++++++++++++++++++*/
-int SK_getc(int  sockfd) {
-  char ch;
-
-  if( read(sockfd, &ch, 1) <= 0 ) {
-    return EOF;
-  }
-  else {
-    return ch;
-  }
-}/* SK_getc() */
-#endif /* 0 */
-
-/* SK_getpeername() */
-/*++++++++++++++++++++++++++++++++++++++
-
-  This function will tell you who is at the other end of a connected stream socket.
-
-  char *SK_getpeername     Returns allocated string with the IP in it,
-                           or "--" if the descriptor is not a socket,
-			   or NULL on error.
-
-  int    sockfd            The socket or file descriptor.
-
-  ++++++++++++++++++++++++++++++++++++++*/
-char *SK_getpeername(int  sockfd) {
-  char *hostaddress = (char*)UT_malloc(IP_ADDRSTR_MAX);
-  ip_addr_t localaddr;
-
-	/* this conversion is not optimal; however it makes no sense to
-	 * write the mapping converter function for every representation of
-	 * the ip address */
-  SK_getpeerip(sockfd, &localaddr);
-  IP_addr_b2a(&localaddr, hostaddress, IP_ADDRSTR_MAX);
-
-  return hostaddress;
-
-} /* SK_getpeername() */
-
-
-/* SK_getpeerip */
 /*++++++++++++++++++++++++++++++++++++++
 
   This function will check the ip of the connected peer and store it in the
   ip_addr_t structure defined in the IP module.
 
   int SK_getpeerip    returns 0 on success, -1 on failure.
-
   int  sockfd         The socket descriptor (file will result in -1)
-
-  ip_addr_t *ip       Pointer to where the address should be stored.
-
+  ip_addr_t *ip       ip_addr_t version of the IP
+  char *text          text version of IP (can be NULL, should be preallocated with size IP_ADDRSTR_MAX)
   ++++++++++++++++++++++++++++++++++++++*/
-
-int SK_getpeerip(int sockfd, ip_addr_t * ip)
-{
+int SK_getpeerip(int sockfd, ip_addr_t *ip, char *text) {
 	struct sockaddr_storage ss;
 	socklen_t namelen = sizeof(ss);
 	int ret = -1;
@@ -736,6 +684,10 @@ int SK_getpeerip(int sockfd, ip_addr_t * ip)
 		addr_in.sin_port = 0;
 		IP_addr_s2b(ip, &addr_in, sizeof(addr_in));
 	}
+
+	if (text) {
+        IP_addr_b2a(ip, text, IP_ADDRSTR_MAX);
+    }
 
 	return ret;
 }
