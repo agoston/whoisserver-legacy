@@ -48,7 +48,7 @@
 #define STR_XXL 16383
 
 void PW_init(LG_context_t *pw_ctx, LG_context_t *query_ctx);
-void PW_interact(int sock);
+void PW_interact(svr_args *args);
 void PW_startqueries();
 void PW_stopqueries();
 void PW_record_query_start();

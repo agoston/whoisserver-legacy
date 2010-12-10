@@ -400,90 +400,82 @@ PW_record_query_end()
     char *input			  query as a string. may be empty string ""
 
 ++++++++++++++++++++++++++++++++++++++*/
-void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_st *acl_ip, char *hostaddress, char *input)
-{
+void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_st *acl_ip, char *hostaddress, char *input) {
 
-  /* time */
-  ut_timer_t begintime;
-  ut_timer_t endtime;
-  acc_st copy_credit;
+    /* time */
+    ut_timer_t begintime;
+    ut_timer_t endtime;
+    acc_st copy_credit;
 
-  mysql_thread_init();
+    mysql_thread_init();
 
-  /* save accounting copy */
-  copy_credit = *acc_credit;
+    /* save accounting copy */
+    copy_credit = *acc_credit;
 
-  UT_timeget(&begintime);
+    UT_timeget(&begintime);
 
-  /* ** ACTUAL PROCESSING IS HERE ** */
-  PW_process_qc(qe, qc, acc_credit, acl_ip,hostaddress);
+    /* ** ACTUAL PROCESSING IS HERE ** */
+    PW_process_qc(qe, qc, acc_credit, acl_ip, hostaddress);
 
-  /* increase the number of queries */
-  if( qc->query_type == QC_REAL ) {
-    copy_credit.queries ++;
-  }
+    /* increase the number of queries */
+    if (qc->query_type == QC_REAL) {
+        copy_credit.queries++;
+    }
 
-  /* now, do some accounting stuff */
+    /* now, do some accounting stuff */
 
-  /* calc. the credit used, result  into copy_credit
+    /* calc. the credit used, result  into copy_credit
      This step MUST NOT be forgotten. It must complement
      the initial calculation of a credit, otherwise accounting
      will go bgzzzzzt.
-  */
+     */
 
-  AC_acc_addup(&copy_credit, acc_credit, ACC_MINUS);
+    AC_acc_addup(&copy_credit, acc_credit, ACC_MINUS);
 
-  /* can say 'nothing found' only if:
-       - the query did not just cause denial
-       - was a 'real' query
-       - nothing was returned
-  */
+    /* can say 'nothing found' only if:
+     - the query did not just cause denial
+     - was a 'real' query
+     - nothing was returned
+     */
 
-  if(  ! AC_credit_isdenied(&copy_credit)
-          && (qc->query_type == QC_REAL || qc->query_type == QC_FILTERED)
-          && copy_credit.private_objects + copy_credit.public_objects
-          + copy_credit.referrals == 0 ) {
+    if (!AC_credit_isdenied(&copy_credit) && (qc->query_type == QC_REAL || qc->query_type == QC_FILTERED) && copy_credit.private_objects + copy_credit.public_objects + copy_credit.referrals == 0) {
 
-    /* now: if the rtc flag is zero, the query ran to completion */
-    if( qe->condat.rtc == 0 ) {
-      char *rep = ca_get_pw_notfound ;
-      SK_cd_puts(&(qe->condat), rep);
-      UT_free(rep);
-      SK_cd_puts(&(qe->condat), "\n");
-    }
-    else {
-      /* something happened. Hope for working socket and display message
-         (won't hurt even if socket not operable)
-      */
-      char *rep = ca_get_pw_connclosed ;
-      SK_cd_puts(&(qe->condat), rep);
-      UT_free(rep);
-    }
-  } /* if credit is denied */
+        /* now: if the rtc flag is zero, the query ran to completion */
+        if (qe->condat.rtc == 0) {
+            char *rep = ca_get_pw_notfound;
+            SK_cd_puts(&(qe->condat), rep);
+            UT_free(rep);
+            SK_cd_puts(&(qe->condat), "\n");
+        } else {
+            /* something happened. Hope for working socket and display message
+             (won't hurt even if socket not operable)
+             */
+            char *rep = ca_get_pw_connclosed;
+            SK_cd_puts(&(qe->condat), rep);
+            UT_free(rep);
+        }
+    } /* if credit is denied */
 
-  /* LOGGING */
+    /* LOGGING */
 
-  UT_timeget(&endtime);
+    UT_timeget(&endtime);
 
-  /* query logging */
-  pw_log_query(qe, qc, &copy_credit, begintime, endtime,
-               hostaddress, input);
+    /* query logging */
+    pw_log_query(qe, qc, &copy_credit, begintime, endtime, hostaddress, input);
 
-  /* Commit the credit. This will deny if bonus limit hit
-     and clear the copy */
+    /* Commit the credit. This will deny if bonus limit hit and clear the copy */
 
-  /* to avoid increasing the number of (simultaneous) connections (is already committed in PW_interact) */
-  copy_credit.sim_connections = 0;
-  copy_credit.connections = 0;
+    /* to avoid increasing the number of (simultaneous) connections (is already committed in PW_interact) */
+    copy_credit.sim_connections = 0;
+    copy_credit.connections = 0;
 
-  /* ATTENTION: copy_credit is zeroed here !!! */
-  AC_commit(&(qe->condat.eIP), &copy_credit, acl_ip);
+    /* ATTENTION: copy_credit is zeroed here !!! */
+    AC_commit(&(qe->eIP), &copy_credit, acl_ip);
 
-  /* end-of-result -> ONE empty line */
-  SK_cd_puts(&(qe->condat), "\n");
+    /* end-of-result -> ONE empty line */
+    SK_cd_puts(&(qe->condat), "\n");
 
-  mysql_thread_end();
-
+    mysql_thread_end();
 }
 
 /*+++++++++++++++++++++++++++++++++++
@@ -551,96 +543,54 @@ void PW_log_denied_query(Query_environ *qe, Query_command *qc, char *hostaddress
 			  invokes parsing, execution, logging and accounting
 			  of the query.
 
-  int sock                Socket that client is connected to.
-
   ++++++++++++++++++++++++++++++++++++++*/
-void PW_interact(int sock) {
+void PW_interact(svr_args *args) {
     char input[MAX_INPUT_SIZE];
     int read_result;
-    char *hostaddress = NULL;
-    acl_st acl_rip, acl_eip;
-    acc_st copy_credit;
     Query_environ *qe = NULL;
     Query_command *qc = NULL;
     int deny = 0;
     GList *message_node;
 
-    /* Get the IP of the client */
-    hostaddress = SK_getpeername(sock);
-    LG_log(pw_context, LG_DEBUG, "connection from %s", hostaddress);
-
     /* Initialize the query environment. */
-    qe = QC_environ_new(hostaddress, sock);
-
-    /* init the connection structure, set timeout for reading the query */
-    SK_cd_make(&(qe->condat), sock, (unsigned) ca_get_keepopen);
-
-    TA_setcondat(&(qe->condat));
-
-    /* check out acl */
-    AC_check_acl(&(qe->condat.rIP), NULL, &acl_rip);
-
-    {
-        /* increase the number of sim. connections */
-        acc_st tmp_acc;
-        memset(&tmp_acc, 0, sizeof(acc_st));
-        tmp_acc.sim_connections = 1;
-        /* increase the number of connections */
-        tmp_acc.connections = 1;
-
-        AC_commit(&(qe->condat.rIP), &tmp_acc, &acl_rip);
-    }
+    qe = QC_environ_new(args->conn_sock);
 
     /* this is main loop. it runs at least once and
      exits if one of these is true:
-     1. sim_conn > maxconn
-     2. sim_conn > threshold
-     3. real IP is _permanently_ denied
-     4. not a persistent connection
-     5. broken socket
-     6. whoisd off
+     (-1). sim_conn > maxconn, checked at server.c::main_loop()
+     1. sim_conn > threshold
+     2. real IP is _permanently_ denied
+     3. not a persistent connection
+     4. broken socket
+     5. whoisd off
      */
     do {
 
         /* main variables:
-         real_credit 			used for sim_connections accounting.
          acc_credit 			used to store real IP accounting for normal queries.
          pass_credit 			used to store passed IP accounting for normal queries.
          acl_rip				stores real IP acl record
          acl_eip				stores passed IP acl record (if needed).
          */
-        acc_st real_credit, acc_credit, pass_credit;
+        acc_st acc_credit, pass_credit;
+        acl_st acl_rip, acl_eip;
 
         /* refresh acl and accounting copy */
         AC_check_acl(&(qe->condat.rIP), &acc_credit, &acl_rip);
 
-        /* need this copy for sim_connections */
-        AC_fetch_acc(&(qe->condat.rIP), &real_credit);
-
-        /**
-         *  this is checked in server.c:main_loop() now to avoid creating threads unnecessarily
-         */
-        //  if ( real_credit.sim_connections > acl_rip.maxconn ) 	{
-        //
-        //    /* maxconn limit reached: say nothing and prepare to drop connection */
-        //    PW_log_denied_query(qe, NULL, hostaddress, "");
-        //
-        //    /* keep in mind */
-        //    deny = 1;
-        //
-        //  } else
-        if (real_credit.sim_connections > acl_rip.threshold) {
+        /* The hard limit of simultaneous connections is checked in server.c:main_loop() to avoid the overhead of creating threads
+         * So here we are only checking for the soft limits (a.k.a. the ones which return an error message) */
+        if ((long)g_hash_table_lookup(args->conn_ipnum, &(qe->condat.rIP)) > acl_rip.threshold) {
 
             /* threshold exceeded: show the message and prepare to drop connection */
-            /* greeting */
             char *banner = ca_get_pw_banner;
             char *conndeny = ca_get_pw_fmt_acl_conndeny;
             SK_cd_printf(&(qe->condat), "%s\n", banner);
-            SK_cd_printf(&(qe->condat), conndeny, hostaddress);
+            SK_cd_printf(&(qe->condat), conndeny, qe->condat.rIPs);
             UT_free(conndeny);
             UT_free(banner);
 
-            PW_log_denied_query(qe, NULL, hostaddress, "");
+            PW_log_denied_query(qe, NULL, qe->condat.rIPs, "");
 
             /* keep in mind */
             deny = 1;
@@ -650,18 +600,15 @@ void PW_interact(int sock) {
 
             char *banner = ca_get_pw_banner;
             char *permdeny = ca_get_pw_fmt_acl_permdeny;
-            /*
-             SK_cd_printf(&(qe->condat), "%s\n%s\n\n", banner,permdeny);
-             */
             SK_cd_printf(&(qe->condat), "%s\n", banner);
-            SK_cd_printf(&(qe->condat), permdeny, hostaddress);
+            SK_cd_printf(&(qe->condat), permdeny, qe->condat.rIPs);
             UT_free(permdeny);
             UT_free(banner);
 
             /* increase denial count */
             AC_commit_denials(&(qe->condat.rIP), &acl_rip);
 
-            PW_log_denied_query(qe, NULL, hostaddress, "");
+            PW_log_denied_query(qe, NULL, qe->condat.rIPs, "");
 
             /* keep in mind */
             deny = 1;
@@ -686,17 +633,15 @@ void PW_interact(int sock) {
                 SK_cd_printf(&(qe->condat), "%s\n\n", errmsg);
                 UT_free(errmsg);
 
-                PW_log_denied_query(qe, NULL, hostaddress, "");
+                PW_log_denied_query(qe, NULL, qe->condat.rIPs, "");
 
                 /* keep in mind */
                 deny = 1;
-            }
 
-            /* line fits in buffer */
-            else {
+            } else { /* line fits in buffer */
 
-                /* remove trailing whitespace (including "\n") */
-                g_strchomp(input);
+                /* remove leading and trailing whitespace (including "\n") */
+                g_strstrip(input);
 
                 TA_setactivity(input);
                 TA_increment();
@@ -711,109 +656,60 @@ void PW_interact(int sock) {
                 }
 
                 /* ADDRESS PASSING: check if -V option has passed IP in it */
-                if (!STRUCT_EQUAL(qe->pIP, IP_ADDR_UNSPEC)) {
+                if (!STRUCT_EQUAL(qe->eIP, IP_ADDR_UNSPEC)) {
                     if (!acl_rip.trustpass) {
                         /* host not authorised to pass addresses with -V */
 
                         /* display the deny banner */
                         char *rep = ca_get_pw_fmt_acl_addrpass;
-                        SK_cd_printf(&(qe->condat), rep, hostaddress);
+                        SK_cd_printf(&(qe->condat), rep, qe->condat.rIPs);
                         UT_free(rep);
-
-                        /* XXX shall we deny such user ? Now we can... */
-                        LG_log(pw_context, LG_INFO, "unauthorised address passing by %s", hostaddress);
 
                         /* commit denial count */
                         AC_commit_denials(&(qe->condat.rIP), &acl_rip);
-                        PW_log_denied_query(qe, qc, hostaddress, input);
+                        PW_log_denied_query(qe, qc, qe->condat.rIPs, input);
 
-                    } /* if trustpass not allowed */
-                    else {
-                        /* address passing allowed, set effective IP */
-
-                        /* increase addrpasses count */
-                        acc_st tmp_acc;
-                        memset(&tmp_acc, 0, sizeof(acc_st));
-                        tmp_acc.addrpasses = 1;
-                        AC_commit(&(qe->condat.rIP), &tmp_acc, &acl_rip);
-
-                        /* set eIP to this IP */
-                        qe->condat.eIP = qe->pIP;
-
-                        /* set effective IP text */
-                        {
-                            char *buf = UT_malloc(IP_ADDRSTR_MAX);
-                            IP_addr_b2a(&qe->condat.eIP, buf, IP_ADDRSTR_MAX);
-                            UT_free(qe->condat.ip);
-                            qe->condat.ip = buf;
-                        }
+                    } else {
 
                         /* check ACL. Get the proper acl record. Calculate credit */
-                        AC_check_acl(&(qe->condat.eIP), &pass_credit, &acl_eip);
-
-                        copy_credit = pass_credit;
+                        AC_check_acl(&(qe->eIP), &pass_credit, &acl_eip);
 
                         if (acl_eip.deny) {
 
                             /* passed IP permanently denied */
                             char *rep = ca_get_pw_fmt_acl_permdeny;
-                            char paddress[IP_ADDRSTR_MAX];
-                            IP_addr_b2a(&qe->pIP, paddress, IP_ADDRSTR_MAX);
-                            SK_cd_printf(&(qe->condat), rep, paddress);
+                            SK_cd_printf(&(qe->condat), rep, qe->eIPs);
                             UT_free(rep);
 
                             /* increase denial count */
-                            AC_commit_denials(&(qe->condat.eIP), &acl_eip);
-                            PW_log_denied_query(qe, qc, hostaddress, input);
+                            AC_commit_denials(&(qe->eIP), &acl_eip);
+                            PW_log_denied_query(qe, qc, qe->eIPs, input);
 
                             /* keep in mind */
                             deny = 1;
 
                         } else {
                             /* allowed to query from passed IP */
-                            PW_run_query(qe, qc, &pass_credit, &acl_eip, hostaddress, input);
-                        } /* effective IP denied */
-
-                    } /* trustpass allowed */
-
-                } /* if address is passed in the query */
-
-                else {
+                            PW_run_query(qe, qc, &pass_credit, &acl_eip, qe->eIPs, input);
+                        }
+                    }
+                } else {
                     /* allowed to query from real IP */
-                    PW_run_query(qe, qc, &acc_credit, &acl_rip, hostaddress, input);
+                    PW_run_query(qe, qc, &acc_credit, &acl_rip, qe->condat.rIPs, input);
 
-                } /* else address is not passed in the query */
+                }
 
-                /* free the query command structure */
                 QC_free(qc);
+            }
+        }
+    } while (qe->k && qe->condat.rtc == 0 && deny == 0 && CO_get_whois_suspended() == 0);
 
-            } /* fit in the buffer ... */
-
-        } /* reading the query ... */
-
-    } /* do, for exit states see comment above */
-    while (qe->k && qe->condat.rtc == 0 && deny == 0 && CO_get_whois_suspended() == 0);
-
-    /* decrease the number of connections */
-    {
-        acc_st tmp_acc;
-        memset(&tmp_acc, 0, sizeof(acc_st));
-        tmp_acc.sim_connections = -1; /* descrease the number of sim. connections */
-        AC_commit(&(qe->condat.rIP), &tmp_acc, &acl_rip);
-    }
-
-    /* Free the hostaddress */
-    UT_free(hostaddress);
-    /* Free the connection struct's dynamic data */
-    SK_cd_free(&(qe->condat));
-    /* Free the query_environ */
     QC_environ_free(qe);
-} /* PW_interact() */
+}
 
-/* *MUST* be called before any other PW functions */
-void
-PW_init (LG_context_t *pw_ctx, LG_context_t *query_ctx)
-{
+
+/* to be called before any other PW functions */
+void PW_init(LG_context_t *pw_ctx, LG_context_t *query_ctx) {
     TH_init_read_write_lockw(&queries_lock);
     pw_context = pw_ctx;
     query_context = query_ctx;
