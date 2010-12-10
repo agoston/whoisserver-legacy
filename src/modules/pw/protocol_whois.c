@@ -694,9 +694,12 @@ void PW_interact(svr_args *args) {
                         }
                     }
                 } else {
-                    /* allowed to query from real IP */
-                    PW_run_query(qe, qc, &acc_credit, &acl_rip, qe->condat.rIPs, input);
+                    /* set effective IP to real IP */
+                    qe->eIP = qe->condat.rIP;
+                    strcpy(qe->eIPs, qe->condat.rIPs);
 
+                    /* allowed to query from real IP */
+                    PW_run_query(qe, qc, &acc_credit, &acl_rip, qe->eIPs, input);
                 }
 
                 QC_free(qc);
