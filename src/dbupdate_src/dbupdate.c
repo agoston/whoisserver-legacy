@@ -578,131 +578,99 @@ void log_options(LG_context_t *lg_ctx, options_struct_t *options, char *args_str
             input data structure
    Returns  sets values in options structure
 */
+void check_keywords(RT_context_t *rt_ctx, LG_context_t *lg_ctx, options_struct_t *options, ep_input_structure_t *input) {
+    int kw_idx, kw_item;
+    int invalid = 0;
+    int found;
+    char *keyword_str = NULL;
+    char *ptrlc = NULL;
+    char **keywords_list = NULL;
+    int keywords_found[NUMBER_OF_KEYWORDS];
+    GString *invalid_keywords;
 
-void check_keywords(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                       options_struct_t *options, ep_input_structure_t *input)
-{
-  int kw_idx, kw_item;
-  int invalid = 0;
-  int found;
-  char *keyword_str = NULL;
-  char *ptrlc = NULL;
-  char *ptruc = NULL;
-  char **keywords_list = NULL;
-  int keywords_found[NUMBER_OF_KEYWORDS];
-  GString *invalid_keywords;
+    LG_log(lg_ctx, LG_FUNC, ">check_keywords: entered");
 
-  LG_log(lg_ctx, LG_FUNC,">check_keywords: entered");
+    invalid_keywords = g_string_new(NULL);
 
-  invalid_keywords = g_string_new(NULL);
-
-  /* if it is a mail message, get a list of the keywords from the subject line.
+    /* if it is a mail message, get a list of the keywords from the subject line.
      These are returned as a comma seperated list. */
-  if ( options->mail_input )
-  {
-    keyword_str = (char *)EP_get_candidate_keywords(input);
-//printf("keyword_str [%s]\n", keyword_str);
-    /* if there is a keywords: tag on the subject line,
-       skip past everything up to and including it */
-    if ( keyword_str && ( (ptrlc = strstr(keyword_str, "keywords:")) ||
-                (ptruc = strstr(keyword_str, "KEYWORDS:")) ) )
-    {
-      keyword_str = ptrlc ? ptrlc + 10 : ptruc + 10;  /* yes it is 10, don't forget the comma */
-//printf("keyword_str [%s]\n", keyword_str);
-    }
-  }
-  else keyword_str = options->keywords;
-
-  /* initialise the keywords_found array */
-  for (kw_idx = 0; kw_idx < NUMBER_OF_KEYWORDS; kw_idx++)
-  {
-    keywords_found[kw_idx] = 0;
-  }
-
-  if ( keyword_str)
-  {
-    LG_log(lg_ctx, LG_DEBUG,"check_keywords: keywords [%s]", keyword_str);
-    /* split the keyword string on comma */
-    keywords_list = g_strsplit(keyword_str, ",", 0);
-
-    /* check for valid and invalid keywords */
-    for (kw_idx = 0; keywords_list[kw_idx] != NULL; kw_idx++)
-    {
-      found = 0;
-      for ( kw_item=0; kw_item<sizeof(keywords)/sizeof(key_words); kw_item++ )
-      {
-        if ( ! strcasecmp(keywords_list[kw_idx], keywords[kw_item].word) )
-        {
-          /* found a valid keyword */
-          LG_log(lg_ctx, LG_DEBUG,"check_keywords: valid keyword [%s]", keywords_list[kw_idx]);
-          keywords_found[keywords[kw_item].index] = 1;
-          found = 1;
-          break;
+    if (options->mail_input) {
+        keyword_str = (char *) EP_get_candidate_keywords(input);
+        LG_log(lg_ctx, LG_FUNC, "EP_get_candidate_keywords: [%s]", keyword_str);
+        if (keyword_str && (ptrlc = strcasestr(keyword_str, "keywords:"))) {
+            keyword_str = ptrlc + 9;
+            if (*keyword_str == ',') keyword_str++;
         }
-      }
-      if ( ! found )
-      {
-        LG_log(lg_ctx, LG_DEBUG,"check_keywords: invalid keyword [%s]", keywords_list[kw_idx]);
-        if ( invalid ) invalid_keywords = g_string_append(invalid_keywords, ", ");
-        invalid_keywords = g_string_append(invalid_keywords, keywords_list[kw_idx]);
-        invalid = 1;
-      }
-    }
-    g_strfreev(keywords_list);
+    } else
+        keyword_str = options->keywords;
 
-    if ( invalid )
-    {
-      /* at least one invalid keyword found, so ignoring all keywords */
-      RT_invalid_keyword(rt_ctx, invalid_keywords->str);
-      LG_log(lg_ctx, LG_WARN,
-          "check_keywords: invalid keyword(s) found [%s]\nAll keywords will be ignored",
-          keyword_str);
+    /* initialise the keywords_found array */
+    for (kw_idx = 0; kw_idx < NUMBER_OF_KEYWORDS; kw_idx++) {
+        keywords_found[kw_idx] = 0;
     }
-    else
-    {
-      /* check that the keywords combination is valid */
-      if ( (keywords_found[UP_HELP] || keywords_found[UP_HOWTO]) &&
-               keywords_found[UP_NEW] )
-      {
-        /* illegal combination */
-        RT_invalid_keyword_combination(rt_ctx, "NEW and HELP/HOWTO");
-        LG_log(lg_ctx, LG_WARN,
-            "check_keywords: invalid combination of keywords NEW and HELP/HOWTO\nAll keywords will be ignored");
-      }
-      else if ( (keywords_found[UP_HELP] || keywords_found[UP_HOWTO]) &&
-               keywords_found[UP_NOTIF_DIFF] )
-      {
-        /* illegal combination */
-        RT_invalid_keyword_combination(rt_ctx, "DIFF and HELP/HOWTO");
-        LG_log(lg_ctx, LG_WARN,
-            "check_keywords: invalid combination of keywords DIFF and HELP/HOWTO\nAll keywords will be ignored");
-      }
-      else
-      {
-        /* set options values for keywords */
-        if ( keywords_found[UP_HELP] || keywords_found[UP_HOWTO] )
-        {
-          options->help = 1;
-          LG_log(lg_ctx, LG_DEBUG,"check_keywords: options->help= %d", options->help);
-        }
-        if ( keywords_found[UP_NEW] )
-        {
-          options->enforced_new = 1;
-          LG_log(lg_ctx, LG_DEBUG,"check_keywords: options->enforced_new= %d", options->enforced_new);
-        }
-        if ( keywords_found[UP_NOTIF_DIFF] )
-        {
-          options->notif_diff = 1;
-          LG_log(lg_ctx, LG_DEBUG,"check_keywords: options->notif_diff= %d", options->notif_diff);
-        }
-      }
-    }
-  }
-  else
-    LG_log(lg_ctx, LG_DEBUG,"check_keywords: no keywords found");
 
-  g_string_free(invalid_keywords, 1);
-  LG_log(lg_ctx, LG_FUNC,"<check_keywords: exiting");
+    if (keyword_str) {
+        LG_log(lg_ctx, LG_DEBUG, "check_keywords: keywords [%s]", keyword_str);
+        /* split the keyword string on comma */
+        keywords_list = g_strsplit(keyword_str, ",", 0);
+
+        /* check for valid and invalid keywords */
+        for (kw_idx = 0; keywords_list[kw_idx] != NULL; kw_idx++) {
+            found = 0;
+            for (kw_item = 0; kw_item < sizeof(keywords) / sizeof(key_words); kw_item++) {
+                if (!strcasecmp(keywords_list[kw_idx], keywords[kw_item].word)) {
+                    /* found a valid keyword */
+                    LG_log(lg_ctx, LG_DEBUG, "check_keywords: valid keyword [%s]", keywords_list[kw_idx]);
+                    keywords_found[keywords[kw_item].index] = 1;
+                    found = 1;
+                    break;
+                }
+            }
+            if (!found) {
+                LG_log(lg_ctx, LG_DEBUG, "check_keywords: invalid keyword [%s]", keywords_list[kw_idx]);
+                if (invalid)
+                    invalid_keywords = g_string_append(invalid_keywords, ", ");
+                invalid_keywords = g_string_append(invalid_keywords, keywords_list[kw_idx]);
+                invalid = 1;
+            }
+        }
+        g_strfreev(keywords_list);
+
+        if (invalid) {
+            /* at least one invalid keyword found, so ignoring all keywords */
+            RT_invalid_keyword(rt_ctx, invalid_keywords->str);
+            LG_log(lg_ctx, LG_WARN, "check_keywords: invalid keyword(s) found [%s]\nAll keywords will be ignored", keyword_str);
+        } else {
+            /* check that the keywords combination is valid */
+            if ((keywords_found[UP_HELP] || keywords_found[UP_HOWTO]) && keywords_found[UP_NEW]) {
+                /* illegal combination */
+                RT_invalid_keyword_combination(rt_ctx, "NEW and HELP/HOWTO");
+                LG_log(lg_ctx, LG_WARN, "check_keywords: invalid combination of keywords NEW and HELP/HOWTO\nAll keywords will be ignored");
+            } else if ((keywords_found[UP_HELP] || keywords_found[UP_HOWTO]) && keywords_found[UP_NOTIF_DIFF]) {
+                /* illegal combination */
+                RT_invalid_keyword_combination(rt_ctx, "DIFF and HELP/HOWTO");
+                LG_log(lg_ctx, LG_WARN, "check_keywords: invalid combination of keywords DIFF and HELP/HOWTO\nAll keywords will be ignored");
+            } else {
+                /* set options values for keywords */
+                if (keywords_found[UP_HELP] || keywords_found[UP_HOWTO]) {
+                    options->help = 1;
+                    LG_log(lg_ctx, LG_DEBUG, "check_keywords: options->help= %d", options->help);
+                }
+                if (keywords_found[UP_NEW]) {
+                    options->enforced_new = 1;
+                    LG_log(lg_ctx, LG_DEBUG, "check_keywords: options->enforced_new= %d", options->enforced_new);
+                }
+                if (keywords_found[UP_NOTIF_DIFF]) {
+                    options->notif_diff = 1;
+                    LG_log(lg_ctx, LG_DEBUG, "check_keywords: options->notif_diff= %d", options->notif_diff);
+                }
+            }
+        }
+    } else
+        LG_log(lg_ctx, LG_DEBUG, "check_keywords: no keywords found");
+
+    g_string_free(invalid_keywords, 1);
+    LG_log(lg_ctx, LG_FUNC, "<check_keywords: exiting");
 }
 
 

@@ -132,8 +132,8 @@ typedef enum {
 
 #include "lg.h"
 
-void UD_do_nrtm(void *args);
-void UD_do_updates(void *args);
+void *UD_do_nrtm(void *args);
+void *UD_do_updates(void *args);
 void UD_init(LG_context_t *ctx);
 
 

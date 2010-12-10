@@ -100,7 +100,7 @@ void pl_print_answers(rx_datcpy_t *data, pl_answer_t *info) {
 /* The maximum input buffer size */
 #define MAX_INPUT_SIZE	1024
 
-void PL_interact(int socket) {
+void PL_interact(svr_args *args) {
     pl_answer_t answer_info;
     char input[MAX_INPUT_SIZE + 1];
     char *str, *search_key;
@@ -115,7 +115,7 @@ void PL_interact(int socket) {
     rx_srch_mt search_mode;
 
     // start by getting the connection information
-    SK_cd_make(&answer_info.condat, socket, (unsigned) ca_get_keepopen);
+    SK_cd_make(&answer_info.condat, args->conn_sock, (unsigned) ca_get_keepopen);
 
     // allow multiple queries - similar to the PW_interact function
     do {

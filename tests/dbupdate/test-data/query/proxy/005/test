@@ -1,7 +1,6 @@
 # CASE 005: "proxy pass over v6, passed address is accepted" test
 #           set our IP to trustpass=1 in the ripadmin table,
 #           then issue a simple query over v6, passing a nondenied v6 address
-#           Also check addrpass count increase
 #
 # NOTE: This test relies on running on the same machine as the server!
 #

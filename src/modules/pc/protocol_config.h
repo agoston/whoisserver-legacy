@@ -1,6 +1,8 @@
 #ifndef READ_PROTOCOL_CONFIG
 #define READ_PROTOCOL_CONFIG
 
+#include "server.h"
+
 /***************************************
   $Revision: 1.3 $
 
@@ -130,8 +132,8 @@ http://cs.wwc.edu/~bellmi/ANSI_escape_codes.html
 #define PC_RET_ERR      (1)
 
 
-void PC_interact(int sock);
-void PC_init (LG_context_t *ctx);
+void PC_interact(svr_args *args);
+void PC_init(LG_context_t *ctx);
 
 
 /*+ Each command has a +*/

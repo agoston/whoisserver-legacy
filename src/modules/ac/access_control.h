@@ -124,7 +124,7 @@ typedef enum {
 /* Accounting == counters */
 typedef struct {
   int connections;
-  int addrpasses;
+  int addrpasses;       /* not used, as this info can be fetched from log files. Should be removed - agoston, 2010-12-10 */
   int denials;
   int queries;
   int referrals;

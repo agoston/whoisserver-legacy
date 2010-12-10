@@ -81,12 +81,18 @@ function send_command_get_ret() {
 # it also handles the switch to dynamic mode.
 check_server() {
 	# give server a chance
-	my_log 'Waiting for the server to come up...'
+	my_log 'Waiting for the server to come up... (If you know what you are doing, hit ESC to cancel)'
 	NUM=0
+	key=""; escape=$'\x1b';
+	
 	while ! send_command help >/dev/null 2>&1; do
-		sleep 1
+		read -t1 -s -n1 key
+		if [[ "$key" == "$escape" ]]; then
+			my_log "User cancelled wait at $NUM seconds"
+			break;
+		fi
 		NUM=$[NUM+1]
-		if [ $NUM -gt 60 ]; then	# admin table load into radix trees can take quite a while!
+		if [ $NUM -gt 90 ]; then	# admin tables are huge, and mysql can stall quite a bit before coughing up the first rows
 			# bail out
 			my_log "Couldn't connect to config port after 30 seconds - something's gone wrong!"
 			return
@@ -94,10 +100,12 @@ check_server() {
 	done
 
 	# wait for rx_load thread to finish
-	my_log 'Waiting for rx_load thread to finish...'
+	my_log 'Waiting for rx_load thread to finish... (If you know what you are doing, hit ESC to cancel)'
 	RX_LOAD="Init"
 	NUM=0
-	while [ $NUM -lt 45 ]; do
+	key=""; escape=$'\x1b';
+	
+	while [ $NUM -lt 60 ]; do	# radix tables are huge, and mysql can stall quite a bit before coughing up the first rows
 		RX_LOAD=`send_command 'show threads' | grep '^rx load' | awk '{printf("%s %s %s", $10, $11, $12);}'`
 		echo -en "\r${RX_LOAD}                              "
 		if [ "$RX_LOAD" ]; then
@@ -105,7 +113,12 @@ check_server() {
 		else 
 			NUM=$[NUM+1]
 		fi
-		sleep 1
+		
+		read -t1 -s -n1 key
+		if [[ "$key" == "$escape" ]]; then
+			my_log "User cancelled wait at $NUM seconds"
+			break;
+		fi
 	done
 	echo -en "\r"
 
@@ -126,7 +139,7 @@ check_server() {
 
 	# second test - query the server after (also takes care of any first-time initialization problems we might have)
 	# we'll sleep a bit (kinda like bears in the winter), so that dynamic mode has some time to start catching up
-	sleep 5
+	sleep 3
 	if [ `echo '193.0/16' | nc -q 10 localhost $QUERY_PORT | wc -l` -gt 10 ]; then
 		my_log "$SERVICE second startup check succeeded."
 	else

@@ -317,17 +317,14 @@ char *authenticate_user(sk_conn_st *condat)
   int sock        connected client socket
 
   ++++++++++++++++++++++++++++++++++++++*/
-void PC_interact(int sock)
-{
+void PC_interact(svr_args *args) {
 	char input[MAX_INPUT_SIZE];
 	int connected = 1;
 	char *user = NULL;
 	sk_conn_st condat;
 
-	memset(&condat, 0, sizeof(condat));
-	condat.sock = sock;
-	SK_getpeerip(sock, &(condat.rIP));
-	condat.ip = SK_getpeername(sock);	/* XXX *alloc involved */
+	/* init the connection structure, set timeout for reading the query */
+    SK_cd_make(&condat, args->conn_sock, 0);
 
 	/* Welcome the client */
 	SK_cd_puts(&condat, CO_get_welcome());
@@ -337,7 +334,7 @@ void PC_interact(int sock)
 		user = authenticate_user(&condat);
 
 		if (user == NULL) {
-			LG_log(protocol_config_ctx, LG_INFO, "unsuccesful login attempt from %s", condat.ip);
+			LG_log(protocol_config_ctx, LG_INFO, "unsuccesful login attempt from %s", condat.rIPs);
 		}
 	} else {
 		user = "nobody";
@@ -346,7 +343,7 @@ void PC_interact(int sock)
 	if (user != NULL) {
 
 		/* Log admin logging on */
-		LG_log(protocol_config_ctx, LG_INFO, "user %s from %s logged on", user, condat.ip);
+		LG_log(protocol_config_ctx, LG_INFO, "user %s from %s logged on", user, condat.rIPs);
 
 		{
 			show_uptime("", NULL, &condat);
@@ -382,9 +379,8 @@ void PC_interact(int sock)
 		}
 
 		/* Log admin logging off */
-		LG_log(protocol_config_ctx, LG_INFO, "user %s from %s logged off", user, condat.ip);
-
+		LG_log(protocol_config_ctx, LG_INFO, "user %s from %s logged off", user, condat.rIPs);
 	}
 
-	UT_free(condat.ip);
-}								/* PC_interact() */
+	SK_cd_free(&condat);
+}

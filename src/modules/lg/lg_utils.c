@@ -58,7 +58,7 @@ LG_device_t* LG_dev_get_file(FILE* f) {
   return dev;
 }
 
-LG_device_t* LG_dev_get_filedes(int fd) {
+LG_device_t* LG_dev_get_filedes(long fd) {
   LG_device_t* dev;
 
   dev = g_malloc(sizeof(LG_device_t));
@@ -85,7 +85,7 @@ void LG_dev_vfprintf(LG_device_t* dev, const char* message, va_list ap) {
 void LG_dev_vasprintf(LG_device_t* dev, const char* message, va_list ap) {
 	char *buf;
 	int len;
-	int fd = (int)dev->data;
+	long fd = (long)dev->data;
 	off_t currpos;
 
 	len = vasprintf(&buf, message, ap);

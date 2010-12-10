@@ -481,7 +481,7 @@ void UP_connect_all_servers(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   int num_sources = 0;
   char *source;
   char *query_host;
-  int query_port;
+  long query_port;
   ca_updDbSource_t **upd_source_hdl;
   LU_server_t *server = NULL;
   GList *host_list = NULL;
@@ -525,7 +525,7 @@ void UP_connect_all_servers(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     svr_item = *server_list;
     while ( host_item && port_item && svr_item  )
     {
-      if ( ! strcmp(query_host, host_item->data) && query_port == (int)(port_item->data))
+      if ( ! strcmp(query_host, host_item->data) && query_port == (long)(port_item->data))
       {
         /* we have already connected to this host/port
            so use the same connection */
@@ -1608,8 +1608,8 @@ int up_send_object_db(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     };
   }
 
+  SK_cd_close(&condat);
   SK_cd_free(&condat);
-  SK_close(sockfd);
   free(to_be_sent);
   free(tr_id_str);
 

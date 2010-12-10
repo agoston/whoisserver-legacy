@@ -22,6 +22,8 @@ au_check_multiple_authentications (char *attr_to_check[],
                                    rpsl_object_t *obj,
                                    char *parent_text,
                                    au_plugin_callback_info_t *info);
+AU_ret_t
+au_rir_auth_check(au_plugin_callback_info_t *info, const rpsl_object_t *obj, GList *rir_mntner_list);
 
 
 #endif /* AU_UTIL_H */

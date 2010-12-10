@@ -95,7 +95,7 @@ WH_cd_sock(sk_conn_st *out_cd, char *hostname, unsigned port,
     
 
     SK_cd_close(&peer_cd);
-    SK_cd_free (&peer_cd);
+    SK_cd_free(&peer_cd);
   } /* if OK */
 
   return err;

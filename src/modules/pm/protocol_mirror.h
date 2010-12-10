@@ -66,7 +66,7 @@ char *PM_get_serial_object(SQ_connection_t *sql_connection, long serial_number, 
 GString *PM_get_nrtm_sources(ip_addr_t *client_address, char *source);
 char *PM_dummify_object(char *object);
 
-void PM_interact(int sock);
+void PM_interact(svr_args *args);
 void PM_init(LG_context_t *ctx);
 
 #endif /* PM_H */

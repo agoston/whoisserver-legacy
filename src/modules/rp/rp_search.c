@@ -143,9 +143,9 @@ int rp_leaf_occ_inc(GHashTable *hash, rx_dataleaf_t *leafptr)
 {
   /* one little trick: store the number of occurences 
      as cast (void *) */
-  int val;
+  long val;
   
-  val = (int) g_hash_table_lookup(hash, leafptr);
+  val = (long) g_hash_table_lookup(hash, leafptr);
   /* 0 if it's not known yet. anyway: put it in the hash (value==key) */
   
   g_hash_table_insert(hash, leafptr, (void *) ++val); 
