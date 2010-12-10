@@ -38,7 +38,8 @@ if [ $[OLDQRY_HOST+1] '!=' $NEWQRY_HOST ]; then
 	exit 1
 fi
 
-if [ $[OLDPASS_PROXY+1] '!=' $NEWPASS_PROXY ]; then
-	echo "ERROR: proxy pass count mismatch; OLD: $OLDPASS_PROXY, NEW: $NEWPASS_PROXY (should be: $[OLDPASS_PROXY+1])"
-	exit 1
-fi
+# we don't care - this should be gathered from query logs
+#if [ $[OLDPASS_PROXY+1] '!=' $NEWPASS_PROXY ]; then
+#	echo "ERROR: proxy pass count mismatch; OLD: $OLDPASS_PROXY, NEW: $NEWPASS_PROXY (should be: $[OLDPASS_PROXY+1])"
+#	exit 1
+#fi
