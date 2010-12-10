@@ -25,6 +25,7 @@ typedef struct {
   LU_ret_t (*lookup)();
   LU_ret_t (*inverse_lookup)();
   LU_ret_t (*get_object)();
+  LU_ret_t (*get)();
   LU_ret_t (*get_parents)();
   LU_ret_t (*check_overlap)();
   void (*cleanup)();
@@ -39,6 +40,8 @@ LU_ret_t LU_inverse_lookup(LU_server_t *server, GList **objects, GList *types,
                    const gchar *key, GList *inverse_keys, const gchar *source);
 LU_ret_t LU_get_object(LU_server_t *server, rpsl_object_t **dbase_obj, 
                        const rpsl_object_t *obj, const gchar *source);
+LU_ret_t LU_get(LU_server_t *server, gchar *query_str,
+                  gchar *source, GList **result, const gchar *key);
 LU_ret_t LU_get_parents(LU_server_t *server, GList **parents, 
                         const rpsl_object_t *obj, const gchar *source);
 LU_ret_t LU_check_overlap(LU_server_t *server, GList **overlap, 

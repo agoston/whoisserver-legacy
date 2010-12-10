@@ -436,68 +436,6 @@ gboolean ns_is_rdns_suffix(au_plugin_callback_info_t * info)
 }
 
 /*
- * checks whether the parent object has our name servers
- */
-AU_ret_t ns_is_parent_ours(au_plugin_callback_info_t * info,
-                           gchar * domain)
-{
-  AU_ret_t ret_val;             /* our return value */
-  GList *parents;               /* list of parent domains */
-  rpsl_object_t *parent;        /* one parent object */
-  gchar *parent_key;            /* domain attribute of key */
-  gchar **nservers;             /* list of name servers */
-  gint i, j;                    /* temp iterators */
-  gboolean found;               /* flag to set if the prefix is found */
-  gchar **ns_ours;              /* our name servers */
-
-  ns_ours = ut_g_strsplit_v1(ca_get_ns_nservers, "\n", -1);
-
-  if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY) {
-    /* error getting parent list */
-    LG_log(au_context, LG_DEBUG, "error getting parents of %s", domain);
-    ret_val = AU_ERROR;
-  } else if (parents == NULL) {
-    /* there are no parents */
-    LG_log(au_context, LG_DEBUG, "%s has no parents", domain);
-    RT_parent_not_exist(info->ctx);
-    ret_val = AU_UNAUTHORISED_CONT;
-  } else {
-    /* one parent is enough */
-    parent = parents->data;
-    parent_key = rpsl_object_get_key_value(parent);
-    nservers = ns_nservers(parent, info->ctx, parent_key, &ret_val);
-    LG_log(au_context, LG_DEBUG, "parent is %s with nservers %s\n",
-           parent_key, nservers ? g_strjoinv(",",
-                                             nservers) : "NONE FOUND");
-    i = 0;
-    found = FALSE;
-    if (nservers != NULL) {
-      while (nservers[i] != NULL) {
-        j = 0;
-        while (ns_ours[j] != NULL) {
-          if (strcasecmp(ns_ours[j], nservers[i]) == 0) {
-            found = TRUE;
-          }
-          j++;
-        }
-        i++;
-      }
-      g_strfreev(nservers);
-    }
-    if (found) {
-      RT_rdns_parenthasourns(info->ctx);
-      ret_val = AU_AUTHORISED;
-    } else {
-      RT_rdns_notdelegated(info->ctx);
-      ret_val = AU_UNAUTHORISED_CONT;
-    }
-  }
-
-  g_strfreev(ns_ours);
-  return ret_val;
-}
-
-/*
  * returns true if the object must be decomposed
  */
 gboolean ns_is_decompose(LG_context_t * lg_ctx, const gchar * object_str,

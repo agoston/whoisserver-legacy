@@ -116,37 +116,79 @@ descr:        Test
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
-nserver:      ns-none.ripe.net
-nserver:      ns-nonenone.ripe.net
+nserver:      ns-pri.ripe.net
+nserver:      ns-sec.ripe.net
 mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 
-% sample domain object that qualifies for delchecking
+%      End of Standard Template Objects
+%----------------------------------------------------------------
+
+%  Additional objects required for this test
 
 domain:       0.193.in-addr.arpa
 descr:        Test
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
-nserver:      ns-none.ripe.net
+nserver:      ns-pri.ripe.net
+nserver:      ns-sec.ripe.net
+mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 
-% sample domain object that is outside our rir
-
-domain:       129.in-addr.arpa
+domain:       0.0.193.in-addr.arpa
 descr:        Test
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
 nserver:      ns-pri.ripe.net
 nserver:      ns-sec.ripe.net
-mnt-by:       RIPE-NCC-HM-DOM-MNT
+mnt-by:       TEST-DBM-MNT
+mnt-lower:    TEST-DBM-MNT
+changed:      dbtest@ripe.net 20040329
+source:       DB-TEST
+
+domain:       0.1.193.in-addr.arpa
+descr:        Test
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns-pri.ripe.net
+nserver:      ns-sec.ripe.net
+mnt-by:       TEST-DBM-MNT
+mnt-lower:    TEST-DBM-MNT
+changed:      dbtest@ripe.net 20040329
+source:       DB-TEST
+
+domain:       1.0.193.in-addr.arpa
+descr:        Test
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns-pri.ripe.net
+nserver:      ns-sec.ripe.net
+mnt-by:       TEST-DBM-MNT
+mnt-lower:    TEST-DBM-MNT
+changed:      dbtest@ripe.net 20040329
+source:       DB-TEST
+
+domain:       194.in-addr.arpa
+descr:        Test
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns-pri.ripe.net
+nserver:      ns-sec.ripe.net
+mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 
 
+% none
+
+% End of loader data file

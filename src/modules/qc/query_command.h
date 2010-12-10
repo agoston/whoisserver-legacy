@@ -81,11 +81,11 @@ typedef struct Query_command_t {
 
   /* -c: query for the most specific inetnum/inet6num with the "mnt-irt:" 
          attribute set and return the irt object */
-  gboolean c_irt_search;
+  gboolean c;
   /* -C: negates -c */
   gboolean C;
   /* -G: non-grouped ouput (default - grouped) */
-  gboolean G_group_search;
+  gboolean G;
   /* -B: original output (with e-mail, changed and notify attrs */
   gboolean B;
   /* -b: brief output (keys + abuse-mailbox from object/recursive objects) */
@@ -94,7 +94,7 @@ typedef struct Query_command_t {
   int d;
   int fast;
   int g;
-  mask_t inv_attrs_bitmap;
+  mask_t inv_attrs_bitmap;      /* bitmap for -i flag */
   int recursive;
   int l;
   int m;
@@ -106,8 +106,8 @@ typedef struct Query_command_t {
   int L;
   int M;
   int R;
-  mask_t object_type_bitmap;
-  mask_t keytypes_bitmap;
+  mask_t object_type_bitmap;    /* bitmap for -T flag */
+  mask_t keytypes_bitmap;       /* bitmap for possible types for query key */
   char *keys;
 
   /* messages to return to the user about parsing problems */

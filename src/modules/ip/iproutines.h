@@ -71,7 +71,8 @@ typedef enum {
   IPK_UNDEF = 0,
   IPK_RANGE,
   IPK_PREFIX,
-  IPK_IP
+  IPK_IP,
+  IPK_REVD
 } ip_keytype_t;
 
 /*+ the space type +*/
@@ -149,11 +150,8 @@ typedef unsigned int  ip_rangesize_t;
 #define IP_PREFSTR_MAX 64
 #define IP_RANGSTR_MAX 128
 
-/*+
-  IP expansion mode - for use with t2b functions, they control
-  whether the input is supposed to be fully expanded or contain shortcuts
-  (eg. enabling saying 0/0 instead 0.0.0.0/0)
-  +*/
+/* IP expansion mode - for use with t2b functions, they control whether the input is supposed to be fully expanded or contain shortcuts
+  (eg. if IP_EXPN, 0/0 will be taken as 0.0.0.0/0); in IP_PLAIN mode, it 0/0 returns error */
 typedef enum {
   IP_PLAIN = 1,
   IP_EXPN
@@ -204,7 +202,6 @@ int IP_pref_b2a(ip_prefix_t * prefptr, char *ascaddr, unsigned strmax);
 int IP_rang_b2a(ip_range_t * rangptr, char *ascaddr, unsigned strmax);
 int IP_rang_classful(ip_range_t * rangptr, ip_addr_t * addrptr);
 int IP_pref_2_rang(ip_range_t * rangptr, ip_prefix_t * prefptr);
-int IP_rang_2_pref(ip_range_t * rangptr, ip_prefix_t * prefptr);
 int IP_addr_b2a_uncompress(ip_addr_t * binaddr, char *ascaddr, unsigned strmax);
 
 /* utility functions: testers/converters */

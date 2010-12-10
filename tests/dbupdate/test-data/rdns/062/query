@@ -1,0 +1,26 @@
+% This is the MyDB Whois server.
+
+% Note: this output has been filtered.
+%       To receive output for a database update, use the "-B" flag.
+
+% Information related to '0.193.in-addr.arpa'
+
+domain:         0.193.in-addr.arpa
+descr:          Test
+admin-c:        TP1-DB-TEST
+tech-c:         TP1-DB-TEST
+zone-c:         TP1-DB-TEST
+nserver:        ns-pri.ripe.net
+nserver:        ns-sec.ripe.net
+mnt-by:         TEST-DBM-MNT
+mnt-lower:      TEST-DBM-MNT
+source:         DB-TEST # Filtered
+
+person:         test person
+address:        Singel
+phone:          +0123456789
+nic-hdl:        TP1-DB-TEST
+mnt-by:         TEST-DBM-MNT
+source:         DB-TEST # Filtered
+
+

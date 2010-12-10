@@ -54,9 +54,9 @@
 #define RX_DATNOF  1
 
 typedef enum {
-  RX_FAM_RT = 1,
-  RX_FAM_IN = 2,
-  RX_FAM_IP = 4
+  RX_FAM_RT = 1,    /* prefix (as in route object) */
+  RX_FAM_IN = 2,    /* range (as in inetnum object) */
+  RX_FAM_IP = 4     /* address (as in access counters) */
 } rx_fam_t;
 
       

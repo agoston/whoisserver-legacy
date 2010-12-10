@@ -781,8 +781,6 @@ void RT_inetnum_prefix_convert_failed(RT_context_t* ctx, gchar* prefix) {
 }
 
 
-
-
 /*+
   RT_changed_date_missing - The changed date is missing (WARNING)
 
@@ -792,7 +790,7 @@ void RT_inetnum_prefix_convert_failed(RT_context_t* ctx, gchar* prefix) {
 
   gchar* value - Current value.
  +*/
-void RT_changed_date_missing(RT_context_t* ctx, gchar* date, gchar* value) { //
+void RT_changed_date_missing(RT_context_t* ctx, gchar* date, gchar* value) {
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*)"changed_date_missing");
@@ -1313,6 +1311,20 @@ void RT_parent_not_exist(RT_context_t* ctx) {
 
 
 /*+
+  RT_no_address_space - Report that rDNS object has no corresponding inet(6)num in the DB
+
+  RT_context_t* ctx - Context.
+  +*/
+void RT_no_address_space(RT_context_t *ctx) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"RDNSno_address_space");
+
+  rt_prepare_node(ctx, node);
+}
+
+
+/*+
   RT_rdns_ds_not_accepted - Report that we don't accept DS records for this zone
 
   RT_context_t* ctx - Context.
@@ -1336,6 +1348,24 @@ void RT_rdns_size_not_accepted(RT_context_t* ctx) {
 
   node = xmlNewNode(NULL, (xmlChar*)"RDNSsize_not_accepted");
 
+  rt_prepare_node(ctx, node);
+}
+
+/*+
+  RT_rdns_hierarchy - A more or less specific domain object found
+
+  RT_context_t *ctx - Context.
+
+  gchar *specifics - 'more' or 'less'.
+
+  gchar *name - name of domain object found.
+ +*/
+void RT_rdns_hierarchy(RT_context_t *ctx, gchar *specifics, gchar *name) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"rdns_hierarchy");
+  rt_add_text_node(node, "specifics", specifics);
+  rt_add_text_node(node, "name", name);
   rt_prepare_node(ctx, node);
 }
 

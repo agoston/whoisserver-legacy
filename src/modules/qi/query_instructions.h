@@ -111,10 +111,6 @@ Ie. Try using a LEFT JOIN to do the "NOT IN"/ "MINUS" equivalent.
 #define Q_ALTER_TMP_GROUPED "ALTER TABLE %s ADD COLUMN gid INT NOT NULL DEFAULT 0, DROP PRIMARY KEY, ADD PRIMARY KEY (id, gid)"
 #define Q_UPD_TMP "UPDATE %s SET gid=id"
 
-#if 0
-#define Q_NO_OBJECTS  "SELECT object_id, sequence_id, object FROM last WHERE object_id = 0"
-#endif
-
 #define MAX_INSTRUCTIONS 100
 
 #define LIST_HAS_ATTR "SELECT DISTINCT gid FROM %s IDS,%s REF WHERE IDS.id=REF.object_id"
@@ -140,9 +136,9 @@ typedef struct Query_instruction_t {
 
 typedef struct Query_instructions_t {
   Query_instruction *instruction[MAX_INSTRUCTIONS];
-  unsigned int filtered;
-  unsigned int fast;
-  unsigned int recursive;
+  unsigned int filtered;    /* -K query flag */
+  unsigned int fast;        /* -F query flag */
+  unsigned int recursive;   /* on by default, -r query flag turns it off */
   const Query_command *qc; /* pointer to the Query_command structure of this query */
 } Query_instructions;
 

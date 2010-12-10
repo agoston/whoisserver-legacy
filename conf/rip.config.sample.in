@@ -467,7 +467,7 @@ QC_DUPPROXYIPFLAG % the administrator of the server and report this error.
 # Duplicate IP flags
 QC_FMT_DUPIPFLAG %%WARNING:901: duplicate IP flags passed
 QC_FMT_DUPIPFLAG %%
-QC_FMT_DUPIPFLAG %% More than one IP flag (-l, -L, -m, -M, -x, -b, -C or -c) passed to the server.
+QC_FMT_DUPIPFLAG %% More than one IP flag (-l, -L, -m, -M, -x, -d, -b, -C or -c) passed to the server.
 QC_FMT_DUPIPFLAG %% Only "-%s" will be used for this query.
 
 #
@@ -475,7 +475,14 @@ QC_FMT_DUPIPFLAG %% Only "-%s" will be used for this query.
 
 QC_USELESSIPFLAG %WARNING:902: useless IP flag passed
 QC_USELESSIPFLAG %
-QC_USELESSIPFLAG % An IP flag (-l, -L, -m, -M, -x, -b, -C or -c) used without an IP key.
+QC_USELESSIPFLAG % An IP flag (-l, -L, -m, -M, -x, -d, -b, -C or -c) used without an IP key.
+
+#
+# Useless '-d' flag
+
+QC_USELESSDFLAG %WARNING:903: useless '-d' flag passed
+QC_USELESSDFLAG %
+QC_USELESSDFLAG % '-d' flag has no meaning with a reverse domain key.
 
 #
 # Useless no-referral flag
@@ -567,6 +574,15 @@ QI_FMT_GROUP_BANNER %% Information related to '%s'
 
 QI_FILTER_BANNER % Note: this output has been filtered.
 QI_FILTER_BANNER %       To receive output for a database update, use the "-B" flag.
+
+#
+# Internal error
+
+QI_INTERNAL_ERROR % An internal database error has occurred.
+QI_INTERNAL_ERROR % It has been logged.
+QI_INTERNAL_ERROR % Please contact <my-dbm@mydb.net> if the problem persists.
+QI_INTERNAL_ERROR
+
 
 ###########
 ##

@@ -11,7 +11,8 @@
 #include "lu_whois.h"
 #include "cr.h"
 #include "rt.h"
-
+#include "ut.h"
+#include "pg.h"
 
 
 static GList *

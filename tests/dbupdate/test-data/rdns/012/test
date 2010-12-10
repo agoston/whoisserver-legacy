@@ -1,11 +1,11 @@
 # rdns tests
-# CASE 12: Creation passes with correct auth from parent domain
+# CASE 12: Creation fails with parent domain existing
 #
 # create domain object
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 12: creation will pass
+# RESULT 12: creation will fail
 
 domain:       0.0.193.in-addr.arpa
 descr:        Test

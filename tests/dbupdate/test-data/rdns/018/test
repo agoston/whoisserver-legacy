@@ -1,5 +1,6 @@
 # rdns tests
 # CASE 18: Creation passes with correct delchecker output
+# parent object under 0::/0
 #
 # create domain object
 # WARNING WARNING WARNING
@@ -25,4 +26,3 @@ changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 password: host3
 password: test-mb
-

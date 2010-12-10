@@ -31,13 +31,22 @@
 #include "bitmask.h"
 
 /*******************************************
-If any IP reg exps change - check whois cgi which has a copy
+---> If any of the regexes below change - check whois.cgi (and other tools), which could have a copy
+---> Keys are converted to uppercase before regexp matching!
 *******************************************/
 
-#define WK_REXP_DOMAINNAME "^[ ]*[a-zA-Z0-9/-]*(\\.[a-zA-Z0-9-]+)*\\.?[ ]*$"
+/* covers domain name as defined in RFC1034 - forward AND reverse */
+#define WK_REXP_DOMAINNAME "^[a-zA-Z0-9/-]*(\\.[a-zA-Z0-9-]+)*\\.?$"
 /* add a constraint: there must be at least one character in the domain name
    because the TLD must not be composed of digits only */
 #define WK_REXP_DOMAINALPHA  "[a-zA-Z]"
+
+/* Covers reverse domain names that are convertable to an IP range that we can stuff in a radix tree.
+ * In other words, it HAS TO be parsable by IP_revd_t2b()
+ *
+ * Note: we skipped classless in-addr.arpa now, as it seems to be impossible to determine their size, making it impossible to stuff in a radix tree */
+#define WK_REXP_REVDOMAINNAME "^[0-9A-F]*(\\.[0-9A-F]+)*\\.(IN-ADDR\\.ARPA|IP6\\.INT|IP6\\.ARPA)\\.?$"
+
 
 #define WK_REXP_VALIDIP6PREFIX "^[0-9A-F:]*:[0-9A-F:/]*$"     /* at least one colon */
 /* "^[0-9A-F]{1,4}(:[0-9A-F]{1,4}){7}$"*/
@@ -129,6 +138,7 @@ typedef enum WK_Type_t {
   WK_ASSETNAME,      /*+ AS set name                         +*/
   WK_ROUTESETNAME,   /*+ Route set name                      +*/
   WK_DOMAIN,         /*+ Domain name                         +*/
+  WK_REVDOMAIN,      /*+ Reverse Domain name                 +*/
   WK_HOSTNAME,       /*+ Host name                           +*/
   WK_LIMERICK,       /*+ Limerick name                       +*/
   WK_ASRANGE,        /*+ AS range (possibly only beginning)  +*/
@@ -168,6 +178,7 @@ char * const Keytypes[] = {
   "assetname",
   "routesetname",
   "domain",
+  "revdomain",
   "hostname",
   "limerick",
   "asrange",

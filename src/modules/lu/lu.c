@@ -97,6 +97,32 @@ LU_get_object (LU_server_t *server, rpsl_object_t **dbase_obj,
 }
 
 /* 
+  Lookup anything
+
+ * server    - connection information
+ * qyery     - query string
+ * source    - update source
+ * result    - resulting rpsl object list
+ * key       - query search key
+
+  return       - LU_OKAY on success, LU_ERROR on error
+
+  This is merely a dispatch to the server's implementation.
+ */
+LU_ret_t
+LU_get(LU_server_t *server, gchar *query_str,
+                 gchar *source, GList **result, const gchar *key)
+{
+  LU_ret_t ret_val;
+
+  LG_log(lu_context, LG_FUNC, ">LU_get: entered");
+  ret_val = server->get(server, query_str, source, result, key);
+  LG_log(lu_context, LG_FUNC, "<LU_get: exiting with value [%s]",
+         LU_ret2str(ret_val));
+  return ret_val;
+}
+
+/*
   Lookup a parents of an object
 
   server     - connection information

@@ -57,10 +57,11 @@ AU_ret_t rdns_deletion(au_plugin_callback_info_t * info)
   /* retrieve the current version from database */
   if (LU_get_object(au_lookup, &old_object, info->obj, NULL) != LU_OKAY) {
     LG_log(au_context, LG_DEBUG,
-           "error getting current version of object");
+           "rdns_deletion: error getting current version of object");
     ret_val = AU_ERROR;
   } else if (rpsl_object_get_attr(old_object, "mnt-by") == NULL) {
     /* success if it has no mnt-by's */
+    LG_log(au_context, LG_DEBUG, "rdns_deletion: no maintainer, authorised");
     ret_val = AU_AUTHORISED;
   } else {
     /* check auth from mnt-by */
@@ -75,7 +76,7 @@ AU_ret_t rdns_deletion(au_plugin_callback_info_t * info)
         domain = rpsl_object_get_key_value(info->obj);
         source_attrs = rpsl_object_get_attr(info->obj, "source");
         if (source_attrs == NULL) {
-          LG_log(au_context, LG_DEBUG, "can't retrieve source from object");
+          LG_log(au_context, LG_DEBUG, "rdns_deletion: can't retrieve source from object");
           ret_val = AU_ERROR;
         } else {
           source = rpsl_attr_get_clean_value(source_attrs->data);
@@ -83,25 +84,22 @@ AU_ret_t rdns_deletion(au_plugin_callback_info_t * info)
             LU_get_inetnum_from_domain(au_lookup, domain, source,
                                    &inetnum_obj_list);
           if (inetnum_obj_list == NULL) {
-            LG_log(au_context, LG_DEBUG, "%s has no parents", domain);
-            RT_parent_not_exist(info->ctx);
+            LG_log(au_context, LG_DEBUG, "rdns_deletion: %s has no corresponding inet(6)num", domain);
+            RT_no_address_space(info->ctx);
             ret_val = AU_UNAUTHORISED_CONT;
           } else if (inetnum_obj_list->next != NULL) {
             LG_log(au_context, LG_DEBUG,
-                   "%s has overlapping inetnum parents", domain);
+                   "rdns_deletion: %s has overlapping inet(6)num parents", domain);
             RT_rdns_overlap(info->ctx);
             ret_val = AU_UNAUTHORISED_CONT;
           } else {
             inetnum_obj = inetnum_obj_list->data;
             parent_auth =
               au_check_multiple_authentications
-              (CHECK_MNT_DOMAINS_THEN_MNT_LOWER_THEN_MNT_BY, inetnum_obj,
-               "parent", info);
+              (CHECK_MNT_DOMAINS_THEN_MNT_LOWER_THEN_MNT_BY, inetnum_obj, "parent", info);
             ret_val = parent_auth;
           }
         }
-    } else {
-      ret_val = AU_AUTHORISED;
     }
   }
 
@@ -109,7 +107,8 @@ AU_ret_t rdns_deletion(au_plugin_callback_info_t * info)
   au_override(&ret_val, &override, info);
   RT_rdns_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
 
-  LG_log(au_context, LG_FUNC, "<rdns_deletion: exiting");
+  LG_log(au_context, LG_FUNC, "<rdns_deletion: exiting with value [%s]",
+         AU_ret2str(ret_val));
   return ret_val;
 }
 
@@ -139,7 +138,7 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
   /* retrieve the current version from database */
   if (LU_get_object(au_lookup, &old_object, info->obj, NULL) != LU_OKAY) {
     LG_log(au_context, LG_DEBUG,
-           "error getting current version of object");
+           "rdns_modification: error getting current version of object");
     ret_val = AU_ERROR;
   } else if (rpsl_object_get_attr(old_object, "mnt-by") != NULL) {
     /* check auth from existing object if it contains mnt-by */
@@ -154,10 +153,9 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
   }
   /* if no conf file, reject */
   if (delcheck_conf_file == NULL) {
-    /* REJECT */
-    /* RT message */
+    LG_log(au_context, LG_DEBUG,
+             "rdns_modification: no delcheck conf file found - rdns size not accepted");
     RT_rdns_size_not_accepted(info->ctx);
-    /* ret_val set */
     ret_val = AU_UNAUTHORISED_CONT;
   }
   else {
@@ -165,13 +163,12 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
       /* check if we're the related party */
       au_check_result = ns_find_rir(info, domain);
       if (au_check_result == AU_AUTHORISED) {
-        /* check if the parent is us */
-        au_check_result = ns_is_parent_ours(info, domain);
-        if (au_check_result == AU_AUTHORISED) {
           /* find nservers */
           nservers =
               ns_nservers(info->obj, info->ctx, domain, &au_check_result);
           if (au_check_result != AU_AUTHORISED) {
+            LG_log(au_context, LG_DEBUG,
+                         "rdns_modification: no nservers found");
             ret_val = au_check_result;
           } else {
             /* find ds-rdata records */
@@ -181,6 +178,8 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
             } else {
               
               if (ds_rdata != NULL && ns_ds_accepted(domain) == FALSE) {
+                 LG_log(au_context, LG_DEBUG,
+                               "rdns_modification: ds not accepted");
                  RT_rdns_ds_not_accepted(info->ctx);
                  au_check_result = AU_UNAUTHORISED_CONT;
               }
@@ -200,13 +199,11 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
           if (nservers != NULL) {
             g_strfreev(nservers);
           }
-        } else {
-          ret_val = AU_UNAUTHORISED_CONT;
-        }
       } else {
+        LG_log(au_context, LG_DEBUG,
+                   "rdns_modification: not the right RIR");
         ret_val = AU_UNAUTHORISED_CONT;
       }
-
     }
   }
 
@@ -214,7 +211,8 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
   au_override(&ret_val, &override, info);
   RT_rdns_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
 
-  LG_log(au_context, LG_FUNC, "<rdns_modification: exiting");
+  LG_log(au_context, LG_FUNC, "<rdns_modification: exiting with value [%s]",
+         AU_ret2str(ret_val));
 
   if (delcheck_conf_file != NULL) {
     g_free(delcheck_conf_file);
@@ -240,14 +238,16 @@ static AU_ret_t ns_flat_creation(au_plugin_callback_info_t * info,
   GList *parents = NULL;        /* parent domains */
   rpsl_object_t *parent;        /* rpsl object for the parent */
   gchar *parent_key;            /* key of the parent object */
+
+  LG_log(au_context, LG_FUNC, ">ns_flat_creation: entering");
   
   if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY) {
     /* error getting parent list */
-    LG_log(au_context, LG_DEBUG, "error getting parents of %s", domain);
+    LG_log(au_context, LG_DEBUG, "ns_flat_creation: error getting parents of %s", domain);
     ret_val = AU_ERROR;
   } else if (parents == NULL) {
     /* there are no parents */
-    LG_log(au_context, LG_DEBUG, "%s has no parents", domain);
+    LG_log(au_context, LG_DEBUG, "ns_flat_creation: %s has no parents", domain);
     RT_parent_not_exist(info->ctx);
     ret_val = AU_UNAUTHORISED_CONT;
   } else {
@@ -259,16 +259,19 @@ static AU_ret_t ns_flat_creation(au_plugin_callback_info_t * info,
       ret_val = au_check_multiple_authentications (CHECK_MNT_LOWER_THEN_MNT_BY, parent, "parent", info);
     } else {
       RT_rdns_parentisnotenum(info->ctx);
-      LG_log(au_context, LG_DEBUG, "parent is not e164.arpa");
+      LG_log(au_context, LG_DEBUG, "ns_flat_creation: parent is not e164.arpa");
       ret_val = AU_UNAUTHORISED_CONT;
     }
   }
   
+  LG_log(au_context, LG_FUNC, "<ns_flat_creation: exiting with value [%s]",
+         AU_ret2str(ret_val));
   return ret_val;
 
 }
 /*
  * Hierarchical authorisation of a reverse dns object
+ * authorisation is only checked against address space
  */
 static AU_ret_t ns_hierarchical_creation(au_plugin_callback_info_t * info,
                                          gchar * domain, gchar * source)
@@ -281,54 +284,30 @@ static AU_ret_t ns_hierarchical_creation(au_plugin_callback_info_t * info,
   rpsl_object_t *inetnum_obj;   /* corresponding inetnum object */
   LU_ret_t lu_retval;           /* lookup return value */
 
+  LG_log(au_context, LG_FUNC, ">ns_hierarchical_creation: entering");
+
   lu_retval =
-      LU_get_inetnum_from_domain(au_lookup, domain, source,
-                                 &inetnum_obj_list);
+      LU_get_inetnum_from_domain(au_lookup, domain, source, &inetnum_obj_list);
   if (lu_retval != LU_OKAY) {
-    LG_log(au_context, LG_DEBUG, "error retrieving inetnum for %s",
-           domain);
+    LG_log(au_context, LG_DEBUG, "ns_hierarchical_creation: error retrieving inet(6)num for %s", domain);
     ret_val = AU_ERROR;
   } else if (inetnum_obj_list == NULL) {
-    LG_log(au_context, LG_DEBUG, "%s has no parents", domain);
-    RT_parent_not_exist(info->ctx);
+    LG_log(au_context, LG_DEBUG, "ns_hierarchical_creation: %s has no corresponding inet(6)num object", domain);
+    RT_no_address_space(info->ctx);
     ret_val = AU_UNAUTHORISED_CONT;
   } else if (inetnum_obj_list->next != NULL) {
-    LG_log(au_context, LG_DEBUG, "%s has overlapping inetnum parents",
-           domain);
+    LG_log(au_context, LG_DEBUG, "ns_hierarchical_creation: %s has overlapping inet(6)num parents", domain);
     RT_rdns_overlap(info->ctx);
     ret_val = AU_UNAUTHORISED_CONT;
   } else {
     inetnum_obj = inetnum_obj_list->data;
-    /* check authorization from corresponding inetnum */
-    parent_auth =
-        au_check_multiple_authentications
-        (CHECK_MNT_DOMAINS_THEN_MNT_LOWER_THEN_MNT_BY, inetnum_obj,
-         "parent", info);
-    if (parent_auth == AU_AUTHORISED) {
-      ret_val = parent_auth;
-    } else {
-
-      /* check authorization from parent domain */
-      if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY) {
-        /* error getting parent list */
-        LG_log(au_context, LG_DEBUG, "error getting parents of %s",
-               domain);
-        ret_val = AU_ERROR;
-      } else if (parents == NULL) {
-        /* there are no parents */
-        LG_log(au_context, LG_DEBUG, "%s has no parents", domain);
-        RT_parent_not_exist(info->ctx);
-        ret_val = AU_UNAUTHORISED_CONT;
-      } else {
-        /* one parent is enough */
-        parent = parents->data;
-        ret_val =
-            au_check_multiple_authentications
-            (CHECK_MNT_LOWER_THEN_MNT_BY, parent, "parent", info);
-      }
-    }
+    /* check authorization from corresponding inet(6)num */
+    ret_val = au_check_multiple_authentications
+                     (CHECK_MNT_DOMAINS_THEN_MNT_LOWER_THEN_MNT_BY, inetnum_obj, "parent", info);
   }
 
+  LG_log(au_context, LG_FUNC, "<ns_hierarchical_creation: exiting with value [%s]",
+         AU_ret2str(ret_val));
   return ret_val;
 }
 
@@ -353,59 +332,54 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
   domain = rpsl_object_get_key_value(info->obj);
 
   /* find the configuration file for delcheck */
-  LG_log(au_context, LG_DEBUG, "find the delcheck configuration");
+  LG_log(au_context, LG_DEBUG, "rdns_creation: find the delcheck configuration");
   delcheck_conf_file = ns_find_delcheck_conf(au_context, domain);
 
   /* Extract the source attribute */
   source_attrs = rpsl_object_get_attr(info->obj, "source");
   if (source_attrs == NULL) {
-    LG_log(au_context, LG_DEBUG, "can't retrieve source from object");
+    LG_log(au_context, LG_DEBUG, "rdns_creation: can't retrieve source from object");
     ret_val = AU_ERROR;
   } else {
-    LG_log(au_context, LG_DEBUG, "found the object source");
+    LG_log(au_context, LG_DEBUG, "rdns_creation: found the object source");
     source = rpsl_attr_get_clean_value(source_attrs->data);
     if (delcheck_conf_file == NULL) {   
-      /* REJECT */
-      /* RT message */
       RT_rdns_size_not_accepted(info->ctx);
-      /* ret_val set */
       ret_val = AU_UNAUTHORISED_CONT;
     } else {
-
       /* Extract the related nservers */
-      LG_log(au_context, LG_DEBUG, "extracting the nameservers");
+      LG_log(au_context, LG_DEBUG, "rdns_creation: extracting the nservers");
       nservers =
           ns_nservers(info->obj, info->ctx, domain, &au_check_result);
       if (au_check_result != AU_AUTHORISED) {
         ret_val = AU_UNAUTHORISED_CONT;
-        LG_log(au_context, LG_DEBUG, "problem extracting the nameservers");
+        LG_log(au_context, LG_DEBUG, "rdns_creation: problem extracting the nservers");
       } else {
-        
         /* find ds-rdata records */
-        LG_log(au_context, LG_DEBUG, "checking DS rdata records");
+        LG_log(au_context, LG_DEBUG, "rdns_creation: checking DS rdata records");
         ds_rdata = ns_ds_rdata(info->obj, info->ctx, domain, &au_check_result);
 
         /* Check if we're the related party, fail if not */
-        LG_log(au_context, LG_DEBUG, "checking the RIR");
+        LG_log(au_context, LG_DEBUG, "rdns_creation: checking the RIR");
         au_check_result = ns_find_rir(info, domain);
         if (au_check_result != AU_AUTHORISED) {
           ret_val = au_check_result;
         } else {
 
           /* Check if the parent is us */
-          LG_log(au_context, LG_DEBUG, "checking the parent");
-          au_check_result = ns_is_parent_ours(info, domain);
-          if (au_check_result != AU_AUTHORISED) {
-            ret_val = au_check_result;
-          } else {
+//          LG_log(au_context, LG_DEBUG, "rdns_creation: checking the parent");
+//          au_check_result = ns_is_parent_ours(info, domain);
+//          if (au_check_result != AU_AUTHORISED) {
+//            ret_val = au_check_result;
+//          } else {
             if (ns_is_e164_arpa(info)) {
               /* Check flat authorization */
-              LG_log(au_context, LG_DEBUG, "check the flat authorisation");
+              LG_log(au_context, LG_DEBUG, "rdns_creation: check the e164 flat authorisation");
               au_check_result = ns_flat_creation(info, domain, source);
             }
             else {
               /* Check hierarchical authorization */
-              LG_log(au_context, LG_DEBUG, "check hierarchical authorisation");
+              LG_log(au_context, LG_DEBUG, "rdns_creation: check hierarchical authorisation");
               au_check_result = ns_hierarchical_creation(info, domain, source);
             }
             if (au_check_result != AU_AUTHORISED) {
@@ -413,12 +387,13 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
             } else {
 
               if ( ds_rdata != NULL && ns_ds_accepted(domain) == FALSE) {
+                  LG_log(au_context, LG_DEBUG, "rdns_creation: ds not accepted");
                   RT_rdns_ds_not_accepted(info->ctx);
                   au_check_result = AU_UNAUTHORISED_CONT;
               }
               else {
                 /* call delcheck */
-                LG_log(au_context, LG_DEBUG, "calling delchecker");
+                LG_log(au_context, LG_DEBUG, "rdns_creation: calling delchecker");
                 au_check_result =
                   ns_domain_delcheck(info, domain, nservers, ds_rdata,
                                      delcheck_conf_file);
@@ -427,7 +402,7 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
                 ret_val = au_check_result;
               }
             }
-          }
+//          }
         }
       }
     }
@@ -488,9 +463,10 @@ PG_status_t au_rdns_check(PG_transaction_t * trans, gpointer * info)
   object_type = rpsl_object_get_class(callback_info->obj);
 
   if (!ns_is_rdns_suffix(callback_info)) {
+    LG_log(au_context, LG_DEBUG, "au_rdns_check: not rdns");
     ret_val = AU_AUTHORISED;
   } else {
-    LG_log(au_context, LG_DEBUG, "doing rdns checks");
+    LG_log(au_context, LG_DEBUG, "au_rdns_check: doing rdns checks");
     au_ret_val = AU_check_by_type(rdns_plugins, callback_info);
     switch (au_ret_val) {
     case AU_AUTHORISED:

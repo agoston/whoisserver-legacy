@@ -896,45 +896,34 @@ if ((tr->class_type==C_AS || tr->class_type==C_RS) && ACT_UPD_DUMMY(tr->action))
 
 
 
-     	       /* Do more in the forest
-   * Update radix tree for route and inetnum
-   */
+/* Do more in the forest
+ * Update radix tree for route and inetnum
+ */
+int UD_update_rx(Transaction_t *tr, rx_oper_mt mode) {
+    rp_upd_pack_t *packptr = tr->packptr;
+    int err = 0;
 
-int UD_update_rx(Transaction_t *tr, rx_oper_mt mode)
-{
-rp_upd_pack_t *packptr = tr->packptr;
-int err=0;
+    if (!IS_STANDALONE(tr->mode)) { /* only if server */
 
- 
-  if(!IS_STANDALONE(tr->mode)) { /* only if server */
-  
+        /* Only for these types of objects and only if we have collected data (tr->save != NULL) */
+        if (((tr->class_type == C_RT) || (tr->class_type == C_R6) || (tr->class_type == C_IN) || (tr->class_type == C_I6) || (tr->class_type == C_DN))) {
+            /* Collect some data for radix tree and NH repository update for deletes*/
+            if (mode == RX_OPER_DEL) {
+                g_list_foreach((GList *) rpsl_object_get_all_attr(tr->object), get_rx_data, tr);
+            }
 
-    /* Only for these types of objects and only if we have collected data (tr->save != NULL) */
-    if( (   (tr->class_type==C_RT) 
-   || (tr->class_type==C_R6)
-	 || (tr->class_type==C_IN) 
-	 || (tr->class_type==C_I6)
-	 || (tr->class_type==C_DN))) {
-      /* Collect some data for radix tree and NH repository update for deletes*/
-      if(mode == RX_OPER_DEL) {
-        g_list_foreach((GList *)rpsl_object_get_all_attr(tr->object), get_rx_data, tr);
-      }
-     
-      /* Except for regular domains we need to update radix tree */
-      if(ACT_UPD_RX(tr->action)){
-       packptr->key = tr->object_id;
-       if( RP_pack_node(mode, packptr, tr->source_hdl) == RX_OK ) {
-	err = 0;
-       } else {
-	err = (-1);
-        LG_log(ud_context, LG_SEVERE, "cannot update radix tree\n");
-	die;
-       }
-      } /* update radix tree */
+            /* Except for regular domains we need to update radix tree */
+            if (ACT_UPD_RX(tr->action)) {
+                packptr->key = tr->object_id;
+                if (RP_pack_node(mode, packptr, tr->source_hdl) == RX_OK) {
+                    err = 0;
+                } else {
+                    err = (-1);
+                    LG_log(ud_context, LG_SEVERE, "cannot update radix tree\n");
+                    die;
+                }
+            } /* update radix tree */
+        }
     }
-  }
-  return(err);
+    return (err);
 }
-   
-	       
-

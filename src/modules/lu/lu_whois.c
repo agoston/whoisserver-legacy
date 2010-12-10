@@ -1104,6 +1104,40 @@ lu_whois_get_parents (LU_server_t *server, GList **parents,
 }
 
 /*
+ * Lookup anything
+ *
+ * server    - connection information
+ * qyery     - query string
+ * source    - update source
+ * result    - resulting rpsl object list
+ * key       - query search key
+ */
+LU_ret_t lu_whois_get(LU_server_t *server, gchar *query_str,
+                  gchar *source, GList **result, const gchar *key)
+{
+  gchar *query;
+  gint ret_val;
+  gboolean query_ret;
+
+  LG_log(lu_context, LG_FUNC, ">Entering lu_whois_get");
+  LG_log(lu_context, LG_FUNC, "with query string %s",query_str);
+  LG_log(lu_context, LG_FUNC, "source is %s",source);
+  LG_log(lu_context, LG_FUNC, "search key is %s",key);
+
+  query = g_strdup_printf("%s -s %s %s", query_str, source, key);
+  query_ret = lu_whois_query(server->info, query, result);
+  g_free(query);
+  if (!query_ret) {
+    ret_val = LU_ERROR;
+  } else  {
+    ret_val = LU_OKAY;
+  }
+
+  LG_log(lu_context, LG_FUNC, "<lu_whois_get: exiting with value [%s]", LU_ret2str(ret_val));
+  return ret_val;
+}
+
+/*
   Initialise a WHOIS lookup connection
 
   hostname   - name of server, e.g. "whois.ripe.net"
@@ -1128,6 +1162,7 @@ LU_whois_init (const gchar *hostname, int port, int timeout)
   ret_val->lookup = lu_whois_lookup;
   ret_val->inverse_lookup = lu_whois_inverse_lookup;
   ret_val->get_object = lu_whois_get_object;
+  ret_val->get = lu_whois_get;
   ret_val->get_parents = lu_whois_get_parents;
   ret_val->check_overlap = lu_whois_check_overlap;
   ret_val->cleanup = lu_whois_cleanup;

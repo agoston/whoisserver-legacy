@@ -832,31 +832,28 @@ AC_ban_set(ip_prefix_t *prefix, char *text, int denyflag)
   returns error code from IP_smart_conv, AC_ban_set or
   AC_INVARG if range composed
   +++++++++++++++++++++++++++++++++++++++*/
-int
-AC_asc_ban_set(char *addrstr, char *text, int denyflag)
-{
-  int ret_err;
-  GList *preflist = NULL;
-  ip_keytype_t key_type;
+int AC_asc_ban_set(char *addrstr, char *text, int denyflag) {
+    int ret_err;
+    GList *preflist = NULL;
+    ip_keytype_t key_type;
 
-  if( (ret_err = IP_smart_conv(addrstr, 0, 0,
-			       &preflist, IP_PLAIN, &key_type)) != IP_OK ) {
+    if ((ret_err = IP_smart_conv(addrstr, 0, 0, &preflist, IP_PLAIN, &key_type)) != IP_OK) {
+        return ret_err;
+    }
+
+    /* allow only one prefix */
+    /* The argument can be even a range, but must decompose into one prefix */
+    if (NOERR(ret_err) && g_list_length(preflist) != 1) {
+        ret_err = AC_INVARG;
+    }
+
+    if (NOERR(ret_err)) {
+        ret_err = AC_ban_set((g_list_first(preflist)->data), text, denyflag);
+    }
+
+    wr_clear_list(&preflist);
+
     return ret_err;
-  }
-
-  /* allow only one prefix */
-  /* The argument can be even a range, but must decompose into one prefix */
-  if(  NOERR(ret_err) && g_list_length( preflist ) != 1 ) {
-    ret_err = AC_INVARG;
-  }
-
-  if( NOERR(ret_err) ) {
-    ret_err = AC_ban_set( (g_list_first(preflist)->data), text, denyflag);
-  }
-
-  wr_clear_list( &preflist );
-
-  return ret_err;
 }/* AC_asc_ban_set */
 
 /*++++++++++++++++++++++++++++++++++++++

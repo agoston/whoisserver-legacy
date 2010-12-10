@@ -66,7 +66,6 @@ extern int getsubopt(char **optionp, char * const *tokens, char **valuep);
  qc_sources_list_to_string     returns an allocated string, must be freed
 
  GList *list                   list of source handles (as defined by CA)
-
  ++++++++++++++++++++++++++++++++++++++*/
 char *
 qc_sources_list_to_string(GList *list) {
@@ -122,21 +121,10 @@ char *QC_environ_to_string(Query_environ qe) {
     return g_string_free(tmp, FALSE);
 }
 
-/* QC_query_command_to_string() */
 /*++++++++++++++++++++++++++++++++++++++
  Convert the query_command to a string.
 
  Query_command *query_command The query_command to be converted.
-
- More:
- +html+ <PRE>
- Authors:
- ottrey
- +html+ </PRE><DL COMPACT>
- +html+ <DT>Online References:
- +html+ <DD><UL>
- +html+ </UL></DL>
-
  ++++++++++++++++++++++++++++++++++++++*/
 char *QC_query_command_to_string(Query_command *query_command) {
     char result_buf[STR_XL];
@@ -150,8 +138,8 @@ char *QC_query_command_to_string(Query_command *query_command) {
 
     sprintf(result_buf,
             "Query_command : inv_attrs=%s, recursive=%s, object_type=%s, (c=%s,C=%s,G=%s,B=%s,b=%s,g=%d,l=%d,m=%d,q=%d,t=%d,v=%d,x=%d,F=%d,K=%d,L=%d,M=%d,R=%d), possible keytypes=%s, keys=[%s]",
-            str1, query_command->recursive ? "y" : "n", str2, query_command->c_irt_search ? "TRUE" : "FALSE",
-            query_command->C ? "TRUE" : "FALSE", query_command->G_group_search ? "TRUE" : "FALSE",
+            str1, query_command->recursive ? "y" : "n", str2, query_command->c ? "TRUE" : "FALSE",
+            query_command->C ? "TRUE" : "FALSE", query_command->G ? "TRUE" : "FALSE",
             query_command->B ? "TRUE" : "FALSE", query_command->b ? "TRUE" : "FALSE", query_command->g,
             query_command->l, query_command->m, query_command->q, query_command->t, query_command->v, query_command->x,
             query_command->fast, query_command->filtered, query_command->L, query_command->M, query_command->R, str3,
@@ -162,42 +150,13 @@ char *QC_query_command_to_string(Query_command *query_command) {
 
     return UT_strdup(result_buf);
 
-} /* QC_query_command_to_string() */
-
-/* log_command() */
-/*++++++++++++++++++++++++++++++++++++++
- Log the command.
- This is more to do with Tracing.  And should/will get merged with a tracing
- module (when it is finalized.)
-
- char *query_str
-
- Query_command *query_command
-
- More:
- +html+ <PRE>
- Authors:
- ottrey
- +html+ </PRE><DL COMPACT>
- +html+ <DT>Online References:
- +html+ <DD><UL>
- +html+ </UL></DL>
-
- ++++++++++++++++++++++++++++++++++++++*/
-static void log_command(const char *query_str, Query_command *query_command) {
-    char *str;
-
-    str = QC_query_command_to_string(query_command);
-    LG_log(qc_context, LG_DEBUG, "query=[%s]   %s", query_str, str);
-    UT_free(str);
-} /* log_command() */
+}
 
 
 /*++++++++++++++++++++++++++++++++++++++
  Free the query_environ.
 
  Query_command *qc query_environ to be freed.
-
  ++++++++++++++++++++++++++++++++++++++*/
 void QC_environ_free(Query_environ *qe) {
     if (qe != NULL) {
@@ -211,7 +170,7 @@ void QC_environ_free(Query_environ *qe) {
     }
 }
 
-/* QC_free() */
+
 /*++++++++++++++++++++++++++++++++++++++
  Free the query_command.
 
@@ -221,16 +180,6 @@ void QC_environ_free(Query_environ *qe) {
  qc->inv_attrs_bitmap
  qc->object_type_bitmap
  qc->keytypes_bitmap
-
- More:
- +html+ <PRE>
- Authors:
- ottrey
- +html+ </PRE><DL COMPACT>
- +html+ <DT>Online References:
- +html+ <DD><UL>
- +html+ </UL></DL>
-
  ++++++++++++++++++++++++++++++++++++++*/
 void QC_free(Query_command *qc) {
     GList *message_node;
@@ -251,9 +200,9 @@ void QC_free(Query_command *qc) {
 
 void QC_init_struct(Query_command *query_command) {
     query_command->query_type = QC_SYNERR;
-    query_command->c_irt_search = TRUE; /* IRT search is on by default */
+    query_command->c = TRUE; /* IRT search is on by default */
     query_command->C = FALSE;
-    query_command->G_group_search = TRUE; /* grouping is on by default */
+    query_command->G = TRUE; /* grouping is on by default */
     query_command->B = FALSE; /* "original" output is off by default */
     query_command->b = FALSE;
     query_command->d = 0;
@@ -326,7 +275,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
     int num_flags;
     int num_client_ip;
 
-    gboolean is_ip_key;
+    gboolean is_ip_key, is_rdns_key, is_inverse;
     gboolean fixed_lookup;
     char lookup[64];
 
@@ -381,7 +330,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'C':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->C = TRUE;
                 query_command->l = 0;
                 query_command->m = 0;
@@ -395,7 +344,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'c':
-                query_command->c_irt_search = TRUE;
+                query_command->c = TRUE;
                 query_command->l = 0;
                 query_command->m = 0;
                 query_command->x = 0;
@@ -408,7 +357,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'G':
-                query_command->G_group_search = FALSE;
+                query_command->G = FALSE;
                 break;
 
             case 'B':
@@ -417,7 +366,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
 
             case 'b':
                 query_command->b = TRUE;
-                query_command->c_irt_search = TRUE;
+                query_command->c = TRUE;
                 query_command->l = 0;
                 query_command->m = 0;
                 query_command->x = 0;
@@ -487,7 +436,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'l':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->l = 1;
                 query_command->m = 0;
                 query_command->x = 0;
@@ -500,7 +449,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'm':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->l = 0;
                 query_command->m = 1;
                 query_command->x = 0;
@@ -597,7 +546,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'x':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->l = 0;
                 query_command->m = 0;
                 query_command->x = 1;
@@ -619,7 +568,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'L':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->l = 0;
                 query_command->m = 0;
                 query_command->x = 0;
@@ -632,7 +581,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 break;
 
             case 'M':
-                query_command->c_irt_search = FALSE;
+                query_command->c = FALSE;
                 query_command->l = 0;
                 query_command->m = 0;
                 query_command->x = 0;
@@ -790,7 +739,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
         badparerr++;
     }
 
-    if ((query_command->b == 1) && (query_command->G_group_search == 0)) {
+    if ((query_command->b == 1) && (query_command->G == 0)) {
         /* -G -b is error, we need grouping */
         /* ERROR:109 */
         char *fmt = ca_get_qc_fmt_uncompflag;
@@ -839,15 +788,48 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
 
         /* XXX: missing checks for "-i" and "-T" versus key types */
 
-        is_ip_key = MA_isset(query_command->keytypes_bitmap, WK_IPADDRESS) || MA_isset(query_command->keytypes_bitmap,
-                                                                                       WK_IPRANGE)
-                || MA_isset(query_command->keytypes_bitmap, WK_IPPREFIX) || MA_isset(query_command->keytypes_bitmap,
-                                                                                     WK_IP6PREFIX);
+        is_ip_key = MA_isset(query_command->keytypes_bitmap, WK_IPADDRESS)
+                || MA_isset(query_command->keytypes_bitmap, WK_IPRANGE)
+                || MA_isset(query_command->keytypes_bitmap, WK_IPPREFIX)
+                || MA_isset(query_command->keytypes_bitmap, WK_IP6PREFIX);
+
+        {   /* determine if is_rdns_key */
+            ip_prefix_t ign;
+
+            is_rdns_key = MA_isset(query_command->keytypes_bitmap, WK_REVDOMAIN);
+
+            if (is_rdns_key && IP_revd_t2b(&ign, query_command->keys, IP_EXPN) != IP_OK) {
+                /* not a reverse domain - adjust flags accordingly */
+                MA_set(&query_command->keytypes_bitmap, WK_REVDOMAIN, 0);
+                is_rdns_key = FALSE;
+            }
+        }
+
+        /* determine if inverse query */
+        is_inverse = MA_bitcount(query_command->inv_attrs_bitmap) > 0;
+
+        /* remove domain keytype if revdomain key was used in forward lookup
+         * this is needed to avoid searching the domain table AND the domain radix tree
+         * Note: in reverse lookup, we don't do this, as there are many inverse searchable attributes with domain syntax
+         * FIXME: there should be a clear separation between forward and reverse domain in the WK module and all across whois code */
+        if (!is_inverse && is_rdns_key) {
+            // it must have WK_DOMAIN set also, as it is a lot more relaxed than WK_REVDOMAIN
+            MA_set(&query_command->keytypes_bitmap, WK_DOMAIN, 0);
+            /* no use of irt lookup (the -c query flag) on domain objects, as there is not even an mnt-irt attribute
+             * Maybe later we could add some smart lookup feature */
+            query_command->c = FALSE;
+        }
 
         /* check for use of IP flags on non-IP lookups */
-        if ((ip_flag_used || query_command->d) && !is_ip_key) {
+        if ((ip_flag_used || query_command->d) && !(is_ip_key || is_rdns_key)) {
             /* WARNING:902, meaningless IP flag */
             query_command->parse_messages = g_list_append(query_command->parse_messages, ca_get_qc_uselessipflag);
+        }
+
+        /* check for use of -d flag on revd lookups */
+        if (query_command->d && is_rdns_key) {
+            /* WARNING:903, meaningless -d flag */
+            query_command->parse_messages = g_list_append(query_command->parse_messages, ca_get_qc_uselessdflag);
         }
 
         /* check for "fixed" lookups on IP addresses */
@@ -900,26 +882,21 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
              get returned from radix tree. EG 2003-08-07 */
             UT_free(query_command->keys);
             query_command->keys = g_strdup(lookup);
-
             UT_free(fmt);
         }
 
-        /* -d handling: if the keytype is IPv4/v6 address/prefix/range, then
-         exclude the domains unless -d is set
-         XXX this must be kept in sync with new types */
-        /* XXX: do we want this?  what's the point?!?!? - shane */
+        /* exclude revdomain if no -d is used */
         if (is_ip_key && !query_command->d) {
             MA_set(&(query_command->object_type_bitmap), C_DN, 0);
         }
 
-        if (query_command->R && !MA_isset(query_command->keytypes_bitmap, WK_DOMAIN)) {
+        /* if -R on anything else than a forward domain (revdomain is a subset of domain, hence we need to explicitly deny it) */
+        if (query_command->R && (!MA_isset(query_command->keytypes_bitmap, WK_DOMAIN) || MA_isset(query_command->keytypes_bitmap, WK_REVDOMAIN))) {
             /* WARNING:904, meaningless no-referral flag */
             query_command->parse_messages = g_list_append(query_command->parse_messages, ca_get_qc_uselessnorefflag);
         }
 
-        /* check if the domain query contains a dot at the end, remove if
-         * any
-         * WARNING:906 */
+        /* check if the domain query contains a dot at the end, remove if any WARNING:906 */
         if (MA_isset(query_command->keytypes_bitmap, WK_DOMAIN)) {
             char *domain_dot = strrchr(query_command->keys, '.');
             if ((domain_dot != NULL) && (strcmp(domain_dot, ".") == 0)) {
@@ -928,9 +905,6 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 query_command->parse_messages = g_list_append(query_command->parse_messages, g_strdup_printf(fmt, query_command->keys));
             }
         }
-
-        /* tracing */
-        log_command(query_str, query_command);
 
         /* "keep connection" processing:
          when opening connection, -k may be alone or with a query

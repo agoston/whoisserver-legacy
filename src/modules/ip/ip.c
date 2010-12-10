@@ -1336,12 +1336,12 @@ ip_rangesize_t IP_rang_span(ip_range_t *rangptr) {
 #define ad(which) (rangptr->which)
 
 /**************************************************************************/
-/*+ Decomposes a binary range into prefixes and appends them to the list.
+/* Decomposes a binary range into prefixes and appends them to the list.
  Allocates prefix structures and list elements, they must be freed
  after use.
 
  returns a bitmask of prefix lengths used.
- +*/
+*/
 unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist) {
     unsigned prefmask=0;
     register int slash=0;
@@ -1390,8 +1390,7 @@ unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist) {
 
         c_dif += 1; /* was not done earlier to protect from overflow */
 
-        for (slash=1; slash<32 && ((blk=((unsigned)0x80000000>>(slash-1))) & c_dif) == 0; slash++) {
-        }
+        for (slash=1; slash<32 && ((blk=((unsigned)0x80000000>>(slash-1))) & c_dif) == 0; slash++);
 
         /* clear all digits in a and b under the blk one. */
         ff=blk-1;
@@ -1437,14 +1436,11 @@ unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist) {
 
 /***************************************************************************/
 
-/*+ Similar name, slightly different code, totally different functionality.
-
+/*
  finds the smallest canonical block encompassing the whole given range,
  then MODIFIES the range pointed to by the argument
  so that it's equal to this block.
-
- +*/
-
+*/
 void IP_rang_encomp(ip_range_t *rangptr) {
     int slash=0;
     unsigned c_dif, blk, ff, t_dif;
@@ -1538,34 +1534,6 @@ int IP_pref_2_rang(ip_range_t * rangptr, ip_prefix_t * prefptr) {
 
 #undef ad
 
-/* IP_OK assumes a classful range!!! */
-int IP_rang_2_pref(ip_range_t * rangptr, ip_prefix_t * prefptr) {
-    /* begin ^ end = inverted mask */
-    //
-    //	ip_addr_t res;
-    //	int i;
-    //	int k;
-    //	unsigned len = 0;
-    //
-    //	prefptr->ip = rangptr->begin;
-    //
-    //	for (i = 3; i >= 0; i--) {
-    //		for (k = 31; k >= 0; k--) {
-    //			/* check bit number k */
-    //			if (((rangptr->begin.words[i] >> k) & 1) ^ ((rangptr->end.words[i] >> k) & 1) == 0) {
-    //				len++;
-    //			}
-    //		}
-    //	}
-    //
-    //	prefptr->bits = len;
-    //	return IP_OK;
-
-    /* I decided to deprecate this function as it's unoptimized, unused and buggy - agoston, 2006-09-13 */
-    die;
-    return IP_OK;
-}
-
 /***************************************************************************/
 
 /*+
@@ -1629,81 +1597,81 @@ int IP_rang_classful(ip_range_t *rangptr, ip_addr_t *addrptr) {
     return IP_OK;
 }
 
-/***************************************************************************/
-/*+
- Trying to be smart :-) and convert a query search term into prefix(es),
- regardless of whether specified as IP address, prefix or range.
+/*
+Convert a query search term into prefix(es),
+regardless of whether specified as IP address, prefix, range or reverse domain.
 
- justcheck - if just checking the syntax (justcheck == 1),
- then the prefixes are freed before the function returns,
- otherwise it is the responsibility of the caller to free the list.
+key          input string (or query key)
+justcheck    no return value, just checking syntax
+encomp       range should be encompassed by smallest possible prefix (results in a single prefix returned)
+preflist     returned GList consisting of ip_prefix_t
+expf         IP expansion mode
+keytype      identified key type (can be NULL)
 
- +*/
-
+It is the responsibility of the caller to free preflist (unless justcheck is set)
+*/
 int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp_t expf, ip_keytype_t *keytype) {
-    int free_it;
-    int err=IP_OK; /* let's be optimistic :-) */
-    ip_prefix_t *querypref;
+    int free_it = justcheck;
+    int err = IP_OK;
+    ip_prefix_t *querypref = (ip_prefix_t *)UT_malloc(sizeof(ip_prefix_t));;
 
-    /* if just checking the syntax (justcheck == 1),
-     then free_it = 1,
-     else 0, but may be modified later (in range conversion)
-     */
-
-    free_it = justcheck;
-
-    querypref = (ip_prefix_t *)UT_malloc(sizeof(ip_prefix_t));
-
-    /*XXX inconsistent perfix/length is excused. Later we will warn people */
+    /*XXX inconsistent prefix/length is excused. Later we will warn people */
+    /* check for prefix */
     err = IP_pref_t2b(querypref, key, expf);
     if (NOERR(err)) {
-        *keytype = IPK_PREFIX;
+        if (keytype) *keytype = IPK_PREFIX;
 
-        if (justcheck == 0) {
+        if (!justcheck) {
             *preflist = g_list_append(*preflist, querypref);
         }
     } else {
-        /* not a prefix.  */
-        /* Maybe an IP ? */
+        /* check for IP */
         err = IP_addr_t2b( &(querypref->ip), key, expf);
         if (NOERR(err)) {
-
-            *keytype = IPK_IP;
+            if (keytype) *keytype = IPK_IP;
 
             /*convert to a /32 or /128*/
             querypref->bits = IP_sizebits(querypref->ip.space);
 
-            if (justcheck == 0) {
+            if (!justcheck) {
                 *preflist = g_list_append(*preflist, querypref);
             }
         } else {
-            /* hm, maybe a range then ? */
-            ip_range_t myrang;
-
-            /* won't use the querypref anymore, mark it for freeing later */
-            free_it = 1;
-
-            err = IP_rang_t2b(&myrang, key, expf);
+            /* check for reverse domain */
+            err = IP_revd_t2b(querypref, key, expf);
             if (NOERR(err)) {
-                /* Wow. Great.  */
+                if (keytype) *keytype = IPK_REVD;
 
-                *keytype = IPK_RANGE;
-
-                /* sometimes (exless match) we look for the first bigger(shorter)  */
-                /* prefix containing this range. */
-
-                if (encomp) {
-                    IP_rang_encomp(&myrang);
-                }
-                /* OK, now we can let the engine happily find that there's just one */
-                /* prefix in range */
-
-                if (justcheck == 0) {
-                    IP_rang_decomp(&myrang, preflist);
+                if (!justcheck) {
+                    *preflist = g_list_append(*preflist, querypref);
                 }
             } else {
-                *keytype = IPK_UNDEF;
-                err = IP_INVARG; /* "conversion error" */
+                /* check for range */
+                ip_range_t myrang;
+
+                /* won't use the querypref anymore, mark it for freeing later */
+                free_it = 1;
+
+                err = IP_rang_t2b(&myrang, key, expf);
+                if (NOERR(err)) {
+                    if (keytype) *keytype = IPK_RANGE;
+
+                    /* sometimes (exless match) we look for the first bigger(shorter)  */
+                    /* prefix containing this range. */
+                    if (encomp) {
+                        IP_rang_encomp(&myrang);
+                    }
+
+                    /* OK, now we can let the engine happily find that there's just one */
+                    /* prefix in range */
+                    if (!justcheck) {
+                        IP_rang_decomp(&myrang, preflist);
+                    }
+                } else {
+                    /* unknown key */
+                    if (keytype) *keytype = IPK_UNDEF;
+                    err = IP_INVARG; /* "conversion error" */
+                }
             }
         }
     }
@@ -1715,15 +1683,15 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
     return err;
 }
 
-/* convert whatever comes into a range */
+/* convert whatever comes into a range
+ * keytype can be NULL */
 int IP_smart_range(char *key, ip_range_t * rangptr, ip_exp_t expf, ip_keytype_t * keytype) {
     int err = IP_OK;
-    GList *preflist= NULL;
+    GList *preflist = NULL;
 
     /* first : is it a range ? */
-
     if (NOERR(err = IP_rang_t2b(rangptr, key, expf))) {
-        *keytype = IPK_RANGE;
+        if (keytype) *keytype = IPK_RANGE;
     } else {
         /* OK, this must be possible to convert it to prefix and from there
          to a range. */
