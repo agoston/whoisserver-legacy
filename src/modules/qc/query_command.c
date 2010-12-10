@@ -101,49 +101,26 @@ qc_sources_list_to_string(GList *list) {
     return result;
 }
 
-/* QC_environ_to_string() */
 /*++++++++++++++++++++++++++++++++++++++
  Convert the query_environ to a string.
 
  Query_environ *query_environ The query_environ to be converted.
-
- More:
- +html+ <PRE>
- Authors:
- ottrey
- +html+ </PRE><DL COMPACT>
- +html+ <DT>Online References:
- +html+ <DD><UL>
- +html+ </UL></DL>
-
  ++++++++++++++++++++++++++++++++++++++*/
-char *
-QC_environ_to_string(Query_environ qe) {
+char *QC_environ_to_string(Query_environ qe) {
     char *sources;
-    char passed_addr[IP_ADDRSTR_MAX];
     GString *tmp;
-    char *result;
 
     /* convert the sources and the passed address (if any) to printable strings */
     sources = qc_sources_list_to_string(qe.sources_list);
-    if (IP_addr_b2a(&(qe.pIP), passed_addr, IP_ADDRSTR_MAX) != IP_OK) {
-        passed_addr[0] = '\0';
-    }
-
     /* format the environment info */
     tmp = g_string_sized_new(STR_L);
-    g_string_sprintf(tmp, "host=%s, keep_connection=%s, sources=%s, version=%s%s%s", qe.condat.ip, qe.k ? "on" : "off",
-                     sources, (qe.version == NULL) ? "?" : qe.version, passed_addr[0] == '\0' ? "" : ", passedIP=",
-                     passed_addr);
-
-    /* move result to return buffer, and free up memory */
-    result = UT_strdup(tmp->str);
-    g_string_free(tmp, TRUE);
+    g_string_sprintf(tmp, "host=%s, keep_connection=%s, sources=%s, version=%s%s%s", qe.condat.rIPs, qe.k ? "on" : "off",
+                     sources, (qe.version == NULL) ? "?" : qe.version, qe.eIPs[0] == '\0' ? "" : ", passedIP=",
+                     qe.eIPs);
     UT_free(sources);
 
-    return result;
-
-} /* QC_environ_to_string() */
+    return g_string_free(tmp, FALSE);
+}
 
 /* QC_query_command_to_string() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -215,33 +192,24 @@ static void log_command(const char *query_str, Query_command *query_command) {
     UT_free(str);
 } /* log_command() */
 
-/* QC_environ_free() */
+
 /*++++++++++++++++++++++++++++++++++++++
  Free the query_environ.
 
  Query_command *qc query_environ to be freed.
 
- More:
- +html+ <PRE>
- Authors:
- ottrey
- +html+ </PRE><DL COMPACT>
- +html+ <DT>Online References:
- +html+ <DD><UL>
- +html+ </UL></DL>
-
  ++++++++++++++++++++++++++++++++++++++*/
 void QC_environ_free(Query_environ *qe) {
     if (qe != NULL) {
         UT_free(qe->version);
+        SK_cd_free(&(qe->condat));
 
         if (qe->sources_list != NULL) {
             g_list_free(qe->sources_list);
-            qe->sources_list = NULL;
         }
         UT_free(qe);
     }
-} /* QC_environ_free() */
+}
 
 /* QC_free() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -471,22 +439,6 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
             case 'i':
                 /* always get an argument here (according to the code) */
                 dieif(gst->optarg == NULL);
-
-                /*
-                 Now a really stupid hard-coded hack to support "pn" being a
-                 synonym for "ac,tc,zc,ah".  I particularly object to this because
-                 it references attributes that should only be defined in XML - but
-                 I don't see a simplier more robust way of doing this hack.
-                 :-( - ottrey 8/12/99
-
-                 ** removed a memory leak - MB, 1/08/00
-
-                 ** removed the use of "ro", added "person" - shane, 2002-01-23
-
-                 ** simplified to simply set the flags rather than requiring a
-                 memory allocation and parse - shane, 2002-06-27
-
-                 */
 
                 /* check each argument present */
                 inv_attr_mask = MA_new(INV_ATTR_MASK);
@@ -719,30 +671,38 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 g_strfreev(types);
                 break;
 
-            case 'V':
+            case 'V': {
+                int num = 0;
                 version_info = g_strsplit(gst->optarg, ",", 3);
-                if (version_info[1] == NULL) {
-                    /* single parameter */
-                    UT_free(qe->version);
-                    qe->version = UT_strdup(version_info[0]);
-                } else if (version_info[2] == NULL) {
-                    /* two parameters */
+                for (; version_info[num]; num++) {
+                    g_strstrip(version_info[num]);
+                }
 
-                    if (IP_addr_e2b(&(qe->pIP), version_info[1]) != IP_OK) {
-                        synerrflg++;
-                    } else {
-                        num_client_ip++;
-                    }
-
-                    UT_free(qe->version);
-                    qe->version = UT_strdup(version_info[0]);
-                } else {
+                if (num > 2) {
                     /* more than two parameters */
                     synerrflg++;
+                } else {
+                    if (num > 0) {
+                        /* first parameter */
+                        if (qe->version) UT_free(qe->version);
+                        qe->version = UT_strdup(version_info[0]);
+                    }
+
+                    if (num > 1) {
+                        /* second parameter */
+                        if (IP_addr_e2b(&(qe->eIP), version_info[1]) != IP_OK) {
+                            synerrflg++;
+                        } else {
+                            num_client_ip++;
+                            strncpy(qe->eIPs, version_info[1], sizeof(qe->eIPs));
+                            qe->eIPs[sizeof(qe->eIPs)-1] = 0;
+                        }
+                    }
                 }
                 g_strfreev(version_info);
                 num_flags--; /* don't count -V flags in our total */
                 break;
+            }
 
                 /* any other flag, including '?' */
             default:
@@ -1005,14 +965,16 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
 
 
 /* Create a new query environment */
-Query_environ *QC_environ_new(char *ip, int sock) {
+Query_environ *QC_environ_new(int sock) {
     Query_environ *qe;
 
     qe = (Query_environ *) UT_calloc(1, sizeof(Query_environ));
-    qe->condat.ip = ip;
-    qe->condat.sock = sock;
-
     qe->sources_list = g_list_copy(deflook_sources_list);
+
+    /* init the connection structure, set timeout for reading the query */
+    SK_cd_make(&(qe->condat), sock, (unsigned) ca_get_keepopen);
+
+    TA_setcondat(&(qe->condat));
 
     return qe;
 }
@@ -1036,22 +998,19 @@ Query_environ *QC_environ_new(char *ip, int sock) {
 
 Query_command *QC_create(const char *input, Query_environ *qe) {
     Query_command *qc;
-    const char *s;
     int qt;
 
     qc = (Query_command *) UT_calloc(1, sizeof(Query_command));
     QC_init_struct(qc);
 
     /* search the string for illegal characters */
-    for (s = input; *s != '\0'; s++) {
-        if (!strchr(ALLOWED_QUERY_CHARS, *s)) {
-            qc->query_type = QC_PARERR;
-            qc->parse_messages = g_list_append(qc->parse_messages, ca_get_qc_badinput);
-            return qc;
-        }
+    if (input[strspn(input, ALLOWED_QUERY_CHARS)]) {
+        qc->query_type = QC_PARERR;
+        qc->parse_messages = g_list_append(qc->parse_messages, ca_get_qc_badinput);
+        return qc;
     }
 
-    if (strlen(input) == 0) {
+    if (!*input) {
         /* An empty query (Ie return) was sent */
         qc->query_type = QC_EMPTY;
     } else { /* else <==> input_length > 0 ) */

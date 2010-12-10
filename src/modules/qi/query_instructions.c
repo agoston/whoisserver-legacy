@@ -1725,7 +1725,7 @@ void qi_prep_run_refer(char *domain,
 
     /* prepend with -Vversion,IP for type CLIENTADDRESS */
     if( ref_type == RF_CLIENTADDRESS ) {
-        g_string_sprintf(querystr, "-V%s,%s ", VERSION, qe->condat.ip);
+        g_string_sprintf(querystr, "-V%s,%s ", VERSION, qe->condat.rIPs);
     }
 
 

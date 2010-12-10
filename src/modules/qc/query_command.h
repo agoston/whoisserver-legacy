@@ -67,13 +67,13 @@ char *qrytype_str[] = {
 #define QC_Q_TYPES   2
 
 
-
 typedef struct Query_environ_t {
-  sk_conn_st   condat;
-  unsigned int k;
-  GList *sources_list;
-  char *version;
-  ip_addr_t pIP; /* passed IP */
+    sk_conn_st condat;
+    unsigned int k;
+    GList *sources_list;
+    char *version;
+    ip_addr_t eIP; /* effective IP */
+    char eIPs[IP_ADDRSTR_MAX]; /* effective IP string */
 } Query_environ;
 
 typedef struct Query_command_t {
@@ -120,7 +120,7 @@ char *QC_query_command_to_string(Query_command *query_command);
 void QC_environ_free(Query_environ *qe);
 void QC_free(Query_command *qc);
 Query_command *QC_create(const char *query_str, Query_environ *qe);
-Query_environ *QC_environ_new(char *ip, int sock);
+Query_environ *QC_environ_new(int sock);
 Query_environ *QC_environ_update(Query_command *qc, Query_environ *qe);
 char *QC_get_qrytype(qc_qtype_t qrytype);
 void QC_init (LG_context_t *ctx);
