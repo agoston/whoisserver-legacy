@@ -147,22 +147,19 @@ int counter_state(svr_counter_t *cst) {
  Author:
  marek
  ++++++++++++++++++++++++++++++++++++++*/
-static
-int counter_wait(svr_counter_t *cst, int limit) {
-	int newval;
+static int counter_wait(svr_counter_t *cst, int limit) {
+    int newval;
 
-	pthread_mutex_lock( &(cst->lock));
+    if (limit != 0) {
+        pthread_mutex_lock(&(cst->lock));
+        while (cst->count >= limit) {
+            pthread_cond_wait(&(cst->cond), &(cst->lock));
+        }
+        newval = cst->count;
+        pthread_mutex_unlock(&(cst->lock));
+    }
 
-	if (limit != 0) {
-		while (cst->count >= limit) {
-			pthread_cond_wait( &(cst->cond), &(cst->lock));
-		}
-	}
-
-	newval = cst->count;
-	pthread_mutex_unlock(&(cst->lock));
-
-	return newval;
+    return newval;
 }
 
 /*++++++++++++++++++++++++++++++++++++++
