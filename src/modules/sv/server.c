@@ -294,9 +294,9 @@ void *SV_signal_thread() {
 				break;
 		}
 	}
-} /* SV_signal_thread() */
+}
 
-/* SV_do_child() */
+
 /*++++++++++++++++++++++++++++++++++++++
 
  Handle whois/config/mirror connections. Takes a pointer to the
@@ -311,22 +311,14 @@ void *SV_signal_thread() {
 
  void *varg            service description structure.
 
- Author:
- marek
  ++++++++++++++++++++++++++++++++++++++*/
 void *SV_do_child(void *varg) {
 	svr_args *args = (svr_args *) varg;
 	int sock = args->conn_sock;
-	int curclients;
-
-	LG_log(sv_context, LG_DEBUG, "%s: Child thread [%d]: Socket number = %d", args->name, pthread_self(), sock);
-
-	curclients = counter_state(args->counter); /* already added */
-	LG_log(sv_context, LG_DEBUG, "%s threads++ = %d", args->name, curclients);
 
 	TA_add(sock, args->name);
 
-	args->function(sock);
+	args->function(args);
 
 	/* TA_delete must come first - otherwise the server would crash
 	 when trying to report address of a closed socket */
@@ -336,34 +328,34 @@ void *SV_do_child(void *varg) {
 	/* decrement the simultaneous connection counter */
 	if (args->limit > 0) {
 		gpointer orig_key, client_conn_num;
-		int i;
+		long i;
 
 		pthread_mutex_lock(args->conn_lock);
-		g_hash_table_lookup_extended(args->conn_ipnum, args->conn_ip, &orig_key, &client_conn_num);
-		i = (int)client_conn_num;
+		g_hash_table_lookup_extended(args->conn_ipnum, &args->act_conn_ip, &orig_key, &client_conn_num);
+		i = (long)client_conn_num;
 
 		if (i == 1) { /* remove the key from the hashtable & free memory */
-			g_hash_table_remove(args->conn_ipnum, args->conn_ip);
+			g_hash_table_remove(args->conn_ipnum, &args->act_conn_ip);
 			UT_free(orig_key);
 
 		} else { /* decrease the num_conn */
 
 			client_conn_num = (void*)(i-1);
-			g_hash_table_insert(args->conn_ipnum, args->conn_ip, client_conn_num);
+			g_hash_table_insert(args->conn_ipnum, &args->act_conn_ip, client_conn_num);
 		}
 		pthread_mutex_unlock(args->conn_lock);
 	}
 
-	/* update the global thread counter. */
-	curclients = counter_add(args->counter, -1);
-	LG_log(sv_context, LG_DEBUG, "%s threads-- = %d", args->name, curclients);
+	/* update the global thread counter - this wouldn't work on a copy, but 'counter' is a pointer and we made a shallow copy earlier */
+	counter_add(args->counter, -1);
 
 	UT_free(args);
 
 	return NULL; /* exit the thread */
-} /* SV_do_child */
+}
 
-/* main_loop() */
+
+
 /*++++++++++++++++++++++++++++++++++++++
 
  Waits for an incoming connection on the and spawns a new thread to
@@ -375,14 +367,6 @@ void *SV_do_child(void *varg) {
 
  void *arg      pointer to the service description structure.
 
- More:
- +html+ <PRE>
- Author:
- ottrey
- joao
- andrei (do_server)
- marek (rewritten/simplified/added limits)
- +html+ </PRE>
  ++++++++++++++++++++++++++++++++++++++*/
 static void *main_loop(void *arg) {
 	svr_args *args = (svr_args *) arg;
@@ -431,13 +415,13 @@ static void *main_loop(void *arg) {
 		if (args->limit > 0) {
 			gpointer orig_key, client_conn_num;
 
-			SK_getpeerip(args->conn_sock, clientip);
+			SK_getpeerip(args->conn_sock, clientip, NULL);
 			AC_check_acl(clientip, NULL, &clientacl);
 			pthread_mutex_lock(args->conn_lock);
 
 			if (g_hash_table_lookup_extended(args->conn_ipnum, clientip, &orig_key, &client_conn_num)) {
-				int i = (int)client_conn_num;
-				args->conn_ip = orig_key;
+				long i = (long)client_conn_num;
+				args->act_conn_ip = *((ip_addr_t *)orig_key);
 				if (i >= clientacl.maxconn) {
 					/* close the connection without further warning */
 					//char buf[IP_ADDRSTR_MAX];
@@ -445,24 +429,25 @@ static void *main_loop(void *arg) {
 					//IP_addr_b2a(clientip, buf, sizeof(buf));
 
 					SK_close(args->conn_sock);
-					/* FIXME: this should go to the log as well, but now I wanted to make it DOS-resistant,
+					/* WARNING: this should go to the log as well, but now I wanted to make it as DOS-resistant as possible,
 					 * so it's important to handle as many refused connections/sec as possible */
 					//fprintf(stderr, "Refused connection from %s (reason: too many simultaneous connections)\n", buf);
 					continue;
 				}
 				client_conn_num = (void *)(i + 1);
 			} else {
-				args->conn_ip = clientip;
+				args->act_conn_ip = *clientip;
 				clientip = UT_malloc(sizeof(ip_addr_t)); /* always keep an instance allocated */
 				client_conn_num = (void *)1;
 			}
 
-			g_hash_table_insert(args->conn_ipnum, args->conn_ip, client_conn_num);
+			g_hash_table_insert(args->conn_ipnum, &args->act_conn_ip, client_conn_num);
 			pthread_mutex_unlock(args->conn_lock);
 		}
 
-		LG_log(sv_context, LG_DEBUG, "%s: starting a new child thread", loopname);
+//		LG_log(sv_context, LG_DEBUG, "%s: starting a new child thread", loopname);
 		TA_increment();
+
 		/* incrementing argset->counter here - to avoid race condition and
 		 ensure a _more_correct_ value of current clients also for unlimited
 		 or infrequent connections. Does not really matter otherwise.
@@ -474,8 +459,6 @@ static void *main_loop(void *arg) {
 		 the number would be an underestimation instead. I prefer over-e.
 		 */
 		counter_add(args->counter, 1);
-
-		/* Start a new thread. will decrement counter when exiting */
 
 		/* now. There's a race condition - argset must be copied in SV_do_child
 		 and can be reused here only afterwards. To avoid it, we make a copy
@@ -512,7 +495,7 @@ static void *main_loop(void *arg) {
  marek
  +html+ </PRE>
  ++++++++++++++++++++++++++++++++++++++*/
-static void SV_concurrent_server(int sock, int limit, char *name, void do_function(int)) {
+static void SV_concurrent_server(int sock, int limit, char *name, void do_function(svr_args *)) {
 	svr_args *args;
 
 	args = (svr_args *) UT_calloc(1, sizeof(svr_args));
