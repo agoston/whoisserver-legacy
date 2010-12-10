@@ -833,12 +833,12 @@ void SV_switchdynamic() {
 				source_name, ca_get_srcupdateport(source_hdl));
 				LG_log(sv_context, LG_INFO, "Source [%s] Mode UPDATE [port=%d]", source_name,
 				        ca_get_srcupdateport(source_hdl));
-				TH_create((void *(*)(void *))UD_do_updates, (void *)source);
+				TH_create(UD_do_updates, (void *)source);
 			} else if (IS_NRTM_CLNT(update_mode)) {
 				/* start NRTM client */
 				fprintf(stderr,"Source [%s] Mode NRTM\n", source_name);
 				LG_log(sv_context, LG_INFO, "Source [%s] Mode NRTM", source_name);
-				TH_create((void *(*)(void *))UD_do_nrtm, (void *)source);
+				TH_create(UD_do_nrtm, (void *)source);
 			} else {
 				/* notify STATIC sources */
 				fprintf(stderr,"Source [%s] Mode already STATIC\n", source_name);

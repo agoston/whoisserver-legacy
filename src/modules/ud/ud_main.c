@@ -164,8 +164,8 @@ int get_NRTM_fd(struct _nrtm *nrtm, int upto_last, char *source) {
  *                                                           *
  ************************************************************/
 
-void UD_do_nrtm(void *arg) {
-	int source = (int)arg;
+void *UD_do_nrtm(void *arg) {
+	long source = (long)arg;
 	UD_stream_t ud_stream;
 	struct _nrtm *nrtm;
 	int nrtm_delay;
@@ -361,7 +361,8 @@ void UD_do_nrtm(void *arg) {
 	LG_log(src_ctx, LG_DEBUG, "%s NRTM client stopped", UD_TAG);
 
 	LG_ctx_free(src_ctx);
-} /* UD_do_nrtm() */
+	return NULL;
+}
 
 /************************************************************
  *  void UD_do_updates()                                     *
@@ -374,41 +375,20 @@ void UD_do_nrtm(void *arg) {
  *                                                           *
  ************************************************************/
 
-void UD_do_updates(void *arg) {
-	int source = (int)arg;
+void *UD_do_updates(void *arg) {
+	long source = (long)arg;
 	int listening_socket = SV_update_sock[source];
 	int connected_socket;
 	UD_stream_t ud_stream;
 	int do_update=1;
 	int num_ok;
 	ca_dbSource_t *source_hdl = ca_get_SourceHandleByPosition(source);
-	ip_addr_t address;
 	char *source_name;
 	LG_context_t *src_ctx;
 	struct pollfd pfd[2];
 
 	source_name = ca_get_srcname(source_hdl);
 
-#if 0
-	{ /* set up the lohgging path */
-		/* get source we are going to update */
-		int res;
-		char *er_ud_def = ca_get_er_ud_def; /* something like 'RIPUPDLOG basename' */
-		GString *er_def;
-		char *erret = NULL;
-
-		er_def = g_string_sized_new(256);
-		g_string_sprintf(er_def, "%s %s", er_ud_def, source_name);
-		if( (res = ER_macro_spec(er_def->str, &erret)) != 0 ) {
-			fputs(erret, stderr);
-			die;
-			/* or some other error handling */
-		}
-		UT_free(erret); /* the response is allocated and must be freed */
-		g_string_free(er_def, TRUE);
-		UT_free(er_ud_def);
-	}
-#endif /* 0 */
 	{ /* set up the logging path */
 		char *er_ud_def;
 		GString *er_def;
@@ -459,7 +439,6 @@ void UD_do_updates(void *arg) {
 		die;
 	}
 
-	ud_stream.condat.rd_timeout.tv_sec=STREAM_TIMEOUT;
 	ud_stream.num_skip=0;
 	ud_stream.load_pass=0;
 	ud_stream.nrtm=NULL;
@@ -494,36 +473,18 @@ void UD_do_updates(void *arg) {
 			continue;
 
 		/* check if the client is authorised to update */
-		SK_getpeerip(connected_socket, &address);
-		if (!AA_can_ripupdate(&address, source_name)) {
-			char *hostaddress;
-			sk_conn_st condat;
-			char buff[STR_L];
-
-			memset( &condat, 0, sizeof(sk_conn_st));
-			condat.wr_timeout.tv_sec=STREAM_TIMEOUT;
-			condat.sock = connected_socket;
-			SK_getpeerip(connected_socket, &(condat.rIP));
-			memcpy( &(condat.eIP), &(condat.rIP), sizeof(ip_addr_t));
-			hostaddress = SK_getpeername(connected_socket);
-			condat.ip = hostaddress;
-
-			LG_log(src_ctx, LG_INFO, "[%s] --  Not authorized to update the source %s", hostaddress, source_name);
-			sprintf(buff, "\n%%ERROR:406: not authorized to update the database\n\n\n");
-			SK_cd_puts(&condat, buff);
-			SK_cd_close(&(condat));
-
-			UT_free(hostaddress);
-			/* start the next loop */
+		SK_cd_make(&ud_stream.condat, connected_socket, STREAM_TIMEOUT);
+		if (!AA_can_ripupdate(&ud_stream.condat.rIP, source_name)) {
+			LG_log(src_ctx, LG_INFO, "[%s] --  Not authorized to update the source %s", ud_stream.condat.rIPs, source_name);
+			SK_cd_printf(&ud_stream.condat, "\n%%ERROR:406: not authorized to update the database\n\n\n");
+			SK_cd_close(&ud_stream.condat);
+			SK_cd_free(&ud_stream.condat);
 			continue;
 		}
 
 		/* make a record for thread accounting */
 		TA_delete(); /* Delete 'waiting' record */
 		TA_add(connected_socket, "update");
-
-		ud_stream.condat.sock = connected_socket;
-		ud_stream.condat.rtc = 0;
 
 		LG_log(src_ctx, LG_DEBUG, "%s Connection accepted...", UD_TAG);
 
@@ -555,7 +516,8 @@ void UD_do_updates(void *arg) {
 			LG_log(src_ctx, LG_DEBUG, "%s processing object finished", UD_TAG);
 
 			/* close the socket of the NRTM stream */
-			close(ud_stream.condat.sock);
+            SK_cd_close(&ud_stream.condat);
+            SK_cd_free(&ud_stream.condat);
 
 		} /* if do_update*/
 
@@ -571,5 +533,6 @@ void UD_do_updates(void *arg) {
 	LG_ctx_free(src_ctx);
 
 	LG_log(ud_context, LG_INFO, "%s update server stopped", UD_TAG);
-} /* UD_do_update() */
+	return NULL;
+}
 
