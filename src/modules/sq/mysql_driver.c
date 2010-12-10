@@ -85,33 +85,31 @@ Notes:
   so the MySQL documentation should be checked for current meaning.
 */
 
-int
-SQ_try_connection (SQ_connection_t **conn, const char *host,
-                   unsigned int port, const char *db,
-                   const char *user, const char *password)
-{
+int SQ_try_connection(SQ_connection_t **conn, const char *host, unsigned int port, const char *db, const char *user, const char *password) {
     SQ_connection_t *res;
 
+#ifdef DEBUG_SQL
+    fprintf(stderr, "SQL: SQ_get_connection(%s, %d, %s, %s, %s) = ", host, port, db, user, password);
+#endif
+
     *conn = mysql_init(NULL);
-    dieif(*conn == NULL);  /* XXX SK - need to call "out of memory handler" */
+    dieif(*conn == NULL); /* XXX SK - need to call "out of memory handler" */
 
     if (mysql_options(*conn, MYSQL_READ_DEFAULT_GROUP, "client")) {
         fprintf(stderr, "mysql_options failed: unknown option MYSQL_READ_DEFAULT_GROUP: %s\n", mysql_error(*conn));
         die;
     }
 
-    /* This is commented out for now, as it changes behavior, but would probably be useful at some point
-     * agoston, 2008-10-16 */
-//    my_bool my_true = 1;
-//    if (mysql_options(*conn, MYSQL_OPT_RECONNECT, &my_true)) {
-//        fprintf(stderr, "mysql_options failed: unknown option MYSQL_OPT_RECONNECT: %s\n", mysql_error(*conn));
-//        die;
-//    }
-
     res = mysql_real_connect(*conn, host, user, password, db, port, NULL, 0);
     if (res == NULL) {
+#ifdef DEBUG_SQL
+            fprintf(stderr, "%s\n", mysql_error(*conn));
+#endif
         return SQ_CTCONN;
     } else {
+#ifdef DEBUG_SQL
+            fprintf(stderr, "%ld\n", mysql_thread_id(*conn));
+#endif
         return SQ_OK;
     }
 }
@@ -189,12 +187,10 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
                 SQ_close_connection(sql_connection);
             }
         }
-    }/* for(;;) */
-} /* SQ_get_connection() */
+    }
+}
 
-/* SQ_execute_query() */
-/*++++++++++++++++++++++++++++++++++++++
-  Execute the sql query.
+/*Execute the sql query.
 
   SQ_connection_t *sql_connection Connection to database.
 
@@ -206,45 +202,33 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
   Returns:
     0 if the query was successful.
     Non-zero if an error occured.
-
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey, andrei, marek
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+     <LI><A HREF="http://www.tcx.se/Manual/manual.html#mysql_query">mysql_query()</A>
-  +html+     <LI><A HREF="http://www.tcx.se/Manual/manual.html#mysql_use_result">mysql_use_result()</A>
-  +html+ </UL></DL>
-
-  ++++++++++++++++++++++++++++++++++++++*/
-int SQ_execute_query(SQ_connection_t *sql_connection, const char *query,
-    SQ_result_set_t **result_ptr)
-{
+*/
+int SQ_execute_query(SQ_connection_t *sql_connection, const char *query, SQ_result_set_t **result_ptr) {
     int err;
     SQ_result_set_t *result;
+
+#ifdef DEBUG_SQL
+    fprintf(stderr, "SQL: SQ_execute_query('%s')\n", query);
+#endif
 
     err = mysql_query(sql_connection, query);
 
     /* log the time and result of the query */
-    if (err == 0)
-    {
+    if (err == 0) {
         result = mysql_store_result(sql_connection);
 
-        if (result_ptr)
+        if (result_ptr) {
             *result_ptr = result;
-        else if (result) mysql_free_result(result);
-        return (0);
+        } else if (result) {
+            mysql_free_result(result);
+        }
+        return 0;
+    } else {
+        return -1;
     }
-    else
-        return (-1);
-
-} /* SQ_execute_query() */
+}
 
 /*
-Description:
-
     Performs identially to SQ_execute_query(), except that it does not read the
     entire query into memory.
 
@@ -257,46 +241,32 @@ Notes:
     2. there is no chance that a user can accidentally or maliciously
        prevent the result set from being read in a expedicious manner
 */
+int SQ_execute_query_nostore(SQ_connection_t *sql_connection, const char *query, SQ_result_set_t **result_ptr) {
+    int err;
+    SQ_result_set_t *result;
 
-int
-SQ_execute_query_nostore(SQ_connection_t *sql_connection,
-                         const char *query, SQ_result_set_t **result_ptr)
-{
-  int err;
-  SQ_result_set_t *result;
+#ifdef DEBUG_SQL
+    fprintf(stderr, "SQL: SQ_execute_query_nostore('%s')", query);
+#endif
 
-  err = mysql_query(sql_connection, query);
-  if (err != 0) {
-      return -1;
-  }
-  result = mysql_use_result(sql_connection);
-  if (result == NULL) {
-      return -1;
-  }
-  *result_ptr = result;
-  return 0;
-} /* SQ_execute_query_nostore() */
+    err = mysql_query(sql_connection, query);
+    if (err != 0) {
+        return -1;
+    }
+    result = mysql_use_result(sql_connection);
+    if (result == NULL) {
+        return -1;
+    }
+    *result_ptr = result;
+    return 0;
+}
 
-/* SQ_get_column_count() */
-/*++++++++++++++++++++++++++++++++++++++
-  Get the column count.
+/*Get the column count.
 
-  SQ_result_set_t *result The results from the query.
-
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+     <LI><A HREF="http://www.tcx.se/Manual/manual.html#mysql_num_fields">mysql_num_fields()</A>
-  +html+ </UL></DL>
-
-  ++++++++++++++++++++++++++++++++++++++*/
+  SQ_result_set_t *result The results from the query. */
 int SQ_get_column_count(SQ_result_set_t *result) {
 	return mysql_num_fields(result);
-} /* SQ_get_column_count() */
+}
 
 /* SQ_get_table_size() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -333,25 +303,19 @@ int SQ_get_table_size(SQ_connection_t *sql_connection,
   SQ_free_result(result);
 
   return count;
-} /* SQ_get_table_size() */
+}
 
-/* SQ_get_affected_rows() */
-/*++++++++++++++++++++++++++++++++++++++
-  Get the row count of a table
 
-  char *table   The table to be examined
+/*Get the row count of a table
 
-  More:
-  +html+ <PRE>
-  Authors:
-        marek
-  +html+ </PRE>
-
-  ++++++++++++++++++++++++++++++++++++++*/
-int SQ_get_affected_rows(SQ_connection_t *sql_connection)
-{
-  return (int)mysql_affected_rows(sql_connection);
-}/* SQ_get_affected_rows() */
+  char *table   The table to be examined */
+int SQ_get_affected_rows(SQ_connection_t *sql_connection) {
+    int ret = mysql_affected_rows(sql_connection);
+#ifdef DEBUG_SQL
+    fprintf(stderr, "SQL: SQ_get_affected_rows() = %d\n", ret);
+#endif
+  return ret;
+}
 
 /* SQ_get_insert_id() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -365,9 +329,12 @@ int SQ_get_affected_rows(SQ_connection_t *sql_connection)
   +html+ </PRE>
 
   ++++++++++++++++++++++++++++++++++++++*/
-long SQ_get_insert_id(SQ_connection_t *sql_connection)
-{
-  return (long)mysql_insert_id(sql_connection);
+long SQ_get_insert_id(SQ_connection_t *sql_connection) {
+    long res = (long)mysql_insert_id(sql_connection);
+#ifdef DEBUG_SQL
+    fprintf(stderr, "SQL: SQ_get_insert_id() = %ld\n", res);
+#endif
+  return res;
 }/* SQ_get_insert_id() */
 
 /* SQ_get_column_label() */
@@ -391,20 +358,11 @@ long SQ_get_insert_id(SQ_connection_t *sql_connection)
   ++++++++++++++++++++++++++++++++++++++*/
 char *SQ_get_column_label(SQ_result_set_t *result, unsigned int column) {
   char *str;
-/* MySQL decided to change their interface.  Doh! */
-#ifdef OLDMYSQL
-  MYSQL_FIELD field;
-
-  field = mysql_fetch_field_direct(result, column);
-
-  str = UT_strdup(field.name);
-#else
   MYSQL_FIELD *field;
 
   field = mysql_fetch_field_direct(result, column);
 
   str = UT_strdup(field->name);
-#endif
 
 /*
   printf("column=%d\n", column);
@@ -444,47 +402,30 @@ char *SQ_get_column_label(SQ_result_set_t *result, unsigned int column) {
 
   ++++++++++++++++++++++++++++++++++++++*/
 unsigned int SQ_get_column_max_length(SQ_result_set_t *result, unsigned int column) {
-/* MySQL decided to change their interface.  Doh! */
-#ifdef OLDMYSQL
-  MYSQL_FIELD field;
-
-  field = mysql_fetch_field_direct(result, column);
-
-  return field.length;
-#else
   MYSQL_FIELD *field;
 
   field = mysql_fetch_field_direct(result, column);
 
   return field->length;
-#endif
-
 } /* SQ_get_column_max_length() */
 
-/* SQ_row_next() */
-/*++++++++++++++++++++++++++++++++++++++
-  Get the next row.
+/*Get the next row.
 
   SQ_result_set_t *result The results from the query.
 
   unsigned int column The column index.
-
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+     <LI><A HREF="http://www.tcx.se/Manual/manual.html#mysql_fetch_row">mysql_fetch_row()</A>
-  +html+ </UL></DL>
-
-  ++++++++++++++++++++++++++++++++++++++*/
+*/
 SQ_row_t *SQ_row_next(SQ_result_set_t *result) {
-
-  return (SQ_row_t *)mysql_fetch_row(result);
-
-} /* SQ_row_next() */
+    SQ_row_t *row = (SQ_row_t *)mysql_fetch_row(result);
+#ifdef DEBUG_SQL
+    if (row) {
+        gchar *temp = SQ_row_to_string(result, row);
+        fprintf(stderr, "SQL: SQ_row_next() = %s\n", temp);
+        g_free(temp);
+    }
+#endif
+  return row;
+}
 
 /* SQ_get_column_string() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -667,97 +608,104 @@ int SQ_get_column_llint(SQ_result_set_t *result, SQ_row_t *current_row, unsigned
 	}
 }
 
+/* Pretty formats a row of a resultset. Doesn't alter input.
+ * row should not be NULL.
+ * Caller is responsible to call g_free() on return value.
+ */
+gchar *SQ_row_to_string(SQ_result_set_t *result, SQ_row_t *row) {
+    int no_cols = mysql_num_fields(result);
+    int i, length;
+    GString *ret = g_string_sized_new(STR_M);
 
-/* SQ_result_to_string() */
-/*++++++++++++++++++++++++++++++++++++++
-  Convert the result set to a string.
+    for (i = 0; i < no_cols; i++) {
+        length = SQ_get_column_max_length(result, i);
+        if (row[i]) {
+            g_string_append_printf(ret, "| %-*s", length, (char *)(row[i]));
+        } else {
+            g_string_append_printf(ret, "| %-*s", length, "NULL");
+        }
+    }
+    g_string_append_printf(ret, "|");
+
+    return g_string_free(ret, FALSE);
+}
+
+/*Convert the result set to a string.
 
   SQ_result_set_t *result The results.
 
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+ </UL></DL>
-
-  ++++++++++++++++++++++++++++++++++++++*/
+  Caller is responsible for free()ing return value.*/
 char *SQ_result_to_string(SQ_result_set_t *result) {
-  MYSQL_ROW row;
-  unsigned int no_cols;
-  unsigned int i, j;
-  char str_buffer[STR_XXL];
-  char str_buffer_tmp[STR_L];
-  char border[STR_L];
+    MYSQL_ROW row;
+    unsigned int no_cols;
+    unsigned int i, j;
+    char str_buffer[STR_XXL];
+    char str_buffer_tmp[STR_L];
+    char border[STR_L];
 
-  char *label;
+    char *label;
 
-  unsigned int length[STR_S];
+    unsigned int length[STR_S];
 
-  strcpy(str_buffer, "");
+    strcpy(str_buffer, "");
 
-  no_cols = mysql_num_fields(result);
+    no_cols = mysql_num_fields(result);
 
-  /* Determine the maximum column widths */
-  /* XXX Surely MySQL should keep note of this for me! */
-  strcpy(border, "");
-  for (i=0; i < no_cols; i++) {
-    length[i] = SQ_get_column_max_length(result, i);
-    /* Make sure the lenghts don't get too long */
-    if (length[i] > STR_M) {
-      length[i] = STR_M;
+    /* Determine the maximum column widths */
+    /* XXX Surely MySQL should keep note of this for me! */
+    strcpy(border, "");
+    for (i = 0; i < no_cols; i++) {
+        length[i] = SQ_get_column_max_length(result, i);
+        /* Make sure the lenghts don't get too long */
+        if (length[i] > STR_M) {
+            length[i] = STR_M;
+        }
+        strcat(border, "*");
+        for (j = 0; (j <= length[i]) && (j < STR_L); j++) {
+            strcat(border, "-");
+        }
     }
-    strcat(border, "*");
-    for (j=0; (j <= length[i]) && (j < STR_L); j++) {
-      strcat(border, "-");
-    }
-  }
-  strcat(border, "*\n");
-  /*
-  for (i=0; i < no_cols; i++) {
-    printf("length[%d]=%d\n", i, length[i]);
-  }
-  */
+    strcat(border, "*\n");
+    /*
+     for (i=0; i < no_cols; i++) {
+     printf("length[%d]=%d\n", i, length[i]);
+     }
+     */
 
-  strcat(str_buffer, border);
+    strcat(str_buffer, border);
 
-  for (i=0; i < no_cols; i++) {
-    label = SQ_get_column_label(result, i);
-    if (label != NULL) {
-      sprintf(str_buffer_tmp, "| %-*s", length[i], label);
-      strcat(str_buffer, str_buffer_tmp);
-    }
-  }
-  strcat(str_buffer, "|\n");
-
-  strcat(str_buffer, border);
-
-
-  while ((row = mysql_fetch_row(result)) != NULL) {
-    for (i=0; i < no_cols; i++) {
-      if (row[i] != NULL) {
-        sprintf(str_buffer_tmp, "| %-*s", length[i], row[i]);
-      }
-      else {
-        sprintf(str_buffer_tmp, "| %-*s", length[i], "NuLL");
-      }
-      strcat(str_buffer, str_buffer_tmp);
+    for (i = 0; i < no_cols; i++) {
+        label = SQ_get_column_label(result, i);
+        if (label != NULL) {
+            sprintf(str_buffer_tmp, "| %-*s", length[i], label);
+            strcat(str_buffer, str_buffer_tmp);
+        }
     }
     strcat(str_buffer, "|\n");
 
-    if (strlen(str_buffer) >= (STR_XXL - STR_XL) ) {
-      strcat(str_buffer, "And some more stuff...\n");
-      break;
+    strcat(str_buffer, border);
+
+    while ((row = mysql_fetch_row(result)) != NULL) {
+        for (i = 0; i < no_cols; i++) {
+            if (row[i] != NULL) {
+                sprintf(str_buffer_tmp, "| %-*s", length[i], row[i]);
+            } else {
+                sprintf(str_buffer_tmp, "| %-*s", length[i], "NULL");
+            }
+            strcat(str_buffer, str_buffer_tmp);
+        }
+        strcat(str_buffer, "|\n");
+
+        if (strlen(str_buffer) >= (STR_XXL - STR_XL)) {
+            strcat(str_buffer, "And some more stuff...\n");
+            break;
+        }
     }
-  }
 
-  strcat(str_buffer, border);
+    strcat(str_buffer, border);
 
-  return UT_strdup(str_buffer);
-
-} /* SQ_result_to_string() */
+    return UT_strdup(str_buffer);
+}
 
 /* SQ_free_result() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -799,6 +747,9 @@ void SQ_free_result(SQ_result_set_t *result) {
 
   ++++++++++++++++++++++++++++++++++++++*/
 void SQ_close_connection(SQ_connection_t *sql_connection) {
+#ifdef DEBUG_SQL
+    fprintf(stderr, "SQL: SQ_close_connection(%ld)\n", mysql_thread_id(sql_connection));
+#endif
 	mysql_close(sql_connection);
 }
 
@@ -910,49 +861,25 @@ char *SQ_info_to_string(SQ_connection_t *sql_connection) {
 
 } /* SQ_info_to_string() */
 
-/* SQ_error() */
-/*++++++++++++++++++++++++++++++++++++++
-  Get the error string for the last error.
+/*Get the error string for the last error.
 
-  SQ_connection_t *sql_connection The connection to the database.
-
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+     <LI><A HREF="http://www.tcx.se/Manual/manual.html#mysql_error">mysql_error()</A>
-  +html+ </UL></DL>
-
-  ++++++++++++++++++++++++++++++++++++++*/
+  SQ_connection_t *sql_connection The connection to the database. */
 char *SQ_error(SQ_connection_t *sql_connection) {
-	return (char*)mysql_error(sql_connection);
-} /* SQ_error() */
+    char *ret = (char *)mysql_error(sql_connection);
+#ifdef DEBUG_SQL
+    fprintf(stderr, "SQL: SQ_error() = %s\n", ret);
+#endif
+	return ret;
+}
 
-/* SQ_errno() */
-/*++++++++++++++++++++++++++++++++++++++
-  Get the error number for the last error.
-
-  SQ_connection_t *sql_connection The connection to the database.
-
-  More:
-  +html+ <PRE>
-  Authors:
-        ottrey
-  +html+ </PRE><DL COMPACT>
-  +html+ <DT>Online References:
-  +html+ <DD><UL>
-  +html+     <LI><A HREF="http://www.tcx.se/Manual/manual.html#mysql_free_result">mysql_free_result()</A>
-  +html+ </UL></DL>
-
-  ++++++++++++++++++++++++++++++++++++++*/
+/* Get the error number for the last SQL statement. */
 int SQ_errno(SQ_connection_t *sql_connection) {
-
-  return mysql_errno(sql_connection);
-
-} /* SQ_errno() */
+    int ret = mysql_errno(sql_connection);
+#ifdef DEBUG_SQL
+    fprintf(stderr, "SQL: SQ_errno() = %d\n", ret);
+#endif
+    return ret;
+}
 
 /************************************************************
  * get_minmax_id()                                           *
@@ -1088,20 +1015,15 @@ SQ_duplicate_connection(SQ_connection_t *orig)
 
    by marek
 */
-int
-SQ_abort_query(SQ_connection_t *sql_connection)
-{
-  SQ_connection_t *contemp = SQ_duplicate_connection(sql_connection);
-  int res = mysql_kill(contemp, sql_connection->thread_id);
+int SQ_abort_query(SQ_connection_t *sql_connection) {
+    SQ_connection_t *contemp = SQ_duplicate_connection(sql_connection);
+    int res = mysql_kill(contemp, sql_connection->thread_id);
 
-  LG_log(sq_context, LG_DEBUG,
-	    "connection %d aborted by tmp thread %d",
-	    sql_connection->thread_id,
-	    contemp->thread_id);
+    LG_log(sq_context, LG_DEBUG, "connection %d aborted by tmp thread %d", sql_connection->thread_id, contemp->thread_id);
 
-  SQ_close_connection(contemp);
+    SQ_close_connection(contemp);
 
-  return res;
+    return res;
 }
 
 /* SQ_ping() */

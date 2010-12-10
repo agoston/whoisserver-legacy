@@ -44,6 +44,11 @@
 #define SQ_CTCONN   1
 #define SQ_NORES    2
 
+/* Error codes for SQ_errno() - currently maps to MySQL error codes */
+// Message: Duplicate entry '%s' for key %d
+#define SQ_ERR_DUPLICATE_ENTRY 1062
+
+
 #define SQ_connection_t MYSQL
 #define SQ_result_set_t MYSQL_RES
 
@@ -75,6 +80,7 @@ char *SQ_get_column_strings(SQ_result_set_t *result, unsigned int column);
 int SQ_get_column_int(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long  *resultptr);
 int SQ_get_column_unsigned(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, unsigned *resultptr);
 int SQ_get_column_llint(SQ_result_set_t *result, SQ_row_t *current_row, unsigned int column, long long int *resultptr);
+gchar *SQ_row_to_string(SQ_result_set_t *result, SQ_row_t *row);
 char *SQ_result_to_string(SQ_result_set_t *result);
 void SQ_free_result(SQ_result_set_t *result);
 void SQ_close_connection(SQ_connection_t *sql_connection);

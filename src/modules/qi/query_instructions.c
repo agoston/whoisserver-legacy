@@ -2433,14 +2433,13 @@ int QI_execute(ca_dbSource_t *dbhdl,
 
 #ifdef DEBUG_QUERY
 	  {
-	      fprintf(stderr, "After mnt_irt_filter:\n");
+	      fprintf(stderr, "After mnt_irt_filter, before insert_radix_serials:\n");
           GList *pp = datlist;
           for (; pp; pp = pp->next) {
               fprintf(stderr, "%s", (char *)(((rx_datcpy_t *)(pp->data))->leafcpy.data_ptr));
           }
 	  }
 #endif
-
 
           /* add radix results to the table and destroy the datlist */
           sql_error = insert_radix_serials( &(qe->condat),

@@ -738,6 +738,11 @@ int SV_start(char *pidfile) {
 	/* terminate the thread */
 	/* XXX not return becase then we terminate the whole process */
 
+#ifdef DEBUG_QUERY
+    /* warn about DEBUG_QUERY */
+    fprintf(stderr, "Compiled with DEBUG_QUERY, query debug messages follow\n");
+#endif
+
 	/* Loop until the server goes down */
 	ufds.fd = SV_shutdown_recv_fd;
 	ufds.events = POLLIN | POLLPRI;
