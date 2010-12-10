@@ -192,7 +192,7 @@ static void ta_printone_l(ta_str_t *tas, char *buf, unsigned length, ut_timer_t 
     ip_addr_t localaddr;
     char address[IP_ADDRSTR_MAX];
     float session, task; /* duration of the session/task */
-    SK_getpeerip(tas->sock, &localaddr, &address);
+    SK_getpeerip(tas->sock, &localaddr, address);
 
     /* can be NULL for example if the socket has just closed
      or the file descriptor is not a socket */

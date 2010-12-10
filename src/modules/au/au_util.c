@@ -383,7 +383,7 @@ au_check_multiple_authentications (char *attr_to_check[],
 
 
 AU_ret_t
-au_rir_auth_check(au_plugin_callback_info_t *info, rpsl_object_t *obj, GList *rir_mntner_list)
+au_rir_auth_check(au_plugin_callback_info_t *info, const rpsl_object_t *obj, GList *rir_mntner_list)
 {
   AU_ret_t ret_val;
   gchar *value;

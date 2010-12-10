@@ -64,7 +64,7 @@ void SK_cd_make(sk_conn_st *condat, int sock, unsigned timeout) {
     memset(condat, 0, sizeof(sk_conn_st));
 
     condat->sock = sock;
-    SK_getpeerip(sock, &(condat->rIP), &(condat->rIPs));
+    SK_getpeerip(sock, &(condat->rIP), condat->rIPs);
     condat->rd_timeout.tv_sec = timeout;
     condat->wr_timeout.tv_sec = timeout;
     condat->rd_buf_len = 0;

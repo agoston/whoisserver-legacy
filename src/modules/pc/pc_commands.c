@@ -306,8 +306,7 @@ int show_threads(char *input, GString *output, sk_conn_st *condat)
   ++++++++++++++++++++++++++++++++++++++*/
 int show_whois(char *input, GString *output, sk_conn_st *condat) 
 {
-  /*  Go to whois mode */
-  PW_interact(condat->sock);
+  /*  deprecated */
   return 0;
 } /* show_whois() */
 

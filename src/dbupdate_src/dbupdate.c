@@ -584,7 +584,6 @@ void check_keywords(RT_context_t *rt_ctx, LG_context_t *lg_ctx, options_struct_t
     int found;
     char *keyword_str = NULL;
     char *ptrlc = NULL;
-    char *ptruc = NULL;
     char **keywords_list = NULL;
     int keywords_found[NUMBER_OF_KEYWORDS];
     GString *invalid_keywords;

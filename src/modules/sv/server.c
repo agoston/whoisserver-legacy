@@ -119,22 +119,6 @@ int counter_add(svr_counter_t *cst, int incval) {
 }
 
 /*++++++++++++++++++++++++++++++++++++++
-
- int
- counter_state         returns the current value of a counter
-
- svr_counter_t *cst    counter
-
- Author:
- marek
-
- ++++++++++++++++++++++++++++++++++++++*/
-static
-int counter_state(svr_counter_t *cst) {
-	return counter_add(cst, 0);
-}
-
-/*++++++++++++++++++++++++++++++++++++++
  waits until the counter is in the range [0-limit].
  unless the limit is 0, in which case the check is disabled.
 
@@ -778,7 +762,7 @@ int SV_start(char *pidfile) {
 void SV_switchdynamic() {
 	int dynamic_status = CO_get_dynamic();
 	static int already_set = 0;
-	int source;
+	long source;
 	ca_dbSource_t *source_hdl;
 	char *source_name;
 	int update_mode = 0;
