@@ -56,7 +56,8 @@ typedef struct {
 typedef struct svr_args {
     void (*function)(struct svr_args *);
     int conn_sock;
-    ip_addr_t act_conn_ip; /* ip of the actual client */
+    ip_addr_t *act_conn_ip;  /* ip of the actual client */
+    long act_conn_num;       /* the number of sim. connections from this IP at the time of starting handler thread */
     int accept_sock;
     int limit; /* limit for the number of concurrent connections */
     svr_counter_t *counter; /* number of active clients */

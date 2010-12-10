@@ -580,7 +580,7 @@ void PW_interact(svr_args *args) {
 
         /* The hard limit of simultaneous connections is checked in server.c:main_loop() to avoid the overhead of creating threads
          * So here we are only checking for the soft limits (a.k.a. the ones which return an error message) */
-        if ((long)g_hash_table_lookup(args->conn_ipnum, &(qe->condat.rIP)) > acl_rip.threshold) {
+        if (args->act_conn_num > acl_rip.threshold) {
 
             /* threshold exceeded: show the message and prepare to drop connection */
             char *banner = ca_get_pw_banner;

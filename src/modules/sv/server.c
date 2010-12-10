@@ -315,17 +315,19 @@ void *SV_do_child(void *varg) {
 		long i;
 
 		pthread_mutex_lock(args->conn_lock);
-		g_hash_table_lookup_extended(args->conn_ipnum, &args->act_conn_ip, &orig_key, &client_conn_num);
+		if (!g_hash_table_lookup_extended(args->conn_ipnum, args->act_conn_ip, &orig_key, &client_conn_num)) {
+		    fprintf(stderr, "IP vanished from hash in server.c::SV_do_child()!\n");
+		}
 		i = (long)client_conn_num;
 
 		if (i == 1) { /* remove the key from the hashtable & free memory */
-			g_hash_table_remove(args->conn_ipnum, &args->act_conn_ip);
+			g_hash_table_remove(args->conn_ipnum, args->act_conn_ip);
 			UT_free(orig_key);
 
 		} else { /* decrease the num_conn */
 
 			client_conn_num = (void*)(i-1);
-			g_hash_table_insert(args->conn_ipnum, &args->act_conn_ip, client_conn_num);
+			g_hash_table_insert(args->conn_ipnum, args->act_conn_ip, client_conn_num);
 		}
 		pthread_mutex_unlock(args->conn_lock);
 	}
@@ -405,7 +407,7 @@ static void *main_loop(void *arg) {
 
 			if (g_hash_table_lookup_extended(args->conn_ipnum, clientip, &orig_key, &client_conn_num)) {
 				long i = (long)client_conn_num;
-				args->act_conn_ip = *((ip_addr_t *)orig_key);
+				args->act_conn_ip = (ip_addr_t *)orig_key;
 				if (i >= clientacl.maxconn) {
 					/* close the connection without further warning */
 					//char buf[IP_ADDRSTR_MAX];
@@ -420,13 +422,14 @@ static void *main_loop(void *arg) {
 				}
 				client_conn_num = (void *)(i + 1);
 			} else {
-				args->act_conn_ip = *clientip;
+				args->act_conn_ip = clientip;
 				clientip = UT_malloc(sizeof(ip_addr_t)); /* always keep an instance allocated */
 				client_conn_num = (void *)1;
 			}
 
-			g_hash_table_insert(args->conn_ipnum, &args->act_conn_ip, client_conn_num);
+			g_hash_table_insert(args->conn_ipnum, args->act_conn_ip, client_conn_num);
 			pthread_mutex_unlock(args->conn_lock);
+			args->act_conn_num = (long)client_conn_num;
 		}
 
 //		LG_log(sv_context, LG_DEBUG, "%s: starting a new child thread", loopname);
