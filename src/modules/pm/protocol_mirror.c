@@ -638,16 +638,13 @@ dummify_abort:
 Arguments:
     int sock		Socket that client is connected to
 */
-void PM_interact(int sock)
-{
+void PM_interact(svr_args *args) {
     char input[MAX_PM_INPUT_SIZE + 1];
     char buff[STR_L];
     ca_dbSource_t *source_hdl;
     int read_result;
     int parse_result;
-    ip_addr_t address;
 
-    char *hostaddress = NULL;
     sk_conn_st condat;
     nrtm_q_t nrtm_q;
     long current_serial;
@@ -663,35 +660,28 @@ void PM_interact(int sock)
     int persistent_connection;
 
     /* make a record for thread accounting */
-    TA_add(sock, "nrtm_srv");
+    TA_add(args->conn_sock, "nrtm_srv");
 
-    /* Get the IP of the client */
-    hostaddress = SK_getpeername(sock);
-
-    /* initialise the connection structure */
-    memset(&condat, 0, sizeof (sk_conn_st));
     /* initialise the nrtm structure */
     memset(&nrtm_q, 0, sizeof (nrtm_q_t));
-    /* set the connection data: both rIP and eIP to real IP */
-    condat.sock = sock;
-    condat.ip = hostaddress;
-    SK_getpeerip(sock, &(condat.rIP));
-    memcpy(&(condat.eIP), &(condat.rIP), sizeof (ip_addr_t));
+
+    /* init the connection structure, set timeout for reading the query */
+    SK_cd_make(&condat, args->conn_sock, 0);
 
     /* Read input */
-    read_result = SK_cd_gets(&(condat), input, MAX_PM_INPUT_SIZE);
+    read_result = SK_cd_gets(&condat, input, MAX_PM_INPUT_SIZE);
 
     parse_result = parse_request(input, &nrtm_q);
 
     if (parse_result < 0)
     {
-        LG_log(pm_context, LG_DEBUG, "[%s] -- Garbage received: %s", hostaddress, input);
+        LG_log(pm_context, LG_DEBUG, "[%s] -- Garbage received: %s", condat.rIPs, input);
         sprintf(buff, "\n%%ERROR:405: syntax error\n\n\n");
         SK_cd_puts(&condat, buff);
         goto error_return;
     }
 
-    LG_log(pm_context, LG_DEBUG, "[%s] -- input: [%s]", hostaddress, input);
+    LG_log(pm_context, LG_DEBUG, "[%s] -- input: [%s]", condat.rIPs, input);
 
     /* this is -q sources query  - answer and return */
     if (IS_Q_QUERY(parse_result))
@@ -714,7 +704,7 @@ void PM_interact(int sock)
     }
     else
     {
-        LG_log(pm_context, LG_DEBUG, "[%s] -- Syntax error: %s", hostaddress, input);
+        LG_log(pm_context, LG_DEBUG, "[%s] -- Syntax error: %s", condat.rIPs, input);
         sprintf(buff, "\n%%ERROR:405: syntax error\n\n\n");
         SK_cd_puts(&condat, buff);
         goto error_return;
@@ -722,24 +712,22 @@ void PM_interact(int sock)
 
     /* otherwise this is -g query */
 
-    LG_log(pm_context, LG_DEBUG, "[%s] -- input parsed: %s:%d:%ld-%ld", hostaddress, nrtm_q.source, nrtm_q.version,
-           nrtm_q.first, nrtm_q.last);
+    LG_log(pm_context, LG_DEBUG, "[%s] -- input parsed: %s:%d:%ld-%ld", condat.rIPs, nrtm_q.source, nrtm_q.version, nrtm_q.first, nrtm_q.last);
 
     /* check if source exists */
     source_hdl = ca_get_SourceHandleByName(nrtm_q.source);
     if (source_hdl == NULL)
     {
-        LG_log(pm_context, LG_DEBUG, "[%s] --  Unknown source %s", hostaddress, nrtm_q.source);
+        LG_log(pm_context, LG_DEBUG, "[%s] --  Unknown source %s", condat.rIPs, nrtm_q.source);
         sprintf(buff, "\n%%ERROR:403: unknown source %s\n\n\n", nrtm_q.source);
         SK_cd_puts(&condat, buff);
         goto error_return;
     }
 
     /* check if the client is authorized to mirror */
-    SK_getpeerip(sock, &address);
-    if (!(mirror_perm = AA_can_mirror(&address, nrtm_q.source)))
+    if (!(mirror_perm = AA_can_mirror(&(condat.rIP), nrtm_q.source)))
     {
-        LG_log(pm_context, LG_DEBUG, "[%s] --  Not authorized to mirror the source %s", hostaddress, nrtm_q.source);
+        LG_log(pm_context, LG_DEBUG, "[%s] --  Not authorized to mirror the source %s", condat.rIPs, nrtm_q.source);
         sprintf(buff, "\n%%ERROR:402: not authorized to mirror the database\n\n\n");
         SK_cd_puts(&condat, buff);
         goto error_return;
@@ -748,7 +736,7 @@ void PM_interact(int sock)
     /* Check if requested dummification of non-main database
      * See FIXME of variable placeholders for further details */
     if ((mirror_perm == AA_MIRROR_PUBLIC) && strcmp(main_source, nrtm_q.source)) {
-        LG_log(pm_context, LG_DEBUG, "[%s] --  Dummified mirroring of source %s is not supported (try source %s)", hostaddress, nrtm_q.source, main_source);
+        LG_log(pm_context, LG_DEBUG, "[%s] --  Dummified mirroring of source %s is not supported (try source %s)", condat.rIPs, nrtm_q.source, main_source);
         sprintf(buff, "\n%%ERROR:404: Dummified mirroring of source %s is not supported (try source %s)\n\n\n", nrtm_q.source, main_source);
         SK_cd_puts(&condat, buff);
         goto error_return;
@@ -757,7 +745,7 @@ void PM_interact(int sock)
     /* check if requested nrtm version is supported */
     if (nrtm_q.version < 1 || nrtm_q.version > 3)
     {
-        LG_log(pm_context, LG_DEBUG, "[%s] -- NRTM version mismatch: %s", hostaddress, input);
+        LG_log(pm_context, LG_DEBUG, "[%s] -- NRTM version mismatch: %s", condat.rIPs, input);
         sprintf(buff, "\n%%ERROR:406: NRTM version mismatch\n\n\n");
         SK_cd_puts(&condat, buff);
         goto error_return;
@@ -787,10 +775,8 @@ void PM_interact(int sock)
     if (persistent_connection)
         nrtm_q.last = current_serial;
 
-    if ((nrtm_q.first > nrtm_q.last) || (nrtm_q.first < oldest_serial) || (nrtm_q.last > current_serial) || (nrtm_q.first <= 0)
-        || (nrtm_q.last <= 0))
-    {
-        LG_log(pm_context, LG_DEBUG, "[%s] --  Invalid range: %ld-%ld [%ld-%ld]", hostaddress, nrtm_q.first,
+    if ((nrtm_q.first > nrtm_q.last) || (nrtm_q.first < oldest_serial) || (nrtm_q.last > current_serial) || (nrtm_q.first <= 0) || (nrtm_q.last <= 0)) {
+        LG_log(pm_context, LG_DEBUG, "[%s] --  Invalid range: %ld-%ld [%ld-%ld]", condat.rIPs, nrtm_q.first,
                nrtm_q.last, oldest_serial, current_serial);
         /* write error message back to the client */
         sprintf(buff, "\n%%ERROR:401: invalid range: Not within %ld-%ld\n\n\n", oldest_serial, current_serial);
@@ -813,8 +799,7 @@ void PM_interact(int sock)
         SK_cd_puts(&condat, "\n");
     }
 
-    sprintf(buff, "%%START Version: %d %s %ld-%ld%s\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last,
-            (mirror_perm < AA_MIRROR_FULL) ? " FILTERED" : "");
+    sprintf(buff, "%%START Version: %d %s %ld-%ld%s\n\n", nrtm_q.version, nrtm_q.source, nrtm_q.first, nrtm_q.last, (mirror_perm < AA_MIRROR_FULL) ? " FILTERED" : "");
     SK_cd_puts(&condat, buff);
 
     /* make a record for thread accounting */
@@ -967,8 +952,7 @@ void PM_interact(int sock)
     sprintf(buff, "%%END %s\n\n\n", nrtm_q.source);
     SK_cd_puts(&condat, buff);
 
-    LG_log(pm_context, LG_INFO, "[%s] -- <%s:%d:%ld-%ld (%ld)> ", hostaddress, nrtm_q.source, nrtm_q.version, nrtm_q.first, nrtm_q.last,
-           nrtm_q.last - nrtm_q.first + 1);
+    LG_log(pm_context, LG_INFO, "[%s] -- <%s:%d:%ld-%ld (%ld)> ", condat.rIPs, nrtm_q.source, nrtm_q.version, nrtm_q.first, nrtm_q.last, nrtm_q.last - nrtm_q.first + 1);
 
     /* make a record for thread accounting */
     TA_delete();
@@ -977,7 +961,6 @@ void PM_interact(int sock)
     SQ_close_connection(sql_connection);
 
 error_return:
-    /* Free the hostaddress */
-    UT_free(hostaddress);
+    SK_cd_free(&condat);
     UT_free(nrtm_q.source);
 }
