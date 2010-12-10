@@ -451,7 +451,7 @@ int SK_cd_close(sk_conn_st *condat) {
   ++++++++++++++++++++++++++++++++++++++*/
 int SK_cd_printf(sk_conn_st *condat, char *txt, ...)
 {
-#define SKBUFLEN 2047
+#define SKBUFLEN 4095
   va_list   ap;
   char      buffer[SKBUFLEN+1];
   unsigned  len;
