@@ -106,7 +106,7 @@ typedef struct {
 /*+ prefix structure +*/
 typedef struct {
   unsigned                bits;		/*+ length in bits. +*/
-  ip_addr_internal_t      ip;	        /*+ the IP of the prefix +*/
+  ip_addr_internal_t      ip;	    /*+ the IP of the prefix +*/
 } ip_prefix_internal_t;
 
 /*+ range structure +*/

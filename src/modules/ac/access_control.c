@@ -1258,12 +1258,6 @@ int AC_commit(ip_addr_t *addr, acc_st *acc_conn, acl_st *acl_copy) {
     ret_err = AC_ban_set(&prefix, "Automatic", 1);
   }
 
-  /*
-  SK_cd_make(&condat, 1, 0);
-  rx_tree_print(&condat, act_runtime);
-  SK_cd_free(&condat);
-  */
-
   return ret_err;
 } /* AC_commit */
 
