@@ -46,6 +46,24 @@ typedef struct _wd_args_t {
 } wd_args_t;
 
 
+typedef struct {
+    int count;
+    pthread_mutex_t lock; /*+ Mutex lock.Used for synchronizing changes.+*/
+    pthread_cond_t cond; /*+ condition variable +*/
+} svr_counter_t;
+
+/* structure passed to every running server */
+typedef struct svr_args {
+    void (*function)(struct svr_args *);
+    int conn_sock;
+    ip_addr_t act_conn_ip; /* ip of the actual client */
+    int accept_sock;
+    int limit; /* limit for the number of concurrent connections */
+    svr_counter_t *counter; /* number of active clients */
+    GHashTable *conn_ipnum; /* how many times each IP has connected */
+    pthread_mutex_t *conn_lock; /* for synchronizing hashtable accesses */
+    char *name;
+} svr_args;
 
 
 void SV_init (LG_context_t *ctx);
