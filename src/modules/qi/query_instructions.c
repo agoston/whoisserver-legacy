@@ -326,70 +326,34 @@ static int create_asblock_query(GString *query_str, const char *sql_query, Query
     return -1;
 }
 
-/*++++++++++++++++++++++++++++++++++++++
- add_filter(): construct a query to limit the objects returned from the last
- table to predefined types.
+/* construct a query to limit the objects returned from the last
+   table to predefined types.
 
- char *query_str           buffer for the final query, containing the initial
- part of the query (must be big enough)
+   query_str           buffer for the final query, containing the initial
+                       part of the query (must be big enough)
 
- const Query_command *qc   query command structure with the bitmap of
- object types to be included.
-
- Author:
- ottrey.
- ++++++++++++++++++++++++++++++++++++++*/
+   qc                  query command structure with the bitmap of
+                       object types to be included.
+*/
 static void add_filter(GString *query_str, const Query_command *qc) {
     unsigned i;
-    /*  int qlen;*/
-    char filter_atom[STR_M];
-
-#if 0
-    /* glib string manipulation - untested yet */
-
-    if (MA_bitcount(qc->object_type_bitmap) != MASK_MAX) {
-        g_string_sprintfa(query_str, " AND (");
-        for (i=0; i < C_END; i++) {
-            if (MA_isset(qc->object_type_bitmap, i)) {
-                g_string_sprintfa(query_str, "i.object_type = %d OR ", DF_get_class_dbase_code(i));
-            }
-        }
-        g_string_truncate(query_str, query_str->len-3);
-        g_string_append_c(query_str, ')');
-    }
-
-#else /* classic string operations */
 
     /* add filters only if any bits are 0 (the number of 1's is < MAX_MAX */
     if (MA_bitcount(qc->object_type_bitmap) != MASK_MAX) {
         g_string_append(query_str, " AND (");
         for (i = 0; i < C_END; i++) {
             if (MA_isset(qc->object_type_bitmap, i)) {
-                strcpy(filter_atom, "");
-                sprintf(filter_atom, "i.object_type = %d OR ", i);
-                /* XXX class codes should be used instead:
-                 DF_get_class_dbase_code(i))
-                 but currently the tables contain values of enums
-                 (C_IN, etc) and not codes
-                 */
-                g_string_append(query_str, filter_atom);
+                g_string_append_printf(query_str, "i.object_type = %d OR ", DF_get_class_dbase_code(i));
             }
         }
-        dieif(query_str->len < 3); /* this code can only be reached if there is
-         at least one object here, meaning this
-         must end with the string "OR ", which we
-         then remove */
+
+        /* this code can only be reached if there is at least one object here, meaning this
+           must end with the string "OR ", which we then remove */
+        dieif(query_str->len < 3);
         g_string_truncate(query_str, query_str->len - 3);
         g_string_append_c(query_str, ')');
-        /*    qlen = strlen(query_str);
-         query_str[qlen-3] = ')';
-         query_str[qlen-2] = '\0';
-         query_str[qlen-1] = '\0';*/
     }
-
-#endif
-
-} /* add_filter() */
+}
 
 /* create_query() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -427,9 +391,6 @@ static char *create_query(const Query_t q, Query_command *qc) {
     }
 
     if ((q.query != NULL) && (q.querytype == querytype)) {
-
-        /* addquery = 1; */
-        /* if it got here, it should be added, unless.(see asblock)*/
 
         if (q.keytype == WK_NAME) {
             /* Name queries require special treatment. */
@@ -1212,10 +1173,10 @@ static int qi_write_objects(SQ_connection_t **sql_connection, char *id_table, Qu
  ++++++++++++++++++++++++++++++++++++++*/
 void mnt_irt_filter(sk_conn_st *condat, SQ_connection_t *sql_connection, GList **datlist, int *irt_inet_id, int *irt_gid) {
     GList *p;
-    GList *p_old;
     GList *new_datlist;
     rx_datcpy_t *rx_data;
     int object_id;
+    char *pkey;
     int inet_found = 0;
     int irt_found = 0;
 
@@ -1225,11 +1186,18 @@ void mnt_irt_filter(sk_conn_st *condat, SQ_connection_t *sql_connection, GList *
     *irt_gid = 0;
 
     /* search for node with "mnt-irt:" attribute */
-    p = g_list_last(*datlist);
-    while (p != NULL) {
+    for (p = g_list_last(*datlist); p; p = g_list_previous(p)) {
         /* grab the data for this node */
         rx_data = (rx_datcpy_t *) p->data;
         object_id = rx_data->leafcpy.data_key;
+        pkey = rx_data->leafcpy.data_ptr;
+
+        /* for domain, we don't do anything - they don't have irt whatsoever, so keep them in the list */
+        if (!strncmp(pkey, "domain", 6)) {
+            new_datlist = g_list_append(new_datlist, rx_data);
+            p->data = NULL;
+            continue;
+        }
 
         /* see if this is the node we are looking for */
         if (!irt_found && object_has_attr(condat, sql_connection, object_id, "mnt_irt")) {
@@ -1239,36 +1207,25 @@ void mnt_irt_filter(sk_conn_st *condat, SQ_connection_t *sql_connection, GList *
         }
 
         /* save the first inet(6)num found from the end of the list */
-        if (!inet_found && (object_has_attr(condat, sql_connection, object_id, "inetnum") || object_has_attr(condat, sql_connection, object_id, "inet6num"))) {
+        if (!inet_found && (!strncmp(pkey, "inetnum", 7) || !strncmp(pkey, "inet6num", 8))) {
             /* This is the object the irt object has to be grouped with
              when the objects are displayed in the output */
             *irt_gid = object_id;
             /* move this entry to the new list */
             new_datlist = g_list_append(new_datlist, rx_data);
-            p_old = p;
-            p = g_list_previous(p);
-            *datlist = g_list_remove_link(*datlist, p_old);
-            g_list_free_1(p_old);
+            p->data = NULL;
             inet_found = 1;
-        }
-        /* save any route(6) found in the list */
-        else if (object_has_attr(condat, sql_connection, object_id, "route") || object_has_attr(condat, sql_connection, object_id, "route6")) {
+        } else if ((!strncmp(pkey, "route", 5) || !strncmp(pkey, "route6", 6))) { /* save any route(6) found in the list */
             /* move this entry to the new list */
             new_datlist = g_list_append(new_datlist, rx_data);
-            p_old = p;
-            p = g_list_previous(p);
-            *datlist = g_list_remove_link(*datlist, p_old);
-            g_list_free_1(p_old);
-        } else {
-            /* otherwise just move on, this entry will be deleted later */
-            p = g_list_previous(p);
+            p->data = NULL;
         }
     }
 
     /* free our old datlist */
     for (p = *datlist; p != NULL; p = g_list_next(p)) {
         rx_data = (rx_datcpy_t *) p->data;
-        UT_free(rx_data->leafcpy.data_ptr);
+        if (rx_data) UT_free(rx_data->leafcpy.data_ptr);
     }
     wr_clear_list(datlist);
 
