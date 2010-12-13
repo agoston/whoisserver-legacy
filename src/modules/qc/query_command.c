@@ -828,11 +828,13 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
             query_command->parse_messages = g_list_append(query_command->parse_messages, ca_get_qc_uselessipflag);
         }
 
+#if 0
         /* check for use of -d flag on revd lookups */
         if (query_command->d && is_rdns_key) {
             /* WARNING:903, meaningless -d flag */
             query_command->parse_messages = g_list_append(query_command->parse_messages, ca_get_qc_uselessdflag);
         }
+#endif
 
         /* check for "fixed" lookups on IP addresses */
         fixed_lookup = 0;
@@ -887,9 +889,15 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
             UT_free(fmt);
         }
 
-        /* exclude revdomain if no -d is used */
+        /* exclude revdomain on IP key if no -d is used */
         if (is_ip_key && !query_command->d) {
             MA_set(&(query_command->object_type_bitmap), C_DN, 0);
+        }
+
+        /* exclude inet(6)num on revdomain key if no -d is used */
+        if (is_rdns_key && !query_command->d) {
+            MA_set(&(query_command->object_type_bitmap), C_IN, 0);
+            MA_set(&(query_command->object_type_bitmap), C_I6, 0);
         }
 
         /* if -R on anything else than a forward domain (revdomain is a subset of domain, hence we need to explicitly deny it) */

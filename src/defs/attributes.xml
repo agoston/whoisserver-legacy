@@ -697,6 +697,7 @@
     <keys searchable="lookup">
       <primary/>
       <queries>
+        <radixquery keytype="wk_revdomain"/>
         <radixquery keytype="wk_iprange"   space="IP_V4" />
         <radixquery keytype="wk_ipprefix"  space="IP_V4" />
         <radixquery keytype="wk_ipaddress" space="IP_V4" />
@@ -735,6 +736,7 @@
     <keys searchable="lookup">
       <primary/>
       <queries>
+        <radixquery keytype="wk_revdomain"/>
         <radixquery keytype="wk_ip6prefix" space="IP_V6"/>
       </queries>
     </keys>
