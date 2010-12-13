@@ -134,6 +134,7 @@ char *DF_get_class_template(C_Type_t index);
 char *DF_get_class_template_v(C_Type_t index);
 char *DF_class_type2name(C_Type_t index);
 char *DF_get_class_code(C_Type_t index);
+int DF_get_class_dbase_code(int class_index);
 
 /* take index to class alias array */
 int DF_get_class_index(int alias_index);

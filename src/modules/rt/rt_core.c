@@ -410,10 +410,10 @@ void rt_xml_set_prop(xmlNodePtr node, xmlChar* id, xmlChar* value) {
   xmlSetProp(node, id, value);
 }
 
-void rt_add_text_node(xmlNodePtr parent, gchar* name, gchar* content) {
+void rt_add_text_node(xmlNodePtr parent, gchar* name, const gchar *content) {
 //  xmlNodePtr node;
 
-  char *copy_content = NULL;
+  unsigned char *copy_content = NULL;
 
   /* Introduced a copy of the content because many functions pass
      const pointers as the content.
@@ -421,7 +421,7 @@ void rt_add_text_node(xmlNodePtr parent, gchar* name, gchar* content) {
      pointer. */
   if (content)
   {
-    copy_content = strdup(content);
+    copy_content = (unsigned char *)strdup(content);
 
     /*
     node = xmlNewNode(NULL, (xmlChar*)name);

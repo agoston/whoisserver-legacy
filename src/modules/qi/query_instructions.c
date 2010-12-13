@@ -86,16 +86,6 @@ void *qi_kill_body(void *arg) {
     return NULL;
 }
 
-/* a helper function to clean config variables */
-
-char *remove_EOLs(char *arg) {
-    while (strlen(arg) > 0 && (arg[strlen(arg) - 1] == '\n' || arg[strlen(arg) - 1] == '\r')) {
-        arg[strlen(arg) - 1] = '\0';
-    }
-
-    return arg;
-}
-
 /*++++++++++++++++++++++++++++++++++++++
  wrapper around sq_execute_query: starts a query
  in a separate thread and starts the socket watchdog to cancel the query

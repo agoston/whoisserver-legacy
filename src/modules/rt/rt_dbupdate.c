@@ -209,7 +209,7 @@ void RT_process_time(RT_context_t* ctx, gchar* date_stamp) {
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*)"process_time");
-  rt_add_text_node(node, "p_time", (xmlChar*) date_stamp);
+  rt_add_text_node(node, "p_time", date_stamp);
   rt_prepare_node(ctx, node);
 }
 
@@ -250,16 +250,14 @@ xmlNodePtr rt_process_attr(const rpsl_attr_t* attr) {
 
   node = xmlNewNode(NULL, (xmlChar*)"attr");
   rt_xml_node_add_content(node, (xmlChar*)rpsl_attr_get_name(attr));
-  rt_add_text_node(node, "value", (xmlChar*)rpsl_attr_get_value(attr));
+  rt_add_text_node(node, "value", rpsl_attr_get_value(attr));
   errors = rpsl_attr_errors(attr);
   while (errors) {
     if (((rpsl_error_t *)errors->data)->level >= RPSL_ERRLVL_ERROR) {
-      rt_add_text_node(node, "syntax_error",
-      (xmlChar*)((rpsl_error_t*)errors->data)->descr);
+      rt_add_text_node(node, "syntax_error", ((rpsl_error_t*)errors->data)->descr);
     }
     else {
-      rt_add_text_node(node, "syntax_warn",
-      (xmlChar*)((rpsl_error_t*)errors->data)->descr);
+      rt_add_text_node(node, "syntax_warn", ((rpsl_error_t*)errors->data)->descr);
     }
     errors = errors->next;
   }
@@ -277,7 +275,7 @@ void RT_clean_object(RT_context_t* ctx, char *msg) {
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*)"clean_object");
-  rt_add_text_node(node, "msg", (xmlChar*) msg);
+  rt_add_text_node(node, "msg", msg);
   rt_prepare_node(ctx, node);
 }
 
@@ -467,7 +465,7 @@ void RT_invalid_source(RT_context_t* ctx) {
 
 
   node = xmlNewNode(NULL, (xmlChar*)"invalid_source");
-  rt_add_text_node(node, "source", (xmlChar*) source);
+  rt_add_text_node(node, "source", source);
   rt_prepare_node(ctx, node);
   g_free(source);
 }
@@ -497,7 +495,7 @@ void RT_status_check_failed(RT_context_t* ctx, gchar* reason) {
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*)"status_check_failed");
-  rt_add_text_node(node, "reason", (xmlChar*) reason);
+  rt_add_text_node(node, "reason", reason);
   rt_prepare_node(ctx, node);
 }
 
@@ -528,7 +526,7 @@ void RT_unknown_country(RT_context_t* ctx, gchar* country) {
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*)"unknown_country");
-  rt_add_text_node(node, "country", (xmlChar*) country);
+  rt_add_text_node(node, "country", country);
   rt_prepare_node(ctx, node);
 }
 
@@ -556,7 +554,7 @@ void RT_unknown_nic_suffix(RT_context_t* ctx) { //
   rpsl_attr_delete_list(attr_list);
 
   node = xmlNewNode(NULL, (xmlChar*)"unknown_nic_suffix");
-  rt_add_text_node(node, "suffix", (xmlChar*) suffix);
+  rt_add_text_node(node, "suffix", suffix);
   rt_prepare_node(ctx, node);
   g_free(hdl);
 }
@@ -648,7 +646,7 @@ void RT_auth_ok(RT_context_t* ctx,
   }
   */
 
-  rt_add_text_node(node, "mntner", (xmlChar*)mntner);
+  rt_add_text_node(node, "mntner", mntner);
   rt_prepare_node(ctx, node);
 }
 
@@ -1904,7 +1902,6 @@ void RT_auth(RT_context_t* ctx, gchar* key, gchar* type, gchar* attr_checked,
 /* auth check */
 void RT_banned_operation(RT_context_t* ctx, gchar* type) {
   xmlNodePtr node;
-  xmlNodePtr child;
 
   node = xmlNewNode(NULL, (xmlChar*)"banned_operation");
   rt_add_text_node(node, "type", type);
@@ -1945,10 +1942,10 @@ void RT_update_result(RT_context_t* ctx, gchar* result) {
  * rdns messages
  */
 
-void RT_rdns_message(RT_context_t* ctx, gchar *severity,gchar* message) {
+void RT_rdns_message(RT_context_t* ctx, gchar *severity, gchar *message) {
   xmlNodePtr node;
   node = xmlNewNode(NULL, (xmlChar*)severity);
-  rt_add_text_node(node, "", (xmlChar*)message);
+  rt_add_text_node(node, "", message);
   rt_prepare_node(ctx, node);
 }
 
@@ -2026,8 +2023,8 @@ void RT_status_check_failed_parentwithoutstatus(
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*)"status_check_failed_parentwithoutstatus");
-  rt_add_text_node(node, "parent", (xmlChar*) parent);
-  rt_add_text_node(node, "status", (xmlChar*) status);
+  rt_add_text_node(node, "parent", parent);
+  rt_add_text_node(node, "status", status);
   rt_prepare_node(ctx, node);
 }
 
@@ -2066,7 +2063,7 @@ void RT_status_check_failed_modify(RT_context_t *ctx, char* status) {
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*) "status_check_failed_modify");
-  rt_add_text_node(node, "status", (xmlChar*) status);
+  rt_add_text_node(node, "status", status);
   rt_prepare_node(ctx, node);
 }
 
@@ -2078,6 +2075,6 @@ void RT_status_check_failed_rir(RT_context_t *ctx, char* status) {
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*) "status_check_failed_rir");
-  rt_add_text_node(node, "status", (xmlChar*) status);
+  rt_add_text_node(node, "status", status);
   rt_prepare_node(ctx, node);
 }

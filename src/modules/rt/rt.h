@@ -69,7 +69,7 @@ gchar* RT_get(RT_context_t* ctx, gint level, gchar* template_file);
 void RT_message(RT_context_t* ctx, gchar* name, gchar* message);
 void RT_process_time(RT_context_t* ctx, gchar* date_stamp);
 
-void rt_add_text_node(xmlNodePtr parent, gchar* name, gchar* content);
+void rt_add_text_node(xmlNodePtr parent, gchar* name, const gchar *content);
 void rt_xml_node_add_content(xmlNodePtr node, xmlChar* content);
 void rt_xml_set_prop(xmlNodePtr node, xmlChar* id, xmlChar* value);
 

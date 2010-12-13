@@ -277,9 +277,6 @@ static AU_ret_t ns_hierarchical_creation(au_plugin_callback_info_t * info,
                                          gchar * domain, gchar * source)
 {
   AU_ret_t ret_val;             /* result of the function */
-  GList *parents = NULL;        /* parent domains */
-  AU_ret_t parent_auth;         /* authentication from the parent */
-  rpsl_object_t *parent;        /* rpsl object for the parent */
   GList *inetnum_obj_list;      /* list of corresponding inetnums */
   rpsl_object_t *inetnum_obj;   /* corresponding inetnum object */
   LU_ret_t lu_retval;           /* lookup return value */

@@ -1,0 +1,18 @@
+20101213 - version 3.10
+
+
+Merged:
+- feature_rdns_hierarchy
+
+
+Changes:
+- Reverse domain objects cannot be hierarchical from now on (RIPE59 AP)
+- It is now possible to use the 'lLmMx' flags to do hierarchical searches on reverse domains
+- '-d' flag fixed (broken by IRT lookup)
+- '-d' flag now returns corresponding reverse domain objects for address space lookups and vica versa
+- Minor optimizations and bugfixes
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG

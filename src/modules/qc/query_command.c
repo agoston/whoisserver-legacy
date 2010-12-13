@@ -100,10 +100,11 @@ qc_sources_list_to_string(GList *list) {
     return result;
 }
 
-/*++++++++++++++++++++++++++++++++++++++
- Convert the query_environ to a string.
+/* Convert the query_environ to a string.
 
- Query_environ *query_environ The query_environ to be converted.
+   qe    The query_environ to be converted
+
+   Returns gchar*, to be freed by the caller.
  ++++++++++++++++++++++++++++++++++++++*/
 char *QC_environ_to_string(Query_environ qe) {
     char *sources;
@@ -345,6 +346,7 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
 
             case 'c':
                 query_command->c = TRUE;
+                query_command->C = FALSE;
                 query_command->l = 0;
                 query_command->m = 0;
                 query_command->x = 0;

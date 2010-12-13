@@ -42,6 +42,10 @@ typedef struct {
 
 
 /* function prototypes */
+int UP_check_domain(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                    options_struct_t *options, rpsl_object_t *preproc_obj,
+                    int operation, LU_server_t *server, char *obj_source);
+
 
 int UP_check_country_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              rpsl_object_t *preproc_obj, char **countries);

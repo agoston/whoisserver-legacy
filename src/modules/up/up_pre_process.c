@@ -827,7 +827,6 @@ int UP_check_domain(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     int retval = UP_OK;
     const char *type = NULL;
     char *key = NULL;
-    GList *object;
     GList *query_result_m = NULL;
     GList *query_result_l = NULL;
     gchar *query_str_m = "-rBG -M -Tdomain ";
