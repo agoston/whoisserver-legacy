@@ -2,6 +2,7 @@
 # CASE 41: create /20 domain object
 # inet6num exists and authorised
 # make sure rDNS checks took place 
+# override overrides delcheck failure
 #
 # create domain object
 #
