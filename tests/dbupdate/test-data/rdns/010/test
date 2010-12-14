@@ -19,3 +19,4 @@ changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 
 password:     test-dbm
+password: host3
