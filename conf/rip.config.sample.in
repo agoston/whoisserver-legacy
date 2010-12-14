@@ -818,18 +818,23 @@ NICSUFFIX RIPN
 
 # RDNS related entries
 
+# Name of the related RIR
 NS_RIR RIPE NCC
+
+# Delegations Listing
 NS_DELEGATIONSFILE @confdir@/delegations.txt
+
+# Threshold for errors from delchecker
 NS_SEVERITY 20
+
+# Related NS suffix list
 NS_SUFFIX in-addr.arpa
 NS_SUFFIX ip6.arpa
-NS_SUFFIX ip6.int
-NS_NSERVERS ns-pri.ripe.net
-NS_NSERVERS ns-sec.ripe.net
-NS_NSERVERS ns.ripe.net
-NS_NSERVERS ns-v6.ripe.net
+NS_SUFFIX e164.arpa
+
 # prefix for delchecker configurations
 NS_DELCHECKCONF @confdir@/delcheck-
+
 
 ###########
 ##
