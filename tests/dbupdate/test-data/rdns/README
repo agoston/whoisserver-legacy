@@ -356,6 +356,7 @@ under the control of the test suite.
 # RESULT 38: creation will pass
 # CASE 39: Create succeeds - testing decomposition on /24 level.
 # override used to skip dns checks
+# but override will not override the business rule on hierarchies
 #
 # create domain objects
 #

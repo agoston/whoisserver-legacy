@@ -1,12 +1,13 @@
 # rdns tests
 # CASE 39: Create succeeds - testing decomposition on /24 level.
 # override used to skip dns checks
+# but override will not override the business rule on hierarchies
 #
 # create domain objects
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 39: creation will succeed
+# RESULT 39: creation will fail
 
 domain:       1-2.0.193.in-addr.arpa
 descr:        Test
