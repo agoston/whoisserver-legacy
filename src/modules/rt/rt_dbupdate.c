@@ -1955,6 +1955,7 @@ void RT_rdns_message(RT_context_t* ctx, gchar *severity,gchar* message) {
 void RT_rdns_auth_result(RT_context_t* ctx, gboolean result, gboolean override) {
   xmlNodePtr node;
   xmlNodePtr child;
+  xmlNodePtr childov;
 
   node = xmlNewNode(NULL, (xmlChar*)"rdns_auth_result");
   if (override) {
@@ -1967,6 +1968,10 @@ void RT_rdns_auth_result(RT_context_t* ctx, gboolean result, gboolean override) 
     child = xmlNewNode(NULL, (xmlChar*)"fail");
   }
   xmlAddChild(node, child);
+  if (override) {
+    childov = xmlNewNode(NULL, (xmlChar*)"override");
+    xmlAddChild(node, childov);
+  }
   rt_prepare_node(ctx, node);
 }
 

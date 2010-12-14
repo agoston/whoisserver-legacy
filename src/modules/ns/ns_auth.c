@@ -317,6 +317,7 @@ static AU_ret_t ns_hierarchical_creation(au_plugin_callback_info_t * info,
 AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
 {
   AU_ret_t ret_val = AU_AUTHORISED;     /* return value of this function */
+  AU_ret_t rdns_ret_val = AU_AUTHORISED;     /* saved rdns return value of this function */
   gchar *domain = NULL;         /* domain name of the object */
   gchar *source = NULL;         /* domain name of the object */
   gchar **nservers = NULL;      /* array of nserver entries */
@@ -409,8 +410,9 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
   }
 
   /* override */
+  rdns_ret_val = ret_val;
   au_override(&ret_val, &override, info);
-  RT_rdns_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
+  RT_rdns_auth_result(info->ctx, (rdns_ret_val == AU_AUTHORISED), override);
 
   /* cleanup */
   if (source != NULL) {
