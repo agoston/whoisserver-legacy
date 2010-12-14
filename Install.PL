@@ -258,9 +258,6 @@ if( $SetupConfig or $All ) {
         
         ### path to the config file
         [ q[^SOURCEFILE .*]       => qq[SOURCEFILE $DbPrefix/conf/sources.config] ],
-                                     
-        ### rdns suffix change
-        [ q[^NS_SUFFIX\s*ip6.int] => q[NS_SUFFIX e164.arpa] ],
     ) {
 
         my($to,$from) = @$aref;
