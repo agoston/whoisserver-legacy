@@ -377,16 +377,9 @@ int IP_revd_t2b(ip_prefix_t *prefptr, const char *domstr, ip_exp_t expf) {
 
     if ( (arpa=strstr(prefstr, ".in-addr.arpa")) != NULL) {
         prefptr->ip.space = IP_V4;
-    } else if ( (arpa=strstr(prefstr, ".ip6.int")) != NULL) {
+    } else if ( (arpa=strstr(prefstr, ".ip6.arpa")) != NULL) {
         prefptr->ip.space = IP_V6;
-    }
-#if 1
-    /* support for ip6.arpa domains */
-    else if ( (arpa=strstr(prefstr, ".ip6.arpa")) != NULL) {
-        prefptr->ip.space = IP_V6;
-    }
-#endif
-    else {
+    } else {
         return IP_NOREVD;
     }
 
@@ -403,7 +396,7 @@ int IP_revd_t2b(ip_prefix_t *prefptr, const char *domstr, ip_exp_t expf) {
     ip[0]=0; /* init */
     switch (prefptr->ip.space) {
         case IP_V6:
-            /* ipv6 originally looked like: "1.8.0.6.0.1.0.0.2.ip6.int" */
+            /* ipv6 originally looked like: "1.8.0.6.0.1.0.0.2.ip6.arpa" */
             /* here it will look like: "1.8.0.6.0.1.0.0.2" */
             g_strreverse(temp);
             /* now it will look like: "2.0.0.1.0.6.0.8.1" */

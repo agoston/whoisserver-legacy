@@ -364,7 +364,7 @@
 <SHORT>
 	WARNING (2 points): The rname (e-mail contact) field <ARG no="1"/>
 	in the SOA record returned by this server is in a reverse domain
-	(in-addr.arpa, ip6.int or ip6.arpa).
+	(in-addr.arpa or ip6.arpa).
 	
 </SHORT>
 </PROBLEM>

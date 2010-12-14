@@ -11,6 +11,7 @@ Changes:
 - '-d' flag fixed (broken by IRT lookup)
 - '-d' flag now returns corresponding reverse domain objects for address space lookups and vica versa
 - Minor optimizations and bugfixes
+- Deprecated NS_NSERVERS from rip.config (unused)
 
 
 Affected stakeholders:

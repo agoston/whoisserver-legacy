@@ -19,7 +19,7 @@ static GTree *rdns_read_delegations_tree(LG_context_t * lg_ctx,
   FILE *f;                      /* file descriptor that we read from */
   gchar line[200];              /* line buffer */
   gchar **items;                /* split line buffer */
-  gchar *itemsint;              /* copy of the domain ending with ip6.int */
+  gchar *itemsint;              /* copy of the domain ending with ip6.arpa */
   GTree *result;                /* binary tree as the result */
   gchar *p;                     /* temporary placeholder */
 
@@ -39,7 +39,7 @@ static GTree *rdns_read_delegations_tree(LG_context_t * lg_ctx,
       g_strdown(items[1]);
       p = strstr(items[1], "ip6.arpa");
       /* following case requires 2 insertions,
-       * 1 for ip6.arpa and 1 for ip6.int */
+       * 1 for ip6.arpa and 1 for ip6.arpa */
       if ((p != NULL) && (g_strcasecmp(p, "ip6.arpa") == 0)) {
         itemsint = g_strdup(items[1]);
         p = strstr(itemsint, "arpa");   /* this can't be NULL */
