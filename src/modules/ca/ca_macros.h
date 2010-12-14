@@ -488,9 +488,6 @@
 #define ca_get_ns_suffix      ca_get_string(CA_NS_SUFFIX)
 #define ca_set_ns_suffix      ca_set_string(CA_NS_SUFFIX)
 
-#define ca_get_ns_nservers      ca_get_string(CA_NS_NSERVERS)
-#define ca_set_ns_nservers      ca_set_string(CA_NS_NSERVERS)
-
 #define ca_get_ns_delcheckconf      ca_get_string(CA_NS_DELCHECKCONF)
 #define ca_set_ns_delcheckconf      ca_set_string(CA_NS_DELCHECKCONF)
 
