@@ -22,6 +22,6 @@ mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:        katie@ripe.net 20061030
 source:         DB-TEST
-password: host3
 password: hostmaster
+override: password
 
