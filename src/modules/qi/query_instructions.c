@@ -1851,6 +1851,11 @@ int qi_collect_ids(ca_dbSource_t *dbhdl, char *sourcename, SQ_connection_t **sql
 
         case R_RADIX:
 
+#ifdef DEBUG_QUERY
+            fprintf(stderr, "RP_asc_search:  query %s : mode %d (%s) (par %d) for %s\n", DF_get_attribute_name(Query[qi->queryindex].attribute), qi->rx_srch_mode,
+                    RX_text_srch_mode(qi->rx_srch_mode), qi->rx_par_a, qi->rx_keys);
+#endif
+
             err = RP_asc_search(qi->rx_srch_mode, qi->rx_par_a, 0, qi->rx_keys, dbhdl, Query[qi->queryindex].attribute, datlist, limit);
 
             if (NOERR(err)) {

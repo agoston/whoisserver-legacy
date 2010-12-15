@@ -443,10 +443,6 @@ int max_count /*+ max # of answers. RX_ALLANS == unlimited + */
     int hits = 0;
     ip_prefix_t beginpref;
 
-#ifdef DEBUG_QUERY
-    fprintf(stderr, "RP_asc_search:  query %s : mode %d (%s) (par %d) for %s\n", DF_get_attribute_name(attr), search_mode, RX_text_srch_mode(search_mode), par_a, key);
-#endif
-
     /* parse the key into a prefix list */
     if (!NOERR(err = IP_smart_conv(key, 0, 0, &preflist, IP_EXPN, NULL))) {
         /* operational trouble (UT_*) or invalid key (IP_INVARG) */
