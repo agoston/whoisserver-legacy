@@ -14,6 +14,8 @@ typedef struct {
     char *source;
 } pl_answer_t;
 
+GList *default_sources = NULL, *default_attributes = NULL;
+
 /**********************
  * Gather the sources set as default lookups into one list
  *********************/
@@ -319,7 +321,7 @@ void PL_interact(svr_args *args) {
             // we MUST have a source
             if (source_list == NULL) {
                 // so we add the default sources
-                source_list = pl_default_sources();
+                source_list = g_list_copy(default_sources);
                 if (source_list == NULL) {
                     str = ca_get_pl_err_nosource;
                     SK_cd_printf(&answer_info.condat, str);
@@ -330,7 +332,7 @@ void PL_interact(svr_args *args) {
 
             // and we MUST have an attribute/class type
             if (attr_list == NULL) {
-                attr_list = pl_default_attributes();
+                attr_list = g_list_copy(default_attributes);
                 if (attr_list == NULL) {
                     str = ca_get_pl_err_noclass;
                     SK_cd_printf(&answer_info.condat, str);
@@ -451,4 +453,10 @@ void PL_interact(svr_args *args) {
     } while (persistent_connection && answer_info.condat.rtc == 0 && CO_get_whois_suspended() == 0);
 
     SK_cd_free(&answer_info.condat);
+}
+
+/* this interface is fully internal, so no log context (or logging) here, every error goes back to client via TCP */
+void PL_init() {
+    default_sources = pl_default_sources();
+    default_attributes = pl_default_attributes();
 }
