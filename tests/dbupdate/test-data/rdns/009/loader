@@ -125,17 +125,6 @@ source:       DB-TEST
 
 % sample domain object that qualifies for delchecking
 
-domain:       193.in-addr.arpa
-descr:        Test
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-zone-c:       TP1-DB-TEST
-nserver:      ns-pri.ripe.net
-nserver:      ns-sec.ripe.net
-mnt-lower:    TEST-DBM-MNT
-changed:      dbtest@ripe.net 20040329
-source:       DB-TEST
-
 domain:       0.0.193.in-addr.arpa
 descr:        Test2
 admin-c:      TP1-DB-TEST

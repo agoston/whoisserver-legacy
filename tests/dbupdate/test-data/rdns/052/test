@@ -7,7 +7,7 @@
 #
 #FAILURE
 #
-# RESULT 51: creation will fail
+# RESULT 52: creation will fail
 
 
 domain:         0.0.0.0.0.0.0.0.0.a.2.ip6.arpa

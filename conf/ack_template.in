@@ -790,6 +790,8 @@ No PGP error on object
   <xsl:if test="fail">
 
 ***Error: RDNS Authorisation failed</xsl:if>
+  <xsl:if test="override">
+***Info: Authorisation override used</xsl:if>
   </xsl:template>
 
 <!-- lists -->

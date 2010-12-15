@@ -2,6 +2,7 @@
 # CASE 42: create /24 domain object
 # inet6num exists and authorised
 # make sure rDNS checks took place 
+# override overrides delcheck failure
 #
 # create domain object
 #
@@ -22,7 +23,7 @@ mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:        katie@ripe.net 20061030
 source:         DB-TEST
-password: host3
+password: hostmaster
 override: password
 
 
