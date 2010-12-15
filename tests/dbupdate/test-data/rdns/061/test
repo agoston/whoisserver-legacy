@@ -1,7 +1,7 @@
 # rdns tests
-# CASE 57: Hierarchical lookup on the rdns radix tree
+# CASE 61: Hierarchical lookup on the rdns radix tree
 #
 #SUCCESS
 #
-# RESULT 057: the query will succeed
+# RESULT 061: the query will succeed
 

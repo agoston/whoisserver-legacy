@@ -839,10 +839,20 @@ int UP_check_domain(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     /* if the operation is not a create, then return OK */
     if ( (operation != UP_CREATE) || strcasecmp(type, "domain") != 0)
     {
+        LG_log(lg_ctx, LG_DEBUG,"UP_check_domain: not creating a domain object..skipping");
         LG_log(lg_ctx, LG_FUNC, "<UP_check_domain: exiting with value [%s]\n", UP_ret2str(retval));
         return retval;
     }
     key = rpsl_object_get_key_value(preproc_obj);
+    /* skip enum objects */
+    g_strdown(key);
+    if ( strstr(key,"e164") )
+    {
+        free(key);
+        LG_log(lg_ctx, LG_DEBUG,"UP_check_domain: enum object..skipping");
+        LG_log(lg_ctx, LG_FUNC, "<UP_check_domain: exiting with value [%s]\n", UP_ret2str(retval));
+        return retval;
+    }
 
     /* look for any more or less specific domain objects */
     if ( LU_get(server, query_str_l, obj_source, &query_result_l, key) != LU_OKAY ||

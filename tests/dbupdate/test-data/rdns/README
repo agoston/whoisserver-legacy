@@ -330,7 +330,7 @@ under the control of the test suite.
 
 # CASE 036: 
 #
-# modify 1.e164.arpa domain object
+# modify 1.1.1.e164.arpa domain object
 # must fail with rdns errors - no override
 #
 #FAILURE
@@ -566,6 +566,48 @@ under the control of the test suite.
 #FAILURE
 #
 # RESULT 057: creation will fail
+
+
+# CASE 58: Hierarchical lookup on the rdns radix tree
+#
+#SUCCESS
+#
+# RESULT 058: the query will succeed
+
+
+# CASE 59: Hierarchical lookup on the rdns radix tree
+#
+#SUCCESS
+#
+# RESULT 059: the query will succeed
+
+
+# CASE 60: Hierarchical lookup on the rdns radix tree
+#
+#SUCCESS
+#
+# RESULT 060: the query will succeed
+
+
+# CASE 61: Hierarchical lookup on the rdns radix tree
+#
+#SUCCESS
+#
+# RESULT 061: the query will succeed
+
+
+# CASE 62: Hierarchical lookup on the rdns radix tree
+#
+#SUCCESS
+#
+# RESULT 062: the query will succeed
+
+
+# CASE 63: Hierarchical lookup on the rdns radix tree
+#
+#FAILURE
+#
+# RESULT 063: the query will fail
 
 
 # CASE 064: Try to create a domain object when more specific object exists

@@ -109,50 +109,10 @@ remarks:      This network in not allocated.
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
-domain:       in-addr.arpa
-descr:        The whole IPv4 address space
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-zone-c:       TP1-DB-TEST
-nserver:      ns.ripe.net # this is just a placeholder
-mnt-by:       RIPE-NCC-HM-MNT
-mnt-lower:    RIPE-NCC-HM-DOM-MNT
-changed:      hostmaster@ripe.net 20031222
-source:       DB-TEST
-
-domain:       ip6.arpa
-descr:        The whole IPv6 address space
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-zone-c:       TP1-DB-TEST
-nserver:      ns.ripe.net # this is just a placeholder
-mnt-by:       RIPE-NCC-MNT
-mnt-lower:    RIPE-NCC-HM-DOM-MNT
-changed:      hostmaster@ripe.net 20031222
-source:       DB-TEST
-
-
 %      End of Standard Template Objects
 %----------------------------------------------------------------
 
 %  Additional objects required for this test
-
-inet6num:     2a00::/12
-netname:      TEST
-descr:        test inet6num object
-country:      EU
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-mnt-by:       RIPE-NCC-HM-MNT
-mnt-lower:    RIPE-NCC-HM-MNT
-mnt-domains:  RIPE-NCC-HM-MNT
-status:       ALLOCATED-BY-RIR
-remarks:      This network in not allocated.
-              This object is here for Database
-              consistency and to allow hierarchical
-              authorisation checks.
-changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
 
 
 % End of loader data file

@@ -109,7 +109,11 @@ remarks:      This network in not allocated.
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
-% sample domain object that doesn't qualify for delchecking
+%
+%      End of Standard Template Objects
+%----------------------------------------------------------------
+
+%  Additional objects required for this test
 
 domain:       0.0.0.193.in-addr.arpa
 descr:        Test
@@ -122,13 +126,5 @@ mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
-
-%
-%      End of Standard Template Objects
-%----------------------------------------------------------------
-
-%  Additional objects required for this test
-
-% none
 
 % End of loader data file
