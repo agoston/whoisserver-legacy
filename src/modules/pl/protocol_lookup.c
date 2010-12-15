@@ -45,6 +45,9 @@ GList *pl_default_attributes(void) {
 
     for (i = 0; i < A_END; i++) {
         if (DF_attrcode_has_radix_lookup(i)) {
+#ifdef DEBUG_LOOKUP
+            fprintf(stderr, "Attribute %s has radix lookup\n", DF_get_attribute_name(i));
+#endif
             attrs = g_list_append(attrs, GINT_TO_POINTER(i));
         }
     }
@@ -383,6 +386,15 @@ void PL_interact(svr_args *args) {
                         rp_attr_t attr_id = (rp_attr_t) GPOINTER_TO_INT(cur_attr->data);
 
                         rc = RP_asc_search(search_mode, search_depth, 0, search_key, reg_id, attr_id, &answers, RX_ANS_ALL);
+
+#ifdef DEBUG_LOOKUP
+                        fprintf(stderr, "RP_asc_search: %d entries after %s.%s (mode %d, depth %d, key '%s', retcode %d):\n", g_list_length(answers), reg_id->name,
+                                DF_get_attribute_name(attr_id), search_mode, search_depth, search_key, rc);
+                        GList *pp = answers;
+                        for (; pp; pp = pp->next) {
+                            fprintf(stderr, "%s", (char *)(((rx_datcpy_t *)(pp->data))->leafcpy.data_ptr));
+                        }
+#endif
 
                         if (rc == IP_INVARG) {
                             // the search key cannot be converted to an ip range
