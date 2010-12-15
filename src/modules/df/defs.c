@@ -324,17 +324,15 @@ char *DF_class_type2name(C_Type_t class) {
 
 
 /* check in the queries if this attribute can trigger a radix lookup */
-int DF_attrcode_has_radix_lookup(A_Type_t attr)
-{
-  int i;
+int DF_attrcode_has_radix_lookup(A_Type_t attr) {
+    int i;
 
-  for (i=0; Query[i].query != NULL; i++) {
-    if( Query[i].refer == R_RADIX &&
-	Query[i].attribute == attr ) {
-      return 1;
+    for (i = 0; Query[i].query != NULL; i++) {
+        if (Query[i].refer == R_RADIX && Query[i].attribute == attr) {
+            return 1;
+        }
     }
-  }
-  return 0;
+    return 0;
 }
 
 /* return the sql query to load the radix ipv4 tree for this attribute
