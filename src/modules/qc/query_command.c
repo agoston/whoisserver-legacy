@@ -339,9 +339,6 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 query_command->L = 0;
                 query_command->M = 0;
                 query_command->b = 0;
-                if (ip_flag_used)
-                    ip_flag_duplicated++;
-                ip_flag_used = 'C';
                 break;
 
             case 'c':

@@ -437,9 +437,6 @@
 #define ca_get_qc_uselessipflag	ca_get_string(CA_QC_USELESSIPFLAG)
 #define ca_set_qc_uselessipflag	ca_set_string(CA_QC_USELESSIPFLAG)
 
-#define ca_get_qc_uselessdflag ca_get_string(CA_QC_USELESSDFLAG)
-#define ca_set_qc_uselessdflag ca_set_string(CA_QC_USELESSDFLAG)
-
 #define ca_get_qc_uselessnorefflag	ca_get_string(CA_QC_USELESSNOREFFLAG)
 #define ca_set_qc_uselessnorefflag	ca_set_string(CA_QC_USELESSNOREFFLAG)
 

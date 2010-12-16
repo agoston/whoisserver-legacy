@@ -8,10 +8,8 @@ Merged:
 Changes:
 - Reverse domain objects cannot be hierarchical from now on (RIPE59 AP)
 - It is now possible to use the 'lLmMx' flags to do hierarchical searches on reverse domains
-- '-d' flag fixed (broken by IRT lookup)
 - '-d' flag now returns corresponding reverse domain objects for address space lookups and vica versa
-- Minor optimizations and bugfixes
-- Deprecated NS_NSERVERS from rip.config (unused)
+- Many minor optimizations, bugfixes and cleanups
 
 
 Affected stakeholders:
