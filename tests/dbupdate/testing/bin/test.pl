@@ -1185,6 +1185,9 @@ sub match_query($$) {
 
     my $query_orig = $query;
     $query =~ s/^[\s]*EXACT[\s]+//i;
+    # replace newlines in query so that we can issue more than 1 in a single test
+    # in this case '-k' is required for the first query, and an empty query terminates
+    $query =~ s/\\n/\n/g;
 
     my $whois;
 

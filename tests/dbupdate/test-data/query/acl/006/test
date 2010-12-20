@@ -1,0 +1,5 @@
+# CASE 006: test '-k' for behavior
+#
+#SUCCESS
+#
+# RESULT 006: The query will succeed.
