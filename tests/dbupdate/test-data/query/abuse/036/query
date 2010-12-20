@@ -1,10 +1,5 @@
 % This is the MyDB Whois server.
 
-%WARNING:901: duplicate IP flags passed
-%
-% More than one IP flag (-l, -L, -m, -M, -x, -d, -b, -C or -c) passed to the server.
-% Only "-C" will be used for this query.
-
 % Note: this output has been filtered.
 %       To receive output for a database update, use the "-B" flag.
 

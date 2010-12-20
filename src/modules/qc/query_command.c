@@ -333,26 +333,11 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
             case 'C':
                 query_command->c = FALSE;
                 query_command->C = TRUE;
-                query_command->l = 0;
-                query_command->m = 0;
-                query_command->x = 0;
-                query_command->L = 0;
-                query_command->M = 0;
-                query_command->b = 0;
                 break;
 
             case 'c':
                 query_command->c = TRUE;
                 query_command->C = FALSE;
-                query_command->l = 0;
-                query_command->m = 0;
-                query_command->x = 0;
-                query_command->L = 0;
-                query_command->M = 0;
-                query_command->b = 0;
-                if (ip_flag_used)
-                    ip_flag_duplicated++;
-                ip_flag_used = 'c';
                 break;
 
             case 'G':
