@@ -200,13 +200,16 @@ my $DbTempDir;
 
 if( $RunConfigure or $All ) {
     ### Run autogen first:
-    _system( q[sh ./autogen.sh] );
+    _system( q[./autogen.sh] );
     
     ### Then run ./build.sh to build third party extensions
-    _system( q[sh ./build.sh] );
+    _system( q[./build.sh] );
     
     ### configure it to install into $HOME/projects/$name_of_branch
-    _system( qq[sh ./configure --with-rdns --prefix=$DbPrefix --with-perl=$^X --with-rpslvariant=$RPSLVariant] );
+    _system( qq[./configure --with-rdns --prefix=$DbPrefix --with-perl=$^X --with-rpslvariant=$RPSLVariant] );
+
+    ### run 'make clean' to start from a new system
+    _system( qq[make clean] );
 }
 
 if( $SetupDb or $All ) {
@@ -217,8 +220,8 @@ if( $SetupDb or $All ) {
     _system( qq[echo "drop database $DbAdminName"   | mysql -h $SQLHost -P $SQLPort -u $SQLUser -p$SQLPass], 1 );
     _system( qq[echo "create database $DbAdminName" | mysql -h $SQLHost -P $SQLPort -u $SQLUser -p$SQLPass] );
 
-    ### XXX can't we setup ripe db like this?
-    _system( qq[mysql -h $SQLHost -P $SQLPort -u $SQLUser -p$SQLPass $DbAdminName < src/SQL/create.RIPADMIN.sql] ); 
+    _system( qq[cat src/SQL/admin.create.sql src/SQL/admin.data.sql | mysql -h $SQLHost -P $SQLPort -u $SQLUser -p$SQLPass $DbAdminName] );
+    _system( qq[cat src/SQL/main.create.sql src/SQL/main.data.sql src/SQL/main.dummy.sql  | mysql -h $SQLHost -P $SQLPort -u $SQLUser -p$SQLPass $DbName] );
 }
 
 if( $SetupConfig or $All ) {
@@ -366,17 +369,6 @@ if( $UseTempDir ) {
     _system( qq[mv $DbPrefix/log $DbTempDir && ln -s $DbTempDir/log $DbPrefix] );
     _system( qq[mv $DbPrefix/var $DbTempDir && ln -s $DbTempDir/var $DbPrefix] );
     _system( qq[mkdir $DbTempDir/tmp && ln -s $DbTempDir/tmp tests/dbupdate/testing] );
-}
-
-if( $SetupTests or $All ) {
-    ### run a single test to set up & populate the db
-    ### this test will fail, but the db skeleton will have been created. 
-    ### Move on to the nex step
-    eval { 
-        _system( q[./tests/dbupdate/testing/bin/test.pl -m -d -e -o -u -c ].
-                 q[tests/dbupdate/testing/conf/dataset.config -r ].
-                 qq[$Cwd/tests/dbupdate/test-data/misc/021] );
-    };                 
 }
 
 ### final steps

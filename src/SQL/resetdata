@@ -1,8 +1,0 @@
-#!/bin/sh
-set -e
-
-echo "resetting main database"
-$MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB <resetdata.tables.sql
-
-echo "resetting RIPADMIN database"
-$MYSQL -h$RIPADMIN_DBHOST -P$RIPADMIN_DBPORT -u$RIPADMIN_DBUSER -p$RIPADMIN_DBPASS $RIPADMIN_DBNAME <resetdata.RIPADMIN.sql

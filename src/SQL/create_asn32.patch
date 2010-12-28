@@ -1,6 +1,0 @@
-# patch  to alter AS numbers to 32 bit.
-
-ALTER TABLE aut_num MODIFY aut_num char(13) NOT NULL DEFAULT '';
-ALTER TABLE inet_rtr MODIFY local_as varchar(13) NOT NULL DEFAULT '';
-ALTER TABLE route MODIFY origin varchar(13) NOT NULL DEFAULT '';
-ALTER TABLE route6 MODIFY origin varchar(13) NOT NULL DEFAULT '';

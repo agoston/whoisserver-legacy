@@ -88,7 +88,7 @@ MAKE_DB = $SCRIPTDIR/make_db_test
 # SVCONFIG_PORT is taken from rip.config
 # SOURCE is taken from rip.config (UPDSOURCE)
 
-MAKE_DB_FLAGS = -l $LOAD_FILE -t $WHOISDIR -h $WHOIS_HOST -p $SVCONFIG_PORT -c $RIP_CONFIG -1 -f
+MAKE_DB_FLAGS = -l $LOAD_FILE -t $WHOISDIR -h $WHOIS_HOST -p $SVCONFIG_PORT -c $RIP_CONFIG -2 -f
 
 # reset_db script
 RESET_DB = $SCRIPTDIR/reset_db_test

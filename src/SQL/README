@@ -1,0 +1,3 @@
+main.create.sql was dumped from production database @2010-12-28 (whois-server v3.10) with command line
+
+mysqldump -hXXX -uXXX -pXXX -d --compact --add-drop-table XXX | sed 's/) ENGINE=InnoDB DEFAULT CHARSET=latin1;/);/g' | perl -pe 's/`\(\d+\)\)/`\)/' >main.create.sql
