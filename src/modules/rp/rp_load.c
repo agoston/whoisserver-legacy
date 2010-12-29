@@ -172,7 +172,7 @@ static void *RP_sql_load_attr_space(void *arg) {
     int colcount;
     char *load_query = (space == IP_V4) ? DF_attrcode_radix_load_v4(attr) : DF_attrcode_radix_load_v6(attr);
     char *srcnam = ca_get_srcname(reg_id);
-    const char *attr_code;
+    const char *attr_code = DF_get_attribute_code(attr);
     char activity[STR_M];
 
     dieif(load_query == NULL);
@@ -180,7 +180,7 @@ static void *RP_sql_load_attr_space(void *arg) {
 
     LG_log(rp_context, LG_INFO, "loading using %s", load_query);
 
-    attr_code = DF_get_attribute_code(attr);
+    TA_add( 0, "rx load");
     sprintf(activity, "%s/%s, query ", srcnam, attr_code);
     TA_setactivity(activity);
 
@@ -213,8 +213,8 @@ static void *RP_sql_load_attr_space(void *arg) {
 
             objnr++;
 
-            if (!(objnr & 1023)) {
-                sprintf(activity, "%s/%s, %dK done ", srcnam, attr_code, objnr>>10);
+            if (!(objnr & 4095)) {
+                sprintf(activity, "%s/%s, %dK", srcnam, attr_code, objnr>>10);
                 TA_setactivity(activity);
             }
         }
@@ -250,8 +250,6 @@ static void RP_sql_load_thread_add(rp_attr_t attr, ip_space_t space, rp_regid_t 
 }
 
 int RP_sql_load_reg(rp_regid_t reg_id) {
-    GList *p;
-
     /* init thread info */
     RP_sql_load_thread_add(A_RT, IP_V4, reg_id);
     RP_sql_load_thread_add(A_R6, IP_V6, reg_id);
