@@ -42,11 +42,12 @@ static
 int make_sql2pack(SQ_result_set_t *result, SQ_row_t *row, rp_upd_pack_t *pack, rp_attr_t attr, ip_space_t space, int colcount) {
     int conv = RP_OK;
     rp_uni_t *uniptr = &(pack->uni);
-    char *idptr; /* initially set to the 0'th column */
+    char *idptr;
     char *col[5];
     unsigned i;
 
-    dieif(colcount>5); /* size of the col array */
+    /* sanity checks */
+    dieif(colcount>5);
 
     for (i = 0; i < colcount; i++) {
         col[i] = SQ_get_column_string_nocopy(result, row, i);
@@ -55,6 +56,7 @@ int make_sql2pack(SQ_result_set_t *result, SQ_row_t *row, rp_upd_pack_t *pack, r
         }
     }
 
+    /* initially set to the 0'th column */
     idptr = col[0];
 
     pack->type = attr;
@@ -141,16 +143,11 @@ int make_sql2pack(SQ_result_set_t *result, SQ_row_t *row, rp_upd_pack_t *pack, r
         break;
 
     default:
-        /*    die; / * shouldn't have got here */
         conv = IP_INVARG;
     }
 
     if (sscanf(idptr, "%lu", &(pack->key)) < 1) {
         conv = IP_INVARG;
-    }
-
-    for (i = 0; i < colcount; i++) {
-        /*    wr_free(col[i]);*/;
     }
 
     return conv;
@@ -242,7 +239,7 @@ static void *RP_sql_load_attr_space(void *arg) {
 
 static void RP_sql_load_thread_add(rp_attr_t attr, ip_space_t space, rp_regid_t reg_id) {
     RP_thread_info *inf = malloc(sizeof(RP_thread_info));
-    RP_threads = g_list_append(RP_threads, inf);
+    RP_threads = g_list_prepend(RP_threads, inf);
     inf->attr = attr;
     inf->space = space;
     inf->reg_id = reg_id;

@@ -425,13 +425,14 @@ void rp_begend_preselection(GList **datlist, rx_fam_t fam_id, ip_range_t *testra
  If there are more of size equal to the smallest one, they are also
  returned.
 
+ char *key              search term: (string) prefix/range/IP
+ rp_attr_t attr         extra tree id (within the same reg/spc/fam
+ GList **finallist      result
+ int max_count          max # of answers. RX_ALLANS == unlimited
+
  returns RX_OK or a code from an underlying function
  ++++++++++++*/
-int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, /*+ search term: (string) prefix/range/IP + */
-rp_regid_t reg_id, rp_attr_t attr, /*+ extra tree id (within the same reg/spc/fam + */
-GList ** finallist, /*+ answers go here, please + */
-int max_count /*+ max # of answers. RX_ALLANS == unlimited + */
-) {
+int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_regid_t reg_id, rp_attr_t attr, GList ** finallist, int max_count) {
     GList *preflist = NULL;
     GList *datlist = NULL;
     int err;
