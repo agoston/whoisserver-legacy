@@ -85,15 +85,15 @@ char * const  Filter_names[] = {
 }; /* Filter_names */
 
 char **DF_get_filter_names(void) {
-  return Filter_names;
+  return (char **)Filter_names; // FIXME: const qualifier
 } /* DF_get_filter_names() */
 
 char **DF_get_class_names(void) {
-  return Class_names;
+  return (char **)Class_names;   // FIXME: const qualifier
 } /* DF_get_class_names() */
 
 char **DF_get_class_aliases(void) {
-  return Class_aliases;
+  return (char **)Class_aliases;    // FIXME: const qualifier
 } /* DF_get_class_aliases() */
 
 int DF_get_class_index(int alias_index) {
@@ -148,7 +148,7 @@ char *DF_get_class_sql_table(C_Type_t index) {
 
 
 char **DF_get_attribute_aliases(void) {
-  return Attribute_aliases;
+  return (char **)Attribute_aliases;    // FIXME: const qualifier
 } /* DF_get_attribute_aliases() */
 
 char *DF_get_attribute_name(A_Type_t index) {
@@ -160,7 +160,7 @@ char *DF_get_attribute_code(A_Type_t index) {
 } /* DF_get_attribute_code() */
 
 char **DF_get_attribute_names(void) {
-  return Attribute_names;
+  return (char**)Attribute_names;   // FIXME: const qualifier
 } /* DF_get_attribute_names() */
 
 int DF_get_attribute_index(int alias_index) {
@@ -168,11 +168,11 @@ int DF_get_attribute_index(int alias_index) {
 } /* DF_get_attribute_index() */
 
 char *DF_get_class_template(C_Type_t index) {
-  return Templates[index];
+  return (char*)Templates[index];   // FIXME: const qualifier
 } /* DF_get_class_template() */
 
 char *DF_get_class_template_v(C_Type_t index) {
-  return Templates_v[index];
+  return (char *)Templates_v[index];    // FIXME: const qualifier
 } /* DF_get_class_template_v() */
 
 char *DF_get_update_query(A_Type_t index){
