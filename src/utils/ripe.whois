@@ -94,7 +94,7 @@ check_server() {
 		NUM=$[NUM+1]
 		if [ $NUM -gt 90 ]; then	# admin tables are huge, and mysql can stall quite a bit before coughing up the first rows
 			# bail out
-			my_log "Couldn't connect to config port after 30 seconds - something's gone wrong!"
+			my_log "Couldn't connect to config port after 90 seconds - something's gone wrong!"
 			return
 		fi
 	done
@@ -104,10 +104,11 @@ check_server() {
 	RX_LOAD="Init"
 	NUM=0
 	key=""; escape=$'\x1b';
+	COLUMNS=${COLUMNS:-80}
 	
 	while [ $NUM -lt 60 ]; do	# radix tables are huge, and mysql can stall quite a bit before coughing up the first rows
-		RX_LOAD=`send_command 'show threads' | grep '^rx load' | awk '{printf("%s %s %s", $10, $11, $12);}'`
-		echo -en "\r${RX_LOAD}                              "
+		RX_LOAD=`send_command 'show threads' | grep '^rx load' | awk '{printf("[%s %s %s] ", $10, $11, $12);} | cut -c-'$[COLUMNS-30]`
+		echo -en "\r${RX_LOAD}                             "
 		if [ "$RX_LOAD" ]; then
 			NUM=0
 		else 
