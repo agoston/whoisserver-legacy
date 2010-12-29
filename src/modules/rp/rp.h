@@ -195,7 +195,7 @@ RP_pack_node_l(rx_oper_mt    mode,
 	       rp_upd_pack_t *pack, 
 	       rx_tree_t     *mytree);
 
-void rp_make_short(rp_upd_pack_t *pack, char **ptr, unsigned *len);
+void rp_make_short(rp_upd_pack_t *pack, char *ptr, unsigned *len);
 
 int RP_sql_load_reg(rp_regid_t reg_id);
 int RP_asc_load(char *filename, int maxobj, int operation, 
