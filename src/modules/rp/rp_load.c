@@ -227,11 +227,11 @@ static void *RP_sql_load_attr_space(void *arg) {
         die;
     }
 
+    LG_log(rp_context, LG_INFO, "loaded %dK objects into %s/%s", objnr>>10, srcnam, attr_code);
+
     SQ_free_result(result);
     SQ_close_connection(con);
     UT_free(srcnam);
-
-    LG_log(rp_context, LG_INFO, "loaded %d objects into %s", objnr, DF_get_attribute_code(attr));
 
     TA_delete();
 
