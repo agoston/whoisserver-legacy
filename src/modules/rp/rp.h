@@ -80,6 +80,14 @@ typedef struct {
     } d;                /* ascii blob representation of data */
 } rp_upd_pack_t;
 
+typedef struct {
+    rp_attr_t attr;         /* attribute */
+    ip_space_t space;       /* space (v4/v6) */
+    rp_regid_t reg_id;      /* a.k.a. source */
+    int result;             /* result of thread execution */
+    pthread_t thread_id;    /* pthread id */
+} RP_thread_info;
+
 #ifdef RP_IMPL
 #define EXTDEF(a,b) a = b;
 /* forest read write lock */
@@ -195,6 +203,9 @@ int RP_asc_load(char *filename, int maxobj, int operation,
 int RP_attr2spc(rp_attr_t type, ip_space_t space);
 
 void RP_init (LG_context_t *ctx);
+
+int RP_sql_load_start();
+int RP_sql_load_wait_until_finished();
 
 #undef EXTDEF
 #endif /* RP_H */

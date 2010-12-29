@@ -105,7 +105,7 @@ static void wr_free_list_element(void *cpy, void *trash) {
  * setting its value to NULL */
 void wr_clear_list(GList **list) {
 	/* allow NULL argument */
-	if ( *list != NULL) {
+	if (list && *list) {
 		g_list_foreach(*list, wr_free_list_element, NULL);
 		g_list_free(*list);
 		*list = NULL;

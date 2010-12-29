@@ -162,7 +162,7 @@ int main(int argc, char **argv)
 
 	/* Create signal handling thread and block signals for others */
 	/*   printf("Starting the signal handler\n"); */
-	TH_create((void *(*)(void *))SV_signal_thread, NULL);
+	TH_create((void *(*)(void *))SV_signal_thread, NULL, TRUE);
 
 	/*  Set the constants. */
 	/* fprintf(stderr,"Constants:\n");  */
