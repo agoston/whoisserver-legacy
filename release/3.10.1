@@ -3,8 +3,10 @@
 
 Changes:
 - Fixed bug resulting in '-k' flag not working
+- Fixed long outstanding bug that occured when used the same set of multiple
+  maintainers as 'mnt-by:' on route and as 'mbrs-by-ref:' on route-set
 - Backported revamped src/SQL directory format from strong_reg branch
-- Added parallel loading of radix trees
+- Radix trees are now loaded in parallel to help startup speed
 
 
 Affected stakeholders:
