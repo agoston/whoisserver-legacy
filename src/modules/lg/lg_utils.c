@@ -47,6 +47,12 @@ LG_device_t* LG_dev_get_stdout() {
 }
 */
 
+#ifdef DEBUG_LOG
+const int LG_LEVEL = LG_ALL;
+#else
+const int LG_LEVEL = LG_INFO+LG_WARN+LG_ERROR+LG_SEVERE+LG_FATAL+LG_FUNC;
+#endif
+
 LG_device_t* LG_dev_get_file(FILE* f) {
   LG_device_t* dev;
 
@@ -414,7 +420,7 @@ LG_appender_t* LG_app_get_daily_info_dump(gchar* path) {
   LG_appender_t* app;
 
   app = g_malloc(sizeof(LG_appender_t));
-  app->level = LG_INFO+LG_WARN+LG_ERROR+LG_SEVERE+LG_FATAL+LG_FUNC;
+  app->level = LG_LEVEL;
   app->device = LG_dev_daily(path);
   app->formatter = LG_frm_get_replicator();
 
@@ -426,7 +432,7 @@ LG_appender_t* LG_app_get_file_info_dump(FILE* f) {
   LG_appender_t* app;
 
   app = g_malloc(sizeof(LG_appender_t));
-  app->level = LG_INFO+LG_WARN+LG_ERROR+LG_SEVERE+LG_FATAL+LG_FUNC;
+  app->level = LG_LEVEL;
   app->device = LG_dev_get_file(f);
   app->formatter = LG_frm_get_replicator();
 
@@ -438,7 +444,7 @@ LG_appender_t* LG_app_get_filedes_dump(int fd) {
   LG_appender_t* app;
 
   app = g_malloc(sizeof(LG_appender_t));
-  app->level = LG_INFO+LG_WARN+LG_ERROR+LG_SEVERE+LG_FATAL+LG_FUNC;
+  app->level = LG_LEVEL;
   app->device = LG_dev_get_filedes(fd);
   app->formatter = LG_frm_get_replicator();
 
