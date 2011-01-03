@@ -175,8 +175,10 @@ static void radix_load(void) {
 	ca_dbSource_t *source_hdl;
 
 	for (i=0; CO_get_do_server() && (source_hdl = ca_get_SourceHandleByPosition(i))!=NULL; i++) {
-		dieif(RP_sql_load_reg(source_hdl) != RP_OK);
+		RP_sql_load_reg(source_hdl);
 	}
+	RP_sql_load_start();
+	RP_sql_load_wait_until_finished();
 }
 
 /************************************************************
@@ -454,7 +456,7 @@ static void *main_loop(void *arg) {
 		 */
 		argcopy = UT_malloc(sizeof(svr_args));
 		memcpy(argcopy, args, sizeof(svr_args));
-		TH_create(SV_do_child, (void *)argcopy);
+		TH_create(SV_do_child, (void *)argcopy, TRUE);
 	}
 
 	TA_delete();
@@ -504,7 +506,7 @@ static void SV_concurrent_server(int sock, int limit, char *name, void do_functi
 	args->counter->count = 0;
 
 	/* Start a new thread. */
-	TH_create(main_loop, (void *)args);
+	TH_create(main_loop, (void *)args, TRUE);
 
 } /* SV_concurrent_server() */
 
@@ -669,8 +671,8 @@ int SV_start(char *pidfile) {
 	AC_acc_load();
 	AC_persistence_init();
 	/* explicitly start the decay & persistence threads */
-	TH_create((void *(*)(void *))AC_decay, NULL);
-	TH_create((void *(*)(void *))AC_persistence_daemon, NULL);
+	TH_create((void *(*)(void *))AC_decay, NULL, TRUE);
+	TH_create((void *(*)(void *))AC_persistence_daemon, NULL, TRUE);
 
 	LG_log(sv_context, LG_INFO, "whois port is %d", whois_port);
 	LG_log(sv_context, LG_INFO, "config port is %d", config_port);
@@ -786,12 +788,12 @@ void SV_switchdynamic() {
 				source_name, ca_get_srcupdateport(source_hdl));
 				LG_log(sv_context, LG_INFO, "Source [%s] Mode UPDATE [port=%d]", source_name,
 				        ca_get_srcupdateport(source_hdl));
-				TH_create(UD_do_updates, (void *)source);
+				TH_create(UD_do_updates, (void *)source, TRUE);
 			} else if (IS_NRTM_CLNT(update_mode)) {
 				/* start NRTM client */
 				fprintf(stderr,"Source [%s] Mode NRTM\n", source_name);
 				LG_log(sv_context, LG_INFO, "Source [%s] Mode NRTM", source_name);
-				TH_create(UD_do_nrtm, (void *)source);
+				TH_create(UD_do_nrtm, (void *)source, TRUE);
 			} else {
 				/* notify STATIC sources */
 				fprintf(stderr,"Source [%s] Mode already STATIC\n", source_name);

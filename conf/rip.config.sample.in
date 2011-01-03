@@ -373,19 +373,12 @@ PW_ERR_LINETOOLONG %
 PW_ERR_LINETOOLONG % Input exceeds the maximum line length.
 
 #
-# Incompatible flags
-
-QC_FMT_UNCOMPFLAG %%ERROR:109: invalid combination of flags passed
-QC_FMT_UNCOMPFLAG %%
-QC_FMT_UNCOMPFLAG %% The flags "%s" and "%s" cannot be used together.
-
-#
 #
 # For data retrieved with the "-K" flag
 
 PW_K_FILTER % Note: this output has been filtered.
 PW_K_FILTER % Only primary keys will be visible.
-PW_K_FILTER % Contact information will not be shown
+PW_K_FILTER % Contact information will not be shown.
 
 #
 # User is not authorised to pass IP addresses with "-V" flag
@@ -467,7 +460,7 @@ QC_DUPPROXYIPFLAG % the administrator of the server and report this error.
 # Duplicate IP flags
 QC_FMT_DUPIPFLAG %%WARNING:901: duplicate IP flags passed
 QC_FMT_DUPIPFLAG %%
-QC_FMT_DUPIPFLAG %% More than one IP flag (-l, -L, -m, -M, -x, -b or -c) passed to the server.
+QC_FMT_DUPIPFLAG %% More than one IP flag (-l, -L, -m, -M, -x or -b) passed to the server.
 QC_FMT_DUPIPFLAG %% Only "-%s" will be used for this query.
 
 #
@@ -475,7 +468,14 @@ QC_FMT_DUPIPFLAG %% Only "-%s" will be used for this query.
 
 QC_USELESSIPFLAG %WARNING:902: useless IP flag passed
 QC_USELESSIPFLAG %
-QC_USELESSIPFLAG % An IP flag (-l, -L, -m, -M, -x, -d, -b, -C or -c) used without an IP key.
+QC_USELESSIPFLAG % An IP flag (-l, -L, -m, -M, -x, -d, -b) used without an IP key.
+
+#
+# Incompatible flags
+
+QC_FMT_UNCOMPFLAG %%ERROR:109: invalid combination of flags passed
+QC_FMT_UNCOMPFLAG %%
+QC_FMT_UNCOMPFLAG %% The flags "%s" and "%s" cannot be used together.
 
 #
 # Useless no-referral flag
@@ -493,7 +493,7 @@ QC_FMT_FIXEDLOOKUP %% The key "%s" has been changed to "%s" for lookup.
 
 #
 # Trailing dot in domain objects
-#
+
 QC_TRAILINGDOTINDOMAIN %%WARNING:906: trailing dot in domain query
 QC_TRAILINGDOTINDOMAIN %%
 QC_TRAILINGDOTINDOMAIN %% The key has been changed to "%s" for lookup.

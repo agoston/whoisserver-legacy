@@ -68,7 +68,7 @@ void TH_init_read_write_lockw(rw_lock_t *prw_lock);
 
 inline int TH_get_id(void);
 char *TH_to_string(void);
-pthread_t TH_create(void *do_function(void *), void *arguments );
+pthread_t TH_create(void *do_function(void *), void *arguments, gboolean detached);
 
 void (*orig_segfault_handler)(int);
 

@@ -6,7 +6,7 @@
 # unlike make_db, it has no dependencies on other scripts
 
 # Debug info: uncomment when debugging
-DEBUG="set -x"
+export DEBUG="set -x"
 $DEBUG
 
 DATECMD="/bin/date '+%Y-%m-%d %H:%M:%S'"
@@ -145,13 +145,17 @@ log "Loading database [$DB] (source [$SOURCE]) started"
 #log "Flush tables"
 #$MYSQLADMINCMD flush-tables
 
-cd ${SCRIPTDIR}/SQL
-./resetdata 2>&1
+pushd ${SCRIPTDIR}/SQL
+set -e
 
-if [ $? -ne 0 ]; then
-  error_exit "Error loading database=$DB for source=${SOURCE}, $0 exiting"
-fi
-cd -
+echo "resetting main database"
+cat main.truncate.sql main.data.sql main.dummy.sql | $MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB 2>&1
+
+echo "resetting admin database"
+cat admin.truncate.sql admin.data.sql | $MYSQL -h$RIPADMIN_DBHOST -P$RIPADMIN_DBPORT -u$RIPADMIN_DBUSER -p$RIPADMIN_DBPASS $RIPADMIN_DBNAME 2>&1
+
+set +e
+popd
 
 # load data
 if [ $NPASSES -eq 2 ]
@@ -179,25 +183,7 @@ then
 fi
 
 
-INITRX="issue_command_get_ret set initrx $SOURCE"
-
-# this is done in the make_db script
-#DYNAMICCHECK="issue_command show dynamic | grep 'whois R\.I\.P\. config>' | sed 's/.*whois R\.I\.P\. config>//'"
-#DYNAMICSTART="issue_command set dynamic start"
-
-#DYNAMIC=`$DYNAMICCHECK`
-#log "dynamic = $DYNAMIC"
-
-#if [ $DYNAMIC -ne 1 ]; then
-#  log "enabling dynamic updates"
-#  $DYNAMICSTART
-#  if [ $? -ne 0 ]; then
-#    error "Error setting dynamic to start"
-#    error_exit "$0 now exiting"
-#  fi
-#fi
-
-$INITRX
+issue_command_get_ret set initrx $SOURCE
 if [ $? -ne 0 ]; then
     error "Error reloading radix tree, $0 scheduling exit"
 fi

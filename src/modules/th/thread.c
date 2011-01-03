@@ -278,49 +278,34 @@ char *TH_to_string(void) {
 } /* TH_to_string() */
 
 
-/*++++++++++++++++++++++++++++++++++++++
+pthread_t TH_create(void *do_function(void *), void *arguments, gboolean detached) {
+    pthread_t tid;
+    pthread_attr_t attr;
+    size_t ssize;
 
-  This is the routine that creates a thread.
+    /* Start a new thread. */
+    pthread_attr_init(&attr); /* initialize attr with default attributes */
+    if (detached) pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-   More:
-  +html+ <PRE>
-  Author:
-        ottrey
-	joao
-	andrei
-  +html+ </PRE>
-  ++++++++++++++++++++++++++++++++++++++*/
-pthread_t TH_create(void *do_function(void *), void *arguments)
-{
-	pthread_t tid;
-	pthread_attr_t attr;
-	int ret;
-	size_t ssize;
+    pthread_attr_getstacksize(&attr, &ssize);
+    /* don't know if this stack size will be enough, but if ssize is set so low, we shouldn't set it more than absolutely needed */
+    if (ssize < 262144) {
+        pthread_attr_setstacksize(&attr, 262144);
+    }
 
-	/* Start a new thread. */
-	pthread_attr_init(&attr);	/* initialize attr with default attributes */
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    /* And we shouldn't use more than 1M, because we will run out of virtual address space on 32 bit systems
+     * (note that each thread has its own stack address space) */
+    if (ssize > 1048576) {
+        pthread_attr_setstacksize(&attr, 1048576);
+    }
 
-	pthread_attr_getstacksize(&attr, &ssize);
-	/* don't know if this stack size will be enough, but if ssize is set so low, we shouldn't set it more than absolutely needed */
-	if (ssize < 262144) {
-		pthread_attr_setstacksize(&attr, 262144);
-	}
+    if (pthread_create(&tid, &attr, do_function, arguments)) {
+        fprintf(stderr, "pthread_create(): %d: %s\n", errno, strerror(errno));
+        die;
+    }
+    pthread_attr_destroy(&attr);
 
-	/* And we shouldn't use more than 1M, because we will run out of virtual address space on 32 bit systems
-	 * (note that each thread has its own stack address space) */
-	if (ssize > 1048576) {
-		pthread_attr_setstacksize(&attr, 1048576);
-	}
-
-	ret = pthread_create(&tid, &attr, do_function, arguments);
-	if (ret != 0) {
-		fprintf(stderr, "pthread_create(): %d: %s\n", errno, strerror(errno));
-		die;
-	}
-	pthread_attr_destroy(&attr);
-
-	return tid;
+    return tid;
 }
 
 /* This function is called for macros 'die' and 'dieif', both defined in stubs.h

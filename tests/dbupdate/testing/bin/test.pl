@@ -43,6 +43,8 @@ use IO::Socket;
 use IO::Handle;
 use IO::Socket::INET6;
 
+use Data::Dumper;
+
 # global configuration
 our $CONFIG = {};
 
@@ -1185,6 +1187,9 @@ sub match_query($$) {
 
     my $query_orig = $query;
     $query =~ s/^[\s]*EXACT[\s]+//i;
+    # replace newlines in query so that we can issue more than 1 in a single test
+    # in this case '-k' is required for the first query, and an empty query terminates
+    $query =~ s/\\n/\n/g;
 
     my $whois;
 
@@ -1391,8 +1396,7 @@ sub exec_dbupdate($) {
 
     if ( $commandline =~ /<[\s]*(.*)[\s]*$/ ) {
         $input_redirect = $1;
-        $commandline
-            =~ s/<[\s]*(.*)[\s]*$//;    # delete redirector and the filename
+        $commandline =~ s/<[\s]*(.*)[\s]*$//;    # delete redirector and the filename
     }
 
     # split the command line into space seperated arguments
@@ -1524,8 +1528,7 @@ sub run_update(@) {
     $tempfile =~ s/^(.*)\/(.*)$/$2/;
     $tempfile = getvar('TEST_TMPDIR') . "/$tempfile.$$";
 
-    my $force
-        = shift(@_);    # flag to indicate that it should be always successful
+    my $force = shift(@_);    # flag to indicate that it should be always successful
     my $update = [];
     my $flags;
 
@@ -1973,6 +1976,7 @@ sub filter($$$$) {
             next;
         }
         elsif (/^\?([-]?[0-9]+)/o) {
+            # with a '?20' line, one can set the expected dbupdate error code
             setvar('DBUPDATE_IGNORE_EXIT_CODE',$1);
             next;
         }
@@ -2199,6 +2203,15 @@ sub run_test($) {
         = ( 'DBUPDATE_FLAGS', 'DBUPDATE_FLAGS_EXT', 'EXEC_BEFORE',
         'EXEC_AFTER', 'QUERY_AF', 'TEST_RIR', 'DBUPDATE_IGNORE_EXIT_CODE' );
 
+    # -1. unset the variables - for some reason, they are set at this point, even though they are
+    # supposed to be cleaned at the end of this sub - ???
+    foreach my $var (@vars_cleanup) {
+        delvar($var);
+    }
+
+    # debug
+    #print Dumper $CONFIG;
+
     # initialize filenames
     init_paths();
     # get and set the per-test variables from the 'test' file
@@ -2373,14 +2386,19 @@ sub report(@) {
     open( REPORTLOG, ">> $reportlog " )
         or die "Can't open file $reportlog: $!";
 
-    $format =~ s/(E_\S*)/defined($ERR->{$1})?$ERR->{$1}:$1/ie;
-    $format =~ s/%([HMS])/%%$1/g;
+    #$format =~ s/(E_\S*)/defined($ERR->{$1})?$ERR->{$1}:$1/ie;
+    #$format =~ s/%([HMS])/%%$1/g;
 
-    printf REPORTLOG $format, @args;
-    printf STDOUT $format, @args if ( getvar('OUTPUT_REPORT') );
+    if (scalar @args > 0) {
+        printf REPORTLOG $format, @args;
+        printf STDOUT $format, @args if ( getvar('OUTPUT_REPORT') );
+    } else {
+        print REPORTLOG $format;
+        print STDOUT $format if ( getvar('OUTPUT_REPORT') );
+    }
+
     close(REPORTLOG)
         or die "Can't close file $reportlog: $!";
-
 }
 
 sub stamp_test($) {

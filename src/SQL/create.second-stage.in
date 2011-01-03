@@ -1,6 +1,0 @@
-#!/bin/sh
-
-#echo "creating indexes for main tables"
-$MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB <main.index.1
-
-

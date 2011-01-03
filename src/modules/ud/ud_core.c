@@ -735,16 +735,7 @@ static int auth_member_of(const rpsl_attr_t *attribute, Transaction_t *tr) {
 		UT_free(qresult);
 
 	/* Check if membership is protected by the keyword "ANY" */
-	/* There is a dummy mntmer object in the database corresponding to "ANY" */
-	/* Its object_id==0 */
-	/* EXAMPLE:
-
-	 SELECT route_set.object_id
-	 FROM   mbrs_by_ref, route_set
-	 WHERE  mbrs_by_ref.object_id=route_set.object_id
-	 AND    route_set.route_set=<setname>
-	 AND    mbrs_by_ref.mnt_id=0
-	 */
+	/* There is a dummy record in the mntner table with object_id==0, check src/SQL/main.data.sql */
 	g_string_sprintf(query, "SELECT %s.object_id FROM mbrs_by_ref, %s "
 		"WHERE mbrs_by_ref.object_id=%s.object_id "
 		"AND %s.%s='%s' AND mbrs_by_ref.mnt_id=0 ", set_name, set_name, set_name, set_name, set_name, attribute_value);
@@ -759,13 +750,17 @@ static int auth_member_of(const rpsl_attr_t *attribute, Transaction_t *tr) {
 
 	/* Now check if our mnt_by belongs to mbrs_by_ref list of the set */
 	/* we search only mnt_by.thread_id!=0 to check against new/updated mnt-by attribute */
-	g_string_sprintf(query, "SELECT mbrs_by_ref.object_id FROM %s, mbrs_by_ref, mnt_by "
-		"WHERE mbrs_by_ref.mnt_id=mnt_by.mnt_id "
-		"AND mnt_by.object_id=%ld "
-		"AND %s.object_id=mbrs_by_ref.object_id "
-		"AND %s.%s='%s' "
-		"AND ( mnt_by.thread_id=%d OR mnt_by.thread_id=%d ) ", set_name, tr->object_id, set_name, set_name, set_name,
-	        attribute_value, tr->thread_upd, tr->thread_ins);
+	/* We use MIN() as there are possibly multiple maintainers that are present in both the X-set and X, thus resulting in
+	 * multiple records, that get_qresult_str() chokes on */
+	g_string_sprintf(query, "SELECT MIN(mbrs_by_ref.object_id) FROM %s "
+	        "JOIN mbrs_by_ref ON %s.object_id=mbrs_by_ref.object_id "
+	        "JOIN mnt_by ON mnt_by.object_id = %ld AND mbrs_by_ref.mnt_id = mnt_by.mnt_id "
+	        "WHERE %s.%s='%s' AND ( mnt_by.thread_id=%d OR mnt_by.thread_id=%d ) ",
+	        set_name,
+	        set_name,
+	        tr->object_id,
+	        set_name, set_name, attribute_value,
+	        tr->thread_upd, tr->thread_ins);
 
 	qresult = get_qresult_str(tr->sql_connection, query->str);
 	/* If our mntner is listed (non-empty result)  membership is authorized */

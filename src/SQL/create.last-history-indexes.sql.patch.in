@@ -1,4 +1,0 @@
-#indexes for surf
-
-CREATE INDEX last_pkey ON last(pkey);
-CREATE INDEX history_pkey ON history(pkey);

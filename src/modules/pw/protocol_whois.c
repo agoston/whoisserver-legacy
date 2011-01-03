@@ -683,6 +683,10 @@ void PW_interact(svr_args *args) {
                 }
 
                 QC_free(qc);
+
+                /* clear eIP for next query */
+                memset(&(qe->eIP), 0, sizeof(qe->eIP));
+                qe->eIPs[0] = 0;
             }
         }
     } while (qe->k && qe->condat.rtc == 0 && deny == 0 && CO_get_whois_suspended() == 0);

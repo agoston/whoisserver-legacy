@@ -577,28 +577,24 @@ int set_queries(char *input, GString *output, sk_conn_st *condat)
   Argument: the source name.
 
   ++++++++++++++++++++++++++++++++++++++*/
-int set_initrx(char *input, GString *output, sk_conn_st *condat) 
-{
-ca_dbSource_t *source_hdl;
-int res = 0;
- 
-	source_hdl = ca_get_SourceHandleByName(input); 
-        if (source_hdl == NULL){
-		g_string_append(output,  "Unknown source");
-		res = PC_RET_ERR;
-	}
-	else if(RP_init_trees( source_hdl ) != RP_OK ) {
-		g_string_append(output, "Could not re-initialize radix trees");
-                res = PC_RET_ERR;
-	}
-	else if(RP_sql_load_reg( source_hdl ) != RP_OK ) {
-		g_string_append(output, "Could not load radix trees");
-                res = PC_RET_ERR;
-	}
-        else {
-         g_string_append(output, "radix trees reloaded successfully\n");		
-        }
- return res;
+int set_initrx(char *input, GString *output, sk_conn_st *condat) {
+    ca_dbSource_t *source_hdl;
+    int res = 0;
+
+    source_hdl = ca_get_SourceHandleByName(input);
+    if (source_hdl == NULL) {
+        g_string_append(output, "Unknown source");
+        res = PC_RET_ERR;
+    } else if (RP_init_trees(source_hdl) != RP_OK) {
+        g_string_append(output, "Could not re-initialize radix trees");
+        res = PC_RET_ERR;
+    } else if ((RP_sql_load_reg(source_hdl) != RP_OK) || (RP_sql_load_start() != RP_OK) || (RP_sql_load_wait_until_finished() != RP_OK)) {
+        g_string_append(output, "Could not load radix trees");
+        res = PC_RET_ERR;
+    } else {
+        g_string_append(output, "radix trees reloaded successfully\n");
+    }
+    return res;
 }
 /*++++++++++++++++++++++++++++++++++++++
   

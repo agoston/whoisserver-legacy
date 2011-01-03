@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# execute debug (set by caller to 'set -x' if debug output required)
+$DEBUG
+
 check_error()
 {
 	if [ $2 -ne 0 ] 
@@ -38,10 +41,14 @@ $DEBUG
 NPASSES=$1
 NPASSES=${NPASSES:?"Usage $0 npasses"}
 echo "*******************"`date`"******************" 
-echo "Creating tables\n" 
 echo "Creating tables\n"
 
-cd $SCRIPTDIR/SQL; sh ./create.first-stage; cd ..
+cd $SCRIPTDIR/SQL
+# at the moment, we need the dummy object for nrtm v2 emulation.
+# the whole dummy object caching can be removed completely as we
+# deprecate nrtm v2 and support nrtm v3 only - agoston, 2010-09-27
+cat main.create.sql main.data.sql main.dummy.sql| $MYSQL -h$HOST -P$PORT -u$USER -p$PASSWORD $DB
+cd ..
 
 # 2 - pass loading 
 
@@ -53,13 +60,6 @@ then
   loadpass 1 
   check_error "Pass I failed" $?
 fi
-
-echo `date`"\n" 
-echo "Making indexes\n"
-
-cd $SCRIPTDIR/SQL; ./create.second-stage; cd ..
-
-
 
 if [ $NPASSES -eq 2 ]
 then
@@ -77,13 +77,6 @@ then
   loadpass 0
   check_error "Pass I failed" $?
 fi
-
-
-
-echo `date`"\n" 
-echo "Making more indexes\n"
-
-cd $SCRIPTDIR/SQL; ./create.third-stage; cd ..
 
 echo "Finished "`date`
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Debug info: uncomment when debugging
-DEBUG="set -x"
+export DEBUG="set -x"
 $DEBUG
 
 ##
@@ -166,9 +166,6 @@ if [ $? -ne 0 ]; then
 fi
 
 REMADMINCMD="$TOPDIR/bin/remadmin.pl -h $WHOISHOST -p $CONFPORT"
-PAUSEQUERIES="$REMADMINCMD set queries pause"
-RESUMEQUERIES="$REMADMINCMD set queries resume"
-RESUMEUPDATES="$REMADMINCMD set updates resume"
 INITRX="$REMADMINCMD set initrx $SOURCE"
 
 # enable updates
@@ -187,14 +184,8 @@ if [ $DYNAMIC -ne 1 ]; then
   fi
 fi
 
-$PAUSEQUERIES
 if [ $? -ne 0 ]; then
-   error "Error stopping queries, attempting to resume queries"
-   $RESUMEQUERIES
-    if [ $? -ne 0 ]; then
-      error "Error resuming queries"
-    fi
-    error_exit "$0 now exiting"
+   error "Error stopping queries, $0 now exiting"
 fi
 
 $MYSQLADMINCMD flush-tables
@@ -212,12 +203,10 @@ $REMADMINCMD set access_tree
 $REMADMINCMD set aaa_cache
 
 # at one point, initrx would stop updates - resume them here just in case
-$RESUMEUPDATES
 if [ $? -ne 0 ]; then
     error "Error resuming updates, $0 scheduling exit"
     ERROR=1
 fi
-$RESUMEQUERIES
 if [ $? -ne 0 ]; then
     error "Error resuming queries, $0 exiting"
     ERROR=1
@@ -227,4 +216,3 @@ if [ $ERROR -eq 1 ]; then
 fi
 
 log "Loading database [$SQLDB] (source [$SOURCE]) finished without errors"
-

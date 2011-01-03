@@ -158,9 +158,7 @@ loader_SOURCES = loader_src/loader.c
 loader_LDADD = $(LDRIP)
 
 getvar_SOURCES = getvar_src/getvar.c
-# FIXME: this should be LDRIPNOMYSQL, but we have compilation problems on the old whois boxes
-#getvar_LDADD = $(LDRIPNOMYSQL)
-getvar_LDADD = $(LDRIP)
+getvar_LDADD = $(LDRIPNOMYSQL)
 
 #archive_SOURCES = history/miniconf.c history/aconf.c history/archive.c history/dbsupport.c
 #archive_LDADD = $(LDHISTORY)
@@ -180,9 +178,7 @@ getvar_LDADD = $(LDRIP)
 ripupdate_SOURCES = ripupdate_src/ripupdate.c
 
 mr_SOURCES = mr_src/mr.c
-# FIXME: this should be LDRIPNOMYSQL, but we have compilation problems on the old whois boxes
-#mr_LDADD = $(LDRIPNOMYSQL)
-mr_LDADD = $(LDRIP)
+mr_LDADD = $(LDRIPNOMYSQL)
 
 text_export_SOURCES = text_export_src/text_export.c
 text_export_LDADD = $(LDRIP)
@@ -222,11 +218,3 @@ install-exec-hook:
 	${INSTALL} -m 0644 ../doc/LOOKUP-HELP $(DESTDIR)/${docdir}
 	${INSTALL} -m 0644 ../conf/sample.db.gz  $(DESTDIR)/${tmpdir}/load/SAMPLE
 	${INSTALL} -m 0644 ../conf/SAMPLE.CURRENTSERIAL  $(DESTDIR)/${tmpdir}/load/SAMPLE
-	${INSTALL} -m 0644 ./SQL/aux.index.2 $(DESTDIR)/${bindir}/SQL
-	${INSTALL} -m 0644 ./SQL/create.RIPADMIN.sql $(DESTDIR)/${bindir}/SQL
-	${INSTALL} -m 0644 ./SQL/create.tables.sql $(DESTDIR)/${bindir}/SQL
-	${INSTALL} -m 0644 ./SQL/leaf.index.2 $(DESTDIR)/${bindir}/SQL
-	${INSTALL} -m 0644 ./SQL/main.index.1 $(DESTDIR)/${bindir}/SQL
-	${INSTALL} -m 0755 ./SQL/create.first-stage $(DESTDIR)/${bindir}/SQL
-	${INSTALL} -m 0755 ./SQL/create.second-stage $(DESTDIR)/${bindir}/SQL
-	${INSTALL} -m 0755 ./SQL/create.third-stage $(DESTDIR)/${bindir}/SQL

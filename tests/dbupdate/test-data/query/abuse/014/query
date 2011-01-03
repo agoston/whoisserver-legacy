@@ -2,7 +2,7 @@
 
 %WARNING:901: duplicate IP flags passed
 %
-% More than one IP flag (-l, -L, -m, -M, -x, -d, -b, -C or -c) passed to the server.
+% More than one IP flag (-l, -L, -m, -M, -x or -b) passed to the server.
 % Only "-L" will be used for this query.
 
 % Note: this output has been filtered.

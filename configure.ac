@@ -1,10 +1,10 @@
 M4PATH=m4
 
 AC_PREREQ(2.59)
-AC_INIT([Whois Server], [3.10],
+AC_INIT([Whois Server], [3.10.1],
         [RIPE Database Management <ripe-dbm@ripe.net>],
         [whoisserver])
-AM_INIT_AUTOMAKE([whoisserver],[3.10])
+AM_INIT_AUTOMAKE([whoisserver],[3.10.1])
 
 PRODUCT=$PACKAGE_NAME
 VERSION=$PACKAGE_VERSION
@@ -359,19 +359,6 @@ AC_CONFIG_FILES([
   doc/LOOKUP-HELP
   src/defs/makedefsall
   src/defs/Makefile
-  src/SQL/aux.index.2
-  src/SQL/fingerpr_x509.sql.patch
-  src/SQL/create.first-stage
-  src/SQL/create.second-stage
-  src/SQL/leaf.index.2
-  src/SQL/create.irt-tables.sql.patch
-  src/SQL/create.tables.sql
-  src/SQL/main.index.1
-  src/SQL/create.last-history-indexes.sql.patch
-  src/SQL/create.tables.sql.patch
-  src/SQL/dummification.sql.patch
-  src/SQL/create.RIPADMIN.sql
-  src/SQL/create.third-stage
   src/opl-perl/Makefile.PL
   Makefile
   src/Makefile
