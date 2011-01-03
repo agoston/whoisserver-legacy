@@ -1,0 +1,39 @@
+# CASE 4: We try to create a route object indirectly populating route-set 
+#         We do this with a double maintainer set
+#
+#FAILED
+#
+# RESULT 4: The creation will fail.
+
+route-set:    RS-UUNETNL
+descr:        community for routing domain UUNETNL
+mbrs-by-ref:  TEST-DBM-MNT
+mbrs-by-ref:  TEST-MNT
+tech-c:       TP1-DB-TEST
+admin-c:      TP1-DB-TEST
+notify:       unread@ripe.net
+mnt-by:       TEST-DBM-MNT
+mnt-by:       TEST-MNT
+changed:      unread@ripe.net 20011030
+source:       DB-TEST
+
+route:        192.250.24.0/23
+descr:        Encompass Europe
+origin:       AS100
+member-of:    RS-UUNETNL
+remarks:      -------------------------------------------
+remarks:      E-mail is the preferred contact method!
+remarks:      -------------------------------------------
+remarks:      Please use one of the following addresses:
+remarks:      abuse@nl.uu.net   - for abuse notification
+remarks:      support@nl.uu.net - for technical questions
+remarks:      info@nl.uu.net    - for anything else
+remarks:      -------------------------------------------
+notify:       unread@ripe.net
+mnt-by:       TEST-DBM-MNT
+mnt-by:       TEST-MNT
+changed:      unread@ripe.net 20011030
+source:       DB-TEST
+
+password: auth
+password: hostmaster
