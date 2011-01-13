@@ -589,7 +589,7 @@ QI_INTERNAL_ERROR
 # The below lines will be added to the end of every such object
 
 DUMMY_ADD_ATTR ****************************
-DUMMY_ADD_ATTR * THIS OBJECT IS NOT VALID
+DUMMY_ADD_ATTR * THIS OBJECT IS MODIFIED
 DUMMY_ADD_ATTR * Please note that all data that is generally regarded as personal 
 DUMMY_ADD_ATTR * data has been removed from this object.
 DUMMY_ADD_ATTR * To view the original object, please query the RIPE Database at:

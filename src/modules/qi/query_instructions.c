@@ -519,6 +519,11 @@ char *QI_fast_output(const char *str) {
             g_string_append(result_buff, (char *) value);
             break;
 
+        case 0:
+            // this is the ending empty newline
+            g_string_append_c(result_buff, '\n');
+            break;
+
         default:
             /* a line of the form "attribute: value" */
             /* first: close the last line (if there was any, i.e. j>0) */
@@ -532,34 +537,28 @@ char *QI_fast_output(const char *str) {
             /* if there's no colon for whatever reason, dump the object
              and report the condition */
             if (colon == NULL) {
-                LG_log(qi_context, LG_ERROR, " [%s]", lines[0]);
+                LG_log(qi_context, LG_ERROR, "Object [%s], line %d has no : on the line", lines[0], j);
                 goto fast_output_cleanup;
             }
             *colon = '\0';
-            for (value = colon + 1; *value != '\0' && isspace(*value); value++)
-                ;
+            for (value = colon + 1; *value != '\0' && isspace(*value); value++);
 
-            /* rev-srv hack, remove this after rev-srv deprecation project is done 
-             * agoston, 2009-05-29 */
-            if (!strcmp(attr, "rev-srv")) {
-                g_string_append(result_buff, "*rz: ");
-                g_string_append(result_buff, (char *) value);
+            if (((i = DF_attribute_name2type(attr)) == -1)) {
+                /* warning! error in the object format */
+                LG_log(qi_context, LG_ERROR, "No attribute code found for attribute [%s] in object [%s], line %d", lines[j], lines[0], j);
+                goto fast_output_cleanup;
+
             } else {
-                if (((i = DF_attribute_name2type(attr)) == -1)) {
-                    /* warning! error in the object format */
-                    LG_log(qi_context, LG_ERROR, " [%s]", lines[0]);
-                    goto fast_output_cleanup;
-
-                } else {
-                    /* This is the juicy bit that converts the likes of; "source: RIPE" to "*so: RIPE" */
-                    g_string_append_c(result_buff, '*');
-                    g_string_append(result_buff, DF_get_attribute_code(i));
-                    g_string_append(result_buff, ": ");
-                    g_string_append(result_buff, (char *) value);
-                }
+                /* This is the juicy bit that converts the likes of; "source: RIPE" to "*so: RIPE" */
+                g_string_append_c(result_buff, '*');
+                g_string_append(result_buff, DF_get_attribute_code(i));
+                g_string_append(result_buff, ": ");
+                g_string_append(result_buff, (char *) value);
             }
-        } /* switch */
-    } /* for every line */
+
+            *colon = ':';   // set it back to original value (e.g. for first line that we use for logging to identify the object
+        }
+    }
 
     fast_output_cleanup:
 
@@ -570,7 +569,7 @@ char *QI_fast_output(const char *str) {
     g_string_free(result_buff, /* CONSTCOND */TRUE);
 
     return result;
-} /* fast_output() */
+}
 
 /* brief_filter() */
 /*++++++++++++++++++++++++++++++++++++++
