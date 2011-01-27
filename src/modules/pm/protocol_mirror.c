@@ -945,9 +945,7 @@ void PM_interact(svr_args *args) {
                 sleep(2);
         }
 
-    } /* do while there are more serials, connection was not reset and XXX do_server is on*/
-    while ((current_serial <= nrtm_q.last) && (condat.rtc == 0) && (CO_get_do_server() == 1));
-    /*******************************************************************/
+    } while ((current_serial <= nrtm_q.last) && (condat.rtc == 0) && (CO_get_do_server() == 1));
 
     sprintf(buff, "%%END %s\n\n\n", nrtm_q.source);
     SK_cd_puts(&condat, buff);
