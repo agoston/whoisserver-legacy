@@ -1145,7 +1145,7 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
     retval |= UP_check_disallowmnt(rt_ctx, lg_ctx, preproc_obj);
 
-    retval |= UP_check_org_attr(rt_ctx, lg_ctx, preproc_obj);
+    retval |= UP_check_inet_required_attr(rt_ctx, lg_ctx, preproc_obj);
 
     retval |= UP_check_organisation(rt_ctx, lg_ctx, preproc_obj, operation);
 

@@ -541,7 +541,12 @@ No PGP error on object
 
   <xsl:template match="wrong_org_attr_optionality">
  
-***Error: Missing mandatory "org:" attribute.
+***Error: Missing required "org:" attribute.
+  </xsl:template>
+
+  <xsl:template match="wrong_ass_size_attr_optionality">
+ 
+***Error: Missing required "assignment-size:" attribute.
   </xsl:template>
 
   <xsl:template match="organisation_creation_without_auto_id">

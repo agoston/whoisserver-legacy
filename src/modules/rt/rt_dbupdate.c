@@ -1758,6 +1758,15 @@ void RT_wrong_org_attr_optionality(RT_context_t* ctx){
   rt_prepare_node(ctx, node);
 }
 
+/* external check: optionality of "assignment-size:" attribute */
+void RT_wrong_ass_size_attr_optionality(RT_context_t* ctx){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"wrong_ass_size_attr_optionality");
+
+  rt_prepare_node(ctx, node);
+}
+
 
 /* external check: for organisation object creations, the orgID must be AUTO-id */
 void RT_organisation_creation_without_auto_id(RT_context_t* ctx){
