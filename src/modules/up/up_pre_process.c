@@ -143,12 +143,13 @@ int UP_check_country_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
      inetnum: ALLOCATED PI, ALLOCATED PA, ALLOCATED UNSPECIFIED 
    The inetn6um must have an "assignment-size:" attribute if its
    "status:" attribute is AGGREGATED-BY-LIR
+   The assignment-size must be > prefix size
 
    Receives RT context
             LG context
             parsed object
    Returns  UP_FAIL if an object does not have an "org:" attr when it has to have one
-            UP_OK if optionality of "org:" attribute is OK
+            UP_OK if optionality of required attributes is OK
 */
 
 int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
@@ -160,11 +161,19 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   GList *status_attrs = NULL;
   GList *org_attrs = NULL;
   GList *ass_size_attrs = NULL;
+  GList *pkey = NULL;
+  char *value = NULL;
+  char *ass_size = NULL;
+  char *dummy = NULL;
+  char *prefix = NULL;
 
 
-  LG_log(lg_ctx, LG_FUNC,">UP_check_org_attr: entered");
+  LG_log(lg_ctx, LG_FUNC,">UP_check_inet_required_attr: entered");
 
   type = rpsl_object_get_class(preproc_obj);
+  pkey = rpsl_object_get_attr(object, type);
+  pvalue = rpsl_attr_get_clean_value((rpsl_attr_t *)(pkey->data));
+
   org_attrs = rpsl_object_get_attr(preproc_obj, "org");
   ass_size_attrs = rpsl_object_get_attr(preproc_obj, "assignment-size");
 
@@ -172,12 +181,7 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   {
     /* if the object is an inetnum */
     status_attrs = rpsl_object_get_attr(preproc_obj, "status");
-    if (status_attrs == NULL)
-    {
-      /* this should have been checked in RPSL syntax checks. Just return OK */
-      retval = UP_OK;
-    }
-    else
+    if ( status_attrs )
     {
        status_value = rpsl_attr_get_clean_value(status_attrs->data);
        g_strup(status_value);
@@ -186,21 +190,13 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
             || strncmp(status_value, "ALLOCATED UNSPECIFIED", strlen("ALLOCATED UNSPECIFIED")) == 0 )
 
        {
-         LG_log(lg_ctx, LG_DEBUG,"UP_check_org_attr: inetnum requires org");
+         LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: inetnum requires org");
          if(org_attrs == NULL)
          {
            retval = UP_FAIL; /* this object must have an "org:" attribute! */
-           LG_log(lg_ctx, LG_DEBUG,"UP_check_org_attr: no org found");
+           LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: no org found");
            RT_wrong_org_attr_optionality(rt_ctx);
          }
-         else
-         {
-           retval = UP_OK;
-         }
-       }
-       else
-       {
-         retval = UP_OK;
        }
        free(status_value);
     }
@@ -209,56 +205,53 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   {
     /* if the object is an inet6num */
     status_attrs = rpsl_object_get_attr(preproc_obj, "status");
-    if (status_attrs == NULL)
-    {
-      /* this should have been checked in RPSL syntax checks. Just return OK */
-      retval = UP_OK;
-    }
-    else
+    if ( status_attrs )
     {
        status_value = rpsl_attr_get_clean_value(status_attrs->data);
        g_strup(status_value);
        if ( ( strncmp(status_value, "ALLOCATED-BY-RIR", strlen("ALLOCATED-BY-RIR")) == 0 ) || 
             ( strncmp(status_value, "ASSIGNED PI", strlen("ASSIGNED PI")) == 0 ) )
        {
-         if (org_attrs == NULL)
+         if ( ! org_attrs )
          {
            retval = UP_FAIL; /* this object must have an "org:" attribute! */
-           LG_log(lg_ctx, LG_DEBUG,"UP_check_org_attr: no org found");
+           LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: no org found");
            RT_wrong_org_attr_optionality(rt_ctx);
-         }
-         else
-         {
-           retval = UP_OK;
          }
        }
        else if ( ( strncmp(status_value, "AGGREGATED-BY-LIR", strlen("AGGREGATED-BY-LIR")) == 0 ) )
        {
-         if (ass_size_attrs == NULL)
+         if ( ! ass_size_attrs )
          {
            retval = UP_FAIL; /* this object must have an "assignment-size:" attribute! */
-           LG_log(lg_ctx, LG_DEBUG,"UP_check_org_attr: no assignment-size found");
+           LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: no assignment-size found");
            RT_wrong_ass_size_attr_optionality(rt_ctx);
          }
          else
          {
-           retval = UP_OK;
+           ass_size = rpsl_attr_get_clean_value((rpsl_attr_t *)(ass_size_attrs->data));
+           g_strdown(pvalue);
+           sscanf(pvalue, "%s/%s", dummy, prefix);
+           if ( prefix )
+           {
+               prefix_n = atoi(prefix);
+               ass_size_n = atoi(ass_size);
+               if ( prefix_n >= ass_size_n)
+               {
+                   retval = UP_FAIL; /* ass_size must be > prefix */
+                   LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: prefix %d >= assignment-size %d", prefix_n, ass_size_n);
+                   RT_wrong_ass_size(rt_ctx);
+               }
+           }
+           free(ass_size);
          }
-       }
-       else
-       {
-         retval = UP_OK;
        }
        free(status_value);
     }
   }
-  else
-  {
-    /* if the object is not an inet(6)num object, just return OK */
-    retval = UP_OK;
-  }
+  free(pvalue);
 
-  LG_log(lg_ctx, LG_FUNC,"<UP_check_org_attr: exiting with value [%s]", UP_ret2str(retval));
+  LG_log(lg_ctx, LG_FUNC,"<UP_check_inet_required_attr: exiting with value [%s]", UP_ret2str(retval));
   return retval;
 }
 

@@ -549,6 +549,11 @@ No PGP error on object
 ***Error: Missing required "assignment-size:" attribute.
   </xsl:template>
 
+  <xsl:template match="wrong_ass_size">
+ 
+***Error: "assignment-size:" value must be greater then prefix size.
+  </xsl:template>
+
   <xsl:template match="organisation_creation_without_auto_id">
   
 ***Error: The organisation ID must be AUTO-id for organisation object creations.

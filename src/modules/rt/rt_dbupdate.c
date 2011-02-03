@@ -1767,6 +1767,15 @@ void RT_wrong_ass_size_attr_optionality(RT_context_t* ctx){
   rt_prepare_node(ctx, node);
 }
 
+/* external check: size of "assignment-size:" */
+void RT_wrong_ass_size(RT_context_t* ctx){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"wrong_ass_size");
+
+  rt_prepare_node(ctx, node);
+}
+
 
 /* external check: for organisation object creations, the orgID must be AUTO-id */
 void RT_organisation_creation_without_auto_id(RT_context_t* ctx){
