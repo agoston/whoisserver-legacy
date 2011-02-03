@@ -1855,6 +1855,14 @@
     <syntax>status-i6</syntax>
   </ripe_attribute>
 
+  <ripe_attribute xmlname="assignment-size" name="assignment-size" code="ae">
+    <description>
+   Specifies the size of blocks assigned to end users from
+   this aggregated inet6num assignment.
+    </description>
+    <syntax>assignment-size</syntax>
+  </ripe_attribute>
+
   <ripe_attribute name="org-type" code="ot">
     <description>
   Specifies the type of the organisation.  The possible values are:
@@ -1862,8 +1870,8 @@
   'RIR' for Regional Internet Registries
   'NIR' for National Internet Registries
   'LIR' for Local Internet Registries
-  WHITEPAGES for special links to industry people
-  DIRECT_ASSIGNMENT for direct contract with RIPE NCC
+  'WHITEPAGES' for special links to industry people
+  'DIRECT_ASSIGNMENT' for direct contract with RIPE NCC
   'OTHER' for all other organisations.
     </description>
     <syntax>org-type</syntax>
