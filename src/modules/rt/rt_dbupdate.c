@@ -2060,6 +2060,14 @@ void RT_status_check_failed_parentwithoutstatus(
   rt_prepare_node(ctx, node);
 }
 
+void RT_invalid_grandparent_status(RT_context_t* ctx) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"invalid_grandparent_status");
+
+  rt_prepare_node(ctx, node);
+}
+
 static void RT_status_check_failed_message(RT_context_t *ctx,gchar *t) {
   xmlNodePtr node;
 

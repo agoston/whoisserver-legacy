@@ -55,11 +55,51 @@ get_status (rpsl_object_t *obj)
   {
     status = rpsl_attr_get_clean_value(status_attr->data);
     g_strup(status);
+    rpsl_attr_delete_list(status_attr);
   }
-  rpsl_attr_delete_list(status_attr);
 
   LG_log(au_context, LG_FUNC, "<get_status: exiting with value [\"%s\"]", status ? status : "NULL");
   return status;
+}
+
+static gboolean
+grand_parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj)
+{
+    GList *parents;
+    char *parent_status;
+
+    LG_log(au_context, LG_FUNC, ">grand_parent_status_is_valid: entering");
+
+    /* get parent(s) */
+    if (LU_get_parents(au_lookup, &parents, obj, NULL) != LU_OKAY)
+    {
+      /* error with lookup, reject */
+      LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
+      return FALSE;
+    }
+
+    /* if no parents, reject */
+    if (parents == NULL)
+    {
+      LG_log(au_context, LG_DEBUG, "grand_parent_status_is_valid: no parent(s)");
+      LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
+      return FALSE;
+    }
+
+    parent_status = get_status(parents->data);
+    if ( parent_status && ! strcmp(parent_status, "AGGREGATED-BY-LIR") )
+    {
+      /* if parent_status is AGGREGATED-BY-LIR, grand parent status cannot be AGGREGATED-BY-LIR */
+      if ( parent_status_is_valid(ctx, parents->data, "AGGREGATED-BY-LIR", NULL) )
+      {
+        LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
+        RT_invalid_grandparent_status(ctx);
+        return FALSE;
+      }
+    }
+
+    LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [TRUE]");
+    return TRUE;
 }
 
 static gboolean
@@ -609,7 +649,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
 
   gboolean parent_status_ok;
 
-  AU_ret_t ret_val;
+  AU_ret_t ret_val = AU_UNAUTHORISED_CONT;
   gboolean override;
 
   LG_log(au_context, LG_FUNC, ">ripe_inet6num_checks: entering");
@@ -628,7 +668,6 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
   new_status = get_status(info->obj);
   if (new_status == NULL)
   {
-    ret_val = AU_UNAUTHORISED_CONT;
     LG_log(au_context, LG_ERROR, "ripe_inet6num_checks: no \"status:\" on updated inet6num");
     RT_status_check_failed_missingstatus(info->ctx);
   }
@@ -656,7 +695,6 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
              (strcmp(old_status, "ASSIGNED ANYCAST") == 0))
     {
       RT_status_check_failed_anycast_modify(info->ctx);
-      ret_val = AU_UNAUTHORISED_CONT;
       LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: trying to modify status from ASSIGNED ANYCAST");
     }
     /* changing to ASSIGNED ANYCAST */
@@ -670,7 +708,6 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
              (strcmp(old_status, "ASSIGNED PI") == 0))
     {
       RT_status_check_failed_modify(info->ctx, "ASSIGNED PI");
-      ret_val = AU_UNAUTHORISED_CONT;
       LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: trying to modify status from ASSIGNED PI");
     }
     /* changing to ASSIGNED PI */
@@ -712,10 +749,17 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
       {
         ret_val = AU_AUTHORISED;
       }
-      else
+    }
+    /* changing to AGGREGATED-BY-LIR */
+    else if ((strcmp(new_status, "AGGREGATED-BY-LIR") == 0) &&
+             (strcmp(old_status, "AGGREGATED-BY-LIR") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: AGGREGATED-BY-LIR");
+      parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
+        "ALLOCATED-BY-RIR", "ALLOCATED-BY-LIR", "AGGREGATED-BY-LIR", NULL);
+      if (parent_status_ok && grand_parent_status_is_valid(info->ctx, info->obj) )
       {
-        /* note that the RT logging is done by parent_status_is_valid() */
-        ret_val = AU_UNAUTHORISED_CONT;
+          ret_val = AU_AUTHORISED;
       }
     }
     /* changing to ASSIGNED */
@@ -728,11 +772,6 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
       if (parent_status_ok)
       {
         ret_val = AU_AUTHORISED;
-      }
-      else
-      {
-        /* note that the RT logging is done by parent_status_is_valid() */
-        ret_val = AU_UNAUTHORISED_CONT;
       }
     }
     /* no change */

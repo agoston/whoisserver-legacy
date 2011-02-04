@@ -279,6 +279,7 @@ void RT_rdns_hierarchy(RT_context_t* ctx, gchar* specifics, gchar* name);
 void RT_no_address_space(RT_context_t *ctx);
 
 /* status check related */
+void RT_invalid_grandparent_status(RT_context_t*);
 void RT_status_check_failed_parentwithoutstatus(RT_context_t*,gchar*,gchar*);
 void RT_status_check_failed_missingstatus(RT_context_t*);
 void RT_status_check_failed_allocated(RT_context_t*);

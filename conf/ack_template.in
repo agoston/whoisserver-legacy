@@ -18,6 +18,11 @@
   <xsl:value-of select="status/text()"/>
 </xsl:template>
 
+<xsl:template match="invalid_grandparent_status">
+
+***Error: Cannot have 3 levels of hierarchy with status AGGREGATED-BY-LIR
+</xsl:template>
+
 <xsl:template match="status_check_failed_missingstatus">
 
 ***Error: missing "status:" attribute
