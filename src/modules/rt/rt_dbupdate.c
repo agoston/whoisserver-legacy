@@ -1758,11 +1758,20 @@ void RT_wrong_org_attr_optionality(RT_context_t* ctx){
   rt_prepare_node(ctx, node);
 }
 
-/* external check: optionality of "assignment-size:" attribute */
-void RT_wrong_ass_size_attr_optionality(RT_context_t* ctx){
+/* external check: missing required "assignment-size:" attribute */
+void RT_missing_ass_size_attr(RT_context_t* ctx){
   xmlNodePtr node;
 
-  node = xmlNewNode(NULL, (xmlChar*)"wrong_ass_size_attr_optionality");
+  node = xmlNewNode(NULL, (xmlChar*)"missing_ass_size_attr");
+
+  rt_prepare_node(ctx, node);
+}
+
+/* external check: missing required "assignment-size:" attribute */
+void RT_ass_size_attr_found(RT_context_t* ctx){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"ass_size_attr_found");
 
   rt_prepare_node(ctx, node);
 }

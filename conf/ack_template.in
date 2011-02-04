@@ -544,9 +544,14 @@ No PGP error on object
 ***Error: Missing required "org:" attribute.
   </xsl:template>
 
-  <xsl:template match="wrong_ass_size_attr_optionality">
+  <xsl:template match="missing_ass_size_attr">
  
 ***Error: Missing required "assignment-size:" attribute.
+  </xsl:template>
+
+  <xsl:template match="ass_size_attr_found">
+ 
+***Error: "assignment-size:" attribute only allowed with status AGGREGATED-BY-LIR.
   </xsl:template>
 
   <xsl:template match="wrong_ass_size">

@@ -204,7 +204,8 @@ void RT_org_auth_result(RT_context_t* ctx, gboolean result, gboolean override,
                                  gboolean organisation_type_check_failed);
 void RT_org_creation_auth_result(RT_context_t* ctx, gboolean result, gboolean override);
 void RT_wrong_org_attr_optionality(RT_context_t* ctx);
-void RT_wrong_ass_size_attr_optionality(RT_context_t* ctx);
+void RT_missing_ass_size_attr(RT_context_t* ctx);
+void RT_ass_size_attr_found(RT_context_t* ctx);
 void RT_wrong_ass_size(RT_context_t* ctx);
 void RT_organisation_creation_without_auto_id(RT_context_t* ctx);
 

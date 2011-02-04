@@ -199,6 +199,7 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
          }
        }
        free(status_value);
+       rpsl_attr_delete_list(status_attrs);
     }
   }
   else if ( strncmp(type,"inet6num", strlen("inet6num")) == 0 )
@@ -214,18 +215,18 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
        {
          if ( ! org_attrs )
          {
-           retval = UP_FAIL; /* this object must have an "org:" attribute! */
+           retval = UP_FAIL; /* this object must have an "org:" attribute */
            LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: no org found");
            RT_wrong_org_attr_optionality(rt_ctx);
          }
        }
-       else if ( ( strncmp(status_value, "AGGREGATED-BY-LIR", strlen("AGGREGATED-BY-LIR")) == 0 ) )
+       if ( ( strncmp(status_value, "AGGREGATED-BY-LIR", strlen("AGGREGATED-BY-LIR")) == 0 ) )
        {
          if ( ! ass_size_attrs )
          {
-           retval = UP_FAIL; /* this object must have an "assignment-size:" attribute! */
+           retval = UP_FAIL; /* this object must have an "assignment-size:" attribute */
            LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: no assignment-size found");
-           RT_wrong_ass_size_attr_optionality(rt_ctx);
+           RT_missing_ass_size_attr(rt_ctx);
          }
          else
          {
@@ -244,12 +245,23 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                }
            }
            free(ass_size);
+           rpsl_attr_delete_list(ass_size_attrs);
          }
        }
+       else if ( ass_size_attrs )
+       {
+           retval = UP_FAIL; /* this object must not have an "assignment-size:" attribute */
+           LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: assignment-size found");
+           RT_ass_size_attr_found(rt_ctx);
+           rpsl_attr_delete_list(ass_size_attrs);
+       }
        free(status_value);
+       rpsl_attr_delete_list(status_attrs);
     }
   }
   free(pvalue);
+  rpsl_attr_delete_list(pkey);
+  if ( org_attrs ) rpsl_attr_delete_list(org_attrs);
 
   LG_log(lg_ctx, LG_FUNC,"<UP_check_inet_required_attr: exiting with value [%s]", UP_ret2str(retval));
   return retval;
