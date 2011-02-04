@@ -162,16 +162,18 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   GList *org_attrs = NULL;
   GList *ass_size_attrs = NULL;
   GList *pkey = NULL;
-  char *value = NULL;
+  char *pvalue = NULL;
   char *ass_size = NULL;
   char *dummy = NULL;
   char *prefix = NULL;
+  int *prefix_n = NULL;
+  int *ass_size_n = NULL;
 
 
   LG_log(lg_ctx, LG_FUNC,">UP_check_inet_required_attr: entered");
 
   type = rpsl_object_get_class(preproc_obj);
-  pkey = rpsl_object_get_attr(object, type);
+  pkey = rpsl_object_get_attr(preproc_obj, type);
   pvalue = rpsl_attr_get_clean_value((rpsl_attr_t *)(pkey->data));
 
   org_attrs = rpsl_object_get_attr(preproc_obj, "org");

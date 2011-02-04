@@ -63,46 +63,6 @@ get_status (rpsl_object_t *obj)
 }
 
 static gboolean
-grand_parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj)
-{
-    GList *parents;
-    char *parent_status;
-
-    LG_log(au_context, LG_FUNC, ">grand_parent_status_is_valid: entering");
-
-    /* get parent(s) */
-    if (LU_get_parents(au_lookup, &parents, obj, NULL) != LU_OKAY)
-    {
-      /* error with lookup, reject */
-      LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
-      return FALSE;
-    }
-
-    /* if no parents, reject */
-    if (parents == NULL)
-    {
-      LG_log(au_context, LG_DEBUG, "grand_parent_status_is_valid: no parent(s)");
-      LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
-      return FALSE;
-    }
-
-    parent_status = get_status(parents->data);
-    if ( parent_status && ! strcmp(parent_status, "AGGREGATED-BY-LIR") )
-    {
-      /* if parent_status is AGGREGATED-BY-LIR, grand parent status cannot be AGGREGATED-BY-LIR */
-      if ( parent_status_is_valid(ctx, parents->data, "AGGREGATED-BY-LIR", NULL) )
-      {
-        LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
-        RT_invalid_grandparent_status(ctx);
-        return FALSE;
-      }
-    }
-
-    LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [TRUE]");
-    return TRUE;
-}
-
-static gboolean
 parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj, ...)
 {
   va_list args;
@@ -238,6 +198,46 @@ parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj, ...)
     LG_log(au_context, LG_FUNC, "<parent_status_is_valid: exiting with value [FALSE]");
     return FALSE;
   }
+}
+
+static gboolean
+grand_parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj)
+{
+    GList *parents;
+    char *parent_status;
+
+    LG_log(au_context, LG_FUNC, ">grand_parent_status_is_valid: entering");
+
+    /* get parent(s) */
+    if (LU_get_parents(au_lookup, &parents, obj, NULL) != LU_OKAY)
+    {
+      /* error with lookup, reject */
+      LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
+      return FALSE;
+    }
+
+    /* if no parents, reject */
+    if (parents == NULL)
+    {
+      LG_log(au_context, LG_DEBUG, "grand_parent_status_is_valid: no parent(s)");
+      LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
+      return FALSE;
+    }
+
+    parent_status = get_status(parents->data);
+    if ( parent_status && ! strcmp(parent_status, "AGGREGATED-BY-LIR") )
+    {
+      /* if parent_status is AGGREGATED-BY-LIR, grand parent status cannot be AGGREGATED-BY-LIR */
+      if ( parent_status_is_valid(ctx, parents->data, "AGGREGATED-BY-LIR", NULL) )
+      {
+        LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
+        RT_invalid_grandparent_status(ctx);
+        return FALSE;
+      }
+    }
+
+    LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [TRUE]");
+    return TRUE;
 }
 
 /* Find all the mntners in the mnt-by attributes of the object.
