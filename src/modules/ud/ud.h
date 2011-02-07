@@ -43,7 +43,7 @@
 #define ERROR_U_BUG     0x0080 /*  software bug - report to developer */
 
 /* definition of mode bits */
-#define B_DUMMY                 0x01
+/* DEPRECATED dummy objects, free to reuse bit #define B_DUMMY                 0x01 */
 #define B_UPDATE                0x02
 #define B_NRTM_CLNT             0x04
 #define B_STANDALONE            0x08
@@ -54,7 +54,6 @@
 #define B_PERSIST_MIRR          0x20
  
 /* macros for update mode operation */
-#define IS_DUMMY_ALLOWED(a)     ((a)&(B_DUMMY))
 #define IS_UPDATE(a)            ((a)&(B_UPDATE))
 #define IS_NRTM_CLNT(a)         ((a)&(B_NRTM_CLNT))
 #define IS_STANDALONE(a)        ((a)&(B_STANDALONE))
