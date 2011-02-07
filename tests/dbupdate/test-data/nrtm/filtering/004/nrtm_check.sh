@@ -24,11 +24,11 @@ FILE2=$DATADIR/nrtm/filtering/004/nrtm_result
 
 get_nrtm '-g DB-TEST:2:1-5' >>$FILE2
 
-diff $FILE1 $FILE2 &>/dev/null
+diff -u $FILE1 $FILE2
 RET=$?
 rm -f $FILE2
 
 if [ $RET -gt 0 ]; then
-	echo 'Error: the objects returned by nrtm do not look like they should! Check expected_result and nrtm_check.sh!'
+	echo ' *** Error: the objects returned by nrtm do not look like they should! Check expected_result and nrtm_check.sh!'
 	exit 1
 fi
