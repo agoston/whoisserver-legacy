@@ -49,6 +49,7 @@ DELETE FROM `organisation`;
 DELETE FROM `organisation_id`;
 DELETE FROM `peering_set`;
 DELETE FROM `person_role`;
+DELETE FROM `ping_hdl`;
 DELETE FROM `poem`;
 DELETE FROM `poetic_form`;
 DELETE FROM `ref_nfy`;
