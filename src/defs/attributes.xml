@@ -2757,4 +2757,68 @@
     </keys>
   </ripe_attribute>
 
+  <ripe_attribute name="ping-hdl" code="pc">
+    <description>
+   References a person or role capable of responding to queries
+   concerning the IP address(es) specified in the 'pingable'
+   attribute.
+    </description>
+    <syntax>nic-handle</syntax>
+
+    <representation>
+    <sqltable name="ping_hdl">
+      <insert qtype="ud_aux__">
+        INSERT ping_hdl
+        SELECT %d, %ld, person_role.object_id, %d
+        FROM person_role
+        WHERE person_role.nic_hdl='%s'
+      </insert>
+      <update qtype="ud_ax_pr">
+        UPDATE ping_hdl
+        SET thread_id=%d
+        WHERE object_id=%ld
+        AND pe_ro_id=%ld
+      </update>
+      <dummy qtype="ud_ax_pr">
+        INSERT person_role
+        SET thread_id=%d, object_id=%ld, nic_hdl='%s', object_type=%d, dummy=1
+      </dummy>
+    </sqltable>
+    </representation>
+
+    <keys searchable="inverse">
+      <foreign value="nh"/>
+
+      <queries>
+        <sqlquery keytype="wk_nic_hdl" class="ANY">
+          SELECT i.object_id,0
+          FROM   ping_hdl i, person_role
+          WHERE  i.pe_ro_id = person_role.object_id
+          AND    person_role.nic_hdl  = '%s'
+          AND    i.thread_id = 0
+        </sqlquery>
+      </queries>
+    </keys>
+    <foreignkey>person</foreignkey>
+  </ripe_attribute>
+
+  <ripe_attribute xmlname="pingable-rt" name="pingable" code="pa">
+    <description>
+   Allows a network operator to advertise an IP address of a node
+   that should be reachable from outside networks. This node can be
+   used as a destination address for diagnostic tests.
+    </description>
+    <syntax>ipv4-address</syntax>
+  </ripe_attribute>
+
+  <ripe_attribute xmlname="pingable-r6" name="pingable" code="pa">
+    <description>
+   Allows a network operator to advertise an IP address of a node
+   that should be reachable from outside networks. This node can be
+   used as a destination address for diagnostic tests.
+    </description>
+    <syntax>ipv6-address</syntax>
+  </ripe_attribute>
+
+
 </ripe_attributes>

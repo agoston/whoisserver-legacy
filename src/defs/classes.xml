@@ -729,6 +729,8 @@
       <route        choice="mandatory" number="single"   />
       <descr        choice="mandatory" number="multiple" />
       <origin       choice="mandatory" number="single"   />
+      <pingable-rt  choice="optional"  number="multiple" />
+      <ping-hdl     choice="optional"  number="multiple" />
       <holes-rt     choice="optional"  number="multiple" />
       <org          choice="optional"  number="multiple" />
       <member-of-rt choice="optional"  number="multiple" />
@@ -755,6 +757,7 @@
       <table name="organisation"/>
     </rollback-tables>
     <affected-tables>
+      <table name="ping_hdl"/>
       <table name="member_of"/>
       <table name="notify"/>
       <table name="mnt_by"/>
@@ -776,6 +779,8 @@
       <route6       choice="mandatory" number="single"   />
       <descr        choice="mandatory" number="multiple" />
       <origin       choice="mandatory" number="single"   />
+      <pingable-r6  choice="optional"  number="multiple" />
+      <ping-hdl     choice="optional"  number="multiple" />
       <holes-r6     choice="optional"  number="multiple" />
       <org          choice="optional"  number="multiple" />
       <member-of-rt choice="optional"  number="multiple" />
@@ -802,6 +807,7 @@
       <table name="organisation"/>
     </rollback-tables>
     <affected-tables>
+      <table name="ping_hdl"/>
       <table name="member_of"/>
       <table name="notify"/>
       <table name="mnt_by"/>
