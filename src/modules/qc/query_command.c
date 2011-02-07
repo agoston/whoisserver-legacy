@@ -379,11 +379,12 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 for (i = 0; inv_attrs[i] != NULL; i++) {
                     g_strdown(inv_attrs[i]);
                     if (!strcmp(inv_attrs[i], "pn") || !strcmp(inv_attrs[i], "person")) {
-                        /* person means "admin-c,tech-c,zone-c,author" */
+                        /* person means "admin-c,tech-c,zone-c,author,ping-hdl" */
                         MA_set(&(query_command->inv_attrs_bitmap), A_AC, 1);
                         MA_set(&(query_command->inv_attrs_bitmap), A_TC, 1);
                         MA_set(&(query_command->inv_attrs_bitmap), A_ZC, 1);
                         MA_set(&(query_command->inv_attrs_bitmap), A_AH, 1);
+                        MA_set(&(query_command->inv_attrs_bitmap), A_PC, 1);
                     } else {
                         /* otherwise it should be an inverse attribute name */
                         attr = DF_attribute_name2type(inv_attrs[i]);
