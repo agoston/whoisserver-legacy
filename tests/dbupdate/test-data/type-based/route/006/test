@@ -1,0 +1,22 @@
+# CASE 6: We try to create a route object with pingable: and
+#         ping-hdl: attributes, then do an inverse query on ping-hdl
+#
+# create route object 
+#
+#SUCCEES
+#
+# RESULT 5: The creation will succeed.
+
+
+route:   20.13.0.0/16
+descr:   test route
+origin:  AS200
+pingable: 20.13.0.1
+ping-hdl: TP2-DB-TEST
+mnt-by:  TEST-MNT
+mnt-routes: TEST-MNT ANY
+changed: dbtest@ripe.net
+source:  DB-TEST
+
+
+password: auth
