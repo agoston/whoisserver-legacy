@@ -1,0 +1,43 @@
+# ipv6 status tests
+# CASE 64: delete an inet6num with status AGGREGATED-BY-LIR
+#          with parent having status AGGREGATED-BY-LIR
+#          re-create inet6num with status AGGREGATED-BY-LIR
+#          as parent to other AGGREGATED-BY-LIR
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 64: The deletion will succeed
+
+
+inet6num:         2001:0600::/32
+netname:          EU-ZZ-2001-0600
+descr:            European Regional Registry
+country:          EU
+admin-c:          TP1-DB-TEST
+tech-c:           TP1-DB-TEST
+mnt-by:           LIR-MNT
+mnt-lower:        LIR-MNT
+status:           AGGREGATED-BY-LIR
+assignment-size:  56
+changed:          dbtest@ripe.net 20060101
+source:           DB-TEST
+delete:
+
+inet6num:         2001:0600::/23
+netname:          EU-ZZ-2001-0600
+descr:            European Regional Registry
+country:          EU
+admin-c:          TP1-DB-TEST
+tech-c:           TP1-DB-TEST
+mnt-by:           LIR-MNT
+mnt-lower:        LIR-MNT
+status:           AGGREGATED-BY-LIR
+assignment-size:  32
+changed:          dbtest@ripe.net 20060101
+source:           DB-TEST
+
+password: LIR
+password: hostmaster
+
