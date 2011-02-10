@@ -539,37 +539,37 @@ No PGP error on object
   </xsl:template>
 
   <xsl:template match="wrong_org_attr_optionality">
- 
+
 ***Error: Missing required "org:" attribute.
   </xsl:template>
 
   <xsl:template match="missing_ass_size_attr">
- 
+
 ***Error: Missing required "assignment-size:" attribute.
   </xsl:template>
 
   <xsl:template match="ass_size_attr_found">
- 
+
 ***Error: "assignment-size:" attribute only allowed with status AGGREGATED-BY-LIR.
   </xsl:template>
 
   <xsl:template match="wrong_ass_size">
- 
+
 ***Error: "assignment-size:" value must be greater then prefix size.
   </xsl:template>
 
   <xsl:template match="ass_size_changed">
- 
+
 ***Error: "assignment-size:" cannot be changed (was <xsl:value-of select="old_ass_size/text()"/>).
   </xsl:template>
 
   <xsl:template match="ass_size_out_of_bounds">
- 
+
 ***Error: "assignment-size:" value must be in the range 1-128.
   </xsl:template>
 
   <xsl:template match="invalid_more_specific_prefix_size">
- 
+
 ***Error: In a hierarchy of "AGGREGATED-BY-LIR" objects
           the more specific object prefix size must be equal to
           the less specific object assignment-size (<xsl:value-of select="parent_ass_size/text()"/>).
