@@ -153,7 +153,7 @@ int UP_check_country_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 */
 
 int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                             rpsl_object_t *preproc_obj)
+                             rpsl_object_t *preproc_obj, rpsl_object_t *old_obj)
 {
   int retval = UP_OK;
   const char *type = NULL;
@@ -161,10 +161,11 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   GList *status_attrs = NULL;
   GList *org_attrs = NULL;
   GList *ass_size_attrs = NULL;
+  GList *old_ass_size_attrs = NULL;
   GList *pkey = NULL;
   char *pvalue = NULL;
   char *ass_size = NULL;
-  char *dummy = NULL;
+  char *old_ass_size = NULL;
   char *prefix = NULL;
   int *prefix_n = NULL;
   int *ass_size_n = NULL;
@@ -177,15 +178,16 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   pvalue = rpsl_attr_get_clean_value((rpsl_attr_t *)(pkey->data));
 
   org_attrs = rpsl_object_get_attr(preproc_obj, "org");
-  ass_size_attrs = rpsl_object_get_attr(preproc_obj, "assignment-size");
 
   if ( strncmp(type,"inetnum", strlen("inetnum")) == 0 )
   {
-    /* if the object is an inetnum */
+    /* the object is an inetnum */
+    LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: checking inetnum");
     status_attrs = rpsl_object_get_attr(preproc_obj, "status");
     if ( status_attrs )
     {
        status_value = rpsl_attr_get_clean_value(status_attrs->data);
+       LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: status [%s]", status_value);
        g_strup(status_value);
        if ( strncmp(status_value, "ALLOCATED PI", strlen("ALLOCATED PI")) == 0
             || strncmp(status_value, "ALLOCATED PA", strlen("ALLOCATED PA")) == 0
@@ -206,12 +208,14 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
   else if ( strncmp(type,"inet6num", strlen("inet6num")) == 0 )
   {
-    /* if the object is an inet6num */
+    /* the object is an inet6num */
+    LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: checking inet6num");
     status_attrs = rpsl_object_get_attr(preproc_obj, "status");
     if ( status_attrs )
     {
        status_value = rpsl_attr_get_clean_value(status_attrs->data);
        g_strup(status_value);
+       LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: status [%s]", status_value);
        if ( ( strncmp(status_value, "ALLOCATED-BY-RIR", strlen("ALLOCATED-BY-RIR")) == 0 ) || 
             ( strncmp(status_value, "ASSIGNED PI", strlen("ASSIGNED PI")) == 0 ) )
        {
@@ -222,6 +226,7 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
            RT_wrong_org_attr_optionality(rt_ctx);
          }
        }
+       ass_size_attrs = rpsl_object_get_attr(preproc_obj, "assignment-size");
        if ( ( strncmp(status_value, "AGGREGATED-BY-LIR", strlen("AGGREGATED-BY-LIR")) == 0 ) )
        {
          if ( ! ass_size_attrs )
@@ -233,21 +238,39 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
          else
          {
            ass_size = rpsl_attr_get_clean_value((rpsl_attr_t *)(ass_size_attrs->data));
+           if (old_obj) old_ass_size_attrs = rpsl_object_get_attr(old_obj, "assignment-size");
+           if (old_ass_size_attrs) old_ass_size = rpsl_attr_get_clean_value((rpsl_attr_t *)(old_ass_size_attrs->data));
+           LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: ass_size [%s] old_ass_size [%s]", ass_size, old_ass_size ? old_ass_size : "None");
            g_strdown(pvalue);
-           sscanf(pvalue, "%s/%s", dummy, prefix);
-           if ( prefix )
+           LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: pvalue [%s]", pvalue);
+           prefix = strchr(pvalue, '/');
+           if ( prefix && prefix++ != '\0' )
            {
                prefix_n = atoi(prefix);
                ass_size_n = atoi(ass_size);
-               if ( prefix_n >= ass_size_n)
+               LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: prefix [%s] prefix_n [%d] ass_size_n [%d]", prefix, prefix_n, ass_size_n);
+               if ( ass_size_n < 1 || ass_size_n > 128)
+               {
+                   retval = UP_FAIL;
+                   LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: assignment-size %d out of bounds (1-128)", ass_size_n);
+                   RT_ass_size_out_of_bounds(rt_ctx);
+               }
+               else if ( prefix_n >= ass_size_n)
                {
                    retval = UP_FAIL; /* ass_size must be > prefix */
                    LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: prefix %d >= assignment-size %d", prefix_n, ass_size_n);
                    RT_wrong_ass_size(rt_ctx);
                }
            }
+           if ( old_ass_size  && strcmp(ass_size, old_ass_size) )
+           {
+               retval = UP_FAIL; /* ass_size cannot be changed */
+               LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: ass_size [%s] != old_ass_size [%s]", ass_size, old_ass_size);
+               RT_ass_size_changed(rt_ctx, old_ass_size);
+           }
            free(ass_size);
-           rpsl_attr_delete_list(ass_size_attrs);
+           if (old_ass_size) free(old_ass_size);
+           if (old_ass_size_attrs) rpsl_attr_delete_list(old_ass_size_attrs);
          }
        }
        else if ( ass_size_attrs )
@@ -255,8 +278,8 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
            retval = UP_FAIL; /* this object must not have an "assignment-size:" attribute */
            LG_log(lg_ctx, LG_DEBUG,"UP_check_inet_required_attr: assignment-size found");
            RT_ass_size_attr_found(rt_ctx);
-           rpsl_attr_delete_list(ass_size_attrs);
        }
+       if (ass_size_attrs) rpsl_attr_delete_list(ass_size_attrs);
        free(status_value);
        rpsl_attr_delete_list(status_attrs);
     }

@@ -178,65 +178,6 @@
 # RESULT 18: The creation will fail
 
 
-#############################################################
-# AfriNic tests
-
-# CASE 19: create an inet6num with SUB-ALLOCATED PA
-#          no org: reference
-#
-# create inet6num object 
-#
-#FAILURE
-#
-# RESULT 19: The creation will fail
-#rir AFRINIC
-
-
-# CASE 20: create an inet6num with SUB-ALLOCATED PA
-#          with org: reference
-#
-# create inet6num object 
-#
-#SUCCESS
-#
-# RESULT 20: The creation will succeed
-#rir AFRINIC
-
-
-# CASE 21: create an inet6num with SUB-ALLOCATED PA
-#          under SUB-ALLOCATED PA
-#
-# create inet6num object 
-#
-#FAILURE
-#
-# RESULT 21: The creation will fail
-#rir AFRINIC
-
-
-# CASE 22: create an inet6num with ASSIGNED PA
-#          under SUB-ALLOCATED PA
-#
-# create inet6num object 
-#
-#SUCCESS
-#
-# RESULT 22: The creation will succeed
-#rir AFRINIC
-
-
-# CASE 23: create an inet6num with ASSIGNED PA
-#          under ASSIGNED PA
-#
-# create inet6num object 
-#
-#FAILURE
-#
-# RESULT 23: The creation will fail
-#rir AFRINIC
-
-# end of AfriNIC tests
-#############################################################
 
 
 # CASE 24: create an inet6num with ASSIGNED ANYCAST
@@ -476,5 +417,274 @@
 #SUCCESS
 #
 # RESULT 46: The deletion will succeed
+
+
+# CASE 47: create an inet6num with AGGREGATED-BY-LIR
+# with less specific having ALLOCATED-BY-RIR status
+# with valid assignment-size
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 47: The creation will succeed
+
+
+# CASE 48: create an inet6num with AGGREGATED-BY-LIR
+# with less specific having ALLOCATED-BY-LIR status
+# with valid assignment-size
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 48: The creation will succeed
+
+
+# CASE 49: create an inet6num with status AGGREGATED-BY-LIR
+#          with parent status ASSIGNED
+#          with valid assignment-size
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 49: The creation will fail
+
+
+# CASE 50: create an inet6num with status AGGREGATED-BY-LIR
+#          with parent status ASSIGNED ANYCAST
+#          with valid assignment-size
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 50: The creation will fail
+
+
+# CASE 51: create an inet6num with AGGREGATED-BY-LIR
+# with parent having AGGREGATED-BY-LIR status
+# with grand parent not having AGGREGATED-BY-LIR status
+# with valid assignment-size
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 51: The creation will succeed
+
+
+# CASE 52: create an inet6num with status AGGREGATED-BY-LIR
+# with parent having AGGREGATED-BY-LIR status
+# with grand parent having AGGREGATED-BY-LIR status
+#          with valid assignment-size
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 52: The creation will fail
+
+
+# CASE 53: create an inet6num with status AGGREGATED-BY-LIR
+#          with parent status ASSIGNED PI
+#          with valid assignment-size
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 53: The creation will fail
+
+
+# CASE 54: create an inet6num with status AGGREGATED-BY-LIR
+#          no assignment-size
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 54: The creation will fail with syntax error
+
+
+# CASE 55: create 5 inet6num with status AGGREGATED-BY-LIR
+#          first: assignment-size > 128
+#          second: assignment-size < prefix
+#          third: assignment-size = prefix
+#          fourth: assignment-size = 0
+#          fifth: assignment-size = small
+#
+# create 5 inet6num object 
+#
+#FAILURE
+#
+# RESULT 55: All 5 creations will fail
+
+
+# CASE 56: create an inet6num with ALLOCATED-BY-LIR
+# with less specific having ALLOCATED-BY-RIR status
+# with valid assignment-size
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 56: The creation will fail
+
+
+# CASE 57: create an inet6num with ASSIGNED
+# with less specific having ALLOCATED-BY-RIR status
+# with valid assignment-size
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 57: The creation will fail
+
+
+# CASE 58: modify an inet6num with status AGGREGATED-BY-LIR
+#          with parent status ALLOCATED-BY-RIR
+#          with valid assignment-size
+#          change status to ALLOCATED-BY-LIR
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 58: The modification will fail
+
+
+# CASE 59: modify an inet6num with status ALLOCATED-BY-LIR
+#          with parent status ALLOCATED-BY-RIR
+#          change status to AGGREGATED-BY-LIR
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 59: The modification will fail
+
+
+# CASE 60: delete an inet6num with status AGGREGATED-BY-LIR
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 60: The deletion will succeed
+
+
+# CASE 61: delete an inet6num with status AGGREGATED-BY-LIR
+#          with parent having status AGGREGATED-BY-LIR
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 61: The deletion will succeed
+
+
+# CASE 62: delete an inet6num with status AGGREGATED-BY-LIR
+#          with child having status AGGREGATED-BY-LIR
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 62: The deletion will succeed
+
+
+# CASE 63: delete an inet6num with status AGGREGATED-BY-LIR
+#          with parent having status AGGREGATED-BY-LIR
+#          re-create inet6num with status AGGREGATED-BY-LIR
+#          as child to other AGGREGATED-BY-LIR
+#
+# delete and create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 63: The deletion and creation will succeed
+
+
+# CASE 64: delete an inet6num with status AGGREGATED-BY-LIR
+#          with parent having status AGGREGATED-BY-LIR
+#          re-create inet6num with status AGGREGATED-BY-LIR
+#          as parent to other AGGREGATED-BY-LIR
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 64: The deletion will succeed
+
+
+# CASE 65: modify an inet6num with status AGGREGATED-BY-LIR
+#          with parent status ALLOCATED-BY-RIR
+#          with valid assignment-size
+#          change asignment-size
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 65: The modification will fail
+
+
+# CASE 66: create an inet6num with status AGGREGATED-BY-LIR
+#          with parent having AGGREGATED-BY-LIR status
+#          with valid assignment-size
+#          with prefix != parent assignment-size
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 66: The creation will fail
+
+
+# CASE 67: create an inet6num with AGGREGATED-BY-LIR
+#          with less specific having ALLOCATED-BY-RIR status
+#          with valid assignment-size
+#          create 2 child inet6num with AGGREGATED-BY-LIR
+#
+# create 3 inet6num object 
+#
+#SUCCESS
+#
+# RESULT 67: The creations will succeed
+
+
+# CASE 68: create 2 inet6num with AGGREGATED-BY-LIR
+#          with less specific having ALLOCATED-BY-LIR status
+#          with different valid assignment-size
+#
+# create 2 inet6num object 
+#
+#SUCCESS
+#
+# RESULT 68: The creations will succeed
+
+
+# CASE 69: create an inet6num with ASSIGNED
+# with parent having AGGREGATED-BY-LIR status
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 69: The creation will succeed
+
+
+# CASE 70: create an inet6num with ASSIGNED
+# with parent having AGGREGATED-BY-LIR status
+# with grand parent having AGGREGATED-BY-LIR status
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 70: The creation will succeed
 
 

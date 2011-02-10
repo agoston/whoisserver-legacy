@@ -203,11 +203,14 @@ void RT_org_auth(RT_context_t* ctx, gchar* key, gchar* type, gchar* attr_checked
 void RT_org_auth_result(RT_context_t* ctx, gboolean result, gboolean override,
                                  gboolean organisation_type_check_failed);
 void RT_org_creation_auth_result(RT_context_t* ctx, gboolean result, gboolean override);
-void RT_wrong_org_attr_optionality(RT_context_t* ctx);
-void RT_missing_ass_size_attr(RT_context_t* ctx);
-void RT_ass_size_attr_found(RT_context_t* ctx);
-void RT_wrong_ass_size(RT_context_t* ctx);
-void RT_organisation_creation_without_auto_id(RT_context_t* ctx);
+void RT_wrong_org_attr_optionality(RT_context_t *ctx);
+void RT_missing_ass_size_attr(RT_context_t *ctx);
+void RT_ass_size_attr_found(RT_context_t *ctx);
+void RT_wrong_ass_size(RT_context_t *ctx);
+void RT_ass_size_changed(RT_context_t* ctx, gchar *old_ass_size);
+void RT_ass_size_out_of_bounds(RT_context_t *ctx);
+void RT_invalid_more_specific_prefix_size(RT_context_t *ctx, gchar *parent_ass_size);
+void RT_organisation_creation_without_auto_id(RT_context_t *ctx);
 
 
 typedef struct {
@@ -286,7 +289,6 @@ void RT_status_check_failed_allocated(RT_context_t*);
 void RT_status_check_failed_earlyregistration(RT_context_t*);
 void RT_status_check_failed_notset(RT_context_t*);
 void RT_status_check_failed_allocbyrir(RT_context_t*);
-void RT_status_check_failed_anycast_modify(RT_context_t*);
 void RT_status_check_failed_modify(RT_context_t*, char *status);
 void RT_status_check_failed_anycast_rir(RT_context_t*);
 void RT_status_check_failed_rir(RT_context_t*, char *status);

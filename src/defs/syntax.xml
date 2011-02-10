@@ -731,15 +731,19 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
        </description>
    </attribute_syntax>
 
-   <attribute_syntax name="assignment-size">
+   <attribute_syntax name="number">
+       <core>
+          <regex>
+              ^[0-9]+$
+          </regex>
+       </core>
        <front_end>
            <regex>
-               ^[1-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8]$
+               ^[0-9]+$
            </regex>
        </front_end>
        <description>
-   Specifies the size of blocks assigned to end users from
-   this aggregated inet6num assignment.
+   Specifies a numeric value.
        </description>
    </attribute_syntax>
 

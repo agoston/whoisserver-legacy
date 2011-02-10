@@ -1855,12 +1855,12 @@
     <syntax>status-i6</syntax>
   </ripe_attribute>
 
-  <ripe_attribute xmlname="assignment-size" name="assignment-size" code="ae">
+  <ripe_attribute name="assignment-size" code="ae">
     <description>
    Specifies the size of blocks assigned to end users from
    this aggregated inet6num assignment.
     </description>
-    <syntax>assignment-size</syntax>
+    <syntax>number</syntax>
   </ripe_attribute>
 
   <ripe_attribute name="org-type" code="ot">
