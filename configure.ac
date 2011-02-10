@@ -354,7 +354,6 @@ AC_CONFIG_FILES([
   conf/notif_template
   conf/notif_text
   conf/SAMPLE.CURRENTSERIAL
-  doc/AUTO-DBM-HELP
   doc/WHOIS-HELP
   doc/LOOKUP-HELP
   src/defs/makedefsall
