@@ -1,0 +1,27 @@
+# ipv6 status tests
+# CASE 53: create an inet6num with status AGGREGATED-BY-LIR
+#          with parent status ASSIGNED PI
+#          with valid assignment-size
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 53: The creation will fail
+
+
+inet6num:         2001:0600::/64
+netname:          EU-ZZ-2001-0600
+descr:            European Regional Registry
+country:          EU
+admin-c:          TP1-DB-TEST
+tech-c:           TP1-DB-TEST
+mnt-by:           LIR-MNT
+mnt-lower:        LIR-MNT
+status:           AGGREGATED-BY-LIR
+assignment-size:  128
+changed:          dbtest@ripe.net 20060101
+source:           DB-TEST
+
+password: LIR
+

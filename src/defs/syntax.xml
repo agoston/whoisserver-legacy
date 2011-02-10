@@ -716,7 +716,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
    <attribute_syntax name="status-i6">
        <front_end>
            <regex>
-               ^(ALLOCATED-BY-RIR|ALLOCATED-BY-LIR|ASSIGNED|ASSIGNED ANYCAST|ASSIGNED PI)$
+               ^(ALLOCATED-BY-RIR|ALLOCATED-BY-LIR|AGGREGATED-BY-LIR|ASSIGNED|ASSIGNED ANYCAST|ASSIGNED PI)$
            </regex>
        </front_end>
        <description>
@@ -724,9 +724,26 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
 
      o ALLOCATED-BY-RIR
      o ALLOCATED-BY-LIR
+     o AGGREGATED-BY-LIR
      o ASSIGNED
      o ASSIGNED ANYCAST
      o ASSIGNED PI
+       </description>
+   </attribute_syntax>
+
+   <attribute_syntax name="number">
+       <core>
+          <regex>
+              ^[0-9]+$
+          </regex>
+       </core>
+       <front_end>
+           <regex>
+               ^[0-9]+$
+           </regex>
+       </front_end>
+       <description>
+   Specifies a numeric value.
        </description>
    </attribute_syntax>
 

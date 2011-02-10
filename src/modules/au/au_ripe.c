@@ -55,8 +55,8 @@ get_status (rpsl_object_t *obj)
   {
     status = rpsl_attr_get_clean_value(status_attr->data);
     g_strup(status);
+    rpsl_attr_delete_list(status_attr);
   }
-  rpsl_attr_delete_list(status_attr);
 
   LG_log(au_context, LG_FUNC, "<get_status: exiting with value [\"%s\"]", status ? status : "NULL");
   return status;
@@ -200,6 +200,76 @@ parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj, ...)
   }
 }
 
+/* This function is only called if new status is AGGREGATED-BY-LIR */
+
+static gboolean
+grand_parent_status_is_valid (RT_context_t *ctx, const rpsl_object_t *obj)
+{
+    GList *parents;
+    char *parent_status;
+    const char *type = NULL;
+    GList *pkey = NULL;
+    char *pvalue = NULL;
+    char *ass_size = NULL;
+    char *prefix = NULL;
+    GList *ass_size_attrs = NULL;
+
+    LG_log(au_context, LG_FUNC, ">grand_parent_status_is_valid: entering");
+
+    /* get parent(s) */
+    if (LU_get_parents(au_lookup, &parents, obj, NULL) != LU_OKAY)
+    {
+      /* error with lookup, reject */
+      LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
+      return FALSE;
+    }
+
+    /* if no parents, reject */
+    if (parents == NULL)
+    {
+      LG_log(au_context, LG_DEBUG, "grand_parent_status_is_valid: no parent(s)");
+      LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
+      return FALSE;
+    }
+
+    parent_status = get_status(parents->data);
+    if ( parent_status && ! strcmp(parent_status, "AGGREGATED-BY-LIR") )
+    {
+      /* if parent_status is AGGREGATED-BY-LIR, grand parent status cannot be AGGREGATED-BY-LIR */
+      /* check status of parent of parent object */
+      if ( ! parent_status_is_valid(ctx, parents->data, "ALLOCATED-BY-RIR", "ALLOCATED-BY-LIR", NULL) )
+      {
+        LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
+        RT_invalid_grandparent_status(ctx);
+        return FALSE;
+      }
+      /* check if prefix length is equal to parent assignment size.
+         This may not be the logical place to do this check, but we
+         have all the pieces available here to do it.
+      */
+      type = rpsl_object_get_class(obj);
+      pkey = rpsl_object_get_attr(obj, type);
+      pvalue = rpsl_attr_get_clean_value((rpsl_attr_t *)(pkey->data));
+      prefix = strchr(pvalue, '/');
+      if ( prefix && prefix++ != '\0' )
+      {
+          /* get parents assignment size */
+          ass_size_attrs = rpsl_object_get_attr(parents->data, "assignment-size");
+          ass_size = rpsl_attr_get_clean_value((rpsl_attr_t *)(ass_size_attrs->data));
+          if ( strcmp(prefix, ass_size) )
+          {
+            LG_log(au_context, LG_DEBUG, "grand_parent_status_is_valid: prefix != aggregated parent assignment size");
+            LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [FALSE]");
+            RT_invalid_more_specific_prefix_size(ctx, ass_size);
+            return FALSE;
+          }
+      }
+    }
+
+    LG_log(au_context, LG_FUNC, "<grand_parent_status_is_valid: exiting with value [TRUE]");
+    return TRUE;
+}
+
 /* Find all the mntners in the mnt-by attributes of the object.
    Get a list of the RIR mntners from the config file.
    Compare the lists.
@@ -327,7 +397,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
     if ((strcmp(new_status, "ASSIGNED ANYCAST") != 0) &&
              (strcmp(old_status, "ASSIGNED ANYCAST") == 0))
     {
-      RT_status_check_failed_anycast_modify(info->ctx);
+      RT_status_check_failed_modify(info->ctx, "ASSIGNED ANYCAST");
       ret_val = AU_UNAUTHORISED_CONT;
       LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status from ASSIGNED ANYCAST");
     }
@@ -407,7 +477,7 @@ ripe_inetnum_checks (au_plugin_callback_info_t *info)
         /* ASSIGNED ANYCAST can only be set on object creation,
         not on modification */
         ret_val = AU_UNAUTHORISED_CONT;
-        RT_status_check_failed_anycast_modify(info->ctx);
+        RT_status_check_failed_modify(info->ctx, "ASSIGNED ANYCAST");
         LG_log(au_context, LG_DEBUG, "ripe_inetnum_checks: trying to modify status to ASSIGNED ANYCAST");
       }
       else
@@ -609,7 +679,7 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
 
   gboolean parent_status_ok;
 
-  AU_ret_t ret_val;
+  AU_ret_t ret_val = AU_UNAUTHORISED_CONT;
   gboolean override;
 
   LG_log(au_context, LG_FUNC, ">ripe_inet6num_checks: entering");
@@ -628,7 +698,6 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
   new_status = get_status(info->obj);
   if (new_status == NULL)
   {
-    ret_val = AU_UNAUTHORISED_CONT;
     LG_log(au_context, LG_ERROR, "ripe_inet6num_checks: no \"status:\" on updated inet6num");
     RT_status_check_failed_missingstatus(info->ctx);
   }
@@ -655,23 +724,28 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
     if ((strcmp(new_status, "ASSIGNED ANYCAST") != 0) &&
              (strcmp(old_status, "ASSIGNED ANYCAST") == 0))
     {
-      RT_status_check_failed_anycast_modify(info->ctx);
-      ret_val = AU_UNAUTHORISED_CONT;
+      RT_status_check_failed_modify(info->ctx, "ASSIGNED ANYCAST");
       LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: trying to modify status from ASSIGNED ANYCAST");
-    }
-    /* changing to ASSIGNED ANYCAST */
-    else if ((strcmp(new_status, "ASSIGNED ANYCAST") == 0) &&
-             (strcmp(old_status, "ASSIGNED ANYCAST") != 0))
-    {
-      ret_val = au_v6_assigned_check( info->ctx, au_context, old_status, new_status, info->obj, "ASSIGNED ANYCAST", info );
     }
     /* changing from ASSIGNED PI not allowed */
     else if ((strcmp(new_status, "ASSIGNED PI") != 0) &&
              (strcmp(old_status, "ASSIGNED PI") == 0))
     {
       RT_status_check_failed_modify(info->ctx, "ASSIGNED PI");
-      ret_val = AU_UNAUTHORISED_CONT;
       LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: trying to modify status from ASSIGNED PI");
+    }
+    /* changing from AGGREGATED-BY-LIR not allowed */
+    else if ((strcmp(new_status, "AGGREGATED-BY-LIR") != 0) &&
+             (strcmp(old_status, "AGGREGATED-BY-LIR") == 0))
+    {
+      RT_status_check_failed_modify(info->ctx, "AGGREGATED-BY-LIR");
+      LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: trying to modify status from AGGREGATED-BY-LIR");
+    }
+    /* changing to ASSIGNED ANYCAST */
+    else if ((strcmp(new_status, "ASSIGNED ANYCAST") == 0) &&
+             (strcmp(old_status, "ASSIGNED ANYCAST") != 0))
+    {
+      ret_val = au_v6_assigned_check( info->ctx, au_context, old_status, new_status, info->obj, "ASSIGNED ANYCAST", info );
     }
     /* changing to ASSIGNED PI */
     else if ((strcmp(new_status, "ASSIGNED PI") == 0) &&
@@ -712,10 +786,25 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
       {
         ret_val = AU_AUTHORISED;
       }
+    }
+    /* changing to AGGREGATED-BY-LIR */
+    else if ((strcmp(new_status, "AGGREGATED-BY-LIR") == 0) &&
+             (strcmp(old_status, "AGGREGATED-BY-LIR") != 0))
+    {
+      LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: AGGREGATED-BY-LIR");
+      if ( strcmp(old_status, "") )
+      {
+          LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: modify to AGGREGATED-BY-LIR not allowed");
+          RT_status_check_failed_modify(info->ctx, "AGGREGATED-BY-LIR");
+      }
       else
       {
-        /* note that the RT logging is done by parent_status_is_valid() */
-        ret_val = AU_UNAUTHORISED_CONT;
+          parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
+            "ALLOCATED-BY-RIR", "ALLOCATED-BY-LIR", "AGGREGATED-BY-LIR", NULL);
+          if (parent_status_ok && grand_parent_status_is_valid(info->ctx, info->obj) )
+          {
+              ret_val = AU_AUTHORISED;
+          }
       }
     }
     /* changing to ASSIGNED */
@@ -724,15 +813,10 @@ ripe_inet6num_checks (au_plugin_callback_info_t *info)
     {
       LG_log(au_context, LG_DEBUG, "ripe_inet6num_checks: ASSIGNED");
       parent_status_ok = parent_status_is_valid(info->ctx, info->obj,
-        "ALLOCATED-BY-RIR", "ALLOCATED-BY-LIR", NULL);
+        "ALLOCATED-BY-RIR", "ALLOCATED-BY-LIR", "AGGREGATED-BY-LIR", NULL);
       if (parent_status_ok)
       {
         ret_val = AU_AUTHORISED;
-      }
-      else
-      {
-        /* note that the RT logging is done by parent_status_is_valid() */
-        ret_val = AU_UNAUTHORISED_CONT;
       }
     }
     /* no change */

@@ -1,0 +1,26 @@
+# ipv6 status tests
+# CASE 70: create an inet6num with ASSIGNED
+# with parent having AGGREGATED-BY-LIR status
+# with grand parent having AGGREGATED-BY-LIR status
+#
+# create inet6num object 
+#
+#SUCCESS
+#
+# RESULT 70: The creation will succeed
+
+
+inet6num:         2001:0600::/56
+netname:          NL-SURF
+descr:            The Netherlands
+country:          NL
+admin-c:          TP1-DB-TEST
+tech-c:           TP1-DB-TEST
+mnt-by:           LIR-MNT
+mnt-lower:        LIR-MNT
+status:           ASSIGNED
+changed:          dbtest@ripe.net 20020101
+source:           DB-TEST
+
+password: LIR
+
