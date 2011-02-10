@@ -502,25 +502,26 @@
       and assignments of IPv6 address space.
     </description>
     <attributes>
-      <inet6num     choice="mandatory" number="single"   />
-      <netname      choice="mandatory" number="single"   />
-      <descr        choice="mandatory" number="multiple" />
-      <country      choice="mandatory" number="multiple" />
-      <org          choice="optional"  number="single"   />
-      <admin-c      choice="mandatory" number="multiple" />
-      <tech-c       choice="mandatory" number="multiple" />
-      <status-i6    choice="mandatory" number="single"   />
-      <remarks      choice="optional"  number="multiple" />
-      <notify       choice="optional"  number="multiple" />
-      <mnt-by       choice="mandatory" number="multiple" />
-      <mnt-lower    choice="optional"  number="multiple" />
-      <mnt-routes6  choice="optional"  number="multiple" />
-      <mnt-domains  choice="optional"  number="multiple" />
-      <mnt-irt      choice="optional"  number="multiple" />
-      <changed      choice="mandatory" number="multiple" />
-      <source       choice="mandatory" number="single"   />
-      <delete       choice="optional"  number="single"   pseudo="yes"/>
-      <override     choice="optional"  number="single"   pseudo="yes"/>
+      <inet6num         choice="mandatory" number="single"   />
+      <netname          choice="mandatory" number="single"   />
+      <descr            choice="mandatory" number="multiple" />
+      <country          choice="mandatory" number="multiple" />
+      <org              choice="optional"  number="single"   />
+      <admin-c          choice="mandatory" number="multiple" />
+      <tech-c           choice="mandatory" number="multiple" />
+      <status-i6        choice="mandatory" number="single"   />
+      <assignment-size  choice="optional"  number="single"   />
+      <remarks          choice="optional"  number="multiple" />
+      <notify           choice="optional"  number="multiple" />
+      <mnt-by           choice="mandatory" number="multiple" />
+      <mnt-lower        choice="optional"  number="multiple" />
+      <mnt-routes6      choice="optional"  number="multiple" />
+      <mnt-domains      choice="optional"  number="multiple" />
+      <mnt-irt          choice="optional"  number="multiple" />
+      <changed          choice="mandatory" number="multiple" />
+      <source           choice="mandatory" number="single"   />
+      <delete           choice="optional"  number="single"   pseudo="yes"/>
+      <override         choice="optional"  number="single"   pseudo="yes"/>
     </attributes>
     <dbase_code value="5"/>
     <rollback-tables>

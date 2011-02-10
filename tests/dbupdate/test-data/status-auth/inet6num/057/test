@@ -1,0 +1,27 @@
+# ipv6 status tests
+# CASE 57: create an inet6num with ASSIGNED
+# with less specific having ALLOCATED-BY-RIR status
+# with valid assignment-size
+#
+# create inet6num object 
+#
+#FAILURE
+#
+# RESULT 57: The creation will fail
+
+
+inet6num:         2001:0600::/48
+netname:          NL-SURF
+descr:            The Netherlands
+country:          NL
+admin-c:          TP1-DB-TEST
+tech-c:           TP1-DB-TEST
+mnt-by:           LIR-MNT
+mnt-lower:        LIR-MNT
+status:           ASSIGNED
+assignment-size:  56
+changed:          dbtest@ripe.net 20020101
+source:           DB-TEST
+
+password: LIR
+

@@ -1750,7 +1750,7 @@ void RT_irt_auth(RT_context_t* ctx, gchar* key, gchar* type, gchar* attr_checked
 }
 
 /* external check: optionality of "org:" attribute */
-void RT_wrong_org_attr_optionality(RT_context_t* ctx){
+void RT_wrong_org_attr_optionality(RT_context_t *ctx){
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*)"wrong_org_attr_optionality");
@@ -1758,9 +1758,61 @@ void RT_wrong_org_attr_optionality(RT_context_t* ctx){
   rt_prepare_node(ctx, node);
 }
 
+/* external check: missing required "assignment-size:" attribute */
+void RT_missing_ass_size_attr(RT_context_t *ctx){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"missing_ass_size_attr");
+
+  rt_prepare_node(ctx, node);
+}
+
+/* external check: missing required "assignment-size:" attribute */
+void RT_ass_size_attr_found(RT_context_t *ctx){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"ass_size_attr_found");
+
+  rt_prepare_node(ctx, node);
+}
+
+/* external check: size of "assignment-size:" */
+void RT_wrong_ass_size(RT_context_t *ctx){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"wrong_ass_size");
+
+  rt_prepare_node(ctx, node);
+}
+
+void RT_ass_size_changed(RT_context_t *ctx, gchar *old_ass_size){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"ass_size_changed");
+  rt_add_text_node(node, "old_ass_size", old_ass_size);
+
+  rt_prepare_node(ctx, node);
+}
+
+void RT_ass_size_out_of_bounds(RT_context_t *ctx){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"ass_size_out_of_bounds");
+
+  rt_prepare_node(ctx, node);
+}
+
+void RT_invalid_more_specific_prefix_size(RT_context_t *ctx, gchar *parent_ass_size){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"invalid_more_specific_prefix_size");
+  rt_add_text_node(node, "parent_ass_size", parent_ass_size);
+
+  rt_prepare_node(ctx, node);
+}
 
 /* external check: for organisation object creations, the orgID must be AUTO-id */
-void RT_organisation_creation_without_auto_id(RT_context_t* ctx){
+void RT_organisation_creation_without_auto_id(RT_context_t *ctx){
   xmlNodePtr node;
 
   node = xmlNewNode(NULL, (xmlChar*)"organisation_creation_without_auto_id");
@@ -2033,6 +2085,14 @@ void RT_status_check_failed_parentwithoutstatus(
   rt_prepare_node(ctx, node);
 }
 
+void RT_invalid_grandparent_status(RT_context_t* ctx) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"invalid_grandparent_status");
+
+  rt_prepare_node(ctx, node);
+}
+
 static void RT_status_check_failed_message(RT_context_t *ctx,gchar *t) {
   xmlNodePtr node;
 
@@ -2058,10 +2118,6 @@ void RT_status_check_failed_allocbyrir(RT_context_t *ctx) {
 
 void RT_status_check_failed_allocated(RT_context_t *ctx) {
   RT_status_check_failed_message(ctx,"status_check_failed_allocated");
-}
-
-void RT_status_check_failed_anycast_modify(RT_context_t *ctx) {
-  RT_status_check_failed_message(ctx,"status_check_failed_anycast_modify");
 }
 
 void RT_status_check_failed_modify(RT_context_t *ctx, char* status) {

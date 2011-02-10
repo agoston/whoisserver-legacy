@@ -1,0 +1,27 @@
+# ipv6 status tests
+# CASE 59: modify an inet6num with status ALLOCATED-BY-LIR
+#          with parent status ALLOCATED-BY-RIR
+#          change status to AGGREGATED-BY-LIR
+#
+# modify inet6num object 
+#
+#FAILURE
+#
+# RESULT 59: The modification will fail
+
+
+inet6num:         2001:0600::/64
+netname:          EU-ZZ-2001-0600
+descr:            European Regional Registry
+country:          EU
+admin-c:          TP1-DB-TEST
+tech-c:           TP1-DB-TEST
+mnt-by:           LIR-MNT
+mnt-lower:        LIR-MNT
+status:           AGGREGATED-BY-LIR
+assignment-size:  68
+changed:          dbtest@ripe.net 20060101
+source:           DB-TEST
+
+password: LIR
+
