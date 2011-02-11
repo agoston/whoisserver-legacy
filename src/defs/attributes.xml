@@ -2729,7 +2729,7 @@
     <foreignkey>person</foreignkey>
   </ripe_attribute>
 
-  <ripe_attribute xmlname="pingable-rt" name="pingable" code="pa">
+  <ripe_attribute name="pingable" code="pa">
     <description>
    Allows a network operator to advertise an IP address of a node
    that should be reachable from outside networks. This node can be
@@ -2737,19 +2737,7 @@
    The IP address must be within the address range of the prefix
    containing this attribute.
     </description>
-    <syntax>ipv4-address</syntax>
+    <syntax>ip-address</syntax>
   </ripe_attribute>
-
-  <ripe_attribute xmlname="pingable-r6" name="pingable" code="pa">
-    <description>
-   Allows a network operator to advertise an IP address of a node
-   that should be reachable from outside networks. This node can be
-   used as a destination address for diagnostic tests.
-   The IP address must be within the address range of the prefix
-   containing this attribute.
-    </description>
-    <syntax>ipv6-address</syntax>
-  </ripe_attribute>
-
 
 </ripe_attributes>
