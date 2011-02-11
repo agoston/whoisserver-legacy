@@ -875,6 +875,91 @@ int UP_check_domain(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     return retval;
 }
 
+/* check if pingable address(es) are within route(6) prefix and of the same address space type */
+
+int UP_check_ping(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                    rpsl_object_t *preproc_obj, int operation, rpsl_object_t *old_obj)
+{
+    int retval = UP_OK;
+    const char *type = NULL;
+    GList *pkey = NULL;
+    char *pvalue = NULL;
+    char *ping_add = NULL;
+    GList *ping_attrs = NULL;
+    GList *item = NULL;
+    ip_prefix_t *route_pref = NULL;
+    ip_space_t route_space = IP_V4;
+    ip_addr_t *ping_add_ptr = NULL;
+
+    LG_log(lg_ctx, LG_FUNC, ">UP_check_ping: entered\n");
+
+    type = rpsl_object_get_class(preproc_obj);
+    /* if the object is not a route(6) object, return OK */
+    if ( (strcasecmp(type, "route") && strcasecmp(type, "route6")) || operation == UP_DELETE )
+    {
+        LG_log(lg_ctx, LG_DEBUG,"UP_check_ping: not a route(6) object, or operation is delete..skipping");
+        LG_log(lg_ctx, LG_FUNC, "<UP_check_ping: exiting with value [%s]\n", UP_ret2str(retval));
+        return retval;
+    }
+    pkey = rpsl_object_get_attr(preproc_obj, type);
+    pvalue = rpsl_attr_get_clean_value((rpsl_attr_t *)(pkey->data));
+
+    ping_attrs = rpsl_object_get_attr(preproc_obj, "pingable");
+    if ( ping_attrs )
+    {
+        /* get route prefix details */
+        if ( IP_pref_t2b(route_pref, pvalue, IP_EXPN) != IP_OK )
+        {
+            /* should never happen if syntax checks work */
+            LG_log(lg_ctx, LG_DEBUG,"UP_check_ping: route(6) prefix invalid");
+            RT_addr_format_error(rt_ctx, pvalue);
+            retval = UP_FAIL;
+        }
+        else
+        {
+            if ( ! strcasecmp(type, "route6") ) route_space = IP_V6;
+            for ( item = ping_attrs; item != NULL; item = g_list_next(item) )
+            {
+                ping_add = rpsl_attr_get_clean_value((rpsl_attr_t *) (item->data));
+                if ( IP_addr_t2b(ping_add_ptr, ping_add, IP_PLAIN) != IP_OK )
+                {
+                    /* should never happen if syntax checks work */
+                    LG_log(lg_ctx, LG_DEBUG, "UP_check_ping: pingable address invalid [%s]", ping_add);
+                    RT_addr_format_error(rt_ctx, ping_add);
+                    retval = UP_FAIL;
+                }
+                else
+                {
+                    /* check space types */
+                    if ( IP_addr_b2_space(ping_add_ptr) != route_space )
+                    {
+                        LG_log(lg_ctx, LG_DEBUG, "UP_check_ping: pingable address space does not match route prefix space");
+                        RT_ping_addr_space_mismatch(rt_ctx, ping_add);
+                        retval = UP_FAIL;
+                    }
+                    else
+                    {
+                        /* check if pingable address is withing prefix */
+                        if ( ! IP_addr_in_pref(ping_add_ptr, route_pref) )
+                        {
+                            LG_log(lg_ctx, LG_DEBUG, "UP_check_ping: pingable address is not within route prefix");
+                            RT_ping_addr_outside_prefix(rt_ctx, ping_add);
+                            retval = UP_FAIL;
+                        }
+                    }
+                }
+                free(ping_add);
+            }
+        }
+        rpsl_attr_delete_list(ping_attrs);
+    }
+    free(pvalue);
+    rpsl_attr_delete_list(pkey);
+
+    LG_log(lg_ctx, LG_FUNC, "<UP_check_ping: exiting with value [%s]\n", UP_ret2str(retval));
+    return retval;
+}
+
 /* checks for a valid suffix at the end of a 'nic-hdl' attributes 
    Receives RT context
             LG context

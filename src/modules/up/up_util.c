@@ -1022,7 +1022,7 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                            rpsl_object_t *preproc_obj,int operation,
                            char *auto_key, char *obj_source, LU_server_t *server,
                            int handle_auto_keys, char **reason,
-                           GList *credentials, source_data_t *source_data)
+                           GList *credentials, source_data_t *source_data, rpsl_object_t *old_obj)
 {
   int retval = UP_OK;
   int key_status;
@@ -1154,6 +1154,8 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
     retval |= UP_check_domain(rt_ctx, lg_ctx, options, preproc_obj,
                                operation, server, obj_source);
+
+    retval |= UP_check_ping(rt_ctx, lg_ctx, preproc_obj, operation, old_obj);
 
     /* check for references to AUTO- keys */
     if (handle_auto_keys)
@@ -1979,7 +1981,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   retval = up_pre_process_object(rt_ctx, lg_ctx, options, &key_info, preproc_obj,
                                     operation, auto_key, obj_source, current_server,
                                     handle_auto_keys, &reason, credentials,
-                                    &source_data);
+                                    &source_data, old_object);
 
   if ( retval != UP_OK )
   {

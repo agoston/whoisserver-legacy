@@ -1768,6 +1768,33 @@ void RT_organisation_creation_without_auto_id(RT_context_t* ctx){
   rt_prepare_node(ctx, node);
 }
 
+void RT_addr_format_error(RT_context_t *ctx, gchar *ping_add){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"addr_format_error");
+  rt_add_text_node(node, "ping_add", ping_add);
+
+  rt_prepare_node(ctx, node);
+}
+
+void RT_ping_addr_space_mismatch(RT_context_t *ctx, gchar *ping_add){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"ping_addr_space_mismatch");
+  rt_add_text_node(node, "ping_add", ping_add);
+
+  rt_prepare_node(ctx, node);
+}
+
+void RT_ping_addr_outside_prefix(RT_context_t *ctx, gchar *ping_add){
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"ping_addr_outside_prefix");
+  rt_add_text_node(node, "ping_add", ping_add);
+
+  rt_prepare_node(ctx, node);
+}
+
 
 /* final result */
 void RT_irt_auth_result(RT_context_t* ctx, gboolean result, gboolean override) {

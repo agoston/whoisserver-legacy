@@ -205,6 +205,9 @@ void RT_org_auth_result(RT_context_t* ctx, gboolean result, gboolean override,
 void RT_org_creation_auth_result(RT_context_t* ctx, gboolean result, gboolean override);
 void RT_wrong_org_attr_optionality(RT_context_t* ctx);
 void RT_organisation_creation_without_auto_id(RT_context_t* ctx);
+void RT_addr_format_error(RT_context_t *rt_ctx, gchar *ping_add);
+void RT_ping_addr_space_mismatch(RT_context_t *rt_ctx, gchar *ping_add);
+void RT_ping_addr_outside_prefix(RT_context_t *rt_ctx, gchar *ping_add);
 
 
 typedef struct {

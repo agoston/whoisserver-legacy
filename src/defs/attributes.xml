@@ -2734,6 +2734,8 @@
    Allows a network operator to advertise an IP address of a node
    that should be reachable from outside networks. This node can be
    used as a destination address for diagnostic tests.
+   The IP address must be within the address range of the prefix
+   containing this attribute.
     </description>
     <syntax>ipv4-address</syntax>
   </ripe_attribute>
@@ -2743,6 +2745,8 @@
    Allows a network operator to advertise an IP address of a node
    that should be reachable from outside networks. This node can be
    used as a destination address for diagnostic tests.
+   The IP address must be within the address range of the prefix
+   containing this attribute.
     </description>
     <syntax>ipv6-address</syntax>
   </ripe_attribute>

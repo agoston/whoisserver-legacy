@@ -550,6 +550,21 @@ No PGP error on object
 ***Error: For example, you can use AUTO-1.
   </xsl:template>
 
+  <xsl:template match="addr_format_error">
+ 
+***Error: IP address format eror <xsl:value-of select="ping_add/text()"/>).
+  </xsl:template>
+
+  <xsl:template match="ping_addr_space_mismatch">
+ 
+***Error: pingable address space does not match route prefix space <xsl:value-of select="ping_add/text()"/>).
+  </xsl:template>
+
+  <xsl:template match="ping_addr_outside_prefix">
+ 
+***Error: pingable address is not within route prefix <xsl:value-of select="ping_add/text()"/>).
+  </xsl:template>
+
   <xsl:template match="peering_set_syntax">
 
 ***Error: a peering-set object must contain at least one mp-peering or peering attribute
