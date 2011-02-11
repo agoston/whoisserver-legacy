@@ -1,0 +1,24 @@
+# routes tests
+# CASE 5: create a route with 2 x pingable
+#         with 2 x ping-hdl
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed
+
+
+route:            194.20.0.0/16
+descr:            Test route
+origin:           AS3333
+pingable:         194.20.0.1
+pingable:         194.20.0.30
+ping-hdl:         TP1-DB-TEST
+ping-hdl:         TP2-DB-TEST
+mnt-by:           LIR-MNT
+changed:          dbtest@ripe.net 20020101
+source:           DB-TEST
+
+password: LIR
+

@@ -38,3 +38,13 @@
 # RESULT 4: The creation will succeed
 
 
+# CASE 5: create a route with 2 x pingable
+#         with 2 x ping-hdl
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed
+
+
