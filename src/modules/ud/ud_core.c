@@ -1478,7 +1478,7 @@ static void each_attribute_process(void *element_data, void *tr_ptr) {
 						die;
 					}
 					update_attr(attribute, tr);
-				} else {
+				} else  if (tr->load_pass != 1) {
 					/* this is an emty SELECT because there is no referred object */
 				    /* dummy not allowed */
 				    tr->error |= ERROR_U_OBJ;

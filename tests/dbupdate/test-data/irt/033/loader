@@ -136,8 +136,8 @@ source:       DB-TEST
 irt:          IRT-ONE
 address:      Singel 258
 e-mail:       dbtest@ripe.net
-admin-c:      TP12-DB-TEST
-tech-c:       TP12-DB-TEST
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
 auth:         MD5-PW $1$12345678$wza1MMo7nPUnBHNJMOMq3.   # irt
 mnt-by:       TEST-MNT
 changed:      dbtest@ripe.net 20020101
