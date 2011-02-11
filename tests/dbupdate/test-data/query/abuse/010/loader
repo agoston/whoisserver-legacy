@@ -98,7 +98,7 @@ encryption:          PGPKEY-4EA45E47
 admin-c:             TP1-DB-TEST
 tech-c:              TP1-DB-TEST
 auth:                MD5-PW $1$12345678$wza1MMo7nPUnBHNJMOMq3.   # irt
-mnt-by:              TEST-MNT
+mnt-by:              TEST-DBM-MNT
 abuse-mailbox:       dbtest@ripe.net
 changed:             dbtest@ripe.net 20020101
 source:              DB-TEST
@@ -111,7 +111,7 @@ e-mail:       dbtest@ripe.net
 nic-hdl:      ROLE-DB-TEST
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-mnt-by:       TEST-MNT
+mnt-by:       TEST-DBM-MNT
 notify:       dbtest@ripe.net
 changed:      dbtest@ripe.net 20020101
 abuse-mailbox: dbtest@ripe.net
