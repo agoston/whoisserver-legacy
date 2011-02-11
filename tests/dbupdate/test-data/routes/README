@@ -28,3 +28,13 @@
 # RESULT 3: The creation will succeed
 
 
+# CASE 4: create a route6 with ping-hdl
+#         no pingable
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed
+
+

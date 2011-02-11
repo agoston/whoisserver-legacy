@@ -1,12 +1,12 @@
 # routes tests
-# CASE 2: create a route6 with ping-hdl
+# CASE 4: create a route6 with ping-hdl
 #         no pingable
 #
 # create route object 
 #
 #SUCCESS
 #
-# RESULT 2: The creation will succeed
+# RESULT 4: The creation will succeed
 
 
 route6:           2001:600::/32
