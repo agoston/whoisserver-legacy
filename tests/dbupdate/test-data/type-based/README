@@ -434,33 +434,6 @@
 # RESULT 3: The deletion will succeed.
 
 
-# CASE 1: We try to create route-set object AS100:RS-CUSTOMERS
-#
-# create route-set object 
-#
-#SUCCESS
-#
-# RESULT 1: The creation will succeed.
-
-
-# CASE 2: We try to modify route-set object AS100:RS-CUSTOMERS
-#
-# modify route-set object 
-#
-#SUCCESS
-#
-# RESULT 2: The modification will succeed.
-
-
-# CASE 3: We try to delete route-set object AS100:RS-CUSTOMERS
-#
-# delete route-set object 
-#
-#SUCCESS
-#
-# RESULT 3: The deletion will succeed.
-
-
 # CASE 1: We try to create route object 20.13.0.0/16,AS200
 #
 # create route object 
@@ -482,6 +455,33 @@
 # CASE 3: We try to delete route object 20.13.0.0/16,AS200
 #
 # delete route object 
+#
+#SUCCESS
+#
+# RESULT 3: The deletion will succeed.
+
+
+# CASE 1: We try to create route-set object AS100:RS-CUSTOMERS
+#
+# create route-set object 
+#
+#SUCCESS
+#
+# RESULT 1: The creation will succeed.
+
+
+# CASE 2: We try to modify route-set object AS100:RS-CUSTOMERS
+#
+# modify route-set object 
+#
+#SUCCESS
+#
+# RESULT 2: The modification will succeed.
+
+
+# CASE 3: We try to delete route-set object AS100:RS-CUSTOMERS
+#
+# delete route-set object 
 #
 #SUCCESS
 #

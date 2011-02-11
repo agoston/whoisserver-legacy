@@ -887,9 +887,9 @@ int UP_check_ping(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     char *ping_add = NULL;
     GList *ping_attrs = NULL;
     GList *item = NULL;
-    ip_prefix_t *route_pref = NULL;
+    ip_prefix_t route_pref;
     ip_space_t route_space = IP_V4;
-    ip_addr_t *ping_add_ptr = NULL;
+    ip_addr_t ping_add_ptr;
 
     LG_log(lg_ctx, LG_FUNC, ">UP_check_ping: entered\n");
 
@@ -907,8 +907,10 @@ int UP_check_ping(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     ping_attrs = rpsl_object_get_attr(preproc_obj, "pingable");
     if ( ping_attrs )
     {
+        LG_log(lg_ctx, LG_DEBUG,"UP_check_ping: pingable attrs found");
         /* get route prefix details */
-        if ( IP_pref_t2b(route_pref, pvalue, IP_EXPN) != IP_OK )
+LG_log(lg_ctx, LG_DEBUG,"UP_check_ping: call IP_pref_t2b with pvalue [%s]", pvalue);
+        if ( IP_pref_t2b(&route_pref, pvalue, IP_EXPN) != IP_OK )
         {
             /* should never happen if syntax checks work */
             LG_log(lg_ctx, LG_DEBUG,"UP_check_ping: route(6) prefix invalid");
@@ -918,10 +920,12 @@ int UP_check_ping(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         else
         {
             if ( ! strcasecmp(type, "route6") ) route_space = IP_V6;
+            LG_log(lg_ctx, LG_DEBUG,"UP_check_ping: route prefix space [%s]", route_space == IP_V6 ? "IPv6" : "IPv4");
             for ( item = ping_attrs; item != NULL; item = g_list_next(item) )
             {
                 ping_add = rpsl_attr_get_clean_value((rpsl_attr_t *) (item->data));
-                if ( IP_addr_t2b(ping_add_ptr, ping_add, IP_PLAIN) != IP_OK )
+                LG_log(lg_ctx, LG_DEBUG,"UP_check_ping: ping address [%s]", ping_add);
+                if ( IP_addr_t2b(&ping_add_ptr, ping_add, IP_PLAIN) != IP_OK )
                 {
                     /* should never happen if syntax checks work */
                     LG_log(lg_ctx, LG_DEBUG, "UP_check_ping: pingable address invalid [%s]", ping_add);
@@ -931,7 +935,7 @@ int UP_check_ping(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                 else
                 {
                     /* check space types */
-                    if ( IP_addr_b2_space(ping_add_ptr) != route_space )
+                    if ( IP_addr_b2_space(&ping_add_ptr) != route_space )
                     {
                         LG_log(lg_ctx, LG_DEBUG, "UP_check_ping: pingable address space does not match route prefix space");
                         RT_ping_addr_space_mismatch(rt_ctx, ping_add);
@@ -939,12 +943,17 @@ int UP_check_ping(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                     }
                     else
                     {
+                        LG_log(lg_ctx, LG_DEBUG,"UP_check_ping: spaces match");
                         /* check if pingable address is withing prefix */
-                        if ( ! IP_addr_in_pref(ping_add_ptr, route_pref) )
+                        if ( ! IP_addr_in_pref(&ping_add_ptr, &route_pref) )
                         {
                             LG_log(lg_ctx, LG_DEBUG, "UP_check_ping: pingable address is not within route prefix");
                             RT_ping_addr_outside_prefix(rt_ctx, ping_add);
                             retval = UP_FAIL;
+                        }
+                        else
+                        {
+                            LG_log(lg_ctx, LG_DEBUG,"UP_check_ping: pingable address OK");
                         }
                     }
                 }
