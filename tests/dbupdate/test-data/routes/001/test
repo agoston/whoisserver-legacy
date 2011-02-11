@@ -1,0 +1,22 @@
+# routes tests
+# CASE 1: We try to create route object 20.13.0.0/16,AS200
+# having deprecated "cross-nfy" and "cross-mnt" attributes
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail.
+
+
+route:   20.13.0.0/16
+descr:   test route
+origin:  AS200
+mnt-by:  TEST-MNT
+cross-mnt: TEST-MNT
+cross-nfy: TP1-DB-TEST
+changed: dbtest@ripe.net
+source:  DB-TEST
+
+
+password: auth
