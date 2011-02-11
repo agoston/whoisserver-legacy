@@ -100,6 +100,26 @@ auth:    MD5-PW $1$12345678$28Jr/8MuLiKvwiHIYC1C21  # mb-child
 changed: dbtest@ripe.net 20020101
 source:  DB-TEST
 
+mntner:  EXACT-MB-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net 
+referral-by: TEST-DBM-MNT
+mnt-by:  CHILD-MB-MNT
+auth:    MD5-PW $1$12345678$28Jr/8MuLiKvwiHIYC1C22  # ???
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
+mntner:  PARENT-MB-MNT
+descr:   Test maintainer object
+admin-c: TP1-DB-TEST
+upd-to:  dbtest@ripe.net 
+referral-by: TEST-DBM-MNT
+mnt-by:  CHILD-MB-MNT
+auth:    MD5-PW $1$12345678$28Jr/8MuLiKvwiHIYC1C23  # ???
+changed: dbtest@ripe.net 20020101
+source:  DB-TEST
+
 mntner:  PARENT-ROUTE-MB-MNT
 descr:   Test maintainer object
 admin-c: TP1-DB-TEST

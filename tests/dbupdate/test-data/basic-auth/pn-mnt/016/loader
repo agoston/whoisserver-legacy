@@ -94,6 +94,13 @@ nic-hdl:      TP2-DB-TEST
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 
+person:       Test Person3
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP3-DB-TEST
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
 role:         Test Role1
 address:      Singel
 e-mail:       dbtest@ripe.net

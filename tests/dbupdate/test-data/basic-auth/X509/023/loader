@@ -95,7 +95,7 @@ source:       DB-TEST
 as-block:     AS1 - AS65534
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-mnt-by:       TEST-MNT
+mnt-by:       TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
