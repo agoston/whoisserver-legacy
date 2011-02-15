@@ -149,7 +149,9 @@ MM_mail_info_t *MM_extract_mail_info(const gchar *stream) {
     LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: Exploding MIME(MM)");
     ret->content = mm_explode_mime(body, contents);
 
+    LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: closing mail stream");
     mail_close(mail_stream);
+
     LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: mail stream closed");
     if (from) {
         g_free(from);
@@ -571,10 +573,7 @@ char* mm_qp_clean(char* dirty) {
  */
 MM_content_t* mm_explode_mime(BODY* body, char* contents) {
 
-    //  gchar* type;
-    //  gchar* subtype;
     MM_content_t* content_struc;
-    //  int size; /* should not be ignored? */
     char* content;
     char* old_content;
 
