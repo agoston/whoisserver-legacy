@@ -213,7 +213,6 @@ install-exec-hook:
 	${INSTALL} -m 0644 ../conf/frwd_text $(DESTDIR)/${confdir}
 	${INSTALL} -m 0644 ../conf/notif_template $(DESTDIR)/${confdir}
 	${INSTALL} -m 0644 ../conf/notif_text $(DESTDIR)/${confdir}
-	${INSTALL} -m 0644 ../doc/AUTO-DBM-HELP $(DESTDIR)/${docdir}
 	${INSTALL} -m 0644 ../doc/WHOIS-HELP $(DESTDIR)/${docdir}
 	${INSTALL} -m 0644 ../doc/LOOKUP-HELP $(DESTDIR)/${docdir}
 	${INSTALL} -m 0644 ../conf/sample.db.gz  $(DESTDIR)/${tmpdir}/load/SAMPLE

@@ -614,7 +614,6 @@ MM_content_t* mm_explode_mime(BODY* body, char* contents) {
 
     LG_log(mm_ctx, LG_FUNC, "<mm_explode_mime: exiting");
     return content_struc;
-
 }
 
 /*
