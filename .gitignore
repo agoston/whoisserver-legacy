@@ -9,7 +9,7 @@ cscope*
 *.lex.c
 *.tab.[ch]
 src/include/*
-third-party/imap-2004g
+third-party/imap-2007e
 third-party/libxml2_2.6.16-7sarge1
 third-party/libxslt_1.1.12-8
 Makefile

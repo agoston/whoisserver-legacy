@@ -15,7 +15,7 @@ AC_ARG_WITH(cclientinc,
         fi ,
         if test x$cclientinc = x
         then
-          cclientinc=$RIP/third-party/imap-2004g/c-client
+          cclientinc=$RIP/third-party/imap-2007e/c-client
         fi)
 
 AC_ARG_WITH(cclientlib,
@@ -30,7 +30,7 @@ AC_ARG_WITH(cclientlib,
         fi ,
         if test x$cclientlib = x
         then
-          cclientlib=$RIP/third-party/imap-2004g/c-client
+          cclientlib=$RIP/third-party/imap-2007e/c-client
         fi)
 
 AC_CHECK_FILE($cclientinc/mail.h, ,
