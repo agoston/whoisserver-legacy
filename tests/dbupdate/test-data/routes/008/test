@@ -1,18 +1,18 @@
 # routes tests
-# CASE 6: create a route with IPv6 pingable address
+# CASE 8: create a route6 with pingable address outside prefix range
 #         with ping-hdl
 #
-# create route object 
+# create route6 object 
 #
 #FAILURE
 #
-# RESULT 6: The creation will fail
+# RESULT 8: The creation will fail
 
 
-route:            194.20.0.0/16
-descr:            Test route
+route6:           2001:600::/32
+descr:            Test route6
 origin:           AS3333
-pingable:         194.20.0.5
+pingable:         2002:600::
 pingable:         2001:600::
 ping-hdl:         TP1-DB-TEST
 mnt-by:           LIR-MNT

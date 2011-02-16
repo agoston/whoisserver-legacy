@@ -552,17 +552,17 @@ No PGP error on object
 
   <xsl:template match="addr_format_error">
  
-***Error: IP address format eror <xsl:value-of select="ping_add/text()"/>).
+***Error: IP address format error <xsl:value-of select="ping_add/text()"/>).
   </xsl:template>
 
   <xsl:template match="ping_addr_space_mismatch">
  
-***Error: pingable address space does not match route prefix space <xsl:value-of select="ping_add/text()"/>).
+***Error: pingable address space (<xsl:value-of select="ping_add/text()"/>) does not match route prefix space.
   </xsl:template>
 
   <xsl:template match="ping_addr_outside_prefix">
  
-***Error: pingable address is not within route prefix <xsl:value-of select="ping_add/text()"/>).
+***Error: pingable address (<xsl:value-of select="ping_add/text()"/>) is not within route prefix.
   </xsl:template>
 
   <xsl:template match="peering_set_syntax">

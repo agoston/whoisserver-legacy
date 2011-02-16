@@ -1,20 +1,20 @@
 # routes tests
-# CASE 6: create a route with IPv6 pingable address
-#         with ping-hdl
+# CASE 10: create a route
+#          pingable address with nic-hdl
+#          ping-hdl with IP address
 #
-# create route object 
+# create route6 object 
 #
 #FAILURE
 #
-# RESULT 6: The creation will fail
+# RESULT 10: The creation will fail
 
 
 route:            194.20.0.0/16
 descr:            Test route
 origin:           AS3333
-pingable:         194.20.0.5
-pingable:         2001:600::
-ping-hdl:         TP1-DB-TEST
+pingable:         TP1-DB-TEST
+ping-hdl:         194.20.0.1
 mnt-by:           LIR-MNT
 changed:          dbtest@ripe.net 20020101
 source:           DB-TEST

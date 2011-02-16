@@ -1,16 +1,16 @@
 # routes tests
-# CASE 6: create a route with IPv6 pingable address
+# CASE 7: create a route6 with IPv4 pingable address
 #         with ping-hdl
 #
-# create route object 
+# create route6 object 
 #
 #FAILURE
 #
-# RESULT 6: The creation will fail
+# RESULT 7: The creation will fail
 
 
-route:            194.20.0.0/16
-descr:            Test route
+route6:           2001:600::/32
+descr:            Test route6
 origin:           AS3333
 pingable:         194.20.0.5
 pingable:         2001:600::
