@@ -149,8 +149,8 @@ MM_mail_info_t *MM_extract_mail_info(const gchar *stream) {
     LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: Exploding MIME(MM)");
     ret->content = mm_explode_mime(body, contents);
 
-    LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: closing mail stream");
-    mail_close(mail_stream);
+    //LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: closing mail stream");
+    //mail_close(mail_stream);
 
     LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: mail stream closed");
     if (from) {
