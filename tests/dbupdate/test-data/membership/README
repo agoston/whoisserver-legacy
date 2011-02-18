@@ -70,6 +70,8 @@
 # This test is faulty to be honest - normally you can't create an
 # member-of: without the as-set existing.
 #
+# removed by agoston @2010-09-24
+#
 # create as-set object
 #
 #FAILURE

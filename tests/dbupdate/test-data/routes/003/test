@@ -1,0 +1,21 @@
+# routes tests
+# CASE 3: create a route6 with pingable
+#         no ping-hdl
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed
+
+
+route6:           2001:600::/32
+descr:            Test route6
+origin:           AS3333
+pingable:         2001:600::
+mnt-by:           LIR-MNT
+changed:          dbtest@ripe.net 20020101
+source:           DB-TEST
+
+password: LIR
+

@@ -1,0 +1,23 @@
+# routes tests
+# CASE 10: create a route
+#          pingable address with nic-hdl
+#          ping-hdl with IP address
+#
+# create route6 object 
+#
+#FAILURE
+#
+# RESULT 10: The creation will fail
+
+
+route:            194.20.0.0/16
+descr:            Test route
+origin:           AS3333
+pingable:         TP1-DB-TEST
+ping-hdl:         194.20.0.1
+mnt-by:           LIR-MNT
+changed:          dbtest@ripe.net 20020101
+source:           DB-TEST
+
+password: LIR
+

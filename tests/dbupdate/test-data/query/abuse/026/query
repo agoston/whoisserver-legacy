@@ -10,7 +10,7 @@ e-mail:         dbtest@ripe.net
 nic-hdl:        ROLE-DB-TEST
 admin-c:        TP2-DB-TEST
 tech-c:         TP2-DB-TEST
-mnt-by:         TEST-MNT
+mnt-by:         TEST-DBM-MNT
 abuse-mailbox:  dbtest-role1@ripe.net
 notify:         dbtest@ripe.net
 changed:        dbtest@ripe.net
@@ -35,7 +35,7 @@ e-mail:         dbtest@ripe.net
 nic-hdl:        ROLE2-DB-TEST
 admin-c:        TP2-DB-TEST
 tech-c:         TP3-DB-TEST
-mnt-by:         TEST-MNT
+mnt-by:         TEST-DBM-MNT
 abuse-mailbox:  dbtest-role2@ripe.net
 notify:         dbtest@ripe.net
 changed:        dbtest@ripe.net

@@ -1,10 +1,10 @@
 M4PATH=m4
 
 AC_PREREQ(2.59)
-AC_INIT([Whois Server], [3.10.2],
+AC_INIT([Whois Server], [3.10.3],
         [RIPE Database Management <ripe-dbm@ripe.net>],
         [whoisserver])
-AM_INIT_AUTOMAKE([whoisserver],[3.10.2])
+AM_INIT_AUTOMAKE([whoisserver],[3.10.3])
 
 PRODUCT=$PACKAGE_NAME
 VERSION=$PACKAGE_VERSION
@@ -354,7 +354,6 @@ AC_CONFIG_FILES([
   conf/notif_template
   conf/notif_text
   conf/SAMPLE.CURRENTSERIAL
-  doc/AUTO-DBM-HELP
   doc/WHOIS-HELP
   doc/LOOKUP-HELP
   src/defs/makedefsall

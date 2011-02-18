@@ -45,6 +45,20 @@ changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
 
+% end user maintainer
+
+mntner:       END-USER-MNT
+descr:        End User Maintainer
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         MD5-PW $1$12345678$NN4rSWChzZ4bTTjt90C8L.    # hostmaster
+upd-to:       dbtest@ripe.net
+mnt-by:       RIPE-NCC-HM-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
+
 % root inetnum object
 
 inetnum:      0.0.0.0 - 255.255.255.255

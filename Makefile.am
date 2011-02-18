@@ -30,7 +30,6 @@ EXTRA_DIST = README \
 	     conf/sample.db \
 	     conf/SAMPLE.CURRENTSERIAL.in \
 	     conf/sources.config.sample.in \
-	     doc/AUTO-DBM-HELP.in \
 	     doc/WHOIS-HELP.in \
 	     doc/LOOKUP-HELP.in \
              doc/DIFF-320-330.sql \
@@ -449,7 +448,6 @@ uninstall-local:
 	rm -f $(DESTDIR)/${confdir}/frwd_text
 	rm -f $(DESTDIR)/${confdir}/notif_template
 	rm -f $(DESTDIR)/${confdir}/notif_text
-	rm -f $(DESTDIR)/${docdir}/AUTO-DBM-HELP
 	rm -f $(DESTDIR)/${docdir}/WHOIS-HELP
 	rm -f $(DESTDIR)/${docdir}/LOOKUP-HELP
 	rm -f $(DESTDIR)/${tmpdir}/load/SAMPLE/sample.db.gz

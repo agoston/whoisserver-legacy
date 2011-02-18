@@ -21,7 +21,7 @@ fi
 ### Compile c-client
 ###
 CCCOMP=1
-CCDIR=`pwd`/third-party/imap-2004g/
+CCDIR=`pwd`/third-party/imap-2007e/
 
 if [ -s ${CCDIR}/c-client/mail.o ]; then
 	CCBITS=`file ${CCDIR}/c-client/mail.o | sed 's/.*\([0-9][0-9]\)-bit.*/\1/'`
@@ -36,14 +36,14 @@ if [ $CCCOMP -eq 1 ]; then
 	echo ' *** Compiling c-client'
 	echo ' ***'
 	pushd $CCDIR
-	rm -rf imap2004g
-	tar xjf imap-2004g.tar.bz2
-	cd imap-2004g
-	make slx
+	rm -rf imap2007e
+	tar xjf imap-2007e.tar.bz2
+	cd imap-2007e
+	make slx EXTRACFLAGS="-I/usr/include/openssl"
 	# clean up
 	cd ..
-	cp -Lr imap-2004g/c-client .
-	rm -rf imap-2004g
+	cp -Lr imap-2007e/c-client .
+	rm -rf imap-2007e
 	popd
 fi
 
@@ -125,5 +125,5 @@ echo ' ***'
 
 #./configure --with-rdns --prefix=$HOME/local
 # default options omitted:
-#--with-cclientinc=`pwd`/third-party/imap-2004g/c-client --with-cclientlib=`pwd`/third-party/imap-2004g/c-client
+#--with-cclientinc=`pwd`/third-party/imap-2007e/c-client --with-cclientlib=`pwd`/third-party/imap-2007e/c-client
 #--with-xml-prefix=`pwd`/third-party/libxml2_2.6.16-7sarge1 --with-xslt-prefix=`pwd`/third-party/libxslt_1.1.12-8

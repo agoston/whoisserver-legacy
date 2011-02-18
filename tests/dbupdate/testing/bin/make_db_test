@@ -149,9 +149,6 @@ PORT=$SQLPORT
 
 log "Loading the database [$DB] [see list in ${UPDLOG}] "
 
-log "Flush tables"
-$MYSQLADMINCMD flush-tables
-
 export MYSQL HOST USER PASSWORD DB PORT
 export UNZIP1 FILTER LOADER
 export LIST CURRENTSERIAL SOURCE
@@ -187,8 +184,6 @@ fi
 if [ $? -ne 0 ]; then
    error "Error stopping queries, $0 now exiting"
 fi
-
-$MYSQLADMINCMD flush-tables
 
 ERROR=0
 $INITRX

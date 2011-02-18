@@ -1,0 +1,22 @@
+# routes tests
+# CASE 2: We try to create route object 20.13.0.0/16,AS200
+# having new mnt-routes syntax
+#
+# create route object 
+#
+#SUCCEES
+#
+# RESULT 2: The creation will succeed.
+
+
+route:   20.13.0.0/16
+descr:   test route
+origin:  AS200
+mnt-by:  TEST-MNT
+mnt-routes: TEST-MNT {20.13.0.0/16^+, 20.13.0.0/16^-, 20.13.0.0/16^16-32, 20.13.0.0/16^24, 20.13.0.0/24}
+mnt-routes: TEST-MNT ANY
+changed: dbtest@ripe.net
+source:  DB-TEST
+
+
+password: auth

@@ -24,7 +24,7 @@ e-mail:         dbtest@ripe.net
 admin-c:        TP2-DB-TEST
 tech-c:         TP2-DB-TEST
 auth:           MD5-PW $1$12345678$wza1MMo7nPUnBHNJMOMq3.   # irt
-mnt-by:         TEST-MNT
+mnt-by:         TEST-DBM-MNT
 source:         DB-TEST
 
 

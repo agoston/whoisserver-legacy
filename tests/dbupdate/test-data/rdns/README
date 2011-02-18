@@ -364,9 +364,9 @@ under the control of the test suite.
 #
 # create domain objects
 #
-#SUCCESS
+#FAILURE
 #
-# RESULT 39: creation will succeed
+# RESULT 39: creation will fail
 
 
 # CASE 40: create /16

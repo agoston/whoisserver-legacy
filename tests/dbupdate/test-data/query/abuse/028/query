@@ -12,7 +12,7 @@ fax-no:         +49 700 00006467
 nic-hdl:        ROLE-DB-TEST
 admin-c:        TP2-DB-TEST
 tech-c:         TP2-DB-TEST
-mnt-by:         TEST-MNT
+mnt-by:         TEST-DBM-MNT
 abuse-mailbox:  dbtest-role1@ripe.net
 source:         DB-TEST
 
@@ -25,7 +25,7 @@ fax-no:         +49 700 00006467
 nic-hdl:        ROLE2-DB-TEST
 admin-c:        TP2-DB-TEST
 tech-c:         TP3-DB-TEST
-mnt-by:         TEST-MNT
+mnt-by:         TEST-DBM-MNT
 abuse-mailbox:  dbtest-role2@ripe.net
 source:         DB-TEST
 

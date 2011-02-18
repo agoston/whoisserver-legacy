@@ -96,7 +96,7 @@ e-mail:       dbtest@ripe.net
 nic-hdl:      ROLE-DB-TEST
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-mnt-by:       TEST-MNT
+mnt-by:       TEST-DBM-MNT
 notify:       dbtest@ripe.net
 changed:      dbtest@ripe.net
 abuse-mailbox: dbtest@ripe.net

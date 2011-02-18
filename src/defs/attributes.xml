@@ -64,10 +64,6 @@
         WHERE object_id=%ld
         AND pe_ro_id=%ld
       </update>
-      <dummy qtype="ud_ax_pr">
-        INSERT person_role 
-        SET thread_id=%d, object_id=%ld, nic_hdl='%s', object_type=%d, dummy=1
-      </dummy>
     </sqltable>
     </representation>
     <keys searchable="inverse">
@@ -134,7 +130,7 @@
     <sqltable name="as_set">
       <insert qtype="ud_main_">
         INSERT as_set
-        SET thread_id=%d, object_id=%ld, as_set='%s', dummy=0
+        SET thread_id=%d, object_id=%ld, as_set='%s'
       </insert>
       <update qtype="ud_main_">
         UPDATE as_set
@@ -213,10 +209,6 @@
           WHERE object_id=%ld
           AND pe_ro_id=%ld
         </update>
-        <dummy qtype="ud_ax_pr">
-          INSERT person_role
-          SET thread_id=%d, object_id=%ld, nic_hdl='%s', object_type=%d, dummy=1
-        </dummy>
       </sqltable>
     </representation>
     <keys searchable="inverse">
@@ -817,10 +809,6 @@
         WHERE object_id=%ld
         AND mnt_id=%ld
       </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -830,7 +818,6 @@
         SELECT i.object_id,0
         FROM   mbrs_by_ref i, mntner MT
         WHERE  MT.mntner = '%s'
-        AND    MT.dummy = 0
         AND    MT.object_id = i.mnt_id
         AND    i.thread_id = 0
         </sqlquery>
@@ -902,10 +889,6 @@
         WHERE object_id=%ld
         AND mnt_id=%ld
       </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner 
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -950,10 +933,6 @@
         WHERE object_id=%ld
         AND mnt_id=%ld
       </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -993,10 +972,6 @@
         WHERE object_id=%ld
         AND mnt_id=%ld
       </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner 
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -1039,10 +1014,6 @@
         WHERE object_id=%ld
         AND mnt_id=%ld
       </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -1160,10 +1131,6 @@
         WHERE object_id=%ld
         AND mnt_id=%ld
       </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -1209,10 +1176,6 @@
         WHERE object_id=%ld
         AND mnt_id=%ld
       </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -1258,10 +1221,6 @@
         WHERE object_id=%ld
         AND mnt_id=%ld
       </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -1291,7 +1250,7 @@
     <sqltable name="mntner">
       <insert qtype="ud_main_">
         INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=0
+        SET thread_id=%d, object_id=%ld, mntner='%s'
       </insert>
       <update qtype="ud_main_">
         UPDATE mntner
@@ -1372,7 +1331,7 @@
     <sqltable name="person_role">
       <insert qtype="ud_ma_pr">
         INSERT person_role
-        SET thread_id=%d, object_type=%d, object_id=%ld, nic_hdl='%s', dummy=0
+        SET thread_id=%d, object_type=%d, object_id=%ld, nic_hdl='%s'
       </insert>
       <update qtype="ud_ma_pr">
         UPDATE person_role
@@ -1420,7 +1379,7 @@
     <sqltable name="organisation">
       <insert qtype="ud_main_">
         INSERT organisation
-        SET thread_id=%d, object_id=%ld, organisation='%s', dummy=0
+        SET thread_id=%d, object_id=%ld, organisation='%s'
       </insert>
       <select qtype="ud_main_">
         organisation='%s' AND
@@ -1664,10 +1623,6 @@
         WHERE object_id=%ld
         AND mnt_id=%ld
       </update>
-      <dummy qtype="ud_ax_mt">
-        INSERT mntner
-        SET thread_id=%d, object_id=%ld, mntner='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -1804,7 +1759,7 @@
     <sqltable name="route_set">
       <insert qtype="ud_main_">
         INSERT route_set
-        SET thread_id=%d, object_id=%ld, route_set='%s', dummy=0
+        SET thread_id=%d, object_id=%ld, route_set='%s'
       </insert>
       <update qtype="ud_main_">
         UPDATE route_set
@@ -1933,10 +1888,6 @@
         WHERE object_id=%ld
         AND pe_ro_id=%ld
       </update>
-      <dummy qtype="ud_ax_pr">
-        INSERT person_role 
-        SET thread_id=%d, object_id=%ld, nic_hdl='%s', object_type=%d, dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -1985,10 +1936,6 @@
         WHERE object_id=%ld
         AND org_id=%ld
       </update>
-      <dummy qtype="ud_ax_oa">
-        INSERT organisation
-        SET thread_id=%d, object_id=%ld, organisation='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -2071,10 +2018,6 @@
         WHERE object_id=%ld
         AND pe_ro_id=%ld
       </update>
-      <dummy qtype="ud_ax_pr">
-        INSERT person_role
-        SET thread_id=%d, object_id=%ld, nic_hdl='%s', object_type=%d, dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -2248,7 +2191,7 @@
     <sqltable name="route">
       <insert qtype="ud_ma_rt">
         INSERT route
-        SET thread_id=%d, object_id=%ld, prefix=%u, prefix_length=%d, dummy=0
+        SET thread_id=%d, object_id=%ld, prefix=%u, prefix_length=%d
       </insert>
       <update qtype="ud_main_"></update>
       <select qtype="ud_ma_rt">
@@ -2355,7 +2298,7 @@
     <sqltable name="">
       <insert qtype="ud_main_">
         INSERT rtr_set
-        SET thread_id=%d, object_id=%ld, rtr_set='%s', dummy=0
+        SET thread_id=%d, object_id=%ld, rtr_set='%s'
       </insert>
       <update qtype="ud_main_"></update>
       <select qtype="ud_main_">
@@ -2432,10 +2375,6 @@
         WHERE object_id=%ld
         AND set_id=%ld
       </update>
-      <dummy qtype="ud_ax_mo">
-        INSERT %s
-        SET thread_id=%d, object_id=%ld, %s='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -2538,10 +2477,6 @@
         WHERE object_id=%ld
         AND irt_id=%ld
       </update>
-      <dummy qtype="ud_ax_it">
-        INSERT irt
-        SET thread_id=%d, object_id=%ld, irt='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
     <keys searchable="inverse">
@@ -2570,7 +2505,7 @@
     <sqltable name="irt">
       <insert qtype="ud_main_">
         INSERT irt
-        SET thread_id=%d, object_id=%ld, irt='%s', dummy=0
+        SET thread_id=%d, object_id=%ld, irt='%s'
       </insert>
       <update qtype="ud_main_">
         UPDATE irt
@@ -2702,7 +2637,7 @@
     <sqltable name="poetic_form">
       <insert qtype="ud_ax_pf">
         INSERT poetic_form
-        SET thread_id=%d, object_id=%ld, poetic_form='%s', dummy=0
+        SET thread_id=%d, object_id=%ld, poetic_form='%s'
       </insert>
       <select qtype="ud_main_">
         poetic_form='%s' AND
@@ -2743,10 +2678,6 @@
         WHERE object_id=%ld
         AND form_id=%ld
       </update>
-      <dummy qtype="ud_ax_fr">
-        INSERT poetic_form
-        SET thread_id=%d, object_id=%ld, poetic_form='%s', dummy=1
-      </dummy>
     </sqltable>
     </representation>
 
@@ -2763,6 +2694,58 @@
         </sqlquery>
       </queries>
     </keys>
+  </ripe_attribute>
+
+  <ripe_attribute name="ping-hdl" code="pc">
+    <description>
+   References a person or role capable of responding to queries
+   concerning the IP address(es) specified in the 'pingable'
+   attribute.
+    </description>
+    <syntax>nic-handle</syntax>
+
+    <representation>
+    <sqltable name="ping_hdl">
+      <insert qtype="ud_aux__">
+        INSERT ping_hdl
+        SELECT %d, %ld, person_role.object_id, %d
+        FROM person_role
+        WHERE person_role.nic_hdl='%s'
+      </insert>
+      <update qtype="ud_ax_pr">
+        UPDATE ping_hdl
+        SET thread_id=%d
+        WHERE object_id=%ld
+        AND pe_ro_id=%ld
+      </update>
+    </sqltable>
+    </representation>
+
+    <keys searchable="inverse">
+      <foreign value="nh"/>
+
+      <queries>
+        <sqlquery keytype="wk_nic_hdl" class="ANY">
+          SELECT i.object_id,0
+          FROM   ping_hdl i, person_role
+          WHERE  i.pe_ro_id = person_role.object_id
+          AND    person_role.nic_hdl  = '%s'
+          AND    i.thread_id = 0
+        </sqlquery>
+      </queries>
+    </keys>
+    <foreignkey>person</foreignkey>
+  </ripe_attribute>
+
+  <ripe_attribute name="pingable" code="pa">
+    <description>
+   Allows a network operator to advertise an IP address of a node
+   that should be reachable from outside networks. This node can be
+   used as a destination address for diagnostic tests.
+   The IP address must be within the address range of the prefix
+   containing this attribute.
+    </description>
+    <syntax>ip-address</syntax>
   </ripe_attribute>
 
 </ripe_attributes>

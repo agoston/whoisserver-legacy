@@ -13,7 +13,9 @@
 #         A dummy object was created for this object when AS123 was created
 #         which referenced AS123:AS-TEST in the member-of: attribute.
 #
-# create as-set object 
+# create as-set object
+#
+# removed by agoston as part of dummy removal @2010-09-24
 #
 #FAILURE
 #
@@ -24,8 +26,10 @@
 #         A dummy object was created for this object when 1.2.3.0/24 was created
 #         which referenced AS100:RS-CUSTOMERS in the member-of: attribute.
 #
-# create route-set object 
+# create route-set object
 #
+# removed by agoston as part of dummy removal @2010-09-24
+##
 #FAILURE
 #
 # RESULT 3: The creation will fail because of error 32
@@ -35,7 +39,9 @@
 #         A dummy object was created for this object when kst1-core.swip.net was created
 #         which referenced rtr-test in the member-of: attribute.
 #
-# create rtr-set object 
+# create rtr-set object
+#
+# removed by agoston as part of dummy removal @2010-09-24
 #
 #FAILURE
 #
