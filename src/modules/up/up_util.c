@@ -1155,6 +1155,8 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     retval |= UP_check_domain(rt_ctx, lg_ctx, options, preproc_obj,
                                operation, server, obj_source);
 
+    retval |= UP_check_ping(rt_ctx, lg_ctx, preproc_obj, operation, old_obj);
+
     /* check for references to AUTO- keys */
     if (handle_auto_keys)
     {

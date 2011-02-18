@@ -142,9 +142,6 @@ log "Loading database [$DB] (source [$SOURCE]) started"
 
 ######################### DATABASE CREATION AND LOADING ###############################
 
-#log "Flush tables"
-#$MYSQLADMINCMD flush-tables
-
 pushd ${SCRIPTDIR}/SQL
 set -e
 

@@ -211,6 +211,9 @@ void RT_ass_size_changed(RT_context_t* ctx, gchar *old_ass_size);
 void RT_ass_size_out_of_bounds(RT_context_t *ctx);
 void RT_invalid_more_specific_prefix_size(RT_context_t *ctx, gchar *parent_ass_size);
 void RT_organisation_creation_without_auto_id(RT_context_t *ctx);
+void RT_addr_format_error(RT_context_t *rt_ctx, gchar *ping_add);
+void RT_ping_addr_space_mismatch(RT_context_t *rt_ctx, gchar *ping_add);
+void RT_ping_addr_outside_prefix(RT_context_t *rt_ctx, gchar *ping_add);
 
 
 typedef struct {

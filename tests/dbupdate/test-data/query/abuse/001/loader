@@ -104,22 +104,12 @@ referral-by:  PERSON-MNT
 changed:      dbtest@ripe.net 20081113
 source:       DB-TEST
 
-mntner:  TEST-MNT
-descr:   Test maintainer object
-admin-c: TP1-DB-TEST
-upd-to:  dbtest@ripe.net
-referral-by: TEST-DBM-MNT
-mnt-by:  TEST-MNT
-auth:    MD5-PW $1$12345678$Y5n.GDFOxpXd2S1etuHFa/  # auth
-changed: dbtest@ripe.net 20020101
-source:  DB-TEST
-
 % create an encompassing as-block 
 
 as-block: AS1 - AS65534
 admin-c: TP1-DB-TEST
 tech-c: TP1-DB-TEST
-mnt-by: TEST-MNT
+mnt-by: TEST-DBM-MNT
 changed: dbtest@ripe.net 20020101
 source: DB-TEST
 

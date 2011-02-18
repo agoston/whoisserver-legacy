@@ -1,14 +1,12 @@
-
-# CASE 5: We try to create route object 20.13.0.0/16,AS200
+# routes tests
+# CASE 2: We try to create route object 20.13.0.0/16,AS200
 # having new mnt-routes syntax
-%
-% requires initial objects to be loaded
 #
 # create route object 
 #
 #SUCCEES
 #
-# RESULT 5: The creation will succeed.
+# RESULT 2: The creation will succeed.
 
 
 route:   20.13.0.0/16

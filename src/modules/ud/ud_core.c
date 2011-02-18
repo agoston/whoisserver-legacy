@@ -56,8 +56,6 @@ static void each_attribute_process(void *element_data, void *tr_ptr);
 
 static void update_attr(const rpsl_attr_t *attr, Transaction_t *tr);
 
-static int create_dummy(const rpsl_attr_t *attr, Transaction_t *tr);
-
 static int auth_member_of(const rpsl_attr_t *attr, Transaction_t *tr);
 
 /**********************************************************
@@ -594,22 +592,19 @@ static long get_ref_id(Transaction_t *tr, const char *ref_tbl_name, const char *
  * -1 - sql error or object does not exist
  *
  ***********************************************************/
-int isdummy(Transaction_t *tr)
-{
+int isdummy(Transaction_t *tr) {
     char *sql_str;
     char str_id[STR_M];
     int object_type = -1;
 
     sprintf(str_id, "%ld", tr->object_id);
     sql_str = get_field_str(tr->sql_connection, "object_type", "last", "object_id", str_id, NULL);
-    if (sql_str)
-    {
+    if (sql_str) {
         object_type = atoi(sql_str);
         UT_free(sql_str);
     }
 
-    if (object_type == -1)
-    {
+    if (object_type == -1) {
         LG_log(ud_context, LG_SEVERE, "cannot get object type for object_id %s", str_id);
         die;
     }
@@ -775,186 +770,6 @@ static int auth_member_of(const rpsl_attr_t *attribute, Transaction_t *tr) {
 		return (1);
 	}
 }/* auth_member_of()  */
-
-/************************************************************
- * create_dummy()                                            *
- *                                                           *
- * Function that creates a dummy object (that is one that    *
- * is referenced from an object but does not                 *
- * exist in the database).                                   *
- * Dummy object exists only in relevant main and 'last'      *
- * tables. Its creation is controlled by tr->dummy_allowed.  *
- * Queries for the dummies are defined in Dummy[] array.     *
- *                                                           *
- * Returns:                                                  *
- * 0  success                                                *
- * 1  no rf integrity and dummy not allowed                  *
- * -1 SQL error                                              *
- *                                                           *
- *************************************************************/
-static int create_dummy(const rpsl_attr_t *attribute, Transaction_t *tr) {
-	const char *query_fmt;
-	long dummy_id;
-	GString *query;
-	int result=0;
-	char *set_name;
-	char *p_name;
-	int query_type;
-	long timestamp;
-	char str_id[16];
-	int sql_err;
-	char *token=NULL;
-
-	int commit_now;
-	nic_handle_t *nh_ptr;
-	char *a_value;
-
-	int attribute_type;
-	const gchar *attribute_value;
-
-	/* Determine the attribute type */
-	attribute_type = rpsl_get_attr_id(rpsl_attr_get_name(attribute));
-	/* Get attribute value .It is already clean since we process the flattened copy of the object */
-	attribute_value = rpsl_attr_get_value(attribute);
-
-	query_fmt = DF_get_dummy_query(attribute_type);
-	if (strcmp(query_fmt, "") == 0) {
-		LG_log(ud_context, LG_SEVERE, "empty query string\n");
-		die;
-	}
-	/* for loader we do not perform commits/rollbacks */
-	if (IS_STANDALONE(tr->mode))
-		commit_now = 1;
-	else
-		commit_now = 0;
-
-	/* do not allow dummy objects to be created when the mode doesnt permit */
-	if (!IS_DUMMY_ALLOWED(tr->mode))
-		return (1);
-
-	/* Allocate resourses. We cannot use tr->query because it is in use */
-	query = g_string_sized_new(STR_XL);
-
-	/* Insert dummy in the last table */
-	/* Calculate the object_id - should be max+1 */
-	dummy_id = SQ_get_max_id(tr->sql_connection, "object_id", "last") +1;
-	/* Record dummy's object_id, it'll be needed in commit/rollback */
-	tr->dummy_id[tr->ndummy]=dummy_id;
-	tr->ndummy++;
-
-	/* Update the TR for crash recovery */
-	/* If we crash before actually creating an entry in last */
-	/* there should be no harm - later in rollback we will just try to delete nonexistent object */
-	TR_update_dummy(tr);
-
-	sprintf(str_id, "%ld", tr->object_id);
-	timestamp=time(NULL);
-	g_string_sprintf(query,
-	        "INSERT INTO last SET thread_id=%d, object_id=%ld, timestamp=%ld, object_type=%d, object='DUMMY for %s'",
-	        tr->thread_ins, dummy_id, timestamp, DUMMY_TYPE, str_id);
-
-	LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, query->str);
-	sql_err = SQ_execute_query(tr->sql_connection, query->str, (SQ_result_set_t **)NULL);
-
-	/* Check for errors */
-	if (sql_err) {
-		LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), query->str);
-		die;
-	}
-
-	/* compose the query */
-	query_type=DF_get_dummy_query_type(attribute_type);
-	switch (query_type) {
-
-		/* person_role */
-		case UD_AX_PR:
-			/* irt      */
-		case UD_AX_IT:
-			/* maintner */
-		case UD_AX_MT:
-		case UD_AX_FR:
-		case UD_AX_OA:
-			g_string_sprintf(query, query_fmt, tr->thread_ins, dummy_id, attribute_value, DUMMY_TYPE);
-			break;
-
-			/* as_set, route_set */
-		case UD_AX_MO:
-			set_name = get_set_name(tr->class_type);
-			g_string_sprintf(query, query_fmt, set_name, tr->thread_ins, dummy_id, set_name, attribute_value);
-			break;
-
-		default:
-			LG_log(ud_context, LG_SEVERE, "query not defined for this type of attribute[%d]\n", attribute_type);
-			die;
-			break;
-	}
-
-	LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, query->str);
-	sql_err = SQ_execute_query(tr->sql_connection, query->str, (SQ_result_set_t **)NULL);
-	if (sql_err) {
-		LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), query->str);
-		die;
-	}
-
-	/* for legacy person/role reference try to allocate a nic handle in NHR, */
-	/* if failied - create records in names table */
-	if (query_type == UD_AX_PR) {
-		if (ACT_UPD_NHR(tr->action) && (NH_parse(attribute_value, &nh_ptr)>0)) {
-			int nhres;
-			/* go ahead and register */
-			if (NH_check(nh_ptr, tr->sql_connection)>0) {
-				nhres = NH_register(nh_ptr, tr->sql_connection, commit_now);
-				if (nhres == -1) {
-					tr->succeeded=0;
-					tr->error |= ERROR_U_DBS;
-					LG_log(ud_context, LG_SEVERE, "cannot allocate nic handle %s", attribute_value);
-					die;
-				} else if (nhres == 0) {
-					tr->succeeded=0;
-					tr->error |= ERROR_U_OBJ;
-					LG_log(tr->src_ctx, LG_INFO, "[%ld] nic handle [%s]: wrong or already in use", tr->transaction_id,
-					        attribute_value);
-					g_string_sprintfa(tr->error_script, "E[%d][%d:%s]:nic-handle wrong or already in use\n",
-					        ERROR_U_OBJ, attribute_type, attribute_value);
-					result=-1;
-				}
-			} else {
-				tr->succeeded=0;
-				tr->error |= ERROR_U_OBJ;
-				LG_log(tr->src_ctx, LG_INFO, "[%ld] nic handle [%s]: wrong or already in use", tr->transaction_id,
-				        attribute_value);
-				g_string_sprintfa(tr->error_script, "E[%d][%d:%s]:nic-handle wrong or already in use\n", ERROR_U_OBJ,
-				        attribute_type, attribute_value);
-				result=-1;
-			}
-			free_nh(nh_ptr);
-		} else {
-			/* create record in the names table */
-			query_fmt = DF_get_insert_query(A_PN);
-
-			/* we need to copy string as strsep is destructive */
-			a_value = g_strdup(attribute_value);
-			token = a_value;
-
-			while ((p_name=strsep(&token, " \t"))) {
-				if (*p_name != '\0') {
-					g_string_sprintf(query, query_fmt, tr->thread_ins, dummy_id, DUMMY_TYPE, p_name);
-					LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, query->str);
-					sql_err = SQ_execute_query(tr->sql_connection, query->str, (SQ_result_set_t **)NULL);
-					if (sql_err && (SQ_errno(tr->sql_connection) != ER_DUP_ENTRY)) {
-						LG_log(ud_context, LG_ERROR, "insert dummy names:%s[%s]\n", SQ_error(tr->sql_connection),
-						        query->str);
-						result=-1;
-					}
-				}
-			}
-			UT_free(a_value);
-		}
-	}
-
-	g_string_free(query, TRUE);
-	return (result);
-}
 
 /************************************************************
  * update_attr()                                             *
@@ -1663,57 +1478,15 @@ static void each_attribute_process(void *element_data, void *tr_ptr) {
 						die;
 					}
 					update_attr(attribute, tr);
-				} else {
+				} else  if (tr->load_pass != 1) {
 					/* this is an emty SELECT because there is no referred object */
-					/* try to create dummy and repeat the original query*/
-					dummy_err = create_dummy(attribute, tr);
-					if (dummy_err == 0) {
-						/* Dummy was created */
-						g_string_sprintfa(tr->error_script, "W[%d][%d:%s]:dummy created\n", 0, attribute_type,
-						        attribute_value);
-						LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, tr->query->str);
-						sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **)NULL);
-						num = SQ_get_affected_rows(tr->sql_connection);
-						if (sql_err) {
-							sq_error=SQ_error(tr->sql_connection);
-							LG_log(ud_context, LG_ERROR, "%s[%s]\n", sq_error, tr->query->str);
-							tr->error|=ERROR_U_DBS;
-							tr->succeeded=0;
-							g_string_sprintfa(tr->error_script, "E[%d][%d:%s]:%s\n", ERROR_U_DBS, attribute_type,
-							        attribute_value, sq_error);
-							die;
-						}
-						if (num==0) {
-							LG_log(ud_context, LG_ERROR, "0 rows affected [%s]\n", tr->query->str);
-							tr->error|=ERROR_U_DBS;
-							tr->succeeded=0;
-							g_string_sprintfa(tr->error_script, "E[%d][%d:%s]:re-insert qry\n", ERROR_U_DBS,
-							        attribute_type, attribute_value);
-							die;
-						}
-					} else {
-						if (dummy_err == 1) {
-							/* dummy not allowed */
-							tr->error |= ERROR_U_OBJ;
-							tr->succeeded=0;
-							g_string_sprintfa(tr->error_script,
-							        "E[%d][%d:%s]:ref integrity: reference cannot be resolved\n", ERROR_U_OBJ,
-							        attribute_type, attribute_value);
-							LG_log(tr->src_ctx, LG_INFO, "[%ld] dummy not allowed [%d:%s]", tr->transaction_id,
-							        attribute_type, attribute_value);
-						} else {
-							/* SQL problem */
-							tr->error|=ERROR_U_DBS;
-							tr->succeeded=0;
-							LG_log(ud_context, LG_ERROR, "dummy cannot be created [%d:%s]", attribute_type,
-							        attribute_value);
-							g_string_sprintfa(tr->error_script, "E[%d][%d:%s]:dummy cannot be created\n", ERROR_U_DBS,
-							        attribute_type, attribute_value);
-							die;
-						}
-					}
-				} /* RI*/
-			}/* if num == 0*/
+				    /* dummy not allowed */
+				    tr->error |= ERROR_U_OBJ;
+				    tr->succeeded=0;
+				    g_string_sprintfa(tr->error_script, "E[%d][%d:%s]:ref integrity: reference cannot be resolved\n", ERROR_U_OBJ, attribute_type, attribute_value);
+				    LG_log(tr->src_ctx, LG_INFO, "[%ld] dummy not allowed [%d:%s]", tr->transaction_id, attribute_type, attribute_value);
+				}
+			}
 			break;
 
 		default:

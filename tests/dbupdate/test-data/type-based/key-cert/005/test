@@ -37,8 +37,8 @@ certif:     h9bwgUrHcHep8MU=
 certif:     =LPNy
 certif:     -----END PGP PUBLIC KEY BLOCK-----
 mnt-by:     TEST-MNT
-admin-c:    TP1-DB-TEST
-tech-c:     TP1-DB-TEST
+admin-c:    TP2-DB-TEST
+tech-c:     TP2-DB-TEST
 changed:    dbtest@ripe.net 20021111
 source:     DB-TEST
 password:   auth

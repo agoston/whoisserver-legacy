@@ -1,0 +1,23 @@
+# routes tests
+# CASE 8: create a route6 with pingable address outside prefix range
+#         with ping-hdl
+#
+# create route6 object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail
+
+
+route6:           2001:600::/32
+descr:            Test route6
+origin:           AS3333
+pingable:         2002:600::
+pingable:         2001:600::
+ping-hdl:         TP1-DB-TEST
+mnt-by:           LIR-MNT
+changed:          dbtest@ripe.net 20020101
+source:           DB-TEST
+
+password: LIR
+

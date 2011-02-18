@@ -1,4 +1,4 @@
-# CASE 001: create 3, modify 2 objects, and then query for the  private object types through NRTM
+# CASE 003: create 3, modify 2 objects, and then query for the  private object types through NRTM
 #           check if we filter them properly
 #           In this test, we set up multi-leveled rights, with no nrtm access rights on the lowest level
 #
@@ -9,7 +9,7 @@
 #
 #SUCCESS
 #
-# RESULT 001: The query will succeed.
+# RESULT 003: The query will succeed.
 $EXEC_BEFORE=$DATADIR/nrtm/filtering/003/nrtm_setup.sh
 $EXEC_AFTER=$DATADIR/nrtm/filtering/003/nrtm_check.sh
 

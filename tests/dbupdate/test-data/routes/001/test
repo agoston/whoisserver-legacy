@@ -1,14 +1,12 @@
-
-# CASE 4: We try to create route object 20.13.0.0/16,AS200
+# routes tests
+# CASE 1: We try to create route object 20.13.0.0/16,AS200
 # having deprecated "cross-nfy" and "cross-mnt" attributes
-%
-% requires initial objects to be loaded
 #
 # create route object 
 #
 #FAILURE
 #
-# RESULT 4: The creation will fail.
+# RESULT 1: The creation will fail.
 
 
 route:   20.13.0.0/16

@@ -1,0 +1,111 @@
+# CASE 1: We try to create route object 20.13.0.0/16,AS200
+# having deprecated "cross-nfy" and "cross-mnt" attributes
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 1: The creation will fail.
+
+
+# CASE 2: We try to create route object 20.13.0.0/16,AS200
+# having new mnt-routes syntax
+#
+# create route object 
+#
+#SUCCEES
+#
+# RESULT 2: The creation will succeed.
+
+
+# CASE 3: create a route6 with pingable
+#         no ping-hdl
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 3: The creation will succeed
+
+
+# CASE 4: create a route6 with ping-hdl
+#         no pingable
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 4: The creation will succeed
+
+
+# CASE 5: create a route with 2 x pingable
+#         with 2 x ping-hdl
+#
+# create route object 
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed
+
+
+# CASE 6: create a route with IPv6 pingable address
+#         with ping-hdl
+#
+# create route object 
+#
+#FAILURE
+#
+# RESULT 6: The creation will fail
+
+
+# CASE 7: create a route6 with IPv4 pingable address
+#         with ping-hdl
+#
+# create route6 object 
+#
+#FAILURE
+#
+# RESULT 7: The creation will fail
+
+
+# CASE 8: create a route6 with pingable address outside prefix range
+#         with ping-hdl
+#
+# create route6 object 
+#
+#FAILURE
+#
+# RESULT 8: The creation will fail
+
+
+# CASE 9: create a route with pingable address outside address range
+#         with ping-hdl
+#
+# create route6 object 
+#
+#FAILURE
+#
+# RESULT 9: The creation will fail
+
+
+# CASE 10: create a route
+#          pingable address with nic-hdl
+#          ping-hdl with IP address
+#
+# create route6 object 
+#
+#FAILURE
+#
+# RESULT 10: The creation will fail
+
+
+# CASE 11: We create a route object with pingable: and
+#          ping-hdl: attributes, then do an inverse query on ping-hdl
+#
+# create route object 
+#
+#SUCCEES
+#
+# RESULT 11: The creation will succeed.
+
+

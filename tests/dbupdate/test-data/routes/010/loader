@@ -1,4 +1,6 @@
-% misc tests
+% ipv6 status tests
+% load objects for Case 8 test
+%
 
 
 %----------------------------------------------------------------
@@ -87,40 +89,67 @@ source:       DB-TEST
 %  Additional objects required for this test
 
 
-% create maintainer for successful authorisation
-
-mntner:       TEST-MNT                       
-descr:        Test maintainer object         
-admin-c:      TP1-DB-TEST                    
-upd-to:       dbtest@ripe.net                
-referral-by:  TEST-DBM-MNT                   
-mnt-by:       TEST-MNT                       
-auth:         MD5-PW $1$12345678$Y5n.GDFOxpXd2S1etuHFa/  # auth 
-changed:      dbtest@ripe.net 20020101       
-source:       DB-TEST                        
-
-% create an encompassing as-block 
-
-as-block:     AS1 - AS65534
-admin-c:      TP1-DB-TEST
-tech-c:       TP1-DB-TEST
-mnt-by:       TEST-MNT
+person:       test person
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
-% misc tests
 
-aut-num:      AS123
-as-name:      TESTAS
-descr:        TEST TELEKOM
-import:       from AS1 accept {1.2.3.4/24}
-export:       to AS2 announce {1.2.3.4/24}
+mntner:       LIR-MNT
+descr:        Test maintainer for ipv6 status
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-member-of:    AS123:AS-TEST    
-notify:       dbtest@ripe.net
-mnt-by:       TEST-MNT
-changed:      dbtest@ripe.net 20030101
+auth:         MD5-PW $1$12345678$ctXe/33SiImj97lXBf4Mw0   # LIR
+mnt-by:       LIR-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
 source:       DB-TEST
+
+
+mntner:       END-USER-MNT
+descr:        Test maintainer for ipv6 status
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+auth:         MD5-PW $1$12345678$mvVg2qg9mfB9tlQoFo2W//   # END-USER
+mnt-by:       END-USER-MNT
+referral-by:  TEST-DBM-MNT
+changed:      dbtest@ripe.net 20020101 
+source:       DB-TEST
+
+
+as-block:     as1 - as4000
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       LIR-MNT
+changed:      20110101
+source:       DB-TEST
+
+
+aut-num:      as3333
+as-name:      test aut-num
+descr:        used for testing
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       LIR-MNT
+changed:      20110101
+source:       DB-TEST
+
+
+inetnum:      194.20.0.0 - 194.20.255.255
+netname:      EU-ZZ-194.20.0.0-194.20.255.255
+descr:        European Regional Registry
+country:      EU
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+mnt-lower:    LIR-MNT
+mnt-routes:   LIR-MNT
+status:       ALLOCATED-BY-RIR
+changed:      dbtest@ripe.net 20020101
+source:       DB-TEST
+
 
 % End of loader data file
