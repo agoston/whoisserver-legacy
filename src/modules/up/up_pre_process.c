@@ -891,10 +891,10 @@ int UP_check_domain(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     key = rpsl_object_get_key_value(preproc_obj);
     /* skip enum objects */
     g_strdown(key);
-    if ( strstr(key,"e164") )
+    if ( strstr(key,"e164") || ! strstr(key,".arpa") )
     {
         free(key);
-        LG_log(lg_ctx, LG_DEBUG,"UP_check_domain: enum object..skipping");
+        LG_log(lg_ctx, LG_DEBUG,"UP_check_domain: enum object or not reverse domain..skipping");
         LG_log(lg_ctx, LG_FUNC, "<UP_check_domain: exiting with value [%s]\n", UP_ret2str(retval));
         return retval;
     }
