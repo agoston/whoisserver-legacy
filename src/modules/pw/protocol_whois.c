@@ -296,7 +296,7 @@ void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl
 
 		/* go through all sources,
 		 stop if connection broken - further action is meaningless */
-		for (qitem = g_list_first(qe->sources_list); qitem != NULL && qe->condat.rtc == 0; qitem = g_list_next(qitem)) {
+		for (qitem = g_list_first(qe->sources_list); qitem && !qe->condat.rtc; qitem = g_list_next(qitem)) {
 
 			/* QI will decrement the credit counters */
 			PW_record_query_start();

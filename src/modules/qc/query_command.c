@@ -42,8 +42,14 @@
 /* logging */
 LG_context_t *qc_context;
 
-/* cache of default sources list */
+/* cache of default sources */
 GList *deflook_sources_list;
+
+/* cache of GRS sources */
+GList *grs_sources_list;
+
+/* cache of all sources (REVERSED!) */
+GList *all_sources_list_r;
 
 /*
  note on errors:
@@ -251,8 +257,7 @@ void QC_init_struct(Query_command *query_command) {
  +html+ </UL></DL>
 
  ++++++++++++++++++++++++++++++++++++++*/
-static
-int QC_fill(const char *query_str, Query_command *query_command, Query_environ *qe) {
+static int QC_fill(const char *query_str, Query_command *query_command, Query_environ *qe) {
 
     int c;
     int synerrflg = 0;
@@ -270,21 +275,15 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
     gchar **types;
     gchar **version_info;
 
-    int ip_flag_used;
-    int ip_flag_duplicated;
-    GList *sources_specified;
-    int num_flags;
-    int num_client_ip;
+    int ip_flag_used = 0;
+    int ip_flag_duplicated = 0;
+    GList *sources_specified_r = NULL;      /* in reverse order */
+    int num_flags = 0;
+    int num_client_ip = 0;
 
     gboolean is_ip_key, is_rdns_key, is_inverse;
     gboolean fixed_lookup;
     char lookup[64];
-
-    ip_flag_used = 0;
-    ip_flag_duplicated = 0;
-    sources_specified = NULL;
-    num_flags = 0;
-    num_client_ip = 0;
 
     /* split into words */
     opt_argv = ut_g_strsplit_v1((char*) query_str, " ", -1);
@@ -319,15 +318,10 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
 
         switch (c) {
             case 'a':
-                /* Add all the config sources to the sources list. */
-            {
-                int i;
-                ca_dbSource_t *hdl;
-
-                for (i = 0; (hdl = ca_get_SourceHandleByPosition(i)) != NULL; i++) {
-                    sources_specified = g_list_append(sources_specified, hdl);
+                if (sources_specified_r) {
+                    g_list_free(sources_specified_r);
                 }
-            }
+                sources_specified_r = g_list_copy(all_sources_list_r);
                 break;
 
             case 'C':
@@ -461,36 +455,51 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
                 }
                 break;
 
-            case 's':
-                /* always get an argument here (according to the code) */
-                dieif(gst->optarg == NULL);
+            case 's': {
 
-                {
-                    gchar **sources;
-                    ca_dbSource_t *hdl;
+                dieif(gst->optarg == NULL); /* always get an argument here (according to the code) */
 
-                    g_strdown(gst->optarg);
+                gchar **sources;
+                ca_dbSource_t *hdl;
 
-                    /* go through specified sources */
-                    sources = ut_g_strsplit_v1(gst->optarg, ",", -1);
-                    for (i = 0; sources[i] != NULL; i++) {
+                g_strup(gst->optarg);
+
+                /* go through specified sources */
+                sources = ut_g_strsplit_v1(gst->optarg, ",", -1);
+                for (i = 0; sources[i]; i++) {
+                    if (!strcmp(sources[i], "GRS")) {
+                        /* append all GRS sources to sources_specified */
+                        GList *p;
+                        for (p = g_list_first(grs_sources_list); p; p = g_list_next(p)) {
+                            sources_specified_r = g_list_prepend(sources_specified_r, p->data);
+                        }
+                    } else {
                         hdl = ca_get_SourceHandleByName(sources[i]);
-                        if (hdl == NULL) {
+
+                        /* FIXME: temporary hack to allow using old names for GRS sources; e.g. ARIN instead of ARIN-GRS
+                         * Should be removed after a grace period - agoston, 2011-03-03 */
+                        if (!hdl) {
+                            char t[STR_M];
+                            snprintf(t, STR_M, "%s-GRS", sources[i]);
+                            hdl = ca_get_SourceHandleByName(t);
+                        }
+
+                        if (!hdl) {
                             /* ERROR:102 */
                             /* Unknown source %s requested. */
                             char *fmt = ca_get_qc_fmt_badsource;
-                            g_strup(sources[i]);
                             query_command->parse_messages = g_list_append(query_command->parse_messages, g_strdup_printf(fmt, sources[i]));
                             UT_free(fmt);
                             badparerr++;
                         } else {
                             /* append */
-                            sources_specified = g_list_append(sources_specified, hdl);
+                            sources_specified_r = g_list_prepend(sources_specified_r, hdl);
                         }
                     }
                     g_strfreev(sources);
                 }
                 break;
+            }
 
             case 't':
                 /* always get an argument here (according to the code) */
@@ -645,25 +654,22 @@ int QC_fill(const char *query_str, Query_command *query_command, Query_environ *
     }
 
     /* update sources list if specified */
-    if (sources_specified) {
-        GList *ptr, *next_ptr;
+    if (sources_specified_r) {
+        GList *p;
 
         /* free space from previous version of the list */
         g_list_free(qe->sources_list);
         qe->sources_list = NULL;
 
         /* add each new source */
-        ptr = sources_specified;
-        while (ptr != NULL) {
-            next_ptr = g_list_next(ptr);
+        for (p = g_list_first(sources_specified_r); p; p = g_list_next(p)) {
             /* only add this if it does not appear later in the list;
              this removes duplicate source specifications */
-            if (g_list_find(next_ptr, ptr->data) == NULL) {
-                qe->sources_list = g_list_append(qe->sources_list, ptr->data);
+            if (!g_list_find(g_list_next(p), p->data)) {
+                qe->sources_list = g_list_prepend(qe->sources_list, p->data);
             }
-            ptr = next_ptr;
         }
-        g_list_free(sources_specified);
+        g_list_free(sources_specified_r);
     }
 
     /* check for duplicate IP flags */
@@ -1037,13 +1043,24 @@ void QC_init(LG_context_t *ctx) {
     /* init logging context */
     qc_context = ctx;
 
-    /* init default sources list */
+    /* init GList caches */
+    all_sources_list_r = NULL;
     deflook_sources_list = NULL;
+    grs_sources_list = NULL;
+
     for (i = 0; (hdl = ca_get_SourceHandleByPosition(i)) != NULL; i++) {
+        all_sources_list_r = g_list_prepend(all_sources_list_r, (void *) hdl);
+
         char *isdeflook = ca_get_srcdeflook(hdl);
         if (strcmp(isdeflook, "y") == 0) {
             deflook_sources_list = g_list_append(deflook_sources_list, (void *) hdl);
         }
         UT_free(isdeflook);
+
+        char *grs_name = ca_get_srcname(hdl);
+        if (g_str_has_suffix(grs_name, "-GRS")) {
+            grs_sources_list = g_list_append(grs_sources_list, (void *) hdl);
+        }
+        UT_free(grs_name);
     }
 }
