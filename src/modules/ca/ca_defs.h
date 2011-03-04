@@ -184,6 +184,7 @@ typedef struct ca_dbSource_s {
 	int updPort;
 	char canupd[2];
 	char deflook[2];
+	char isGRS;         /* true if name ends with '-GRS' */
 } ca_dbSource_t;
 
 /*

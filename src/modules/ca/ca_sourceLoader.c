@@ -497,6 +497,11 @@ void ca_readSources(const char *sourcesDefFile, values_t confVars[])
             /* Assign the name of the Source */
             strcpy(newSrcPtr->name, source);
 
+            /* FIXME: this could be set in the config as well, but for now, the '*-GRS' check is perfect - agoston, 2011-03-03 */
+            g_strup(source);
+            if (g_str_has_suffix(source, "-GRS")) {
+                newSrcPtr->isGRS = 1;
+            }
         }
 
         /* Read the next line. */

@@ -1057,10 +1057,8 @@ void QC_init(LG_context_t *ctx) {
         }
         UT_free(isdeflook);
 
-        char *grs_name = ca_get_srcname(hdl);
-        if (g_str_has_suffix(grs_name, "-GRS")) {
+        if (hdl->isGRS) {
             grs_sources_list = g_list_append(grs_sources_list, (void *) hdl);
         }
-        UT_free(grs_name);
     }
 }
