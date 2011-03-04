@@ -137,7 +137,7 @@ int make_sql2pack(SQ_result_set_t *result, SQ_row_t *row, rp_upd_pack_t *pack, r
          4 - origin
          */
         if (NOERR(conv = IP_pref_f2b_v6(&(uniptr->u.rt), col[1], col[2], col[3]))) {
-            pack->d.origin = UT_strdup(col[3]);
+            pack->d.origin = UT_strdup(col[4]);
         }
         uniptr->space = IP_pref_b2_space(&(uniptr->u.rt));
         break;
