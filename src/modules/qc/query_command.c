@@ -558,6 +558,7 @@ static int QC_fill(const char *query_str, Query_command *query_command, Query_en
 
             case 'K':
                 query_command->filtered = 1;
+                query_command->B = TRUE;
                 query_command->recursive = 0; /* no recursion */
                 break;
 
