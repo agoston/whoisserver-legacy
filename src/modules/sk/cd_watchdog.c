@@ -206,7 +206,7 @@ void *sk_watchdog(void *arg)
 
   void *arg    - pointer to the connection data structure
   ++++++++++++++++++++++++++++++++++++++*/
-static
+// commented out to avoid compiler warning - agoston, 2011-03-03 //static
 void *sk_watchdog(void *arg)
 {
   sk_conn_st *condat = (sk_conn_st *) arg;
