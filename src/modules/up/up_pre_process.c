@@ -167,8 +167,8 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   char *ass_size = NULL;
   char *old_ass_size = NULL;
   char *prefix = NULL;
-  int *prefix_n = NULL;
-  int *ass_size_n = NULL;
+  int prefix_n = 0;
+  int ass_size_n = 0;
 
 
   LG_log(lg_ctx, LG_FUNC,">UP_check_inet_required_attr: entered");
