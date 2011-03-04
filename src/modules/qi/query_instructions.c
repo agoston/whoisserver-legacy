@@ -852,7 +852,7 @@ static int write_results(SQ_result_set_t *result, Query_instructions *qis, GHash
             type = atoi(objt);
 
             /* ASP_QI_LAST_DET */
-            LG_log(qi_context, LG_DEBUG, "Retrieved serial id = %d , type = %s", atoi(id), objt);
+            //LG_log(qi_context, LG_DEBUG, "Retrieved serial id = %d , type = %s", atoi(id), objt);
 
             /* decide to account for private of public object */
             if (qis->source->isGRS || qis->qc->filtered) {
@@ -860,18 +860,19 @@ static int write_results(SQ_result_set_t *result, Query_instructions *qis, GHash
             } else {
                 /* FIXME: if -B is not used, we should not account for private objects, but have a proper filter that truly removes all private information
                  * agoston, 2011-03-04 */
-                isPrivate = type == C_PN || type == C_RO || type == C_MT || type == C_OA;
+                isPrivate = (type == C_PN || type == C_RO || type == C_MT || type == C_OA);
             }
 
             /* decrement credit for accounting purposes */
-            AC_count_object(qis->qe->acc_credit, qis->qe->acl, isPrivate); /* is private? */
+            AC_count_object(qis->qe->acc_credit, qis->qe->acl, isPrivate);
+
             /* person, role, mntner and organisation objects are counted as private objects */
             /* We don't count IRT objects as private as we want users to see them always    */
             /* break the loop if the credit has just been exceeded and */
             /* further results denied */
             if (AC_credit_isdenied(qis->qe->acc_credit)) {
                 continue;
-            } /* if credit_isdenied */
+            }
 
             if ((str = SQ_get_column_string(result, row, 2)) == NULL) {
                 die;
@@ -2038,13 +2039,13 @@ int QI_execute(Query_instructions *qis) {
     }
 
     /* post-processing */
-    if (!sql_error && (qis->qc->filtered == 0)) {
+    if (!sql_error && !qis->qc->filtered) {
         /* start the watchdog just to set the rtc flag */
 //        SK_watch_setclear(&(qe->condat));
 //        SK_watchstart(&(qe->condat));
 
         /* add radix results (only if -K is not active and still connected) */
-        if (condat->rtc == 0) {
+        if (!condat->rtc) {
 
             /* if -c selected, find the referencing inet(6)num and remove
              all the less specific inet(6)num object_ids from the list */
@@ -2125,7 +2126,7 @@ int QI_execute(Query_instructions *qis) {
      */
 
     /* display the immediate data from the radix tree */
-    if (!sql_error && (qis->qc->filtered == 1)) {
+    if (!sql_error && qis->qc->filtered) {
         write_radix_immediate(datlist, condat, qis->qe->acc_credit, qis->qe->acl);
     }
 
