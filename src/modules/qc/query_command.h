@@ -89,7 +89,7 @@ typedef struct Query_command_t {
   /* -B: original output (with e-mail, changed and notify attrs */
   gboolean B;
   /* -b: brief output (keys + abuse-mailbox from object/recursive objects) */
-	gboolean b;
+  gboolean b;
 
   int d;
   int fast;
@@ -102,7 +102,7 @@ typedef struct Query_command_t {
   int t;
   int v;
   int x;
-  int filtered;
+  int filtered;                 /* -K flag */
   int L;
   int M;
   int R;

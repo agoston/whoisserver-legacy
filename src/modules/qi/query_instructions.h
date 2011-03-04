@@ -136,10 +136,10 @@ typedef struct Query_instruction_t {
 
 typedef struct Query_instructions_t {
   Query_instruction *instruction[MAX_INSTRUCTIONS];
+  const Query_command *qc;       /* pointer to the Query_command structure of this query */
   unsigned int filtered;    /* -K query flag */
   unsigned int fast;        /* -F query flag */
   unsigned int recursive;   /* on by default, -r query flag turns it off */
-  const Query_command *qc; /* pointer to the Query_command structure of this query */
   const ca_dbSource_t *source;   /* current source */
 } Query_instructions;
 

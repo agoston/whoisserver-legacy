@@ -666,6 +666,7 @@ static int QC_fill(const char *query_str, Query_command *query_command, Query_en
             /* only add this if it does not appear later in the list;
              this removes duplicate source specifications */
             if (!g_list_find(g_list_next(p), p->data)) {
+                /* the order of qe->sources_list MATTERS; sources are returned to the user in that order! */
                 qe->sources_list = g_list_prepend(qe->sources_list, p->data);
             }
         }
