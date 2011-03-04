@@ -1291,7 +1291,7 @@ static void write_radix_immediate(GList *datlist, sk_conn_st *condat, acc_st *ac
         /* account it as public object (private=0) */
         AC_count_object(acc_credit, acl, 0);
 
-        if (condat->rtc != 0) {
+        if (condat->rtc) {
             break;
         }
     }
@@ -1451,22 +1451,17 @@ void run_referral(Query_environ *qe, char *ref_host, unsigned ref_port_int, char
 
  Query_instructions *qis    original query instructions structure
 
- Query_environ *qe          original query environment structure
-
  Query_instruction *qi      specific query instruction triggered
 
  SQ_result_set_t *result    result of the lookup containing referral details
 
  SQ_row_t *row              first row (should be only 1) of the result
- this should contain columns: type, port, host
-
- char *sourcename           name of the database "source"
+                            should contain columns: type, port, host
 
  Author:
  marek
  ++++++++++++++++++++++++++++++++++++++*/
-static
-void qi_prep_run_refer(char *domain, Query_instructions *qis, Query_instruction *qi, SQ_result_set_t *result, SQ_row_t *row) {
+static void qi_prep_run_refer(char *domain, Query_instructions *qis, Query_instruction *qi, SQ_result_set_t *result, SQ_row_t *row) {
     int err;
     long ref_type;
     long ref_port;
@@ -1526,31 +1521,17 @@ void qi_prep_run_refer(char *domain, Query_instructions *qis, Query_instruction 
 }
 
 /*++++++++++++++++++++++++++++++++++++++
-
  specific case of the object ID collection: the domains.
  Checks to see if the domain exists, and runs the referral if it is defined
  and the domain is missing.
 
  Arguments:
 
- char *sourcename                     name of the database "source"
-
  SQ_connection_t *sql_connection      sql connection dedicated to this thread
-
  char *id_table                       name of the temporary table to be used
-
  char *sub_table                      name of the temporary subtable
-
- Query_instructions *qis    original query instructions structure
-
- Query_environ *qe          original query environment structure
-
- Query_instruction *qi      specific query instruction triggered
-
- acc_st *acc_credit         credit for this client
-
- Author:
- marek.
+ Query_instructions *qis              original query instructions structure
+ Query_instruction *qi                specific query instruction triggered
  ++++++++++++++++++++++++++++++++++++++*/
 static int qi_collect_domain(SQ_connection_t *sql_connection, char *id_table, char *sub_table, Query_instructions *qis, Query_instruction *qi, int *sql_error) {
     char *domain = qis->qc->keys;
@@ -1720,25 +1701,14 @@ static int qi_collect_domain(SQ_connection_t *sql_connection, char *id_table, ch
  for the client (acl and credit are checked for this).
  The routine uses its own temporary _S table, destroyed at exit.
 
- ca_dbSource_t *dbhdl              source-specific identifier (defined in CA)
-
- char *sourcename                  name of the database "source"
-
  SQ_connection_t **sql_connection  sql connection dedicated to this thread
  (replaced on cancel)
 
  Query_instructions *qis           original query instructions structure
 
- Query_environ *qe                 original query environment structure
-
  char *id_table                    the table to store the ID's found
 
  GList **datlist                   the list  to store the Radix leaves found
-
- acc_st *acc_credit                credit for this client
-
- acl_st *acl                       acl for this client
-
  ++++++++++++++++++++++++++++++++++++++*/
 static int qi_collect_ids(SQ_connection_t **sql_connection, Query_instructions *qis, char *id_table, GList **datlist) {
     sk_conn_st *condat = &qis->qe->condat;
@@ -2277,7 +2247,7 @@ static int valid_query(const Query_command *qc, const Query_t q) {
     return result;
 } /* valid_query() */
 
-/* QI_new() */
+
 /*++++++++++++++++++++++++++++++++++++++
  Create a new set of query_instructions. Returns an allocated structure which
  must be freed after use with QI_free().
@@ -2285,14 +2255,9 @@ static int valid_query(const Query_command *qc, const Query_t q) {
  Query_command *qc The query_command that the instructions are created from.
  (This is no longer const to allow error messages further down the line)
 
- const Query_environ *qe The environmental variables that they query is being
+ Query_environ *qe The environmental variables that they query is being
  performed under.
 
- +html+ <PRE>
- Authors:
- ottrey,
- marek.
- +html+ </PRE>
  ++++++++++++++++++++++++++++++++++++++*/
 Query_instructions *QI_new(Query_command *qc, Query_environ *qe) {
     Query_instructions *qis = NULL;
@@ -2377,7 +2342,7 @@ Query_instructions *QI_new(Query_command *qc, Query_environ *qe) {
 
     return qis;
 
-} /* QI_new() */
+}
 
 /*++++++++++++++++++++++++++++++++++++++
 
