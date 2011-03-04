@@ -74,6 +74,8 @@ typedef struct Query_environ_t {
     char *version;
     ip_addr_t eIP; /* effective IP */
     char eIPs[IP_ADDRSTR_MAX]; /* effective IP string */
+    acc_st *acc_credit;       /* accounting info struct */
+    acl_st *acl;              /* ACL info struct */
 } Query_environ;
 
 typedef struct Query_command_t {
