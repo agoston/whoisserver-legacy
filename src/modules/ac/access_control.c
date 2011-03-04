@@ -1754,30 +1754,26 @@ unsigned AC_print_acl(GString *output)
 
   int private               indicates if the object type is private
   ++++++++++++++++++++++++++++++++++++++*/
-void
-AC_count_object( acc_st    *acc_credit,
-		 acl_st    *acl,
-		 int private )
-{
-  if( private ) {
-    if( acc_credit->private_objects <= 0 && acl->maxprivate != -1 ) {
-      /* must be negative - will be subtracted */
-      acc_credit->denials = -1;
+void AC_count_object(acc_st *acc_credit, acl_st *acl, int private) {
+    if (!acc_credit || !acl) return;
+
+    if (private) {
+        if (acc_credit->private_objects <= 0 && acl->maxprivate != -1) {
+            /* must be negative - will be subtracted */
+            acc_credit->denials = -1;
+        } else {
+            acc_credit->private_objects--;
+        }
     } else {
-      acc_credit->private_objects --;
+        if (acc_credit->public_objects <= 0 && acl->maxpublic != -1) {
+            acc_credit->denials = -1;
+        } else {
+            acc_credit->public_objects--;
+        }
     }
-  }
-  else {
-    if( acc_credit->public_objects <= 0 && acl->maxpublic != -1 ) {
-      acc_credit->denials = -1;
-    } else {
-      acc_credit->public_objects --;
-    }
-  }
-} /* AC_count_object */
+}
 
 
-/* AC_credit_isdenied */
 /*++++++++++++++++++++++++++++++++++++++
 
   checks the denied flag in credit (-1 or 1 means denied)
@@ -1787,14 +1783,11 @@ AC_count_object( acc_st    *acc_credit,
 
   acc_st    *acc_credit    pointer to the credit structure
   ++++++++++++++++++++++++++++++++++++++*/
-int
-AC_credit_isdenied(acc_st    *acc_credit)
-{
-  return (acc_credit->denials != 0);
-} /* AC_credit_isdenied */
+int AC_credit_isdenied(acc_st *acc_credit) {
+    return (acc_credit && acc_credit->denials != 0);
+}
 
 
-/* AC_get_higher_limit */
 /*++++++++++++++++++++++++++++++++++++++
 
   returns the higher number of the two acl limits: maxprivate & maxpublic
@@ -1807,20 +1800,16 @@ AC_credit_isdenied(acc_st    *acc_credit)
 
   acl_st    *acl                acl for that user
 ++++++++++++++++++++++++++++++++++++++*/
-int
-AC_get_higher_limit(acc_st    *acc_credit,
-		    acl_st    *acl)
-{
-  if( acl->maxprivate == -1 || acl->maxpublic == -1 ) {
-    return -1;
-  }
-  else {
-    int a = acc_credit->private_objects;
-    int b = acc_credit->public_objects;
+int AC_get_higher_limit(acc_st *acc_credit, acl_st *acl) {
+    if (!acl || !acc_credit || acl->maxprivate == -1 || acl->maxpublic == -1) {
+        return -1;
+    } else {
+        int a = acc_credit->private_objects;
+        int b = acc_credit->public_objects;
 
-    return (a > b ? a : b);
-  }
-}/* AC_get_higher_limit */
+        return (a > b ? a : b);
+    }
+}
 
 /* AC_commit_denials */
 /*+++++++++++++++++++++++++++++++++++++
