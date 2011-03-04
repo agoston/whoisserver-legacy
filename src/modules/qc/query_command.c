@@ -993,8 +993,6 @@ Query_command *QC_create(const char *input, Query_environ *qe) {
         if (qt == QC_SYNERR || qt == QC_PARERR) {
             qc->query_type = qt;
         } else {
-            /* Update the query environment */
-            /* qe = QC_environ_update(qc, qe); */
 
             /* Only do a query if there are keys. */
             if (qc->keys == NULL || strlen(qc->keys) == 0) {
@@ -1006,9 +1004,7 @@ Query_command *QC_create(const char *input, Query_environ *qe) {
             } else {
                 if (strcmp(qc->keys, "HELP") == 0) {
                     qc->query_type = QC_HELP;
-                }
-                /* So, a real query */
-                else if (qc->filtered) {
+                } else if (qc->filtered) {
                     qc->query_type = QC_FILTERED;
                 } else {
                     qc->query_type = QC_REAL;

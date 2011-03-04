@@ -1354,10 +1354,8 @@ static void each_attribute_process(void *element_data, void *tr_ptr) {
 	Transaction_t *tr = (Transaction_t *)tr_ptr;
 
 	int sq_info[3];
-	int dummy_err;
 	char *sq_error;
 	ip_prefix_t dn_pref;
-	int sql_err;
 
 	int attribute_type;
 	const gchar *attribute_value;
