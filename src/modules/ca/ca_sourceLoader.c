@@ -379,7 +379,6 @@ void ca_readSources(const char *sourcesDefFile, values_t confVars[])
 
             /* Assign the name of the mirror ? */
             strcpy(newMirrPtr->mrName, mirror);
-
         }
 
         /*********************
