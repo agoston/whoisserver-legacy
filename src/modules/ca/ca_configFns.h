@@ -151,13 +151,13 @@ ca_SrcHdl_t *ca_get_SourceHandleByName(char *);
  * Given a source-handle and an attribute, returns a
  * pointer to a character variable.
  */
-char *ca_srchandle2Strelement(ca_SrcHdl_t *, int);
+char *ca_srchandle2Strelement(const ca_SrcHdl_t *, int);
 
 /*
  * Given a source-handle and an attribute, returns an
  * integer.
  */
-int ca_srchandle2Intelement(ca_SrcHdl_t *ah, int srcAttrib);
+int ca_srchandle2Intelement(const ca_SrcHdl_t *ah, int srcAttrib);
 
 /*
  * Returns a string element of the admin db structure.

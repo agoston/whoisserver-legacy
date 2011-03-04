@@ -66,7 +66,7 @@ typedef struct {
 } rp_uni_t;
 
 
-typedef ca_dbSource_t *rp_regid_t;
+typedef const ca_dbSource_t *rp_regid_t;
 typedef A_Type_t rp_attr_t;
 
 

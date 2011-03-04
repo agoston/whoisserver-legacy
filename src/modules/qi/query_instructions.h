@@ -140,6 +140,7 @@ typedef struct Query_instructions_t {
   unsigned int fast;        /* -F query flag */
   unsigned int recursive;   /* on by default, -r query flag turns it off */
   const Query_command *qc; /* pointer to the Query_command structure of this query */
+  const ca_dbSource_t *source;   /* current source */
 } Query_instructions;
 
 

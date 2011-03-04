@@ -1088,7 +1088,7 @@ char *SQ_escape_string(SQ_connection_t *sql_connection, char *str) {
 /* get DB connection to a source by a source handle
  * always returns a connection, or dies
  * agoston, 2010-04-20 */
-SQ_connection_t *SQ_get_connection_by_source_hdl(ca_dbSource_t *source_hdl) {
+SQ_connection_t *SQ_get_connection_by_source_hdl(const ca_dbSource_t *source_hdl) {
     char *db_host = ca_get_srcdbmachine(source_hdl);
     int db_port = ca_get_srcdbport(source_hdl);
     char *db_name = ca_get_srcdbname(source_hdl);
