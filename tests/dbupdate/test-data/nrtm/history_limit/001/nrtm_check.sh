@@ -35,7 +35,7 @@ FILE2=$DATADIR/nrtm/history_limit/001/nrtm_result
 
 get_nrtm '-g DB-TEST:3:1-5' >>$FILE2
 
-diff -u $FILE1 $FILE2
+diff -ub $FILE1 $FILE2
 RET=$?
 rm -f $FILE2
 
