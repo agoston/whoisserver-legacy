@@ -89,18 +89,25 @@ int RP_tree_add(rp_regid_t reg_id, rp_attr_t attr, char *prefixstr, rx_mem_mt me
     int err;
     rp_tentry_t *treedef;
     rx_tree_t *mytree;
-    rx_tree_t *existree;
     rx_fam_t fam_id = RP_attr2fam(attr);
+    ip_prefix_t newpref;
+    ip_space_t spc_id;
 
-    if (RP_tree_get(&existree, reg_id, mytree->space, attr) == RP_OK) {
+    if( !NOERR(IP_pref_e2b(&newpref, prefixstr))) {
+      die;
+    }
+
+    spc_id = IP_pref_b2_space( &newpref );
+
+    if (RP_tree_get(&mytree, reg_id, spc_id, attr) == RP_OK) {
         /* In this case we need to delete and re-initialize it  */
-        if ((err = RP_tree_del(existree)) == RP_OK) {
+        if ((err = RP_tree_del(mytree)) == RP_OK) {
             /* Initialize the tree */
-            existree->num_nodes = 0;
+            mytree->num_nodes = 0;
         }
     } else {
         /* OK, see if there is a tree for this space already */
-        if ((err = RX_tree_cre(prefixstr, fam_id, mem_mode, subtrees, &mytree)) == RX_OK) {
+        if ((err = RX_tree_cre(prefixstr, fam_id, mem_mode, subtrees, &mytree)) != RX_OK) {
             return err;
         }
 
@@ -141,16 +148,14 @@ int RP_tree_del(rx_tree_t * tree) {
 
 
 int rp_init_attr_tree(rp_regid_t reg_id, rp_attr_t attr) {
-    int err;
-
-    err = RP_OK;
+    int err = RP_OK;
 
     /* Some (DN) attributes are related to two trees */
     if (RP_attr2spc(attr, IP_V4)) {
         err = RP_tree_add(reg_id, attr, "0.0.0.0/0", RX_MEM_RAMONLY, RX_SUB_NONE);
     }
 
-    if (RP_attr2spc(attr, IP_V6)) {
+    if (NOERR(err) && RP_attr2spc(attr, IP_V6)) {
         err = RP_tree_add(reg_id, attr, "0::/0", RX_MEM_RAMONLY, RX_SUB_NONE);
     }
 
@@ -160,6 +165,9 @@ int rp_init_attr_tree(rp_regid_t reg_id, rp_attr_t attr) {
 
 int RP_init_trees(rp_regid_t reg_id) {
     int err;
+
+    /* init RX forest */
+    rx_forest = NULL;
 
     if (NOERR(err = rp_init_attr_tree(reg_id, A_IN)) &&
         NOERR(err = rp_init_attr_tree(reg_id, A_RT)) &&
