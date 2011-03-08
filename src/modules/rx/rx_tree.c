@@ -250,8 +250,6 @@ int rx_delete_tree(rx_tree_t * tree, rx_node_t * node, int maxlevel, int level, 
   generates a tablename for a tree (if NONE)
   updates LL of trees
 
-  MT-note: locks/unlocks the forest (still to be done)
-  
 ++++++++*/
 int 
 RX_tree_cre (

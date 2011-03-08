@@ -215,8 +215,6 @@ static void *RP_sql_load_attr_space(void *arg) {
                 TA_setactivity(activity);
             }
         }
-        /* XXX UNLOCK */
-        TH_release_write_lockw(&(mytree->rwlock));
     }
 
     if (SQ_errno(con)) {

@@ -59,10 +59,10 @@ extern LG_context_t *rx_context;
 int rx_build_stack(rx_nodcpy_t stack[], int *maxdepth, rx_tree_t *tree, ip_prefix_t *newpref, rx_stk_mt dmode) {
     register rx_node_t *curnode;
     register int link, quit_now = 0;
-    char bbf[IP_PREFSTR_MAX];
+//    char bbf[IP_PREFSTR_MAX];
 
-    IP_pref_b2a(newpref, bbf, IP_PREFSTR_MAX);
-    LG_log(rx_context, LG_DEBUG, "rx_build_stack: searching for %s in mode %d", bbf, dmode);
+//    IP_pref_b2a(newpref, bbf, IP_PREFSTR_MAX);
+//    LG_log(rx_context, LG_DEBUG, "rx_build_stack: searching for %s in mode %d", bbf, dmode);
 
     *maxdepth = 0;
 

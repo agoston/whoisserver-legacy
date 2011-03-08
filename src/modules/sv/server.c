@@ -157,7 +157,6 @@ static void radix_init(void) {
 	int i;
 	ca_dbSource_t *source_hdl;
 
-	TH_init_read_write_lockw(&rx_forest_rwlock);
 	for (i=0; (source_hdl = ca_get_SourceHandleByPosition(i))!=NULL; i++) {
 		dieif(RP_init_trees(source_hdl) != RP_OK);
 	}

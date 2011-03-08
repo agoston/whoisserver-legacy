@@ -86,17 +86,6 @@ typedef struct {
     pthread_t thread_id;    /* pthread id */
 } RP_thread_info;
 
-#ifdef RP_IMPL
-#define EXTDEF(a,b) a = b;
-/* forest read write lock */
-rw_lock_t rx_forest_rwlock = { PTHREAD_MUTEX_INITIALIZER, PTHREAD_COND_INITIALIZER, PTHREAD_COND_INITIALIZER, PTHREAD_COND_INITIALIZER, 0, 0, 0 };
-#else
-#define EXTDEF(a,b) extern a;
-extern rw_lock_t rx_forest_rwlock; 
-#endif
-
-EXTDEF (GList *rx_forest, NULL)		/* linked list of trees */
-     
 typedef struct {
   rp_regid_t      reg_id;	/*+ registry id +*/
   rp_attr_t       attr;         /*+ extra tree attribute (within the same reg/spc/fam), allows 
