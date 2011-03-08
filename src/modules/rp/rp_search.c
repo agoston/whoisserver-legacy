@@ -46,17 +46,15 @@ void rp_exclude_datlink(GList **datlist, GList *element) {
     wr_clear_list(&element);
 }
 
-/**************************************************************************/
+
 /*+++++++++++
  helper:
  this routine goes through the list of prefixes and performs a bin_search
  on each of them; attaches the results to datlist.
  +++++++++++*/
 static
-int rp_preflist_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *mytree, GList **preflist, GList **datlist)
-
-{
-    char prefstr[IP_PREFSTR_MAX];
+int rp_preflist_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *mytree, GList **preflist, GList **datlist) {
+    //char prefstr[IP_PREFSTR_MAX];
     GList *qitem;
     ip_prefix_t *querypref;
     int err;
@@ -65,10 +63,10 @@ int rp_preflist_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *
 
         querypref = qitem->data;
 
-        if (IP_pref_b2a(querypref, prefstr, IP_PREFSTR_MAX) != IP_OK) {
-            die;
-        }
-        LG_log(rp_context, LG_DEBUG, "rx_preflist_search: mode %d (%s) (par %d) for %s", search_mode, RX_text_srch_mode(search_mode), par_a, prefstr);
+//        if (IP_pref_b2a(querypref, prefstr, IP_PREFSTR_MAX) != IP_OK) {
+//            die;
+//        }
+//        LG_log(rp_context, LG_DEBUG, "rx_preflist_search: mode %d (%s) (par %d) for %s", search_mode, RX_text_srch_mode(search_mode), par_a, prefstr);
 
         if (mytree->num_nodes > 0) {
             err = RX_bin_search(search_mode, par_a, par_b, mytree, querypref, datlist, RX_ANS_ALL);
@@ -504,8 +502,8 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
 
     /* 5. processing - using the same processing function */
     if (NOERR(err)) {
-        err = rp_asc_process_datlist(search_mode, par_a, fam_id, 1, /* one occurence is enough */
-        &datlist, &testrang, &hits);
+        /* one occurence is enough */
+        err = rp_asc_process_datlist(search_mode, par_a, fam_id, 1, &datlist, &testrang, &hits);
     }
 
     /* 6. copy results */

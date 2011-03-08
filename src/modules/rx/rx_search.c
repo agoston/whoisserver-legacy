@@ -161,7 +161,7 @@ int rx_build_stack(rx_nodcpy_t stack[], int *maxdepth, rx_tree_t *tree, ip_prefi
     return RX_OK;
 }
 
-/***************************************************************************/
+
 /*+++++++++
  helper for the nod_search routine:
 
@@ -179,7 +179,6 @@ int rx_nod_append(GList **nodlist, rx_nodcpy_t *element) {
     return RX_OK;
 }
 
-/***************************************************************************/
 
 /*+++++++++++
  helper for MORE specific lookup in rx_nod_search
@@ -210,7 +209,6 @@ int rx_walk_hook_addnode(rx_node_t *node, int level, int nodecounter, void *user
     return rx_nod_append(userdat->nodlist, &nodcpy);
 }
 
-/***************************************************************************/
 
 /*+++++++++++
  helper for DBLS lookup in rx_nod_search
@@ -423,8 +421,8 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
         /* but there is no actual object for it (not even glue)*/
 
         if (sps < 0) {
-            if (tree->num_nodes > 0 /* there is any node in the tree */
-            && 0 == IP_addr_cmp(&prefix->ip, &stack[0].cpy.prefix.ip, prefix->bits)) { /* addr match */
+            /* there is any node in the tree */
+            if (tree->num_nodes > 0  && !IP_addr_cmp(&prefix->ip, &stack[0].cpy.prefix.ip, prefix->bits)) { /* addr match */
                 rx_walk_tree(tree->top_ptr, hook_function,
                 /* RX_WALK_REVERS | */RX_WALK_SKPGLU, /* skip glue nodes while counting*/
                 par_a, /* display this many levels */
