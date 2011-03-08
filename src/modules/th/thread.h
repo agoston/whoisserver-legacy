@@ -41,16 +41,13 @@
 /* structure for writers favouring functions */
 typedef struct _rwlock {
 	pthread_mutex_t rw_mutex;	/* lock for accessing this structure */
-	pthread_cond_t rw_cond;		/* general wait condition */
-	pthread_cond_t w_cond;		/* while waiting for writers to finish */
-	pthread_cond_t r_cond;		/* while waiting for readers to finish */
+	pthread_cond_t rw_cond;		/* signalled when threads waiting for read or write lock should wake */
+	pthread_cond_t w_cond;		/* signalled when threads waiting for write lock should wake (writers favored case) */
+	pthread_cond_t r_cond;		/* signalled when threads waiting for read lock should wake */
 	int r_count;				/* read locks count */
 	int rw_count;				/* rw locks count */
 	pthread_t thread_id;		/* lock thread's id (if rw_count > 0; contains garbage otherwise) */
 } rw_lock_t;
-
-/* Timeout for locks in seconds */
-#define CONDWAITTIMEOUT 1
 
 /* Readers writers lock functions favoring readers */
 void TH_acquire_read_lock(rw_lock_t *prw_lock);

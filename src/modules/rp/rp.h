@@ -32,15 +32,13 @@
 #ifndef RP_H
 #define RP_H
 
-#include <stddef.h>  /* definition of NULL */
+#include <stddef.h>
 #include <glib.h>
 #include <pthread.h>
-/*#include <DF_attribute_enum.def> / * attribute codes */
 
 #include <defs.h>
 
 #include <iproutines.h>
-/*#include <erroutines.h>*/
 #include <rxroutines.h>
 #include <mysql_driver.h>
 
