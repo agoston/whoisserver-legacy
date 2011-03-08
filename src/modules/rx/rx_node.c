@@ -581,7 +581,7 @@ int RX_rt_node(rx_oper_mt mode, ip_prefix_t *newpref, rx_tree_t *tree, rx_datale
 */
 int RX_in_node(rx_oper_mt mode, ip_range_t *rang, rx_tree_t *tree, rx_dataleaf_t *leafptr) {
     unsigned i, prefcount;
-    GList *preflist = NULL;
+    GList *preflist = NULL, *p;
     char buf[IP_RANGSTR_MAX];
 
 //    IP_rang_b2a(rang, buf, IP_RANGSTR_MAX);
@@ -605,8 +605,8 @@ int RX_in_node(rx_oper_mt mode, ip_range_t *rang, rx_tree_t *tree, rx_dataleaf_t
         LG_log(rx_context, LG_ERROR, "prefcount=0 range: [%s][%u-%u]\n", buf, (rang->begin).words[0], (rang->end).words[0]);
     }
 
-    for (i = 0; i < prefcount; i++) {
-        ip_prefix_t *mypref = g_list_nth_data(preflist, i);
+    for (p = g_list_first(preflist); p; p = g_list_next(p)) {
+        ip_prefix_t *mypref = (ip_prefix_t *)p->data;
         rx_bin_node(mode, mypref, tree, leafptr);
     }
 
