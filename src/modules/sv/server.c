@@ -178,6 +178,13 @@ static void radix_load(void) {
 	}
 	RP_sql_load_start();
 	RP_sql_load_wait_until_finished();
+
+#ifdef DEBUG_RADIX_LOAD
+	fprintf(stderr, "\n\ninetnum tree:\n");
+	rx_tree_t *mytree;
+	RP_tree_get(&mytree, ca_get_SourceHandleByPosition(0), IP_V4, A_IN);    /* during testing, only source is 0 == DB-TEST */
+	rx_tree_print_stderr(mytree);
+#endif
 }
 
 /************************************************************

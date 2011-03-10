@@ -584,8 +584,10 @@ int RX_in_node(rx_oper_mt mode, ip_range_t *rang, rx_tree_t *tree, rx_dataleaf_t
     GList *preflist = NULL, *p;
     char buf[IP_RANGSTR_MAX];
 
-//    IP_rang_b2a(rang, buf, IP_RANGSTR_MAX);
-//    LG_log(rx_context, LG_DEBUG, "rx_inum_node: adding %s", buf);
+#ifdef DEBUG_RADIX_LOAD
+    IP_rang_b2a(rang, buf, IP_RANGSTR_MAX);
+    fprintf(stderr, "RX_in_node: adding %s, decomposed to: ", buf);
+#endif
 
     /* decompose, put links to the data leaf into every prefix*/
     /* that makes up this range.*/
@@ -607,11 +609,19 @@ int RX_in_node(rx_oper_mt mode, ip_range_t *rang, rx_tree_t *tree, rx_dataleaf_t
 
     for (p = g_list_first(preflist); p; p = g_list_next(p)) {
         ip_prefix_t *mypref = (ip_prefix_t *)p->data;
+#ifdef DEBUG_RADIX_LOAD
+        IP_pref_b2a(mypref, buf, IP_RANGSTR_MAX);
+        fprintf(stderr, "[%s] ", buf);
+#endif
         rx_bin_node(mode, mypref, tree, leafptr);
     }
 
     /* free the storage from decomposition*/
     wr_clear_list(&preflist);
+
+#ifdef DEBUG_RADIX_LOAD
+        fprintf(stderr, "\n");
+#endif
 
     return RX_OK;
 }
