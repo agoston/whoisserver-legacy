@@ -204,6 +204,11 @@ int rx_walk_hook_addnode(rx_node_t *node, int level, int nodecounter, void *user
     nodcpy.srckey = SQ_NOKEY;
     nodcpy.tree = userdat->tree;
 
+#ifdef DEBUG_RADIX
+    char DEBUGbuf[256];
+    rx_nod_print(node, DEBUGbuf, 256);
+    fprintf(stderr, "rx_walk_hook_addnode: nodecounter=%d, level=%d, node=[%s]\n", nodecounter, level, DEBUGbuf);
+#endif
     return rx_nod_append(userdat->nodlist, &nodcpy);
 }
 
@@ -240,8 +245,7 @@ int rx_walk_hook_adddoubles(rx_node_t *node, int level, int nodecounter, void *u
     return rx_nod_append(userdat->nodlist, &nodcpy);
 }
 
-/***************************************************************************/
-/*
+/***************************************************************************
  searches the stack for a given prefix, finds *nodes* in the stack
  and appends *copies of the nodes* to the nodlist;
 
@@ -300,18 +304,26 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
             char *reason = NULL;
 
             if (stack[sps].cpy.prefix.bits > prefix->bits) { /* too deep*/
-                reason = "2deep";
+                reason = "too deep";
             } else if (0 != IP_addr_cmp(&stack[sps].cpy.prefix.ip, &prefix->ip, stack[sps].cpy.prefix.bits)) { /* mismatch */
                 reason = "mismatch";
-            } else if (search_mode != RX_SRCH_MORE && search_mode != RX_SRCH_DBLS && search_mode != RX_SRCH_RANG && stack[sps].cpy.glue == 1) { /* is glue*/
+            } else if (search_mode != RX_SRCH_RANG && stack[sps].cpy.glue) { /* is glue*/
                 reason = "glue";
             } else {
                 break;
             }
 
+//            /* mhm. it can't be limited here, must be done in RP */
+//            else if ( search_mode == RX_SRCH_LESS && par_a == 1
+//                    && stack[sps].cpy.prefix.bits == prefix->bits ) { /* too deep*/
+//                reason = "2deep4less";
+//            }
 
+#ifdef DEBUG_RADIX
             rx_nod_print(&stack[sps].cpy, buf, IP_PREFSTR_MAX);
-            LG_log(rx_context, LG_DEBUG, "rx_nod_search: peeling off %d: %s (%s)", sps, buf, reason);
+            fprintf(stderr, "rx_nod_search: peeling off %d: %s (%s)\n", sps, buf, reason);
+#endif
+
             sps--;
         }
     }
@@ -409,57 +421,20 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
         /* or any other prefix that the tree might be set to represent,*/
         /* but there is no actual object for it (not even glue)*/
 
-        if (sps < 0) {
-            /* there is any node in the tree */
+        if (sps < 0) { /* if nothing on stack */
             if (tree->num_nodes > 0  && !IP_addr_cmp(&prefix->ip, &stack[0].cpy.prefix.ip, prefix->bits)) { /* addr match */
-                rx_walk_tree(tree->top_ptr, hook_function,
-                /* RX_WALK_REVERS | */RX_WALK_SKPGLU, /* skip glue nodes while counting*/
-                par_a, /* display this many levels */
-                1, 0, &datstr, &err);
+                rx_walk_tree(tree->top_ptr, hook_function, RX_WALK_SKPGLU, par_a, 0, 0, &datstr, &err);
                 if (err != RX_OK) {
                     return err;
                 }
             }
-        } /* if nothing on stack */
-        else {
-
-            /* walk from this node if it matches the query prefix and is
-             long enough (if it is shorter, then it will harvest too many
-             results
-             */
-            if (prefix->bits <= stack[sps].srcptr->prefix.bits && 0 == IP_addr_cmp(&stack[sps].srcptr->prefix.ip, &prefix->ip, prefix->bits)) {
-                rx_walk_tree(stack[sps].srcptr, hook_function,
-                /* RX_WALK_REVERS | */RX_WALK_SKPGLU, /* skip glue nodes while counting*/
-                par_a, /* display up to this max length*/
-                1, 0, &datstr, &err);
+        } else {
+            /* walk from this node, results will be filtered at a later stage */
+            if (!IP_addr_cmp(&stack[sps].srcptr->prefix.ip, &prefix->ip, MIN(prefix->bits, stack[sps].srcptr->prefix.bits))) {
+                rx_walk_tree(stack[sps].srcptr, hook_function, RX_WALK_SKPGLU, par_a, 0, 0, &datstr, &err);
                 if (err != RX_OK) {
                     return err;
                 }
-            } else {
-                /* or walk the child nodes otherwise (still check the address) */
-
-                for (i = 1; i >= 0; i--) {
-                    if (stack[sps].cpy.child_ptr[i] != NULL) {
-                        IP_pref_b2a(&stack[sps].cpy.child_ptr[i]->prefix, buf, 1023);
-
-                        if (0 == IP_addr_cmp(&stack[sps].cpy.child_ptr[i]->prefix.ip, &prefix->ip, prefix->bits)) {
-
-                            LG_log(rx_context, LG_DEBUG, "rx_nod_search: digging child %d: %s", i, buf);
-
-                            rx_walk_tree(stack[sps].cpy.child_ptr[i], hook_function,
-                            /* RX_WALK_REVERS | */RX_WALK_SKPGLU, /* skip glue nodes while counting*/
-                            par_a, /* display this many levels */
-                            1, 0, &datstr, &err);
-                            if (err != RX_OK) {
-                                return err;
-                            }
-                        } else {
-                            LG_log(rx_context, LG_DEBUG, "rx_nod_search: prefix mismatch with child %d: %s", i, buf);
-                        }
-                    }
-                }
-            } /* if node does not match, dig child nodes */
-
         }
         break;
 
@@ -560,6 +535,17 @@ int RX_bin_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t * tree
     dmode = (search_mode == RX_SRCH_MORE || search_mode == RX_SRCH_DBLS || search_mode == RX_SRCH_RANG) ? RX_STK_QUERY_ALLNOD : RX_STK_QUERY_NOGLUE;
 
     rx_build_stack(stack, &stkcnt, tree, prefix, dmode);
+
+#ifdef DEBUG_RADIX
+    char DEBUGbuf[256];
+    int DEBUGi;
+    IP_pref_b2a(prefix, DEBUGbuf, 256);
+    fprintf(stderr, ">>> RX_bin_search(%d, %d, %d, %s) = %d results:\n", search_mode, par_a, par_b, DEBUGbuf, stkcnt);
+    for (DEBUGi = 0; DEBUGi < stkcnt; DEBUGi++) {
+        rx_nod_print(&stack[DEBUGi].cpy, DEBUGbuf, 256);
+        fprintf(stderr, ">>> %s\n", DEBUGbuf);
+    }
+#endif
 
     rx_nod_search(search_mode, par_a, par_b, tree, prefix, stack, stkcnt, &nodlist, 1000);
 

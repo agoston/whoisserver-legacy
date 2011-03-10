@@ -62,79 +62,76 @@ RX_init (LG_context_t *ctx)
 
   XXX: nodecounter is ALWAYS passed as 0, so should probably be removed from
        calling parameter list, shane 2001-02-01
+
+  Arguments:
+         rx_walk_mt walk_mode          controls if glue nodes are counted
+                                       and if levels or prefix lenghts are checked
 ++++++++++++*/
-int
-rx_walk_tree(rx_node_t *node, 
-	     int (*func)(rx_node_t *node, int level, int nodecounter, 
-			  void *userptr), 
-	     rx_walk_mt walk_mode, 
-	                     /* controls if glue nodes are counted*/
-	                     /* and if levels or prefix lenghts are checked*/
-	     int maxlevel, 
-	     int level, 
-	     int nodecounter,
-	     void *userptr,
-	     int *err)
-{
-int i, link;
+int rx_walk_tree(rx_node_t *node, int(*func)(rx_node_t *node, int level, int nodecounter, void *userptr), rx_walk_mt walk_mode, int maxlevel, int level, int nodecounter, void *userptr, int *err) {
+    int i, link;
 
- if( node == NULL ) die; /* program error. we expect a valid, checked, node.*/
+    if (node == NULL)
+        die; /* program error. we expect a valid, checked, node.*/
 
- /* check the limits and maybe quit here: prefix length for RX_WALK_PRFLEN, */
- /* level otherwise */
- 
- if(walk_mode & RX_WALK_PRFLEN) {
-   if(node->prefix.bits > maxlevel) {
-     return nodecounter; 
-   }
- }
- else if( level > maxlevel ) {
-   return nodecounter; 
- }
+    /* check the limits and maybe quit here: prefix length for RX_WALK_PRFLEN, */
+    /* level otherwise */
 
+    if (walk_mode & RX_WALK_PRFLEN) {
+        if (node->prefix.bits > maxlevel) {
+            return nodecounter;
+        }
+    } else if (level > maxlevel) {
+        return nodecounter;
+    }
 
- /* process the node appropriately: */
- /* if (not node glue) or (process glue nodes) */
+#ifdef DEBUG_RADIX
+    if (userptr != (void*)-1) {     /* to allow avoiding printing this debug from rx_tree_print*() */
+        char DEBUGbuf[256];
+        rx_nod_print(node, DEBUGbuf, 256);
+        fprintf(stderr, "rx_walk_tree: walk_mode=%d, nodecounter=%d, level=%d, maxlevel=%d, node=[%s]\n", walk_mode, nodecounter, level, maxlevel, DEBUGbuf);
+    }
+#endif
 
- if( node->glue == 0 || (walk_mode & RX_WALK_SKPGLU) == 0 ) {
+    /* process the node appropriately: */
+    /* if (not node glue) or (process glue nodes) */
 
-   /* increase our depth counter */
-   level++;
+    if (node->glue == 0 || (walk_mode & RX_WALK_SKPGLU) == 0) {
 
-   /* increase the count of visited nodes */
-   nodecounter++;
+        /* increase our depth counter */
+        level++;
 
-   /* call supplied function, if any */
-   if( func != NULL ) {
-     *err = func(node, level, nodecounter, userptr);
+        /* increase the count of visited nodes */
+        nodecounter++;
 
-     /* abort the walk on error*/
-     if( *err != RX_OK ) {
-       LG_log(rx_context, LG_DEBUG,
-  	         "walk_tree: func returned error %d, aborting", *err);
-       return nodecounter;
-     }
-   }
- }
+        /* call supplied function, if any */
+        if (func != NULL) {
+            *err = func(node, level, nodecounter, userptr);
 
- /* process left and right children */
- for(i=0; i<=1; i++) {
-   
-   /* reverse the sense of the walk*/
-   link = ( walk_mode & RX_WALK_REVERS ) ? ! i : i;
-     
-   if( node->child_ptr[link] != NULL ) {
-     nodecounter += rx_walk_tree(node->child_ptr[link], func, walk_mode,
-				 maxlevel, level, 0, userptr, err);
-     /* abort the walk on error*/
-     if( func != NULL && *err != RX_OK ) {
-       break;
-     }
-   }
- }
- 
- /* return count of nodes visited */
- return nodecounter;
+            /* abort the walk on error*/
+            if (*err != RX_OK) {
+                LG_log(rx_context, LG_DEBUG, "walk_tree: func returned error %d, aborting", *err);
+                return nodecounter;
+            }
+        }
+    }
+
+    /* process left and right children */
+    for (i = 0; i <= 1; i++) {
+
+        /* reverse the sense of the walk*/
+        link = (walk_mode & RX_WALK_REVERS) ? !i : i;
+
+        if (node->child_ptr[link] != NULL) {
+            nodecounter += rx_walk_tree(node->child_ptr[link], func, walk_mode, maxlevel, level, 0, userptr, err);
+            /* abort the walk on error*/
+            if (func != NULL && *err != RX_OK) {
+                break;
+            }
+        }
+    }
+
+    /* return count of nodes visited */
+    return nodecounter;
 }
 
 /*+++++++++  
