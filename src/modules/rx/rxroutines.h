@@ -81,9 +81,8 @@ typedef enum {
   RX_SRCH_EXACT,
   RX_SRCH_LESS,
   RX_SRCH_MORE,           /*+ more specific search +*/
-  RX_SRCH_DBLS,           /*+ special more spec: return only nodes with
-			     more than one data leaves +*/
-  RX_SRCH_RANG            /*+ more specific range search, RPSL style : ^n-m +*/
+  RX_SRCH_DBLS,           /*+ special more spec: return only nodes with more than one data leaves +*/
+  RX_SRCH_RANG            /*+ more specific range search, RPSL style : ^n-m     ---=== UNUSED as of 2011-03-10 - agoston +*/
 } rx_srch_mt;
 
 

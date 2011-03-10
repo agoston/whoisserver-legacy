@@ -143,9 +143,7 @@ int rx_build_stack(rx_nodcpy_t stack[], int *maxdepth, rx_tree_t *tree, ip_prefi
             (*maxdepth)++;
         }
 
-        /* make debug info.*/
-
-        // disabled this to avoid unnecessary bin->asc conversion for _every_ level on _every_ lookup (again, who did this?)
+        // disabled this to avoid unnecessary bin->asc conversion for every level on every lookup
         //    IP_pref_b2a( & curnode->prefix , bbf, IP_PREFSTR_MAX );
         //    LG_log(rx_context, LG_DEBUG,
         //                "rx_build_stack: %s%d at %s%s (stk len: %d)",
@@ -307,19 +305,10 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
                 reason = "mismatch";
             } else if (search_mode != RX_SRCH_MORE && search_mode != RX_SRCH_DBLS && search_mode != RX_SRCH_RANG && stack[sps].cpy.glue == 1) { /* is glue*/
                 reason = "glue";
+            } else {
+                break;
             }
-#if 0 
-            /* mhm. it can't be limited here, must be done in RP */
-            else if ( search_mode == RX_SRCH_LESS && par_a == 1
-                    && stack[sps].cpy.prefix.bits == prefix->bits ) { /* too deep*/
-                reason = "2deep4less";
-            }
-#endif
 
-            else {
-
-                break; /* stop peeling off */
-            }
 
             rx_nod_print(&stack[sps].cpy, buf, IP_PREFSTR_MAX);
             LG_log(rx_context, LG_DEBUG, "rx_nod_search: peeling off %d: %s (%s)", sps, buf, reason);
@@ -345,7 +334,7 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
 
         while (sps >= 0) {
 
-            rx_nod_print(&stack[sps].cpy, buf, 1024);
+            rx_nod_print(&stack[sps].cpy, buf, sizeof(buf));
             LG_log(rx_context, LG_DEBUG, "rx_nod_search: position %d: %s", sps, buf);
 
             if (search_mode == RX_SRCH_EXACT && stack[sps].cpy.glue) {
@@ -475,18 +464,16 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
         break;
 
     case RX_SRCH_RANG:
+        /*********************** This branch is never executed as of 2011-03-10 - agoston */
+
         /* OK, start from the node at the end of the stack (exless match including
-         glue nodes) then
-
-
-         if its prefix length is
+         glue nodes) then if its prefix length is
          OK -> found! descend from here as long as the prefixes are in range
          shorter -> apparently there is even no such glue node. come back down
-         one step
-
-         */
+         one step  */
 
         i = sps; /* go up the tree (down the stack) */
+
         /* until too far (one node too much, after >= )*/
         while (i >= 0 && stack[i].cpy.prefix.bits >= prefix->bits) {
             i--;
@@ -499,21 +486,16 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
         else
             i++; /* went one too much, now come back one step*/
 
-        rx_walk_tree(stack[i].srcptr, rx_walk_hook_addnode, RX_WALK_PRFLEN, /* skip glue nodes while counting*/
-        par_a, /* display up to this max length*/
-        1, 0, &datstr, &err);
+        rx_walk_tree(stack[i].srcptr, rx_walk_hook_addnode, RX_WALK_PRFLEN, par_a, 0, 0, &datstr, &err);
+
         if (err != RX_OK) {
             return err;
         }
 
         break;
 
-        /* return RX_NOYETI;*/
-        /*not implemented*/
-        /*    die; */
     default:
-        die
-        ; /* are you nuts??*/
+        die;
     }
 
     return err;
@@ -581,7 +563,7 @@ int RX_bin_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t * tree
 
     rx_nod_search(search_mode, par_a, par_b, tree, prefix, stack, stkcnt, &nodlist, 1000);
 
-    LG_log(rx_context, LG_DEBUG, "RX_bin_search: processing nodes");
+//    LG_log(rx_context, LG_DEBUG, "RX_bin_search: processing nodes");
 
     for (nitem = g_list_first(nodlist); nitem != NULL; nitem = g_list_next(nitem)) {
 

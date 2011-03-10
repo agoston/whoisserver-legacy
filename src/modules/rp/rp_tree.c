@@ -86,7 +86,7 @@ int RP_tree_get(rx_tree_t **treeptr, rp_regid_t reg_id, ip_space_t spc_id, rp_at
              rx_subtree_mt subtrees     one of NONE, AUTO, HAND
   ++++++++++++++++++++*/
 int RP_tree_add(rp_regid_t reg_id, rp_attr_t attr, char *prefixstr, rx_mem_mt mem_mode, rx_subtree_mt subtrees) {
-    int err;
+    int err = RP_OK;
     rp_tentry_t *treedef;
     rx_tree_t *mytree;
     rx_fam_t fam_id = RP_attr2fam(attr);
@@ -104,6 +104,8 @@ int RP_tree_add(rp_regid_t reg_id, rp_attr_t attr, char *prefixstr, rx_mem_mt me
         if ((err = RP_tree_del(mytree)) == RP_OK) {
             /* Initialize the tree */
             mytree->num_nodes = 0;
+        } else {
+            return err;
         }
     } else {
         /* OK, see if there is a tree for this space already */
