@@ -400,7 +400,7 @@ rx_walk_tree(rx_node_t *node,
 	     int *err);
 
 
-int rx_tree_print( sk_conn_st *condat,rx_tree_t     *tree );
+int rx_tree_print_stderr(rx_tree_t *tree);
 void rx_space_list(sk_conn_st *condat);
 void rx_nod_print( rx_node_t *node, char *buf, unsigned maxchar );
 void rx_stk_print( rx_nodcpy_t   stack[], int stackdepth );
