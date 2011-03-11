@@ -193,7 +193,7 @@ void pw_log_query(Query_environ *qe,
   char *hostaddress      IP address of the query
 
   ++++++++++++++++++++++++++++++++++++++*/
-void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_st *acl_eip, char *hostaddress) {
+void PW_process_qc(Query_environ *qe, Query_command *qc) {
 	GList *qitem;
 	Query_instructions *qis=NULL;
 	int err;
@@ -204,27 +204,29 @@ void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl
 		/* force disconnection on error */
 		qe->k = 0;
 		break;
+
 	case QC_NOKEY:
 		/* no key (this is OK for some operational stuff, like -k) */
 		/* we still need an extra newline to hand control back to the
-		 client in the "-k" scenerio */
+		 client in the "-k" scenario */
 		if (qe->k) {
 			/* XXX: in the query new code this newline is not necessary! */
 			/*        SK_cd_puts(&(qe->condat), "\n");*/
 			break;
 		}
+
 		/* if not -k, treat as an empty query, and FALLTHROUGH */
-	case QC_EMPTY:
+	case QC_EMPTY: {
 		/* The user didn't specify a key, so
-		 - print moron banner
+		 - print error banner
 		 - force disconnection of the user. */
-	{
 		char *rep = ca_get_pw_err_nokey;
 		SK_cd_printf(&(qe->condat), "%s\n\n", rep);
 		UT_free(rep);
-	}
+	    }
 		qe->condat.rtc = SK_NOTEXT;
 		break;
+
 	case QC_HELP:
 	case QC_SYNERR: {
 		char *rep = ca_get_pw_help_file;
@@ -232,6 +234,7 @@ void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl
 		UT_free(rep);
 	}
 		break;
+
 	case QC_TEMPLATE:
 		switch (qc->q) {
 		case QC_Q_SOURCES:
@@ -242,6 +245,7 @@ void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl
 			g_string_free(srcs, TRUE);
 		}
 			break;
+
 		case QC_Q_TYPES:
 			/* print available types */
 		{
@@ -257,13 +261,14 @@ void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl
 			g_string_free(types, TRUE);
 		}
 			break;
+
 		case QC_Q_VERSION:
 			SK_cd_puts(&(qe->condat), "% whois-server-" VERSION "\n\n");
 			break;
+
 		default:
-			/* EMPTY */
-			;
-		} /* -q */
+		    break;
+		}
 
 		if (qc->t >= 0) {
 			SK_cd_printf(&(qe->condat), "%s\n", DF_get_class_template(qc->t));
@@ -294,31 +299,32 @@ void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl
 
 	    qis = QI_new(qc, qe);
 
-		/* go through all sources,
-		 stop if connection broken - further action is meaningless */
-		for (qitem = g_list_first(qe->sources_list); qitem != NULL && qe->condat.rtc == 0; qitem = g_list_next(qitem)) {
+		/* go through all sources, stop if connection broken - further action is meaningless */
+		for (qitem = g_list_first(qe->sources_list); qitem && !qe->condat.rtc; qitem = g_list_next(qitem)) {
+		    ca_dbSource_t* source = (ca_dbSource_t *)qitem->data;
+		    qis->source = source;
 
 			/* QI will decrement the credit counters */
 			PW_record_query_start();
-			err = QI_execute(qitem->data, qis, qe, acc_credit, acl_eip);
+            err = QI_execute(qis);
 			PW_record_query_end();
+
 			if ( !NOERR(err) ) {
 				if (err == QI_CANTDB) {
 					SK_cd_puts(&(qe->condat), "% WARNING: Failed to make connection to ");
-					SK_cd_puts(&(qe->condat), (char *)qitem->data);
+					SK_cd_puts(&(qe->condat), source->name);
 					SK_cd_puts(&(qe->condat), " database.\n\n");
 				}
-				break; /* quit the loop after any error */
-			}/* if error*/
-
-		}/* for every source */
+				break;
+			}
+		}
 
 		QI_free(qis);
 
-		if (AC_credit_isdenied(acc_credit) ) {
+		if (AC_credit_isdenied(qe->acc_credit) ) {
 			/* host reached the limit of returned contact information */
 			char *rep = ca_get_pw_fmt_limit_reached;
-			SK_cd_printf(&(qe->condat), rep, hostaddress);
+			SK_cd_printf(&(qe->condat), rep, qe->eIPs);
 			UT_free(rep);
 		}
 
@@ -326,7 +332,7 @@ void PW_process_qc(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl
 	default:
 		die;
 	}
-} /* PW_process_qc */
+}
 
 /*
    Occasionally, we need to pause queries to the Whois database.  This
@@ -402,7 +408,7 @@ PW_record_query_end()
     char *input			  query as a string. may be empty string ""
 
 ++++++++++++++++++++++++++++++++++++++*/
-void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_st *acl_ip, char *hostaddress, char *input) {
+void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_st *acl_ip, char *input) {
 
     /* time */
     ut_timer_t begintime;
@@ -416,8 +422,12 @@ void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_
 
     UT_timeget(&begintime);
 
+    /* set accounting for processing this query */
+    qe->acc_credit = acc_credit;
+    qe->acl = acl_ip;
+
     /* ** ACTUAL PROCESSING IS HERE ** */
-    PW_process_qc(qe, qc, acc_credit, acl_ip, hostaddress);
+    PW_process_qc(qe, qc);
 
     /* increase the number of queries */
     if (qc->query_type == QC_REAL) {
@@ -463,7 +473,7 @@ void PW_run_query(Query_environ *qe, Query_command *qc, acc_st *acc_credit, acl_
     UT_timeget(&endtime);
 
     /* query logging */
-    pw_log_query(qe, qc, &copy_credit, begintime, endtime, hostaddress, input);
+    pw_log_query(qe, qc, &copy_credit, begintime, endtime, qe->eIPs, input);
 
     /* Commit the credit. This will deny if bonus limit hit and clear the copy */
 
@@ -670,7 +680,7 @@ void PW_interact(svr_args *args) {
 
                         } else {
                             /* allowed to query from passed IP */
-                            PW_run_query(qe, qc, &pass_credit, &acl_eip, qe->eIPs, input);
+                            PW_run_query(qe, qc, &pass_credit, &acl_eip, input);
                         }
                     }
                 } else {
@@ -679,7 +689,7 @@ void PW_interact(svr_args *args) {
                     strcpy(qe->eIPs, qe->condat.rIPs);
 
                     /* allowed to query from real IP */
-                    PW_run_query(qe, qc, &acc_credit, &acl_rip, qe->eIPs, input);
+                    PW_run_query(qe, qc, &acc_credit, &acl_rip, input);
                 }
 
                 QC_free(qc);

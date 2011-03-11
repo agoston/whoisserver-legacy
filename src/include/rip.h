@@ -40,22 +40,12 @@
 #include "ca_configFns.h"
 #include "ca_defs.h"
 #include "ca_dictionary.h"
-/*#include "ca_libs.h"*/   /* the status of the ca_libs.h file is unknown */
 #include "ca_macros.h"
 #include "ca_srcAttribs.h"
 #include "comparisons.h"
 #include "constants.h"
 #include "cr.h"
 #include "defs.h"
-/* ER module is deprecated due to infinite complexity */
-/*#include "er_arrays.h"*/
-/*#include "er_aspects.h"*/
-/*#include "er_facilities.h"*/
-/*#include "er_formats.h"*/
-/*#include "er_macro.h"*/
-/*#include "er_paths.h"*/
-/*#include "er_yacc_helper.h"*/
-/* #include "erroutines.h" */
 #include "fdwrap.h"
 #include "mg_getopt.h"
 #include "globaldefs.h"

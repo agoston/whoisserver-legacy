@@ -101,4 +101,11 @@ int UP_check_peering_set_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl
 int up_check_as_block(RT_context_t *rt_ctx, LG_context_t *lg_ctx, char *key_value);
 
 int UP_check_available_nichdl(RT_context_t *rt_ctx, LG_context_t *lg_ctx, options_struct_t *options, rpsl_object_t *preproc_obj, source_data_t *source_data);
+
+int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                             rpsl_object_t *preproc_obj, rpsl_object_t *old_obj);
+
+int UP_check_ping(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                    rpsl_object_t *preproc_obj, int operation, rpsl_object_t *old_obj);
+
 #endif

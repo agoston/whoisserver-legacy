@@ -86,7 +86,7 @@ check_server() {
 	key=""; escape=$'\x1b';
 	
 	while ! send_command help >/dev/null 2>&1; do
-		read -t1 -s -n1 key
+		read -t1 -s -n1 key || ([[ $? == 1 ]] && sleep 1)	# gracefully handle lack of terminal
 		if [[ "$key" == "$escape" ]]; then
 			my_log "User cancelled wait at $NUM seconds"
 			break;
@@ -107,15 +107,15 @@ check_server() {
 	COLUMNS=${COLUMNS:-80}
 	
 	while [ $NUM -lt 60 ]; do	# radix tables are huge, and mysql can stall quite a bit before coughing up the first rows
-		RX_LOAD=`send_command 'show threads' | grep '^rx load' | awk '{printf("[%s %s %s] ", $10, $11, $12);} | cut -c-'$[COLUMNS-30]`
-		echo -en "\r${RX_LOAD}                             "
+		RX_LOAD=`send_command 'show threads' | grep '^rx load' | awk '{printf("[%s %s %s] ", $10, $11, $12);}' | cut -c-$[COLUMNS-30]`
+		echo -en "\r${RX_LOAD}                                      "
 		if [ "$RX_LOAD" ]; then
 			NUM=0
 		else 
 			NUM=$[NUM+1]
 		fi
 		
-		read -t1 -s -n1 key
+		read -t1 -s -n1 key || ([[ $? == 1 ]] && sleep 1)	# gracefully handle lack of terminal
 		if [[ "$key" == "$escape" ]]; then
 			my_log "User cancelled wait at $NUM seconds"
 			break;

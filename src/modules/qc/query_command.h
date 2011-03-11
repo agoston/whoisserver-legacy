@@ -74,6 +74,8 @@ typedef struct Query_environ_t {
     char *version;
     ip_addr_t eIP; /* effective IP */
     char eIPs[IP_ADDRSTR_MAX]; /* effective IP string */
+    acc_st *acc_credit;       /* accounting info struct */
+    acl_st *acl;              /* ACL info struct */
 } Query_environ;
 
 typedef struct Query_command_t {
@@ -89,7 +91,7 @@ typedef struct Query_command_t {
   /* -B: original output (with e-mail, changed and notify attrs */
   gboolean B;
   /* -b: brief output (keys + abuse-mailbox from object/recursive objects) */
-	gboolean b;
+  gboolean b;
 
   int d;
   int fast;
@@ -102,7 +104,7 @@ typedef struct Query_command_t {
   int t;
   int v;
   int x;
-  int filtered;
+  int filtered;                 /* -K flag */
   int L;
   int M;
   int R;

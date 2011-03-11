@@ -1645,7 +1645,7 @@ ca_SrcHdl_t * ca_get_SourceHandleByName(char *srcName)
     return (mySource);
 }
 
-char * ca_srchandle2Strelement(ca_SrcHdl_t * ah, int srcAttrib)
+char * ca_srchandle2Strelement(const ca_SrcHdl_t * ah, int srcAttrib)
 /*******************************************************************
  * ca_srchandle2Strelement                              *
  *  -- returns a string which represents the attribute of a source *
@@ -1746,7 +1746,7 @@ char * ca_srchandle2Strelement(ca_SrcHdl_t * ah, int srcAttrib)
     return (myStr);
 }
 
-int ca_srchandle2Intelement(ca_SrcHdl_t * ah, int srcAttrib)
+int ca_srchandle2Intelement(const ca_SrcHdl_t * ah, int srcAttrib)
 /*******************************************************************
  * ca_srchandle2Intelement                            *
  *   -- a function that returns the integer value of the requested  *

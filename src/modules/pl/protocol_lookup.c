@@ -11,7 +11,7 @@
 
 typedef struct {
     sk_conn_st condat;
-    char *source;
+    const char *source;
 } pl_answer_t;
 
 GList *default_sources = NULL, *default_attributes = NULL;

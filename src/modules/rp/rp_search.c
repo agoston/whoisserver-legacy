@@ -46,17 +46,15 @@ void rp_exclude_datlink(GList **datlist, GList *element) {
     wr_clear_list(&element);
 }
 
-/**************************************************************************/
+
 /*+++++++++++
  helper:
  this routine goes through the list of prefixes and performs a bin_search
  on each of them; attaches the results to datlist.
  +++++++++++*/
 static
-int rp_preflist_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *mytree, GList **preflist, GList **datlist)
-
-{
-    char prefstr[IP_PREFSTR_MAX];
+int rp_preflist_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *mytree, GList **preflist, GList **datlist) {
+    //char prefstr[IP_PREFSTR_MAX];
     GList *qitem;
     ip_prefix_t *querypref;
     int err;
@@ -65,10 +63,10 @@ int rp_preflist_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *
 
         querypref = qitem->data;
 
-        if (IP_pref_b2a(querypref, prefstr, IP_PREFSTR_MAX) != IP_OK) {
-            die;
-        }
-        LG_log(rp_context, LG_DEBUG, "rx_preflist_search: mode %d (%s) (par %d) for %s", search_mode, RX_text_srch_mode(search_mode), par_a, prefstr);
+//        if (IP_pref_b2a(querypref, prefstr, IP_PREFSTR_MAX) != IP_OK) {
+//            die;
+//        }
+//        LG_log(rp_context, LG_DEBUG, "rx_preflist_search: mode %d (%s) (par %d) for %s", search_mode, RX_text_srch_mode(search_mode), par_a, prefstr);
 
         if (mytree->num_nodes > 0) {
             err = RX_bin_search(search_mode, par_a, par_b, mytree, querypref, datlist, RX_ANS_ALL);
@@ -131,21 +129,16 @@ int rp_leaf_occ_inc(GHashTable *hash, rx_dataleaf_t *leafptr) {
 
 /* exclude exact match - not to be merged with preselction :-( */
 static void rp_exclude_exact_match(GList **datlist, ip_range_t *testrang) {
-    GList *ditem, *newitem;
+    GList *ditem;
 
-    ditem = g_list_first(*datlist);
-
-    while (ditem != NULL) {
+    for (ditem = g_list_first(*datlist); ditem != NULL; ditem = g_list_next(ditem)) {
         rx_datref_t *refptr = (rx_datref_t *) (ditem->data);
-
-        newitem = g_list_next(ditem);
 
         if (memcmp(&refptr->leafptr->iprange, testrang, sizeof(ip_range_t)) == 0) {
             rp_exclude_datlink(datlist, ditem);
-            LG_log(rp_context, LG_DEBUG, "process_datlist: discarded an exact match");
+//            LG_log(rp_context, LG_DEBUG, "process_datlist: discarded an exact match");
         }
-        ditem = newitem;
-    } /* while */
+    }
 }
 
 static int rp_find_longest_prefix(GList **datlist) {
@@ -241,13 +234,13 @@ int rp_asc_process_datlist(rx_srch_mt search_mode, int par_a, rx_fam_t fam_id, i
             /* min_span defined <=> EXLESS or LESS(1) search of INETNUMS:
              the smallest span must be returned */
             if (!exclude && use_span && (span = IP_rang_span(&refptr->leafptr->iprange)) != min_span) {
-                LG_log(rp_context, LG_DEBUG, "process_datlist: (EX)LESS: discarded object with span %d", span);
+//                LG_log(rp_context, LG_DEBUG, "process_datlist: (EX)LESS: discarded object with span %d", span);
                 exclude = 1;
             }
             /* max_pref defined <=> EXLESS search of INETNUMS or LESS(1) of RT:
              */
             if (!exclude && max_pref >= 0 && refptr->leafptr->preflen < max_pref) {
-                LG_log(rp_context, LG_DEBUG, "process_datlist: (EX)LESS: discarded object with preflen %d", refptr->leafptr->preflen);
+//                LG_log(rp_context, LG_DEBUG, "process_datlist: (EX)LESS: discarded object with preflen %d", refptr->leafptr->preflen);
                 exclude = 1;
             }
 
@@ -256,23 +249,23 @@ int rp_asc_process_datlist(rx_srch_mt search_mode, int par_a, rx_fam_t fam_id, i
             if (!exclude && prefnumber > 1) { /* do not check if all will be approved */
 
                 if (rp_leaf_occ_inc(lohash, refptr->leafptr) < prefnumber) {
-                    LG_log(rp_context, LG_DEBUG, "process_datlist: (EX)LESS: leafptr %x not enough", refptr->leafptr);
+//                    LG_log(rp_context, LG_DEBUG, "process_datlist: (EX)LESS: leafptr %x not enough", refptr->leafptr);
                     exclude = 1;
                 } else {
-                    LG_log(rp_context, LG_DEBUG, "process_datlist: (EX)LESS: leafptr %x GOOD enough", refptr->leafptr);
+//                    LG_log(rp_context, LG_DEBUG, "process_datlist: (EX)LESS: leafptr %x GOOD enough", refptr->leafptr);
                 }
             }
         } else if (search_mode == RX_SRCH_EXACT) {
             /* EXACT search - discard if the range does not match */
             if (memcmp(&refptr->leafptr->iprange, testrang, sizeof(ip_range_t)) != 0) {
 
-                LG_log(rp_context, LG_DEBUG, "process_datlist: EXACT; discarded a mismatch");
+//                LG_log(rp_context, LG_DEBUG, "process_datlist: EXACT; discarded a mismatch");
                 exclude = 1;
             } /*  EXACT match */
         } else if (search_mode == RX_SRCH_MORE) {
             /* MORE: exclude if not fully contained in the search term */
             if (!(IP_addr_in_rang(&refptr->leafptr->iprange.begin, testrang) && IP_addr_in_rang(&refptr->leafptr->iprange.end, testrang))) {
-                LG_log(rp_context, LG_DEBUG, "process_datlist: MORE; discarded a not-fully contained one");
+//                LG_log(rp_context, LG_DEBUG, "process_datlist: MORE; discarded a not-fully contained one");
                 exclude = 1;
             }
         }
@@ -374,8 +367,7 @@ int rp_srch_copyresults(GList * datlist, GList ** finallist, int maxcount) {
     return RP_OK;
 }
 
-static
-void rp_begend_preselection(GList **datlist, rx_fam_t fam_id, ip_range_t *testrang) {
+static void rp_begend_preselection(GList **datlist, rx_fam_t fam_id, ip_range_t *testrang) {
     GList *ditem, *newitem;
 
     ditem = g_list_first(*datlist);
@@ -386,12 +378,11 @@ void rp_begend_preselection(GList **datlist, rx_fam_t fam_id, ip_range_t *testra
 
         /* the test is indentical for route & inetnum trees */
         if (IP_addr_in_rang(&testrang->end, &refptr->leafptr->iprange) == 0) {
-
-            LG_log(rp_context, LG_DEBUG, "process_datlist: discarded an uncovering leafptr %x", refptr->leafptr);
+//            LG_log(rp_context, LG_DEBUG, "process_datlist: discarded an uncovering leafptr %x", refptr->leafptr);
             rp_exclude_datlink(datlist, ditem);
         }
         ditem = newitem;
-    } /* while */
+    }
 }
 
 /*+++++++++++++++
@@ -504,8 +495,8 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
 
     /* 5. processing - using the same processing function */
     if (NOERR(err)) {
-        err = rp_asc_process_datlist(search_mode, par_a, fam_id, 1, /* one occurence is enough */
-        &datlist, &testrang, &hits);
+        /* one occurence is enough */
+        err = rp_asc_process_datlist(search_mode, par_a, fam_id, 1, &datlist, &testrang, &hits);
     }
 
     /* 6. copy results */

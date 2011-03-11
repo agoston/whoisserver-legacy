@@ -125,27 +125,26 @@ typedef struct Ref_queries_t
 
 typedef struct Query_instruction_t {
   R_Type_t search_type;
-  int  queryindex;/* index into the Query table showing origin of this entry */
+  int  queryindex;      /* index into the Query table showing origin of this entry */
   char *query_str;
   char *rx_keys;
-  unsigned int rx_srch_mode;
-  int rx_par_a;
+  unsigned int rx_srch_mode;    /* radix tree search mode */
+  int rx_par_a;                 /* radix tree search depth */
   ip_space_t space;
   rx_fam_t family;
 } Query_instruction;
 
 typedef struct Query_instructions_t {
   Query_instruction *instruction[MAX_INSTRUCTIONS];
-  unsigned int filtered;    /* -K query flag */
-  unsigned int fast;        /* -F query flag */
-  unsigned int recursive;   /* on by default, -r query flag turns it off */
-  const Query_command *qc; /* pointer to the Query_command structure of this query */
+  const Query_command *qc;       /* pointer to the Query_command structure of this query */
+  const ca_dbSource_t *source;   /* current source */
+  Query_environ *qe;        /* current query environment (not const, as qe.condat can change value on any socket operation, e.g. connection close by client) */
 } Query_instructions;
 
 
-int QI_execute(ca_dbSource_t *dbhdl, Query_instructions *qis, Query_environ *qe, acc_st *acc_credit, acl_st *acl);
+int QI_execute(Query_instructions *qis);
 void QI_free(Query_instructions *qis);
-Query_instructions *QI_new(Query_command *qc, const Query_environ *qe);
+Query_instructions *QI_new(Query_command *qc, Query_environ *qe);
 char *QI_queries_to_string(Query_instructions *qis);
 char *QI_fast_output(const char *str);
 void QI_init (LG_context_t *qi_ctx, LG_context_t *sql_ctx);

@@ -11,7 +11,7 @@ phone:          +0123456789
 nic-hdl:        TP2-DB-TEST
 mnt-by:       PERSON-MNT
 abuse-mailbox:  dbtest@ripe.net
-+  # comment for abuse-mailbox attr
++   # comment for abuse-mailbox attr
 source:         DB-TEST
 
 
