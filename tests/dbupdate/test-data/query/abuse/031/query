@@ -5,12 +5,12 @@
 
 % Information related to 'TP2-DB-TEST'
 
-person:         test person2
-address:        Singel
-phone:          +0123456789
-nic-hdl:        TP2-DB-TEST
-mnt-by:         PERSON-MNT
-e-mail:         dbtest@ripe.net
-source:         DB-TEST # Filtered
+person:          test person2
+address:         Singel
+phone:           +0123456789
+nic-hdl:         TP2-DB-TEST
+mnt-by:          PERSON-MNT
+e-mail:          dbtest@ripe.net
+source:          DB-TEST # Filtered
 
 

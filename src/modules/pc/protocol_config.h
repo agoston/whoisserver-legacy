@@ -117,7 +117,7 @@ http://cs.wwc.edu/~bellmi/ANSI_escape_codes.html
                           "\tSyntax: set updates {pause|resume}"
 #define HELP_SET_QUERIES  "Pause/resume all queries: \n"\
                           "\tSyntax: set queries {pause|resume}"
-#define HELP_SET_INITRX   "Reload radix trees for a given source: \n"\
+#define HELP_SET_INITRX   "Reload radix trees for a given source. No other access to radix forest allowed (e.g. queries, set initrx in parallel) \n"\
 			  "\tSyntax: set initrx <source>" 
 #define HELP_SET_ERR      "Modify the error path system.\n"\
                           "\tSyntax: set err <errspec>\n"\

@@ -125,11 +125,11 @@ typedef struct Ref_queries_t
 
 typedef struct Query_instruction_t {
   R_Type_t search_type;
-  int  queryindex;/* index into the Query table showing origin of this entry */
+  int  queryindex;      /* index into the Query table showing origin of this entry */
   char *query_str;
   char *rx_keys;
-  unsigned int rx_srch_mode;
-  int rx_par_a;
+  unsigned int rx_srch_mode;    /* radix tree search mode */
+  int rx_par_a;                 /* radix tree search depth */
   ip_space_t space;
   rx_fam_t family;
 } Query_instruction;

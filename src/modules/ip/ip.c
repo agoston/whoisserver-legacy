@@ -1295,15 +1295,12 @@ int IP_addr_in_pref(ip_addr_t * ptra, ip_prefix_t * prefix) {
  returns 1 if it is, 0 otherwise
  0 is also returned if they are from different space (V4, V6)
  it seems logical that they cannot contain each other in this case.
-
  +*/
-
 int IP_addr_in_rang(ip_addr_t *ptra, ip_range_t *rangptr) {
-
-    if (IP_sizebits(ptra->space) == IP_sizebits(rangptr->begin.space)) {
-        return (IP_addr_cmp(ptra, &rangptr->begin, IP_sizebits(rangptr->end.space)) >= 0 /* adr >= begin */
-        && IP_addr_cmp(ptra, &rangptr->end, IP_sizebits(rangptr->end.space)) <= 0 /* adr <= end */
-        );
+    /* adr >= begin && adr <= end */
+    int bits = IP_sizebits(rangptr->begin.space);
+    if (IP_sizebits(ptra->space) == bits) {
+        return IP_addr_cmp(ptra, &rangptr->begin, bits) >= 0 && IP_addr_cmp(ptra, &rangptr->end, bits) <= 0;
     } else {
         return 0;
     }

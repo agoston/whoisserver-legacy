@@ -81,9 +81,8 @@ typedef enum {
   RX_SRCH_EXACT,
   RX_SRCH_LESS,
   RX_SRCH_MORE,           /*+ more specific search +*/
-  RX_SRCH_DBLS,           /*+ special more spec: return only nodes with
-			     more than one data leaves +*/
-  RX_SRCH_RANG            /*+ more specific range search, RPSL style : ^n-m +*/
+  RX_SRCH_DBLS,           /*+ special more spec: return only nodes with more than one data leaves +*/
+  RX_SRCH_RANG            /*+ more specific range search, RPSL style : ^n-m     ---=== UNUSED as of 2011-03-10 - agoston +*/
 } rx_srch_mt;
 
 
@@ -401,7 +400,7 @@ rx_walk_tree(rx_node_t *node,
 	     int *err);
 
 
-int rx_tree_print( sk_conn_st *condat,rx_tree_t     *tree );
+int rx_tree_print_stderr(rx_tree_t *tree);
 void rx_space_list(sk_conn_st *condat);
 void rx_nod_print( rx_node_t *node, char *buf, unsigned maxchar );
 void rx_stk_print( rx_nodcpy_t   stack[], int stackdepth );

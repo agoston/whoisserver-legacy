@@ -18,20 +18,20 @@ mnt-lower:      RIPE-NCC-HM-MNT
 mnt-routes:     RIPE-NCC-HM-MNT
 source:         DB-TEST # Filtered
 
-inet6num:       0::/0
-netname:        ROOT
-descr:          Root inet6num object
-country:        EU
-admin-c:        TP1-DB-TEST
-tech-c:         TP1-DB-TEST
-mnt-by:         RIPE-NCC-HM-MNT
-mnt-lower:      RIPE-NCC-HM-MNT
-status:         ALLOCATED-BY-RIR
-remarks:        This network in not allocated.
-                This object is here for Database
-                consistency and to allow hierarchical
-                authorisation checks.
-source:         DB-TEST # Filtered
+inet6num:        0::/0
+netname:         ROOT
+descr:           Root inet6num object
+country:         EU
+admin-c:         TP1-DB-TEST
+tech-c:          TP1-DB-TEST
+mnt-by:          RIPE-NCC-HM-MNT
+mnt-lower:       RIPE-NCC-HM-MNT
+status:          ALLOCATED-BY-RIR
+remarks:         This network in not allocated.
+                 This object is here for Database
+                 consistency and to allow hierarchical
+                 authorisation checks.
+source:          DB-TEST # Filtered
 
 mntner:         TEST-DBM-MNT
 descr:          Mntner for RIPE DBM objects.

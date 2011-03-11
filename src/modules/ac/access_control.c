@@ -1409,8 +1409,7 @@ int AC_decay(void)
 
 			UT_timeget(&oldest_timestamp[i]);
 			if (act_runtime[i]->top_ptr) {
-				count += rx_walk_tree(act_runtime[i]->top_ptr, AC_decay_hook, RX_WALK_SKPGLU,	/* skip glue nodes */
-					255, 0, 0, &dec_dat, &ret_err);
+				count += rx_walk_tree(act_runtime[i]->top_ptr, AC_decay_hook, RX_WALK_SKPGLU, 255, 0, 0, &dec_dat, &ret_err);
 			}
 
 			/* it should also be as smart as to delete nodes that have reached
@@ -1659,9 +1658,7 @@ unsigned AC_print_access(GString *output)
 	    g_string_append(output, header);
 	    UT_free(header);
 
-	    cnt = rx_walk_tree(act_runtime[i]->top_ptr, ac_rxwalkhook_print,
-			       RX_WALK_SKPGLU,  /* print no glue nodes */
-			       255, 0, 0, output, &err);
+	    cnt = rx_walk_tree(act_runtime[i]->top_ptr, ac_rxwalkhook_print, RX_WALK_SKPGLU, 255, 0, 0, output, &err);
 	  }
 	}
 
@@ -1732,9 +1729,7 @@ unsigned AC_print_acl(GString *output)
 	    g_string_append(output, header);
 	    UT_free(header);
 
-	    cnt = rx_walk_tree(act_acl[i]->top_ptr, ac_rxwalkhook_print_acl,
-			       RX_WALK_SKPGLU,  /* print no glue nodes */
-			       255, 0, 0, output, &err);
+	    cnt = rx_walk_tree(act_acl[i]->top_ptr, ac_rxwalkhook_print_acl, RX_WALK_SKPGLU, 255, 0, 0, output, &err);
 	  }
 	}
 
