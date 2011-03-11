@@ -305,7 +305,7 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
 
             if (stack[sps].cpy.prefix.bits > prefix->bits) { /* too deep*/
                 reason = "too deep";
-            } else if (0 != IP_addr_cmp(&stack[sps].cpy.prefix.ip, &prefix->ip, stack[sps].cpy.prefix.bits)) { /* mismatch */
+            } else if (IP_addr_cmp(&stack[sps].cpy.prefix.ip, &prefix->ip, stack[sps].cpy.prefix.bits)) { /* mismatch */
                 reason = "mismatch";
             } else if (search_mode != RX_SRCH_RANG && stack[sps].cpy.glue) { /* is glue*/
                 reason = "glue";
@@ -408,21 +408,15 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
         /* The difference is in calling another hook function*/
         hook_function = (search_mode == RX_SRCH_MORE) ? rx_walk_hook_addnode : rx_walk_hook_adddoubles;
 
-        /* the result of a more spec search should NOT contain the object exactly*/
-        /* matching the query, even if it exists in the database. So two walks are */
-        /* performed, one for each child (if it exists). */
-        /* MEMORY IMPLEMENTATION ONLY FOR THE MOMENT*/
+        /* the result of a more spec search should NOT contain the object exactly. this is filtered at a later stage. */
 
-        /* start from the top node if the searched prefix is between the
-         top node and the first node on the stack (i.e. the first node is
-         contained within the search term) */
+        /* algorithm: take the first element on stack - that is the smallest encompassing parent. From there,
+         * walk the tree (depth limited in par_a), gather everything, and pass it back. Caller should filter the results
+         * and remove everything that didn't pass the originally queries range */
 
-        /* COVERS THE CASE 0.0.0.0/0 */
-        /* or any other prefix that the tree might be set to represent,*/
-        /* but there is no actual object for it (not even glue)*/
-
-        if (sps < 0) { /* if nothing on stack */
-            if (tree->num_nodes > 0  && !IP_addr_cmp(&prefix->ip, &stack[0].cpy.prefix.ip, prefix->bits)) { /* addr match */
+        if (sps < 0) {
+            /* nothing on stack - just walk from the root node, then */
+            if (tree->num_nodes > 0) {
                 rx_walk_tree(tree->top_ptr, hook_function, RX_WALK_SKPGLU, par_a, 0, 0, &datstr, &err);
                 if (err != RX_OK) {
                     return err;
@@ -435,6 +429,7 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
                 if (err != RX_OK) {
                     return err;
                 }
+            }
         }
         break;
 
@@ -600,4 +595,5 @@ int RX_bin_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t * tree
 
     return RX_OK;
 }
+
 
