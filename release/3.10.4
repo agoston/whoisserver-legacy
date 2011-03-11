@@ -1,0 +1,24 @@
+20100311 - version 3.10.4
+
+
+Changes:
+- added source alias 'GRS' that maps to all '*-GRS' sources
+- added alias for source '*' to map to '*-GRS' for backwards compatibility
+- removed accounting and filtering for GRS sources
+- bugfix: '-K' flag printing prefix length instead of origin for route6 objects
+- bugfix: increased RPSL_STD_COLUMNS to 17 to accommodate lengthy attribute name 'assignment-size: '
+- bugfix: fixed '-m' flag not returning 1st level more specific objects in some cases
+- bugfix: fixed '-m' flag returning 2 levels instead of one in some cases
+- lots of minor cleanups and fixes
+
+
+
+Merged:
+- bugfix_2011-05
+- grs-revamp
+
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG
