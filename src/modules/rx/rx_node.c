@@ -580,7 +580,7 @@ int RX_rt_node(rx_oper_mt mode, ip_prefix_t *newpref, rx_tree_t *tree, rx_datale
   rx_dataleaf_t *leafptr    dataleaf to attach at the node
 */
 int RX_in_node(rx_oper_mt mode, ip_range_t *rang, rx_tree_t *tree, rx_dataleaf_t *leafptr) {
-    unsigned i, prefcount;
+    unsigned prefcount;
     GList *preflist = NULL, *p;
     char buf[IP_RANGSTR_MAX];
 
