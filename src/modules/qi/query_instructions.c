@@ -566,7 +566,7 @@ char *QI_fast_output(const char *str) {
     result = UT_strdup(result_buff->str);
     dieif(result == NULL);
 
-    g_string_free(result_buff, /* CONSTCOND */TRUE);
+    g_string_free(result_buff, TRUE);
 
     return result;
 }
