@@ -132,7 +132,7 @@ int counter_add(svr_counter_t *cst, int incval) {
  marek
  ++++++++++++++++++++++++++++++++++++++*/
 static int counter_wait(svr_counter_t *cst, int limit) {
-    int newval;
+    int newval = 0;
 
     if (limit != 0) {
         pthread_mutex_lock(&(cst->lock));
@@ -157,7 +157,7 @@ static void radix_init(void) {
 	int i;
 	ca_dbSource_t *source_hdl;
 
-	for (i=0; (source_hdl = ca_get_SourceHandleByPosition(i))!=NULL; i++) {
+	for (i=0; (source_hdl = ca_get_SourceHandleByPosition(i)); i++) {
 		dieif(RP_init_trees(source_hdl) != RP_OK);
 	}
 }
@@ -173,7 +173,7 @@ static void radix_load(void) {
 	int i;
 	ca_dbSource_t *source_hdl;
 
-	for (i=0; CO_get_do_server() && (source_hdl = ca_get_SourceHandleByPosition(i))!=NULL; i++) {
+	for (i=0; (source_hdl = ca_get_SourceHandleByPosition(i)); i++) {
 		RP_sql_load_reg(source_hdl);
 	}
 	RP_sql_load_start();
@@ -720,7 +720,7 @@ int SV_start(char *pidfile) {
 	 Don't allow any connections until this is done - there is no use of it
 	 as the radix trees are locked and no queries nor updates can succeed,
 	 just end up in a connection timeout */
-	fprintf(stderr, "Loading the radix trees...");
+    fprintf(stderr, "Loading the radix trees...");
 	radix_init();
 	radix_load();
 	fprintf(stderr, " done.\n");

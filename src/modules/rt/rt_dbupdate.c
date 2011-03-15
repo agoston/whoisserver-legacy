@@ -90,10 +90,10 @@ void rt_blob(ep_authenticated_data_t* data, gpointer user_data) {
   EP_input_structure_t* input - The input structure.
   +*/
 gchar* RT_EP_analyse(RT_context_t* ctx, ep_input_structure_t* input) {
-  xmlNodePtr node;
-  xmlNodePtr child_node;
-  xmlNodePtr cred_node_pgp;
-  xmlNodePtr cred_node_x509;
+  xmlNodePtr node = NULL;
+  xmlNodePtr child_node = NULL;
+  xmlNodePtr cred_node_pgp = NULL;
+  xmlNodePtr cred_node_x509 = NULL;
   xmlNodePtr gen_node;
   analiser_struct as;
   GList* creds;

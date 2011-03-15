@@ -39,6 +39,9 @@ GList *rx_forest;           /* linked list of trees */
 
 void RP_init(LG_context_t *ctx) {
     rp_context = ctx;
+
+    /* init RX forest */
+    rx_forest = NULL;
 }
 
 /*++++++++++++++
@@ -58,18 +61,23 @@ int RP_tree_get(rx_tree_t **treeptr, rp_regid_t reg_id, ip_space_t spc_id, rp_at
     GList *elem;
     rp_tentry_t *trdef;
 
-    /* lock the forest */
+//    fprintf(stderr, " >>> Looking for %s, %d, %d...\n", reg_id->name, spc_id, attr);
     elem = g_list_first(rx_forest);
 
     while (elem != NULL) {
         trdef = elem->data;
+//        fprintf(stderr, " >>> found for %s, %d, %d...", trdef->reg_id->name, trdef->tree->space, trdef->attr);
 
         if (trdef->reg_id == reg_id && trdef->attr == attr && trdef->tree->space == spc_id) {
+//            fprintf(stderr, " !!!MATCH!!!\n");
             *treeptr = trdef->tree;
             return RP_OK;
         }
+//        fprintf(stderr, " nope\n");
         elem = g_list_next(elem);
     }
+
+//    fprintf(stderr, " >>> NOT FOUND: %s, %d, %d...\n", reg_id->name, spc_id, attr);
 
     *treeptr = NULL; /* set when NOT FOUND*/
     return RP_NOTREE;
@@ -115,9 +123,9 @@ int RP_tree_add(rp_regid_t reg_id, rp_attr_t attr, char *prefixstr, rx_mem_mt me
 
         treedef = (rp_tentry_t *) UT_malloc(sizeof(rp_tentry_t));
 
-        treedef -> reg_id = reg_id;
-        treedef -> attr = attr;
-        treedef -> tree = mytree;
+        treedef->reg_id = reg_id;
+        treedef->attr = attr;
+        treedef->tree = mytree;
 
         rx_forest = g_list_append(rx_forest, treedef);
     }
@@ -167,9 +175,6 @@ int rp_init_attr_tree(rp_regid_t reg_id, rp_attr_t attr) {
 
 int RP_init_trees(rp_regid_t reg_id) {
     int err;
-
-    /* init RX forest */
-    rx_forest = NULL;
 
     if (NOERR(err = rp_init_attr_tree(reg_id, A_IN)) &&
         NOERR(err = rp_init_attr_tree(reg_id, A_RT)) &&

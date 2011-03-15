@@ -44,7 +44,7 @@ extern LG_context_t *rp_context;
  */
 int RP_uni_node_l(rx_oper_mt mode, rp_uni_t *uni, rx_tree_t *mytree, void *data, unsigned datalen, sql_key_t key) {
     rx_dataleaf_t *leafptr = calloc(sizeof(rx_dataleaf_t), 1);
-    int err;
+    int err = RP_OK;
 
     leafptr->data_key = key; /* also for deletion - it is used for finding the right dataleaf in the tree */
 
