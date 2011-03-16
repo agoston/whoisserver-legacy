@@ -123,70 +123,75 @@ static void sv_init_modules(void) {
     UD_init(sv_prepare_context(ca_get_ripupdlog, "UD"));
 }
 
-int main(int argc, char **argv)
-{
-	extern char *optarg;
-	char *prop_file_name;
-	char *pid_file_name;
-	char *result;
-	int c, ret, errflg = 0;
-	LG_context_t *boot_ctx;
+int main(int argc, char **argv) {
+    extern char *optarg;
+    char *prop_file_name;
+    char *pid_file_name;
+    char *result;
+    int c, ret, errflg = 0;
+    LG_context_t *boot_ctx;
 
-	/* Initialize GLib library to be thread-safe */
-	g_thread_init(NULL);
+    /* Initialize GLib library to be thread-safe */
+    g_thread_init(NULL);
 
-	/* parse command line options */
-	prop_file_name = NULL;
-	pid_file_name = NULL;
-	if (argc < 5)
-		errflg++;
+#ifdef DEBUG_MEMLEAK
+    prop_file_name = strdup("conf/rip.config");
+    pid_file_name = strdup("pid");
+#else
+    /* parse command line options */
+    prop_file_name = NULL;
+    pid_file_name = NULL;
+    if (argc < 5)
+        errflg++;
 
-	while ((c = getopt(argc, argv, "c:p:?")) != EOF)
-		switch (c) {
-		case 'c':
-			prop_file_name = g_strdup(optarg);
-			break;
-		case 'p':
-			pid_file_name = g_strdup(optarg);
-			break;
-		case '?':
-		default:
-			errflg++;
-		}
-	if (errflg || (prop_file_name == NULL) || (pid_file_name == NULL)) {
-		fprintf(stderr, "usage: %s -c config -p pid_file\n", argv[0]);
-		exit(2);
-	}
+    while ((c = getopt(argc, argv, "c:p:?")) != EOF) {
+        switch (c) {
+        case 'c':
+            prop_file_name = g_strdup(optarg);
+            break;
+        case 'p':
+            pid_file_name = g_strdup(optarg);
+            break;
+        case '?':
+        default:
+            errflg++;
+        }
 
-	install_signal_handler();
+        if (errflg || (prop_file_name == NULL) || (pid_file_name == NULL)) {
+            fprintf(stderr, "usage: %s -c config -p pid_file\n", argv[0]);
+            exit(2);
+        }
+    }
+#endif
 
-	/* Create signal handling thread and block signals for others */
-	/*   printf("Starting the signal handler\n"); */
-	TH_create((void *(*)(void *))SV_signal_thread, NULL, TRUE);
+    install_signal_handler();
 
-	/*  Set the constants. */
-	/* fprintf(stderr,"Constants:\n");  */
-	result = CO_set();
-	UT_free(result);
-	fprintf(stderr, "Configuration [%s]:\n", prop_file_name);
-	boot_ctx = LG_ctx_new();	//this is leaking, not serious
-	LG_ctx_add_appender(boot_ctx, LG_app_get_file_info_dump(stderr));
-	UT_init(boot_ctx);
-	ca_init(prop_file_name);
-	g_free(prop_file_name);
+    /* Create signal handling thread and block signals for others */
+    /*   printf("Starting the signal handler\n"); */
+    TH_create((void *(*)(void *)) SV_signal_thread, NULL, TRUE);
+
+    /*  Set the constants. */
+    /* fprintf(stderr,"Constants:\n");  */
+    result = CO_set();
+    UT_free(result);
+    fprintf(stderr, "Configuration [%s]:\n", prop_file_name);
+    boot_ctx = LG_ctx_new(); //this is leaking, not serious
+    LG_ctx_add_appender(boot_ctx, LG_app_get_file_info_dump(stderr));
+    UT_init(boot_ctx);
+    ca_init(prop_file_name);
+    g_free(prop_file_name);
 
     /* get command on die value as early as possible, and cache it in a variable so there are no external dependencies when die()ing */
     SV_command_on_die = ca_get_command_on_die;
 
     sv_init_modules();
 
-	/*  Start the server */
-	ret = SV_start(pid_file_name);
+    /*  Start the server */
+    ret = SV_start(pid_file_name);
 
-	if (ret != 0)
-		return (1);
-	else
-		return (0);
+    if (ret != 0)
+        return (1);
+    else
+        return (0);
 
-}								/* main() */
-
+}
