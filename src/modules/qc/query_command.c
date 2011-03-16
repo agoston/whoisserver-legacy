@@ -496,8 +496,8 @@ static int QC_fill(const char *query_str, Query_command *query_command, Query_en
                             sources_specified_r = g_list_prepend(sources_specified_r, hdl);
                         }
                     }
-                    g_strfreev(sources);
                 }
+                g_strfreev(sources);
                 break;
             }
 
