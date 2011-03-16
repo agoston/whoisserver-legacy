@@ -156,11 +156,11 @@ int main(int argc, char **argv) {
         default:
             errflg++;
         }
+    }
 
-        if (errflg || (prop_file_name == NULL) || (pid_file_name == NULL)) {
-            fprintf(stderr, "usage: %s -c config -p pid_file\n", argv[0]);
-            exit(2);
-        }
+    if (errflg || (prop_file_name == NULL) || (pid_file_name == NULL)) {
+        fprintf(stderr, "usage: %s -c config -p pid_file\n", argv[0]);
+        exit(2);
     }
 #endif
 
