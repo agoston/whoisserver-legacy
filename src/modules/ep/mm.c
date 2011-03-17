@@ -57,9 +57,9 @@ MM_mail_info_t *MM_extract_mail_info(const gchar *stream) {
     mail_stream = NIL;
 
     tmp_file_prefix = strdup("MM_extract_mail_info_temp_file");
-    tmp_file_name_len = strlen(ep_temporary_directory) + strlen(tmp_file_prefix) + 8;
+    tmp_file_name_len = strlen(ep_temporary_directory) + strlen(tmp_file_prefix) + 256;
     tmp_file_name = (char *) malloc(tmp_file_name_len);
-    g_snprintf(tmp_file_name, tmp_file_name_len, "%s/%s.%d", ep_temporary_directory, tmp_file_prefix, (int) getpid());
+    g_snprintf(tmp_file_name, tmp_file_name_len, "%s/%s.%d.%d", ep_temporary_directory, tmp_file_prefix, time(NULL), (int) getpid());
 
     LG_log(ep_ctx, LG_DEBUG, "MM_extract_mail_info: using temporary file name: %s", tmp_file_name);
     tmp_file_handle = open(tmp_file_name, O_CREAT | O_EXCL | O_RDWR, 0644);
@@ -149,10 +149,15 @@ MM_mail_info_t *MM_extract_mail_info(const gchar *stream) {
     LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: Exploding MIME(MM)");
     ret->content = mm_explode_mime(body, contents);
 
+    /* for some reason, mail_close() call causes a segfault. Since dbupdate is restarted for every update message,
+     * it is acceptable to not free memory allocated by c_client. We also don't plan on keeping MM module in place
+     * much longer, so it is not worth the fuss - agoston, 2011-03-17
+
     LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: closing mail stream");
     mail_close(mail_stream);
-
     LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: mail stream closed");
+    */
+
     if (from) {
         g_free(from);
     }

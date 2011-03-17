@@ -1561,9 +1561,9 @@ int AC_acc_load(void)
 		}
 
 		TH_release_write_lock(&(act_acl[i]->rwlock));
+	    SQ_free_result(rs);
 	}
 
-	SQ_free_result(rs);
 	/* Close connection */
 	SQ_close_connection(con);
 
