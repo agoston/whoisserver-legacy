@@ -149,10 +149,15 @@ MM_mail_info_t *MM_extract_mail_info(const gchar *stream) {
     LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: Exploding MIME(MM)");
     ret->content = mm_explode_mime(body, contents);
 
+    /* for some reason, mail_close() call causes a segfault. Since dbupdate is restarted for every update message,
+     * it is acceptable to not free memory allocated by c_client. We also don't plan on keeping MM module in place
+     * much longer, so it is not worth the fuss - agoston, 2011-03-17
+
     LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: closing mail stream");
     mail_close(mail_stream);
-
     LG_log(mm_ctx, LG_DEBUG, "MM_extract_mail_info: mail stream closed");
+    */
+
     if (from) {
         g_free(from);
     }
