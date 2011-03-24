@@ -1812,7 +1812,7 @@ static int qi_collect_ids(SQ_connection_t **sql_connection, Query_instructions *
             if (NOERR(err)) {
 #ifdef DEBUG_QUERY
                 fprintf(stderr, "%d entries after %s (mode %d par %d reg %s) query for %s:\n", g_list_length(*datlist), Query[qi->queryindex].descr,
-                        qi->rx_srch_mode, qi->rx_par_a, dbhdl->name, qi->rx_keys);
+                        qi->rx_srch_mode, qi->rx_par_a, qis->source->name, qi->rx_keys);
                 GList *pp = *datlist;
                 for (; pp; pp = pp->next) {
                     fprintf(stderr, "%s", (char *)(((rx_datcpy_t *)(pp->data))->leafcpy.data_ptr));
