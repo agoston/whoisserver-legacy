@@ -37,8 +37,8 @@
 /* logging */
 extern LG_context_t *rp_context;
 
-static
-void rp_exclude_datlink(GList **datlist, GList *element) {
+/* Warning: if called, it changes *element, so you CAN'T and MUSTN'T use g_list_next() on *element after calling this! */
+static void rp_exclude_datlink(GList **datlist, GList *element) {
     /* remove element from list(becomes a self-consistent list) */
     *datlist = g_list_remove_link(*datlist, element);
 
@@ -129,15 +129,23 @@ int rp_leaf_occ_inc(GHashTable *hash, rx_dataleaf_t *leafptr) {
 
 /* exclude exact match - not to be merged with preselction :-( */
 static void rp_exclude_exact_match(GList **datlist, ip_range_t *testrang) {
-    GList *ditem;
+    GList *ditem, *newitem;
 
-    for (ditem = g_list_first(*datlist); ditem != NULL; ditem = g_list_next(ditem)) {
+    ditem = g_list_first(*datlist);
+
+    while (ditem != NULL) {
         rx_datref_t *refptr = (rx_datref_t *) (ditem->data);
+        newitem = g_list_next(ditem);
 
         if (memcmp(&refptr->leafptr->iprange, testrang, sizeof(ip_range_t)) == 0) {
+#ifdef DEBUG_RADIX
+            char DEBUGbuf[256];
+            IP_rang_b2a(testrang, DEBUGbuf, 256);
+            fprintf(stderr, "rp_exclude_exact_match(): found matching range %s; removing\n", DEBUGbuf);
+#endif
             rp_exclude_datlink(datlist, ditem);
-//            LG_log(rp_context, LG_DEBUG, "process_datlist: discarded an exact match");
         }
+        ditem = newitem;
     }
 }
 
