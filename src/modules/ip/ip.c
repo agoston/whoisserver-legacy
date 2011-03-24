@@ -1501,7 +1501,7 @@ int IP_pref_2_rang(ip_range_t * rangptr, ip_prefix_t * prefptr) {
     int shift;
     int i;
 
-    ad(begin) = ad(end) = prefptr->ip;
+    rangptr->begin = rangptr->end = prefptr->ip;
 
     /* IPv6 is a bit more complicated, as four words are involved */
     /* additional problem: shifting right by >=32 is equal to shifting by 0,
@@ -1512,7 +1512,7 @@ int IP_pref_2_rang(ip_range_t * rangptr, ip_prefix_t * prefptr) {
 
         if (prefptr->bits < 32 * (1 + i)) {
             shift = prefptr->bits <= i * 32 ? 0 : (prefptr->bits % 32);
-            ad(end).words[i] |= (0xffffffffU >> shift);
+            rangptr->end.words[i] |= (0xffffffffU >> shift);
         }
 
         if (prefptr->ip.space == IP_V4) {
