@@ -303,21 +303,17 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
         while (sps >= 0) {
             char *reason = NULL;
 
-            if (stack[sps].cpy.prefix.bits > prefix->bits) { /* too deep*/
+            if (stack[sps].cpy.prefix.bits > prefix->bits) {
                 reason = "too deep";
-            } else if (IP_addr_cmp(&stack[sps].cpy.prefix.ip, &prefix->ip, stack[sps].cpy.prefix.bits)) { /* mismatch */
+            } else if (IP_addr_cmp(&stack[sps].cpy.prefix.ip, &prefix->ip, stack[sps].cpy.prefix.bits)) {
                 reason = "mismatch";
-            } else if (search_mode != RX_SRCH_RANG && stack[sps].cpy.glue) { /* is glue*/
+            } else if (search_mode == RX_SRCH_MORE || search_mode == RX_SRCH_DBLS) {
+                break;
+            } else if (search_mode != RX_SRCH_RANG && stack[sps].cpy.glue) {
                 reason = "glue";
             } else {
                 break;
             }
-
-//            /* mhm. it can't be limited here, must be done in RP */
-//            else if ( search_mode == RX_SRCH_LESS && par_a == 1
-//                    && stack[sps].cpy.prefix.bits == prefix->bits ) { /* too deep*/
-//                reason = "2deep4less";
-//            }
 
 #ifdef DEBUG_RADIX
             rx_nod_print(&stack[sps].cpy, buf, IP_PREFSTR_MAX);
@@ -328,11 +324,8 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
         }
     }
 
-    /* nothing left on the stack. Sorry.*/
-    /* we allow that for more spec search -- this means*/
-    /* that the search term is a shorter prefix than the one*/
-    /* in the top node. Possibly it's 0/0 which is valid for more spec search.*/
-
+    /* we allow that for more spec search -- this means that the search term is a shorter prefix than the one
+     * in the top node. Possibly it's 0/0 which is valid for more spec search.*/
     if (search_mode != RX_SRCH_MORE && search_mode != RX_SRCH_DBLS && sps < 0) {
         return RX_OK;
     }
@@ -514,7 +507,7 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
  GList ** datleaves          data leaves go here
  +++++++++++++++*/
 
-int RX_bin_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t * tree, ip_prefix_t * prefix, GList ** datleaves, int max_count) {
+int RX_bin_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree, ip_prefix_t *prefix, GList **datleaves, int max_count) {
     rx_nodcpy_t stack[128];
     rx_dataleaf_t *leafptr;
     int stkcnt, resnum = 0;

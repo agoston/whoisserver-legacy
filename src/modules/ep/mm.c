@@ -59,7 +59,7 @@ MM_mail_info_t *MM_extract_mail_info(const gchar *stream) {
     tmp_file_prefix = strdup("MM_extract_mail_info_temp_file");
     tmp_file_name_len = strlen(ep_temporary_directory) + strlen(tmp_file_prefix) + 256;
     tmp_file_name = (char *) malloc(tmp_file_name_len);
-    g_snprintf(tmp_file_name, tmp_file_name_len, "%s/%s.%d.%d", ep_temporary_directory, tmp_file_prefix, time(NULL), (int) getpid());
+    g_snprintf(tmp_file_name, tmp_file_name_len, "%s/%s.%ld.%d", ep_temporary_directory, tmp_file_prefix, time(NULL), (int) getpid());
 
     LG_log(ep_ctx, LG_DEBUG, "MM_extract_mail_info: using temporary file name: %s", tmp_file_name);
     tmp_file_handle = open(tmp_file_name, O_CREAT | O_EXCL | O_RDWR, 0644);

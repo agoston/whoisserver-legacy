@@ -731,7 +731,7 @@ static int QC_fill(const char *query_str, Query_command *query_command, Query_en
         badparerr++;
     }
 
-    if ((query_command->b == 1) && (query_command->G == 0)) {
+    if ((query_command->b == 1) && (query_command->G == FALSE)) {
         /* -G -b is error, we need grouping */
         /* ERROR:109 */
         char *fmt = ca_get_qc_fmt_uncompflag;

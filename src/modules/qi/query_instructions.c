@@ -1295,7 +1295,6 @@ static int insert_radix_serials(sk_conn_st *condat, SQ_connection_t *sql_connect
     GString *sql_command = g_string_sized_new(STR_S);
     int object_id;
     int sql_error;
-    int radix_id = -1;
 
     sql_error = 0;
     for (qitem = g_list_first(datlist); qitem; qitem = g_list_next(qitem)) {
@@ -1306,7 +1305,7 @@ static int insert_radix_serials(sk_conn_st *condat, SQ_connection_t *sql_connect
         /* don't bother to insert values into our temporary table */
         /* if we've lost the client connection */
         if ((condat->rtc == 0) && !sql_error) {
-            g_string_sprintf(sql_command, "INSERT INTO %s values (%d, %d, %d)", id_table, object_id, object_id, radix_id--);
+            g_string_sprintf(sql_command, "INSERT INTO %s values (%d, 0)", id_table, object_id);
             if (SQ_execute_query(sql_connection, sql_command->str, NULL) == -1) {
                 /* it seems to be a design decision to gracefully fail here - for performance and sanity reasons,
                  * there should never be two query instructions returning the same object_id twice
