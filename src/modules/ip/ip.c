@@ -1463,8 +1463,7 @@ void IP_rang_encomp(ip_range_t *rangptr) {
             /* find the smallest block ENCOMPASSING c_dif. */
             /* this implies a loop from the bottom up */
 
-            for (slash=32; slash>1 && (blk=((unsigned)0x80000000>>(slash-1))) < c_dif; slash--) {
-            }
+            for (slash=32; slash>1 && (blk=((unsigned)0x80000000>>(slash-1))) < c_dif; slash--);
 
             ff=blk-1;
 
@@ -1603,7 +1602,7 @@ It is the responsibility of the caller to free preflist (unless justcheck is set
 int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp_t expf, ip_keytype_t *keytype) {
     int free_it = justcheck;
     int err = IP_OK;
-    ip_prefix_t *querypref = (ip_prefix_t *)UT_malloc(sizeof(ip_prefix_t));;
+    ip_prefix_t *querypref = (ip_prefix_t *)UT_malloc(sizeof(ip_prefix_t));
 
     /*XXX inconsistent prefix/length is excused. Later we will warn people */
     /* check for prefix */

@@ -43,21 +43,79 @@
 /*   As of 2002-03-04 the most names in a person object are 14 */
 #define MAX_NAMES 30
 
-/* the TEMPORARY table is only available in 3.23 or later MySQL */
-#if MYSQL_VERSION_ID >= 32300
-#define USE_TEMPORARY_TABLE
-#endif
-
-/* string to stick in CREATE TABLE statments */
-#ifdef USE_TEMPORARY_TABLE
-#define TEMPORARY "TEMPORARY"
-#else
-#define TEMPORARY ""
-#endif
-
 /* logging contexts */
 static LG_context_t *qi_context;
 static LG_context_t *sql_context;
+
+/*
+--- snipped from http://www.tcx.se/Manual/manual.html ---
+
+5.3 Functionality missing from MySQL
+
+The following functionality is missing in the current version of MySQL. For a prioritized list indicating when new extensions may be added to MySQL, you should consult the
+online MySQL TODO list. That is the latest version of the TODO list in this manual. See section F List of things we want to add to MySQL in the future (The TODO).
+
+5.3.1 Sub-selects
+
+The following will not yet work in MySQL:
+
+SELECT * FROM table1 WHERE id IN (SELECT id FROM table2);
+SELECT * FROM table1 WHERE id NOT IN (SELECT id FROM table2);
+
+However, in many cases you can rewrite the query without a sub select:
+
+SELECT table1.* FROM table1,table2 WHERE table1.id=table2.id;
+SELECT table1.* FROM table1 LEFT JOIN table2 ON table1.id=table2.id where table2.id IS NULL
+
+For more complicated sub queries you can create temporary tables to hold the sub query.
+
+MySQL only supports INSERT ... SELECT ... and REPLACE ... SELECT ... Independent sub-selects will be probably be available in 3.24.0. You can now use the function IN() in other
+contexts, however.
+
+--- end snip ---
+
+Ie. Try using a LEFT JOIN to do the "NOT IN"/ "MINUS" equivalent.
+*/
+
+/*
+  mysql optimizer is sometimes sub-optimal,
+  therefore we force the join order with STRAIGHT_JOIN (MB, 2000/05/02)
+*/
+
+/* RIPE 6 */
+/*#define Q_OBJECTS     "SELECT last.object_id, last.sequence_id, last.object ,last.object_type FROM  %s IDS STRAIGHT_JOIN last,object_order WHERE last.object_id=IDS.id AND last.object_type != 100 AND last.object_type = object_order.object_type ORDER BY recursive, order_code"
+ */
+
+const char *Q_OBJECTS = "SELECT STRAIGHT_JOIN last.object_id, last.sequence_id, last.object, last.object_type, last.pkey, recursive, gid "
+                        "FROM %s IDS, last, last glast, object_order, object_order gorder "
+                        "WHERE (IDS.gid=glast.object_id AND glast.object_type=gorder.object_type) AND "
+                        "(IDS.id=last.object_id AND last.object_type=object_order.object_type) "
+                        "ORDER BY %s recursive, object_order.order_code";
+
+/* rewritten for JOIN syntax by agoston, 2011-03-30
+
+SELECT last.object_id, last.sequence_id, last.object, last.object_type, last.pkey, recursive, gid
+FROM %s IDS
+JOIN last glast ON IDS.gid = glast.object_id
+JOIN object_order gorder ON glast.object_type = gorder.object_type
+JOIN last ON IDS.id = last.object_id
+JOIN object_order ON last.object_type = object_order.object_type
+ORDER BY %s recursive, object_order.order_code
+
+*/
+
+const char *Q_ALTER_TMP = "ALTER TABLE %s ADD COLUMN gid INT NOT NULL DEFAULT 0";
+const char *Q_ALTER_TMP_GROUPED = "ALTER TABLE %s ADD COLUMN gid INT NOT NULL DEFAULT 0, DROP PRIMARY KEY, ADD PRIMARY KEY (id, gid)";
+const char *Q_UPD_TMP = "UPDATE %s SET gid=id";
+
+const char *LIST_HAS_ATTR = "SELECT DISTINCT gid FROM %s IDS,%s REF WHERE IDS.id=REF.object_id";
+
+/* Query for finding person/role objects recursively (when -r  isn't specified) */
+#define Q_REC "INSERT IGNORE INTO %s SELECT pe_ro_id,1,object_id FROM %s IDS, %s WHERE object_id = IDS.id"
+/* Query for finding organisation objects recursively (when -r isn't specified) */
+#define Q_REC_ORG "INSERT IGNORE INTO %s SELECT org_id,1,object_id FROM %s IDS, %s WHERE object_id = IDS.id"
+/* Query for finding irt objects recursively (when -c (or -b) is specified) */
+#define Q_REC_IRT "INSERT IGNORE INTO %s SELECT irt_id,1,%s FROM %s WHERE object_id = %d"
 
 Ref_queries ref_queries[] = { { Q_REC, "author" }, { Q_REC, "admin_c" }, { Q_REC, "tech_c" }, { Q_REC, "zone_c" }, { Q_REC_ORG, "org" }, { "", "" } };
 
@@ -1247,7 +1305,7 @@ static int insert_radix_serials(sk_conn_st *condat, SQ_connection_t *sql_connect
         /* don't bother to insert values into our temporary table */
         /* if we've lost the client connection */
         if ((condat->rtc == 0) && !sql_error) {
-            g_string_sprintf(sql_command, "INSERT INTO %s values (%d,0)", id_table, object_id);
+            g_string_sprintf(sql_command, "INSERT INTO %s values (%d, 0)", id_table, object_id);
             if (SQ_execute_query(sql_connection, sql_command->str, NULL) == -1) {
                 /* it seems to be a design decision to gracefully fail here - for performance and sanity reasons,
                  * there should never be two query instructions returning the same object_id twice
@@ -1753,7 +1811,7 @@ static int qi_collect_ids(SQ_connection_t **sql_connection, Query_instructions *
     }
 
     /* create a table for special subqueries (domain only for now) */
-    g_string_sprintf(sql_command, "CREATE " TEMPORARY " TABLE %s ( id int ) TYPE=HEAP", sub_table);
+    g_string_sprintf(sql_command, "CREATE TEMPORARY TABLE %s ( id int ) TYPE=HEAP", sub_table);
     if (SQ_execute_query(*sql_connection, sql_command->str, NULL) == -1) {
         report_sql_error(condat, *sql_connection, sql_command->str);
         return SQ_errno(*sql_connection);
@@ -1797,7 +1855,7 @@ static int qi_collect_ids(SQ_connection_t **sql_connection, Query_instructions *
                 } /* not DN */
             } /* if SQL query not NULL */
 
-            LG_log(qi_context, LG_DEBUG, "%d entries added in %s query for %s", count, Query[qi->queryindex].descr, qis->qc->keys);
+//            LG_log(qi_context, LG_DEBUG, "%d entries added in %s query for %s", count, Query[qi->queryindex].descr, qis->qc->keys);
             break;
 
         case R_RADIX:
@@ -1944,9 +2002,7 @@ static int qi_fetch_references(SQ_connection_t **sql_connection, Query_environ *
      a query using the same table as a source and target is illegal
      ( like: INSERT into ID_123 SELECT * FROM ID_123,admin_c WHERE ... )
      */
-    sprintf(sql_command,
-            "CREATE " TEMPORARY " TABLE %s ( id int NOT NULL, recursive BOOL DEFAULT 1, gid INT NOT NULL DEFAULT 0, PRIMARY KEY (id, gid)) TYPE=HEAP",
-            rec_table);
+    sprintf(sql_command, "CREATE TEMPORARY TABLE %s ( id int NOT NULL, recursive BOOL DEFAULT 1, gid INT NOT NULL DEFAULT 0, PRIMARY KEY (id, gid)) TYPE=HEAP", rec_table);
     if (SQ_execute_query(*sql_connection, sql_command, NULL) == -1) {
         report_sql_error(&qe->condat, *sql_connection, sql_command);
         return SQ_errno(*sql_connection);
@@ -2024,9 +2080,7 @@ int QI_execute(Query_instructions *qis) {
 
     /* create a table for id's of all objects found NOT NULL , UNIQUE(id) */
     if (!sql_error) {
-        sprintf(sql_command,
-                "CREATE " TEMPORARY
-                " TABLE %s ( id INT PRIMARY KEY NOT NULL, recursive BOOL DEFAULT 0 ) TYPE=HEAP", id_table);
+        sprintf(sql_command, "CREATE TEMPORARY TABLE %s ( id INT PRIMARY KEY NOT NULL, recursive BOOL DEFAULT 0 ) TYPE=HEAP", id_table);
         if (SQ_execute_query(sql_connection, sql_command, NULL) == -1) {
             sql_error = SQ_errno(sql_connection);
             report_sql_error(condat, sql_connection, sql_command);
@@ -2040,13 +2094,8 @@ int QI_execute(Query_instructions *qis) {
 
     /* post-processing */
     if (!sql_error && !qis->qc->filtered) {
-        /* start the watchdog just to set the rtc flag */
-//        SK_watch_setclear(&(qe->condat));
-//        SK_watchstart(&(qe->condat));
-
         /* add radix results (only if -K is not active and still connected) */
         if (!condat->rtc) {
-
             /* if -c selected, find the referencing inet(6)num and remove
              all the less specific inet(6)num object_ids from the list */
             if (qis->qc->c) {
@@ -2066,32 +2115,11 @@ int QI_execute(Query_instructions *qis) {
             /* add radix results to the table and destroy the datlist */
             sql_error = insert_radix_serials(condat, sql_connection, id_table, datlist);
         }
-
-//        SK_watchstop(&(qe->condat));
     }
-
-#ifdef DEBUG_QUERY
-    {
-        SQ_result_set_t *res;
-
-        sprintf(sql_command, "SELECT * from %s", id_table);
-        if (SQ_execute_query(sql_connection, sql_command, &res)) {
-            fprintf(stderr, "ERROR: %s", SQ_error(sql_connection));
-        } else {
-            char *temp = SQ_result_to_string(res);
-            fprintf(stderr, "Contents of table %s:\n%s\n", id_table, temp);
-            free(temp);
-        }
-
-        if (res) {
-            SQ_free_result(res);
-        }
-    }
-#endif
 
     /* change the idtable */
     if (!sql_error) {
-        if (qis->qc->G == TRUE) {
+        if (qis->qc->G) {
             sprintf(sql_command, Q_ALTER_TMP_GROUPED, id_table);
         } else {
             sprintf(sql_command, Q_ALTER_TMP, id_table);
@@ -2109,6 +2137,25 @@ int QI_execute(Query_instructions *qis) {
             }
         }
     }
+
+#ifdef DEBUG_QUERY
+    {
+        SQ_result_set_t *res;
+
+        sprintf(sql_command, "SELECT * from %s", id_table);
+        if (SQ_execute_query(sql_connection, sql_command, &res)) {
+            fprintf(stderr, "ERROR: %s", SQ_error(sql_connection));
+        } else {
+            char *temp = SQ_result_to_string(res);
+            fprintf(stderr, "Before recursive fetch (table %s):\n%s\n", id_table, temp);
+            free(temp);
+        }
+
+        if (res) {
+            SQ_free_result(res);
+        }
+    }
+#endif
 
     /* fetch recursive objects (ac,tc,zc,ah,org,irt(if -c)) */
     if (!sql_error && qis->qc->recursive && (condat->rtc == 0)) {

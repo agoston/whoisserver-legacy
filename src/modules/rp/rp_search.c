@@ -47,38 +47,6 @@ static void rp_exclude_datlink(GList **datlist, GList *element) {
 }
 
 
-/*+++++++++++
- helper:
- this routine goes through the list of prefixes and performs a bin_search
- on each of them; attaches the results to datlist.
- +++++++++++*/
-static
-int rp_preflist_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *mytree, GList **preflist, GList **datlist) {
-    //char prefstr[IP_PREFSTR_MAX];
-    GList *qitem;
-    ip_prefix_t *querypref;
-    int err;
-
-    for (qitem = g_list_first(*preflist); qitem != NULL; qitem = g_list_next(qitem)) {
-
-        querypref = qitem->data;
-
-//        if (IP_pref_b2a(querypref, prefstr, IP_PREFSTR_MAX) != IP_OK) {
-//            die;
-//        }
-//        LG_log(rp_context, LG_DEBUG, "rx_preflist_search: mode %d (%s) (par %d) for %s", search_mode, RX_text_srch_mode(search_mode), par_a, prefstr);
-
-        if (mytree->num_nodes > 0) {
-            err = RX_bin_search(search_mode, par_a, par_b, mytree, querypref, datlist, RX_ANS_ALL);
-            if (err != RX_OK) {
-                return err;
-            }
-        }
-    }
-
-    return RX_OK;
-}
-
 /*++++
  this is a helper: goes through a datlist and returns the smallest
  size of a range
@@ -443,8 +411,8 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
     int hits = 0;
     ip_prefix_t beginpref;
 
-    /* parse the key into a prefix list */
-    if (!NOERR(err = IP_smart_conv(key, 0, 0, &preflist, IP_EXPN, NULL))) {
+    /* parse the key into a prefix list. ranges encompassed into smallest prefix */
+    if (!NOERR(err = IP_smart_conv(key, 0, 1, &preflist, IP_EXPN, NULL))) {
         /* operational trouble (UT_*) or invalid key (IP_INVARG) */
         return err;
     }
@@ -453,15 +421,12 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
     IP_smart_range(key, &testrang, IP_EXPN, NULL);
 
     /* find the tree */
-    /* I took out the surrounding "if" because it is always taken when
-     we get to this point, and it causes compiler warnings otherwise - shane */
-    /*if( NOERR(err) ) { */
-    spc_id = IP_pref_b2_space(g_list_first(preflist)->data);
+    spc_id = IP_pref_b2_space(preflist->data);
     if (!NOERR(err = RP_tree_get(&mytree, reg_id, spc_id, attr))) {
         wr_clear_list(&preflist);
         return err;
     }
-    /*} */
+
     /* the point of no return: now we lock the tree. From here, even if errors
      occur, we still go through all procedure to unlock the tree at the end */
 
@@ -487,19 +452,12 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
             rp_begend_preselection(&datlist, fam_id, &testrang);
         }
 
-    } /* if exless|less|exact */
-    else {
-        /* MORE */
-
-        /* standard collection using the traditional method:
-         repeat the search for all prefixes and join results */
-
+    } else {    /* MORE */
         if (NOERR(err)) {
-            err = rp_preflist_search(search_mode, par_a, par_b, mytree, &preflist, &datlist);
+            /* there is only a single prefix in preflist */
+            err = RX_bin_search(search_mode, par_a, par_b, mytree, preflist->data, &datlist, RX_ANS_ALL);
         }
-    } /* collection */
-
-    LG_log(rp_context, LG_DEBUG, "RP_NEW_asc_search: collected %d references ", g_list_length(datlist));
+    }
 
     /* 5. processing - using the same processing function */
     if (NOERR(err)) {
@@ -513,7 +471,6 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
     }
 
     if (locked) {
-        /* 100. unlock the tree */
         TH_release_read_lockw(&(mytree->rwlock));
     }
 
