@@ -42,7 +42,6 @@
 #include <memwrap.h>
 #include <stdio.h>
 #include <iproutines.h>
-/*#include <erroutines.h>*/
 
 #include "sk.h" /*condat*/
 
@@ -145,11 +144,11 @@ typedef struct {
 				   for determining exact matches (all trees)
 				   and to see if an address is in range
 				   (only IPv4 inetnum trees) +*/
-  unsigned char   preflen;      /* to avoid arithmetics on IPv6 ranges,
-				   we have to store prefix length to
-				   determine the shortest object in search.
-				   This is filled in for all route trees
-				*/
+
+  unsigned char   preflen;      /* cache prefix length to determine the shortest object in search.
+				   This is filled in for all route trees and the inet6num tree */
+
+  unsigned int    rangelen;     /* cache range length for ipv4 addresses, used for inet4num tree */
 
   char            composed;	/*+ non-zero for composed inetnums 
 				  equal to: the number of prefixes composing
