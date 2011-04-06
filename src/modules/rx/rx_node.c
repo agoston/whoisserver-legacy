@@ -72,8 +72,6 @@ static int rx_creat_node(ip_prefix_t *newpref, rx_tree_t *tree, rx_dataleaf_t *d
     tree->num_nodes++;
 
     newnode->prefix = *newpref;
-
-    /* attach the leaf to a (presumably empty?! hence NULL) list...*/
     newnode->leaves_ptr = g_list_prepend(NULL, dataleaf);
 
     /* OK, so take a look at the tree*/
@@ -164,7 +162,7 @@ static int rx_creat_node(ip_prefix_t *newpref, rx_tree_t *tree, rx_dataleaf_t *d
         /* attach here as a child of the node found      */
         link = IP_addr_bit_get(&newpref->ip, dif_bit);
 
-        LG_log(rx_context, LG_DEBUG, "attaching as child %d", link);
+//        LG_log(rx_context, LG_DEBUG, "attaching as child %d", link);
 
         if (memnode -> child_ptr[link] != NULL) {
             die;
@@ -180,7 +178,7 @@ static int rx_creat_node(ip_prefix_t *newpref, rx_tree_t *tree, rx_dataleaf_t *d
 
         link = IP_addr_bit_get(&curnode->prefix.ip, dif_bit);
 
-        LG_log(rx_context, LG_DEBUG, "shifting down as child %d", link);
+//        LG_log(rx_context, LG_DEBUG, "shifting down as child %d", link);
 
         /* PARENT<->NEW LINKS*/
         /* see if the node was the top_node*/
@@ -455,9 +453,9 @@ int rx_bin_node(rx_oper_mt mode, ip_prefix_t *newpref, rx_tree_t *tree, rx_datal
     rx_node_t *curnode;
     rx_nodcpy_t stack[128];
     int err;
-    char bbf[IP_PREFSTR_MAX];
+//    char bbf[IP_PREFSTR_MAX];
 
-    IP_pref_b2a(newpref, bbf, IP_PREFSTR_MAX);
+//    IP_pref_b2a(newpref, bbf, IP_PREFSTR_MAX);
 //    LG_log(rx_context, LG_DEBUG, "rx_bin_node: %s in spc %d /fam %d operation %d", bbf, tree->space, tree->family, mode);
 
     /* first check: are we using the correct tree ???*/

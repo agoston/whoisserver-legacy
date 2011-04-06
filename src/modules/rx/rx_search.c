@@ -59,16 +59,11 @@ extern LG_context_t *rx_context;
 int rx_build_stack(rx_nodcpy_t stack[], int *maxdepth, rx_tree_t *tree, ip_prefix_t *newpref, rx_stk_mt dmode) {
     register rx_node_t *curnode;
     register int link, quit_now = 0;
-//    char bbf[IP_PREFSTR_MAX];
-
-//    IP_pref_b2a(newpref, bbf, IP_PREFSTR_MAX);
-//    LG_log(rx_context, LG_DEBUG, "rx_build_stack: searching for %s in mode %d", bbf, dmode);
 
     *maxdepth = 0;
 
     if (tree -> num_nodes == 0) {
-        /* The tree was empty. */
-        return RX_OK;
+        return RX_OK;   /* emtpy tree */
     }
 
     curnode = tree->top_ptr;
@@ -128,29 +123,16 @@ int rx_build_stack(rx_nodcpy_t stack[], int *maxdepth, rx_tree_t *tree, ip_prefi
         }
 
         /* push the current node on the stack. RAM only.*/
-        /* */
-        /* (unless quit_now is 64 which means do NOT copy the current node.*/
-        /**/
         /* In CREAT and QUERY_ALLNOD modes, push everything. */
         /* In QUERY_NOGLUE mode, only non-glues.*/
 
-        if ( /* quit_now < 64 &&           disabled as 64 is not in use right now */
-        (dmode != RX_STK_QUERY_NOGLUE || curnode->glue == 0)) {
+        if (dmode != RX_STK_QUERY_NOGLUE || curnode->glue == 0) {
             memcpy( & stack[*maxdepth].cpy, curnode, sizeof(rx_node_t));
             stack[*maxdepth].srcptr = curnode;
             stack[*maxdepth].srckey = SQ_NOKEY;
             stack[*maxdepth].tree = tree;
             (*maxdepth)++;
         }
-
-        // disabled this to avoid unnecessary bin->asc conversion for every level on every lookup
-        //    IP_pref_b2a( & curnode->prefix , bbf, IP_PREFSTR_MAX );
-        //    LG_log(rx_context, LG_DEBUG,
-        //                "rx_build_stack: %s%d at %s%s (stk len: %d)",
-        //                quit_now ? "stop/" : "link ",
-        //                quit_now ? quit_now : link,
-        //                bbf, ( curnode->glue ) ? " ++glue++" : "",
-        //                *maxdepth  );
 
         curnode = curnode -> child_ptr[link];
 
@@ -266,14 +248,13 @@ int rx_walk_hook_adddoubles(rx_node_t *node, int level, int nodecounter, void *u
  int         max_count        max # of answers
  */
 int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree, ip_prefix_t *prefix, rx_nodcpy_t stack[], int stackcount, GList **nodlist, int max_count) {
-    char buf[1024];
+//    char buf[1024];
     int sps = stackcount - 1; /* stack position.*/
     int depthcounter = 0;
     int err = RX_OK;
     int i;
     hook_addnode_userdat_t datstr;
     int (*hook_function)(); /* pointer to the walk_hook function*/
-    /* (see MORE spec lookup)*/
 
     /* structure for carrying data to walk_tree hook functions, used only
      in MORE, DBLS and RANG search modes 
@@ -282,8 +263,8 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
     datstr.tree = tree;
     datstr.prefix = prefix;
 
-    IP_pref_b2a(prefix, buf, IP_PREFSTR_MAX);
-    LG_log(rx_context, LG_DEBUG, "rx_nod_search: searching for %s in mode %d (%s)", buf, search_mode, RX_text_srch_mode(search_mode));
+//    IP_pref_b2a(prefix, buf, IP_PREFSTR_MAX);
+//    LG_log(rx_context, LG_DEBUG, "rx_nod_search: searching for %s in mode %d (%s)", buf, search_mode, RX_text_srch_mode(search_mode));
 
     /* in non-CREAT modes, glue nodes are skipped anyway.
      (they should normally not be there if the stack was created in
@@ -339,8 +320,8 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
 
         while (sps >= 0) {
 
-            rx_nod_print(&stack[sps].cpy, buf, sizeof(buf));
-            LG_log(rx_context, LG_DEBUG, "rx_nod_search: position %d: %s", sps, buf);
+//            rx_nod_print(&stack[sps].cpy, buf, sizeof(buf));
+//            LG_log(rx_context, LG_DEBUG, "rx_nod_search: position %d: %s", sps, buf);
 
             if (search_mode == RX_SRCH_EXACT && stack[sps].cpy.glue) {
                 die;
@@ -354,7 +335,7 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
                     return err;
                 }
 
-                LG_log(rx_context, LG_DEBUG, "rx_nod_search: found!");
+//                LG_log(rx_context, LG_DEBUG, "rx_nod_search: found!");
                 break;
             }
             sps--;
@@ -528,7 +509,7 @@ int RX_bin_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
     char DEBUGbuf[256];
     int DEBUGi;
     IP_pref_b2a(prefix, DEBUGbuf, 256);
-    fprintf(stderr, ">>> RX_bin_search(%d, %d, %d, %s) = %d results:\n", search_mode, par_a, par_b, DEBUGbuf, stkcnt);
+    fprintf(stderr, ">>> RX_bin_search(%d, %d, %d, %s) = %d results after rx_build_stack:\n", search_mode, par_a, par_b, DEBUGbuf, stkcnt);
     for (DEBUGi = 0; DEBUGi < stkcnt; DEBUGi++) {
         rx_nod_print(&stack[DEBUGi].cpy, DEBUGbuf, 256);
         fprintf(stderr, ">>> %s\n", DEBUGbuf);
@@ -543,36 +524,16 @@ int RX_bin_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
 
         resnum++;
         curcpy = nitem->data;
-
-        /*
-         if memory mode includes RAM:
-         * do not expect copies of nodes in the list received from bin_search.
-         * iterate through data leaves with g_list_nth_data.
-         */
-
         curnode = curcpy->srcptr;
-
-        /*    rx_nod_print( curnode, buf, 1024 ); */
-
-        /*    fprintf(stderr,"###node %d, %d dataleaves attached:", i, maxleaves); */
 
         /* iterate through dataleafs attached to this node */
         for (iitem = g_list_first(curnode->leaves_ptr); iitem != NULL; iitem = g_list_next(iitem)) {
             leafptr = (rx_dataleaf_t *) iitem->data;
 
-            /*
-             check the conditions to add the leaf:
-
-             XXX never add composed inetnum for exact prefix search
-             (but do for exact range search...) - must be solved in upper layer.
-
-             */
-
-            /* add */
-
+            /* XXX never add composed inetnum for exact prefix search
+               (but do for exact range search...) - must be solved in upper layer. */
             datref = (rx_datref_t *) UT_calloc(1, sizeof(rx_datref_t));
             datref->leafptr = leafptr;
-            /* srckey and excluded fields are initialised to 0 by calloc */
 
             *datleaves = g_list_prepend(*datleaves, datref);
         }
@@ -580,11 +541,10 @@ int RX_bin_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
 
     wr_clear_list(&nodlist);
 
-    LG_log(rx_context, LG_DEBUG, "RX_bin_search: found %d nodes", resnum);
+//    LG_log(rx_context, LG_DEBUG, "RX_bin_search: found %d nodes", resnum);
 
     /* the LL of answers (*datleaves) contains pointers to answer structs,
-     that SHOULD BE NORMALIZED HERE (==with no redundant entries)
-     */
+     that SHOULD BE NORMALIZED HERE (==with no redundant entries) */
 
     return RX_OK;
 }

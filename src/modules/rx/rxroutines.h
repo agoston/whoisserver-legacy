@@ -42,7 +42,6 @@
 #include <memwrap.h>
 #include <stdio.h>
 #include <iproutines.h>
-/*#include <erroutines.h>*/
 
 #include "sk.h" /*condat*/
 
