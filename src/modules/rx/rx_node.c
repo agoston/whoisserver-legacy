@@ -36,6 +36,19 @@
 /* logging */
 extern LG_context_t *rx_context;
 
+/* sorts in reverse order, because dataleaves are walked in order, and prepended to resulting datlist */
+gint rx_dataleaf_compare(gconstpointer a, gconstpointer b) {
+	const rx_dataleaf_t *rx_a = a, *rx_b = b;
+
+	/* Decide if we need to compare preflen or rangelen. at any given time, only one of them holds a meaningful value,
+	 * the other is 0, and both a and b have the the same variable filled.
+	 * Special case when comparing /0 to /0, in which case rangelen will be 0 for both, giving the desired result. */
+	if (rx_a->preflen || rx_b->preflen) {
+	    return rx_b->preflen - rx_a->preflen;
+	} else {
+	    return rx_b->rangelen - rx_a->rangelen;
+	}
+}
 
 /*
   rx_creat_node = create a new data node 
@@ -515,7 +528,8 @@ int rx_bin_node(rx_oper_mt mode, ip_prefix_t *newpref, rx_tree_t *tree, rx_datal
             /* was it glue ?*/
             glue = curnode->glue;
 
-            curnode->leaves_ptr = g_list_prepend(curnode->leaves_ptr, dataleaf);
+            /* insert sorted for quicker lookup */
+            curnode->leaves_ptr = g_list_insert_sorted(curnode->leaves_ptr, dataleaf, &rx_dataleaf_compare);
             /* now it's not a glue anymore */
             curnode->glue = 0;
 
@@ -557,6 +571,7 @@ int RX_rt_node(rx_oper_mt mode, ip_prefix_t *newpref, rx_tree_t *tree, rx_datale
 
     IP_pref_2_rang(&leafptr->iprange, newpref);
     leafptr->preflen = IP_pref_b2_len(newpref);
+    leafptr->rangelen = 0;  /* zero out, just in case */
 
     /* store the object's range, used in rp.search */
     reterr = rx_bin_node(mode, newpref, tree, leafptr);
@@ -587,8 +602,7 @@ int RX_in_node(rx_oper_mt mode, ip_range_t *rang, rx_tree_t *tree, rx_dataleaf_t
     fprintf(stderr, "RX_in_node: adding %s, decomposed to: ", buf);
 #endif
 
-    /* decompose, put links to the data leaf into every prefix*/
-    /* that makes up this range.*/
+    /* decompose, put links to the data leaf into every prefix that makes up this range.*/
     IP_rang_decomp(rang, &preflist);
 
     /* see if there is more than 1 prefix, set the composed flag*/
@@ -596,6 +610,21 @@ int RX_in_node(rx_oper_mt mode, ip_range_t *rang, rx_tree_t *tree, rx_dataleaf_t
     leafptr->composed = (prefcount - 1);
 
     leafptr->iprange = *rang;
+    switch (rang->begin.space) {
+    case IP_V4:
+        leafptr->rangelen = IP_rang_span(rang);
+        leafptr->preflen = 0;   /* zero out, just in case */
+        break;
+
+    case IP_V6:
+        assert(prefcount == 1); /* ipv6 can't have ranges, only prefixes */
+        leafptr->preflen = IP_pref_b2_len(preflist->data);
+        leafptr->rangelen = 0;  /* zero out, just in case */
+        break;
+
+    default:
+        die;    /* should never happen */
+    }
 
     if (prefcount == 0) {
         /* XXX This indicates that some inetnum ranges are not correct (e.g. start>end) */
