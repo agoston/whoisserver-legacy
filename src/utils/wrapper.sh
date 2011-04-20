@@ -25,7 +25,6 @@ if ! [[ $INSTANCE ]]; then
 fi
 
 BASEDIR=/home/dbase/services/whois-${INSTANCE}
-STOPUPDATES=${BASEDIR}/var/STOPUPDATES
 DBUPDATE=${BASEDIR}/bin/dbupdate
 ERRORS_TO="dbint@ripe.net"
 
