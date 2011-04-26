@@ -29,6 +29,7 @@ DBUPDATE=${BASEDIR}/bin/dbupdate
 ERRORS_TO="dbint@ripe.net"
 
 # log execution times (used in CMM reports ONLY)
+mkdir $BASEDIR/var/log/time
 TIMELOG=$BASEDIR/var/log/time/timelog.$(date +%Y%m%d)
 TIME="/usr/bin/time --append --quiet --format %e --output ${TIMELOG}"
 
