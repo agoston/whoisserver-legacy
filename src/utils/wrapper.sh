@@ -18,20 +18,12 @@
 # import default settings
 . /etc/default/ripe
 
-INSTANCE=${0##*dbupdate-}
-if ! [[ $INSTANCE ]]; then
-	echo Should be called as dbupdate-INSTANCE
-	exit 1
-fi
-
-BASEDIR=/home/dbase/services/whois-${INSTANCE}
+BASEDIR=$(readlink -e $(dirname $0))/..
 DBUPDATE=${BASEDIR}/bin/dbupdate
 ERRORS_TO="dbint@ripe.net"
 
 # log execution times (used in CMM reports ONLY)
-if [ ! -d "$BASEDIR/var/log/time" ]; then
-	mkdir $BASEDIR/var/log/time
-fi
+mkdir -p $BASEDIR/var/log/time &>/dev/null
 TIMELOG=$BASEDIR/var/log/time/timelog.$(date +%Y%m%d)
 TIME="/usr/bin/time --append --quiet --format %e --output ${TIMELOG}"
 
