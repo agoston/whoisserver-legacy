@@ -276,7 +276,7 @@ $Id: syntax.xml,v 1.35 2007/02/21 15:47:00 agoston Exp $
           </reserved_regex>
        </front_end>
        <description>
-     From 2 to 4 characters optionally followed by up to 5 digits
+     From 2 to 4 characters optionally followed by up to 6 digits
      optionally followed by a source specification.  The first digit
      must not be "0".  Source specification starts with "-" followed
      by source name up to 9-character length.
