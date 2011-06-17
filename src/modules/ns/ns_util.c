@@ -240,48 +240,47 @@ gchar **ns_nservers(rpsl_object_t * obj, RT_context_t * ctx,
 /*
  * checks whether the suffix is rdns related
  */
-static gboolean ns_check_suffix(rpsl_object_t * obj, gboolean with_dot)
-{
-  gchar *domain;                /* domain name */
-  gchar *p;                     /* temporary pointer */
-  gchar *ns_suffix_dotted;      /* add dot to ns_suffix */
-  gboolean ret_val = FALSE;     /* result */
-  gint i = 0;                   /* generic iterator */
-  gchar **ns_suffix;            /* ns suffixes we recognize */
+static gboolean ns_check_suffix(LG_context_t * lg_ctx, rpsl_object_t * obj, gboolean with_dot) {
+    gchar *domain; /* domain name */
+    gchar *p; /* temporary pointer */
+    gboolean ret_val = FALSE; /* result */
+    gint i = 0; /* generic iterator */
+    gchar **ns_suffix; /* ns suffixes we recognize */
+    char *ns_suffix_from_config;
 
-  ns_suffix = ut_g_strsplit_v1(ca_get_ns_suffix, "\n", 0);
+    /* Extract the domain name */
+    domain = rpsl_object_get_key_value(obj);
+    if (!domain) return ret_val;
 
-  /* Extract the domain name */
-  domain = rpsl_object_get_key_value(obj);
+    LG_log(lg_ctx, LG_FUNC, ">Entering ns_check_suffix(%s)", domain);
 
-  /* check suffix */
-  if ( domain != NULL ) {
-    while (ns_suffix[i] != NULL) {
-      if (with_dot) {
-        ns_suffix_dotted = g_strdup_printf("%s.", ns_suffix[i]);
-      } else {
-        ns_suffix_dotted = g_strdup_printf("%s", ns_suffix[i]);
-      }
-      p = stristr(domain, ns_suffix_dotted);
-      if ((p != NULL) && (strcasecmp(p, ns_suffix_dotted) == 0)) {
+    ns_suffix_from_config = ca_get_ns_suffix;
+    ns_suffix = ut_g_strsplit_v1(ns_suffix_from_config, "\n", 0);
+    free(ns_suffix_from_config);
 
-        if (p != ns_suffix_dotted) /* domain: something.?suffix */ {
-          /* make sure suffix is preceded by dot */ 
-          if (((p-1) != NULL) && (*(p-1) == '.')) {
-            ret_val = TRUE;
-          }
-        } else {
-          ret_val = TRUE;
-        }
-      }
-      g_free(ns_suffix_dotted);
-      i++;
+    /* remove trailing dot */
+    if (with_dot) {
+        domain[strlen(domain)-1] = 0;
     }
-    free(domain);
-  }
 
-  g_strfreev(ns_suffix);
-  return ret_val;
+    /* convert to lowercase */
+    p = g_ascii_strdown(domain, -1);
+    g_free(domain);
+    domain = p;
+
+    /* check against list of ns suffixes */
+    for (i = 0; ns_suffix[i]; i++) {
+        LG_log(lg_ctx, LG_DEBUG, "comparing [%s] with [%s]", domain, ns_suffix[i]);
+        if (g_str_has_suffix(domain, ns_suffix[i])) {
+            ret_val = TRUE;
+            break;
+        }
+    }
+
+    g_free(domain);
+    g_strfreev(ns_suffix);
+    LG_log(lg_ctx, LG_FUNC, "<Exiting ns_check_suffix with result %d", ret_val);
+    return ret_val;
 }
 
 /*
@@ -340,7 +339,7 @@ gboolean ns_remove_trailing_dot(LG_context_t * lg_ctx, gchar ** object_str)
   /* Extract the domain name */
   domain = rpsl_object_get_key_value(object);
 
-  if ((!ns_check_suffix(object, TRUE)) && (!ns_is_domain_dotted(object))) {
+  if ((!ns_check_suffix(lg_ctx, object, TRUE)) && (!ns_is_domain_dotted(object))) {
     LG_log(lg_ctx, LG_DEBUG, "object is not a domain with trailing dot");
     ret_val = FALSE;
   } else {
@@ -426,7 +425,7 @@ gboolean ns_has_suffix(gchar * domain, const char * suffix)
  */
 gboolean ns_is_rdns_suffix(au_plugin_callback_info_t * info)
 {
-  if (ns_check_suffix(info->obj, FALSE)) {
+  if (ns_check_suffix(au_context, info->obj, FALSE)) {
     LG_log(au_context, LG_DEBUG, "object is rdns related");
     return TRUE;
   } else {

@@ -1,0 +1,22 @@
+# rdns tests
+# CASE 064: Try to create a domain object when more specific object exists
+#
+# create domain object
+#
+#FAILURE
+#
+# RESULT 64: creation will fail
+
+Domain: 8.1.f.0.2.0.a.2.ip6.arpa
+Descr:  Reverse delegation
+admin-c:        TP1-DB-TEST
+tech-c:         TP1-DB-TEST
+zone-c:         TP1-DB-TEST
+mnt-by:         TEST-DBM-MNT
+nserver:        ns1.netground.nl
+nserver:        ns2.netground.nl
+nserver:        ns3.netground.nl
+changed:        unread@ripe.net
+source:         DB-TEST
+
+password: test-dbm

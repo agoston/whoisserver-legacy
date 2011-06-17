@@ -396,130 +396,108 @@ set_rpsl_create (au_plugin_callback_info_t *info)
   return ret_val;
 }
 
-AU_ret_t
-hierarchical_rpsl_create (au_plugin_callback_info_t *info)
-{
-  AU_ret_t parent_auth;
-  AU_ret_t child_auth;
-  AU_ret_t ret_val;
-  gboolean override;
+AU_ret_t hierarchical_rpsl_create(au_plugin_callback_info_t *info) {
+    AU_ret_t parent_auth;
+    AU_ret_t child_auth;
+    AU_ret_t ret_val;
+    gboolean override;
 
-  char *key;
+    char *key;
 
-  GList *parents;
-  rpsl_object_t *parent;
-  char *parent_key;
-  const rpsl_attr_t *first_attr;
+    GList *parents;
+    rpsl_object_t *parent;
+    char *parent_key;
+    const rpsl_attr_t *first_attr;
 
-  LG_log(au_context, LG_FUNC, ">hierarchical_rpsl_create: entering");
+    LG_log(au_context, LG_FUNC, ">hierarchical_rpsl_create: entering");
 
-  key = rpsl_object_get_key_value(info->obj);
-  LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: key is [%s]", key);
-  UT_free(key);
+    key = rpsl_object_get_key_value(info->obj);
+    LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: key is [%s]", key);
+    UT_free(key);
 
-  /* this is ugly, needs definite fix TODO */
-  /* check auth from corresponding inetnum */
-  first_attr = rpsl_object_get_attr_by_ofs(info->obj,0);
-  if ((strcmp(first_attr->name,"domain")==0)&&(ns_is_rdns_suffix(info))) {
-    LG_log(au_context,LG_DEBUG,"hierarchical_rpsl_create: domain object encountered, skipping");
-    LG_log(au_context,LG_DEBUG,"<hierarchical_rpsl_create: exiting with [AU_AUTHORISED]");
-    ret_val = AU_AUTHORISED;
-    override = FALSE;
-    RT_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);
-    return ret_val;
-  }
-
-  /* check for parent authorisation */
-  if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY)
-  {
-    /* error finding parent */
-    parent_auth = AU_ERROR;
-  }
-  else if (parents == NULL)
-  {
-    /* no parent */
-    parent_auth = AU_UNAUTHORISED_CONT;
-    RT_parent_not_exist(info->ctx);
-    LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: no parent found");
-  }
-  else if (g_list_next(parents) != NULL)
-  {
-    /* multiple parents - e.g. overlapping inetnum objects */
-    /* we will still do the auth checks on all the parents so that
-       the lists of mntners (authenticated, unauthenticated) are built
-       up for the notifications to be sent to */
-
-    LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: multiple parents found");
-    RT_multiple_parents(info->ctx, parents);
-
-    while ( parents != NULL)
-    {
-      parent = parents->data;
-      parent_key = rpsl_object_get_key_value(parent);
-      LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: parent is [%s]", parent_key);
-      UT_free(parent_key);
-
-      parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY,
-                                          parent, "parent", info);
-
-      parents = g_list_next(parents);
+    /* this is ugly, needs definite fix TODO */
+    /* check auth from corresponding inetnum */
+    first_attr = rpsl_object_get_attr_by_ofs(info->obj, 0);
+    if ((strcasecmp(first_attr->name, "domain") == 0) && (ns_is_rdns_suffix(info))) {
+        LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: domain object encountered, skipping");
+        LG_log(au_context, LG_DEBUG, "<hierarchical_rpsl_create: exiting with [AU_AUTHORISED]");
+        ret_val = AU_AUTHORISED;
+        override = FALSE;
+        RT_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
+        return ret_val;
     }
 
-    /* set parent_auth to AU_UNAUTHORISED_CONT, regardless of the result */
-    parent_auth = AU_UNAUTHORISED_CONT;
-  }
-  else
-  {
-    parent = parents->data;
-    parent_key = rpsl_object_get_key_value(parent);
-    LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: parent is [%s]", parent_key);
-    UT_free(parent_key);
+    /* check for parent authorisation */
+    if (LU_get_parents(au_lookup, &parents, info->obj, NULL) != LU_OKAY) {
+        /* error finding parent */
+        parent_auth = AU_ERROR;
+    } else if (parents == NULL) {
+        /* no parent */
+        parent_auth = AU_UNAUTHORISED_CONT;
+        RT_parent_not_exist(info->ctx);
+        LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: no parent found");
+    } else if (g_list_next(parents) != NULL) {
+        /* multiple parents - e.g. overlapping inetnum objects */
+        /* we will still do the auth checks on all the parents so that
+         the lists of mntners (authenticated, unauthenticated) are built
+         up for the notifications to be sent to */
 
-    parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY,
-                                          parent, "parent", info);
-  }
+        LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: multiple parents found");
+        RT_multiple_parents(info->ctx, parents);
 
-  LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: parent_auth is [%s]",
-         AU_ret2str(parent_auth));
+        while (parents != NULL) {
+            parent = parents->data;
+            parent_key = rpsl_object_get_key_value(parent);
+            LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: parent is [%s]", parent_key);
+            UT_free(parent_key);
 
-  /* now check the "mnt-by:" in the object itself */
-  child_auth = au_check_multiple_authentications(CHECK_MNT_BY,
-                                     info->obj, "", info);
+            parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY, parent, "parent", info);
 
-  LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: child_auth is [%s]",
-         AU_ret2str(child_auth));
+            parents = g_list_next(parents);
+        }
 
-  /* determine authorisation based on the parent and child */
-  if ((parent_auth == AU_ERROR) || (child_auth == AU_ERROR))
-  {
-    ret_val = AU_ERROR;
-  }
-  else if ((parent_auth == AU_AUTHORISED) && (child_auth == AU_AUTHORISED))
-  {
-    ret_val = AU_AUTHORISED;
-  }
-  else
-  {
-    ret_val = AU_UNAUTHORISED_CONT;
-  }
+        /* set parent_auth to AU_UNAUTHORISED_CONT, regardless of the result */
+        parent_auth = AU_UNAUTHORISED_CONT;
+    } else {
+        parent = parents->data;
+        parent_key = rpsl_object_get_key_value(parent);
+        LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: parent is [%s]", parent_key);
+        UT_free(parent_key);
 
-  au_override(&ret_val, &override, info);
+        parent_auth = au_check_multiple_authentications(CHECK_MNT_LOWER_THEN_MNT_BY, parent, "parent", info);
+    }
 
-  /* return maintainers, or free maintainers */
-  LG_log(au_context, LG_DEBUG,"hierarchical_rpsl_create: [%d] mntners used", g_list_length(info->mntner_used));
-  if (ret_val == AU_ERROR)
-  {
-      g_list_foreach(info->mntner_used, au_rpsl_object_delete, NULL);
-      info->mntner_used = NULL;
-  }
+    LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: parent_auth is [%s]", AU_ret2str(parent_auth));
 
-  /* report result */
-  RT_auth_result(info->ctx, (ret_val==AU_AUTHORISED), override);
+    /* now check the "mnt-by:" in the object itself */
+    child_auth = au_check_multiple_authentications(CHECK_MNT_BY, info->obj, "", info);
 
-  LG_log(au_context, LG_FUNC, "<hierarchical_rpsl_create: exiting with value [%s]",
-         AU_ret2str(ret_val));
+    LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: child_auth is [%s]", AU_ret2str(child_auth));
 
-  return ret_val;
+    /* determine authorisation based on the parent and child */
+    if ((parent_auth == AU_ERROR) || (child_auth == AU_ERROR)) {
+        ret_val = AU_ERROR;
+    } else if ((parent_auth == AU_AUTHORISED) && (child_auth == AU_AUTHORISED)) {
+        ret_val = AU_AUTHORISED;
+    } else {
+        ret_val = AU_UNAUTHORISED_CONT;
+    }
+
+    au_override(&ret_val, &override, info);
+
+    /* return maintainers, or free maintainers */
+    LG_log(au_context, LG_DEBUG, "hierarchical_rpsl_create: [%d] mntners used", g_list_length(info->mntner_used));
+    if (ret_val == AU_ERROR) {
+        g_list_foreach(info->mntner_used, au_rpsl_object_delete, NULL);
+        info->mntner_used = NULL;
+    }
+
+    /* report result */
+    RT_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
+
+    LG_log(au_context, LG_FUNC, "<hierarchical_rpsl_create: exiting with value [%s]", AU_ret2str(ret_val));
+
+    return ret_val;
 }
 
 AU_ret_t
