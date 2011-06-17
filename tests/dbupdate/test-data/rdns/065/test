@@ -1,11 +1,11 @@
 # rdns tests
-# CASE 064: Try to create a domain object when more specific object exists
+# CASE 065: Real world failure caused by uppercase 'Domain:' attribute not triggering RDNS checks
 #
 # create domain object
 #
-#FAILURE
+#SUCCESS
 #
-# RESULT 64: creation will fail
+# RESULT 64: creation will succeed
 
 Domain: 8.1.f.0.2.0.a.2.ip6.arpa
 Descr:  Reverse delegation
