@@ -89,7 +89,7 @@ Ie. Try using a LEFT JOIN to do the "NOT IN"/ "MINUS" equivalent.
 const char *Q_OBJECTS = "SELECT STRAIGHT_JOIN last.object_id, last.sequence_id, last.object, last.object_type, last.pkey, recursive, gid "
                         "FROM %s IDS, last, last glast, object_order, object_order gorder "
                         "WHERE (IDS.gid=glast.object_id AND glast.object_type=gorder.object_type) AND "
-                        "(IDS.id=last.object_id AND last.object_type=object_order.object_type) "
+                        "(IDS.id=last.object_id AND last.object_type=object_order.object_type) AND last.thread_id = 0 AND glast.thread_id = 0 "
                         "ORDER BY %s recursive, object_order.order_code";
 
 /* rewritten for JOIN syntax by agoston, 2011-03-30
