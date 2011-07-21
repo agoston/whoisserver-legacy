@@ -11,9 +11,9 @@ done
 
 # issue a single command to the server
 function issue_command() {
-	echo "$@" | nc -q 1 $WHOIS_HOST $SVCONFIG_PORT
+	echo "$@" | nc $WHOIS_HOST $SVCONFIG_PORT
 }
 
 function issue_command_get_ret() {
-        return `echo "$@" | nc -q 1 $WHOISHOST $SVCONFIG_PORT | sed 's/.*=\([0-9]*\)=.*/\1/g' | tail -1`
+        return `echo "$@" | nc $WHOISHOST $SVCONFIG_PORT | sed 's/.*=\([0-9]*\)=.*/\1/g' | tail -1`
 }

@@ -183,7 +183,7 @@ void km_X509_key_get_fingerprint(gchar *out_dir, km_key_return_t *kr, gchar *key
 
   /* get the fingerprint and subject from the certificate */
   openssl_line = g_string_new(openssl_path);
-  g_string_append(openssl_line, " x509 -inform PEM -in ");
+  g_string_append(openssl_line, " x509 -md5 -inform PEM -in ");
   g_string_append(openssl_line, in_file);
   g_string_append(openssl_line, " -fingerprint -subject -noout ");
   g_string_append(openssl_line, " > ");

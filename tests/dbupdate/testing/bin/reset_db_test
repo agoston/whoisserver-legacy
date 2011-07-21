@@ -42,11 +42,11 @@ error_exit()
 }
 
 function issue_command() {
-	echo -e "$@" | nc -q 1 $WHOISHOST $CONFPORT
+	echo -e "$@" | nc $WHOISHOST $CONFPORT
 }
 
 function issue_command_get_ret() {
-	return `echo -e "$@" | nc -q 1 $WHOISHOST $CONFPORT | sed 's/.*=\([0-9]*\)=.*/\1/g' | tail -1`
+	return `echo -e "$@" | nc $WHOISHOST $CONFPORT | sed 's/.*=\([0-9]*\)=.*/\1/g' | tail -1`
 }
 
 loadpass()
