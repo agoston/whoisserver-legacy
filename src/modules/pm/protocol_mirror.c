@@ -871,6 +871,7 @@ void PM_interact(svr_args *args) {
                 {
                     object = NULL;
                     operation = -1;
+                    LG_log(pm_context, LG_ERROR, "serialID %ld failed to dummify", current_serial);
                 }
             }
 
