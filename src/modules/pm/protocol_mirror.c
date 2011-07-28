@@ -728,7 +728,7 @@ void PM_interact(svr_args *args) {
     if (!(mirror_perm = AA_can_mirror(&(condat.rIP), nrtm_q.source)))
     {
         LG_log(pm_context, LG_DEBUG, "[%s] --  Not authorized to mirror the source %s", condat.rIPs, nrtm_q.source);
-        sprintf(buff, "\n%%ERROR:402: not authorized to mirror the database\n\n\n");
+        sprintf(buff, "\n%%ERROR:402: not authorized to mirror the database from IP address %s\n\n\n", condat.rIPs);
         SK_cd_puts(&condat, buff);
         goto error_return;
     }
