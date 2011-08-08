@@ -277,7 +277,7 @@ void RT_rdns_parentisnotenum(RT_context_t*);
 void RT_rdns_notdelegated(RT_context_t*);
 void RT_rdns_delcheckwarning(RT_context_t*,gchar*);
 void RT_rdns_threshold(RT_context_t*);
-void RT_rdns_invalid_range(RT_context_t*,gchar*);
+void RT_rdns_invalid_range(RT_context_t*);
 void RT_rdns_auth_result(RT_context_t* ctx, gboolean result, gboolean override);
 void RT_rdns_ds_not_accepted(RT_context_t* ctx);
 void RT_rdns_size_not_accepted(RT_context_t* ctx);

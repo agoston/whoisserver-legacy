@@ -129,10 +129,9 @@
 
 <xsl:template match="RDNSinvalidrange">
 
-***Error: The range
-          <xsl:apply-templates/>
-          is not a valid range for expansion. Both numbers must be in
+***Error: The range is not valid. Both numbers must different and be in
           between 0-255 and the first number must be less than the second.
+          Also the range can only exist in the 4th octet.
 </xsl:template>
 
 <xsl:template match="RDNSds_not_accepted">

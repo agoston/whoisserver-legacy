@@ -45,6 +45,8 @@
 #include "up_pre_process.h"
 #include <glib.h>
 
+#include "regex.h"
+
 /* these enum values and error messages must be kept in sync */
 typedef enum
 {
@@ -1013,6 +1015,93 @@ LG_log(lg_ctx, LG_DEBUG,"UP_check_ping: call IP_pref_t2b with pvalue [%s]", pval
     LG_log(lg_ctx, LG_FUNC, "<UP_check_ping: exiting with value [%s]\n", UP_ret2str(retval));
     return retval;
 }
+
+
+int UP_check_domain_dash(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *preproc_obj)
+{
+    int retval = UP_OK;
+    int range_start = 0;
+    int range_end = 0;
+    char *type = NULL;
+    char *primary_key = NULL;
+    char *cnt_str = NULL;
+    char *pkey_copy = NULL;
+    regex_t preg;
+    regmatch_t pmatch[10];
+    gint reg_retval;
+    gchar errstr[200];
+    gchar temp_num[100];
+
+    LG_log(lg_ctx, LG_FUNC,">UP_check_domain_dash: entered\n");
+
+    type = rpsl_object_get_class(preproc_obj);
+
+    /* if not domain, return directly */
+    if (strcasecmp(type, "domain"))
+    {
+        return retval;
+    }
+
+    primary_key = rpsl_object_get_key_value(preproc_obj);
+    pkey_copy = strdup(primary_key);
+
+    cnt_str = strcasestr(pkey_copy, ".in-addr.arpa");
+
+    /* if in-addr.arpa not found, or not at the end, return directly */
+    if (cnt_str == NULL || strcasecmp(cnt_str, ".in-addr.arpa") != 0)
+    {
+        return retval;
+    }
+
+    /* trim off the found part */
+    *cnt_str = '\0';
+
+    if (!strstr(pkey_copy, "-"))
+    {
+        return retval;
+    }
+
+    /* checking that if there is a dash it is in the fourth octet */
+    if ((reg_retval = regcomp(&preg,
+                     "^([0-9]+)\\-([0-9]+)\\.[0-9]+\\.[0-9]+\\.[0-9]+$",
+                     REG_EXTENDED)) != 0) {
+      regerror(reg_retval, &preg, errstr, 100);
+      LG_log(lg_ctx, LG_DEBUG,
+             "compiling regular expression in UP_check_domain_dash: %s", errstr);
+    } else if ((reg_retval = regexec(&preg, pkey_copy, 3, pmatch, 0)) != 0) {
+      regerror(reg_retval, &preg, errstr, 100);
+      LG_log(lg_ctx, LG_DEBUG,
+             "executing regular expression in UP_check_domain_dash: %s", errstr);
+      RT_rdns_invalid_range(rt_ctx);
+      retval = UP_FAIL;
+    } else {
+      g_snprintf(temp_num, (pmatch[1].rm_eo - pmatch[1].rm_so + 2), "%s",
+              pkey_copy + pmatch[1].rm_so);
+      range_start = atoi(temp_num);
+      g_snprintf(temp_num, (pmatch[2].rm_eo - pmatch[2].rm_so + 2), "%s",
+              pkey_copy + pmatch[2].rm_so);
+      range_end = atoi(temp_num);
+
+      if ((range_start > range_end) || (range_start < 0)
+          || (range_start > 255) || (range_end < 0) || (range_end > 255)
+          || (range_start == 0 && range_end == 255) || (range_start == range_end))
+      {
+        LG_log(lg_ctx, LG_DEBUG, "UP_check_domain_dash: range %d - %d can't be decomposed",
+               range_start, range_end);
+        RT_rdns_invalid_range(rt_ctx);
+        retval = UP_FAIL;
+      }
+    }
+
+    free(pkey_copy);
+    regfree(&preg);
+
+    LG_log(lg_ctx, LG_FUNC,"<UP_check_domain_dash: exiting\n");
+
+    return retval;
+}
+
+
 
 /* checks for a valid suffix at the end of a 'nic-hdl' attributes 
    Receives RT context
