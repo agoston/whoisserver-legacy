@@ -1,0 +1,52 @@
+# CASE 5: We try to create inet6num, inetnum, organisation objects with geoloc and language attributes
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed.
+
+
+inet6num:     2001:0658:021A::/64
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+geoloc:	      15.258 154.349
+language:     ro
+status:       ALLOCATED-BY-LIR
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+inetnum:      80.16.151.184 - 80.16.151.184
+netname:      TEST-NET-NAME
+descr:        TEST network
+country:      NL
+geoloc:	      78.28 1.5755
+language:     nl
+status:       ASSIGNED PA
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+
+
+password: hostmaster
+
+organisation:  AUTO-1
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+language:      en
+geoloc:        0 0
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm

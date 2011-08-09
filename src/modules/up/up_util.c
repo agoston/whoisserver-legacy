@@ -1027,9 +1027,11 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   int retval = UP_OK;
   int key_status;
   const char *type = NULL;
-  int str_idx, ctry_idx;
+  int str_idx, ctry_idx, lng_idx;
   char *country_str = NULL;
   char *countries[COUNTRY_LIST_SIZE];
+  char *language_str = NULL;
+  char *languages[LANGUAGE_LIST_SIZE];
   char **temp_vector;
   char *value;
   KM_context_t key_cert_type;
@@ -1103,34 +1105,69 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   if ( operation != UP_DELETE )
   {
-    /* get country details from config file */
-    LG_log(lg_ctx, LG_INFO,"up_pre_process_object: get country codes from config file");
-    country_str = ca_get_country;
-    /* construct countries array from country string variable */
-    temp_vector = ut_g_strsplit_v1(country_str, "\n", 0);
-    for (str_idx=0, ctry_idx=0; temp_vector[str_idx] != NULL; str_idx++)
+    attr = rpsl_object_get_attr(preproc_obj, "country");
+    if (attr != NULL)
     {
-      temp_vector[str_idx] = g_strstrip(temp_vector[str_idx]);
-      if (strlen(temp_vector[str_idx]) > 0)
-	  {
-        countries[ctry_idx] = strdup(temp_vector[str_idx]);
-        g_strup(countries[ctry_idx++]);
-      }
-    }
-    countries[ctry_idx] = NULL; /* mark the end of array */
-    g_strfreev(temp_vector);
-    free(country_str);
-    LG_log(lg_ctx, LG_DEBUG,"up_pre_process_object: number of countries [%d]", ctry_idx);
+        /* get country details from config file */
+        LG_log(lg_ctx, LG_INFO, "up_pre_process_object: get country codes from config file");
+        country_str = ca_get_country;
+        /* construct countries array from country string variable */
+        temp_vector = ut_g_strsplit_v1(country_str, "\n", 0);
+        for (str_idx = 0, ctry_idx = 0; temp_vector[str_idx] != NULL; str_idx++) {
+            temp_vector[str_idx] = g_strstrip(temp_vector[str_idx]);
+            if (strlen(temp_vector[str_idx]) > 0) {
+                countries[ctry_idx] = strdup(temp_vector[str_idx]);
+                g_strup(countries[ctry_idx++]);
+            }
+        }
+        countries[ctry_idx] = NULL; /* mark the end of array */
+        g_strfreev(temp_vector);
+        free(country_str);
+        LG_log(lg_ctx, LG_DEBUG, "up_pre_process_object: number of countries [%d]", ctry_idx);
 
-    retval |= UP_check_country_attr(rt_ctx, lg_ctx, preproc_obj, countries);
+        retval |= UP_check_country_attr(rt_ctx, lg_ctx, preproc_obj, countries);
+
+        rpsl_attr_delete_list(attr);
+
+        /* free the countries list */
+        for (ctry_idx=0; countries[ctry_idx] != NULL; ctry_idx++)
+        {
+          free(countries[ctry_idx]);
+        }
+    }
+    attr = rpsl_object_get_attr(preproc_obj, "language");
+    if (attr != NULL)
+    {
+        /* get language details from config file */
+        LG_log(lg_ctx, LG_INFO,"up_pre_process_object: get language codes from config file");
+        language_str = ca_get_language;
+        /* construct languages array from language string variable */
+        temp_vector = ut_g_strsplit_v1(language_str, "\n", 0);
+        for (str_idx=0, lng_idx=0; temp_vector[str_idx] != NULL; str_idx++)
+        {
+          temp_vector[str_idx] = g_strstrip(temp_vector[str_idx]);
+          if (strlen(temp_vector[str_idx]) > 0)
+          {
+            languages[lng_idx++] = strdup(temp_vector[str_idx]);
+          }
+        }
+        languages[lng_idx] = NULL; /* mark the end of array */
+        g_strfreev(temp_vector);
+        free(language_str);
+        LG_log(lg_ctx, LG_DEBUG,"up_pre_process_object: number of languages [%d]", lng_idx);
+
+        retval |= UP_check_language_attr(rt_ctx, lg_ctx, preproc_obj, languages);
+
+        rpsl_attr_delete_list(attr);
+
+        /* free the countries list */
+        for (ctry_idx=0; languages[ctry_idx] != NULL; ctry_idx++)
+        {
+          free(languages[ctry_idx]);
+        }
+    }
 
     retval |= UP_check_nicsuffixes(rt_ctx, lg_ctx, options, preproc_obj, countries);
-
-    /* free the countries list */
-    for (ctry_idx=0; countries[ctry_idx] != NULL; ctry_idx++)
-    {
-      free(countries[ctry_idx]);
-    }
 
     if ( operation == UP_CREATE &&
          (! strcasecmp(type, "person") || ! strcasecmp(type, "role")) )

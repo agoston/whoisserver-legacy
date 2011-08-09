@@ -241,8 +241,11 @@
 #define ca_get_nicsuffix	ca_get_string(CA_NICSUFFIX)
 #define ca_set_nicsuffix	ca_set_string(CA_NICSUFFIX)
 
-#define ca_get_country	ca_get_string(CA_COUNTRY)
-#define ca_set_country	ca_set_string(CA_COUNTRY)
+#define ca_get_country  ca_get_string(CA_COUNTRY)
+#define ca_set_country  ca_set_string(CA_COUNTRY)
+
+#define ca_get_language  ca_get_string(CA_LANGUAGE)
+#define ca_set_language  ca_set_string(CA_LANGUAGE)
 
 #define ca_get_authmethod	ca_get_string(CA_AUTHMETHOD)
 #define ca_set_authmethod	ca_set_string(CA_AUTHMETHOD)

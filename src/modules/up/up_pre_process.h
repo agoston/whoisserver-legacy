@@ -50,6 +50,9 @@ int UP_check_domain(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 int UP_check_country_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              rpsl_object_t *preproc_obj, char **countries);
 
+int UP_check_language_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
+                             rpsl_object_t *preproc_obj, char **languages);
+
 int UP_check_nicsuffixes(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                              options_struct_t *options,
                              rpsl_object_t *preproc_obj, char **countries);
