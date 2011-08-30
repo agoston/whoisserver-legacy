@@ -34,18 +34,9 @@
  ***************************************/
 
 
-#include "config.h"
 #include <assert.h>
 #include "rip.h"
-
-#include "iproutines.h"
-#include "km.h"
-#include "ca_defs.h"
-#include "dbupdate.h"
-#include "up_pre_process.h"
-#include <glib.h>
-
-#include "regex.h"
+#include <regex.h>
 
 /* these enum values and error messages must be kept in sync */
 typedef enum
