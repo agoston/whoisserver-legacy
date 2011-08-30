@@ -99,7 +99,7 @@ int RP_asc2pack(rp_upd_pack_t *pack, rp_attr_t type, const char *string) {
 
     pack->type = type;
 
-    LG_log(rp_context, LG_DEBUG, "RP_asc2pack: converted attr %s: %s to pack at %08x", DF_get_attribute_code(type), string, pack);
+//    LG_log(rp_context, LG_DEBUG, "RP_asc2pack: converted attr %s: %s to pack at %08x", DF_get_attribute_code(type), string, pack);
 
     err = RP_asc2uni(string, type, &(pack->uni));
 
