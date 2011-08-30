@@ -168,8 +168,8 @@ DROP TABLE IF EXISTS `inaddr_arpa`;
 CREATE TABLE `inaddr_arpa` (
   `thread_id` int(11) NOT NULL default '0',
   `object_id` int(10) unsigned NOT NULL default '0',
-  `prefix` int(10) unsigned NOT NULL default '0',
-  `prefix_length` tinyint(3) unsigned NOT NULL default '0',
+  `begin_in` int(10) unsigned NOT NULL default '0',
+  `end_in` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`object_id`)
 );
 DROP TABLE IF EXISTS `inet6num`;
