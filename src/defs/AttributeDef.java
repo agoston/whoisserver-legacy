@@ -70,7 +70,8 @@ public class AttributeDef implements Cloneable {
                              // should not appear in template definitions
     
   // radix tree representation
-  private String family;
+  private String family_ipv4;
+  private String family_ipv6;
   private String load_ipv4; // query to load the ipv4 tree
   private String load_ipv6; // query to load the ipv6 tree
 
@@ -178,13 +179,14 @@ public class AttributeDef implements Cloneable {
                 sqlTable = rpSearch;
             } else if (rpSearch.getNodeName().equals("radixtrees")) {
                 NamedNodeMap map = rpSearch.getAttributes();
-                family = map.getNamedItem("family").getNodeValue();
                 Node rxSearch = rpSearch.getFirstChild();
                 while (rxSearch != null) {
                     if (rxSearch.getNodeName().equals("IP_V4")) {
-	                load_ipv4 = getTextFromNode(rxSearch);
+                    	load_ipv4 = getTextFromNode(rxSearch);
+                        family_ipv4 = rxSearch.getAttributes().getNamedItem("family").getNodeValue();
                     } else if (rxSearch.getNodeName().equals("IP_V6")) {
                         load_ipv6 = getTextFromNode(rxSearch);
+                        family_ipv6 = rxSearch.getAttributes().getNamedItem("family").getNodeValue();
                     }
                     rxSearch = rxSearch.getNextSibling();
                 }
@@ -405,9 +407,13 @@ private String getTextFromNode( Node q ) {
       return sb.toString();
   } // getNodeRawValue()
   
-  public String getFamily() {
-    return family;
+  public String getFamilyIPv4() {
+    return family_ipv4;
   } 
+
+  public String getFamilyIPv6() {
+	    return family_ipv6;
+  }
 
   public String getV4Load() {
     return load_ipv4;

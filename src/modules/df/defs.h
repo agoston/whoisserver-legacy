@@ -72,7 +72,8 @@ extern Query_t Query[];
 
 typedef struct {
   A_Type_t attr;
-  rx_fam_t family;
+  rx_fam_t family_ipv4;
+  rx_fam_t family_ipv6;
   char *   ipv4_load;
   char *   ipv6_load;
 } DF_Load_t;
