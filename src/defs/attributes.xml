@@ -323,7 +323,7 @@
         </sqltable>
         <radixtrees>
              <IP_V4 family="RX_FAM_IN">
-                SELECT domain.object_id,prefix,prefix_length,domain
+                SELECT domain.object_id,begin_in,end_in,domain
                 FROM inaddr_arpa,domain
                 WHERE domain.object_id = inaddr_arpa.object_id
                 AND   inaddr_arpa.thread_id = 0
