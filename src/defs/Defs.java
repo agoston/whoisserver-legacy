@@ -692,8 +692,8 @@ public class Defs {
 						+ "\"" : "NULL";
 				String ip6 = ad.getV6Load() != null ? "\"" + ad.getV6Load()
 						+ "\"" : "NULL";
-				if (fam4 == null) fam4 = "NULL"; 
-				if (fam6 == null) fam6 = "NULL"; 
+				if (fam4 == null) fam4 = "-1"; 
+				if (fam6 == null) fam6 = "-1"; 
 
 				System.out.print("  { " + ad.getEnumeration() + ", "
 						+ fam4 + ", "+fam6+",\n\t" + ip4.replace('\n', ' ')
@@ -701,7 +701,7 @@ public class Defs {
 			}
 		} // while more
 
-		System.out.println("  { -1, -1, NULL, NULL }\n};");
+		System.out.println("  { -1, -1, -1, NULL, NULL }\n};");
 	} // printDF_radix_load()
 
     private void writeAttributeInfo(PrintStream out, AttributeDef ad, int id)
