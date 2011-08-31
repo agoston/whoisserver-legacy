@@ -406,7 +406,7 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
     ip_range_t testrang;
     int locked = 0;
     ip_space_t spc_id;
-    rx_fam_t fam_id = RP_attr2fam(attr);
+    rx_fam_t fam_id;
     rx_tree_t *mytree;
     int hits = 0;
     ip_prefix_t beginpref;
@@ -422,6 +422,7 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
 
     /* find the tree */
     spc_id = IP_pref_b2_space(preflist->data);
+    fam_id = RP_attr2fam(attr, spc_id);     // set the family id based on the space and attribute
     if (!NOERR(err = RP_tree_get(&mytree, reg_id, spc_id, attr))) {
         wr_clear_list(&preflist);
         return err;

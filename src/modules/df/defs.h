@@ -163,7 +163,7 @@ UD_qtype DF_get_dummy_query_type(A_Type_t index);
 	/* return boolean if attribute has a radix tree */
 int DF_attrcode_has_radix_lookup(A_Type_t attr);
 	/* return radix family */
-rx_fam_t DF_attrcode_radix_family(A_Type_t attr);
+rx_fam_t DF_attrcode_radix_family(A_Type_t attr, ip_space_t space);
 	/* return query string to load the v4/v6 radix tree*/
 char * DF_attrcode_radix_load_v4(A_Type_t attr);
 char * DF_attrcode_radix_load_v6(A_Type_t attr);
