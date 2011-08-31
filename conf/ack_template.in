@@ -274,6 +274,11 @@ key-cert operation OK
 ***Error: No subject found in the supplied certificate
   </xsl:template>
 
+  <xsl:template match="invalid_signature">
+***Error: PGP signature validation failed:
+  <xsl:value-of select="msg/text()"/>
+  </xsl:template>
+
 
   <xsl:template match="non_existent_object">
 ***Error: This object does not exist in the database.<xsl:apply-templates/>

@@ -47,6 +47,7 @@
 static gchar* temporary_directory = NULL;
 static gchar* gpg_path = NULL;
 static LG_context_t* ctx;
+static RT_context_t *rctx;
 static GList* my_sources = NULL;
 
 void km_pgp_end() {
@@ -76,9 +77,10 @@ void km_pgp_end() {
 
   return - the status.
  */
-KM_status_t km_pgp_init(LG_context_t* _ctx, GList* servers,
+KM_status_t km_pgp_init(LG_context_t* _ctx, RT_context_t *_rt_ctx, GList* servers,
                         GList* sources, gchar* tmp_dir, gchar* path) {
   ctx = _ctx;
+  rctx = _rt_ctx;
 
   km_pgp_end();
   gpg_path = g_strdup(path);
@@ -138,6 +140,7 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
     gchar in_file[LINE_LENGTH];
     gchar tmp[LINE_LENGTH];
     gchar* char_file;
+    GString *gpg_output = NULL;
 
     LG_log(ctx, LG_FUNC, ">Entering km_pgp_signature_verify_low");
     valid = FALSE;
@@ -191,10 +194,12 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
     g_string_free(gpg_line, TRUE);
     /* Parsing gpg output */
 
+    gpg_output = g_string_new(NULL);
     general = fopen(status_file, "r");
     while (fgets(txt, LINE_LENGTH - 1, general) != NULL)
     {
         LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: gpg returns: %s", txt);
+        g_string_append(gpg_output, txt);
         if (strstr(txt, "Good signature") != NULL)
         {
             valid = TRUE;
@@ -258,6 +263,13 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
         }
         key_ret = km_key_return_new((gchar*) key_id, valid, text, KM_OK);
     }
+
+    if ( !valid && gpg_output->str && key_ring )
+    {
+        LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: report signature not valid [%s]", gpg_output->str);
+        RT_invalid_signature(rt_ctx, gpg_output->str);
+    }
+    g_string_free(gpg_output, TRUE);
 
     unlink(in_file);
     unlink(out_file);

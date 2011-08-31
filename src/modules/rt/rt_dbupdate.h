@@ -170,6 +170,7 @@ void RT_unknown_auto_key(RT_context_t* ctx, gchar* key);
  */
 void RT_cert_error(RT_context_t* ctx,gchar* err_str);
 void RT_report_key_info(RT_context_t* ctx, KM_key_return_t* info);
+void RT_invalid_signature(RT_context_t* ctx, gchar *msg);
 void RT_key_add_error(RT_context_t* ctx, KM_status_t status);
 void RT_key_modify_error(RT_context_t* ctx, KM_status_t status);
 void RT_key_remove_error(RT_context_t* ctx, KM_status_t status);

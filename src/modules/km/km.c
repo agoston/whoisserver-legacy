@@ -45,7 +45,7 @@ KM_status_t retval;
     default:
       return KM_UNKNOWN_PKI;
   }
-  retval =  pki[context].init(ctx, servers, sources, tmp_dir, path);
+  retval =  pki[context].init(ctx, rt_ctx, servers, sources, tmp_dir, path);
   LG_log(ctx, LG_FUNC,"<KM_init: exiting with status %s", KM_return_string((int)retval));
   return retval;
 }

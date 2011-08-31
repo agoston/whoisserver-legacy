@@ -1174,6 +1174,19 @@ void RT_report_key_info(RT_context_t* ctx, KM_key_return_t* info) {
 }
 
 /*+
+  RT_invalid_signature - Validating pgp signature failed.
+
+  RT_context_t* ctx - Context.
+  +*/
+void RT_invalid_signature(RT_context_t* ctx, gchar *msg) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"invalid_signature");
+  rt_add_text_node(node, "msg", msg);
+  rt_prepare_node(ctx, node);
+}
+
+/*+
   RT_key_add_error - Reports an add key error.
 
   RT_context_t* ctx - Context.
