@@ -93,12 +93,12 @@ int make_sql2pack(SQ_result_set_t *result, SQ_row_t *row, rp_upd_pack_t *pack, r
             /*
              read 0-3 from inaddr
              0 - objectid
-             1 - prefix
-             2 - prefix_length
+             1 - begin_in
+             2 - end_in
              3 - domain
              */
-            conv = IP_pref_f2b_v4(&(uniptr->u.rt), col[1], col[2]);
-            uniptr->space = IP_pref_b2_space(&(uniptr->u.rt));
+            conv = IP_rang_f2b_v4(&(uniptr->u.in), col[1], col[2]);
+            uniptr->space = IP_rang_b2_space(&(uniptr->u.in));
             pack->d.domain = UT_strdup(col[3]);
         } else {
             /* read 0-4 from ip6int
