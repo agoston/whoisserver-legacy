@@ -73,9 +73,17 @@ int RP_asc2uni(const char *astr, rp_attr_t attr, rp_uni_t *uni) {
         conv = IP_pref_e2b(&(uni->u.rt), astr);
         uni->space = uni->u.rt.ip.space;
         break;
-    case A_DN:
-        conv = IP_revd_e2b(&(uni->u.rt), astr);
-        uni->space = uni->u.rt.ip.space;
+    case A_DN: {
+        ip_revd_t revd;
+        if ((conv = IP_revd_t2b(&revd, astr)) == IP_OK) {
+            uni->space = revd.space;
+            if (revd.space == IP_V4) {
+                uni->u.in = revd.rang;
+            } else if (revd.space == IP_V6) {
+                uni->u.rt = revd.pref;
+            } else die;
+        }
+        } // case scope
         break;
     default:
         conv = IP_INVARG;
@@ -164,9 +172,19 @@ int RP_pack_set_pref4(rp_attr_t attr, const char *avalue, rp_upd_pack_t *pack, u
 }
 
 int RP_pack_set_revd(rp_attr_t attr, const char *avalue, rp_upd_pack_t *pack) {
-    dieif(IP_revd_a2b(&(pack->uni.u.rt), avalue) != IP_OK); /* assuming correctness checked */
+    ip_revd_t revd;
+    int retval = IP_OK;
+
+    if ((retval = IP_revd_t2b(&revd, avalue)) == IP_OK) {
+        pack->uni.space = revd.space;
+        if (revd.space == IP_V4) {
+            pack->uni.u.in = revd.rang;
+        } else if (revd.space == IP_V6) {
+            pack->uni.u.rt = revd.pref;
+        } else die;
+    } else die;
+
     pack->d.domain = (char*) avalue;
-    pack->uni.space = IP_pref_b2_space(&(pack->uni.u.rt));
     RP_pack_set_type(attr, pack, pack->uni.space);
     return (IP_OK);
 }
