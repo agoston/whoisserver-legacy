@@ -1065,7 +1065,7 @@ static int create_attr(const rpsl_attr_t *attribute, Transaction_t *tr) {
 	/* attribute value is already clean since we have a "flattened" object */
 	attribute_value = rpsl_attr_get_value(attribute);
 
-	query_type=DF_get_insert_query_type(attribute_type);
+	query_type = DF_get_insert_query_type(attribute_type);
 	query_fmt = DF_get_insert_query(attribute_type);
 
 	/* compose the query depending on the attribute */
