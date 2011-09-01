@@ -38,11 +38,10 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <netinet/in.h>
-#include <sys/param.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <errno.h>
-#include <glib.h>
+#include <byteswap.h>
 
 /* workaround to fix broken include files with Linux */
 #ifndef ULLONG_MAX
@@ -72,7 +71,6 @@ inline unsigned IP_sizebits(ip_space_t spc_id) {
 inline int ip_rang_validate(ip_range_t *rangptr) {
 
     if (rangptr->begin.space != rangptr->end.space) {
-        /* die;  *//* incompatible IP spaces */
         return IP_INVRAN;
     }
 
@@ -353,152 +351,184 @@ int IP_pref_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf) {
  For IPv6 the expf doesn't matter, the address must be parsable in whole.
 
  +*/
-int IP_revd_t2b(ip_prefix_t *prefptr, const char *domstr, ip_exp_t expf) {
 #define CPYLEN 264
+int IP_revd_t2b_v6(ip_prefix_t *prefptr, const char *domstr) {
     char ip[256], temp[256];
-    char prefstr[CPYLEN+1];
-    char *arpa;
+    char prefstr[CPYLEN + 1];
     unsigned len;
-    int octets=0, goon=1, quads = 0;
-    char *dot;
+    char *arpa;
+    int quads = 0;
     int err = IP_OK;
     gchar **domains;
     int i, j;
     int zeros_to_add = -1;
 
-    dieif(expf != IP_PLAIN && expf != IP_EXPN);
-
     /* The input may not be in lowercase, but must be processed as well.
      The simplest solution: make a copy and change it to lowercase. */
-
     strncpy(prefstr, domstr, CPYLEN);
     prefstr[CPYLEN] = '\0';
     g_strdown(prefstr);
 
-    if ( (arpa=strstr(prefstr, ".in-addr.arpa")) != NULL) {
-        prefptr->ip.space = IP_V4;
-    } else if ( (arpa=strstr(prefstr, ".ip6.arpa")) != NULL) {
-        prefptr->ip.space = IP_V6;
-    } else {
-        return IP_NOREVD;
-    }
+    prefptr->ip.space = IP_V6;
 
     /* copy the IP part to another string, ERROR if 256 chars not enough */
     len = arpa - prefstr;
     if (len > 255) {
-        /* die;  *//* ERROR - ip address part of the string too long. */
         return IP_ADTOLO;
     }
     strncpy(temp, prefstr, len);
-    temp[len]=0;
+    temp[len] = 0;
 
     /* now: get the octets/quads reversed one by one. Then conversion. */
-    ip[0]=0; /* init */
-    switch (prefptr->ip.space) {
-        case IP_V6:
-            /* ipv6 originally looked like: "1.8.0.6.0.1.0.0.2.ip6.arpa" */
-            /* here it will look like: "1.8.0.6.0.1.0.0.2" */
-            g_strreverse(temp);
-            /* now it will look like: "2.0.0.1.0.6.0.8.1" */
-            /* we split into domains, and then add each one on, putting ':' where
-             necessary */
-            ip[0] = '\0';
-            i = 0;
-            quads = 0;
-            domains = g_strsplit(temp, ".", -1);
-            while (domains[i] != NULL) {
-                strcat(ip, domains[i]);
-                quads++;
-                i++;
-                if (((i % 4) == 0) && (i < 32)) {
-                    strcat(ip, ":");
-                }
-            }
-            g_strfreev(domains);
-            /* our ip string will look like this: "2002:0608:1" */
-            /* add zeros to pad the string, and a final "::" */
-            switch (i % 4) {
-                case 0:
-                    zeros_to_add = 0;
-                    break;
-                case 1:
-                    zeros_to_add = 3;
-                    break;
-                case 2:
-                    zeros_to_add = 2;
-                    break;
-                case 3:
-                    zeros_to_add = 1;
-                    break;
-            }
-            if (zeros_to_add) {
-                for (j=0; j<zeros_to_add; j++) {
-                    strcat(ip, "0");
-                    i++;
-                }
-                if (i < 32) {
-                    strcat(ip, ":");
-                }
-            }
-            if (i < 32) {
-                strcat(ip, ":");
-            }
-            /* now we have a fully-formed IPv6 address: "2002:0608:1000::" */
+    ip[0] = 0; /* init */
+    /* ipv6 originally looked like: "1.8.0.6.0.1.0.0.2.ip6.arpa" */
+    /* here it will look like: "1.8.0.6.0.1.0.0.2" */
+    g_strreverse(temp);
+    /* now it will look like: "2.0.0.1.0.6.0.8.1" */
+    /* we split into domains, and then add each one on, putting ':' where
+     necessary */
+    ip[0] = '\0';
+    i = 0;
+    quads = 0;
+    domains = g_strsplit(temp, ".", -1);
+    while (domains[i] != NULL) {
+        strcat(ip, domains[i]);
+        quads++;
+        i++;
+        if (((i % 4) == 0) && (i < 32)) {
+            strcat(ip, ":");
+        }
+    }
+    g_strfreev(domains);
+    /* our ip string will look like this: "2002:0608:1" */
+    /* add zeros to pad the string, and a final "::" */
+    switch (i % 4) {
+    case 0:
+        zeros_to_add = 0;
+        break;
+    case 1:
+        zeros_to_add = 3;
+        break;
+    case 2:
+        zeros_to_add = 2;
+        break;
+    case 3:
+        zeros_to_add = 1;
+        break;
+    }
 
-            /* convert using our text-to-binary function */
-            err=IP_addr_t2b( &(prefptr->ip), ip, IP_EXPN);
-            prefptr->bits = quads * 4;
-            break;
+    if (zeros_to_add) {
+        for (j = 0; j < zeros_to_add; j++) {
+            strcat(ip, "0");
+            i++;
+        }
+        if (i < 32) {
+            strcat(ip, ":");
+        }
+    }
 
-        case IP_V4:
-            do {
-                if ( (dot = strrchr(temp, '.')) == NULL) {
-                    goon = 0;
-                    dot = temp;
-                }
+    if (i < 32) {
+        strcat(ip, ":");
+    }
+    /* now we have a fully-formed IPv6 address: "2002:0608:1000::" */
 
-                strcat(ip, dot + (goon ));
-                octets++;
-
-                /* add a dot, unless that was the last octet */
-                if (goon) {
-                    strcat(ip, ".");
-                }
-
-                *dot = 0;
-
-            } while (goon);
-
-            /* now try to convert the ip.
-
-             Support for RFC2317:
-             If expf==IP_EXPN, then on failure leave out the last octet
-             (nibble/piece) and try again. On success, quit the loop.
-
-             In any case use the EXPN mode for the conversion.
-             */
-            do {
-                char *lastdot;
-
-                if ( (err=IP_addr_t2b( &(prefptr->ip), ip, IP_EXPN)) == IP_OK) {
-                    break;
-                }
-
-                /* cut the last octet */
-                if ( (lastdot=strrchr(ip, '.')) == NULL) {
-                    break;
-                }
-                *lastdot = '\0';
-                octets--;
-
-            } while (expf == IP_EXPN && octets>0);
-
-            prefptr->bits = octets * 8;
-            break;
-    } /* switch */
+    /* convert using our text-to-binary function */
+    err = IP_addr_t2b(&(prefptr->ip), ip, IP_EXPN);
+    prefptr->bits = quads * 4;
 
     return err;
 }
+
+/* helper function to convert one octet of an in-addr.arpa
+ * returns: IP_OK if correct
+ *          IP_INVRAN if malformed
+ *          result < 0 if 'in-addr.arpa' reached
+ */
+int convert_octet(char *a, char *b, int *result) {
+	char *endptr;
+	int octet = strtol(a, &endptr, 10);
+	if (endptr != b) {		// invalid characters in input
+		// malformed or end of in-addr.arpa
+		return IP_INVRAN;
+	}
+	if (octet < 0 || octet > 255) {	// invalid numbers in input
+		return IP_INVRAN;
+	}
+	*result = octet;
+	return IP_OK;
+}
+
+int IP_revd_t2b_v4(ip_range_t *rangptr, const char *domstr) {
+    int err = IP_OK;
+    char *a = (char *) domstr, *b;
+    unsigned int begin = 0, end = 0;
+    int octetnum = 0, dash_octet = -1;
+    int octet;
+
+    // example inputs: 1-2.3.4.5.in-addr.arpa
+    //                 1.2.3.in-addr.arpa
+    for (b = strpbrk(a, "-."); b; b = strpbrk(a, "-.")) {
+        if (*b == '-') { // separator is a dash
+            if (a == domstr) { // first iteration, dash is allowed
+                if ((dash_octet >= 0) || (octetnum > 0)) { // only one dash octet is allowed, on the first octet
+                    return IP_INVRAN;
+                }
+                if (((err = convert_octet(a, b, &octet)) != IP_OK)) {
+                    return err;
+                }
+                dash_octet = octetnum;
+                begin = (begin << 8) + octet;
+
+                // do an iteration to get the range end (between - and the next .)
+                a = b + 1;
+                b = strpbrk(a, "-.");
+                if (*b != '.') {
+                    return IP_INVRAN;
+                }
+                if ((err = convert_octet(a, b, &octet)) != IP_OK) {
+                    return err;
+                }
+                end = (end << 8) + octet;
+            } else {
+                if (!strcmp(a, "in-addr.arpa")) { // reached end if in-addr.arpa
+                    break;
+                }
+
+                // dash notation outside the the last octet
+                return IP_INVRAN;
+            }
+
+        } else { // *b == '.'
+            if ((err = convert_octet(a, b, &octet)) != IP_OK) {
+                return err;
+            }
+            begin = (begin << 8) + octet;
+            end = (end << 8) + octet;
+        }
+
+        a = b + 1;
+        octetnum++;
+    }
+
+    // if there was a -, it has to be on the lsb octet
+    if (dash_octet >= 0 && octetnum < 4) {
+        return IP_INVRAN;
+    }
+
+    // if there were less than 4 octets, set missing octets to form a range
+    for (; octetnum < 4; octetnum++) {
+        end |= 0xff << (octetnum * 8);
+    }
+
+    // WARNING: bswap_32() is gcc-specific, but it still hell of a lot better than ntohl()
+    IP_rang_v4_mk(rangptr, bswap_32(begin), bswap_32(end));
+    return err;
+}
+
+int IP_revd_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf) {
+    return 0;
+}
+
 
 /**************************************************************************/
 
@@ -857,16 +887,6 @@ int IP_pref_a2v6_32(const char *avalue, ip_prefix_t *pref, ip_limb_t *word1, ip_
     return (ret);
 }
 
-/* Convert reverse domain string into numbers */
-int IP_revd_a2v4(const char *avalue, ip_prefix_t *pref, unsigned int *prefix, unsigned int *prefix_length) {
-    int ret;
-
-    if (NOERR(ret = IP_revd_e2b(pref, avalue))) {
-        IP_pref_b2v4(pref, prefix, prefix_length);
-    }
-    return (ret);
-}
-
 /* Convert ip addr string into numbers */
 int IP_addr_a2v4(const char *avalue, ip_addr_t *ipaddr, unsigned int *address) {
     int ret;
@@ -1093,7 +1113,6 @@ int IP_addr_b2a(ip_addr_t * binaddr, char *ascaddr, unsigned strmax) {
         if (snprintf(ascaddr, strmax, "%d.%d.%d.%d", ((binaddr->words[0]) & ((unsigned)0xff << 24)) >> 24,
                 ((binaddr->words[0]) & (0xff << 16)) >> 16, ((binaddr->words[0]) & (0xff << 8)) >> 8,
                 ((binaddr->words[0]) & (0xff << 0)) >> 0) >= strmax) {
-            /*die;  *//* string too short */
             return IP_TOSHRT;
         }
     } else {
@@ -1448,7 +1467,6 @@ void IP_rang_encomp(ip_range_t *rangptr) {
     /* so this must be checked for separately */
 
     if (c_dif > 0x80000000) {
-        slash = 0;
         ff = 0xffffffff;
         blk = 0;
 

@@ -287,8 +287,6 @@ int IP_pref_a2v6_32(const char *avalue, ip_prefix_t *pref,
 	     ip_limb_t *word1, ip_limb_t  *word2,
 	     ip_limb_t *word3, ip_limb_t  *word4,
 	     unsigned *prefix_length);
-int IP_revd_a2v4(const char *avalue, ip_prefix_t *pref,
-		      unsigned int *prefix, unsigned int *prefix_length);
 int IP_addr_a2v4(const char *avalue,ip_addr_t *ipaddr, unsigned int *address);
 int IP_rang_a2v4(const char *rangstr, ip_range_t *myrang,
 		      unsigned int *begin_in, unsigned int *end_in);
