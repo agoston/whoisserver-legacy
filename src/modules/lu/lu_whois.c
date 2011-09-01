@@ -814,40 +814,40 @@ lu_whois_check_overlap (LU_server_t *server, GList **overlap,
  * source    - update source
  * result    - resulting rpsl object list
  */
-LU_ret_t LU_get_inetnum_from_domain(LU_server_t *server,gchar *domain,
-    gchar *source,GList **result)
-{
-  gint ret_val;
-  ip_prefix_t ip_inet;
-  gchar inetnum_str[300];
-  GList *query_result;
-  gchar *query;
-  gboolean query_ret;
+LU_ret_t LU_get_inetnum_from_domain(LU_server_t *server, gchar *domain, gchar *source, GList **result) {
+    gint ret_val;
+    ip_revd_t revd;
+    gchar inetnum_str[300];
+    GList *query_result;
+    gchar *query;
+    gboolean query_ret;
 
-  /* find the corresponding inetnum object */
-  LG_log(lu_context, LG_FUNC, ">Entering LU_get_inetnum_from_domain");
-  LG_log(lu_context, LG_FUNC, "domain is %s",domain);
-  LG_log(lu_context, LG_FUNC, "source is %s",source);
-  if (IP_revd_t2b(&ip_inet, domain, IP_EXPN) != IP_OK) {
-    LG_log(lu_context, LG_FUNC, "error converting %s to prefix", domain);
-    ret_val = LU_ERROR;
-  } else if (IP_pref_b2a(&ip_inet, inetnum_str, 255) != IP_OK) {
-    LG_log(lu_context, LG_FUNC, "error converting prefix to string");
-    ret_val = LU_ERROR;
-  } else {
-    LG_log(lu_context, LG_FUNC, "inetnum is %s",inetnum_str);
-    query = g_strdup_printf("-C -G -B -Tinetnum,inet6num -s %s -r %s", source, inetnum_str);
-    query_ret = lu_whois_query(server->info, query, &query_result);
-    g_free(query);
-    if (!query_ret) {
-      ret_val = LU_ERROR;
-    } else  {
-      *result=query_result;
-      ret_val=LU_OKAY;
+    /* find the corresponding inetnum object */
+    LG_log(lu_context, LG_FUNC, ">Entering LU_get_inetnum_from_domain");
+    LG_log(lu_context, LG_FUNC, "domain is %s", domain);
+    LG_log(lu_context, LG_FUNC, "source is %s", source);
+    if (IP_revd_t2b(&revd, domain) == IP_OK) {
+        if (IP_revd_b2t_prefrang(&revd, inetnum_str, 255) == IP_OK) {
+            LG_log(lu_context, LG_FUNC, "inetnum is %s", inetnum_str);
+            query = g_strdup_printf("-C -G -B -Tinetnum,inet6num -s %s -r %s", source, inetnum_str);
+            query_ret = lu_whois_query(server->info, query, &query_result);
+            g_free(query);
+            if (!query_ret) {
+                ret_val = LU_ERROR;
+            } else {
+                *result = query_result;
+                ret_val = LU_OKAY;
+            }
+        } else {
+            LG_log(lu_context, LG_FUNC, "error converting prefix to string");
+            ret_val = LU_ERROR;
+        }
+    } else {
+        LG_log(lu_context, LG_FUNC, "error converting %s to prefix", domain);
+        ret_val = LU_ERROR;
     }
-  }
-  LG_log(lu_context, LG_FUNC, "<Exiting LU_get_inetnum_from_domain");
-  return ret_val;
+    LG_log(lu_context, LG_FUNC, "<Exiting LU_get_inetnum_from_domain");
+    return ret_val;
 }
 
 /*
