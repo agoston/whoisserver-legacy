@@ -116,6 +116,16 @@ typedef struct {
   ip_addr_t         end;          /*+ IP where it ends +*/
 } ip_range_t;
 
+/* reverse domains are either prefixes (ipv6) or ranges (ipv4) */
+typedef struct {
+    ip_space_t space;
+    union {
+        ip_prefix_t pref;
+        ip_range_t rang;
+    };
+} ip_revd_t;
+
+
 /*+ prefix_range structure ( 1.2.3.4/24^23-22 +*/
 typedef struct {
   ip_prefix_t    prefix;
@@ -156,7 +166,7 @@ extern "C" {
 int IP_addr_t2b(ip_addr_t *ipptr, const char *addr, ip_exp_t expf);
 int IP_pref_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf);
 int IP_rang_t2b(ip_range_t *rangptr, const char *rangstr, ip_exp_t expf);
-int IP_revd_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf);
+int IP_revd_t2b(ip_revd_t *revdptr, const char *revdstr);
 int IP_pref_rang_t2b(ip_prefix_range_t *prefrangptr, const char *prefrangstr, ip_exp_t expf);
 /* convenience (or call it backward compatibility) macros */
 
@@ -186,6 +196,7 @@ int IP_pref_f2b_v6_32(ip_prefix_t * prefptr, const char *word1str, const char *w
 int IP_addr_b2a(ip_addr_t * binaddr, char *ascaddr, unsigned strmax);
 int IP_pref_b2a(ip_prefix_t * prefptr, char *ascaddr, unsigned strmax);
 int IP_rang_b2a(ip_range_t * rangptr, char *ascaddr, unsigned strmax);
+int IP_revd_b2t_prefrang(ip_revd_t *revdptr, char *buf, int bufsize);
 int IP_rang_classful(ip_range_t * rangptr, ip_addr_t * addrptr);
 int IP_pref_2_rang(ip_range_t * rangptr, ip_prefix_t * prefptr);
 int IP_addr_b2a_uncompress(ip_addr_t * binaddr, char *ascaddr, unsigned strmax);
@@ -231,7 +242,6 @@ void IP_addr_b2v4(ip_addr_t *addrptr, unsigned *address);
 void IP_pref_b2v4(ip_prefix_t *prefptr,
 		   unsigned int *prefix,
 		   unsigned int *prefix_length);
-#define IP_revd_b2v4(a,b,c) IP_pref_b2v4(a,b,c)
 void IP_pref_b2v6(ip_prefix_t *prefptr,
                   ip_v6word_t *high,
                   ip_v6word_t *low,

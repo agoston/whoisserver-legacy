@@ -338,20 +338,9 @@ int IP_pref_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf) {
 }
 
 /**************************************************************************/
-
-/*+ converts an inaddr/ip6int string into a binary prefix.
-
- RFC2317 support for IPv4:
-
- For expf==IP_EXPN (e2b macro) the unparsable part will be silently accepted
- (with the result being the prefix of the succesfully parsed bits).
-
- For expf==IP_PLAIN  the unparsable part will make the function return an error.
-
- For IPv6 the expf doesn't matter, the address must be parsable in whole.
-
- +*/
 #define CPYLEN 264
+
+/* converts an ip6.arpa string into an ip_prefix_t */
 int IP_revd_t2b_v6(ip_prefix_t *prefptr, const char *domstr) {
     char ip[256], temp[256];
     char prefstr[CPYLEN + 1];
@@ -362,12 +351,6 @@ int IP_revd_t2b_v6(ip_prefix_t *prefptr, const char *domstr) {
     gchar **domains;
     int i, j;
     int zeros_to_add = -1;
-
-    /* The input may not be in lowercase, but must be processed as well.
-     The simplest solution: make a copy and change it to lowercase. */
-    strncpy(prefstr, domstr, CPYLEN);
-    prefstr[CPYLEN] = '\0';
-    g_strdown(prefstr);
 
     prefptr->ip.space = IP_V6;
 
@@ -458,6 +441,7 @@ int convert_octet(char *a, char *b, int *result) {
 	return IP_OK;
 }
 
+/* parser an in-addr.arpa to ip_range_t */
 int IP_revd_t2b_v4(ip_range_t *rangptr, const char *domstr) {
     int err = IP_OK;
     char *a = (char *) domstr, *b;
@@ -525,10 +509,44 @@ int IP_revd_t2b_v4(ip_range_t *rangptr, const char *domstr) {
     return err;
 }
 
-int IP_revd_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf) {
-    return 0;
+/* converts an (in-addr|ip6).arpa to binary format (prefix or range) */
+int IP_revd_t2b(ip_revd_t *revdptr, const char *revdstr) {
+    int err = IP_OK;
+    char buf[256];
+
+    /* The input may not be in lowercase, but must be processed as well.
+     The simplest solution: make a copy and change it to lowercase. */
+    int bsize = g_strlcpy(buf, revdstr, 256);
+
+    // remove leftover trailing .
+    if (buf[bsize-1] == '.') {
+        buf[bsize--] = 0;
+    }
+
+    g_strdown(buf);
+
+    if ((bsize > 12) && !strcmp(&(buf[bsize-12]), "in-addr.arpa")) {
+        revdptr->space = IP_V4;
+        err = IP_revd_t2b_v4(&revdptr->rang, revdstr);
+    } else if ((bsize > 7) && !strcmp(&(buf[bsize-7]), "ip6.arpa")) {
+        revdptr->space = IP_V6;
+        err = IP_revd_t2b_v6(&revdptr->pref, revdstr);
+    } else {
+        return IP_INVARG;
+    }
+    return err;
 }
 
+/* converts an ip_revd_t to a textual prefix or range (X/Y or X - Y) */
+int IP_revd_b2t_prefrang(ip_revd_t *revdptr, char *buf, int bufsize) {
+    if (revdptr->space == IP_V4) {
+        return IP_rang_b2a(&revdptr->rang, buf, bufsize);
+    } else if (revdptr->space == IP_V6) {
+        return IP_pref_b2a(&revdptr->pref, buf, bufsize);
+    } else {
+        return IP_INVARG;
+    }
+}
 
 /**************************************************************************/
 
@@ -1645,12 +1663,24 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
             }
         } else {
             /* check for reverse domain */
-            err = IP_revd_t2b(querypref, key, expf);
+            ip_revd_t revd;
+            err = IP_revd_t2b(&revd, key);
             if (NOERR(err)) {
                 if (keytype) *keytype = IPK_REVD;
 
                 if (!justcheck) {
-                    *preflist = g_list_append(*preflist, querypref);
+                    if (revd.space == IP_V4) {
+                        if (encomp) { // look for the first bigger(shorter) prefix containing this range
+                            IP_rang_encomp(&revd.rang);
+                        }
+
+                        if (!justcheck) { // decompose to prefixlist
+                            IP_rang_decomp(&revd.rang, preflist);
+                        }
+                    } else if (revd.space == IP_V6) {
+                        *querypref = revd.pref;
+                        *preflist = g_list_append(*preflist, querypref);
+                    } else die;
                 }
             } else {
                 /* check for range */
@@ -1663,15 +1693,11 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
                 if (NOERR(err)) {
                     if (keytype) *keytype = IPK_RANGE;
 
-                    /* sometimes (exless match) we look for the first bigger(shorter)  */
-                    /* prefix containing this range. */
-                    if (encomp) {
+                    if (encomp) {       // look for the first bigger(shorter) prefix containing this range
                         IP_rang_encomp(&myrang);
                     }
 
-                    /* OK, now we can let the engine happily find that there's just one */
-                    /* prefix in range */
-                    if (!justcheck) {
+                    if (!justcheck) {   // decompose to prefixlist
                         IP_rang_decomp(&myrang, preflist);
                     }
                 } else {
