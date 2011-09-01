@@ -786,11 +786,11 @@ static int QC_fill(const char *query_str, Query_command *query_command, Query_en
                 || MA_isset(query_command->keytypes_bitmap, WK_IP6PREFIX);
 
         {   /* determine if is_rdns_key */
-            ip_prefix_t ign;
+            ip_revd_t ign;
 
             is_rdns_key = MA_isset(query_command->keytypes_bitmap, WK_REVDOMAIN);
 
-            if (is_rdns_key && IP_revd_t2b(&ign, query_command->keys, IP_EXPN) != IP_OK) {
+            if (is_rdns_key && IP_revd_t2b(&ign, query_command->keys) != IP_OK) {
                 /* not a reverse domain - adjust flags accordingly */
                 MA_set(&query_command->keytypes_bitmap, WK_REVDOMAIN, 0);
                 is_rdns_key = FALSE;
