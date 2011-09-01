@@ -1928,7 +1928,6 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   gchar *prefix;
   ip_range_t range;
-  ip_keytype_t ipk;
   GList *attr_list = NULL;
   rpsl_attr_t *attr;
 
@@ -1963,7 +1962,7 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
 
   /* convert ASCII prefix into binary range representation */
-  ip_retval = IP_smart_range(prefix, &range, IP_EXPN, &ipk);
+  ip_retval = IP_smart_range(prefix, &range, IP_EXPN, NULL);
 
   /* handle error condition when the range could not be parsed */
   if (ip_retval != IP_OK)
