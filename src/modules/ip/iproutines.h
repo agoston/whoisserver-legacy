@@ -102,39 +102,26 @@ typedef struct {
   ip_space_t space;       /*+ MUST NOT BE char ! prefixes are compared with
 			    memcmp, so there may be absolutely no unitialised
 			    bytes  +*/
-} ip_addr_internal_t;
+} ip_addr_t;
 
 /*+ prefix structure +*/
 typedef struct {
   unsigned                bits;		/*+ length in bits. +*/
-  ip_addr_internal_t      ip;	    /*+ the IP of the prefix +*/
-} ip_prefix_internal_t;
+  ip_addr_t      ip;	    /*+ the IP of the prefix +*/
+} ip_prefix_t;
 
 /*+ range structure +*/
 typedef struct {
-  ip_addr_internal_t         begin;        /*+ IP where the range begins. +*/
-  ip_addr_internal_t         end;          /*+ IP where it ends +*/
-} ip_range_internal_t;
+  ip_addr_t         begin;        /*+ IP where the range begins. +*/
+  ip_addr_t         end;          /*+ IP where it ends +*/
+} ip_range_t;
 
 /*+ prefix_range structure ( 1.2.3.4/24^23-22 +*/
 typedef struct {
-  ip_prefix_internal_t    prefix;
+  ip_prefix_t    prefix;
   unsigned                n;      /*+ the N number +*/
   unsigned                m;      /*+ the M number +*/
-} ip_prefix_range_internal_t;
-
-#if 0/* #ifndef IP_IMPL  -- set this to see accesses to structure members */
-/* hide the internals */
-typedef struct {char a[sizeof(ip_addr_internal_t)];}    ip_addr_t;
-typedef struct {char a[sizeof(ip_range_internal_t)];}   ip_range_t;
-typedef struct {char a[sizeof(ip_prefix_internal_t)];}  ip_prefix_t;
-typedef struct {char a[sizeof(ip_prefix_range_internal_t)];}  ip_prefix_range_t;
-#else
-typedef ip_addr_internal_t   ip_addr_t;
-typedef ip_range_internal_t  ip_range_t;
-typedef ip_prefix_internal_t ip_prefix_t;
-typedef ip_prefix_range_internal_t ip_prefix_range_t;
-#endif
+} ip_prefix_range_t;
 
 
 /*+
@@ -157,7 +144,6 @@ typedef enum {
   IP_EXPN
 } ip_exp_t;
 
-/* #include <erroutines.h> */
 
 #ifdef __cplusplus
 extern "C" {
