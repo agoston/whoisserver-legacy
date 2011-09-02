@@ -527,7 +527,7 @@ int IP_revd_t2b(ip_revd_t *revdptr, const char *revdstr) {
     if ((bsize > 12) && !strcmp(&(buf[bsize-12]), "IN-ADDR.ARPA")) {
         revdptr->space = IP_V4;
         err = IP_revd_t2b_v4(&revdptr->rang, buf);
-    } else if ((bsize > 7) && !strcmp(&(buf[bsize-7]), "IP6.ARPA")) {
+    } else if ((bsize > 8) && !strcmp(&(buf[bsize-8]), "IP6.ARPA")) {
         revdptr->space = IP_V6;
         err = IP_revd_t2b_v6(&revdptr->pref, buf);
     } else {
