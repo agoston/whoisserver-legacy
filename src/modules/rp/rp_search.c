@@ -48,8 +48,7 @@ static void rp_exclude_datlink(GList **datlist, GList *element) {
 
 
 /*++++
- this is a helper: goes through a datlist and returns the smallest
- size of a range
+ this is a helper: goes through a datlist and returns the smallest size of a range
 
  works for IPv4 only
  +++*/
@@ -69,7 +68,6 @@ static ip_rangesize_t rp_find_smallest_span(GList *datlist) {
             min_span = span;
         }
     }
-    LG_log(rp_context, LG_DEBUG, "rp_find_smallest_span: minimal span is %d", min_span);
 
     return min_span;
 }
@@ -157,7 +155,7 @@ static int rp_find_longest_prefix(GList **datlist) {
  taking span into account
  +*/
 static
-int rp_asc_process_datlist(rx_srch_mt search_mode, int par_a, rx_fam_t fam_id, int prefnumber, GList **datlist, ip_range_t *testrang, int *hits) {
+int rp_asc_process_datlist(rx_srch_mt search_mode, int par_a, int prefnumber, GList **datlist, ip_range_t *testrang, int *hits) {
     ip_rangesize_t min_span = 0, span;
     int use_span = 0;
     int max_pref = -1;
@@ -189,7 +187,7 @@ int rp_asc_process_datlist(rx_srch_mt search_mode, int par_a, rx_fam_t fam_id, i
     if ((search_mode == RX_SRCH_EXLESS) || (search_mode == RX_SRCH_LESS && par_a == 1)) {
         /* span works only for IP_V4. We use it only for inetnums,
          although RT/v4 would work too */
-        if (testrang->begin.space == IP_V4 && fam_id == RX_FAM_IN) {
+        if (testrang->begin.space == IP_V4) {
             min_span = rp_find_smallest_span(*datlist);
             use_span = 1;
         } else {
@@ -343,7 +341,7 @@ int rp_srch_copyresults(GList * datlist, GList ** finallist, int maxcount) {
     return RP_OK;
 }
 
-static void rp_begend_preselection(GList **datlist, rx_fam_t fam_id, ip_range_t *testrang) {
+static void rp_begend_preselection(GList **datlist, ip_range_t *testrang) {
     GList *ditem, *newitem;
 
     ditem = g_list_first(*datlist);
@@ -406,7 +404,6 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
     ip_range_t testrang;
     int locked = 0;
     ip_space_t spc_id;
-    rx_fam_t fam_id;
     rx_tree_t *mytree;
     int hits = 0;
     ip_prefix_t beginpref;
@@ -422,7 +419,6 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
 
     /* find the tree */
     spc_id = IP_pref_b2_space(preflist->data);
-    fam_id = RP_attr2fam(attr, spc_id);     // set the family id based on the space and attribute
     if (!NOERR(err = RP_tree_get(&mytree, reg_id, spc_id, attr))) {
         wr_clear_list(&preflist);
         return err;
@@ -450,7 +446,7 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
         /* 3. preselection: exclude those that do not include end of range
          */
         if (NOERR(err)) {
-            rp_begend_preselection(&datlist, fam_id, &testrang);
+            rp_begend_preselection(&datlist, &testrang);
         }
 
     } else {    /* MORE */
@@ -463,7 +459,7 @@ int RP_asc_search(rx_srch_mt search_mode, int par_a, int par_b, char *key, rp_re
     /* 5. processing - using the same processing function */
     if (NOERR(err)) {
         /* one occurence is enough */
-        err = rp_asc_process_datlist(search_mode, par_a, fam_id, 1, &datlist, &testrang, &hits);
+        err = rp_asc_process_datlist(search_mode, par_a, 1, &datlist, &testrang, &hits);
     }
 
     /* 6. copy results */
