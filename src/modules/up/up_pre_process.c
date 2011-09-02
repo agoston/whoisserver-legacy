@@ -1013,7 +1013,7 @@ int UP_check_domain_dash(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object
     int retval = UP_OK;
     int range_start = 0;
     int range_end = 0;
-    char *type = NULL;
+    const char *type = NULL;
     char *primary_key = NULL;
     char *cnt_str = NULL;
     char *pkey_copy = NULL;

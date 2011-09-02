@@ -2201,7 +2201,6 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   char **split_lines = NULL;
   char *line = NULL;
   char *object_str = NULL;
-  int i;
   int line_idx, line_cnt;
   int valid_first_line = 0;
   int source_line_found = 0;
@@ -2220,8 +2219,6 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   rpsl_object_t *object = NULL;
   guint previous_number_of_objects;
   guint current_number_of_objects;
-  gint range_start; /*required for decomposition */
-  gint range_end; /* required for decomposition */
 
   LG_log(lg_ctx, LG_FUNC,">UP_process_submission: entered");
 
