@@ -339,89 +339,53 @@ int IP_pref_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf) {
 }
 
 /**************************************************************************/
-#define CPYLEN 264
 
-/* converts an ip6.arpa string into an ip_prefix_t
- * FIXME: bad code */
+int convert_digit(char digit) {
+    if (digit >= '0' && digit <= '9') {
+        return digit - '0';
+    } else if (digit >= 'A' && digit <= 'F') {
+        return digit - 'A' + 10;
+    } else return -1;
+}
+
+/* converts an ip6.arpa string into an ip_prefix_t */
 int IP_revd_t2b_v6(ip_prefix_t *prefptr, const char *domstr) {
-    char ip[256], temp[256];
-    char prefstr[CPYLEN + 1];
-    unsigned len;
-    char *arpa;
-    int quads = 0;
-    int err = IP_OK;
-    gchar **domains;
-    int i, j;
-    int zeros_to_add = -1;
+    char *p;
+    unsigned int bits = 0;
+    gboolean nextdigit = TRUE;
+
+    // zero out target prefix
+    memset(prefptr, 0, sizeof(*prefptr));
+
+    // look for terminator
+    p = strstr(domstr, ".IP6.ARPA");
+    if (!p) return IP_INVARG;
+
+    // walk back from there
+    for (--p; p >= domstr; p--) {
+        if (nextdigit) {
+            int digit = convert_digit(*p);
+            if (digit < 0) {
+                return IP_INVARG;
+            }
+
+            /* filling from msb, nibble by nibble */
+            prefptr->ip.words[bits>>5] |= (unsigned int)digit << ((28-bits) & 31);
+            bits += 4;
+            nextdigit = FALSE;
+
+        } else {
+            if (*p != '.') {
+                return IP_INVARG;
+            }
+            nextdigit = TRUE;
+        }
+    }
 
     prefptr->ip.space = IP_V6;
+    prefptr->bits = bits;
 
-    /* copy the IP part to another string, ERROR if 256 chars not enough */
-    len = arpa - prefstr;
-    if (len > 255) {
-        return IP_ADTOLO;
-    }
-    strncpy(temp, prefstr, len);
-    temp[len] = 0;
-
-    /* now: get the octets/quads reversed one by one. Then conversion. */
-    ip[0] = 0; /* init */
-    /* ipv6 originally looked like: "1.8.0.6.0.1.0.0.2.ip6.arpa" */
-    /* here it will look like: "1.8.0.6.0.1.0.0.2" */
-    g_strreverse(temp);
-    /* now it will look like: "2.0.0.1.0.6.0.8.1" */
-    /* we split into domains, and then add each one on, putting ':' where
-     necessary */
-    ip[0] = '\0';
-    i = 0;
-    quads = 0;
-    domains = g_strsplit(temp, ".", -1);
-    while (domains[i] != NULL) {
-        strcat(ip, domains[i]);
-        quads++;
-        i++;
-        if (((i % 4) == 0) && (i < 32)) {
-            strcat(ip, ":");
-        }
-    }
-    g_strfreev(domains);
-    /* our ip string will look like this: "2002:0608:1" */
-    /* add zeros to pad the string, and a final "::" */
-    switch (i % 4) {
-    case 0:
-        zeros_to_add = 0;
-        break;
-    case 1:
-        zeros_to_add = 3;
-        break;
-    case 2:
-        zeros_to_add = 2;
-        break;
-    case 3:
-        zeros_to_add = 1;
-        break;
-    }
-
-    if (zeros_to_add) {
-        for (j = 0; j < zeros_to_add; j++) {
-            strcat(ip, "0");
-            i++;
-        }
-        if (i < 32) {
-            strcat(ip, ":");
-        }
-    }
-
-    if (i < 32) {
-        strcat(ip, ":");
-    }
-    /* now we have a fully-formed IPv6 address: "2002:0608:1000::" */
-
-    /* convert using our text-to-binary function */
-    err = IP_addr_t2b(&(prefptr->ip), ip, IP_EXPN);
-    prefptr->bits = quads * 4;
-
-    return err;
+    return IP_OK;
 }
 
 /* helper function to convert one octet of an in-addr.arpa
@@ -1159,7 +1123,6 @@ int IP_pref_b2a(ip_prefix_t * prefptr, char *ascaddr, unsigned strmax) {
     int err;
 
     if ((err = IP_addr_b2a(&(prefptr->ip), ascaddr, strmax)) != IP_OK) {
-        /*die;  *//* what the hell */
         return err;
     }
     strl = strlen(ascaddr);
@@ -1168,7 +1131,6 @@ int IP_pref_b2a(ip_prefix_t * prefptr, char *ascaddr, unsigned strmax) {
     /* now strmax holds the space that is left */
 
     if (snprintf(ascaddr + strl, strmax, "/%d", prefptr->bits) >= strmax) {
-        /* die;  *//* error: string too short */
         return IP_TOSHRT;
     }
     return IP_OK;
