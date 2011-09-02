@@ -1720,23 +1720,32 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
  * keytype can be NULL */
 int IP_smart_range(char *key, ip_range_t * rangptr, ip_exp_t expf, ip_keytype_t * keytype) {
     int err = IP_OK;
-    GList *preflist = NULL;
+    ip_revd_t revd;
 
-    /* first : is it a range ? */
-    if (NOERR(err = IP_rang_t2b(rangptr, key, expf))) {
+    /* check for range */
+    if ((err = IP_rang_t2b(rangptr, key, expf)) == IP_OK) {
         if (keytype) *keytype = IPK_RANGE;
+
+    /* check for revdomain */
+    } else if ((err = IP_revd_t2b(&revd, key)) == IP_OK) {
+        if (revd.space == IP_V4) {
+            *rangptr = revd.rang;
+        } else if (revd.space == IP_V6) {
+            err = IP_pref_2_rang(rangptr, &revd.pref);
+        } else die;
+
     } else {
-        /* OK, this must be possible to convert it to prefix and from there
-         to a range. */
+        /* convert it to prefix and from there to a range */
+        GList *preflist = NULL;
         if (NOERR(err = IP_smart_conv(key, 0, 0, &preflist, expf, keytype))) {
 
             dieif(g_list_length(preflist) != 1);
 
             dieif(!NOERR(IP_pref_2_rang(rangptr, g_list_first(preflist)->data)));
         }
-    }
 
-    wr_clear_list(&preflist);
+        wr_clear_list(&preflist);
+    }
 
     return err;
 }
