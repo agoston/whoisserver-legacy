@@ -163,6 +163,7 @@ inline void IP_convert_mapped(ip_addr_t * in) {
  to control the expansion with a flag.
  +*/
 
+// FIXME: bad code
 int IP_addr_t2b(ip_addr_t *ipptr, const char *addr, ip_exp_t expf) {
     if (index(addr, ':') == NULL) {
         /* IPv4 */
@@ -340,7 +341,8 @@ int IP_pref_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf) {
 /**************************************************************************/
 #define CPYLEN 264
 
-/* converts an ip6.arpa string into an ip_prefix_t */
+/* converts an ip6.arpa string into an ip_prefix_t
+ * FIXME: bad code */
 int IP_revd_t2b_v6(ip_prefix_t *prefptr, const char *domstr) {
     char ip[256], temp[256];
     char prefstr[CPYLEN + 1];
@@ -474,7 +476,7 @@ int IP_revd_t2b_v4(ip_range_t *rangptr, const char *domstr) {
                 }
                 end = (end << 8) + octet;
             } else {
-                if (!strcmp(a, "in-addr.arpa")) { // reached end if in-addr.arpa
+                if (!strcmp(a, "IN-ADDR.ARPA")) { // reached end if in-addr.arpa
                     break;
                 }
 
@@ -513,9 +515,6 @@ int IP_revd_t2b_v4(ip_range_t *rangptr, const char *domstr) {
 int IP_revd_t2b(ip_revd_t *revdptr, const char *revdstr) {
     int err = IP_OK;
     char buf[256];
-
-    /* The input may not be in lowercase, but must be processed as well.
-     The simplest solution: make a copy and change it to lowercase. */
     int bsize = g_strlcpy(buf, revdstr, 256);
 
     // remove leftover trailing .
@@ -523,14 +522,14 @@ int IP_revd_t2b(ip_revd_t *revdptr, const char *revdstr) {
         buf[bsize--] = 0;
     }
 
-    g_strdown(buf);
+    g_strup(buf);
 
-    if ((bsize > 12) && !strcmp(&(buf[bsize-12]), "in-addr.arpa")) {
+    if ((bsize > 12) && !strcmp(&(buf[bsize-12]), "IN-ADDR.ARPA")) {
         revdptr->space = IP_V4;
-        err = IP_revd_t2b_v4(&revdptr->rang, revdstr);
-    } else if ((bsize > 7) && !strcmp(&(buf[bsize-7]), "ip6.arpa")) {
+        err = IP_revd_t2b_v4(&revdptr->rang, buf);
+    } else if ((bsize > 7) && !strcmp(&(buf[bsize-7]), "IP6.ARPA")) {
         revdptr->space = IP_V6;
-        err = IP_revd_t2b_v6(&revdptr->pref, revdstr);
+        err = IP_revd_t2b_v6(&revdptr->pref, buf);
     } else {
         return IP_INVARG;
     }
@@ -1368,7 +1367,8 @@ ip_rangesize_t IP_rang_span(ip_range_t *rangptr) {
  after use.
 
  returns a bitmask of prefix lengths used.
-*/
+
+FIXME: bad code */
 unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist) {
     unsigned prefmask=0;
     register int slash=0;
@@ -1467,7 +1467,8 @@ unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist) {
  finds the smallest canonical block encompassing the whole given range,
  then MODIFIES the range pointed to by the argument
  so that it's equal to this block.
-*/
+
+ FIXME: bad code */
 void IP_rang_encomp(ip_range_t *rangptr) {
     int slash=0;
     unsigned c_dif, blk, ff, t_dif;
