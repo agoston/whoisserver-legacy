@@ -297,8 +297,11 @@ int rx_nod_search(rx_srch_mt search_mode, int par_a, int par_b, rx_tree_t *tree,
             }
 
 #ifdef DEBUG_RADIX
-            rx_nod_print(&stack[sps].cpy, buf, IP_PREFSTR_MAX);
-            fprintf(stderr, "rx_nod_search: peeling off %d: %s (%s)\n", sps, buf, reason);
+            {
+                char buf[256];
+                rx_nod_print(&stack[sps].cpy, buf, IP_PREFSTR_MAX);
+                fprintf(stderr, "rx_nod_search: peeling off %d: %s (%s)\n", sps, buf, reason);
+            }
 #endif
 
             sps--;

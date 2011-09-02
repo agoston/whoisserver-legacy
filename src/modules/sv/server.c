@@ -189,6 +189,10 @@ static void radix_load(void) {
     fprintf(stderr, "\n\nrevdomain tree (v4):\n");
     RP_tree_get(&mytree, ca_get_SourceHandleByPosition(0), IP_V4, A_DN);    /* during testing, only source is 0 == DB-TEST */
     rx_tree_print_stderr(mytree);
+
+    fprintf(stderr, "\n\nrevdomain tree (v6):\n");
+    RP_tree_get(&mytree, ca_get_SourceHandleByPosition(0), IP_V6, A_DN);    /* during testing, only source is 0 == DB-TEST */
+    rx_tree_print_stderr(mytree);
 #endif
 }
 

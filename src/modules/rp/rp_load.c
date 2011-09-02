@@ -187,6 +187,10 @@ static void *RP_sql_load_attr_space(void *arg) {
         die;
     }
 
+#ifdef DEBUG_RADIX_LOAD
+    fprintf(stderr, "Executing: %s\n", load_query);
+#endif
+
     if (SQ_execute_query(con, load_query, &result)) {
         fprintf(stderr, "SQL ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
         die;
@@ -221,6 +225,10 @@ static void *RP_sql_load_attr_space(void *arg) {
         fprintf(stderr, "SQL ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
         die;
     }
+
+#ifdef DEBUG_RADIX_LOAD
+    fprintf(stderr, "Loaded %d objects\n", objnr);
+#endif
 
     LG_log(rp_context, LG_INFO, "loaded %dK objects into %s/%s", objnr>>10, srcnam, attr_code);
 
