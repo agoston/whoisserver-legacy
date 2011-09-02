@@ -767,6 +767,8 @@ static int QC_fill(const char *query_str, Query_command *query_command, Query_en
 
     /* if no error, process the key, otherwise don't bother */
     if (!synerrflg && !badparerr) {
+        ip_revd_t ign;
+
         /* convert the key to uppercase. */
         g_strup(query_command->keys);
 
@@ -785,16 +787,13 @@ static int QC_fill(const char *query_str, Query_command *query_command, Query_en
                 || MA_isset(query_command->keytypes_bitmap, WK_IPPREFIX)
                 || MA_isset(query_command->keytypes_bitmap, WK_IP6PREFIX);
 
-        {   /* determine if is_rdns_key */
-            ip_revd_t ign;
+        /* determine if is_rdns_key */
+        is_rdns_key = MA_isset(query_command->keytypes_bitmap, WK_REVDOMAIN);
 
-            is_rdns_key = MA_isset(query_command->keytypes_bitmap, WK_REVDOMAIN);
-
-            if (is_rdns_key && IP_revd_t2b(&ign, query_command->keys) != IP_OK) {
-                /* not a reverse domain - adjust flags accordingly */
-                MA_set(&query_command->keytypes_bitmap, WK_REVDOMAIN, 0);
-                is_rdns_key = FALSE;
-            }
+        if (is_rdns_key && (IP_revd_t2b(&ign, query_command->keys) != IP_OK)) {
+            /* not a reverse domain - adjust flags accordingly */
+            MA_set(&query_command->keytypes_bitmap, WK_REVDOMAIN, 0);
+            is_rdns_key = FALSE;
         }
 
         /* determine if inverse query */
