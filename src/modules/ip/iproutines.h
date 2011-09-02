@@ -166,6 +166,8 @@ extern "C" {
 int IP_addr_t2b(ip_addr_t *ipptr, const char *addr, ip_exp_t expf);
 int IP_pref_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf);
 int IP_rang_t2b(ip_range_t *rangptr, const char *rangstr, ip_exp_t expf);
+int IP_revd_t2b_v6(ip_prefix_t *prefptr, const char *domstr);
+int IP_revd_t2b_v4(ip_range_t *rangptr, const char *domstr);
 int IP_revd_t2b(ip_revd_t *revdptr, const char *revdstr);
 int IP_pref_rang_t2b(ip_prefix_range_t *prefrangptr, const char *prefrangstr, ip_exp_t expf);
 /* convenience (or call it backward compatibility) macros */
