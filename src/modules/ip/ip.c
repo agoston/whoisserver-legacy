@@ -1669,20 +1669,19 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
             if (NOERR(err)) {
                 if (keytype) *keytype = IPK_REVD;
 
-                if (!justcheck) {
-                    if (revd.space == IP_V4) {
-                        if (encomp) { // look for the first bigger(shorter) prefix containing this range
-                            IP_rang_encomp(&revd.rang);
-                        }
+                if (revd.space == IP_V4) {
+                    if (encomp) { // look for the first bigger(shorter) prefix containing this range
+                        IP_rang_encomp(&revd.rang);
+                    }
 
-                        if (!justcheck) { // decompose to prefixlist
-                            IP_rang_decomp(&revd.rang, preflist);
-                        }
-                    } else if (revd.space == IP_V6) {
-                        *querypref = revd.pref;
-                        *preflist = g_list_append(*preflist, querypref);
-                    } else die;
-                }
+                    if (!justcheck) { // decompose to prefixlist
+                        IP_rang_decomp(&revd.rang, preflist);
+                    }
+                } else if (revd.space == IP_V6) {
+                    *querypref = revd.pref;
+                    *preflist = g_list_append(*preflist, querypref);
+                } else
+                    die;
             } else {
                 /* check for range */
                 ip_range_t myrang;
