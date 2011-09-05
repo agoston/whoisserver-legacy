@@ -3,9 +3,6 @@
 #        mnt-by TEST-MNT pass
 # parent mnt-by RIPE-NCC-HM-MNT pass
 #
-# (See also issue NCC#2005070991)
-# Create SUCCEDED: [domain] 1-2.3.1.193.in-addr.arpa
-# 
 #
 #SUCCESS
 #
