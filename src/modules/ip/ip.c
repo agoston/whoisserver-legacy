@@ -479,7 +479,11 @@ int IP_revd_t2b_v4(ip_range_t *rangptr, const char *domstr) {
     return err;
 }
 
-/* converts an (in-addr|ip6).arpa to binary format (prefix or range) */
+/* converts an (in-addr|ip6).arpa to binary format (prefix or range)
+ * returns: IP_NOREVD if not reverse dns
+ *          fills revdptr->space (as it is a reverse dns)
+ *          IP_INVRAN, IP_INVARG if malformed input
+ *          IP_OK and revd fully filled if correct input */
 int IP_revd_t2b(ip_revd_t *revdptr, const char *revdstr) {
     int err = IP_OK;
     char buf[256];
@@ -1436,7 +1440,7 @@ unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist) {
 
  FIXME: bad code */
 void IP_rang_encomp(ip_range_t *rangptr) {
-    int slash=0;
+    int slash = 0;
     unsigned c_dif, blk, ff, t_dif;
     ip_addr_t workbegin;
     ip_addr_t workend;
