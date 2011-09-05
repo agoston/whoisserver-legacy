@@ -465,9 +465,9 @@ int IP_revd_t2b_v4(ip_range_t *rangptr, const char *domstr) {
     }
 
     // if there was a -, it has to be on the lsb octet
-    if (dash_octet >= 0 && octetnum < 4) {
-        return IP_INVRAN;
-    }
+//    if (dash_octet >= 0 && octetnum < 4) {
+//        return IP_INVRAN;
+//    }
 
     // if there were less than 4 octets, set missing octets to form a range
     for (; octetnum < 4; octetnum++) {
