@@ -439,6 +439,10 @@ int IP_revd_t2b_v4(ip_range_t *rangptr, const char *domstr) {
                     return err;
                 }
                 end = (end << 8) + octet;
+
+                if (end < begin) {  // range end has to be bigger
+                    return IP_INVARG;
+                }
             } else {
                 if (!strcmp(a, "IN-ADDR.ARPA")) { // reached end if in-addr.arpa
                     break;
