@@ -168,6 +168,8 @@ gchar *ns_find_delcheck_conf(LG_context_t * lg_context, gchar * domain)
       }
     } else if (dot_count == 4) {        /* slash 24 */
       result = g_strdup_printf("%sipv4-24", prefix);
+    } else if (dot_count == 5) {        /* sub-/24 delegation - we use the /24 config file now */
+      result = g_strdup_printf("%sipv4-24", prefix);
     } else if (dot_count == 2) { /* slash 8 */
       result = g_strdup_printf("%sipv4-8", prefix);
     }
