@@ -503,7 +503,7 @@ int IP_revd_t2b(ip_revd_t *revdptr, const char *revdstr) {
         revdptr->space = IP_V6;
         err = IP_revd_t2b_v6(&revdptr->pref, buf);
     } else {
-        return IP_INVARG;
+        return IP_NOREVD;
     }
     return err;
 }
