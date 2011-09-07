@@ -53,7 +53,7 @@ void km_key_return_add(km_key_return_t* kr,
   gchar* key, gchar* value);
 
 typedef struct {
-  KM_status_t (*init)(LG_context_t*, RT_context_t*, GList*, GList*, gchar*, gchar*);
+  KM_status_t (*init)(LG_context_t*, GList*, GList*, gchar*, gchar*);
   void (*end)(void);
   KM_key_return_t* (*signature_verify)(gchar*, gchar*);
   //KM_status_t (*key_remove)(gchar*);

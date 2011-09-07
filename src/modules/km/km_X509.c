@@ -47,7 +47,6 @@
 static gchar *temporary_directory = NULL;
 static gchar *openssl_path = NULL;
 static LG_context_t *lg_ctx;
-static RT_context_t *rctx;
 static GList *my_sources = NULL;
 
 void km_X509_end();
@@ -63,13 +62,12 @@ void km_X509_end();
    Returns  status.
  */
  
-KM_status_t km_X509_init(LG_context_t *_ctx, RT_context_t *_rt_ctx, GList *servers,
+KM_status_t km_X509_init(LG_context_t *_ctx, GList *servers,
                         GList *sources, gchar *tmp_dir, gchar *path)
 {
   int retval = KM_OK;
 
   lg_ctx = _ctx;
-  rctx = _rt_ctx;
   LG_log(lg_ctx, LG_FUNC,">km_X509_init: entered\n");
 
   /* clear static data */

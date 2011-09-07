@@ -35,24 +35,8 @@
 #include <assert.h>
 
 #include "rip.h"
-#include "ep.h"
-#include "rt.h"
-#include "km.h"
-#include "lg.h"
 #include "lu_whois.h"
-#include "dbupdate.h"
-#include "up_pre_process.h"
-#include "up_auto_nic.h"
-#include "up_util.h"
-#include "ca_defs.h"
-#ifdef RDNSYES
 #include "ns_util.h"
-#else
-#define ns_is_decompose(x,y,z,t) (0)
-#define ns_remove_trailing_dot(x,y) (0)
-#define ns_decompose_object(x,y,z,t,w) NULL
-#endif
-#include <glib.h>
 
 /* Report an internal software error, send an ack if possoble and exit out of dbupdate
    Receives RT context
@@ -2464,7 +2448,7 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
           {
             retval = UP_FATAL;  /* so that UP_ret2str macro works */
             /* free up memory */
-            for ( item=item; item != NULL; item=g_slist_next(item) )
+            for (; item != NULL; item=g_slist_next(item) )
             {
               free((char *)(item->data));
             }
@@ -2507,7 +2491,7 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         {
           retval = UP_FATAL;  /* so that UP_ret2str macro works */
           /* free up memory */
-          for ( item=item; item != NULL; item=g_slist_next(item) )
+          for (; item != NULL; item=g_slist_next(item) )
           {
             free((char *)(item->data));
           }

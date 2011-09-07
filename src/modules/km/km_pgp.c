@@ -47,8 +47,9 @@
 static gchar* temporary_directory = NULL;
 static gchar* gpg_path = NULL;
 static LG_context_t* ctx;
-static RT_context_t *rctx;
 static GList* my_sources = NULL;
+
+char *KM_PGP_GNUPG_ERROR_OUTPUT = NULL;
 
 void km_pgp_end() {
   GList* tmp_list;
@@ -77,10 +78,9 @@ void km_pgp_end() {
 
   return - the status.
  */
-KM_status_t km_pgp_init(LG_context_t* _ctx, RT_context_t *_rt_ctx, GList* servers,
+KM_status_t km_pgp_init(LG_context_t* _ctx, GList* servers,
                         GList* sources, gchar* tmp_dir, gchar* path) {
   ctx = _ctx;
-  rctx = _rt_ctx;
 
   km_pgp_end();
   gpg_path = g_strdup(path);
@@ -267,9 +267,11 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
     if ( !valid && gpg_output->str && key_ring )
     {
         LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: report signature not valid [%s]", gpg_output->str);
-        RT_invalid_signature(rt_ctx, gpg_output->str);
+        KM_PGP_GNUPG_ERROR_OUTPUT = gpg_output->str;
+    } else {
+        KM_PGP_GNUPG_ERROR_OUTPUT = NULL;
     }
-    g_string_free(gpg_output, TRUE);
+    g_string_free(gpg_output, FALSE);
 
     unlink(in_file);
     unlink(out_file);

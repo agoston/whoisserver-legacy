@@ -35,6 +35,9 @@
 #include "rt_internal.h"
 #include <libxml/tree.h>
 
+/* declared in km_pgp.c */
+extern char *KM_PGP_GNUPG_ERROR_OUTPUT;
+
 void rt_prepare_node(RT_context_t* ctx, xmlNodePtr node);
 xmlNodePtr rt_generate_list(xmlNodePtr parent_node, gchar* tag, GList* list);
 
@@ -120,21 +123,15 @@ gchar* RT_EP_analyse(RT_context_t* ctx, ep_input_structure_t* input) {
         gen_node = xmlNewNode(NULL, (xmlChar*)"list");
         if ( CR_credential_get_type(list->data) == CR_PGP )
         {
-          if ( ! pgp_found )
-          {
-            cred_node_pgp = xmlNewNode(NULL, (xmlChar*)"bad_pgp_credentials");
-            pgp_found = 1;
-          }
+          cred_node_pgp = xmlNewNode(NULL, (xmlChar*)"bad_pgp_credentials");
+          pgp_found = 1;
           xmlNodeSetContent(gen_node, (xmlChar*)CR_credential_get_value(list->data));
           xmlAddChild(cred_node_pgp, gen_node);
         }
         else if ( CR_credential_get_type(list->data) == CR_X509 )
         {
-          if ( ! x509_found )
-          {
-            cred_node_x509 = xmlNewNode(NULL, (xmlChar*)"bad_x509_credentials");
-            x509_found = 1;
-          }
+          cred_node_x509 = xmlNewNode(NULL, (xmlChar*)"bad_x509_credentials");
+          x509_found = 1;
           xmlNodeSetContent(gen_node, (xmlChar*)CR_credential_get_value(list->data));
           xmlAddChild(cred_node_x509, gen_node);
         }
@@ -148,10 +145,22 @@ gchar* RT_EP_analyse(RT_context_t* ctx, ep_input_structure_t* input) {
       {
         xmlAddChild(node, cred_node_x509);
       }
+
+      /* if GnuPG has any error output while checking the PGP keys earlier, include in the message
+       * This is a horrible hack, but for some reason, reporting from inside km_pgp.c did create the
+       * node in the rt_ctx, but it was lost during the XSLT transformation, for reasons unknown
+       * agoston, 2011-09-07 */
+      if (KM_PGP_GNUPG_ERROR_OUTPUT) {
+          xmlNodePtr invsignode = xmlNewNode(NULL, (xmlChar*)"invalid_signature");
+          rt_add_text_node(invsignode, "msg", KM_PGP_GNUPG_ERROR_OUTPUT);
+          xmlAddChild(node, invsignode);
+      }
+
       CR_credential_list_free(creds);
       return "BAD CREDENTIALS";
     }
   }
+
   return "OK";
 }
 
