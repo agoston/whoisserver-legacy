@@ -80,9 +80,7 @@ AU_ret_t rdns_deletion(au_plugin_callback_info_t * info)
           ret_val = AU_ERROR;
         } else {
           source = rpsl_attr_get_clean_value(source_attrs->data);
-          lu_retval =
-            LU_get_inetnum_from_domain(au_lookup, domain, source,
-                                   &inetnum_obj_list);
+          lu_retval = LU_get_inetnum_from_domain(au_lookup, domain, source, &inetnum_obj_list);
           if (inetnum_obj_list == NULL) {
             LG_log(au_context, LG_DEBUG, "rdns_deletion: %s has no corresponding inet(6)num", domain);
             RT_no_address_space(info->ctx);
@@ -273,39 +271,34 @@ static AU_ret_t ns_flat_creation(au_plugin_callback_info_t * info,
  * Hierarchical authorisation of a reverse dns object
  * authorisation is only checked against address space
  */
-static AU_ret_t ns_hierarchical_creation(au_plugin_callback_info_t * info,
-                                         gchar * domain, gchar * source)
-{
-  AU_ret_t ret_val;             /* result of the function */
-  GList *inetnum_obj_list;      /* list of corresponding inetnums */
-  rpsl_object_t *inetnum_obj;   /* corresponding inetnum object */
-  LU_ret_t lu_retval;           /* lookup return value */
+static AU_ret_t ns_hierarchical_creation(au_plugin_callback_info_t * info, gchar * domain, gchar * source) {
+    AU_ret_t ret_val; /* result of the function */
+    GList *inetnum_obj_list; /* list of corresponding inetnums */
+    rpsl_object_t *inetnum_obj; /* corresponding inetnum object */
+    LU_ret_t lu_retval; /* lookup return value */
 
-  LG_log(au_context, LG_FUNC, ">ns_hierarchical_creation: entering");
+    LG_log(au_context, LG_FUNC, ">ns_hierarchical_creation: entering");
 
-  lu_retval =
-      LU_get_inetnum_from_domain(au_lookup, domain, source, &inetnum_obj_list);
-  if (lu_retval != LU_OKAY) {
-    LG_log(au_context, LG_DEBUG, "ns_hierarchical_creation: error retrieving inet(6)num for %s", domain);
-    ret_val = AU_ERROR;
-  } else if (inetnum_obj_list == NULL) {
-    LG_log(au_context, LG_DEBUG, "ns_hierarchical_creation: %s has no corresponding inet(6)num object", domain);
-    RT_no_address_space(info->ctx);
-    ret_val = AU_UNAUTHORISED_CONT;
-  } else if (inetnum_obj_list->next != NULL) {
-    LG_log(au_context, LG_DEBUG, "ns_hierarchical_creation: %s has overlapping inet(6)num parents", domain);
-    RT_rdns_overlap(info->ctx);
-    ret_val = AU_UNAUTHORISED_CONT;
-  } else {
-    inetnum_obj = inetnum_obj_list->data;
-    /* check authorization from corresponding inet(6)num */
-    ret_val = au_check_multiple_authentications
-                     (CHECK_MNT_DOMAINS_THEN_MNT_LOWER_THEN_MNT_BY, inetnum_obj, "parent", info);
-  }
+    lu_retval = LU_get_inetnum_from_domain(au_lookup, domain, source, &inetnum_obj_list);
+    if (lu_retval != LU_OKAY) {
+        LG_log(au_context, LG_DEBUG, "ns_hierarchical_creation: error retrieving inet(6)num for %s", domain);
+        ret_val = AU_ERROR;
+    } else if (inetnum_obj_list == NULL) {
+        LG_log(au_context, LG_DEBUG, "ns_hierarchical_creation: %s has no corresponding inet(6)num object", domain);
+        RT_no_address_space(info->ctx);
+        ret_val = AU_UNAUTHORISED_CONT;
+    } else if (inetnum_obj_list->next != NULL) {
+        LG_log(au_context, LG_DEBUG, "ns_hierarchical_creation: %s has overlapping inet(6)num parents", domain);
+        RT_rdns_overlap(info->ctx);
+        ret_val = AU_UNAUTHORISED_CONT;
+    } else {
+        inetnum_obj = inetnum_obj_list->data;
+        /* check authorization from corresponding inet(6)num */
+        ret_val = au_check_multiple_authentications(CHECK_MNT_DOMAINS_THEN_MNT_LOWER_THEN_MNT_BY, inetnum_obj, "parent", info);
+    }
 
-  LG_log(au_context, LG_FUNC, "<ns_hierarchical_creation: exiting with value [%s]",
-         AU_ret2str(ret_val));
-  return ret_val;
+    LG_log(au_context, LG_FUNC, "<ns_hierarchical_creation: exiting with value [%s]", AU_ret2str(ret_val));
+    return ret_val;
 }
 
 /*
