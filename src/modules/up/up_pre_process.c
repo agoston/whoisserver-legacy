@@ -1014,10 +1014,9 @@ int UP_check_domain_dash(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object
     int range_end = 0;
     const char *type = NULL;
     char *primary_key = NULL;
-    char *cnt_str = NULL;
     char pkey_copy[256];
     regex_t preg;
-    regmatch_t pmatch[5];
+    regmatch_t pmatch[10];
     gint reg_retval;
     gchar errstr[200];
     gchar temp_num[100];
@@ -1058,23 +1057,28 @@ int UP_check_domain_dash(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object
 
     /* checking that if there is a dash it is in the fourth octet */
     strncpy(pkey_copy, primary_key, sizeof(pkey_copy));
+    g_strdown(pkey_copy);
+
+    LG_log(lg_ctx, LG_DEBUG, "Matching against regexp: %s", pkey_copy);
 
     /* strict regexp for revdns. can't do it in syntax.xml, as we still support forward domains */
-    if ((reg_retval = regcomp(&preg, "^(0|[1-9][0-9]*)(\\-(0|[1-9][0-9]*))?(\\.(0|[1-9][0-9]*)){3}$", REG_EXTENDED)) != 0) {
+    if ((reg_retval = regcomp(&preg, "^(((0|[1-9][0-9]*)\\.){1,4}|(0|[1-9][0-9]*)-(0|[1-9][0-9]*)(\\.(0|[1-9][0-9]*)){3}\\.)in-addr\\.arpa$", REG_EXTENDED)) != 0) {
         regerror(reg_retval, &preg, errstr, 100);
         LG_log(lg_ctx, LG_DEBUG, "compiling regular expression in UP_check_domain_dash(%s): %s", pkey_copy, errstr);
 
-    } else if ((reg_retval = regexec(&preg, pkey_copy, 5, pmatch, 0)) != 0) {
+    } else if ((reg_retval = regexec(&preg, pkey_copy, 10, pmatch, 0)) != 0) {
         regerror(reg_retval, &preg, errstr, 100);
         LG_log(lg_ctx, LG_DEBUG, "executing regular expression in UP_check_domain_dash(%s): %s", pkey_copy, errstr);
         RT_rdns_invalid_range(rt_ctx);
         retval = UP_FAIL;
 
-    } else if (pmatch[2].rm_so >= 0) {  // if there is a - in the regexp
-        g_snprintf(temp_num, (pmatch[1].rm_eo - pmatch[1].rm_so + 2), "%s", pkey_copy + pmatch[1].rm_so);
+    } else if (pmatch[4].rm_so >= 0 && pmatch[5].rm_so >= 0) {  // if there is a - in the regexp
+        g_snprintf(temp_num, (pmatch[4].rm_eo - pmatch[4].rm_so + 2), "%s", pkey_copy + pmatch[4].rm_so);
         range_start = atoi(temp_num);
-        g_snprintf(temp_num, (pmatch[2].rm_eo - pmatch[2].rm_so + 2), "%s", pkey_copy + pmatch[2].rm_so);
+        g_snprintf(temp_num, (pmatch[5].rm_eo - pmatch[5].rm_so + 2), "%s", pkey_copy + pmatch[5].rm_so);
         range_end = atoi(temp_num);
+
+        LG_log(lg_ctx, LG_DEBUG, "Found range: %d - %d", range_start, range_end);
 
         if ((range_start == 0 && range_end == 255) || (range_start == range_end))
         {
@@ -1082,6 +1086,8 @@ int UP_check_domain_dash(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object
             RT_rdns_invalid_range(rt_ctx);
             retval = UP_FAIL;
         }
+    } else {
+        LG_log(lg_ctx, LG_DEBUG, "No range found");
     }
 
     regfree(&preg);
