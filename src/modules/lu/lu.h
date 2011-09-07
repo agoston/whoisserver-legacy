@@ -9,16 +9,15 @@
 
 #define MAX_QUERY_LENGTH 2048
 
-/* lookup returns */
+/* lookup returns, also check LU_ret2str() */
 typedef enum {
   LU_ERROR = 0,
+  LU_INVARG,
   LU_OKAY
 } LU_ret_t;
 
 /* get a string describing the return code */
-#define LU_ret2str(ret) (((ret) == LU_OKAY) ? "LU_OKAY" : \
-                         (((ret) == LU_ERROR) ? "LU_ERROR" : \
-                          NULL))
+const char *LU_ret2str(int ret);
 
 /* generic information for any type of server */
 typedef struct {
@@ -50,7 +49,6 @@ LU_ret_t LU_get_inetnum_from_domain(LU_server_t *,gchar *,gchar *,
                                     GList **);
 void LU_free_parents(GList *parents);
 void LU_cleanup(LU_server_t *server);
-
 
 #endif /* LU_H */
 

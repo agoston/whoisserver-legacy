@@ -280,7 +280,10 @@ static AU_ret_t ns_hierarchical_creation(au_plugin_callback_info_t * info, gchar
     LG_log(au_context, LG_FUNC, ">ns_hierarchical_creation: entering");
 
     lu_retval = LU_get_inetnum_from_domain(au_lookup, domain, source, &inetnum_obj_list);
-    if (lu_retval != LU_OKAY) {
+    if (lu_retval == LU_INVARG) {
+        LG_log(au_context, LG_DEBUG, "ns_hierarchical_creation: domain pkey is malformed");
+        ret_val = AU_UNAUTHORISED_CONT;
+    } else if (lu_retval == LU_ERROR) {
         LG_log(au_context, LG_DEBUG, "ns_hierarchical_creation: error retrieving inet(6)num for %s", domain);
         ret_val = AU_ERROR;
     } else if (inetnum_obj_list == NULL) {

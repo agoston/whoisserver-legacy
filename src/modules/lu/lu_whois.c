@@ -21,6 +21,16 @@
 /* the logging context is defined in lu.c */
 extern LG_context_t *lu_context;
 
+const char * const LU_ret_to_string[] = {
+        "LU_ERROR",
+        "LU_INVARG",
+        "LU_OKAY"
+};
+
+const char *LU_ret2str(int ret) {
+    if (ret < 0 || ret > 2) return NULL;
+    return LU_ret_to_string[ret];
+}
 /*
   Cleans up a WHOIS lookup connection
 
@@ -844,7 +854,7 @@ LU_ret_t LU_get_inetnum_from_domain(LU_server_t *server, gchar *domain, gchar *s
         }
     } else {
         LG_log(lu_context, LG_FUNC, "error converting %s to prefix", domain);
-        ret_val = LU_ERROR;
+        ret_val = LU_INVARG;
     }
     LG_log(lu_context, LG_FUNC, "<Exiting LU_get_inetnum_from_domain");
     return ret_val;
