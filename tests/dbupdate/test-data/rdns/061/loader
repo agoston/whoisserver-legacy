@@ -117,7 +117,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
 nserver:      pri.authdns.ripe.net
-nserver:      ns-sec.ripe.net
+nserver:      sec1.authdns.ripe.net
 mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
@@ -134,7 +134,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
 nserver:      pri.authdns.ripe.net
-nserver:      ns-sec.ripe.net
+nserver:      sec1.authdns.ripe.net
 mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
@@ -146,7 +146,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
 nserver:      pri.authdns.ripe.net
-nserver:      ns-sec.ripe.net
+nserver:      sec1.authdns.ripe.net
 mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
@@ -158,7 +158,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
 nserver:      pri.authdns.ripe.net
-nserver:      ns-sec.ripe.net
+nserver:      sec1.authdns.ripe.net
 mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
@@ -170,7 +170,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
 nserver:      pri.authdns.ripe.net
-nserver:      ns-sec.ripe.net
+nserver:      sec1.authdns.ripe.net
 mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
@@ -182,7 +182,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
 nserver:      pri.authdns.ripe.net
-nserver:      ns-sec.ripe.net
+nserver:      sec1.authdns.ripe.net
 mnt-by:       TEST-DBM-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329

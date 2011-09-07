@@ -13,7 +13,7 @@ admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
 nserver:      pri.authdns.ripe.net
-nserver:      ns-sec.ripe.net
+nserver:      sec1.authdns.ripe.net
 ds-rdata:     52151  1  1  13ee60f7499a70e5aadaf05828e7fc59e8e70bc1
 mnt-by:       RIPE-NCC-HM-DOM-MNT
 mnt-lower:    TEST-DBM-MNT
