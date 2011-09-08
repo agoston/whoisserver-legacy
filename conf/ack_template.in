@@ -200,6 +200,7 @@
 
   <xsl:template match="input_analyse">
 <xsl:apply-templates select="bad_pgp_credentials"/>
+<xsl:apply-templates select="invalid_signature"/>
 <xsl:apply-templates select="bad_x509_credentials"/>
   </xsl:template>
 
@@ -208,6 +209,11 @@
 <xsl:apply-templates select="list"/>
 <xsl:text>
 </xsl:text>
+  </xsl:template>
+
+  <xsl:template match="invalid_signature">
+***Error: PGP signature validation failed:
+<xsl:value-of select="msg/text()"/>
   </xsl:template>
 
   <xsl:template match="bad_x509_credentials">
@@ -270,6 +276,7 @@ key-cert operation OK
   <xsl:template match="no_subject">
 ***Error: No subject found in the supplied certificate
   </xsl:template>
+
 
 
   <xsl:template match="non_existent_object">
@@ -441,6 +448,7 @@ Refered object <xsl:value-of select="refered_object/text()"/> exists.
 
   <xsl:template match="startup">
 <xsl:if test="$level_notice>$level">
+
 ***Info: To create the first person/mntner pair of objects for an organisation see
          http://www.db.ripe.net/cgi-bin/new-user-startup.pl
 </xsl:if>
