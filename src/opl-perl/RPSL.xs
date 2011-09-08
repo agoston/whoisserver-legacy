@@ -328,9 +328,9 @@ rpsl_object_get_attr(object, name)
 
 #const rpsl_attr_t *
 
-rpsl_attr_t *
+const rpsl_attr_t *
 rpsl_object_get_attr_by_ofs(object, ofs)
-	rpsl_object_t *	object
+	const rpsl_object_t *	object
 	gint	ofs
 
 const char *
