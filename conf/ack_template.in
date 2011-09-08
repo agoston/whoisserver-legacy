@@ -451,6 +451,7 @@ Refered object <xsl:value-of select="refered_object/text()"/> exists.
 
   <xsl:template match="startup">
 <xsl:if test="$level_notice>$level">
+
 ***Info: To create the first person/mntner pair of objects for an organisation see
          http://www.db.ripe.net/cgi-bin/new-user-startup.pl
 </xsl:if>
