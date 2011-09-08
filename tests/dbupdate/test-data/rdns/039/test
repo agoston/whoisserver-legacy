@@ -21,4 +21,4 @@ mnt-by:       TEST-MB-MNT
 mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
-override: password
+override:     password

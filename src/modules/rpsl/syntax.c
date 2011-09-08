@@ -73,12 +73,6 @@ syntax_init()
     }
 }
 
-int 
-yywrap()
-{
-    return 1;
-}
-
 /* array of errors (initialize before parsing) */
 GPtrArray *parse_errors;
 

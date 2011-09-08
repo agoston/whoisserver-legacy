@@ -5,7 +5,7 @@
 #
 #SUCCESS
 #
-# RESULT 64: creation will succeed
+# RESULT 65: creation will succeed
 
 Domain: 8.1.f.0.2.0.a.2.ip6.arpa
 Descr:  Reverse delegation

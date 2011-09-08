@@ -84,3 +84,5 @@ tests/dbupdate/testing/dump/
 tests/dbupdate/testing/tmp
 whoisd.pid
 src/utils/enableupdates
+Debug/
+src/defs/alltodo

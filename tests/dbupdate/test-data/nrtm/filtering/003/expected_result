@@ -1,4 +1,4 @@
 
-%ERROR:402: not authorized to mirror the database
+%ERROR:402: not authorized to mirror the database from IP address 127.0.0.1
 
 

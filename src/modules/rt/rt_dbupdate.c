@@ -2094,11 +2094,10 @@ void RT_rdns_threshold(RT_context_t *ctx) {
   RT_rdns_message(ctx,"RDNSthreshold","");
 }
 
-void RT_rdns_invalid_range(RT_context_t *ctx,gchar *object_str) {
+void RT_rdns_invalid_range(RT_context_t *ctx) {
 
   xmlNodePtr node;
   node = xmlNewNode(NULL, (xmlChar*)"RDNSinvalidrange");
-  rt_xml_node_add_content(node, (xmlChar*)object_str);
   rt_prepare_node(ctx, node);
 }
 

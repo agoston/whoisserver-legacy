@@ -835,9 +835,8 @@ AC_ban_set(ip_prefix_t *prefix, char *text, int denyflag)
 int AC_asc_ban_set(char *addrstr, char *text, int denyflag) {
     int ret_err;
     GList *preflist = NULL;
-    ip_keytype_t key_type;
 
-    if ((ret_err = IP_smart_conv(addrstr, 0, 0, &preflist, IP_PLAIN, &key_type)) != IP_OK) {
+    if ((ret_err = IP_smart_conv(addrstr, 0, 0, &preflist, IP_PLAIN, NULL)) != IP_OK) {
         return ret_err;
     }
 
@@ -947,7 +946,6 @@ int AC_asc_acl_command_set(char *command, char *comment)
 	char *array[AC_AR_SIZE];
 	int ret_err = AC_OK;
 	GList *preflist = NULL;
-	ip_keytype_t key_type;
 
 	char *copy = UT_strdup(command);
 	char *addrstr = copy;
@@ -993,7 +991,7 @@ int AC_asc_acl_command_set(char *command, char *comment)
 
 	/* convert the prefix */
 	if (NOERR(ret_err)) {
-		ret_err = IP_smart_conv(addrstr, 0, 0, &preflist, IP_PLAIN, &key_type);
+		ret_err = IP_smart_conv(addrstr, 0, 0, &preflist, IP_PLAIN, NULL);
 
 		/* allow only one prefix */
 		/* The argument can be even a range, but must decompose into one prefix */
@@ -1032,10 +1030,9 @@ int AC_asc_set_nodeny(char *ip)
 	acc_st *ac_ptr;
 	GList *preflist = NULL;
 	acl_st *treeacl;
-	ip_keytype_t key_type;
 
 	/* convert the prefix */
-	ret_err = IP_smart_conv(ip, 0, 0, &preflist, IP_PLAIN, &key_type);
+	ret_err = IP_smart_conv(ip, 0, 0, &preflist, IP_PLAIN, NULL);
 
 	/* allow only one prefix */
 	/* The argument can be even a range, but must decompose into one prefix */

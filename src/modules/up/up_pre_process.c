@@ -34,16 +34,9 @@
  ***************************************/
 
 
-#include "config.h"
 #include <assert.h>
 #include "rip.h"
-
-#include "iproutines.h"
-#include "km.h"
-#include "ca_defs.h"
-#include "dbupdate.h"
-#include "up_pre_process.h"
-#include <glib.h>
+#include <regex.h>
 
 /* these enum values and error messages must be kept in sync */
 typedef enum
@@ -1014,6 +1007,98 @@ LG_log(lg_ctx, LG_DEBUG,"UP_check_ping: call IP_pref_t2b with pvalue [%s]", pval
     return retval;
 }
 
+
+int UP_check_domain_dash(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *preproc_obj) {
+    int retval = UP_OK;
+    int range_start = 0;
+    int range_end = 0;
+    const char *type = NULL;
+    char *primary_key = NULL;
+    char pkey_copy[256];
+    regex_t preg;
+    regmatch_t pmatch[10];
+    gint reg_retval;
+    gchar errstr[200];
+    gchar temp_num[100];
+    ip_revd_t revd;
+
+    LG_log(lg_ctx, LG_FUNC, ">UP_check_domain_dash: entered\n");
+
+    type = rpsl_object_get_class(preproc_obj);
+
+    /* if not domain, return directly */
+    if (strcasecmp(type, "domain")) {
+        LG_log(lg_ctx, LG_DEBUG, "is not domain");
+        goto UP_check_domain_dash_exit;
+    }
+
+    primary_key = rpsl_object_get_key_value(preproc_obj);
+    int revd_ret = IP_revd_t2b(&revd, primary_key);
+
+    /* not a reverse DNS, bail */
+    if (revd_ret == IP_NOREVD) {
+        LG_log(lg_ctx, LG_DEBUG, "is not reverse domain");
+        goto UP_check_domain_dash_exit;
+    }
+
+    /* not ipv4 */
+    if (revd.space != IP_V4) {
+        LG_log(lg_ctx, LG_DEBUG, "is not ipv4 reverse domain");
+        goto UP_check_domain_dash_exit;
+    }
+
+    /* malformed ipv4 */
+    if (revd_ret != IP_OK) {
+        LG_log(lg_ctx, LG_DEBUG, "malformed ipv4 reverse domain");
+        RT_rdns_invalid_range(rt_ctx);
+        retval = UP_FAIL;
+        goto UP_check_domain_dash_exit;
+    }
+
+    /* checking that if there is a dash it is in the fourth octet */
+    strncpy(pkey_copy, primary_key, sizeof(pkey_copy));
+    g_strdown(pkey_copy);
+
+    LG_log(lg_ctx, LG_DEBUG, "Matching against regexp: %s", pkey_copy);
+
+    /* strict regexp for revdns. can't do it in syntax.xml, as we still support forward domains */
+    if ((reg_retval = regcomp(&preg, "^(((0|[1-9][0-9]*)\\.){1,4}|(0|[1-9][0-9]*)-(0|[1-9][0-9]*)(\\.(0|[1-9][0-9]*)){3}\\.)in-addr\\.arpa$", REG_EXTENDED)) != 0) {
+        regerror(reg_retval, &preg, errstr, 100);
+        LG_log(lg_ctx, LG_DEBUG, "compiling regular expression in UP_check_domain_dash(%s): %s", pkey_copy, errstr);
+
+    } else if ((reg_retval = regexec(&preg, pkey_copy, 10, pmatch, 0)) != 0) {
+        regerror(reg_retval, &preg, errstr, 100);
+        LG_log(lg_ctx, LG_DEBUG, "executing regular expression in UP_check_domain_dash(%s): %s", pkey_copy, errstr);
+        RT_rdns_invalid_range(rt_ctx);
+        retval = UP_FAIL;
+
+    } else if (pmatch[4].rm_so >= 0 && pmatch[5].rm_so >= 0) {  // if there is a - in the regexp
+        g_snprintf(temp_num, (pmatch[4].rm_eo - pmatch[4].rm_so + 2), "%s", pkey_copy + pmatch[4].rm_so);
+        range_start = atoi(temp_num);
+        g_snprintf(temp_num, (pmatch[5].rm_eo - pmatch[5].rm_so + 2), "%s", pkey_copy + pmatch[5].rm_so);
+        range_end = atoi(temp_num);
+
+        LG_log(lg_ctx, LG_DEBUG, "Found range: %d - %d", range_start, range_end);
+
+        if ((range_start == 0 && range_end == 255) || (range_start == range_end))
+        {
+            LG_log(lg_ctx, LG_DEBUG, "UP_check_domain_dash: range %d - %d can't be decomposed", range_start, range_end);
+            RT_rdns_invalid_range(rt_ctx);
+            retval = UP_FAIL;
+        }
+    } else {
+        LG_log(lg_ctx, LG_DEBUG, "No range found");
+    }
+
+    regfree(&preg);
+
+UP_check_domain_dash_exit:
+    LG_log(lg_ctx, LG_FUNC, "<UP_check_domain_dash: exiting\n");
+    return retval;
+}
+
+
+
 /* checks for a valid suffix at the end of a 'nic-hdl' attributes 
    Receives RT context
             LG context
@@ -1848,7 +1933,6 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   gchar *prefix;
   ip_range_t range;
-  ip_keytype_t ipk;
   GList *attr_list = NULL;
   rpsl_attr_t *attr;
 
@@ -1883,7 +1967,7 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
 
   /* convert ASCII prefix into binary range representation */
-  ip_retval = IP_smart_range(prefix, &range, IP_EXPN, &ipk);
+  ip_retval = IP_smart_range(prefix, &range, IP_EXPN, NULL);
 
   /* handle error condition when the range could not be parsed */
   if (ip_retval != IP_OK)

@@ -121,7 +121,7 @@ descr:        Test
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
-nserver:        ns-pri.ripe.net
+nserver:        pri.authdns.ripe.net
 nserver:        tinnie.arin.net
 nserver:        sec3.apnic.net
 nserver:        e164-arpa.cnnic.net.cn

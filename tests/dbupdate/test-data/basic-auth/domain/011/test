@@ -3,21 +3,16 @@
 #        mnt-by TEST-MNT pass
 # parent mnt-by RIPE-NCC-HM-MNT pass
 #
-# (See also issue NCC#2005070991)
-# Create FAILED: [domain] 1.1.193.in-addr.arpa
-# Create FAILED: [domain] 2.1.193.in-addr.arpa
 #
-# create two domain object 
-#
-#FAILURE
+#SUCCESS
 #
 # RESULT 11: The creation will fail but expantion will be done.
 
-domain:         1-2.1.193.in-addr.arpa
+domain:         192-255.148.201.193.in-addr.arpa
 descr:          Test-notation
 mnt-by:         TEST-DBM-MNT
-nserver:        ns1.some.net
-nserver:        ns2.some.net
+nserver:        ns1.nl-ix.net
+nserver:        ns2.nl-ix.net
 notify:         dbtest@ripe.net
 admin-c:        TP1-DB-TEST
 tech-c:         TP1-DB-TEST

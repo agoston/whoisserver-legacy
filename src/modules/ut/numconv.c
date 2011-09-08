@@ -40,28 +40,25 @@
    into *result;
 */
 
-int
-ut_dec_2_uns(const char *cpy, unsigned *result) 
-{
-register unsigned val=0;
-register const char *ch=cpy;
+int ut_dec_2_uns(const char *cpy, unsigned *result) {
+    register unsigned val = 0;
+    register const char *ch = cpy;
 
-  while( *ch != '\0') {
+    while (*ch != '\0') {
 
-    if ( ! isdigit(* (unsigned char *) ch)) {       /* make the &*^%#@$%^ */
-      if ( isspace(* (unsigned char *) ch)) {       /* gcc happy */
-        break;
-      }
-      else {
-        return -1;
-      }
+        if (!isdigit(*(unsigned char *) ch)) { /* make the &*^%#@$%^ */
+            if (isspace(*(unsigned char *) ch)) { /* gcc happy */
+                break;
+            } else {
+                return -1;
+            }
+        }
+
+        val *= 10;
+        val += (*ch - '0' );
+        ch++;
     }
 
-    val *= 10;
-    val += ( *ch - '0' );
-    ch++;
-  }
-
- *result = val;
- return 0;
+    *result = val;
+    return 0;
 }

@@ -628,25 +628,25 @@ int isdummy(Transaction_t *tr) {
  *                                                           *
  *************************************************************/
 
-static int process_reverse_domain(Transaction_t *tr, ip_prefix_t *prefptr, int op) {
-	unsigned prefix, prefix_length; /* ipv4 */
+static int process_reverse_domain(Transaction_t *tr, ip_revd_t *revd, int op) {
+	unsigned prefix_length, begin_in, end_in; /* ipv4 */
 	ip_v6word_t msb, lsb; /* ipv6 */
 	char query[512];
 	int num;
 	int sql_err;
 
-	if (IP_pref_b2_space(prefptr) == IP_V4) { /* ipv4 */
+	if (revd->space == IP_V4) {
 		if (op==0) { /* insert record */
-			IP_revd_b2v4(prefptr, &prefix, &prefix_length);
-			sprintf(query, "INSERT INTO inaddr_arpa SET thread_id=%d, object_id=%ld, prefix=%u, prefix_length=%d ",
-			        tr->thread_ins, tr->object_id, prefix, prefix_length);
+			IP_rang_b2v4(&revd->rang, &begin_in, &end_in);
+			sprintf(query, "INSERT INTO inaddr_arpa SET thread_id=%d, object_id=%ld, begin_in=%u, end_in=%u ",
+			        tr->thread_ins, tr->object_id, begin_in, end_in);
 		} else {
 			/* update record */
 			sprintf(query, "UPDATE inaddr_arpa SET thread_id=%d WHERE object_id=%ld ", tr->thread_upd, tr->object_id);
 		}
-	} else { /* ipv6 */
+	} else if (revd->space == IP_V6) {
 		if (op==0) { /* insert record */
-			IP_revd_b2v6(prefptr, &msb, &lsb, &prefix_length);
+			IP_revd_b2v6(&revd->pref, &msb, &lsb, &prefix_length);
 			sprintf(query,
 			        "INSERT INTO ip6int SET thread_id=%d, object_id=%ld, msb='%llu', lsb='%llu', prefix_length=%d ",
 			        tr->thread_ins, tr->object_id, (long long unsigned int)msb, (long long unsigned int)lsb, prefix_length);
@@ -656,7 +656,6 @@ static int process_reverse_domain(Transaction_t *tr, ip_prefix_t *prefptr, int o
 		}
 	}
 
-	LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, query);
 	sql_err = SQ_execute_query(tr->sql_connection, query, (SQ_result_set_t **)NULL);
 	num = SQ_get_affected_rows(tr->sql_connection);
 
@@ -796,7 +795,7 @@ static void update_attr(const rpsl_attr_t *attribute, Transaction_t *tr) {
 	int sql_err;
 	char *token;
 	char *mu_mntner;
-	ip_prefix_t dn_pref;
+	ip_revd_t revd;
 	ip_v6word_t high_ipv6, low_ipv6;
 
 	int attribute_type;
@@ -817,8 +816,8 @@ static void update_attr(const rpsl_attr_t *attribute, Transaction_t *tr) {
 	/*We need to tag the record in inaddr_arpa or int6 tables dor the commit/rollback */
 	/* Otherwise it will be deleted */
 	/* XXX Later we will implement this under UD_MA_DN case */
-	if ((attribute_type == A_DN) && (IP_revd_a2b(&dn_pref, attribute_value)==IP_OK)) {
-		if (update_reverse_domain(tr, &dn_pref) !=0) {
+	if ((attribute_type == A_DN) && (IP_revd_t2b(&revd, attribute_value)==IP_OK)) {
+		if (update_reverse_domain(tr, &revd) !=0) {
 			tr->error|=ERROR_U_DBS;
 			tr->succeeded=0;
 			g_string_sprintfa(tr->error_script, "E[%d][%d:%s]:%s\n", ERROR_U_DBS, attribute_type, attribute_value,
@@ -1065,7 +1064,7 @@ static int create_attr(const rpsl_attr_t *attribute, Transaction_t *tr) {
 	/* attribute value is already clean since we have a "flattened" object */
 	attribute_value = rpsl_attr_get_value(attribute);
 
-	query_type=DF_get_insert_query_type(attribute_type);
+	query_type = DF_get_insert_query_type(attribute_type);
 	query_fmt = DF_get_insert_query(attribute_type);
 
 	/* compose the query depending on the attribute */
@@ -1355,7 +1354,7 @@ static void each_attribute_process(void *element_data, void *tr_ptr) {
 
 	int sq_info[3];
 	char *sq_error;
-	ip_prefix_t dn_pref;
+	ip_revd_t revd;
 
 	int attribute_type;
 	const gchar *attribute_value;
@@ -1447,9 +1446,9 @@ static void each_attribute_process(void *element_data, void *tr_ptr) {
 					}
 				} else {
 					/* Do some additional processing for reverse zones domains */
-					if ((attribute_type == A_DN) && IP_revd_a2b(&dn_pref, attribute_value)==IP_OK) {
+					if ((attribute_type == A_DN) && IP_revd_t2b(&revd, attribute_value)==IP_OK) {
 
-						if (insert_reverse_domain(tr, &dn_pref) != 0) {
+						if (insert_reverse_domain(tr, &revd) != 0) {
 							tr->error|=ERROR_U_DBS;
 							tr->succeeded=0;
 							LG_log(ud_context, LG_SEVERE, "cannot insert inverse domain:[%d:%s]\n", attribute_type,

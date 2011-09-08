@@ -462,14 +462,13 @@ static char *create_query(const Query_t q, Query_command *qc) {
         } else if (q.keytype == WK_IPADDRESS) { /* ifaddr sql lookups */
             ip_range_t myrang;
             unsigned begin, end;
-            ip_keytype_t key_type;
             int err;
 
             /* The only inverse query for IPADDRESS is nserver. */
             /* We need to insure that we don't try to use the numeric values for this
              * query, because the address of the server is stored as a string, and
              * the SQL query is formatted appropriately. */
-            if (NOERR(err = IP_smart_range(qc->keys, &myrang, IP_EXPN, &key_type))) {
+            if (NOERR(err = IP_smart_range(qc->keys, &myrang, IP_EXPN, NULL))) {
                 if (IP_rang_b2_space(&myrang) == IP_V4) {
                     IP_rang_b2v4(&myrang, &begin, &end);
                     if (querytype == Q_INVERSE) {

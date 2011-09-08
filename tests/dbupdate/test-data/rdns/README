@@ -186,13 +186,7 @@ under the control of the test suite.
 # RESULT 19: modification will pass
 
 
-# CASE 20: Update fails because the decomposition range is invalid
-#
-# update domain object
-#
-#FAILURE
-#
-# RESULT 20: update will fail
+# CASE 20 removed
 
 # CASE 21 removed
 
@@ -618,3 +612,62 @@ under the control of the test suite.
 #
 # RESULT 64: creation will fail
 
+
+# CASE 065: Real world failure caused by uppercase 'Domain:' attribute not triggering RDNS checks
+#
+# create domain object
+#
+#SUCCESS
+#
+# RESULT 65: creation will succeed
+
+
+# CASE 66: Create /32 domain object ipv4
+# override used to pass dns checks
+# with a dash notation
+#
+# create domain objects
+#
+#SUCCESS
+#
+# RESULT 66: creation will succeed
+
+
+# CASE 67: Create classless ipv4, with a reversed range (classless delegation)
+# no override
+#
+# create domain objects
+#
+#FAILURE
+#
+# RESULT 67: creation will fail
+
+
+# CASE 68: Create classless ipv4, with a negative range (classless delegation)
+# no override
+#
+# create domain objects
+#
+#FAILURE
+#
+# RESULT 68: creation will fail
+
+
+# CASE 69: Create classless ipv4, with an invalid range end  (classless delegation)
+# no override
+#
+# create domain objects
+#
+#FAILURE
+#
+# RESULT 69: creation will fail
+
+
+# CASE 70: Create classless ipv4, with leading zero ranges (classless delegation)
+# no override
+#
+# create domain objects
+#
+#FAILURE
+#
+# RESULT 70: creation will fail

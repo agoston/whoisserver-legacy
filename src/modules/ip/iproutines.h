@@ -102,39 +102,36 @@ typedef struct {
   ip_space_t space;       /*+ MUST NOT BE char ! prefixes are compared with
 			    memcmp, so there may be absolutely no unitialised
 			    bytes  +*/
-} ip_addr_internal_t;
+} ip_addr_t;
 
 /*+ prefix structure +*/
 typedef struct {
   unsigned                bits;		/*+ length in bits. +*/
-  ip_addr_internal_t      ip;	    /*+ the IP of the prefix +*/
-} ip_prefix_internal_t;
+  ip_addr_t      ip;	    /*+ the IP of the prefix +*/
+} ip_prefix_t;
 
 /*+ range structure +*/
 typedef struct {
-  ip_addr_internal_t         begin;        /*+ IP where the range begins. +*/
-  ip_addr_internal_t         end;          /*+ IP where it ends +*/
-} ip_range_internal_t;
+  ip_addr_t         begin;        /*+ IP where the range begins. +*/
+  ip_addr_t         end;          /*+ IP where it ends +*/
+} ip_range_t;
+
+/* reverse domains are either prefixes (ipv6) or ranges (ipv4) */
+typedef struct {
+    ip_space_t space;
+    union {
+        ip_prefix_t pref;
+        ip_range_t rang;
+    };
+} ip_revd_t;
+
 
 /*+ prefix_range structure ( 1.2.3.4/24^23-22 +*/
 typedef struct {
-  ip_prefix_internal_t    prefix;
+  ip_prefix_t    prefix;
   unsigned                n;      /*+ the N number +*/
   unsigned                m;      /*+ the M number +*/
-} ip_prefix_range_internal_t;
-
-#if 0/* #ifndef IP_IMPL  -- set this to see accesses to structure members */
-/* hide the internals */
-typedef struct {char a[sizeof(ip_addr_internal_t)];}    ip_addr_t;
-typedef struct {char a[sizeof(ip_range_internal_t)];}   ip_range_t;
-typedef struct {char a[sizeof(ip_prefix_internal_t)];}  ip_prefix_t;
-typedef struct {char a[sizeof(ip_prefix_range_internal_t)];}  ip_prefix_range_t;
-#else
-typedef ip_addr_internal_t   ip_addr_t;
-typedef ip_range_internal_t  ip_range_t;
-typedef ip_prefix_internal_t ip_prefix_t;
-typedef ip_prefix_range_internal_t ip_prefix_range_t;
-#endif
+} ip_prefix_range_t;
 
 
 /*+
@@ -157,7 +154,6 @@ typedef enum {
   IP_EXPN
 } ip_exp_t;
 
-/* #include <erroutines.h> */
 
 #ifdef __cplusplus
 extern "C" {
@@ -170,7 +166,9 @@ extern "C" {
 int IP_addr_t2b(ip_addr_t *ipptr, const char *addr, ip_exp_t expf);
 int IP_pref_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf);
 int IP_rang_t2b(ip_range_t *rangptr, const char *rangstr, ip_exp_t expf);
-int IP_revd_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf);
+int IP_revd_t2b_v6(ip_prefix_t *prefptr, const char *domstr);
+int IP_revd_t2b_v4(ip_range_t *rangptr, const char *domstr);
+int IP_revd_t2b(ip_revd_t *revdptr, const char *revdstr);
 int IP_pref_rang_t2b(ip_prefix_range_t *prefrangptr, const char *prefrangstr, ip_exp_t expf);
 /* convenience (or call it backward compatibility) macros */
 
@@ -200,6 +198,7 @@ int IP_pref_f2b_v6_32(ip_prefix_t * prefptr, const char *word1str, const char *w
 int IP_addr_b2a(ip_addr_t * binaddr, char *ascaddr, unsigned strmax);
 int IP_pref_b2a(ip_prefix_t * prefptr, char *ascaddr, unsigned strmax);
 int IP_rang_b2a(ip_range_t * rangptr, char *ascaddr, unsigned strmax);
+int IP_revd_b2t_prefrang(ip_revd_t *revdptr, char *buf, int bufsize);
 int IP_rang_classful(ip_range_t * rangptr, ip_addr_t * addrptr);
 int IP_pref_2_rang(ip_range_t * rangptr, ip_prefix_t * prefptr);
 int IP_addr_b2a_uncompress(ip_addr_t * binaddr, char *ascaddr, unsigned strmax);
@@ -245,7 +244,6 @@ void IP_addr_b2v4(ip_addr_t *addrptr, unsigned *address);
 void IP_pref_b2v4(ip_prefix_t *prefptr,
 		   unsigned int *prefix,
 		   unsigned int *prefix_length);
-#define IP_revd_b2v4(a,b,c) IP_pref_b2v4(a,b,c)
 void IP_pref_b2v6(ip_prefix_t *prefptr,
                   ip_v6word_t *high,
                   ip_v6word_t *low,
@@ -287,8 +285,6 @@ int IP_pref_a2v6_32(const char *avalue, ip_prefix_t *pref,
 	     ip_limb_t *word1, ip_limb_t  *word2,
 	     ip_limb_t *word3, ip_limb_t  *word4,
 	     unsigned *prefix_length);
-int IP_revd_a2v4(const char *avalue, ip_prefix_t *pref,
-		      unsigned int *prefix, unsigned int *prefix_length);
 int IP_addr_a2v4(const char *avalue,ip_addr_t *ipaddr, unsigned int *address);
 int IP_rang_a2v4(const char *rangstr, ip_range_t *myrang,
 		      unsigned int *begin_in, unsigned int *end_in);
