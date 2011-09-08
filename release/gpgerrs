@@ -1,4 +1,0 @@
-Added gpg output to acknowledgement message if gpg returned with error
-
-INSTALL:
-- re-deploy ack_template

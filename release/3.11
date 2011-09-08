@@ -1,0 +1,22 @@
+20110908 - version 3.11
+
+
+Changes:
+- Allow dash in the 4th octet of in-addr.arpa
+- Added gpg output to acknowledgement message if gpg returned with error
+- lots of small bugfixes
+
+
+Merged:
+- dns-dash
+- gpgerrs
+
+
+Installation notes:
+- ack_template changed
+- SQL schema has changed (see src/SQL/patch/v3.11_rdns_dash.sql)
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG

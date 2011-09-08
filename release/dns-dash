@@ -1,5 +1,0 @@
-Allow - in the 4th octet of in-addr.arpa
-
-INSTALL:
-- ack_template
-- sql schema change
