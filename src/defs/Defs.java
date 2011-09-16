@@ -674,34 +674,35 @@ public class Defs {
     }
   } // printDiagrams()
 
-  private void printDF_radix_load() {
-    System.out.print("DF_Load_t DF_radix_load[] = \n{\n");
+	private void printDF_radix_load() {
+		System.out.print("DF_Load_t DF_radix_load[] = \n{\n");
 
-    // Enumerate through the attribute codes.
-    Enumeration e = ripeAttributeCodes.elements();
-    while (e.hasMoreElements()) {
-      String ac = (String)e.nextElement();
-      //AttributeDef ad = (AttributeDef)ripeAttributes.get(ac);
-      AttributeDef ad = (AttributeDef)codeToAttribute.get(ac);
+		// Enumerate through the attribute codes.
+		Enumeration e = ripeAttributeCodes.elements();
+		while (e.hasMoreElements()) {
+			String ac = (String) e.nextElement();
+			// AttributeDef ad = (AttributeDef)ripeAttributes.get(ac);
+			AttributeDef ad = (AttributeDef) codeToAttribute.get(ac);
 
-      // If the attribute has status="valid".
-      if (ad.getFamily() != null) {
-	  String ip4 = ad.getV4Load() != null 
-	      ? "\"" + ad.getV4Load() + "\"" : "NULL";
-	  String ip6 = ad.getV6Load() != null 
-	      ? "\"" + ad.getV6Load() + "\"" : "NULL";
+			// If the attribute has status="valid".
+			String fam4 = ad.getFamilyIPv4();
+			String fam6 = ad.getFamilyIPv6();
+			if (fam4 != null || fam6 != null) {
+				String ip4 = ad.getV4Load() != null ? "\"" + ad.getV4Load()
+						+ "\"" : "NULL";
+				String ip6 = ad.getV6Load() != null ? "\"" + ad.getV6Load()
+						+ "\"" : "NULL";
+				if (fam4 == null) fam4 = "-1"; 
+				if (fam6 == null) fam6 = "-1"; 
 
-	  System.out.print("  { " +  ad.getEnumeration() 
-			   + ", "   + ad.getFamily() 
-			   + ",\n\t"  + ip4.replace('\n',' ')
-			   + ",\n\t"  + ip6.replace('\n',' ')
-			   + "\n  },\n");
-      }
-    } // while more
+				System.out.print("  { " + ad.getEnumeration() + ", "
+						+ fam4 + ", "+fam6+",\n\t" + ip4.replace('\n', ' ')
+						+ ",\n\t" + ip6.replace('\n', ' ') + "\n  },\n");
+			}
+		} // while more
 
-
-    System.out.println("  { -1, -1, NULL, NULL }\n};");
-  } // printDF_radix_load() 
+		System.out.println("  { -1, -1, -1, NULL, NULL }\n};");
+	} // printDF_radix_load()
 
     private void writeAttributeInfo(PrintStream out, AttributeDef ad, int id)
     {

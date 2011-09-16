@@ -7,9 +7,14 @@
 # until this behavior is fixed or decided upon.
 #basic-auth/X509/010
 basic-auth/X509/016
+
 # disabled by agoston, 2009-01-30
 # See FogBugz #788 or test description
 basic-auth/route-ip/015
+
 # enable only when pushing to master - *VERY* slow because of timeouts
 # (will get rid of the whole RDNS part of whois as DNSProv is to be introduced)
 #rdns/
+
+# disabled because we don't have DNS servers with SOA records so we can't really test delcheck
+rdns/050

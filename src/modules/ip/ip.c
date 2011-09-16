@@ -38,11 +38,10 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <netinet/in.h>
-#include <sys/param.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <errno.h>
-#include <glib.h>
+#include <byteswap.h>
 
 /* workaround to fix broken include files with Linux */
 #ifndef ULLONG_MAX
@@ -72,7 +71,6 @@ inline unsigned IP_sizebits(ip_space_t spc_id) {
 inline int ip_rang_validate(ip_range_t *rangptr) {
 
     if (rangptr->begin.space != rangptr->end.space) {
-        /* die;  *//* incompatible IP spaces */
         return IP_INVRAN;
     }
 
@@ -165,6 +163,7 @@ inline void IP_convert_mapped(ip_addr_t * in) {
  to control the expansion with a flag.
  +*/
 
+// FIXME: bad code
 int IP_addr_t2b(ip_addr_t *ipptr, const char *addr, ip_exp_t expf) {
     if (index(addr, ':') == NULL) {
         /* IPv4 */
@@ -341,163 +340,183 @@ int IP_pref_t2b(ip_prefix_t *prefptr, const char *prefstr, ip_exp_t expf) {
 
 /**************************************************************************/
 
-/*+ converts an inaddr/ip6int string into a binary prefix.
+int convert_digit(char digit) {
+    if (digit >= '0' && digit <= '9') {
+        return digit - '0';
+    } else if (digit >= 'A' && digit <= 'F') {
+        return digit - 'A' + 10;
+    } else return -1;
+}
 
- RFC2317 support for IPv4:
+/* converts an ip6.arpa string into an ip_prefix_t */
+int IP_revd_t2b_v6(ip_prefix_t *prefptr, const char *domstr) {
+    char *p;
+    unsigned int bits = 0;
+    gboolean nextdigit = TRUE;
 
- For expf==IP_EXPN (e2b macro) the unparsable part will be silently accepted
- (with the result being the prefix of the succesfully parsed bits).
+    // zero out target prefix
+    memset(prefptr, 0, sizeof(*prefptr));
 
- For expf==IP_PLAIN  the unparsable part will make the function return an error.
+    // look for terminator
+    p = strstr(domstr, ".IP6.ARPA");
+    if (!p) return IP_INVARG;
 
- For IPv6 the expf doesn't matter, the address must be parsable in whole.
+    // walk back from there
+    for (--p; p >= domstr; p--) {
+        if (nextdigit) {
+            int digit = convert_digit(*p);
+            if (digit < 0) {
+                return IP_INVARG;
+            }
 
- +*/
-int IP_revd_t2b(ip_prefix_t *prefptr, const char *domstr, ip_exp_t expf) {
-#define CPYLEN 264
-    char ip[256], temp[256];
-    char prefstr[CPYLEN+1];
-    char *arpa;
-    unsigned len;
-    int octets=0, goon=1, quads = 0;
-    char *dot;
+            /* filling from msb, nibble by nibble */
+            prefptr->ip.words[bits>>5] |= (unsigned int)digit << ((28-bits) & 31);
+            bits += 4;
+            nextdigit = FALSE;
+
+        } else {
+            if (*p != '.') {
+                return IP_INVARG;
+            }
+            nextdigit = TRUE;
+        }
+    }
+
+    prefptr->ip.space = IP_V6;
+    prefptr->bits = bits;
+
+    return IP_OK;
+}
+
+/* helper function to convert one octet of an in-addr.arpa
+ * returns: IP_OK if correct
+ *          IP_INVRAN if malformed
+ *          result < 0 if 'in-addr.arpa' reached
+ */
+int convert_octet(char *a, char *b, int *result) {
+	char *endptr;
+	int octet = strtol(a, &endptr, 10);
+	if (endptr != b) {		// invalid characters in input
+		// malformed or end of in-addr.arpa
+		return IP_INVRAN;
+	}
+	if (octet < 0 || octet > 255) {	// invalid numbers in input
+		return IP_INVRAN;
+	}
+	*result = octet;
+	return IP_OK;
+}
+
+/* parser an in-addr.arpa to ip_range_t */
+int IP_revd_t2b_v4(ip_range_t *rangptr, const char *domstr) {
     int err = IP_OK;
-    gchar **domains;
-    int i, j;
-    int zeros_to_add = -1;
+    char *a = (char *) domstr, *b;
+    unsigned int begin = 0, end = 0;
+    int octetnum = 0, dash_octet = -1;
+    int octet;
 
-    dieif(expf != IP_PLAIN && expf != IP_EXPN);
+    // example inputs: 1-2.3.4.5.in-addr.arpa
+    //                 1.2.3.in-addr.arpa
+    for (b = strpbrk(a, "-."); b; b = strpbrk(a, "-.")) {
+        if (*b == '-') { // separator is a dash
+            if (a == domstr) { // first iteration, dash is allowed
+                if ((dash_octet >= 0) || (octetnum > 0)) { // only one dash octet is allowed, on the first octet
+                    return IP_INVRAN;
+                }
+                if (((err = convert_octet(a, b, &octet)) != IP_OK)) {
+                    return err;
+                }
+                dash_octet = octetnum;
+                begin = (begin << 8) + octet;
 
-    /* The input may not be in lowercase, but must be processed as well.
-     The simplest solution: make a copy and change it to lowercase. */
+                // do an iteration to get the range end (between - and the next .)
+                a = b + 1;
+                b = strpbrk(a, "-.");
+                if (*b != '.') {
+                    return IP_INVRAN;
+                }
+                if ((err = convert_octet(a, b, &octet)) != IP_OK) {
+                    return err;
+                }
+                end = (end << 8) + octet;
 
-    strncpy(prefstr, domstr, CPYLEN);
-    prefstr[CPYLEN] = '\0';
-    g_strdown(prefstr);
+                if (end < begin) {  // range end has to be bigger
+                    return IP_INVARG;
+                }
+            } else {
+                if (!strcmp(a, "IN-ADDR.ARPA")) { // reached end if in-addr.arpa
+                    break;
+                }
 
-    if ( (arpa=strstr(prefstr, ".in-addr.arpa")) != NULL) {
-        prefptr->ip.space = IP_V4;
-    } else if ( (arpa=strstr(prefstr, ".ip6.arpa")) != NULL) {
-        prefptr->ip.space = IP_V6;
+                // dash notation outside the the last octet
+                return IP_INVRAN;
+            }
+
+        } else { // *b == '.'
+            if ((err = convert_octet(a, b, &octet)) != IP_OK) {
+                return err;
+            }
+            begin = (begin << 8) + octet;
+            end = (end << 8) + octet;
+        }
+
+        a = b + 1;
+        octetnum++;
+    }
+
+    // if there was a -, it has to be on the lsb octet
+//    if (dash_octet >= 0 && octetnum < 4) {
+//        return IP_INVRAN;
+//    }
+
+    // if there were less than 4 octets, set missing octets to form a range
+    for (; octetnum < 4; octetnum++) {
+        end |= 0xff << (octetnum * 8);
+    }
+
+    // WARNING: bswap_32() is gcc-specific, but it still hell of a lot better than ntohl()
+    IP_rang_v4_mk(rangptr, bswap_32(begin), bswap_32(end));
+    return err;
+}
+
+/* converts an (in-addr|ip6).arpa to binary format (prefix or range)
+ * returns: IP_NOREVD if not reverse dns
+ *          fills revdptr->space (as it is a reverse dns)
+ *          IP_INVRAN, IP_INVARG if malformed input
+ *          IP_OK and revd fully filled if correct input */
+int IP_revd_t2b(ip_revd_t *revdptr, const char *revdstr) {
+    int err = IP_OK;
+    char buf[256];
+    int bsize = g_strlcpy(buf, revdstr, 256);
+
+    // remove leftover trailing .
+    if (buf[bsize-1] == '.') {
+        buf[bsize--] = 0;
+    }
+
+    g_strup(buf);
+
+    if ((bsize > 12) && !strcmp(&(buf[bsize-12]), "IN-ADDR.ARPA")) {
+        revdptr->space = IP_V4;
+        err = IP_revd_t2b_v4(&revdptr->rang, buf);
+    } else if ((bsize > 8) && !strcmp(&(buf[bsize-8]), "IP6.ARPA")) {
+        revdptr->space = IP_V6;
+        err = IP_revd_t2b_v6(&revdptr->pref, buf);
     } else {
         return IP_NOREVD;
     }
-
-    /* copy the IP part to another string, ERROR if 256 chars not enough */
-    len = arpa - prefstr;
-    if (len > 255) {
-        /* die;  *//* ERROR - ip address part of the string too long. */
-        return IP_ADTOLO;
-    }
-    strncpy(temp, prefstr, len);
-    temp[len]=0;
-
-    /* now: get the octets/quads reversed one by one. Then conversion. */
-    ip[0]=0; /* init */
-    switch (prefptr->ip.space) {
-        case IP_V6:
-            /* ipv6 originally looked like: "1.8.0.6.0.1.0.0.2.ip6.arpa" */
-            /* here it will look like: "1.8.0.6.0.1.0.0.2" */
-            g_strreverse(temp);
-            /* now it will look like: "2.0.0.1.0.6.0.8.1" */
-            /* we split into domains, and then add each one on, putting ':' where
-             necessary */
-            ip[0] = '\0';
-            i = 0;
-            quads = 0;
-            domains = g_strsplit(temp, ".", -1);
-            while (domains[i] != NULL) {
-                strcat(ip, domains[i]);
-                quads++;
-                i++;
-                if (((i % 4) == 0) && (i < 32)) {
-                    strcat(ip, ":");
-                }
-            }
-            g_strfreev(domains);
-            /* our ip string will look like this: "2002:0608:1" */
-            /* add zeros to pad the string, and a final "::" */
-            switch (i % 4) {
-                case 0:
-                    zeros_to_add = 0;
-                    break;
-                case 1:
-                    zeros_to_add = 3;
-                    break;
-                case 2:
-                    zeros_to_add = 2;
-                    break;
-                case 3:
-                    zeros_to_add = 1;
-                    break;
-            }
-            if (zeros_to_add) {
-                for (j=0; j<zeros_to_add; j++) {
-                    strcat(ip, "0");
-                    i++;
-                }
-                if (i < 32) {
-                    strcat(ip, ":");
-                }
-            }
-            if (i < 32) {
-                strcat(ip, ":");
-            }
-            /* now we have a fully-formed IPv6 address: "2002:0608:1000::" */
-
-            /* convert using our text-to-binary function */
-            err=IP_addr_t2b( &(prefptr->ip), ip, IP_EXPN);
-            prefptr->bits = quads * 4;
-            break;
-
-        case IP_V4:
-            do {
-                if ( (dot = strrchr(temp, '.')) == NULL) {
-                    goon = 0;
-                    dot = temp;
-                }
-
-                strcat(ip, dot + (goon ));
-                octets++;
-
-                /* add a dot, unless that was the last octet */
-                if (goon) {
-                    strcat(ip, ".");
-                }
-
-                *dot = 0;
-
-            } while (goon);
-
-            /* now try to convert the ip.
-
-             Support for RFC2317:
-             If expf==IP_EXPN, then on failure leave out the last octet
-             (nibble/piece) and try again. On success, quit the loop.
-
-             In any case use the EXPN mode for the conversion.
-             */
-            do {
-                char *lastdot;
-
-                if ( (err=IP_addr_t2b( &(prefptr->ip), ip, IP_EXPN)) == IP_OK) {
-                    break;
-                }
-
-                /* cut the last octet */
-                if ( (lastdot=strrchr(ip, '.')) == NULL) {
-                    break;
-                }
-                *lastdot = '\0';
-                octets--;
-
-            } while (expf == IP_EXPN && octets>0);
-
-            prefptr->bits = octets * 8;
-            break;
-    } /* switch */
-
     return err;
+}
+
+/* converts an ip_revd_t to a textual prefix or range (X/Y or X - Y) */
+int IP_revd_b2t_prefrang(ip_revd_t *revdptr, char *buf, int bufsize) {
+    if (revdptr->space == IP_V4) {
+        return IP_rang_b2a(&revdptr->rang, buf, bufsize);
+    } else if (revdptr->space == IP_V6) {
+        return IP_pref_b2a(&revdptr->pref, buf, bufsize);
+    } else {
+        return IP_INVARG;
+    }
 }
 
 /**************************************************************************/
@@ -857,16 +876,6 @@ int IP_pref_a2v6_32(const char *avalue, ip_prefix_t *pref, ip_limb_t *word1, ip_
     return (ret);
 }
 
-/* Convert reverse domain string into numbers */
-int IP_revd_a2v4(const char *avalue, ip_prefix_t *pref, unsigned int *prefix, unsigned int *prefix_length) {
-    int ret;
-
-    if (NOERR(ret = IP_revd_e2b(pref, avalue))) {
-        IP_pref_b2v4(pref, prefix, prefix_length);
-    }
-    return (ret);
-}
-
 /* Convert ip addr string into numbers */
 int IP_addr_a2v4(const char *avalue, ip_addr_t *ipaddr, unsigned int *address) {
     int ret;
@@ -1093,7 +1102,6 @@ int IP_addr_b2a(ip_addr_t * binaddr, char *ascaddr, unsigned strmax) {
         if (snprintf(ascaddr, strmax, "%d.%d.%d.%d", ((binaddr->words[0]) & ((unsigned)0xff << 24)) >> 24,
                 ((binaddr->words[0]) & (0xff << 16)) >> 16, ((binaddr->words[0]) & (0xff << 8)) >> 8,
                 ((binaddr->words[0]) & (0xff << 0)) >> 0) >= strmax) {
-            /*die;  *//* string too short */
             return IP_TOSHRT;
         }
     } else {
@@ -1123,7 +1131,6 @@ int IP_pref_b2a(ip_prefix_t * prefptr, char *ascaddr, unsigned strmax) {
     int err;
 
     if ((err = IP_addr_b2a(&(prefptr->ip), ascaddr, strmax)) != IP_OK) {
-        /*die;  *//* what the hell */
         return err;
     }
     strl = strlen(ascaddr);
@@ -1132,7 +1139,6 @@ int IP_pref_b2a(ip_prefix_t * prefptr, char *ascaddr, unsigned strmax) {
     /* now strmax holds the space that is left */
 
     if (snprintf(ascaddr + strl, strmax, "/%d", prefptr->bits) >= strmax) {
-        /* die;  *//* error: string too short */
         return IP_TOSHRT;
     }
     return IP_OK;
@@ -1331,7 +1337,8 @@ ip_rangesize_t IP_rang_span(ip_range_t *rangptr) {
  after use.
 
  returns a bitmask of prefix lengths used.
-*/
+
+FIXME: bad code */
 unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist) {
     unsigned prefmask=0;
     register int slash=0;
@@ -1430,9 +1437,10 @@ unsigned IP_rang_decomp(ip_range_t *rangptr, GList **preflist) {
  finds the smallest canonical block encompassing the whole given range,
  then MODIFIES the range pointed to by the argument
  so that it's equal to this block.
-*/
+
+ FIXME: bad code */
 void IP_rang_encomp(ip_range_t *rangptr) {
-    int slash=0;
+    int slash = 0;
     unsigned c_dif, blk, ff, t_dif;
     ip_addr_t workbegin;
     ip_addr_t workend;
@@ -1448,7 +1456,6 @@ void IP_rang_encomp(ip_range_t *rangptr) {
     /* so this must be checked for separately */
 
     if (c_dif > 0x80000000) {
-        slash = 0;
         ff = 0xffffffff;
         blk = 0;
 
@@ -1627,13 +1634,24 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
             }
         } else {
             /* check for reverse domain */
-            err = IP_revd_t2b(querypref, key, expf);
+            ip_revd_t revd;
+            err = IP_revd_t2b(&revd, key);
             if (NOERR(err)) {
                 if (keytype) *keytype = IPK_REVD;
 
-                if (!justcheck) {
+                if (revd.space == IP_V4) {
+                    if (encomp) { // look for the first bigger(shorter) prefix containing this range
+                        IP_rang_encomp(&revd.rang);
+                    }
+
+                    if (!justcheck) { // decompose to prefixlist
+                        IP_rang_decomp(&revd.rang, preflist);
+                    }
+                } else if (revd.space == IP_V6) {
+                    *querypref = revd.pref;
                     *preflist = g_list_append(*preflist, querypref);
-                }
+                } else
+                    die;
             } else {
                 /* check for range */
                 ip_range_t myrang;
@@ -1645,15 +1663,11 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
                 if (NOERR(err)) {
                     if (keytype) *keytype = IPK_RANGE;
 
-                    /* sometimes (exless match) we look for the first bigger(shorter)  */
-                    /* prefix containing this range. */
-                    if (encomp) {
+                    if (encomp) {       // look for the first bigger(shorter) prefix containing this range
                         IP_rang_encomp(&myrang);
                     }
 
-                    /* OK, now we can let the engine happily find that there's just one */
-                    /* prefix in range */
-                    if (!justcheck) {
+                    if (!justcheck) {   // decompose to prefixlist
                         IP_rang_decomp(&myrang, preflist);
                     }
                 } else {
@@ -1676,23 +1690,32 @@ int IP_smart_conv(char *key, int justcheck, int encomp, GList **preflist, ip_exp
  * keytype can be NULL */
 int IP_smart_range(char *key, ip_range_t * rangptr, ip_exp_t expf, ip_keytype_t * keytype) {
     int err = IP_OK;
-    GList *preflist = NULL;
+    ip_revd_t revd;
 
-    /* first : is it a range ? */
-    if (NOERR(err = IP_rang_t2b(rangptr, key, expf))) {
+    /* check for range */
+    if ((err = IP_rang_t2b(rangptr, key, expf)) == IP_OK) {
         if (keytype) *keytype = IPK_RANGE;
+
+    /* check for revdomain */
+    } else if ((err = IP_revd_t2b(&revd, key)) == IP_OK) {
+        if (revd.space == IP_V4) {
+            *rangptr = revd.rang;
+        } else if (revd.space == IP_V6) {
+            err = IP_pref_2_rang(rangptr, &revd.pref);
+        } else die;
+
     } else {
-        /* OK, this must be possible to convert it to prefix and from there
-         to a range. */
+        /* convert it to prefix and from there to a range */
+        GList *preflist = NULL;
         if (NOERR(err = IP_smart_conv(key, 0, 0, &preflist, expf, keytype))) {
 
             dieif(g_list_length(preflist) != 1);
 
             dieif(!NOERR(IP_pref_2_rang(rangptr, g_list_first(preflist)->data)));
         }
-    }
 
-    wr_clear_list(&preflist);
+        wr_clear_list(&preflist);
+    }
 
     return err;
 }

@@ -93,12 +93,12 @@ int make_sql2pack(SQ_result_set_t *result, SQ_row_t *row, rp_upd_pack_t *pack, r
             /*
              read 0-3 from inaddr
              0 - objectid
-             1 - prefix
-             2 - prefix_length
+             1 - begin_in
+             2 - end_in
              3 - domain
              */
-            conv = IP_pref_f2b_v4(&(uniptr->u.rt), col[1], col[2]);
-            uniptr->space = IP_pref_b2_space(&(uniptr->u.rt));
+            conv = IP_rang_f2b_v4(&(uniptr->u.in), col[1], col[2]);
+            uniptr->space = IP_rang_b2_space(&(uniptr->u.in));
             pack->d.domain = UT_strdup(col[3]);
         } else {
             /* read 0-4 from ip6int
@@ -187,6 +187,10 @@ static void *RP_sql_load_attr_space(void *arg) {
         die;
     }
 
+#ifdef DEBUG_RADIX_LOAD
+    fprintf(stderr, "Executing: %s\n", load_query);
+#endif
+
     if (SQ_execute_query(con, load_query, &result)) {
         fprintf(stderr, "SQL ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
         die;
@@ -221,6 +225,10 @@ static void *RP_sql_load_attr_space(void *arg) {
         fprintf(stderr, "SQL ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
         die;
     }
+
+#ifdef DEBUG_RADIX_LOAD
+    fprintf(stderr, "Loaded %d objects\n", objnr);
+#endif
 
     LG_log(rp_context, LG_INFO, "loaded %dK objects into %s/%s", objnr>>10, srcnam, attr_code);
 

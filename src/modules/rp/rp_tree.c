@@ -97,7 +97,7 @@ int RP_tree_add(rp_regid_t reg_id, rp_attr_t attr, char *prefixstr, rx_mem_mt me
     int err = RP_OK;
     rp_tentry_t *treedef;
     rx_tree_t *mytree;
-    rx_fam_t fam_id = RP_attr2fam(attr);
+    rx_fam_t fam_id;
     ip_prefix_t newpref;
     ip_space_t spc_id;
 
@@ -106,6 +106,7 @@ int RP_tree_add(rp_regid_t reg_id, rp_attr_t attr, char *prefixstr, rx_mem_mt me
     }
 
     spc_id = IP_pref_b2_space( &newpref );
+    fam_id = RP_attr2fam(attr, spc_id);     // set family based on attribute and space
 
     if (RP_tree_get(&mytree, reg_id, spc_id, attr) == RP_OK) {
         /* In this case we need to delete and re-initialize it  */

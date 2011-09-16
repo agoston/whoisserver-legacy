@@ -148,7 +148,7 @@ RP_asc_node( rx_oper_mt mode,       /*+ MODE={cre|mod|del} +*/
 	       sql_key_t key          /*+ the key to the SQL full-text +*/
               );
 
-rx_fam_t RP_attr2fam( rp_attr_t type );
+rx_fam_t RP_attr2fam(rp_attr_t type, ip_space_t space);
 int RP_attr2spc(rp_attr_t type, ip_space_t space);
 int
 RP_asc2uni(const char *astr,       /*+ string prefix/range/IP/inaddr +*/

@@ -129,10 +129,9 @@
 
 <xsl:template match="RDNSinvalidrange">
 
-***Error: The range
-          <xsl:apply-templates/>
-          is not a valid range for expansion. Both numbers must be in
+***Error: The range is not valid. Both numbers must different and be in
           between 0-255 and the first number must be less than the second.
+          Also the range can only exist in the 4th octet.
 </xsl:template>
 
 <xsl:template match="RDNSds_not_accepted">
@@ -146,8 +145,6 @@
           The allowed sizes are:
           IPv4 /8, /16, /24
           IPv6 /12, /16, /20, /24, /28, /32, /48, /64
-          
-          For delegations less than /24 (IPv4), contact ripe-dbm@ripe.net.
 </xsl:template>
 
 <xsl:template match="RDNSno_address_space">
@@ -203,6 +200,7 @@
 
   <xsl:template match="input_analyse">
 <xsl:apply-templates select="bad_pgp_credentials"/>
+<xsl:apply-templates select="invalid_signature"/>
 <xsl:apply-templates select="bad_x509_credentials"/>
   </xsl:template>
 
@@ -211,6 +209,11 @@
 <xsl:apply-templates select="list"/>
 <xsl:text>
 </xsl:text>
+  </xsl:template>
+
+  <xsl:template match="invalid_signature">
+***Error: PGP signature validation failed:
+<xsl:value-of select="msg/text()"/>
   </xsl:template>
 
   <xsl:template match="bad_x509_credentials">
@@ -273,6 +276,7 @@ key-cert operation OK
   <xsl:template match="no_subject">
 ***Error: No subject found in the supplied certificate
   </xsl:template>
+
 
 
   <xsl:template match="non_existent_object">
@@ -444,7 +448,8 @@ Refered object <xsl:value-of select="refered_object/text()"/> exists.
 
   <xsl:template match="startup">
 <xsl:if test="$level_notice>$level">
-***Info: To create a person/mntner pair of objects see
+
+***Info: To create the first person/mntner pair of objects for an organisation see
          http://www.db.ripe.net/cgi-bin/new-user-startup.pl
 </xsl:if>
 </xsl:template>

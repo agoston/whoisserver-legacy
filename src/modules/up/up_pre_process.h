@@ -108,4 +108,6 @@ int UP_check_inet_required_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 int UP_check_ping(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                     rpsl_object_t *preproc_obj, int operation, rpsl_object_t *old_obj);
 
+int UP_check_domain_dash(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *preproc_obj);
+
 #endif

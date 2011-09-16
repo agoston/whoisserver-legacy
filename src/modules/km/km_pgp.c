@@ -49,6 +49,8 @@ static gchar* gpg_path = NULL;
 static LG_context_t* ctx;
 static GList* my_sources = NULL;
 
+char *KM_PGP_GNUPG_ERROR_OUTPUT = NULL;
+
 void km_pgp_end() {
   GList* tmp_list;
 
@@ -138,6 +140,7 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
     gchar in_file[LINE_LENGTH];
     gchar tmp[LINE_LENGTH];
     gchar* char_file;
+    GString *gpg_output = NULL;
 
     LG_log(ctx, LG_FUNC, ">Entering km_pgp_signature_verify_low");
     valid = FALSE;
@@ -191,10 +194,12 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
     g_string_free(gpg_line, TRUE);
     /* Parsing gpg output */
 
+    gpg_output = g_string_new(NULL);
     general = fopen(status_file, "r");
     while (fgets(txt, LINE_LENGTH - 1, general) != NULL)
     {
         LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: gpg returns: %s", txt);
+        g_string_append(gpg_output, txt);
         if (strstr(txt, "Good signature") != NULL)
         {
             valid = TRUE;
@@ -258,6 +263,15 @@ KM_key_return_t* km_pgp_signature_verify_low(gchar* text, gchar* signature,
         }
         key_ret = km_key_return_new((gchar*) key_id, valid, text, KM_OK);
     }
+
+    if ( !valid && gpg_output->str && key_ring )
+    {
+        LG_log(ctx, LG_DEBUG, "km_pgp_signature_verify_low: report signature not valid [%s]", gpg_output->str);
+        KM_PGP_GNUPG_ERROR_OUTPUT = gpg_output->str;
+    } else {
+        KM_PGP_GNUPG_ERROR_OUTPUT = NULL;
+    }
+    g_string_free(gpg_output, FALSE);
 
     unlink(in_file);
     unlink(out_file);

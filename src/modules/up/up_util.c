@@ -35,24 +35,8 @@
 #include <assert.h>
 
 #include "rip.h"
-#include "ep.h"
-#include "rt.h"
-#include "km.h"
-#include "lg.h"
 #include "lu_whois.h"
-#include "dbupdate.h"
-#include "up_pre_process.h"
-#include "up_auto_nic.h"
-#include "up_util.h"
-#include "ca_defs.h"
-#ifdef RDNSYES
 #include "ns_util.h"
-#else
-#define ns_is_decompose(x,y,z,t) (0)
-#define ns_remove_trailing_dot(x,y) (0)
-#define ns_decompose_object(x,y,z,t,w) NULL
-#endif
-#include <glib.h>
 
 /* Report an internal software error, send an ack if possoble and exit out of dbupdate
    Receives RT context
@@ -1157,6 +1141,8 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
     retval |= UP_check_ping(rt_ctx, lg_ctx, preproc_obj, operation, old_obj);
 
+    retval |= UP_check_domain_dash(rt_ctx, lg_ctx, preproc_obj);
+
     /* check for references to AUTO- keys */
     if (handle_auto_keys)
     {
@@ -2199,8 +2185,6 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   char **split_lines = NULL;
   char *line = NULL;
   char *object_str = NULL;
-  gchar **object_strings;
-  int i;
   int line_idx, line_cnt;
   int valid_first_line = 0;
   int source_line_found = 0;
@@ -2219,8 +2203,6 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   rpsl_object_t *object = NULL;
   guint previous_number_of_objects;
   guint current_number_of_objects;
-  gint range_start; /*required for decomposition */
-  gint range_end; /* required for decomposition */
 
   LG_log(lg_ctx, LG_FUNC,">UP_process_submission: entered");
 
@@ -2354,58 +2336,29 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
               /* check if decomposition is needed */
               LG_log(lg_ctx,LG_DEBUG,
                   "UP_process_submission: checking if the object should be decomposed");
-              if (ns_is_decompose(lg_ctx,object_str,&range_start,&range_end))
-              {
-                LG_log(lg_ctx,LG_DEBUG,
-                    "UP_process_submission: object will be decomposed");
-                object_strings=ns_decompose_object(lg_ctx,rt_ctx,object_str,
-                                                   range_start,range_end);
-              }
-              else
-              {
-                object_strings=g_new(gchar *,3);
-                object_strings[0]=object_str;
-                object_strings[1]=NULL;
-              }
 
-              if (object_strings==NULL)
+            /* process this object
+               OR the return value so we can keep track of any failures */
+              retval |= up_process_object(rt_ctx, lg_ctx,
+                                          options,
+                                          object_str, credentials, 0);
+
+              /* do not continue to process objects after a fatal error */
+              if (retval & UP_FATAL)
               {
-                RT_unparsable_input(rt_ctx, object_str);
-                object_strings=g_new(gchar *,2);
-                object_strings[0]=NULL;
-                retval |= UP_FAIL;
-              }
-              /* process this object
-                 OR the return value so we can keep track of any failures */
-              i=0;
-              while (object_strings[i]!=NULL)
-              {
-                retval |= up_process_object(rt_ctx, lg_ctx,
-                                            options,
-                                            object_strings[i], credentials, 0);
-                i++;
-                /* do not continue to process objects after a fatal error */
-                if (retval & UP_FATAL)
+                retval = UP_FATAL;  /* so that UP_ret2str macro works */
+                /* free up memory */
+                if ( list_of_AUTO_refd_objects )
                 {
-                  retval = UP_FATAL;  /* so that UP_ret2str macro works */
-                  /* free up memory */
-                  if ( list_of_AUTO_refd_objects )
-                  {
-                    for ( item=list_of_AUTO_refd_objects; item != NULL; item=g_slist_next(item) )
-                      free((char *)(item->data));
-                    g_slist_free(list_of_AUTO_refd_objects);
-                  }
-                  free(object_str);
-                  g_strfreev(split_lines);
-                  free(new_data_str);
-                  LG_log(lg_ctx, LG_FUNC,"<UP_process_submission: exiting with value %s", UP_ret2str(retval));
-                  return retval;
+                  for ( item=list_of_AUTO_refd_objects; item != NULL; item=g_slist_next(item) )
+                    free((char *)(item->data));
+                  g_slist_free(list_of_AUTO_refd_objects);
                 }
-              }
-
-              if (object_strings[i]!=NULL)
-              {
-                g_strfreev(object_strings);
+                free(object_str);
+                g_strfreev(split_lines);
+                free(new_data_str);
+                LG_log(lg_ctx, LG_FUNC,"<UP_process_submission: exiting with value %s", UP_ret2str(retval));
+                return retval;
               }
             }
           }
@@ -2464,7 +2417,7 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
           {
             retval = UP_FATAL;  /* so that UP_ret2str macro works */
             /* free up memory */
-            for ( item=item; item != NULL; item=g_slist_next(item) )
+            for (; item != NULL; item=g_slist_next(item) )
             {
               free((char *)(item->data));
             }
@@ -2507,7 +2460,7 @@ int UP_process_submission(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         {
           retval = UP_FATAL;  /* so that UP_ret2str macro works */
           /* free up memory */
-          for ( item=item; item != NULL; item=g_slist_next(item) )
+          for (; item != NULL; item=g_slist_next(item) )
           {
             free((char *)(item->data));
           }

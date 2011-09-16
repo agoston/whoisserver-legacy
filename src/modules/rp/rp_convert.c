@@ -38,8 +38,8 @@ extern LG_context_t *rp_context;
 /* return the family of tree to be used for the given attribute.
  die if not defined.
  */
-rx_fam_t RP_attr2fam(rp_attr_t type) {
-    rx_fam_t res = DF_attrcode_radix_family(type);
+rx_fam_t RP_attr2fam(rp_attr_t type, ip_space_t space) {
+    rx_fam_t res = DF_attrcode_radix_family(type, space);
 
     dieif(res == -1);
 
@@ -57,38 +57,37 @@ int RP_attr2spc(rp_attr_t type, ip_space_t space) {
     return (loadqry != NULL); /* 1 if defined, 0 otherwise */
 }
 
-int RP_asc2uni(const char *astr, /*+ string prefix/range/IP/inaddr +*/
-rp_attr_t attr, rp_uni_t *uni) /* destination pointer */
-{
+/* const char *astr                     string prefix/range/IP/inaddr
+   rp_attr_t attr, rp_uni_t *uni        destination pointer
+*/
+int RP_asc2uni(const char *astr, rp_attr_t attr, rp_uni_t *uni) {
     int conv;
-    rx_fam_t fam_id = RP_attr2fam(attr);
     switch (attr) {
     case A_IN:
         conv = IP_rang_e2b(&(uni->u.in), astr);
+        uni->space = uni->u.in.begin.space;
         break;
     case A_RT:
     case A_I6:
     case A_R6:
         conv = IP_pref_e2b(&(uni->u.rt), astr);
+        uni->space = uni->u.rt.ip.space;
         break;
-    case A_DN:
-        conv = IP_revd_e2b(&(uni->u.rt), astr);
+    case A_DN: {
+        ip_revd_t revd;
+        if ((conv = IP_revd_t2b(&revd, astr)) == IP_OK) {
+            uni->space = revd.space;
+            if (revd.space == IP_V4) {
+                uni->u.in = revd.rang;
+            } else if (revd.space == IP_V6) {
+                uni->u.rt = revd.pref;
+            } else die;
+        }
+        } // case scope
         break;
     default:
-        /*    die; / * shouldn't have got here */
         conv = IP_INVARG;
     }
-
-    if (NOERR(conv)) {
-        uni->fam = fam_id;
-
-        if (fam_id == RX_FAM_RT) {
-            uni->space = IP_pref_b2_space(&(uni->u.rt));
-        } else { /* RX_FAM_IN */
-            uni->space = IP_rang_b2_space(&(uni->u.in));
-        }
-    }
-
     return conv;
 }
 
@@ -99,7 +98,7 @@ int RP_asc2pack(rp_upd_pack_t *pack, rp_attr_t type, const char *string) {
 
     pack->type = type;
 
-    LG_log(rp_context, LG_DEBUG, "RP_asc2pack: converted attr %s: %s to pack at %08x", DF_get_attribute_code(type), string, pack);
+//    LG_log(rp_context, LG_DEBUG, "RP_asc2pack: converted attr %s: %s to pack at %08x", DF_get_attribute_code(type), string, pack);
 
     err = RP_asc2uni(string, type, &(pack->uni));
 
@@ -157,9 +156,9 @@ int RP_pack_set_orig(rp_attr_t attr, rp_upd_pack_t *pack, const char *origin) {
 /* those are just interfacing to 
  * functions to convert to IP binary format and retain raw values 
  */
-int RP_pack_set_type(rp_attr_t attr, rp_upd_pack_t *pack) {
+int RP_pack_set_type(rp_attr_t attr, rp_upd_pack_t *pack, ip_space_t space) {
     pack->type = attr;
-    pack->uni.fam = RP_attr2fam(attr);
+    pack->uni.fam = RP_attr2fam(attr, space);
     return (IP_OK);
 }
 
@@ -167,16 +166,26 @@ int RP_pack_set_pref4(rp_attr_t attr, const char *avalue, rp_upd_pack_t *pack, u
     int ret;
     if (NOERR(ret = IP_pref_a2v4(avalue, &(pack->uni.u.rt), prefix, prefix_length))) {
         pack->uni.space = IP_V4;
-        RP_pack_set_type(attr, pack);
+        RP_pack_set_type(attr, pack, IP_V4);
     }
     return (ret);
 }
 
 int RP_pack_set_revd(rp_attr_t attr, const char *avalue, rp_upd_pack_t *pack) {
-    dieif(IP_revd_a2b(&(pack->uni.u.rt), avalue) != IP_OK); /* assuming correctness checked */
+    ip_revd_t revd;
+    int retval = IP_OK;
+
+    if ((retval = IP_revd_t2b(&revd, avalue)) == IP_OK) {
+        pack->uni.space = revd.space;
+        if (revd.space == IP_V4) {
+            pack->uni.u.in = revd.rang;
+        } else if (revd.space == IP_V6) {
+            pack->uni.u.rt = revd.pref;
+        } else die;
+    } else die;
+
     pack->d.domain = (char*) avalue;
-    pack->uni.space = IP_pref_b2_space(&(pack->uni.u.rt));
-    RP_pack_set_type(attr, pack);
+    RP_pack_set_type(attr, pack, pack->uni.space);
     return (IP_OK);
 }
 
@@ -184,7 +193,7 @@ int RP_pack_set_pref6(rp_attr_t attr, const char *avalue, rp_upd_pack_t *pack, i
     int ret;
     if (NOERR(ret = IP_pref_a2v6(avalue, &(pack->uni.u.rt), high, low, prefix_length))) {
         pack->uni.space = IP_V6;
-        RP_pack_set_type(attr, pack);
+        RP_pack_set_type(attr, pack, IP_V6);
     }
     return (ret);
 }
@@ -193,7 +202,7 @@ int RP_pack_set_rang(rp_attr_t attr, const char *avalue, rp_upd_pack_t *pack, un
     int ret;
     if (NOERR(ret = IP_rang_a2v4(avalue, (ip_range_t *) &(pack->uni.u.in), begin_in, end_in))) {
         pack->uni.space = IP_V4;
-        RP_pack_set_type(attr, pack);
+        RP_pack_set_type(attr, pack, IP_V4);
     }
     return (ret);
 }

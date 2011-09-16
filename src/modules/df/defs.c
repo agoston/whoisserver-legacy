@@ -340,8 +340,7 @@ int DF_attrcode_has_radix_lookup(A_Type_t attr) {
 char *DF_attrcode_radix_load_v4(A_Type_t attr) {
     int i;
 
-    for (i = 0; DF_radix_load[i].attr != -1 && DF_radix_load[i].family != -1; i++) {
-
+    for (i = 0; DF_radix_load[i].attr != -1; i++) {
         if (DF_radix_load[i].attr == attr) {
             return DF_radix_load[i].ipv4_load;
         }
@@ -354,8 +353,7 @@ char *DF_attrcode_radix_load_v4(A_Type_t attr) {
 char * DF_attrcode_radix_load_v6(A_Type_t attr) {
     int i;
 
-    for (i = 0; DF_radix_load[i].attr != -1 && DF_radix_load[i].family != -1; i++) {
-
+    for (i = 0; DF_radix_load[i].attr != -1; i++) {
         if (DF_radix_load[i].attr == attr) {
             return DF_radix_load[i].ipv6_load;
         }
@@ -365,16 +363,13 @@ char * DF_attrcode_radix_load_v6(A_Type_t attr) {
 
 /* return the family of the radix tree(s) used for this attribute
    or -1 if no radix is used for this attribute */
-rx_fam_t DF_attrcode_radix_family(A_Type_t attr) {
+rx_fam_t DF_attrcode_radix_family(A_Type_t attr, ip_space_t space) {
     int i;
 
-    for(i=0;
-	DF_radix_load[i].attr != -1 && DF_radix_load[i].family != -1;
-	i++) {
-
-	if( DF_radix_load[i].attr == attr ) {
-	    return DF_radix_load[i].family;
-	}
+    for (i = 0; DF_radix_load[i].attr != -1; i++) {
+        if (DF_radix_load[i].attr == attr) {
+            return space == IP_V4 ? DF_radix_load[i].family_ipv4 : DF_radix_load[i].family_ipv6;
+        }
     }
     return -1;
 }

@@ -12,7 +12,7 @@ descr:        Test2
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
-nserver:      ns-pri.ripe.net
+nserver:      pri.authdns.ripe.net
 nserver:      sec1.apnic.net
 nserver:      sec3.apnic.net
 mnt-by:       TEST-DBM-MNT

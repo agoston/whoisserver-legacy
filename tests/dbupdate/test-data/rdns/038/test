@@ -16,7 +16,7 @@ descr:          2a00::/12 block
 admin-c:        TP1-DB-TEST
 tech-c:         TP1-DB-TEST
 zone-c:         TP1-DB-TEST
-nserver:        ns-pri.ripe.net
+nserver:        pri.authdns.ripe.net
 nserver:        ns1.noname
 nserver:        ns.lacnic.net
 nserver:        sec1.apnic.net

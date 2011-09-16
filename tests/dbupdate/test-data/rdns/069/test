@@ -1,0 +1,23 @@
+# rdns tests
+# CASE 69: Create classless ipv4, with an invalid range end  (classless delegation)
+# no override
+#
+# create domain objects
+#
+#FAILURE
+#
+# RESULT 69: creation will fail
+
+domain:       1-256.1.1.193.in-addr.arpa
+descr:        Test
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+zone-c:       TP1-DB-TEST
+nserver:      ns1.noname
+nserver:      ns2.noname
+mnt-by:       TEST-MB-MNT
+mnt-lower:    TEST-DBM-MNT
+changed:      dbtest@ripe.net 20040329
+source:       DB-TEST
+password: host3
+password: test-mb

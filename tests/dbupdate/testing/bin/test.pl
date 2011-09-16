@@ -2462,6 +2462,7 @@ sub get_test_dirs() {
         while (<EXCLUDE>) {
             chomp();
             s/\/$//;
+            next if /^\s*$/;
             push @exclude_dirs, ($_) unless is_ignored($_);
         }
         close(EXCLUDE)
