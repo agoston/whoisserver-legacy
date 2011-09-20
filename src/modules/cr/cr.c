@@ -128,32 +128,39 @@ gboolean cr_check_crypted(const gchar * plain, const gchar * crypted)
 
   return - TRUE if the credential is contained AND valid, FALSE if not
  */
-gboolean CR_credential_list_check(GList * list, CR_type type, const char *value, gboolean include_invalid)
-{
+gboolean CR_credential_list_check(GList * list, CR_type type, const char *value, gboolean include_invalid) {
+    cr_credential_t *credential;
+    gboolean retval;
+    gchar **pw = NULL;     // the crypted override passwords
+    gchar **pwp;
+    GList *credp;
 
-	cr_credential_t *credential;
-	gboolean retval;
+    LG_log(cr_ctx, LG_FUNC, ">CR_credential_list_check entered with type [%s] value [%s]", CR_type2str(type), value);
 
-	LG_log(cr_ctx, LG_FUNC, ">CR_credential_list_check entered with type [%s] value [%s]", CR_type2str(type), value);
+    if (type != CR_PASSWORD && type != CR_OVERRIDE) {
+        retval = CR_credential_list_has_credential(list, type, value, include_invalid);
+        LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with %s", retval ? "TRUE" : "FALSE");
+        return retval;
+    }
 
-	if (type != CR_PASSWORD && type != CR_OVERRIDE) {
-		retval = CR_credential_list_has_credential(list, type, value, include_invalid);
-		LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with %s", retval ? "TRUE" : "FALSE");
-		return retval;
-	}
-	while (list) {
-		credential = (cr_credential_t *) list->data;
-		if (credential->type == type && cr_check_crypted(credential->value, value)) {
-			if (CR_credential_get_validity(credential) || include_invalid) {
-				LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with TRUE");
-				return TRUE;
-			}
-		}
-		list = list->next;
-	}
+    pw = g_strsplit_set(value, "\n ", -1);
 
-	LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with FALSE");
-	return FALSE;
+    for (pwp = pw; *pwp && **pwp; pwp++) {
+        for (credp = g_list_first(list); credp; credp = g_list_next(credp)) {
+            credential = (cr_credential_t *) credp->data;
+            if (credential->type == type && cr_check_crypted(credential->value, *pwp)) {
+                if (CR_credential_get_validity(credential) || include_invalid) {
+                    LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with TRUE");
+                    g_strfreev(pw);
+                    return TRUE;
+                }
+            }
+        }
+    }
+
+    g_strfreev(pw);
+    LG_log(cr_ctx, LG_FUNC, "<CR_credential_list_check exiting with FALSE");
+    return FALSE;
 }
 
 /*
