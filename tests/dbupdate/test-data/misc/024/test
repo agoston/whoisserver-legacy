@@ -1,0 +1,22 @@
+# CASE 24: Modify a person object
+#          supporting multiple override passwords
+#          (also manually adding 2 OVERRIDECRYPTEDPW in rip.config)
+#
+# modify person object 
+#
+#SUCCESS
+#
+# RESULT 24: The modification will succeed
+
+person:       Override K Test
+address:      Singel
+phone:        +0123456789
+nic-hdl:      TP2-DB-TEST
+mnt-by:       TEST-MNT
+changed:      dbtest@ripe.net 20030101
+source:       DB-TEST
+password:     auth
+override:     doesnotmatch
+override:     password
+override:     lastnotmatch
+
