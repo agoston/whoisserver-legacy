@@ -1542,6 +1542,7 @@ static int qi_collect_domain(SQ_connection_t *sql_connection, char *id_table, ch
     int subcount = 0;
     int foundcount = 0;
     GString *sql_command;
+    char *esc_dot;
 
     /* disconnection from the server */
     if (qis->qe->condat.rtc != 0) return 0;
@@ -1558,9 +1559,11 @@ static int qi_collect_domain(SQ_connection_t *sql_connection, char *id_table, ch
         LG_log(qi_context, LG_DEBUG, "run_referral: checking %s", dot);
 
         /* domain lookup -- query into the _S table */
+        esc_dot = SQ_escape_string(sql_connection, dot);
         g_string_sprintf(sql_command, "INSERT IGNORE INTO %s SELECT object_id "
             "FROM domain "
-            "WHERE domain = '%s'", sub_table, dot);
+            "WHERE domain = '%s'", sub_table, esc_dot);
+        free(esc_dot);
         if (SQ_execute_query(sql_connection, sql_command->str, NULL) != 0) {
             *sql_error = SQ_errno(sql_connection);
             report_sql_error(&qis->qe->condat, sql_connection, sql_command->str);
