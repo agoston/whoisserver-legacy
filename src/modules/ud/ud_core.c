@@ -436,22 +436,19 @@ char *get_qresult_str(SQ_connection_t *sql_connection, char *query) {
  *  NULL in case of an error                                 *
  *                                                           *
  *************************************************************/
-char *get_field_str(SQ_connection_t *sql_connection, const char *field, const char *ref_tbl_name, const char *ref_name,
-        const char * attr_value, const char *condition) {
-	GString *query;
-	char *result;
+char *get_field_str(SQ_connection_t *sql_connection, const char *field, const char *ref_tbl_name, const char *ref_name, const char * attr_value, const char *condition) {
+    GString *query;
+    char *result;
+    query = g_string_sized_new(STR_L);
 
-	query = g_string_sized_new(STR_L);
+    g_string_sprintf(query, "SELECT %s FROM %s WHERE %s='%s' ", field, ref_tbl_name, ref_name, attr_value);
 
-	g_string_sprintf(query, "SELECT %s FROM %s "
-		"WHERE %s='%s' ", field, ref_tbl_name, ref_name, attr_value);
-	if (condition)
-		g_string_append(query, condition);
+    if (condition)
+        g_string_append(query, condition);
 
-	result = get_qresult_str(sql_connection, query->str);
-	g_string_free(query, TRUE);
-	return (result );
-
+    result = get_qresult_str(sql_connection, query->str);
+    g_string_free(query, TRUE);
+    return result;
 }
 
 /************************************************************
