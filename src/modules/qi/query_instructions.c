@@ -252,7 +252,9 @@ static void qi_create_name_query(GString *query_str, const char *sql_query, cons
 
     /* We should use SQ_escape() here as well, but we don't yet have an sql connection here yet.
      * Luckily, qc->keys is already checked to consist only of ALLOWED_QUERY_CHARS
-     * AND we also use "" as a string marker, so it is not necessary to escape here - agoston, 2011-10-26 */
+     * AND we also use "" as a string marker, so it is not necessary to escape here
+     * Also, if ' is used in a query, the ONLY matching keytype is NAME, for which the SQL query
+     * is generated here - agoston, 2011-10-26 */
 
     if (words[0] != NULL) {
         g_string_sprintfa(from_clause, "%s N%.2d", table, 0);
