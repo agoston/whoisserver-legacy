@@ -182,11 +182,6 @@ void QC_environ_free(Query_environ *qe) {
  Free the query_command.
 
  Query_command *qc query_command to be freed.
-
- XXX I'm not sure the bitmaps will get freed.
- qc->inv_attrs_bitmap
- qc->object_type_bitmap
- qc->keytypes_bitmap
  ++++++++++++++++++++++++++++++++++++++*/
 void QC_free(Query_command *qc) {
     GList *message_node;
@@ -195,15 +190,10 @@ void QC_free(Query_command *qc) {
         if (qc->keys != NULL) {
             g_free(qc->keys);
         }
-        message_node = qc->parse_messages;
-        while (message_node != NULL) {
-            UT_free(message_node->data);
-            message_node = g_list_next(message_node);
-        }
-        g_list_free(qc->parse_messages);
+        wr_clear_list(&qc->parse_messages);
         UT_free(qc);
     }
-} /* QC_free() */
+}
 
 void QC_init_struct(Query_command *query_command) {
     query_command->query_type = QC_SYNERR;
