@@ -458,7 +458,11 @@ static char *create_query(const Query_t q, Query_command *qc) {
                 addquery = 1;
             }
         } else {
-            g_string_sprintf(result_buff, q.query, qc->keys);
+            /* We should use SQ_escape() here as well, but we don't yet have an sql connection here yet.
+             * Luckily, qc->keys is already checked to consist only of ALLOWED_QUERY_CHARS */
+            gchar *esc_keys = g_strescape(qc->keys, NULL);
+            g_string_sprintf(result_buff, q.query, esc_keys);
+            g_free(esc_keys);
             addquery = 1;
         }
 
