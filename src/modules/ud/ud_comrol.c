@@ -554,6 +554,7 @@ int UD_check_ref(Transaction_t *tr) {
             /* then compare this reconstructed value with the stored legacy "nic-handle" */
             GList *person, *p;
             GString *reconstructed_value;
+            char *esc_attr;
 
             if (tr->class_type == C_PN)
                 person = rpsl_object_get_attr(tr->object, "person");
@@ -567,12 +568,14 @@ int UD_check_ref(Transaction_t *tr) {
             }
             rpsl_attr_delete_list(person);
 
+            esc_attr = SQ_escape_string(tr->sql_connection, reconstructed_value->str);
+
             for (i = 0; t_ipn[i] != NULL; i++) {
                 /* Calculate number of references */
 
                 g_string_sprintf(tr->query, "SELECT COUNT(*) FROM %s, person_role "
                     "WHERE person_role.object_id=%s.pe_ro_id "
-                    "AND person_role.nic_hdl='%s' ", t_ipn[i], t_ipn[i], reconstructed_value->str);
+                    "AND person_role.nic_hdl='%s' ", t_ipn[i], t_ipn[i], esc_attr);
 
                 sql_str = get_qresult_str(tr->sql_connection, tr->query->str);
 
@@ -592,6 +595,7 @@ int UD_check_ref(Transaction_t *tr) {
                     g_string_sprintfa(tr->error_script, "E[%d][%s]:%s\n", ERROR_U_DBS, t_ipn[i], SQ_error(tr->sql_connection));
                 }
             }
+            free(esc_attr);
             g_string_free(reconstructed_value, TRUE);
 
         }
