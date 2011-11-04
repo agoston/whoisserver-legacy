@@ -362,15 +362,15 @@ static rpsl_object_t *ud_split_names(rpsl_object_t *object) {
  *                                                                 *
  * *****************************************************************/
 static GString *escape_apostrophes(GString *text) {
-	int i;
-	for (i=0; i < text->len; i++) {
-		if ((text->str[i] == '\'') || (text->str[i] == '\\')) {
-			text = g_string_insert_c(text, i, '\\');
-			i++;
-		}
-	}
-	return (text);
-} /* escape_apostrophes() */
+    int i;
+    for (i = 0; i < text->len; i++) {
+        if ((text->str[i] == '\'') || (text->str[i] == '\\')) {
+            text = g_string_insert_c(text, i, '\\');
+            i++;
+        }
+    }
+    return text;
+}
 
 /******************************************************************
  * Line_Type_t line_type(e)                                        *
