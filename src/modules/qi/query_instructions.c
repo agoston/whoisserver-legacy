@@ -437,8 +437,7 @@ static char *create_query(const Query_t q, Query_command *qc) {
             int ret;
             unsigned prefix_length;
 
-            /* first make sure the address has a prefix length part,
-             because IP_pref_a2v6 requires it */
+            /* first make sure the address has a prefix length part, because IP_pref_a2v6 requires it */
             if (index(qc->keys, '/') == NULL) { /* if the query does not have a prefix length */
                 ipv6_prefix = g_strdup_printf("%s/128", qc->keys);
             } else {
@@ -480,7 +479,7 @@ static char *create_query(const Query_t q, Query_command *qc) {
     g_string_free(result_buff, TRUE);
 
     return result;
-} /* create_query() */
+}
 
 /* QI_fast_output() */
 /*++++++++++++++++++++++++++++++++++++++
