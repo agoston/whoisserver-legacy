@@ -716,8 +716,8 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
 	if (TR_check(ud_stream->db_connection, transaction_id, (ud_stream->condat).sock, src_ctx))
 		return (1);
 
-	/* escape apostrophes, otherwise sql will be confused */
-	g_obj_buff=escape_apostrophes(g_obj_buff);
+	/* escape the whole RPSL object for security */
+	g_obj_buff = escape_apostrophes(g_obj_buff);
 
 	/* check if it is an object and init it */
 	if ((submitted_object=rpsl_object_init(g_obj_buff->str))==NULL)
