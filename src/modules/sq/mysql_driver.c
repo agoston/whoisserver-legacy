@@ -1075,7 +1075,7 @@ int SQ_ping(SQ_connection_t **sql_connection) {
 
   ++++++++++++++++++++++++++++++++++++++*/
 
-char *SQ_escape_string(SQ_connection_t *sql_connection, char *str) {
+char *SQ_escape_string(SQ_connection_t *sql_connection, const char *str) {
 	char *new_str;
 	int length;
 
