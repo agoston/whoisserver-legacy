@@ -239,96 +239,40 @@ int sql_execute_watched(sk_conn_st *condat, SQ_connection_t **sql_connection, co
     return retval;
 }
 
-/* qi_create_name_query() */
 /*++++++++++++++++++++++++++++++++++++++
  Create an sql query for the names table.
-
- char *query_str
-
- const char *sql_query
-
- const char *keys
-
- More:
- +html+ <PRE>
- Authors:
- ottrey
- +html+ </PRE>
  ++++++++++++++++++++++++++++++++++++++*/
-static void qi_create_name_query(GString *query_str, const char *sql_query, const char *keys) {
+static void qi_create_name_query(GString *query_str, const char *sql_query, const char *keys, const char *table) {
     int i;
-    /* Allocate stuff - use dynamic strings (initialised to some length) */
     GString *from_clause = g_string_sized_new(STR_L);
     GString *where_clause = g_string_sized_new(STR_L);
     gchar **words = ut_g_strsplit_v1((char*) keys, " ", 0);
 
-    /* double quotes " are used in queries to allow querying for
-     names like O'Hara */
+    /* double quotes " are used in queries to allow querying for names like O'Hara */
+
+    /* We should use SQ_escape() here as well, but we don't yet have an sql connection here yet.
+     * Luckily, qc->keys is already checked to consist only of ALLOWED_QUERY_CHARS
+     * AND we also use "" as a string marker, so it is not necessary to escape here
+     * Also, if ' is used in a query, the ONLY matching keytype is NAME, for which the SQL query
+     * is generated here - agoston, 2011-10-26 */
 
     if (words[0] != NULL) {
-        g_string_sprintfa(from_clause, "names N%.2d", 0);
+        g_string_sprintfa(from_clause, "%s N%.2d", table, 0);
         g_string_sprintfa(where_clause, "N%.2d.name=\"%s\"", 0, words[0]);
 
         for (i = 1; (i < MAX_NAMES) && (words[i] != NULL); i++) {
-            g_string_sprintfa(from_clause, ", names N%.2d", i);
+            g_string_sprintfa(from_clause, ", %s N%.2d", table, i);
             g_string_sprintfa(where_clause, " AND N%.2d.name=\"%s\" AND N00.object_id = N%.2d.object_id", i, words[i], i);
         }
     }
 
     g_string_sprintf(query_str, sql_query, from_clause->str, where_clause->str);
 
-    /* Free up stuff */
     g_strfreev(words);
-    g_string_free(where_clause,/* CONSTCOND */TRUE);
-    g_string_free(from_clause, /* CONSTCOND */TRUE);
+    g_string_free(where_clause, TRUE);
+    g_string_free(from_clause, TRUE);
 
-} /* qi_create_name_query() */
-
-/* qi_create_org_name_query() */
-/*++++++++++++++++++++++++++++++++++++++
- Create an sql query for the org_name table.
-
- char *query_str
-
- const char *sql_query
-
- const char *keys
-
- More:
- +html+ <PRE>
- Authors:
- ottrey
- engin
- +html+ </PRE>
- ++++++++++++++++++++++++++++++++++++++*/
-static void qi_create_org_name_query(GString *query_str, const char *sql_query, const char *keys) {
-    int i;
-    /* Allocate stuff - use dynamic strings (initialised to some length) */
-    GString *from_clause = g_string_sized_new(STR_L);
-    GString *where_clause = g_string_sized_new(STR_L);
-    gchar **words = ut_g_strsplit_v1((char*) keys, " ", 0);
-
-    /* double quotes " are used in queries to allow querying for
-     names like O'Hara */
-
-    if (words[0] != NULL) {
-        g_string_sprintfa(from_clause, "org_name N%.2d", 0);
-        g_string_sprintfa(where_clause, "N%.2d.name=\"%s\"", 0, words[0]);
-
-        for (i = 1; (i < MAX_NAMES) && (words[i] != NULL); i++) {
-            g_string_sprintfa(from_clause, ", org_name N%.2d", i);
-            g_string_sprintfa(where_clause, " AND N%.2d.name=\"%s\" AND N00.object_id = N%.2d.object_id", i, words[i], i);
-        }
-    }
-
-    g_string_sprintf(query_str, sql_query, from_clause->str, where_clause->str);
-
-    /* Free up stuff */
-    g_strfreev(words);
-    g_string_free(where_clause,/* CONSTCOND */TRUE);
-    g_string_free(from_clause, /* CONSTCOND */TRUE);
-
-} /* qi_create_org_name_query() */
+}
 
 /*++++++++++++++++++++++++++++++++++++++
  construct a range query for the as_block table
@@ -453,9 +397,9 @@ static char *create_query(const Query_t q, Query_command *qc) {
         if (q.keytype == WK_NAME) {
             /* Name queries require special treatment. */
             if (q.class == C_OA) {
-                qi_create_org_name_query(result_buff, q.query, qc->keys);
+                qi_create_name_query(result_buff, q.query, qc->keys, "org_name");
             } else {
-                qi_create_name_query(result_buff, q.query, qc->keys);
+                qi_create_name_query(result_buff, q.query, qc->keys, "names");
             }
 
             addquery = 1;
@@ -495,8 +439,7 @@ static char *create_query(const Query_t q, Query_command *qc) {
             int ret;
             unsigned prefix_length;
 
-            /* first make sure the address has a prefix length part,
-             because IP_pref_a2v6 requires it */
+            /* first make sure the address has a prefix length part, because IP_pref_a2v6 requires it */
             if (index(qc->keys, '/') == NULL) { /* if the query does not have a prefix length */
                 ipv6_prefix = g_strdup_printf("%s/128", qc->keys);
             } else {
@@ -534,7 +477,7 @@ static char *create_query(const Query_t q, Query_command *qc) {
     g_string_free(result_buff, TRUE);
 
     return result;
-} /* create_query() */
+}
 
 /* QI_fast_output() */
 /*++++++++++++++++++++++++++++++++++++++
@@ -1597,6 +1540,7 @@ static int qi_collect_domain(SQ_connection_t *sql_connection, char *id_table, ch
     int subcount = 0;
     int foundcount = 0;
     GString *sql_command;
+    char *esc_dot;
 
     /* disconnection from the server */
     if (qis->qe->condat.rtc != 0) return 0;
@@ -1613,9 +1557,11 @@ static int qi_collect_domain(SQ_connection_t *sql_connection, char *id_table, ch
         LG_log(qi_context, LG_DEBUG, "run_referral: checking %s", dot);
 
         /* domain lookup -- query into the _S table */
+        esc_dot = SQ_escape_string(sql_connection, dot);
         g_string_sprintf(sql_command, "INSERT IGNORE INTO %s SELECT object_id "
             "FROM domain "
-            "WHERE domain = '%s'", sub_table, dot);
+            "WHERE domain = '%s'", sub_table, esc_dot);
+        free(esc_dot);
         if (SQ_execute_query(sql_connection, sql_command->str, NULL) != 0) {
             *sql_error = SQ_errno(sql_connection);
             report_sql_error(&qis->qe->condat, sql_connection, sql_command->str);

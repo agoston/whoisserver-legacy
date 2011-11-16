@@ -390,35 +390,35 @@ long get_object_id(Transaction_t *tr) {
  *                                                           *
  *************************************************************/
 char *get_qresult_str(SQ_connection_t *sql_connection, char *query) {
-	SQ_result_set_t *sql_result;
-	SQ_row_t *sql_row;
-	char *sql_str;
-	int sql_err;
+    SQ_result_set_t *sql_result;
+    SQ_row_t *sql_row;
+    char *sql_str;
+    int sql_err;
 
-	LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, query);
-	sql_err=SQ_execute_query(sql_connection, query, &sql_result);
+    LG_log(ud_context, LG_DEBUG, "%s [%s]", UD_TAG, query);
+    sql_err = SQ_execute_query(sql_connection, query, &sql_result);
 
-	if (sql_err) {
-		LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(sql_connection), query);
-		die;
-	}
+    if (sql_err) {
+        LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(sql_connection), query);
+        die;
+    }
 
-	if ((sql_row = SQ_row_next(sql_result)) != NULL) {
-		sql_str = SQ_get_column_string(sql_result, sql_row, 0);
+    if ((sql_row = SQ_row_next(sql_result)) != NULL) {
+        sql_str = SQ_get_column_string(sql_result, sql_row, 0);
 
-		/* We must process all the rows of the result,*/
-		/* otherwise we'll have them as part of the next qry */
-		while ( (sql_row = SQ_row_next(sql_result)) != NULL) {
-			LG_log(ud_context, LG_WARN, "duplicate PK [%s]\n", query);
-			if (sql_str)
-				UT_free(sql_str);
-			sql_str=NULL;
-		}
-	} else
-		sql_str=NULL;
+        /* We must process all the rows of the result,*/
+        /* otherwise we'll have them as part of the next qry */
+        while ((sql_row = SQ_row_next(sql_result)) != NULL) {
+            LG_log(ud_context, LG_WARN, "duplicate PK [%s]", query);
+            if (sql_str)
+                UT_free(sql_str);
+            sql_str = NULL;
+        }
+    } else
+        sql_str = NULL;
 
-	SQ_free_result(sql_result);
-	return (sql_str);
+    SQ_free_result(sql_result);
+    return (sql_str);
 }
 
 /************************************************************
@@ -436,22 +436,19 @@ char *get_qresult_str(SQ_connection_t *sql_connection, char *query) {
  *  NULL in case of an error                                 *
  *                                                           *
  *************************************************************/
-char *get_field_str(SQ_connection_t *sql_connection, const char *field, const char *ref_tbl_name, const char *ref_name,
-        const char * attr_value, const char *condition) {
-	GString *query;
-	char *result;
+char *get_field_str(SQ_connection_t *sql_connection, const char *field, const char *ref_tbl_name, const char *ref_name, const char * attr_value, const char *condition) {
+    GString *query;
+    char *result;
+    query = g_string_sized_new(STR_L);
 
-	query = g_string_sized_new(STR_L);
+    g_string_sprintf(query, "SELECT %s FROM %s WHERE %s='%s' ", field, ref_tbl_name, ref_name, attr_value);
 
-	g_string_sprintf(query, "SELECT %s FROM %s "
-		"WHERE %s='%s' ", field, ref_tbl_name, ref_name, attr_value);
-	if (condition)
-		g_string_append(query, condition);
+    if (condition)
+        g_string_append(query, condition);
 
-	result = get_qresult_str(sql_connection, query->str);
-	g_string_free(query, TRUE);
-	return (result );
-
+    result = get_qresult_str(sql_connection, query->str);
+    g_string_free(query, TRUE);
+    return result;
 }
 
 /************************************************************
@@ -559,7 +556,6 @@ long get_sequence_id(Transaction_t *tr) {
 	}
 
 	return (sequence_id);
-
 }
 
 /************************************************************
@@ -569,17 +565,16 @@ long get_sequence_id(Transaction_t *tr) {
  *
  * **********************************************************/
 
-static long get_ref_id(Transaction_t *tr, const char *ref_tbl_name, const char *ref_name, const char * attr_value,
-        const char *condition) {
-	char *sql_str;
-	long ref_id=-1;
+static long get_ref_id(Transaction_t *tr, const char *ref_tbl_name, const char *ref_name, const char * attr_value, const char *condition) {
+    char *sql_str;
+    long ref_id = -1;
 
-	sql_str= get_field_str(tr->sql_connection, "object_id", ref_tbl_name, ref_name, attr_value, condition);
-	if (sql_str) {
-		ref_id = atol(sql_str);
-		UT_free(sql_str);
-	}
-	return (ref_id);
+    sql_str = get_field_str(tr->sql_connection, "object_id", ref_tbl_name, ref_name, attr_value, condition);
+    if (sql_str) {
+        ref_id = atol(sql_str);
+        UT_free(sql_str);
+    }
+    return (ref_id);
 }
 
 /************************************************************
@@ -1529,23 +1524,25 @@ void ud_each_primary_key_select(void *element_data, void *result_ptr) {
 	if (tr->load_pass == 1)
 		do_query = 0;
 	else
-		do_query=1;
+		do_query = 1;
 
-	if (strcmp(query_fmt, "") != 0) {
+	if (*query_fmt) {
 		/* get value of the attribute. It is already clean since the object is "flattened" */
 		attribute_value = rpsl_attr_get_value(attribute);
 
 		switch (DF_get_select_query_type(attribute_type)) {
 			case UD_MAIN_:
-				if (do_query)
+				if (do_query) {
 					g_string_sprintfa(tr->query, query_fmt, attribute_value);
+				}
 				g_string_sprintfa(tr->K, attribute_value);
 				break;
 			case UD_MA_RT:
 				/* be strict here. bit inconsistencies should result in an error */
 				if (IP_pref_a2v4(attribute_value, &prefstr, &prefix, &prefix_length)==IP_OK) {
-					if (do_query)
+					if (do_query) {
 						g_string_sprintfa(tr->query, query_fmt, prefix, prefix_length);
+					}
 					g_string_sprintfa(tr->K, attribute_value);
 				} else {
 					tr->succeeded = 0;
@@ -1556,8 +1553,9 @@ void ud_each_primary_key_select(void *element_data, void *result_ptr) {
 				break;
 			case UD_MA_IN:
 				if (IP_rang_a2v4(attribute_value, &rangstr, &begin_in, &end_in)==IP_OK) {
-					if (do_query)
+					if (do_query) {
 						g_string_sprintfa(tr->query, query_fmt, begin_in, end_in);
+					}
 					g_string_sprintfa(tr->K, attribute_value);
 				} else {
 					tr->succeeded = 0;
@@ -1569,8 +1567,9 @@ void ud_each_primary_key_select(void *element_data, void *result_ptr) {
 			case UD_MA_R6:
 				/* be strict here. bit inconsistencies should result in an error */
 				if (IP_pref_a2v6(attribute_value, &prefstr, &i6_msb, &i6_lsb, &prefix_length)==IP_OK) {
-					if (do_query)
+					if (do_query) {
 						g_string_sprintfa(tr->query, query_fmt, i6_msb, i6_lsb, prefix_length);
+					}
 					g_string_sprintfa(tr->K, attribute_value);
 				} else {
 					tr->succeeded = 0;
@@ -1582,8 +1581,9 @@ void ud_each_primary_key_select(void *element_data, void *result_ptr) {
 			case UD_MA_I6:
 				/* be strict here. bit inconsistencies should result in an error */
 				if (IP_pref_a2v6(attribute_value, &prefstr, &i6_msb, &i6_lsb, &prefix_length)==IP_OK) {
-					if (do_query)
+					if (do_query) {
 						g_string_sprintfa(tr->query, query_fmt, i6_msb, i6_lsb, prefix_length);
+					}
 					g_string_sprintfa(tr->K, attribute_value);
 				} else {
 					tr->succeeded = 0;
@@ -1594,8 +1594,9 @@ void ud_each_primary_key_select(void *element_data, void *result_ptr) {
 				break;
 			case UD_MA_AK:
 				convert_as_range(attribute_value, &begin_as, &end_as);
-				if (do_query)
+				if (do_query) {
 					g_string_sprintfa(tr->query, query_fmt, begin_as, end_as);
+				}
 				g_string_sprintfa(tr->K, attribute_value);
 				break;
 			default:

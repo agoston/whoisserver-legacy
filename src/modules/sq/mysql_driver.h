@@ -99,7 +99,7 @@ int SQ_get_info(SQ_connection_t *sql_connection, int info[3]);
 SQ_connection_t *SQ_duplicate_connection(SQ_connection_t *orig);
 int SQ_abort_query(SQ_connection_t *sql_connection);
 int SQ_ping(SQ_connection_t **sql_connection);
-char *SQ_escape_string(SQ_connection_t *sql_connection, char *str);
+char *SQ_escape_string(SQ_connection_t *sql_connection, const char *str);
 
 long sq_get_minmax_id(SQ_connection_t *sql_connection, char *id_name, char *table, int max);
 void SQ_init (LG_context_t *ctx);

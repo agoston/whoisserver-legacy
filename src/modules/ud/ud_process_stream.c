@@ -362,15 +362,15 @@ static rpsl_object_t *ud_split_names(rpsl_object_t *object) {
  *                                                                 *
  * *****************************************************************/
 static GString *escape_apostrophes(GString *text) {
-	int i;
-	for (i=0; i < text->len; i++) {
-		if ((text->str[i] == '\'') || (text->str[i] == '\\')) {
-			text = g_string_insert_c(text, i, '\\');
-			i++;
-		}
-	}
-	return (text);
-} /* escape_apostrophes() */
+    int i;
+    for (i = 0; i < text->len; i++) {
+        if ((text->str[i] == '\'') || (text->str[i] == '\\')) {
+            text = g_string_insert_c(text, i, '\\');
+            i++;
+        }
+    }
+    return text;
+}
 
 /******************************************************************
  * Line_Type_t line_type(e)                                        *
@@ -716,8 +716,8 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
 	if (TR_check(ud_stream->db_connection, transaction_id, (ud_stream->condat).sock, src_ctx))
 		return (1);
 
-	/* escape apostrophes, otherwise sql will be confused */
-	g_obj_buff=escape_apostrophes(g_obj_buff);
+	/* escape the whole RPSL object for security */
+	g_obj_buff = escape_apostrophes(g_obj_buff);
 
 	/* check if it is an object and init it */
 	if ((submitted_object=rpsl_object_init(g_obj_buff->str))==NULL)

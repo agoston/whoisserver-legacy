@@ -96,17 +96,15 @@ char * UT_strdup_real(const char *str, const char *file, int line) {
 	return area;
 }
 
-/* for GList's foreach */
-static void wr_free_list_element(void *cpy, void *trash) {
-	free(cpy);
-}
-
 /* free a GList, calling free() on all data elements, then freeing the GList itself, finally
  * setting its value to NULL */
 void wr_clear_list(GList **list) {
 	/* allow NULL argument */
 	if (list && *list) {
-		g_list_foreach(*list, wr_free_list_element, NULL);
+	    GList *p;
+	    for (p = g_list_first(*list); p; p = g_list_next(p)) {
+	        free(p->data);
+	    }
 		g_list_free(*list);
 		*list = NULL;
 	}
