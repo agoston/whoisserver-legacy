@@ -15,6 +15,7 @@ use Config;
 use File::Spec;
 use Getopt::Long;
 use File::Basename  qw[dirname basename];
+use Data::Dumper;
 
 ### Set up defaults firsts
 my $Cwd         = cwd();
@@ -28,7 +29,7 @@ my $SetupDb         = 0;
 my $RunConfigure    = 0;
 my $SetupConfig     = 0;
 my $Install         = 0;
-my $UseTempDir      = 0;
+my $UseTempDir      = 1;
 my $SetupTests      = 0;
 my $StartDaemon     = 0;
 my $All             = 1;
@@ -74,11 +75,15 @@ die usage() if $Help;
 die 'Need db password. You can also set it via $ENV{RIPE_SQLPASS}'.$/ 
     unless $SQLPass;
 
+print 'Install prefix is '.$DbPrefix."\n";
+
 ### Because of our mounting these paths will actually be different texually but
 ### point to the same inode, make the check a bit more thorough and check the
 ### actual inode.
+my @DbPrefixStat = stat($DbPrefix);
+my @CwdStat = stat($Cwd);
 die "Source dir and installation dir are identical ($Cwd):\nPlease set --prefix!\n"
-    if [stat $DbPrefix]->[1] eq [stat $Cwd]->[1];
+    if (@DbPrefixStat && @CwdStat && ($DbPrefixStat[1] eq $CwdStat[1]));
 
 ### documented here so it's close to the original options
 sub usage {
