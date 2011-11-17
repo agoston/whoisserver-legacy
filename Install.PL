@@ -370,7 +370,7 @@ You can now use the Net::Whois::RIPE::RPSL, and all the other RIPE::* modules us
 
 if( $UseTempDir ) {
     ### OPTIONAL - writes over NFS can be slow/lock, so write logs to local drive ####
-    _system( qq[mkdir -p $DbTempDir] ) unless -d $DbTempDir;
+    _system( qq[rm -rf $DbTempDir && mkdir -p $DbTempDir] );
     _system( qq[mv $DbPrefix/log $DbTempDir && ln -s $DbTempDir/log $DbPrefix] );
     _system( qq[mv $DbPrefix/var $DbTempDir && ln -s $DbTempDir/var $DbPrefix] );
     _system( qq[mkdir $DbTempDir/tmp && ln -s $DbTempDir/tmp tests/dbupdate/testing] );
