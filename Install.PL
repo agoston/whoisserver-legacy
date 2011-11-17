@@ -319,6 +319,10 @@ deflook:  y
 }
 
 if( $Install or $All ) {
+    # clean dev install dir
+    _system(qq[rm -rf $DbPrefix]) unless (! -e $DbPrefix);
+    _system(qq[mkdir -p $DbPrefix]);
+
     ### config set up, run make & install
     ### add gcov flags to the compiler flags for profiling
     ### XXX don't set globally, as the perl bindings below will fail
@@ -370,10 +374,11 @@ You can now use the Net::Whois::RIPE::RPSL, and all the other RIPE::* modules us
 
 if( $UseTempDir ) {
     ### OPTIONAL - writes over NFS can be slow/lock, so write logs to local drive ####
-    _system( qq[rm -rf $DbTempDir && mkdir -p $DbTempDir] );
-    _system( qq[mv $DbPrefix/log $DbTempDir && ln -s $DbTempDir/log $DbPrefix] );
-    _system( qq[mv $DbPrefix/var $DbTempDir && ln -s $DbTempDir/var $DbPrefix] );
-    _system( qq[mkdir $DbTempDir/tmp && ln -s $DbTempDir/tmp tests/dbupdate/testing] );
+    _system(qq[rm -rf $DbTempDir]) unless (! -e $DbTempDir);
+    _system(qq[mkdir -p $DbTempDir]);
+    _system( qq[mv $DbPrefix/log $DbTempDir && ln -snf $DbTempDir/log $DbPrefix] );
+    _system( qq[mv $DbPrefix/var $DbTempDir && ln -snf $DbTempDir/var $DbPrefix] );
+    _system( qq[mkdir $DbTempDir/tmp && ln -snf $DbTempDir/tmp tests/dbupdate/testing] );
 }
 
 ### final steps
@@ -414,7 +419,7 @@ sub _system {
     
     $cmd .= ' > /dev/null 2>&1' unless $Debug;
 
-    print "Running '$cmd'"  if $Verbose;
+    print "Running '$cmd'\n"  if $Verbose;
     system( $cmd ) and do { $warn ? warn $? : die $? };
     print "....done\n"      if $Verbose;
     
