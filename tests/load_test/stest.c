@@ -30,20 +30,29 @@ char *arg_hostname1, *arg_hostname2;
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
 int numlines = 0;
-FILE* infile;
-FILE* logfile;
-char* infilename;
+FILE *infile;
+FILE *logfile, *log1, *log2;
+char *infilename;
 
-void log_to_file(char *reason, char *actwork = "") {
+void log_result(char *query, char *res1, char *res2) {
     pthread_mutex_lock(&log_lock);
-    fprintf(logfile, "%s: %s", reason, actwork);
+    fprintf(log1, " >>> %s\n%s\n\n", query, res1);
+    fflush(log1);
+    fprintf(log2, " >>> %s\n%s\n\n", query, res2);
+    fflush(log2);
+    pthread_mutex_unlock(&log_lock);
+}
+
+void log_to_file(char *reason, char *actwork) {
+    pthread_mutex_lock(&log_lock);
+    fprintf(logfile, "%s: %s\n", reason, actwork);
     fflush(logfile);
     pthread_mutex_unlock(&log_lock);
 }
 
 void log_to_file(char *hostname, int port, char *reason, char *actwork = "") {
     pthread_mutex_lock(&log_lock);
-    fprintf(logfile, "[%s:%d] %s: %s", hostname, port, reason, actwork);
+    fprintf(logfile, "[%s:%d] %s: %s\n", hostname, port, reason, actwork);
     fflush(logfile);
     pthread_mutex_unlock(&log_lock);
 }
@@ -84,7 +93,7 @@ char *skip_initial_comment(char *buf, int len) {
     char *p, *ret = buf;
 
     // ignore the first lines up to the first object
-    while ((*ret < 'a') || (*ret > 'z')) {
+    while ((*ret == '%') || (*ret == '\n')) {
         p = strchr(ret, '\n');
         if (p && p[1]) { // if newline found & next character is not 0
             ret = p+1;
@@ -183,8 +192,7 @@ void *startup(void *arg) {
         /* Compare results */
         if (compare_buf(buf1, p1, buf2, p2)) {
             log_to_file("results differ", line);
-            log_to_file("result1", buf1);
-            log_to_file("result2", buf2);
+            log_result(line, buf1, buf2);
             fprintf(stderr, "#");
             fflush(stderr);
         }
@@ -217,6 +225,8 @@ int main(int argc, char **argv) {
     arg_hostname2 = argv[5];
     arg_port2 = strtol(argv[6], NULL, 10);
     logfile = fopen("stest.log", "w+");
+    log1 = fopen("stest.1", "w+");
+    log2 = fopen("stest.2", "w+");
 
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
