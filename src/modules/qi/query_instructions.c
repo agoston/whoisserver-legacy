@@ -2011,8 +2011,8 @@ int QI_execute(Query_instructions *qis) {
     GList *datlist = NULL;
     SQ_connection_t *sql_connection = NULL;
     int sql_error = 0;
-    int irt_inet_id;
-    int irt_gid;
+    int irt_inet_id = 0;
+    int irt_gid = 0;
 
     sql_connection = SQ_get_connection_by_source_hdl(qis->source);
 
@@ -2112,14 +2112,13 @@ int QI_execute(Query_instructions *qis) {
     }
 
     /* find the irt objects (for -c) */
-    if (!sql_error && (qis->qc->c) && irt_inet_id) {
+    if (!sql_error && qis->qc->c && irt_inet_id) {
         sql_error = qi_find_refs(&sql_connection, qis->qe, Q_REC_IRT, "mnt_irt", "", id_table, irt_inet_id, irt_gid);
     }
 
     /* display */
     /* -K filtering:
-     * right now only filtering, no expanding sets like write_set_objects()
-     */
+     * right now only filtering, no expanding sets like write_set_objects() */
 
     /* display the immediate data from the radix tree */
     if (!sql_error && qis->qc->filtered) {
