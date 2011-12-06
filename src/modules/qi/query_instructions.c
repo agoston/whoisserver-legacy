@@ -1319,14 +1319,18 @@ static void write_radix_immediate(GList *datlist, sk_conn_st *condat, acc_st *ac
  ++++++++++++++++++++++++++++++++++++++*/
 static int map_qc2rx(Query_instruction *qi, const Query_command *qc) {
     int result = 1;
-    int allflags = (qc->L == 1) + (qc->M == 1) + (qc->l == 1) + (qc->m == 1) + (qc->x == 1);
+    int allflags = 0;
 
-    allflags += qc->c;
+    if (qc->L) allflags++;
+    if (qc->M) allflags++;
+    if (qc->l) allflags++;
+    if (qc->m) allflags++;
+    if (qc->x) allflags++;
+    if (qc->c) allflags++;
 
     qi->rx_keys = qc->keys;
 
     /* only one option can be active at a time */
-
     if (allflags > 1) {
         /* user error  (this should have been checked before) */
 

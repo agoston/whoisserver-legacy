@@ -144,9 +144,9 @@ char *QC_query_command_to_string(Query_command *query_command) {
     str3 = WK_to_string(query_command->keytypes_bitmap);
 
     sprintf(result_buf,
-            "Query_command : inv_attrs=%s, recursive=%s, object_type=%s, (c=%s,C=%s,G=%s,B=%s,b=%s,g=%d,l=%d,m=%d,q=%d,t=%d,v=%d,x=%d,F=%d,K=%d,L=%d,M=%d,R=%d), possible keytypes=%s, keys=[%s]",
+            "Query_command : inv_attrs=%s, recursive=%s, object_type=%s, (c=%s,G=%s,B=%s,b=%s,g=%d,l=%d,m=%d,q=%d,t=%d,v=%d,x=%d,F=%d,K=%d,L=%d,M=%d,R=%d), possible keytypes=%s, keys=[%s]",
             str1, query_command->recursive ? "y" : "n", str2, query_command->c ? "TRUE" : "FALSE",
-            query_command->C ? "TRUE" : "FALSE", query_command->G ? "TRUE" : "FALSE",
+            query_command->G ? "TRUE" : "FALSE",
             query_command->B ? "TRUE" : "FALSE", query_command->b ? "TRUE" : "FALSE", query_command->g,
             query_command->l, query_command->m, query_command->q, query_command->t, query_command->v, query_command->x,
             query_command->fast, query_command->filtered, query_command->L, query_command->M, query_command->R, str3,
@@ -198,7 +198,6 @@ void QC_free(Query_command *qc) {
 void QC_init_struct(Query_command *query_command) {
     query_command->query_type = QC_SYNERR;
     query_command->c = TRUE; /* IRT search is on by default */
-    query_command->C = FALSE;
     query_command->G = TRUE; /* grouping is on by default */
     query_command->B = FALSE; /* "original" output is off by default */
     query_command->b = FALSE;
@@ -316,12 +315,10 @@ static int QC_fill(const char *query_str, Query_command *query_command, Query_en
 
             case 'C':
                 query_command->c = FALSE;
-                query_command->C = TRUE;
                 break;
 
             case 'c':
                 query_command->c = TRUE;
-                query_command->C = FALSE;
                 break;
 
             case 'G':
