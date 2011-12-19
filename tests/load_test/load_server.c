@@ -19,6 +19,8 @@ int sockfds[NUMBER_OF_CONNECTIONS];
 int numsock = 0;
 int numconns = 0;
 
+char whois_greet[] = "% This is the RIPE Database query service.\n% The objects are in RPSL format.\n\n";
+
 void *startup(void *arg) {
     int sock;
     size_t len;
@@ -34,12 +36,13 @@ void *startup(void *arg) {
         sock = sockfds[numsock];
 
         numconns++;
-        if (numconns > 1000) {
-            numconns -= 1000;
+        if (numconns > 100) {
+            numconns -= 100;
             fprintf(stderr, ".");
         }
         pthread_mutex_unlock(&lock);
 
+        write(sock, whois_greet, sizeof(whois_greet)-1);
         if (len = read(sock, &buf, 1024)) {
             write(sock, buf, len);
         }
@@ -82,7 +85,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("Thread creation done. Each . represents 1000 served queries.\nPress ctrl-c to exit.\n");
+    printf("Thread creation done. Each . represents 100 served queries.\nPress ctrl-c to exit.\n");
 
     while (1) {
         int actsock = SK_accept_connection(mainsock);
