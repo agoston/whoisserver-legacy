@@ -783,17 +783,56 @@ char *filter(const char *str) {
         g_string_append(result_buff, "\n");
     }
     result = UT_strdup(result_buff->str);
-    g_string_free(result_buff,/* CONSTCOND */TRUE);
+    g_string_free(result_buff, TRUE);
 
     return result;
-} /* filter() */
+}
 
-/*++++++++++++++++++++++++++++++++++++++
+/* remove the auth: lines from mntner objects unconditionally */
+char *mntner_auth_filter(const char *str) {
+    gchar **lines = g_strsplit(str, "\n", 0);
+    int len = g_strv_length(lines);
+    gchar *new[len+2];
+    int i = 2;
+    gboolean auth_found = FALSE;
+    gchar **p;
+    gchar *ret;
+
+    new[0] = "% WARNING: all 'auth:' attributes are dropped from the below object";
+    new[1] = "";
+
+    for (p = lines; *p; p++) {
+        if (!(**p == ' ' || **p == '\t' || **p == '\n')) {
+            if (!strncmp(*p, "auth:", 5)) {
+                auth_found = TRUE;
+            } else {
+                auth_found = FALSE;
+            }
+        }
+
+        if (!auth_found) {
+            new[i++] = *p;
+        }
+    }
+    new[i] = NULL;
+
+    ret = g_strjoinv("\n", new);
+    g_strfreev(lines);
+    return ret;
+}
+
+
+/*
  Write the results to the client socket.
+
+ FIXME: This code is horrible. Fully reimplement to:
+        * parse objects once and operate on rpsl_object_t
+        * do ACL properly
+        * implement the filtering chain properly - agoston, 2011-12-20
 
  SQ_result_set_t *result     The result set returned from the sql query.
  Query_instructions *qis     query instructions.
- ++++++++++++++++++++++++++++++++++++++*/
+ */
 static int write_results(SQ_result_set_t *result, Query_instructions *qis, GHashTable *groups) {
     sk_conn_st *condat = &(qis->qe->condat);
     SQ_row_t *row;
@@ -880,17 +919,24 @@ static int write_results(SQ_result_set_t *result, Query_instructions *qis, GHash
                 UT_free(id);
                 UT_free(objt);
 
+                /* filter 'auth:' lines from mntner objects - hack by agoston, 2011-12-20 */
+                if (type == C_MT) {
+                    char *newstr = mntner_auth_filter(str);
+                    free(str);
+                    str = newstr;
+                }
+
                 /* brief output - for inetnum, inet6num, irt, person, role */
-                if (brief == 1) {
+                if (brief) {
                     cont_filter = brief_filter(str);
                     UT_free(str);
                     str = cont_filter;
                 }
 
                 /* filter out contact info - DEFAULT */
-                if (original == 0) {
+                if (!original) {
                     if (groups != NULL) {
-                        if (((grouped == 1) && (g_hash_table_lookup(groups, (long*) gid) != NULL)) || ((grouped == 0) && (g_hash_table_size(groups) > 0))) {
+                        if ((grouped && (g_hash_table_lookup(groups, (long*) gid) != NULL)) || (!grouped && (g_hash_table_size(groups) > 0))) {
                             abuse_attr_exists = 1;
                         }
                     }
