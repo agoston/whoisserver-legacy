@@ -187,7 +187,7 @@
         </sqlquery>
       </queries>
     </keys>
-    <dummify>MD5-PW $1$anntMjx4$h5F7JUovDWX6XVwrmBeN8/</dummify>
+    <dummify>$1$SaltSalt$DummifiedMD5HashValue.   # Real value hidden for security</dummify>
   </ripe_attribute>
 
   <ripe_attribute name="author" code="ah">
