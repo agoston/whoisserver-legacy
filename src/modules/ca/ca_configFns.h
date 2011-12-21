@@ -130,7 +130,7 @@ void ca_getAsource(char *, GSList *);
  * name.  If it finds the name of the source, it returns a
  * pointer to the structure that represents the source.
  */
-ca_dbSource_t *ca_getSourceDetails(char *, GSList *);
+ca_dbSource_t *ca_getSourceDetails(const char *, GSList *);
 
 /*
  * A function that returns a handle to a Source, 
@@ -145,7 +145,7 @@ ca_SrcHdl_t *ca_get_SourceHandleByPosition(int);
  * given its name in the linked-list of sources.
  *
  */
-ca_SrcHdl_t *ca_get_SourceHandleByName(char *);
+ca_SrcHdl_t *ca_get_SourceHandleByName(const char *);
 
 /*
  * Given a source-handle and an attribute, returns a
@@ -225,7 +225,6 @@ void ca_getAllMirrors(GSList *);
  *
  */
 ca_database_t *ca_getDbHandleByName(char *);
-ca_SrcHdl_t *ca_get_SourceHandleByName(char *);
 ca_mirror_t *ca_getNrtmHandleByName(char *);
 
 /*
