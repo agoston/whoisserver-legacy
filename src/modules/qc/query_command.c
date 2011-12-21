@@ -184,8 +184,6 @@ void QC_environ_free(Query_environ *qe) {
  Query_command *qc query_command to be freed.
  ++++++++++++++++++++++++++++++++++++++*/
 void QC_free(Query_command *qc) {
-    GList *message_node;
-
     if (qc != NULL) {
         if (qc->keys != NULL) {
             g_free(qc->keys);

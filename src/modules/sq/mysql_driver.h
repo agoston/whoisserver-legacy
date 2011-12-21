@@ -107,7 +107,7 @@ void SQ_init (LG_context_t *ctx);
 #define SQ_get_max_id(conn, id, table) sq_get_minmax_id(conn, id, table, 1)
 #define SQ_get_min_id(conn, id, table) sq_get_minmax_id(conn, id, table, 0)
 
-SQ_connection_t *SQ_get_connection_by_source_name(char *source);
+SQ_connection_t *SQ_get_connection_by_source_name(const char *source);
 SQ_connection_t *SQ_get_connection_by_source_hdl(const ca_dbSource_t *source_hdl);
 
 

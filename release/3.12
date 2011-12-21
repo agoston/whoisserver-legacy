@@ -1,0 +1,12 @@
+20111221 - version 3.12
+
+
+Changes:
+- query results hide the 'auth:' attribute of mntner objects
+- dbupdate uses direct database access to retrieve original object
+- lots of small bugfixes
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG

@@ -96,7 +96,6 @@ typedef enum UD_qtype_t {
   UD_AX_OA,
   UD_AX_M6,
   UD_AX_FR,
-  UD_AX_PF,
   UD_LEAF_,
   UD_LF_IF,
   UD_LF_RF,

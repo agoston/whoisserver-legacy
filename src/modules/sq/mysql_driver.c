@@ -1110,7 +1110,7 @@ SQ_connection_t *SQ_get_connection_by_source_hdl(const ca_dbSource_t *source_hdl
 /* get DB connection to a source by a source name
  * always returns a connection, or dies
  * agoston, 2010-04-20 */
-SQ_connection_t *SQ_get_connection_by_source_name(char *source) {
+SQ_connection_t *SQ_get_connection_by_source_name(const char *source) {
     ca_dbSource_t *source_hdl = ca_get_SourceHandleByName(source);
     if (source_hdl) {
         return SQ_get_connection_by_source_hdl(source_hdl);

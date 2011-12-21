@@ -1535,7 +1535,7 @@ void ca_getAsource(char *sourceName, GSList * sources)
 
 }
 
-ca_dbSource_t * ca_getSourceDetails(char *sourceName, GSList * sources)
+ca_dbSource_t * ca_getSourceDetails(const char *sourceName, GSList * sources)
 /*******************************************************************
  * ca_getSourceDetails                              *
  *   -- A function that compares each 'name' component of every     *
@@ -1623,7 +1623,7 @@ ca_SrcHdl_t * ca_get_SourceHandleByPosition(int position)
     return (mySource);
 }
 
-ca_SrcHdl_t * ca_get_SourceHandleByName(char *srcName)
+ca_SrcHdl_t * ca_get_SourceHandleByName(const char *srcName)
 /*******************************************************************
  * ca_get_SourceHandleByName                          *
  *  -- retrieves the a handle to a source                  *
