@@ -6,17 +6,8 @@
 #include <pthread.h>
 #include <stdio.h>
 
-#include "which_keytypes.h"
-#include "lg.h"
-#include "memwrap.h"
+#include "rip.h"
 #include "lu_whois.h"
-#include "ut_string.h"
-
-/* XXX: no "-k" flag */
-
-#undef MAX
-#undef MIN
-#include "sk.h"
 
 /* the logging context is defined in lu.c */
 extern LG_context_t *lu_context;
@@ -256,106 +247,62 @@ static void lu_log_object(rpsl_object_t *obj) {
  Logging perfomed via LG module.
  */
 LU_ret_t lu_whois_lookup(LU_server_t *server, rpsl_object_t **obj, const gchar *type, const gchar *key, const gchar *source) {
-    gchar *query;
-    gchar *key_copy;
-    gchar *end_of_key;
-    gboolean query_ret;
-    GList *tmp_obj;
-
-    GList *p;
-    rpsl_object_t *object;
-    gchar *object_key;
-
-    LU_ret_t ret_val;
-
-    int num_query_attempts;
+    gchar **dbcodes = NULL, **p = NULL;
+    GString *textcodes = NULL;
+    LU_ret_t retval = LU_OKAY;
+    SQ_connection_t *conn = NULL;
+    SQ_result_set_t *result = NULL;
+    SQ_row_t *row = NULL;
+    char buf[1024];
+    char *esc_key = NULL;
 
     LG_log(lu_context, LG_FUNC, ">lu_whois_lookup: entered");
-
     LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: type=\"%s\", key=\"%s\", source=\"%s\"", type, key, source);
 
-    /* special case route & route6 , because they have a composite key */
-    if (!strcasecmp(type, "route") || !strcasecmp(type, "route6")) {
-        /* route keys look like this: "1.2.3.4/5AS6", but we cannot
-         perform a lookup on this, so we turn this into "1.2.3.4/5" for
-         the query and filter out any prefixes that do not have the correct
-         AS number */
-        key_copy = g_strdup(key);
-        g_strup(key_copy);
-        end_of_key = strstr(key_copy, "AS");
-        if (end_of_key != NULL)
-        {
-            *end_of_key = '\0';
+    dbcodes = g_strsplit(type, ",", 0);
+    textcodes = g_string_sized_new(255);
+
+    for (p = dbcodes; *p; p++) {
+        int db_code = DF_attribute_name2type(*p);
+        if (db_code < 0) {
+            LG_log(lu_context, LG_ERROR, "lu_whois_lookup: invalid object type \"%s\"", type);
+            retval = LU_INVARG;
+            goto lu_whois_lookup_exit;
         }
-        query = g_strdup_printf("-G -B -s %s -r -x -T %s %s", source, type, key_copy);
-        g_free(key_copy);
+        if (textcodes->len) g_string_append_printf(textcodes, ",%d", db_code);
+        else g_string_append_printf(textcodes, "%d", db_code);
     }
 
-    /* also special case inetnum and inet6num, since we want the -x flag */
-    else if (!strcasecmp(type, "inetnum") || !strcasecmp(type, "inet6num")) {
-        query = g_strdup_printf("-G -B -s %s -r -x -T %s %s", source, type, key);
-    }
-    /* also special case domain, since we want the -R flag */
-    else if (!strcasecmp(type, "domain")) {
-        query = g_strdup_printf("-G -B -s %s -r -R -T %s %s", source, type, key);
-    } else {
-        query = g_strdup_printf("-G -B -s %s -r -T %s %s", source, type, key);
+    if (!(conn = SQ_get_connection_by_source_name(source))) {
+        LG_log(lu_context, LG_ERROR, "lu_whois_lookup: could not get database connection to source \"%s\"", source);
+        retval = LU_ERROR;
+        goto lu_whois_lookup_exit;
     }
 
-    /* XXX: There is a bug in the core server that causes a WHOIS query to
-     occasionally return the same object multiple times.  I think this
-     is related to the server not being strict about locking access
-     on reads.  This will be fixed at a later time, but for now, try
-     the query again, and see if we still get two objects.
-     */
-    num_query_attempts = 0;
-    do {
-        /* query server for objects */
-        query_ret = lu_whois_query(server->info, query, &tmp_obj);
-        if (!query_ret) {
-            LG_log(lu_context, LG_FUNC, "<lu_whois_lookup: exiting with value [%s]", LU_ret2str(LU_ERROR));
-            g_free(query);
-            return LU_ERROR;
+    esc_key = SQ_escape_string(conn, key);
+    snprintf(buf, 1024, "SELECT object FROM last WHERE pkey = '%s' AND object_type IN (%s) AND sequence_id > 0", esc_key, textcodes->str);
+    free(esc_key);
+
+    if (SQ_execute_query(conn, buf, &result) == -1) {
+        LG_log(lu_context, LG_FATAL, "lu_whois_lookup: SQL ERROR '%d': '%s' for query '%s'", SQ_errno(conn), SQ_error(conn), buf);
+        die;
+    }
+
+    if ((row = SQ_row_next(result)) != NULL) {
+        char *objtext = SQ_get_column_string_nocopy(result, row, 0);
+        LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: got object from SQL DB: [%s]", objtext);
+        *obj = rpsl_object_init(objtext);
+        if (!*obj) {
+            LG_log(lu_context, LG_ERROR, "lu_whois_query: error parsing object returned by WHOIS");
+            retval = LU_ERROR;
         }
-        num_query_attempts++;
+    }
 
-        /* filter out the objects that don't have the key */
-        /* we have to do this, because certain object types can return multiple
-         objects even if we specify the key, for example if you want to find
-         the person object with the "nic-hdl: MIKE" */
-        /* see also the comment on routes, above */
-        *obj = NULL;
-        ret_val = LU_OKAY;
-        LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: lookup key is \"%s\"", key);
-        for (p = tmp_obj; p != NULL; p = g_list_next(p)) {
-            object = p->data;
-            object_key = rpsl_object_get_key_value(object);
-            LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: object key is \"%s\"", object_key);
-            if (strcasecmp(object_key, key) == 0) {
-                if (*obj != NULL)
-                {
-                    LG_log(lu_context, LG_ERROR, "lu_whois_lookup: duplicate key \"%s\" found", key);
-                    rpsl_object_delete(*obj);
-                    ret_val = LU_ERROR;
-                }
-                *obj = object;
-            } else {
-                rpsl_object_delete(object);
-            }
-            UT_free(object_key);
-        }
-        g_list_free(tmp_obj);
-
-        /* free resources on error */
-        if (ret_val == LU_ERROR) {
-            rpsl_object_delete(*obj);
-            *obj = NULL;
-        }
-
-    } while ((ret_val == LU_ERROR) && (num_query_attempts < 3));
-
-    /* free query memory */
-    g_free(query);
+    /* sanity check */
+    if ((row = SQ_row_next(result)) != NULL) {
+        LG_log(lu_context, LG_FATAL, "lu_whois_lookup: multiple results on lookup query '%s'", buf);
+        die;
+    }
 
     /* log object */
     if (*obj != NULL) {
@@ -367,9 +314,15 @@ LU_ret_t lu_whois_lookup(LU_server_t *server, rpsl_object_t **obj, const gchar *
         LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: object is NULL");
     }
 
+lu_whois_lookup_exit:
+    if (result) SQ_free_result(result);
+    if (conn) SQ_close_connection(conn);
+    if (textcodes) g_string_free(textcodes, TRUE);
+    if (dbcodes) g_strfreev(dbcodes);
+
     /* return result */
-    LG_log(lu_context, LG_FUNC, "<lu_whois_lookup: exiting with value [%s]", LU_ret2str(ret_val));
-    return ret_val;
+    LG_log(lu_context, LG_FUNC, "<lu_whois_lookup: exiting with value [%s]", LU_ret2str(retval));
+    return retval;
 }
 
 GString* glist_to_string(GList *list, GString *string) {
