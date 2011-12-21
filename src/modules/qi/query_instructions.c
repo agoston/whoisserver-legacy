@@ -788,35 +788,39 @@ char *filter(const char *str) {
     return result;
 }
 
-/* remove the auth: lines from mntner objects unconditionally */
-char *mntner_auth_filter(const char *str) {
+/* remove the auth: lines from mntner objects unconditionally
+ * if needed, add '# Filtered' remark to the source: line */
+char *mntner_auth_filter(const char *str, gboolean filter_source) {
     gchar **lines = g_strsplit(str, "\n", 0);
     int len = g_strv_length(lines);
-    gchar *new[len+2];
-    int i = 2;
-    gboolean auth_found = FALSE;
+    gchar *new[len];
+    gchar *sourceline = NULL;
+    int i = 0;
+    gboolean skip = FALSE;
     gchar **p;
     gchar *ret;
-
-    new[0] = "% WARNING: all 'auth:' attributes are dropped from the below object";
-    new[1] = "";
 
     for (p = lines; *p; p++) {
         if (!(**p == ' ' || **p == '\t' || **p == '\n')) {
             if (!strncmp(*p, "auth:", 5)) {
-                auth_found = TRUE;
+                skip = TRUE;
+            } else if (filter_source && !strncmp(*p, "source:", 7)) {
+                asprintf(&sourceline, "%s # Filtered", *p);
+                new[i++] = sourceline;
+                skip = TRUE;
             } else {
-                auth_found = FALSE;
+                skip = FALSE;
             }
         }
 
-        if (!auth_found) {
+        if (!skip) {
             new[i++] = *p;
         }
     }
     new[i] = NULL;
 
     ret = g_strjoinv("\n", new);
+    if (sourceline) free(sourceline);
     g_strfreev(lines);
     return ret;
 }
@@ -921,7 +925,7 @@ static int write_results(SQ_result_set_t *result, Query_instructions *qis, GHash
 
                 /* filter 'auth:' lines from mntner objects - hack by agoston, 2011-12-20 */
                 if (type == C_MT) {
-                    char *newstr = mntner_auth_filter(str);
+                    char *newstr = mntner_auth_filter(str, original);
                     free(str);
                     str = newstr;
                 }
