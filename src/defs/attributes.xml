@@ -2635,7 +2635,7 @@
 
     <representation>
     <sqltable name="poetic_form">
-      <insert qtype="ud_ax_pf">
+      <insert qtype="ud_main_">
         INSERT poetic_form
         SET thread_id=%d, object_id=%ld, poetic_form='%s'
       </insert>
