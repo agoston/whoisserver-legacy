@@ -263,7 +263,7 @@ LU_ret_t lu_whois_lookup(LU_server_t *server, rpsl_object_t **obj, const gchar *
     textcodes = g_string_sized_new(255);
 
     for (p = dbcodes; *p; p++) {
-        int db_code = DF_attribute_name2type(*p);
+        int db_code = DF_class_name2type(*p);
         if (db_code < 0) {
             LG_log(lu_context, LG_ERROR, "lu_whois_lookup: invalid object type \"%s\"", type);
             retval = LU_INVARG;
@@ -281,6 +281,7 @@ LU_ret_t lu_whois_lookup(LU_server_t *server, rpsl_object_t **obj, const gchar *
 
     esc_key = SQ_escape_string(conn, key);
     snprintf(buf, 1024, "SELECT object FROM last WHERE pkey = '%s' AND object_type IN (%s) AND sequence_id > 0", esc_key, textcodes->str);
+    LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: executing SQL query [%s]", buf);
     free(esc_key);
 
     if (SQ_execute_query(conn, buf, &result) == -1) {
@@ -296,6 +297,8 @@ LU_ret_t lu_whois_lookup(LU_server_t *server, rpsl_object_t **obj, const gchar *
             LG_log(lu_context, LG_ERROR, "lu_whois_query: error parsing object returned by WHOIS");
             retval = LU_ERROR;
         }
+    } else {
+        *obj = NULL;
     }
 
     /* sanity check */

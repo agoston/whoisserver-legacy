@@ -69,7 +69,7 @@ void PM_get_minmax_serial(SQ_connection_t *sql_connection, long *min, long *max)
 	}
 
 	if ((sql_row = SQ_row_next(sql_result)) != NULL) {
-		if (SQ_get_column_int(sql_result, sql_row, 0, min) || SQ_get_column_int(sql_result, sql_row, 1, max)) {
+		if ((SQ_get_column_int(sql_result, sql_row, 0, min) < -1) || (SQ_get_column_int(sql_result, sql_row, 1, max) < -1)) {
 			LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
 			die;
 		}
