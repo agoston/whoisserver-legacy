@@ -1308,9 +1308,6 @@ static int create_attr(const rpsl_attr_t *attribute, Transaction_t *tr) {
 			        attribute_value);
 			die;
 			break;
-		case UD_AX_PF: /* for Poetic Form tables*/
-			g_string_sprintf(tr->query, query_fmt, tr->thread_ins, tr->object_id, attribute_value);
-			break;
 	}
 
 	/* Make the query. For primary keys go straight to updates if we are updating the object */
