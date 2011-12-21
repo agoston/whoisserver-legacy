@@ -66,7 +66,7 @@ void AA_load() {
 
 	pthread_rwlock_wrlock(&aaa_lock);
 
-	for (i = MIN_IPSPACE_ID; i <=MAX_IPSPACE_ID; i++) {
+	for (i = MIN_IPSPACE_ID; i <= MAX_IPSPACE_ID; i++) {
 		/* clear the list */
 		wr_clear_list(&aaa[i]);
 
