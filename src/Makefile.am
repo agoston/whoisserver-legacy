@@ -143,10 +143,7 @@ libut_a_SOURCES = modules/ut/fdwrap.c modules/ut/memwrap.c \
 libwh_a_SOURCES = modules/wh/wh_queries.c
 libwk_a_SOURCES = modules/wk/which_keytypes.c
 
-bin_PROGRAMS = dbupdate whois-server \
-               loader getvar \
-               mr ripupdate \
-               text_export
+bin_PROGRAMS = dbupdate whois-server loader getvar ripupdate text_export
 
 dbupdate_SOURCES = dbupdate_src/dbupdate.c
 dbupdate_LDADD = $(LDRIPFULL)
@@ -176,9 +173,6 @@ getvar_LDADD = $(LDRIPNOMYSQL)
 # backup_LDADD = $(LDHISTORY)
 
 ripupdate_SOURCES = ripupdate_src/ripupdate.c
-
-mr_SOURCES = mr_src/mr.c
-mr_LDADD = $(LDRIPNOMYSQL)
 
 text_export_SOURCES = text_export_src/text_export.c
 text_export_LDADD = $(LDRIP)
