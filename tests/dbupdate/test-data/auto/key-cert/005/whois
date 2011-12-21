@@ -71,24 +71,20 @@ mntner:       TEST-MNT
 descr:        Mntner for DB TEST objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
-auth:         X509-1
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST-MNT
 referral-by:  TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
+source:       DB-TEST # Filtered
 
 mntner:       TEST2-MNT
 descr:        Mntner for DB TEST objects.
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
-auth:         MD5-PW $1$12345678$knzUanD5W.zU11AJAAbNw/   # test-dbm
-auth:         X509-2
 upd-to:       dbtest@ripe.net
 mnt-by:       TEST2-MNT
 referral-by:  TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
-source:       DB-TEST
+source:       DB-TEST # Filtered
 
 
