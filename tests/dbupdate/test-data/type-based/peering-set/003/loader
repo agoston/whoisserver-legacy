@@ -132,6 +132,5 @@ changed: dbtest@ripe.net 20021111
 source:       DB-TEST
 
 
-password: auth
 % End of loader data file
 

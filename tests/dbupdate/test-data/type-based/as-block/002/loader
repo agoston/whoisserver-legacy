@@ -96,6 +96,5 @@ mnt-lower:    RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
-password: hostmaster
 
 % End of loader data file

@@ -1,0 +1,31 @@
+# CASE 3: We try to modify inet6num object 2001:0658:021A::/48
+#         But change the textual representation of the ipv6 address
+#         Becasue at the moment the lookup of the existing object fails
+#         because of different text representation, dbupdate will try to
+#         create it, so it looks up and tries to authenticate against its parent
+#         object.
+#         That operation fails, but the underlying reason is the above.
+%
+% requires initial objects to be loaded
+#
+# delete inet6num object 
+#
+#SUCCESS
+#
+# RESULT 3: The update will succeed
+
+
+inet6num:     2001:658:21a::/48
+descr:        test inet6num
+netname:      TEST-INET6NUM
+org:          ORG-TEST1-DB-TEST
+country:      NL
+status:       ALLOCATED-BY-RIR
+admin-c:      TP1-DB-TEST
+tech-c:       TP1-DB-TEST
+mnt-by:       RIPE-NCC-HM-MNT
+notify:       dbtest@ripe.net
+changed:      dbtest@ripe.net 20111111
+source:       DB-TEST
+
+password: hostmaster

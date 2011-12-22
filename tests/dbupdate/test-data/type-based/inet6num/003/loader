@@ -122,6 +122,5 @@ notify:       dbtest@ripe.net
 changed: dbtest@ripe.net 20021111
 source:       DB-TEST
 
-password: hostmaster
 
 % End of loader data file

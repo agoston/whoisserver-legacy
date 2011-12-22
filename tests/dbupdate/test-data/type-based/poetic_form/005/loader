@@ -126,6 +126,5 @@ mnt-by:       TEST-DBM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
-password: auth
 
 % End of loader data file

@@ -123,6 +123,4 @@ mnt-by:       RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net
 source:       DB-TEST
 
-password: hostmaster
-password: auth
 % End of loader data file
