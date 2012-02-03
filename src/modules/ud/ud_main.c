@@ -377,164 +377,155 @@ void *UD_do_nrtm(void *arg) {
  ************************************************************/
 
 void *UD_do_updates(void *arg) {
-	long source = (long)arg;
-	int listening_socket = SV_update_sock[source];
-	int connected_socket;
-	UD_stream_t ud_stream;
-	int do_update=1;
-	int num_ok;
-	ca_dbSource_t *source_hdl = ca_get_SourceHandleByPosition(source);
-	char *source_name;
-	LG_context_t *src_ctx;
-	struct pollfd pfd[2];
+    long source = (long) arg;
+    int listening_socket = SV_update_sock[source];
+    int connected_socket;
+    UD_stream_t ud_stream;
+    int do_update = 1;
+    int num_ok;
+    ca_dbSource_t *source_hdl = ca_get_SourceHandleByPosition(source);
+    char *source_name;
+    LG_context_t *src_ctx;
+    struct pollfd pfd[2];
 
-	source_name = ca_get_srcname(source_hdl);
+    source_name = ca_get_srcname(source_hdl);
 
-	{ /* set up the logging path */
-		char *er_ud_def;
-		GString *er_def;
-		LG_appender_t *app;
+    { /* set up the logging path */
+        char *er_ud_def;
+        GString *er_def;
+        LG_appender_t *app;
 
-		er_ud_def = ca_get_ripupdlog; /* something like 'RIPUPDLOG basename' */
-		er_def = g_string_new("");
-		g_string_sprintf(er_def, "%s_%s", er_ud_def, source_name);
-		UT_free(er_ud_def);
+        er_ud_def = ca_get_ripupdlog; /* something like 'RIPUPDLOG basename' */
+        er_def = g_string_new("");
+        g_string_sprintf(er_def, "%s_%s", er_ud_def, source_name);
+        UT_free(er_ud_def);
 
-		fprintf(stderr, "[%s]\n", er_def->str);
-		app = LG_app_get_daily_info_dump(er_def->str);
-		g_string_free(er_def, TRUE);
+        fprintf(stderr, "[%s]\n", er_def->str);
+        app = LG_app_get_daily_info_dump(er_def->str);
+        g_string_free(er_def, TRUE);
 
-		src_ctx = LG_ctx_new();
-		LG_app_set_formatter(app, LG_frm_general_prepared("$TIMESTAMP whois_rip-$PID/$TID $SEVERITY $MESSAGE\n"));
-		LG_ctx_add_appender(src_ctx, app);
-	}
+        src_ctx = LG_ctx_new();
+        LG_app_set_formatter(app, LG_frm_general_prepared("$TIMESTAMP whois_rip-$PID/$TID $SEVERITY $MESSAGE\n"));
+        LG_ctx_add_appender(src_ctx, app);
+    }
 
-	/* load the dictionary */
-	rpsl_load_dictionary(RPSL_DICT_CORE);
+    /* load the dictionary */
+    rpsl_load_dictionary(RPSL_DICT_CORE);
 
-	/* get mode of operation: protected/unprotected (dummy) */
-	memset(&ud_stream, 0, sizeof(ud_stream));
-	ud_stream.source_hdl=source_hdl;
-	ud_stream.ud_mode=ca_get_srcmode(source_hdl);
+    /* get mode of operation: protected/unprotected (dummy) */
+    memset(&ud_stream, 0, sizeof(ud_stream));
+    ud_stream.source_hdl = source_hdl;
+    ud_stream.ud_mode = ca_get_srcmode(source_hdl);
 
-	fprintf(stderr, "Mode of operation:\n");
-	if (IS_DUMMY_ALLOWED(ud_stream.ud_mode))
-		fprintf(stderr, "* dummy allowed\n");
-	else
-		fprintf(stderr, "* dummy not allowed\n");
-	if (IS_UPDATE(ud_stream.ud_mode))
-		fprintf(stderr, "* DBupdate\n");
-	else
-		fprintf(stderr, "* NRTM\n");
-	if (IS_STANDALONE(ud_stream.ud_mode))
-		fprintf(stderr, "* running standalone\n");
-	else
-		fprintf(stderr, "* running as a server\n");
+    fprintf(stderr, "Mode of operation:\n");
+    if (IS_DUMMY_ALLOWED(ud_stream.ud_mode)) fprintf(stderr, "* dummy allowed\n");
+    else fprintf(stderr, "* dummy not allowed\n");
+    if (IS_UPDATE(ud_stream.ud_mode)) fprintf(stderr, "* DBupdate\n");
+    else fprintf(stderr, "* NRTM\n");
+    if (IS_STANDALONE(ud_stream.ud_mode)) fprintf(stderr, "* running standalone\n");
+    else fprintf(stderr, "* running as a server\n");
 
-	/* Connect to the database */
-	LG_log(src_ctx, LG_DEBUG, "%s making SQL connection to source %s ...", UD_TAG, source_name);
-	ud_stream.db_connection = SQ_get_connection_by_source_hdl(source_hdl);
+    /* Connect to the database */
+    LG_log(src_ctx, LG_DEBUG, "%s making SQL connection to source %s ...", UD_TAG, source_name);
+    ud_stream.db_connection = SQ_get_connection_by_source_hdl(source_hdl);
 
-	if (!ud_stream.db_connection) {
-		LG_log(ud_context, LG_SEVERE, "no connection to SQL server\n");
-		die;
-	}
+    if (!ud_stream.db_connection) {
+        LG_log(ud_context, LG_SEVERE, "no connection to SQL server\n");
+        die;
+    }
 
-	ud_stream.num_skip=0;
-	ud_stream.load_pass=0;
-	ud_stream.nrtm=NULL;
+    ud_stream.num_skip = 0;
+    ud_stream.load_pass = 0;
+    ud_stream.nrtm = NULL;
 
-	/* set up poll structure */
-	pfd[0].fd = listening_socket;
-	pfd[0].events = POLLIN;
-	pfd[1].fd = SV_shutdown_recv_fd;
-	pfd[1].events = POLLIN;
+    /* set up poll structure */
+    pfd[0].fd = listening_socket;
+    pfd[0].events = POLLIN;
+    pfd[1].fd = SV_shutdown_recv_fd;
+    pfd[1].events = POLLIN;
 
-	/*+++ main cycle +++*/
+    /*+++ main cycle +++*/
 
-	do { /* be alive while do_server is 1. do_server is turned off by SIGINT */
+    do { /* be alive while do_server is 1. do_server is turned off by SIGINT */
 
-		/* make a record for thread accounting */
-		TA_add(listening_socket, "update");
-		TA_setactivity("waiting");
+        /* make a record for thread accounting */
+        TA_add(listening_socket, "update");
+        TA_setactivity("waiting");
 
-		/* check for input */
-		if (poll(pfd, 2, -1) == -1) {
-			LG_log(ud_context, LG_ERROR, "UD_do_updates got error %d on poll; %s", errno, strerror(errno));
-			continue;
-		}
+        /* check for input */
+        if (poll(pfd, 2, -1) == -1) {
+            LG_log(ud_context, LG_ERROR, "UD_do_updates got error %d on poll; %s", errno, strerror(errno));
+            continue;
+        }
 
-		/* shutdown */
-		if (pfd[1].revents != 0)
-			break;
+        /* shutdown */
+        if (pfd[1].revents != 0) break;
 
-		/* accept connection */
-		connected_socket = SK_accept_connection(listening_socket);
-		if (connected_socket==-1)
-			continue;
+        /* accept connection */
+        connected_socket = SK_accept_connection(listening_socket);
+        if (connected_socket == -1) continue;
 
-		/* check if the client is authorised to update */
-		SK_cd_make(&ud_stream.condat, connected_socket, STREAM_TIMEOUT);
-		if (!AA_can_ripupdate(&ud_stream.condat.rIP, source_name)) {
-			LG_log(src_ctx, LG_INFO, "[%s] --  Not authorized to update the source %s", ud_stream.condat.rIPs, source_name);
-			SK_cd_printf(&ud_stream.condat, "\n%%ERROR:406: not authorized to update the database\n\n\n");
-			SK_cd_close(&ud_stream.condat);
-			SK_cd_free(&ud_stream.condat);
-			continue;
-		}
+        /* check if the client is authorised to update */
+        SK_cd_make(&ud_stream.condat, connected_socket, STREAM_TIMEOUT);
+        if (!AA_can_ripupdate(&ud_stream.condat.rIP, source_name)) {
+            LG_log(src_ctx, LG_INFO, "[%s] --  Not authorized to update the source %s", ud_stream.condat.rIPs, source_name);
+            SK_cd_printf(&ud_stream.condat, "\n%%ERROR:406: not authorized to update the database\n\n\n");
+            SK_cd_close(&ud_stream.condat);
+            SK_cd_free(&ud_stream.condat);
+            continue;
+        }
 
-		/* make a record for thread accounting */
-		TA_delete(); /* Delete 'waiting' record */
-		TA_add(connected_socket, "update");
+        /* make a record for thread accounting */
+        TA_delete(); /* Delete 'waiting' record */
+        TA_add(connected_socket, "update");
 
-		LG_log(src_ctx, LG_DEBUG, "%s Connection accepted...", UD_TAG);
+        LG_log(src_ctx, LG_DEBUG, "%s Connection accepted...", UD_TAG);
 
-		ud_stream.log.num_ok=0;
-		ud_stream.log.num_failed=0;
+        ud_stream.log.num_ok = 0;
+        ud_stream.log.num_failed = 0;
 
-		while ((do_update=CO_get_do_update())!=1) {
-			TA_setactivity("suspended");
-			/* if shutdown was requested - break */
-			if (SV_sleep(3*TIME_SLICE))
-				break;
-		}
+        while ((do_update = CO_get_do_update()) != 1) {
+            TA_setactivity("suspended");
+            /* if shutdown was requested - break */
+            if (SV_sleep(3 * TIME_SLICE)) break;
+        }
 
-		if (do_update) {
-			/* Check connection to the database and try to reconnect*/
-			if (SQ_ping(&ud_stream.db_connection)) {
-				LG_log(ud_context, LG_SEVERE, "%s", SQ_error(ud_stream.db_connection));
-				die;
-			}
+        if (do_update) {
+            /* Check connection to the database and try to reconnect*/
+            if (SQ_ping(&ud_stream.db_connection)) {
+                LG_log(ud_context, LG_SEVERE, "%s", SQ_error(ud_stream.db_connection));
+                die;
+            }
 
-			LG_log(src_ctx, LG_DEBUG, "%s starting processing object", UD_TAG);
+            LG_log(src_ctx, LG_DEBUG, "%s starting processing object", UD_TAG);
 
-			/***************** process stream ****************/
+            /***************** process stream ****************/
 
-			num_ok=UD_process_stream(&ud_stream, src_ctx);
+            num_ok = UD_process_stream(&ud_stream, src_ctx);
             SQ_commit(ud_stream.db_connection);
 
-			/***************** process stream ****************/
+            /***************** process stream ****************/
 
-			LG_log(src_ctx, LG_DEBUG, "%s processing object finished", UD_TAG);
+            LG_log(src_ctx, LG_DEBUG, "%s processing object finished", UD_TAG);
 
-			/* close the socket of the NRTM stream */
+            /* close the socket of the NRTM stream */
             SK_cd_close(&ud_stream.condat);
             SK_cd_free(&ud_stream.condat);
 
-		} /* if do_update*/
+        } /* if do_update*/
 
-		TA_delete();
+        TA_delete();
 
-	} while (CO_get_do_server()); /* main cycle */
+    } while (CO_get_do_server()); /* main cycle */
 
-	/*   fclose(ud_stream.log.logfile); */
-	/* That's all. Close connection to the DB */
-	SQ_close_connection(ud_stream.db_connection);
-	UT_free(source_name);
+    /*   fclose(ud_stream.log.logfile); */
+    /* That's all. Close connection to the DB */
+    SQ_close_connection(ud_stream.db_connection);
+    UT_free(source_name);
 
-	LG_ctx_free(src_ctx);
+    LG_ctx_free(src_ctx);
 
-	LG_log(ud_context, LG_INFO, "%s update server stopped", UD_TAG);
-	return NULL;
+    LG_log(ud_context, LG_INFO, "%s update server stopped", UD_TAG);
+    return NULL;
 }
 
