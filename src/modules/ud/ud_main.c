@@ -311,6 +311,7 @@ void *UD_do_nrtm(void *arg) {
 			/***************** process stream ****************/
 
 			num_ok = UD_process_stream(&ud_stream, src_ctx);
+			SQ_commit(ud_stream.db_connection);
 
 			/***************** process stream ****************/
 
@@ -510,6 +511,7 @@ void *UD_do_updates(void *arg) {
 			/***************** process stream ****************/
 
 			num_ok=UD_process_stream(&ud_stream, src_ctx);
+            SQ_commit(ud_stream.db_connection);
 
 			/***************** process stream ****************/
 

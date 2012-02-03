@@ -280,7 +280,7 @@ LU_ret_t lu_whois_lookup(LU_server_t *server, rpsl_object_t **obj, const gchar *
     }
 
     esc_key = SQ_escape_string(conn, key);
-    snprintf(buf, 1024, "SELECT object FROM last WHERE pkey = '%s' AND object_type IN (%s) AND sequence_id > 0", esc_key, textcodes->str);
+    snprintf(buf, 1024, "SELECT object FROM last WHERE pkey = '%s' AND object_type IN (%s) AND sequence_id > 0 AND thread_id = 0", esc_key, textcodes->str);
     LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: executing SQL query [%s]", buf);
     free(esc_key);
 
@@ -303,7 +303,7 @@ LU_ret_t lu_whois_lookup(LU_server_t *server, rpsl_object_t **obj, const gchar *
 
     /* sanity check */
     if ((row = SQ_row_next(result)) != NULL) {
-        LG_log(lu_context, LG_FATAL, "lu_whois_lookup: multiple results on lookup query '%s'", buf);
+        LG_log(lu_context, LG_FATAL, "lu_whois_lookup: multiple results on lookup query '%s': [%s]", buf, SQ_get_column_string_nocopy(result, row, 0));
         die;
     }
 

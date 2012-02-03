@@ -815,6 +815,9 @@ void PM_interact(svr_args *args) {
         /* get the object corresponding to current serial */
         object = PM_get_serial_object(sql_connection, current_serial, &object_type, &timestamp, &operation);
 
+        /* release locks */
+        SQ_rollback(sql_connection);
+
         /* if we can't get it for any reason (error, missing), we skip this serial */
         if (object != NULL)
         {

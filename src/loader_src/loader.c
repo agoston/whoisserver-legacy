@@ -249,6 +249,7 @@ int main(int argc, char** argv) {
 
     fprintf(stderr, "starting processing stream\n");
     num_ok = UD_process_stream(&ud_stream, stream_ctx);
+    SQ_close_connection(ud_stream.db_connection);
     fprintf(stderr, "processing stream finished\n");
     fprintf(stderr, "%d objects processed\n", num_ok);
 

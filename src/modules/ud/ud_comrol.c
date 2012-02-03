@@ -178,19 +178,15 @@ int UD_rollback(Transaction_t *tr) {
 
     /* if our database's table type supports transactions, then we'll use "BEGIN - COMMIT". If not, we have to
      lock all relevant tables */
-    if (transaction_support == 1)
-        g_string_sprintf(tr->query, "BEGIN ");
-
-    else
+    if (!transaction_support) {
         ud_build_lock_query(tr, common_tables);
-
-    sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, NULL);
-
-    if (sql_err) {
-        LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
-        tr->succeeded = 0;
-        tr->error |= ERROR_U_DBS;
-        die;
+        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, NULL);
+        if (sql_err) {
+            LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
+            tr->succeeded = 0;
+            tr->error |= ERROR_U_DBS;
+            die;
+        }
     }
 
     /* Process AUX and LEAF tables */
@@ -247,20 +243,16 @@ int UD_rollback(Transaction_t *tr) {
     sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
 
     /* If there is transaction support in database, just "COMMIT". Else, UNLOCK TABLES */
-    if (transaction_support == 1) {
-        /* commit changes */
-        g_string_sprintf(tr->query, "COMMIT ");
-    } else {
+    if (!transaction_support) {
         /* Unlock all tables */
         g_string_sprintf(tr->query, "UNLOCK TABLES ");
-    }
-    sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
-
-    if (sql_err) {
-        LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
-        tr->succeeded = 0;
-        tr->error |= ERROR_U_DBS;
-        die;
+        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
+        if (sql_err) {
+            LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
+            tr->succeeded = 0;
+            tr->error |= ERROR_U_DBS;
+            die;
+        }
     }
 
     return (0);
@@ -433,18 +425,15 @@ int UD_commit(Transaction_t *tr) {
     /* if our database's table type supports transactions,
      then we'll use "BEGIN - COMMIT".
      If not, we have to lock all relevant tables */
-    if (transaction_support == 1)
-        g_string_sprintf(tr->query, "BEGIN ");
-
-    else
+    if (!transaction_support) {
         ud_build_lock_query(tr, common_tables);
-
-    sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
-    if (sql_err) {
-        LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
-        tr->succeeded = 0;
-        tr->error |= ERROR_U_DBS;
-        die;
+        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
+        if (sql_err) {
+            LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
+            tr->succeeded = 0;
+            tr->error |= ERROR_U_DBS;
+            die;
+        }
     }
 
     /* Perform first phase - deletions */
@@ -459,20 +448,15 @@ int UD_commit(Transaction_t *tr) {
     TR_update_status(tr);
 
     /* If there is transaction support in database, just "COMMIT". Else, UNLOCK TABLES */
-    if (transaction_support == 1) {
-        /* commit changes */
-        g_string_sprintf(tr->query, "COMMIT ");
-    } else {
-        /* Unlock all tables */
+    if (!transaction_support) {
         g_string_sprintf(tr->query, "UNLOCK TABLES ");
-    }
-    sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
-
-    if (sql_err) {
-        LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
-        tr->succeeded = 0;
-        tr->error |= ERROR_U_DBS;
-        die;
+        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
+        if (sql_err) {
+            LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
+            tr->succeeded = 0;
+            tr->error |= ERROR_U_DBS;
+            die;
+        }
     }
 
     /* Update radix tree for route, inetnum and inaddr-arpa domain*/
@@ -794,18 +778,15 @@ int UD_delete(Transaction_t *tr) {
     /* if our database's table type supports transactions, then we'll use "BEGIN - COMMIT". If not, we have to
      lock all relevant tables */
 
-    if (transaction_support == 1)
-        g_string_sprintf(tr->query, "BEGIN ");
-
-    else
+    if (!transaction_support) {
         ud_build_lock_query(tr, common_tables);
-
-    sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
-    if (sql_err) {
-        LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
-        tr->succeeded = 0;
-        tr->error |= ERROR_U_DBS;
-        die;
+        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
+        if (sql_err) {
+            LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
+            tr->succeeded = 0;
+            tr->error |= ERROR_U_DBS;
+            die;
+        }
     }
 
     /* Update the history table */
@@ -894,20 +875,16 @@ int UD_delete(Transaction_t *tr) {
     }
 
     /* If there is transaction support in database, just "COMMIT". Else, UNLOCK TABLES */
-    if (transaction_support == 1) {
-        /* commit changes */
-        g_string_sprintf(tr->query, "COMMIT ");
-    } else {
+    if (!transaction_support) {
         /* Unlock all tables */
         g_string_sprintf(tr->query, "UNLOCK TABLES ");
-    }
-
-    sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
-    if (sql_err) {
-        LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
-        tr->succeeded = 0;
-        tr->error |= ERROR_U_DBS;
-        die;
+        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
+        if (sql_err) {
+            LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
+            tr->succeeded = 0;
+            tr->error |= ERROR_U_DBS;
+            die;
+        }
     }
 
     return (err);

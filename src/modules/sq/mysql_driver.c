@@ -165,6 +165,8 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
 
         /* on success, return our result */
         if (NOERR(res)) {
+            /* disable autocommit */
+            mysql_autocommit(sql_connection, 0);
             return sql_connection;
         } else {
 
@@ -746,10 +748,31 @@ void SQ_free_result(SQ_result_set_t *result) {
   +html+ </UL></DL>
 
   ++++++++++++++++++++++++++++++++++++++*/
+void SQ_commit(SQ_connection_t *sql_connection) {
+#ifdef DEBUG_SQL
+    fprintf(stderr, "SQL: SQ_commit(%ld)\n", mysql_thread_id(sql_connection));
+#endif
+    if (mysql_commit(sql_connection)) {
+        LG_log(sq_context, LG_SEVERE, "SQ_commit: %d: %s", SQ_errno(sql_connection), SQ_error(sql_connection));
+        fprintf(stderr, "SQ_commit: %d: %s", SQ_errno(sql_connection), SQ_error(sql_connection));
+    }
+}
+
+void SQ_rollback(SQ_connection_t *sql_connection) {
+#ifdef DEBUG_SQL
+    fprintf(stderr, "SQL: SQ_commit(%ld)\n", mysql_thread_id(sql_connection));
+#endif
+    if (mysql_rollback(sql_connection)) {
+        LG_log(sq_context, LG_SEVERE, "SQ_commit: %d: %s", SQ_errno(sql_connection), SQ_error(sql_connection));
+        fprintf(stderr, "SQ_commit: %d: %s", SQ_errno(sql_connection), SQ_error(sql_connection));
+    }
+}
+
 void SQ_close_connection(SQ_connection_t *sql_connection) {
 #ifdef DEBUG_SQL
     fprintf(stderr, "SQL: SQ_close_connection(%ld)\n", mysql_thread_id(sql_connection));
 #endif
+    SQ_commit(sql_connection);
 	mysql_close(sql_connection);
 }
 
