@@ -539,6 +539,23 @@ void RT_unknown_country(RT_context_t* ctx, gchar* country) {
   rt_prepare_node(ctx, node);
 }
 
+
+/*+
+  RT_unknown_language - Reports unknown languages.
+
+  RT_context_t* ctx - Context.
+
+  gchar* - language.
+  +*/
+void RT_unknown_language(RT_context_t* ctx, gchar* language) {
+  xmlNodePtr node;
+
+  node = xmlNewNode(NULL, (xmlChar*)"unknown_language");
+  rt_add_text_node(node, "language", language);
+  rt_prepare_node(ctx, node);
+}
+
+
 /*+
   RT_unknown_nic_suffix - Reports unknown NIC suffix.
 

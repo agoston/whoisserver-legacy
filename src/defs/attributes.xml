@@ -274,6 +274,13 @@
     </description>
     <syntax>country-code</syntax>
   </ripe_attribute>
+  
+  <ripe_attribute name="language" code="ln">
+    <description>
+   Identifies the language.
+    </description>
+    <syntax>language-code</syntax>
+  </ripe_attribute>
 
   <ripe_attribute name="default" code="df">
      <description>
@@ -466,6 +473,13 @@
    The fax number of a contact.
     </description>
     <syntax>telephone-number</syntax>
+  </ripe_attribute>
+
+  <ripe_attribute name="geoloc" code="gl">
+    <description>
+   The location coordinates for the resource
+    </description>
+    <syntax>location-coordinates</syntax>
   </ripe_attribute>
 
   <ripe_attribute name="filter" code="fi">

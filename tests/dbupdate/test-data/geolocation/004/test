@@ -1,0 +1,121 @@
+# geolocation tests
+# CASE 4: Modify fails because of syntax error in geoloc
+#
+# modify organisation object
+#
+#FAILURE
+#
+# RESULT 4: modify will fail
+
+organisation:  ORG-ET1-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+geoloc:        -91 175
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+
+organisation:  ORG-ET2-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+geoloc:        90 190
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+
+organisation:  ORG-ET3-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+geoloc:        90 180.9
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+
+organisation:  ORG-ET4-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+geoloc:        .4 145
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+
+organisation:  ORG-ET5-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+geoloc:        02 145
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+
+organisation:  ORG-ET6-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+geoloc:        +2 145
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+
+organisation:  ORG-ET7-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+geoloc:        -..2 145
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+
+organisation:  ORG-ET8-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+geoloc:        -90.5 145
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+

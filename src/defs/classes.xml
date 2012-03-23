@@ -65,6 +65,8 @@
       <netname     choice="mandatory" number="single"   />
       <descr       choice="mandatory" number="multiple" />
       <country     choice="mandatory" number="multiple" />
+      <geoloc      choice="optional"  number="single"   />
+      <language    choice="optional"  number="multiple" />      
       <org         choice="optional"  number="single"   />
       <admin-c     choice="mandatory" number="multiple" />
       <tech-c      choice="mandatory" number="multiple" />
@@ -365,6 +367,8 @@
       <phone        choice="optional"  number="multiple" />
       <fax-no       choice="optional"  number="multiple" />
       <e-mail       choice="mandatory" number="multiple" />
+      <geoloc       choice="optional"  number="single"   />
+      <language     choice="optional"  number="multiple" />
       <org          choice="optional"  number="multiple" />
       <admin-c      choice="optional"  number="multiple" />
       <tech-c       choice="optional"  number="multiple" />
@@ -506,6 +510,8 @@
       <netname          choice="mandatory" number="single"   />
       <descr            choice="mandatory" number="multiple" />
       <country          choice="mandatory" number="multiple" />
+      <geoloc           choice="optional"  number="single"   />
+      <language         choice="optional"  number="multiple" />      
       <org              choice="optional"  number="single"   />
       <admin-c          choice="mandatory" number="multiple" />
       <tech-c           choice="mandatory" number="multiple" />

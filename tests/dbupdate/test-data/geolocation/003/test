@@ -1,0 +1,51 @@
+# geolocation tests
+# CASE 3: Modify succedes with correct location
+#
+# modify organisation object
+#
+#SUCCESS
+#
+# RESULT 3: modify will succed
+
+organisation:  ORG-ET1-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+geoloc:        -90 180
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+
+organisation:  ORG-ET2-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+geoloc:        90 -180
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+
+organisation:  ORG-ET3-DB-TEST
+org-name:      EXAMPLE TTTTTT
+org-type:      OTHER
+address:       Address
+e-mail:        dbtest@ripe.net
+geoloc:        10.568 158.552
+admin-c:       TP1-DB-TEST
+tech-c:        TP1-DB-TEST
+mnt-ref:       TEST-DBM-MNT
+mnt-by:        TEST-DBM-MNT
+changed:       dbtest@ripe.net 20030102
+source:        DB-TEST
+password: test-dbm
+

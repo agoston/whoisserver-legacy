@@ -52,6 +52,7 @@
 #define UPDATE_QUERY_TIMEOUT 60
 #define RIP_TIMEOUT  10
 #define COUNTRY_LIST_SIZE 400
+#define LANGUAGE_LIST_SIZE 400
 #define NIC_SUFFIX_LIST_SIZE 50
 #define AUTO_KEY_LENGTH  32  /* for variables malloc'd when processing AUTO- nic-hdls */
 #define DB_MAXDATASIZE 1023

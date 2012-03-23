@@ -287,6 +287,10 @@ key-cert operation OK
 ***Error: Country not recognised: <xsl:apply-templates/>
   </xsl:template>
 
+  <xsl:template match="unknown_language">
+***Error: Language not recognised: <xsl:apply-templates/>
+  </xsl:template>
+
   <xsl:template match="unknown_nic_suffix">
 ***Error: Unknown NIC handle suffix used: <xsl:apply-templates/>
   </xsl:template>

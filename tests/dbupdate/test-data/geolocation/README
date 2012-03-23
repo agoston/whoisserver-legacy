@@ -1,0 +1,41 @@
+# CASE 1: Modify fails because of wrong language code
+#
+# modify organisation object
+#
+#FAILURE
+#
+# RESULT 1: modify will fail
+
+
+# CASE 2: Modify succedes with correct language
+#
+# modify organisation object
+#
+#SUCCESS
+#
+# RESULT 2: modify will succed
+
+
+# CASE 3: Modify succedes with correct location
+#
+# modify organisation object
+#
+#SUCCESS
+#
+# RESULT 3: modify will succed
+
+
+# CASE 4: Modify fails because of syntax error in geoloc
+#
+# modify organisation object
+#
+#FAILURE
+#
+# RESULT 4: modify will fail
+
+
+# CASE 5: We try to create inet6num, inetnum, organisation objects with geoloc and language attributes
+#
+#SUCCESS
+#
+# RESULT 5: The creation will succeed.
