@@ -1,0 +1,18 @@
+20120323 - version 3.13
+
+
+Changes:
+- enabled SQL transactions for backend updates
+- merged patch to enable compilation on centos6
+- added optional attributes for geolocation
+- several minor bugfixes
+
+
+Merged:
+- centos6_patch
+- geoloc
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG
