@@ -15,6 +15,7 @@ use Config;
 use File::Spec;
 use Getopt::Long;
 use File::Basename  qw[dirname basename];
+use Data::Dumper;
 
 ### Set up defaults firsts
 my $Cwd         = cwd();
@@ -28,7 +29,7 @@ my $SetupDb         = 0;
 my $RunConfigure    = 0;
 my $SetupConfig     = 0;
 my $Install         = 0;
-my $UseTempDir      = 0;
+my $UseTempDir      = 1;
 my $SetupTests      = 0;
 my $StartDaemon     = 0;
 my $All             = 1;
@@ -74,11 +75,15 @@ die usage() if $Help;
 die 'Need db password. You can also set it via $ENV{RIPE_SQLPASS}'.$/ 
     unless $SQLPass;
 
+print 'Install prefix is '.$DbPrefix."\n";
+
 ### Because of our mounting these paths will actually be different texually but
 ### point to the same inode, make the check a bit more thorough and check the
 ### actual inode.
+my @DbPrefixStat = stat($DbPrefix);
+my @CwdStat = stat($Cwd);
 die "Source dir and installation dir are identical ($Cwd):\nPlease set --prefix!\n"
-    if [stat $DbPrefix]->[1] eq [stat $Cwd]->[1];
+    if (@DbPrefixStat && @CwdStat && ($DbPrefixStat[1] eq $CwdStat[1]));
 
 ### documented here so it's close to the original options
 sub usage {
@@ -314,6 +319,10 @@ deflook:  y
 }
 
 if( $Install or $All ) {
+    # clean dev install dir
+    _system(qq[rm -rf $DbPrefix]) unless (! -e $DbPrefix);
+    _system(qq[mkdir -p $DbPrefix]);
+
     ### config set up, run make & install
     ### add gcov flags to the compiler flags for profiling
     ### XXX don't set globally, as the perl bindings below will fail
@@ -365,10 +374,11 @@ You can now use the Net::Whois::RIPE::RPSL, and all the other RIPE::* modules us
 
 if( $UseTempDir ) {
     ### OPTIONAL - writes over NFS can be slow/lock, so write logs to local drive ####
-    _system( qq[mkdir -p $DbTempDir] ) unless -d $DbTempDir;
-    _system( qq[mv $DbPrefix/log $DbTempDir && ln -s $DbTempDir/log $DbPrefix] );
-    _system( qq[mv $DbPrefix/var $DbTempDir && ln -s $DbTempDir/var $DbPrefix] );
-    _system( qq[mkdir $DbTempDir/tmp && ln -s $DbTempDir/tmp tests/dbupdate/testing] );
+    _system(qq[rm -rf $DbTempDir]) unless (! -e $DbTempDir);
+    _system(qq[mkdir -p $DbTempDir]);
+    _system( qq[mv $DbPrefix/log $DbTempDir && ln -snf $DbTempDir/log $DbPrefix] );
+    _system( qq[mv $DbPrefix/var $DbTempDir && ln -snf $DbTempDir/var $DbPrefix] );
+    _system( qq[mkdir $DbTempDir/tmp && ln -snf $DbTempDir/tmp tests/dbupdate/testing] );
 }
 
 ### final steps
@@ -409,7 +419,7 @@ sub _system {
     
     $cmd .= ' > /dev/null 2>&1' unless $Debug;
 
-    print "Running '$cmd'"  if $Verbose;
+    print "Running '$cmd'\n"  if $Verbose;
     system( $cmd ) and do { $warn ? warn $? : die $? };
     print "....done\n"      if $Verbose;
     
