@@ -1006,92 +1006,76 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
                            rpsl_object_t *preproc_obj,int operation,
                            char *auto_key, char *obj_source, LU_server_t *server,
                            int handle_auto_keys, char **reason,
-                           GList *credentials, source_data_t *source_data, rpsl_object_t *old_obj)
-{
-  int retval = UP_OK;
-  int key_status;
-  const char *type = NULL;
-  int str_idx, ctry_idx, lng_idx;
-  char *country_str = NULL;
-  char *countries[COUNTRY_LIST_SIZE];
-  char *language_str = NULL;
-  char *languages[LANGUAGE_LIST_SIZE];
-  char **temp_vector;
-  char *value;
-  KM_context_t key_cert_type;
-  KM_key_return_t *key_data = NULL;
-  GList *overlap = NULL;
-  GList *attr = NULL;
+                           GList *credentials, source_data_t *source_data, rpsl_object_t *old_obj) {
 
-  LG_log(lg_ctx, LG_FUNC,">up_pre_process_object: entered");
+    int retval = UP_OK;
+    int key_status;
+    const char *type = NULL;
+    int str_idx, ctry_idx, lng_idx;
+    char *country_str = NULL;
+    char *countries[COUNTRY_LIST_SIZE];
+    char *language_str = NULL;
+    char *languages[LANGUAGE_LIST_SIZE];
+    char **temp_vector;
+    char *value;
+    KM_context_t key_cert_type;
+    KM_key_return_t *key_data = NULL;
+    GList *overlap = NULL;
+    GList *attr = NULL;
 
-  /* Perform all checks to report any errors.
+    LG_log(lg_ctx, LG_FUNC, ">up_pre_process_object: entered");
+
+    /* Perform all checks to report any errors.
      All functions called return 0 (UP_OK) for success, non zero for error.
      All function calls must do an |= on return value.
      For delete operations we omit some check. As long as the object is identical
      we will allow the deletion to reduce the legacy objects with wrong formats. */
 
-  /* key-cert checks must be done first as one of the checks is for X.509 key-cert creations
+    /* key-cert checks must be done first as one of the checks is for X.509 key-cert creations
      must have a name of the type AUTO-nnn but later operations replace the AUTO-nnn
      in X.509 key-cert objects */
-  type = rpsl_object_get_class(preproc_obj);
-  if ( ! strcasecmp(type, "key-cert") )
-  {
-    /* Special processing needed for key-cert objects */
-    /* Determine the type of key-cert object */
-    /* Get a list with only one item */
-    attr = rpsl_object_get_attr(preproc_obj, type);
-    value = rpsl_attr_get_clean_value((rpsl_attr_t *)(attr->data));
-    g_strdown(value);
-    if ( strstr(value, "pgpkey-") != NULL)
-    {
-      key_cert_type = KM_PGP;
-    }
-    else
-    {
-      key_cert_type = KM_X509;
-    }
-    rpsl_attr_delete_list(attr);
-    LG_log(lg_ctx, LG_DEBUG,"up_pre_process_object: key-cert type [%s]",
-                               KM_context_string(key_cert_type));
-    if ( operation != UP_DELETE )
-    {
-      if ( operation == UP_CREATE && key_cert_type == KM_X509 )
-      {
-        /* Check key-cert name, must be AUTO-nnn */
-        if ( strstr(value, "auto-") != value )
-        {
-          LG_log(lg_ctx, LG_DEBUG,"up_pre_process_object: invalid name [%s] for new X.509 key-cert object",
-                          value);
-          RT_keycert_auto(rt_ctx);
-          retval |= UP_FAIL;
+    type = rpsl_object_get_class(preproc_obj);
+    if (!strcasecmp(type, "key-cert")) {
+        /* Special processing needed for key-cert objects */
+        /* Determine the type of key-cert object */
+        /* Get a list with only one item */
+        attr = rpsl_object_get_attr(preproc_obj, type);
+        value = rpsl_attr_get_clean_value((rpsl_attr_t *) (attr->data));
+        g_strdown(value);
+        if (strstr(value, "pgpkey-") != NULL) {
+            key_cert_type = KM_PGP;
+        } else {
+            key_cert_type = KM_X509;
         }
-      }
-      /* Create the generated attributes for a
-         create or modify key-cert object */
-      if ( retval == UP_OK )
-      {
-        retval |= UP_generate_keycert_attrs(rt_ctx, lg_ctx, key_info, preproc_obj, key_cert_type);
-      }
+        rpsl_attr_delete_list(attr);
+        LG_log(lg_ctx, LG_DEBUG, "up_pre_process_object: key-cert type [%s]", KM_context_string(key_cert_type));
+        if (operation != UP_DELETE) {
+            if (operation == UP_CREATE && key_cert_type == KM_X509) {
+                /* Check key-cert name, must be AUTO-nnn */
+                if (strstr(value, "auto-") != value) {
+                    LG_log(lg_ctx, LG_DEBUG, "up_pre_process_object: invalid name [%s] for new X.509 key-cert object", value);
+                    RT_keycert_auto(rt_ctx);
+                    retval |= UP_FAIL;
+                }
+            }
+            /* Create the generated attributes for a
+             create or modify key-cert object */
+            if (retval == UP_OK) {
+                retval |= UP_generate_keycert_attrs(rt_ctx, lg_ctx, key_info, preproc_obj, key_cert_type);
+            }
+        } else if (key_cert_type == KM_PGP) {
+            /* we still need the key_id for delete */
+            key_status = UP_get_key_data(rt_ctx, lg_ctx, key_info, &key_data, preproc_obj, key_cert_type);
+            KM_key_return_free(key_data);
+            if (key_status != KM_OK) {
+                retval |= UP_FAIL;
+            }
+        }
+        free(value);
     }
-    else if ( key_cert_type == KM_PGP )
-    {
-      /* we still need the key_id for delete */
-      key_status = UP_get_key_data(rt_ctx, lg_ctx, key_info, &key_data, preproc_obj, key_cert_type);
-      KM_key_return_free(key_data);
-      if ( key_status != KM_OK )
-      {
-        retval |= UP_FAIL;
-      }
-    }
-    free (value);
-  }
 
-  if ( operation != UP_DELETE )
-  {
-    attr = rpsl_object_get_attr(preproc_obj, "country");
-    if (attr != NULL)
-    {
+    if (operation != UP_DELETE) {
+
         /* get country details from config file */
         LG_log(lg_ctx, LG_INFO, "up_pre_process_object: get country codes from config file");
         country_str = ca_get_country;
@@ -1107,112 +1091,102 @@ int up_pre_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
         countries[ctry_idx] = NULL; /* mark the end of array */
         g_strfreev(temp_vector);
         free(country_str);
-        LG_log(lg_ctx, LG_DEBUG, "up_pre_process_object: number of countries [%d]", ctry_idx);
 
-        retval |= UP_check_country_attr(rt_ctx, lg_ctx, preproc_obj, countries);
+        attr = rpsl_object_get_attr(preproc_obj, "country");
+        if (attr != NULL) {
+            LG_log(lg_ctx, LG_DEBUG, "up_pre_process_object: number of countries [%d]", ctry_idx);
 
-        rpsl_attr_delete_list(attr);
+            retval |= UP_check_country_attr(rt_ctx, lg_ctx, preproc_obj, countries);
+
+            rpsl_attr_delete_list(attr);
+        }
+
+        attr = rpsl_object_get_attr(preproc_obj, "language");
+        if (attr != NULL) {
+            /* get language details from config file */
+            LG_log(lg_ctx, LG_INFO, "up_pre_process_object: get language codes from config file");
+            language_str = ca_get_language;
+            /* construct languages array from language string variable */
+            temp_vector = ut_g_strsplit_v1(language_str, "\n", 0);
+            for (str_idx = 0, lng_idx = 0; temp_vector[str_idx] != NULL; str_idx++) {
+                temp_vector[str_idx] = g_strstrip(temp_vector[str_idx]);
+                if (strlen(temp_vector[str_idx]) > 0) {
+                    languages[lng_idx++] = strdup(temp_vector[str_idx]);
+                }
+            }
+            languages[lng_idx] = NULL; /* mark the end of array */
+            g_strfreev(temp_vector);
+            free(language_str);
+            LG_log(lg_ctx, LG_DEBUG, "up_pre_process_object: number of languages [%d]", lng_idx);
+
+            retval |= UP_check_language_attr(rt_ctx, lg_ctx, preproc_obj, languages);
+
+            rpsl_attr_delete_list(attr);
+
+            /* free the languages list */
+            for (lng_idx = 0; languages[lng_idx] != NULL; lng_idx++) {
+                free(languages[lng_idx]);
+            }
+        }
+
+        retval |= UP_check_nicsuffixes(rt_ctx, lg_ctx, options, preproc_obj, countries);
 
         /* free the countries list */
-        for (ctry_idx=0; countries[ctry_idx] != NULL; ctry_idx++)
-        {
-          free(countries[ctry_idx]);
+        for (ctry_idx = 0; countries[ctry_idx] != NULL; ctry_idx++) {
+            free(countries[ctry_idx]);
+        }
+
+        if (operation == UP_CREATE && (!strcasecmp(type, "person") || !strcasecmp(type, "role")))
+            retval |= UP_check_available_nichdl(rt_ctx, lg_ctx, options, preproc_obj, source_data);
+
+        retval |= UP_check_changed_attr(rt_ctx, lg_ctx, preproc_obj);
+
+        retval |= UP_check_filter_set_object(rt_ctx, lg_ctx, preproc_obj);
+
+        retval |= UP_check_peering_set_object(rt_ctx, lg_ctx, preproc_obj);
+
+        retval |= UP_check_disallowmnt(rt_ctx, lg_ctx, preproc_obj);
+
+        retval |= UP_check_inet_required_attr(rt_ctx, lg_ctx, preproc_obj, old_obj);
+
+        retval |= UP_check_organisation(rt_ctx, lg_ctx, preproc_obj, operation);
+
+        retval |= UP_check_mnt_by(rt_ctx, lg_ctx, options, preproc_obj, operation, server, obj_source);
+
+        retval |= UP_check_domain(rt_ctx, lg_ctx, options, preproc_obj, operation, server, obj_source);
+
+        retval |= UP_check_ping(rt_ctx, lg_ctx, preproc_obj, operation, old_obj);
+
+        retval |= UP_check_domain_dash(rt_ctx, lg_ctx, preproc_obj);
+
+        /* check for references to AUTO- keys */
+        if (handle_auto_keys) {
+            if (retval == UP_OK && UP_has_ref_to_AUTO_key(lg_ctx, preproc_obj)) {
+                /* replace references to auto keys with the already assigned keys */
+                retval |= UP_replace_refs_to_AUTO_key(rt_ctx, lg_ctx, options, preproc_obj, 1);
+            }
         }
     }
-    attr = rpsl_object_get_attr(preproc_obj, "language");
-    if (attr != NULL)
-    {
-        /* get language details from config file */
-        LG_log(lg_ctx, LG_INFO,"up_pre_process_object: get language codes from config file");
-        language_str = ca_get_language;
-        /* construct languages array from language string variable */
-        temp_vector = ut_g_strsplit_v1(language_str, "\n", 0);
-        for (str_idx=0, lng_idx=0; temp_vector[str_idx] != NULL; str_idx++)
-        {
-          temp_vector[str_idx] = g_strstrip(temp_vector[str_idx]);
-          if (strlen(temp_vector[str_idx]) > 0)
-          {
-            languages[lng_idx++] = strdup(temp_vector[str_idx]);
-          }
+
+    if ((!strcasecmp(type, "inetnum")) && (operation == UP_CREATE)) {
+        /* check overlapping inetnums */
+        if (LU_check_overlap(server, &overlap, preproc_obj, obj_source) != LU_OKAY) {
+            /* any lookup error is considered a fatal error */
+            LG_log(lg_ctx, LG_FATAL, "up_pre_process_object: lookup error");
+            UP_internal_error(rt_ctx, lg_ctx, options, "up_pre_process_object: lookup error\n", 0);
         }
-        languages[lng_idx] = NULL; /* mark the end of array */
-        g_strfreev(temp_vector);
-        free(language_str);
-        LG_log(lg_ctx, LG_DEBUG,"up_pre_process_object: number of languages [%d]", lng_idx);
-
-        retval |= UP_check_language_attr(rt_ctx, lg_ctx, preproc_obj, languages);
-
-        rpsl_attr_delete_list(attr);
-
-        /* free the countries list */
-        for (ctry_idx=0; languages[ctry_idx] != NULL; ctry_idx++)
-        {
-          free(languages[ctry_idx]);
+        if (overlap != NULL) {
+            RT_overlap_inetnums(rt_ctx, overlap);
+            retval |= UP_FAIL;
         }
     }
 
-    retval |= UP_check_nicsuffixes(rt_ctx, lg_ctx, options, preproc_obj, countries);
+    /* MAKE THE POLICY CHECK THE LAST ONE IN THIS FUNCTION */
+    /* stuff removed */
+    /***** ADD ANY NEW CHECKS BEFORE THE POLICY CHECK ABOVE ******/
 
-    if ( operation == UP_CREATE &&
-         (! strcasecmp(type, "person") || ! strcasecmp(type, "role")) )
-        retval |= UP_check_available_nichdl(rt_ctx, lg_ctx, options, preproc_obj,
-                                            source_data);
-
-    retval |= UP_check_changed_attr(rt_ctx, lg_ctx, preproc_obj);
-
-    retval |= UP_check_filter_set_object(rt_ctx, lg_ctx, preproc_obj);
-
-    retval |= UP_check_peering_set_object(rt_ctx, lg_ctx, preproc_obj);
-
-    retval |= UP_check_disallowmnt(rt_ctx, lg_ctx, preproc_obj);
-
-    retval |= UP_check_inet_required_attr(rt_ctx, lg_ctx, preproc_obj, old_obj);
-
-    retval |= UP_check_organisation(rt_ctx, lg_ctx, preproc_obj, operation);
-
-    retval |= UP_check_mnt_by(rt_ctx, lg_ctx, options, preproc_obj, 
-                               operation, server, obj_source);
-
-    retval |= UP_check_domain(rt_ctx, lg_ctx, options, preproc_obj,
-                               operation, server, obj_source);
-
-    retval |= UP_check_ping(rt_ctx, lg_ctx, preproc_obj, operation, old_obj);
-
-    retval |= UP_check_domain_dash(rt_ctx, lg_ctx, preproc_obj);
-
-    /* check for references to AUTO- keys */
-    if (handle_auto_keys)
-    {
-      if ( retval==UP_OK && UP_has_ref_to_AUTO_key(lg_ctx, preproc_obj) )
-      {
-        /* replace references to auto keys with the already assigned keys */
-        retval |= UP_replace_refs_to_AUTO_key(rt_ctx, lg_ctx, options, preproc_obj, 1);
-      }
-    }
-  }
-
-  if ( (! strcasecmp(type, "inetnum")) && (operation == UP_CREATE))
-  {
-    /* check overlapping inetnums */
-    if ( LU_check_overlap(server, &overlap, preproc_obj, obj_source) != LU_OKAY )
-    {
-      /* any lookup error is considered a fatal error */
-      LG_log(lg_ctx, LG_FATAL,"up_pre_process_object: lookup error");
-      UP_internal_error(rt_ctx, lg_ctx, options, "up_pre_process_object: lookup error\n", 0);
-    }
-    if (overlap != NULL)
-	{
-      RT_overlap_inetnums(rt_ctx, overlap);
-      retval |= UP_FAIL;
-    }
-  }
-
-  /* MAKE THE POLICY CHECK THE LAST ONE IN THIS FUNCTION */
-  /* stuff removed */
-  /***** ADD ANY NEW CHECKS BEFORE THE POLICY CHECK ABOVE ******/
-
-  LG_log(lg_ctx, LG_FUNC,"<up_pre_process_object: exiting");
-  return retval;
+    LG_log(lg_ctx, LG_FUNC, "<up_pre_process_object: exiting");
+    return retval;
 }
 
 
