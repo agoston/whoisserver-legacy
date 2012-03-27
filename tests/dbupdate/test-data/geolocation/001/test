@@ -3,8 +3,6 @@
 #
 # modify organisation object
 #
-#currently fails because regular expression doesn't match case
-#
 #FAILURE
 #
 # RESULT 1: modify will fail
