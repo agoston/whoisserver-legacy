@@ -274,7 +274,7 @@
     </description>
     <syntax>country-code</syntax>
   </ripe_attribute>
-  
+
   <ripe_attribute name="language" code="ln">
     <description>
    Identifies the language.

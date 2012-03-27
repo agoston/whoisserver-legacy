@@ -66,7 +66,7 @@
       <descr       choice="mandatory" number="multiple" />
       <country     choice="mandatory" number="multiple" />
       <geoloc      choice="optional"  number="single"   />
-      <language    choice="optional"  number="multiple" />      
+      <language    choice="optional"  number="multiple" />
       <org         choice="optional"  number="single"   />
       <admin-c     choice="mandatory" number="multiple" />
       <tech-c      choice="mandatory" number="multiple" />
@@ -511,7 +511,7 @@
       <descr            choice="mandatory" number="multiple" />
       <country          choice="mandatory" number="multiple" />
       <geoloc           choice="optional"  number="single"   />
-      <language         choice="optional"  number="multiple" />      
+      <language         choice="optional"  number="multiple" />
       <org              choice="optional"  number="single"   />
       <admin-c          choice="mandatory" number="multiple" />
       <tech-c           choice="mandatory" number="multiple" />

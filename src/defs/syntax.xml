@@ -640,7 +640,7 @@ $Id: syntax.xml,v 1.35 2007/02/21 15:47:00 agoston Exp $
      '+' &lt;integer-list&gt; "(" integer list ")" &lt;integer-list&gt; ext. &lt;integer-list&gt;
        </description>
    </attribute_syntax>
-   
+
       <attribute_syntax name="location-coordinates">
        <front_end>
            <regex>
@@ -649,7 +649,7 @@ $Id: syntax.xml,v 1.35 2007/02/21 15:47:00 agoston Exp $
        </front_end>
        <description>
      Location coordinates of the resource. Can take one of the following forms:
-     
+
      [-90,90][-180,180]
        </description>
    </attribute_syntax>
@@ -725,7 +725,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
      Valid two-letter ISO 3166 country code.
        </description>
    </attribute_syntax>
-   
+
    <attribute_syntax name="language-code">
        <front_end>
            <regex>^[a-z]{2}$</regex>
@@ -733,7 +733,7 @@ X509-&lt;nnn&gt;                       Strong scheme of authentication.
        <description>
      Valid two-letter ISO 639-1 language code.
        </description>
-   </attribute_syntax>   
+   </attribute_syntax>
 
    <attribute_syntax name="status-in">
        <front_end>
