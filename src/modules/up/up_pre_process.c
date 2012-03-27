@@ -137,60 +137,52 @@ int UP_check_country_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
    Returns  UP_FAIL if any language is found to be invalid
             UP_OK if all languages are valid
 */
+int UP_check_language_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *preproc_obj, char **languages) {
+    int retval = UP_OK;
+    int matched;
+    int ctry_idx;
+    char *language_name;
+    GList *language_list = NULL;
+    GList *language_item = NULL;
 
-int UP_check_language_attr(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
-                             rpsl_object_t *preproc_obj, char **languages)
-{
-  int retval = UP_OK;
-  int matched ;
-  int ctry_idx;
-  char *language_name;
-  GList *language_list = NULL;
-  GList *language_item = NULL;
+    LG_log(lg_ctx, LG_FUNC, ">UP_check_language_attr: entered\n");
 
-  LG_log(lg_ctx, LG_FUNC,">UP_check_language_attr: entered\n");
+    /* get language attributes from object */
+    language_list = rpsl_object_get_attr(preproc_obj, "language");
+    rpsl_attr_split_multiple(&language_list);
 
-  /* get language attributes from object */
-  language_list = rpsl_object_get_attr(preproc_obj, "language");
-  rpsl_attr_split_multiple(&language_list);
+    if (language_list == NULL) {
+        LG_log(lg_ctx, LG_DEBUG, "UP_check_language_attr: object contains no languages");
+        LG_log(lg_ctx, LG_FUNC, "<UP_check_language_attr: exiting with value UP_OK");
+        return UP_OK;
+    }
 
-  if ( language_list == NULL )
-  {
-    LG_log(lg_ctx, LG_DEBUG,"UP_check_language_attr: object contains no languages");
-    LG_log(lg_ctx, LG_FUNC,"<UP_check_language_attr: exiting with value UP_OK");
-    return UP_OK;
-  }
-
-  /* check each language from the object and make sure it is in the languages list
+    /* check each language from the object and make sure it is in the languages list
      if any one of the languages from the object is not found, return UP_FAIL,
      after checking any remaining languages */
-  for ( language_item = language_list; language_item != NULL ; language_item = g_list_next(language_item) )
-  {
-    language_name = rpsl_attr_get_clean_value( (rpsl_attr_t *)(language_item->data) );
-    matched = 0 ;
-    ctry_idx = 0 ;
-    while(languages[ctry_idx])
-    {
-      if(strcasecmp(languages[ctry_idx++],language_name) == 0)
-      {
-        matched = 1;
-        break;
-      }
-    }
+    for (language_item = language_list; language_item != NULL; language_item = g_list_next(language_item)) {
+        language_name = rpsl_attr_get_clean_value((rpsl_attr_t *) (language_item->data));
+        matched = 0;
+        ctry_idx = 0;
+        while (languages[ctry_idx]) {
+            if (strcasecmp(languages[ctry_idx++], language_name) == 0) {
+                matched = 1;
+                break;
+            }
+        }
 
-    if ( ! matched )
-    {
-      /* found a language in the object that is not recognised */
-      retval = UP_FAIL;
-      LG_log(lg_ctx, LG_DEBUG,"UP_check_language_attr: language not recognised [%s]", language_name);
-      RT_unknown_language(rt_ctx, language_name);
+        if (!matched) {
+            /* found a language in the object that is not recognised */
+            retval = UP_FAIL;
+            LG_log(lg_ctx, LG_DEBUG, "UP_check_language_attr: language not recognised [%s]", language_name);
+            RT_unknown_language(rt_ctx, language_name);
+        }
+        free(language_name);
     }
-    free(language_name);
-  }
-  rpsl_attr_delete_list(language_list);
+    rpsl_attr_delete_list(language_list);
 
-  LG_log(lg_ctx, LG_FUNC,"<UP_check_language_attr: exiting with value [%s]\n", UP_ret2str(retval));
-  return retval;
+    LG_log(lg_ctx, LG_FUNC, "<UP_check_language_attr: exiting with value [%s]\n", UP_ret2str(retval));
+    return retval;
 }
 
 
