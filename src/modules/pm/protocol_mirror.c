@@ -759,6 +759,7 @@ void PM_interact(svr_args *args) {
     }
 
     sql_connection = SQ_get_connection_by_source_hdl(source_hdl);
+    mysql_autocommit(sql_connection, 1);
 
     PM_get_minmax_serial(sql_connection, &oldest_serial, &current_serial);
     if ((current_serial == -1) || (oldest_serial == -1))
