@@ -1817,7 +1817,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
     domain_key = rpsl_object_get_key_value(object);
     RT_rdns_trailingdotremoved(rt_ctx,domain_key);
     free(domain_key);
-    rpsl_object_delete(object);
+    // This memory area is still referenced above, by RT_set_object()! //rpsl_object_delete(object);
     object = rpsl_object_init(object_str);
   }
 
