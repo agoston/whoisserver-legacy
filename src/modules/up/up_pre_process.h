@@ -113,4 +113,7 @@ int UP_check_ping(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
 int UP_check_domain_dash(RT_context_t *rt_ctx, LG_context_t *lg_ctx, rpsl_object_t *preproc_obj);
 
+
+gchar *up_check_multiple_spaces_in_inetnum(LG_context_t *lg_ctx, char **object_str);
+
 #endif

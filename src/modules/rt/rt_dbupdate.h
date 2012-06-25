@@ -104,6 +104,7 @@ void RT_keycert_auto(RT_context_t* ctx);
 void RT_process_time(RT_context_t* ctx, gchar* date_stamp);
 
 void RT_process_time(RT_context_t*, gchar*);
+void RT_inetnum_pkey_fixed(RT_context_t* ctx, gchar *inetnum);
 
 /*
   Changed line stuff...
