@@ -2,7 +2,7 @@
 
 % Information related to '80.16.151.184 - 80.16.151.191'
 
-inetnum:        80.16.151.184			-					80.16.151.191
+inetnum:        80.16.151.184 - 80.16.151.191
 netname:        TEST-NET-NAME
 descr:          TEST network
 country:        NL

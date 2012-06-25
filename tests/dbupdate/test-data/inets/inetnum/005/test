@@ -1,6 +1,7 @@
 # CASE 5: We try to create inetnum object 80.16.151.184			-					80.16.151.191
 # start IP (tabs and spaces)-(tabs and spaces) end IP
-# the object in DB contains all spaces untouched
+# the object in DB will contain the formatted object
+# also check for the emitter warning
 #
 # create inetnum object 
 #
@@ -9,7 +10,7 @@
 # RESULT 5: The creation will succeed.
 
 
-inetnum:      80.16.151.184			-					80.16.151.191
+inetnum:      80.16.151.184			-					80.16.151.191		# this comment will be removed.
 netname:      TEST-NET-NAME
 descr:        TEST network
 country:      NL
