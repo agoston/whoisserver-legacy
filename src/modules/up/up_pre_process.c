@@ -2093,7 +2093,7 @@ gchar *up_check_multiple_spaces_in_inetnum(LG_context_t *lg_ctx, char **object_s
         return FALSE;
     }
 
-    attr = rpsl_object_get_attr_by_ofs(object, 0);
+    attr = (rpsl_attr_t *)rpsl_object_get_attr_by_ofs(object, 0);
     clean_attr = rpsl_attr_get_clean_value(attr);
     LG_log(lg_ctx, LG_FUNC,"up_check_multiple_spaces_in_inetnum: original value [%s], clean value [%s]", attr->value, clean_attr);
 
