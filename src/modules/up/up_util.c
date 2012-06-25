@@ -1822,7 +1822,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
 
   if (new_inetnum_pkey) {
-      RT_inetnum_pkey_fixed(rt_ctx, new_inetnum_pkey)
+      RT_inetnum_pkey_fixed(rt_ctx, new_inetnum_pkey);
   }
 
   if ( rpsl_object_has_error(object, RPSL_ERRLVL_ERROR) )
