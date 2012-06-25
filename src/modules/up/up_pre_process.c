@@ -2079,6 +2079,43 @@ int up_convert_inetnum_prefix(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   return UP_OK;
 }
 
+/* fail if we have more than 1 space on either side of dash in the inetnum pkey value */
+gchar *up_check_multiple_spaces_in_inetnum(LG_context_t *lg_ctx, char **object_str) {
+    rpsl_object_t *object = NULL;
+    rpsl_attr_t *attr = NULL;
+    gchar *clean_attr = NULL;
+
+    LG_log(lg_ctx, LG_FUNC,">up_check_multiple_spaces_in_inetnum: entered");
+
+    object = rpsl_object_init(*object_str);
+    if (strcmp(rpsl_object_get_class(object), "inetnum")) {
+        LG_log(lg_ctx, LG_FUNC,"<up_check_multiple_spaces_in_inetnum: object is not an inetnum, exiting");
+        return FALSE;
+    }
+
+    attr = rpsl_object_get_attr_by_ofs(object, 0);
+    clean_attr = rpsl_attr_get_clean_value(attr);
+    LG_log(lg_ctx, LG_FUNC,"up_check_multiple_spaces_in_inetnum: original value [%s], clean value [%s]", attr->value, clean_attr);
+
+    if (!strstr(attr->value, clean_attr)) {
+        gchar *new_object = NULL;
+
+        LG_log(lg_ctx, LG_FUNC,"up_check_multiple_spaces_in_inetnum: not found, fixing pkey");
+        rpsl_attr_replace_value(attr, clean_attr);
+
+        new_object = rpsl_object_get_text(object, 0);
+        strcpy(*object_str, new_object);
+        free(new_object);
+    } else {
+        free(clean_attr);
+        clean_attr = NULL;
+    }
+
+    LG_log(lg_ctx, LG_FUNC,"<up_check_multiple_spaces_in_inetnum: exiting");
+    rpsl_object_delete(object);
+    return clean_attr;
+}
+
 
 /* checks the as-block objects.
    performs some checks that can't be done by the parser.

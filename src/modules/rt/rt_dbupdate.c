@@ -556,6 +556,14 @@ void RT_unknown_language(RT_context_t* ctx, gchar* language) {
 }
 
 
+void RT_inetnum_pkey_fixed(RT_context_t* ctx, gchar *inetnum) {
+    xmlNodePtr node;
+
+    node = xmlNewNode(NULL, (xmlChar*)"inetnum_pkey_fixed");
+    rt_xml_node_add_content(node, inetnum);
+    rt_prepare_node(ctx, node);
+}
+
 /*+
   RT_unknown_nic_suffix - Reports unknown NIC suffix.
 

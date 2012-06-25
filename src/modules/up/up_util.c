@@ -1786,7 +1786,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   GList *current_server_list = NULL;
   GList *attr = NULL;
   gboolean is_dot_removed;
-  gchar *domain_key;
+  gchar *domain_key, *new_inetnum_pkey;
 
   source_data_t source_data = {NULL, NULL, NULL, 0, 0, NULL, 0, NULL, NULL, NULL, NULL};
   key_info_t    key_info    = {NULL, NULL};
@@ -1798,6 +1798,8 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   /* remove trailing dot from domain, if any */
   is_dot_removed = ns_remove_trailing_dot(lg_ctx, &object_str);
+  /* remove multiple spaces from inetnum, if any */
+  new_inetnum_pkey = up_check_multiple_spaces_in_inetnum(lg_ctx, &object_str);
 
   /* Clean out any unwanted data
      This must be done before parsing the object as it may
@@ -1815,10 +1817,12 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   if ( is_dot_removed )
   {
     domain_key = rpsl_object_get_key_value(object);
-    RT_rdns_trailingdotremoved(rt_ctx,domain_key);
+    RT_rdns_trailingdotremoved(rt_ctx, domain_key);
     free(domain_key);
-    // This memory area is still referenced above, by RT_set_object()! //rpsl_object_delete(object);
-    object = rpsl_object_init(object_str);
+  }
+
+  if (new_inetnum_pkey) {
+      RT_inetnum_pkey_fixed(rt_ctx, new_inetnum_pkey)
   }
 
   if ( rpsl_object_has_error(object, RPSL_ERRLVL_ERROR) )
@@ -1883,7 +1887,7 @@ int up_process_object(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
 
   if ( retval != UP_OK ) goto up_process_object_exit;
 
-  /* Convert prefixes into ranges on inetnum objects. */
+  /* pre-process inetnum objects */
   if( object_class != NULL && ! strcasecmp(object_class, "inetnum") )
   {
     /*

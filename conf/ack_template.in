@@ -176,6 +176,10 @@
 ***Error: Cannot submit filtered whois output for updates.
   </xsl:template>
 
+<xsl:template match="inetnum_pkey_fixed">
+
+***Warning: Primary key of inetnum <xsl:value-of select="text()"/> has been fixed.
+</xsl:template>
 
   <xsl:template match="attr">
 <xsl:text>
