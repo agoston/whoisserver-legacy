@@ -679,6 +679,7 @@ static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int oper
 
 	/* Make a report. U stands for update stream. No reason */
 	result = report_transaction(tr, tr->transaction_id, log_ptr, &sotime, reason);
+	SQ_commit(tr->sql_connection);
 
 	/* Free resources */
 	/*    rpsl_object_delete(tr->object); */
@@ -1001,7 +1002,6 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
  ************************************************************/
 int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 	char line_buff[STR_XXL];
-	SQ_connection_t *sql_connection;
 	struct _nrtm *nrtm;
 	Log_t *log_ptr= &(ud_stream->log);
 	ut_timer_t stime, ftime;
@@ -1024,7 +1024,6 @@ int UD_process_stream(UD_stream_t *ud_stream, LG_context_t *src_ctx) {
 		LG_log(ud_context, LG_ERROR, "%s", SQ_error(ud_stream->db_connection));
 		die;
 	}
-	sql_connection=ud_stream->db_connection;
 
 	UT_timeget(&stime);
 
