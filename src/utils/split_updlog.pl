@@ -6,32 +6,19 @@
 use strict;
 use warnings;
 
-my $nextIsMail = 0;
 my $count = 1;
-my @contents = ();
 
+local $/ = ">>> time: ";
 while (<>) {
-  my $line = $_;
-  if (/^>>> time: (?:[A-Z][a-z][a-z] ){2}[0-9]+ (?:[0-9]{2}:){2}[0-9]{2} [0-9]{4} (MAIL |SYNC |)UPDATE .*<<<$/) {
+    s{$/$}{}; # Strip separator
 
-    my $isMail = $nextIsMail;
-    $nextIsMail = ($1 eq "MAIL ");
+    my ($header, undef, @body) = split /\n/;
 
-    if ($#contents > 5 && $isMail) {
-      open FILE, sprintf('>/tmp/upd%08d', $count);
-      # pop the starting newline
-      shift @contents;
-      # pop the endling newline
-      pop @contents;
-      # now write
-      foreach (@contents) {
-        print FILE $_;
-      }
-      close FILE;
-      $count++;
-    }
-    undef @contents;
-  } else {
-    push @contents, $line;
-  }
+    next unless $header;
+    next unless $header =~ m{MAIL UPDATE};
+    next unless @body > 5;
+
+    open my $fh, '>', sprintf '/tmp/upd%08d', $count++;
+    print $fh join "\n", @body, '';
+    close $fh;
 }
