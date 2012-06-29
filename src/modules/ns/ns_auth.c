@@ -105,9 +105,9 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info) {
     AU_ret_t ret_val = AU_UNAUTHORISED_CONT;
     AU_ret_t au_check_result;
     rpsl_object_t *old_object;
-    gchar *domain = NULL; /* domain entries */
-    gchar **nservers; /* array of nserver entries */
-    gchar **ds_rdata; /* array of ds-rdata entries */
+    gchar *domain = NULL;
+    GList *nservers = NULL;
+    GList *ds_rdata = NULL;
     gboolean override;
 
     LG_log(au_context, LG_FUNC, ">rdns_modification: entering");
@@ -131,37 +131,38 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info) {
         au_check_result = ns_find_rir(info, domain);
         if (au_check_result == AU_AUTHORISED) {
             /* find nservers */
-            nservers = ns_nservers(info->obj, info->ctx, domain, &au_check_result);
-            if (au_check_result != AU_AUTHORISED) {
-                LG_log(au_context, LG_DEBUG, "rdns_modification: no nservers found");
-                ret_val = au_check_result;
+            nservers = rpsl_object_get_attr(info->obj, "nserver");
+            if (nservers == NULL ) { /* we don't accept domains with no nservers */
+                LG_log(au_context, LG_DEBUG, "object contains no nservers");
+                RT_rdns_nonservers(info->ctx);
+                au_check_result = AU_UNAUTHORISED_CONT;
+                nservers = NULL;
             } else {
                 /* find ds-rdata records */
-                ds_rdata = ns_ds_rdata(info->obj, info->ctx, domain, &au_check_result);
-                if (au_check_result != AU_AUTHORISED) {
-                    ret_val = au_check_result;
-                } else {
+                ds_rdata = rpsl_object_get_attr(info->obj, "ds-rdata");
 
-                    if (ds_rdata != NULL && ns_ds_accepted(domain) == FALSE) {
+                if (ds_rdata == NULL ) {
+                    LG_log(au_context, LG_DEBUG, "object contains no ds-rdata");
+                    au_check_result = AU_AUTHORISED;
+                    ds_rdata = NULL;
+                } else {
+                    if (ns_ds_accepted(domain) == FALSE) {
                         LG_log(au_context, LG_DEBUG, "rdns_modification: ds not accepted");
                         RT_rdns_ds_not_accepted(info->ctx);
                         au_check_result = AU_UNAUTHORISED_CONT;
                     } else {
                         /* call delcheck */
-                        au_check_result = ns_domain_delcheck(info, domain, nservers, ds_rdata);
+                        au_check_result = ns_domain_dnscheck(info, domain, nservers, ds_rdata);
                     }
 
-                    if (ds_rdata != NULL ) {
-                        g_strfreev(ds_rdata);
-                    }
+                    rpsl_attr_delete_list(ds_rdata);
+
                     if (au_check_result != AU_AUTHORISED) {
                         ret_val = au_check_result;
                     }
                 }
             }
-            if (nservers != NULL ) {
-                g_strfreev(nservers);
-            }
+            rpsl_attr_delete_list(nservers);
         } else {
             LG_log(au_context, LG_DEBUG, "rdns_modification: not the right RIR");
             ret_val = AU_UNAUTHORISED_CONT;
@@ -266,10 +267,10 @@ static AU_ret_t ns_hierarchical_creation(au_plugin_callback_info_t * info, gchar
 AU_ret_t rdns_creation(au_plugin_callback_info_t * info) {
     AU_ret_t ret_val = AU_AUTHORISED; /* return value of this function */
     AU_ret_t rdns_ret_val = AU_AUTHORISED; /* saved rdns return value of this function */
-    gchar *domain = NULL; /* domain name of the object */
-    gchar *source = NULL; /* domain name of the object */
-    gchar **nservers = NULL; /* array of nserver entries */
-    gchar **ds_rdata = NULL; /* array of ds-rdata entries*/
+    gchar *domain = NULL;
+    gchar *source = NULL;
+    GList *nservers = NULL;
+    GList *ds_rdata = NULL;
     AU_ret_t au_check_result; /* result returned from functions */
     GList *source_attrs; /* used to retrieve source attribute */
     gboolean override;
@@ -292,145 +293,144 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info) {
         source = rpsl_attr_get_clean_value(source_attrs->data);
         /* Extract the related nservers */
         LG_log(au_context, LG_DEBUG, "rdns_creation: extracting the nservers");
-        nservers = ns_nservers(info->obj, info->ctx, domain, &au_check_result);
-        if (au_check_result != AU_AUTHORISED) {
-            ret_val = AU_UNAUTHORISED_CONT;
-            LG_log(au_context, LG_DEBUG, "rdns_creation: problem extracting the nservers");
+        nservers = rpsl_object_get_attr(info->obj, "nserver");
+        if (nservers == NULL ) { /* we don't accept domains with no nservers */
+            LG_log(au_context, LG_DEBUG, "object contains no nservers");
+            RT_rdns_nonservers(info->ctx);
+            au_check_result = AU_UNAUTHORISED_CONT;
+            nservers = NULL;
         } else {
             /* find ds-rdata records */
             LG_log(au_context, LG_DEBUG, "rdns_creation: checking DS rdata records");
-            ds_rdata = ns_ds_rdata(info->obj, info->ctx, domain, &au_check_result);
+            ds_rdata = rpsl_object_get_attr(info->obj, "ds-rdata");
 
-            /* Check if we're the related party, fail if not */
-            LG_log(au_context, LG_DEBUG, "rdns_creation: checking the RIR");
-            au_check_result = ns_find_rir(info, domain);
-            if (au_check_result != AU_AUTHORISED) {
-                ret_val = au_check_result;
+            if (ds_rdata == NULL ) {
+                LG_log(au_context, LG_DEBUG, "object contains no ds-rdata");
+                au_check_result = AU_AUTHORISED;
+                ds_rdata = NULL;
             } else {
-
-                /* Check if the parent is us */
-//          LG_log(au_context, LG_DEBUG, "rdns_creation: checking the parent");
-//          au_check_result = ns_is_parent_ours(info, domain);
-//          if (au_check_result != AU_AUTHORISED) {
-//            ret_val = au_check_result;
-//          } else {
-                if (ns_is_e164_arpa(info)) {
-                    /* Check flat authorization */
-                    LG_log(au_context, LG_DEBUG, "rdns_creation: check the e164 flat authorisation");
-                    au_check_result = ns_flat_creation(info, domain, source);
-                } else {
-                    /* Check hierarchical authorization */
-                    LG_log(au_context, LG_DEBUG, "rdns_creation: check hierarchical authorisation");
-                    au_check_result = ns_hierarchical_creation(info, domain, source);
-                }
+                /* Check if we're the related party, fail if not */
+                LG_log(au_context, LG_DEBUG, "rdns_creation: checking the RIR");
+                au_check_result = ns_find_rir(info, domain);
                 if (au_check_result != AU_AUTHORISED) {
                     ret_val = au_check_result;
                 } else {
 
-                    if (ds_rdata != NULL && ns_ds_accepted(domain) == FALSE) {
-                        LG_log(au_context, LG_DEBUG, "rdns_creation: ds not accepted");
-                        RT_rdns_ds_not_accepted(info->ctx);
-                        au_check_result = AU_UNAUTHORISED_CONT;
+                    if (ns_is_e164_arpa(info)) {
+                        /* Check flat authorization */
+                        LG_log(au_context, LG_DEBUG, "rdns_creation: check the e164 flat authorisation");
+                        au_check_result = ns_flat_creation(info, domain, source);
                     } else {
-                        /* call delcheck */
-                        LG_log(au_context, LG_DEBUG, "rdns_creation: calling delchecker");
-                        au_check_result = ns_domain_delcheck(info, domain, nservers, ds_rdata);
+                        /* Check hierarchical authorization */
+                        LG_log(au_context, LG_DEBUG, "rdns_creation: check hierarchical authorisation");
+                        au_check_result = ns_hierarchical_creation(info, domain, source);
                     }
                     if (au_check_result != AU_AUTHORISED) {
                         ret_val = au_check_result;
+
+                    } else {
+
+                        if (ns_ds_accepted(domain) == FALSE) {
+                            LG_log(au_context, LG_DEBUG, "rdns_creation: ds not accepted");
+                            RT_rdns_ds_not_accepted(info->ctx);
+                            au_check_result = AU_UNAUTHORISED_CONT;
+                        } else {
+                            /* call delcheck */
+                            LG_log(au_context, LG_DEBUG, "rdns_creation: calling delchecker");
+                            au_check_result = ns_domain_dnscheck(info, domain, nservers, ds_rdata);
+                        }
+
+                        if (au_check_result != AU_AUTHORISED) {
+                            ret_val = au_check_result;
+                        }
                     }
                 }
+                rpsl_attr_delete_list(ds_rdata);
+            }
+            rpsl_attr_delete_list(nservers);
+        }
+
+        /* override */
+        rdns_ret_val = ret_val;
+        au_override(&ret_val, &override, info);
+        RT_rdns_auth_result(info->ctx, (rdns_ret_val == AU_AUTHORISED), override);
+
+        /* cleanup */
+        if (source != NULL ) {
+            free(source);
+        }
+        if (domain != NULL ) {
+            free(domain);
+        }
+        rpsl_attr_delete_list(source_attrs);
+        LG_log(au_context, LG_FUNC, "<rdns_creation: exiting with value [%s]", AU_ret2str(ret_val));
+        return ret_val;
+    }
+
+    /*
+     Entry point for rdns authorisation - invoke AU by-type support
+
+     trans    - PG module transaction
+     info     - AU plugin callback information
+
+     return   - PG_OK means AU_AUTHORISED
+     PG_ERROR_PROCEED means AU_UNAUTHORISED_CONT
+     PG_ERROR_STOP means AU_UNAUTHORISED_END
+     PG_ERROR_PLUGIN_NAME means AU_ERROR
+
+     This is merely a dispatcher.
+     */
+    PG_status_t au_rdns_check(PG_transaction_t * trans, gpointer * info) {
+        PG_status_t ret_val;
+        au_plugin_callback_info_t *callback_info;
+        AU_ret_t au_ret_val;
+        const char *object_type;
+
+        LG_log(au_context, LG_FUNC, ">au_rdns_check: entering");
+
+        /* check if we really need to apply specific rules */
+        callback_info = PG_global_get(trans);
+
+        /* check object type */
+        object_type = rpsl_object_get_class(callback_info->obj);
+
+        if (!ns_is_rdns_suffix(callback_info)) {
+            LG_log(au_context, LG_DEBUG, "au_rdns_check: not rdns");
+            ret_val = AU_AUTHORISED;
+        } else {
+            LG_log(au_context, LG_DEBUG, "au_rdns_check: doing rdns checks");
+            au_ret_val = AU_check_by_type(rdns_plugins, callback_info);
+            switch (au_ret_val) {
+            case AU_AUTHORISED:
+                ret_val = PG_OK;
+                break;
+            case AU_UNAUTHORISED_CONT:
+                ret_val = PG_ERROR_PROCEED;
+                callback_info->ret_val = au_ret_val;
+                break;
+            case AU_FWD:
+                ret_val = PG_ERROR_STOP;
+                callback_info->ret_val = au_ret_val;
+                break;
+            case AU_UNAUTHORISED_END:
+                ret_val = PG_ERROR_STOP;
+                callback_info->ret_val = au_ret_val;
+                break;
+            case AU_ERROR:
+                ret_val = PG_ERROR_PLUGIN_NAME;
+                callback_info->ret_val = au_ret_val;
+                break;
+            default:
+                ret_val = PG_ERROR_PLUGIN_NAME;
+                callback_info->ret_val = AU_ERROR;
+                LG_log(au_context, LG_ERROR, "au_rdns_check: unknown return %d from AU_check_by_type()", au_ret_val);
             }
         }
+
+        LG_log(au_context, LG_FUNC, "<au_rdns_check: exiting with value [%d]", ret_val);
+        return ret_val;
     }
 
-    /* override */
-    rdns_ret_val = ret_val;
-    au_override(&ret_val, &override, info);
-    RT_rdns_auth_result(info->ctx, (rdns_ret_val == AU_AUTHORISED), override);
-
-    /* cleanup */
-    if (source != NULL ) {
-        free(source);
+    gboolean au_rdns_init() {
+        return TRUE;
     }
-    if (domain != NULL ) {
-        free(domain);
-    }
-    if (nservers != NULL ) {
-        g_strfreev(nservers);
-    }
-    if (ds_rdata != NULL ) {
-        g_strfreev(ds_rdata);
-    }
-    rpsl_attr_delete_list(source_attrs);
-    LG_log(au_context, LG_FUNC, "<rdns_creation: exiting with value [%s]", AU_ret2str(ret_val));
-    return ret_val;
-}
-
-/* 
- Entry point for rdns authorisation - invoke AU by-type support
-
- trans    - PG module transaction
- info     - AU plugin callback information
-
- return   - PG_OK means AU_AUTHORISED
- PG_ERROR_PROCEED means AU_UNAUTHORISED_CONT
- PG_ERROR_STOP means AU_UNAUTHORISED_END
- PG_ERROR_PLUGIN_NAME means AU_ERROR
-
- This is merely a dispatcher.
- */
-PG_status_t au_rdns_check(PG_transaction_t * trans, gpointer * info) {
-    PG_status_t ret_val;
-    au_plugin_callback_info_t *callback_info;
-    AU_ret_t au_ret_val;
-    const char *object_type;
-
-    LG_log(au_context, LG_FUNC, ">au_rdns_check: entering");
-
-    /* check if we really need to apply specific rules */
-    callback_info = PG_global_get(trans);
-
-    /* check object type */
-    object_type = rpsl_object_get_class(callback_info->obj);
-
-    if (!ns_is_rdns_suffix(callback_info)) {
-        LG_log(au_context, LG_DEBUG, "au_rdns_check: not rdns");
-        ret_val = AU_AUTHORISED;
-    } else {
-        LG_log(au_context, LG_DEBUG, "au_rdns_check: doing rdns checks");
-        au_ret_val = AU_check_by_type(rdns_plugins, callback_info);
-        switch (au_ret_val) {
-        case AU_AUTHORISED:
-            ret_val = PG_OK;
-            break;
-        case AU_UNAUTHORISED_CONT:
-            ret_val = PG_ERROR_PROCEED;
-            callback_info->ret_val = au_ret_val;
-            break;
-        case AU_FWD:
-            ret_val = PG_ERROR_STOP;
-            callback_info->ret_val = au_ret_val;
-            break;
-        case AU_UNAUTHORISED_END:
-            ret_val = PG_ERROR_STOP;
-            callback_info->ret_val = au_ret_val;
-            break;
-        case AU_ERROR:
-            ret_val = PG_ERROR_PLUGIN_NAME;
-            callback_info->ret_val = au_ret_val;
-            break;
-        default:
-            ret_val = PG_ERROR_PLUGIN_NAME;
-            callback_info->ret_val = AU_ERROR;
-            LG_log(au_context, LG_ERROR, "au_rdns_check: unknown return %d from AU_check_by_type()", au_ret_val);
-        }
-    }
-
-    LG_log(au_context, LG_FUNC, "<au_rdns_check: exiting with value [%d]", ret_val);
-    return ret_val;
-}
-
-gboolean au_rdns_init() {
-    return TRUE;
-}

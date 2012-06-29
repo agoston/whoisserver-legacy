@@ -75,14 +75,76 @@ void ns_report_warnings(gpointer data, gpointer user_data) {
     g_free(entity);
 }
 
-void rdns_dnscheck(gchar *domain, gchar **nservers, gchar **ds_rdata, gchar **delcheck_result, gchar **delcheck_errors) {
+void rdns_dnscheck(gchar *domain, GList *nservers, GList *ds_rdata, gchar **delcheck_result, gchar **delcheck_errors) {
+    SQ_connection_t conn;
+    GList *p;
+    GString *sql, *glue;
 
+    LG_log(lu_context, LG_FUNC, ">rdns_dnscheck(%s): entered", domain);
+
+    // get SQL connection
+    if (SQ_try_connection(&conn, "dnscheck.ripe.net", 3306, "dnscheck", "njt53ntu53f8") != SQ_OK) {
+        *delcheck_errors = g_sprintf("Failed to connect to dnscheck backend: %d: %s\n", SQ_errno(conn), SQ_error(conn));
+        LG_log(lu_context, LG_FUNC, "<rdns_dnscheck: %s", *delcheck_errors);
+        SQ_close_connection(conn);
+        return;
+    }
+
+    glue = g_string_new("");
+    sql = g_string_new("");
+
+    // convert input to dnscheck format
+    for (p = nservers; p; p = p->next) {
+        rpsl_attr_t *attr = (rpsl_attr_t *)(p->data);
+        gchar *clean_val = rpsl_attr_get_clean_value(attr);
+
+        // replace space with / if glue present
+        char *space = strchr(clean_val, ' ');
+        if (space) *space = '/';
+
+        // skip space on first entry
+        if (p != nservers) g_string_append(glue, ' ');
+        g_string_append(glue, clean_val);
+        free(clean_val);
+    }
+
+    for (p = ds_rdata; p; p = p->next) {
+        rpsl_attr_t *attr = (rpsl_attr_t *)(p->data);
+        gchar *clean_val = rpsl_attr_get_clean_value(attr);
+
+    }
+
+    // insert
+    snprintf(buf, sizeof(buf), "INSERT INTO queue (domain, priority, source_id, source_data, fake_parent_glue) VALUES ('%s', 1, 2, 'legacy-%d', '');");
+    LG_log(lu_context, LG_FUNC, "rdns_dnscheck: executing query %s", *delcheck_errors);
+
+    if (SQ_execute_query(conn, buf, &result) == -1) {
+        LG_log(lu_context, LG_FATAL, "lu_whois_lookup: SQL ERROR '%d': '%s' for query '%s'", SQ_errno(conn), SQ_error(conn), buf);
+        die;
+    }
+
+    if ((row = SQ_row_next(result)) != NULL) {
+        char *objtext = SQ_get_column_string_nocopy(result, row, 0);
+        LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: got object from SQL DB: [%s]", objtext);
+        *obj = rpsl_object_init(objtext);
+        if (!*obj) {
+            LG_log(lu_context, LG_ERROR, "lu_whois_query: error parsing object returned by WHOIS");
+            retval = LU_ERROR;
+        }
+    } else {
+        *obj = NULL;
+    }
+
+
+    g_string_free(sql, TRUE);
+    g_string_free(glue, TRUE);
+    SQ_close_connection(conn);
 }
 
 /*
  * Check delegation related problems for the domain
  */
-AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info, gchar * domain, gchar ** nservers, gchar ** ds_rdata) {
+AU_ret_t ns_domain_dnscheck(au_plugin_callback_info_t * info, gchar * domain, GList *nservers, GList *ds_rdata) {
     xmlChar *severity_node = (xmlChar *) "//DELCHECK_REPORT/PROBLEM_ENTITY/PROBLEM/attribute::severity";
     xmlChar *entity_node = (xmlChar *) "//DELCHECK_REPORT/PROBLEM_ENTITY/attribute::name";
 
@@ -99,7 +161,7 @@ AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info, gchar * domain, gc
     xmlXPathObjectPtr result; /* result from an xpath query */
     xmlNodeSetPtr nodeset; /* result nodeset from an xpath query */
 
-    LG_log(au_context, LG_DEBUG, "invoking delcheck");
+    LG_log(au_context, LG_DEBUG, "invoking dnscheck");
 
     LG_log(au_context, LG_DEBUG, "with parameters: ");
     LG_log(au_context, LG_DEBUG, "domain=[%s]", domain);
@@ -118,12 +180,12 @@ AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info, gchar * domain, gc
     rdns_dnscheck(domain, nservers, ds_rdata, &delcheck_result, &delcheck_errors);
 
     if (delcheck_errors != NULL ) {
-        LG_log(au_context, LG_DEBUG, "error in running delcheck:");
+        LG_log(au_context, LG_DEBUG, "error in running dnscheck:");
         LG_log(au_context, LG_DEBUG, delcheck_errors);
         g_free(delcheck_errors);
         ret_val = AU_UNAUTHORISED_END;
     } else {
-        tmp_file_name = g_strdup_printf("%s/delcheckxmlXXXXXX", ca_get_tmpdir);
+        tmp_file_name = g_strdup_printf("%s/dnscheckxmlXXXXXX", ca_get_tmpdir);
         f = mkstemp(tmp_file_name);
         if (f == -1) {
             LG_log(au_context, LG_DEBUG, "can't open %s for writing", tmp_file_name);
@@ -133,7 +195,7 @@ AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info, gchar * domain, gc
             write(f, delcheck_result, strlen(delcheck_result));
             close(f);
 
-            /* parsing the result from delchecker via libxml2 */
+            /* parsing the result from dnschecker via libxml2 */
             xml_doc = get_doc(tmp_file_name);
             /* compute the total severity */
             result = getnodeset(xml_doc, (xmlChar *) severity_node);
