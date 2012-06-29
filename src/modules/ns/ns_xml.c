@@ -82,6 +82,10 @@ void ns_report_warnings(gpointer data, gpointer user_data)
   g_free(entity);
 }
 
+void rdns_dnscheck(gchar *domain, gchar **nservers, gchar **ds_rdata, gchar **delcheck_result, gchar **delcheck_errors) {
+
+}
+
 
 /*
  * Check delegation related problems for the domain
@@ -123,9 +127,8 @@ AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info,
     LG_log(au_context, LG_DEBUG, "ds-rdata=[%s]",g_strjoinv(",", (gchar **) ds_rdata));
   }
 
-  // HERE BE MYSQL DELCHECK
-//  rdns_perl_delcheck(delcheck_conf_file, domain, nservers, ds_rdata,
-//                     &delcheck_result, &delcheck_errors);
+  rdns_dnscheck(domain, nservers, ds_rdata, &delcheck_result, &delcheck_errors);
+
   if (delcheck_errors != NULL) {
     LG_log(au_context, LG_DEBUG, "error in running delcheck:");
     LG_log(au_context, LG_DEBUG, delcheck_errors);
