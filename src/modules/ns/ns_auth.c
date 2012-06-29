@@ -11,7 +11,6 @@
 #include "au_util.h"
 #include "au_rpsl.h"
 #include "ns_rir.h"
-#include "ns_perl.h"
 #include "ns_util.h"
 #include "ns_xml.h"
 #include "lu.h"
@@ -123,15 +122,11 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
   gchar **nservers;             /* array of nserver entries */
   gchar **ds_rdata;             /* array of ds-rdata entries */
   gboolean override;
-  gchar *delcheck_conf_file;    /* conf file to use in delchecker */
 
   LG_log(au_context, LG_FUNC, ">rdns_modification: entering");
 
   /* Extract the domain name */
   domain = rpsl_object_get_key_value(info->obj);
-
-  /* find the configuration file for delcheck */
-  delcheck_conf_file = ns_find_delcheck_conf(au_context, domain);
 
   /* retrieve the current version from database */
   if (LU_get_object(au_lookup, &old_object, info->obj, NULL) != LU_OKAY) {
@@ -149,14 +144,6 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
         au_check_multiple_authentications(CHECK_MNT_BY, info->obj,
                                           "existing", info);
   }
-  /* if no conf file, reject */
-  if (delcheck_conf_file == NULL) {
-    LG_log(au_context, LG_DEBUG,
-             "rdns_modification: no delcheck conf file found - rdns size not accepted");
-    RT_rdns_size_not_accepted(info->ctx);
-    ret_val = AU_UNAUTHORISED_CONT;
-  }
-  else {
     if (ret_val == AU_AUTHORISED) {
       /* check if we're the related party */
       au_check_result = ns_find_rir(info, domain);
@@ -183,7 +170,7 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
               }
               else {
                 /* call delcheck */
-                au_check_result = ns_domain_delcheck(info, domain, nservers, ds_rdata, delcheck_conf_file);
+                au_check_result = ns_domain_delcheck(info, domain, nservers, ds_rdata);
               }
 
               if (ds_rdata != NULL)  {
@@ -202,7 +189,6 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
                    "rdns_modification: not the right RIR");
         ret_val = AU_UNAUTHORISED_CONT;
       }
-    }
   }
 
   /* override */
@@ -212,9 +198,6 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info)
   LG_log(au_context, LG_FUNC, "<rdns_modification: exiting with value [%s]",
          AU_ret2str(ret_val));
 
-  if (delcheck_conf_file != NULL) {
-    g_free(delcheck_conf_file);
-  }
   if (domain != NULL) {
     free(domain);
   }
@@ -318,7 +301,6 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
   AU_ret_t au_check_result;     /* result returned from functions */
   GList *source_attrs;          /* used to retrieve source attribute */
   gboolean override;
-  gchar *delcheck_conf_file;    /* conf file to use in delchecker */
 
   LG_log(au_context, LG_FUNC, ">rdns_creation: entering");
 
@@ -327,7 +309,6 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
 
   /* find the configuration file for delcheck */
   LG_log(au_context, LG_DEBUG, "rdns_creation: find the delcheck configuration");
-  delcheck_conf_file = ns_find_delcheck_conf(au_context, domain);
 
   /* Extract the source attribute */
   source_attrs = rpsl_object_get_attr(info->obj, "source");
@@ -337,10 +318,6 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
   } else {
     LG_log(au_context, LG_DEBUG, "rdns_creation: found the object source");
     source = rpsl_attr_get_clean_value(source_attrs->data);
-    if (delcheck_conf_file == NULL) {   
-      RT_rdns_size_not_accepted(info->ctx);
-      ret_val = AU_UNAUTHORISED_CONT;
-    } else {
       /* Extract the related nservers */
       LG_log(au_context, LG_DEBUG, "rdns_creation: extracting the nservers");
       nservers =
@@ -389,15 +366,12 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
                 /* call delcheck */
                 LG_log(au_context, LG_DEBUG, "rdns_creation: calling delchecker");
                 au_check_result =
-                  ns_domain_delcheck(info, domain, nservers, ds_rdata,
-                                     delcheck_conf_file);
+                  ns_domain_delcheck(info, domain, nservers, ds_rdata);
               }
               if (au_check_result != AU_AUTHORISED) {
                 ret_val = au_check_result;
               }
             }
-//          }
-        }
       }
     }
   }
@@ -419,9 +393,6 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info)
   }
   if (ds_rdata != NULL) {
     g_strfreev(ds_rdata);
-  }
-  if (delcheck_conf_file != NULL) {
-    g_free(delcheck_conf_file);
   }
   rpsl_attr_delete_list(source_attrs);
   LG_log(au_context, LG_FUNC, "<rdns_creation: exiting with value [%s]",

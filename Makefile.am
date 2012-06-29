@@ -352,7 +352,6 @@ EXTRA_DIST = README \
              src/modules/lu/lu_whois.h \
              src/modules/ma/bitmask.h \
              src/modules/nh/nh.h \
-             src/modules/ns/ns_perl.h \
              src/modules/ns/ns_rir.h \
              src/modules/ns/ns_util.h \
              src/modules/ns/ns_xml.h \

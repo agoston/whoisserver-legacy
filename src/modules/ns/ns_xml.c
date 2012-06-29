@@ -3,8 +3,6 @@
  */
 
 #include "ns_xml.h"
-#include "ns_perl.h"
-#include "ns_util.h"
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 
@@ -89,8 +87,7 @@ void ns_report_warnings(gpointer data, gpointer user_data)
  * Check delegation related problems for the domain
  */
 AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info,
-                            gchar * domain, gchar ** nservers, gchar ** ds_rdata,
-                            gchar * delcheck_conf_file)
+                            gchar * domain, gchar ** nservers, gchar ** ds_rdata)
 {
   xmlChar *severity_node =
       (xmlChar *)"//DELCHECK_REPORT/PROBLEM_ENTITY/PROBLEM/attribute::severity";
@@ -113,7 +110,6 @@ AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info,
   LG_log(au_context, LG_DEBUG, "invoking delcheck");
   
   LG_log(au_context, LG_DEBUG, "with parameters: ");
-  LG_log(au_context, LG_DEBUG, "delcheck_conf_file=[%s]",delcheck_conf_file);
   LG_log(au_context, LG_DEBUG, "domain=[%s]",domain);
 
   if (nservers == NULL) {
@@ -126,8 +122,10 @@ AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t * info,
   } else {
     LG_log(au_context, LG_DEBUG, "ds-rdata=[%s]",g_strjoinv(",", (gchar **) ds_rdata));
   }
-  rdns_perl_delcheck(delcheck_conf_file, domain, nservers, ds_rdata,
-                     &delcheck_result, &delcheck_errors);
+
+  // HERE BE MYSQL DELCHECK
+//  rdns_perl_delcheck(delcheck_conf_file, domain, nservers, ds_rdata,
+//                     &delcheck_result, &delcheck_errors);
   if (delcheck_errors != NULL) {
     LG_log(au_context, LG_DEBUG, "error in running delcheck:");
     LG_log(au_context, LG_DEBUG, delcheck_errors);

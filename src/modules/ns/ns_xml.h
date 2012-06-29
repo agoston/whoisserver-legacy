@@ -9,7 +9,6 @@
 #include <glib.h>
 #include "au_plugins.h"
 
-AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t *, gchar *, gchar **, gchar **,
-                            gchar *);
+AU_ret_t ns_domain_delcheck(au_plugin_callback_info_t *, gchar *, gchar **, gchar **);
 
 #endif

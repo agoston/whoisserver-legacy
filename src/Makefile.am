@@ -107,7 +107,7 @@ liblu_a_SOURCES = modules/lu/lu.c modules/lu/lu_whois.c \
                   modules/lu/test_lu_whois.c
 libma_a_SOURCES = modules/ma/bitmask.c
 libnh_a_SOURCES = modules/nh/nh.c
-libns_a_SOURCES = modules/ns/ns_auth.c modules/ns/ns_perl.c \
+libns_a_SOURCES = modules/ns/ns_auth.c \
                   modules/ns/ns_rir.c modules/ns/ns_util.c \
                   modules/ns/ns_xml.c
 libnt_a_SOURCES = modules/nt/notification.c
