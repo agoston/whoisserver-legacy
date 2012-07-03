@@ -366,6 +366,7 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info) {
         LG_log(au_context, LG_FUNC, "<rdns_creation: exiting with value [%s]", AU_ret2str(ret_val));
         return ret_val;
     }
+}
 
     /*
      Entry point for rdns authorisation - invoke AU by-type support
