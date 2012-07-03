@@ -75,26 +75,28 @@ void ns_report_warnings(gpointer data, gpointer user_data) {
     g_free(entity);
 }
 
-void rdns_dnscheck(gchar *domain, GList *nservers, GList *ds_rdata, gchar **delcheck_result, gchar **delcheck_errors) {
-    SQ_connection_t conn;
-    GList *p;
-    GString *sql, *glue;
+void rdns_dnscheck(gchar *domain, GList *nservers, GList *ds_rdata, gchar **dnscheck_result, gchar **dnscheck_errors) {
+    SQ_connection_t conn = NULL;
+    SQ_result_set_t *sql_result = NULL;
+    SQ_row_t *row = NULL;
+    GString *sql = NULL, *glue = NULL, *ret = NULL;
+    char process_id[256];
+    int timeleft = 300;
+    long long int id, end;
+    long count_critical, count_error;
 
     LG_log(lu_context, LG_FUNC, ">rdns_dnscheck(%s): entered", domain);
 
     // get SQL connection
     if (SQ_try_connection(&conn, "dnscheck.ripe.net", 3306, "dnscheck", "njt53ntu53f8") != SQ_OK) {
-        *delcheck_errors = g_sprintf("Failed to connect to dnscheck backend: %d: %s\n", SQ_errno(conn), SQ_error(conn));
-        LG_log(lu_context, LG_FUNC, "<rdns_dnscheck: %s", *delcheck_errors);
-        SQ_close_connection(conn);
-        return;
+        *dnscheck_errors = g_sprintf("Failed to connect to dnscheck backend: %d: %s\n", SQ_errno(conn), SQ_error(conn));
+        goto rdns_dnscheck_bail;
     }
 
     glue = g_string_new("");
-    sql = g_string_new("");
 
     // convert input to dnscheck format
-    for (p = nservers; p; p = p->next) {
+    for (GList *p = nservers; p; p = p->next) {
         rpsl_attr_t *attr = (rpsl_attr_t *)(p->data);
         gchar *clean_val = rpsl_attr_get_clean_value(attr);
 
@@ -108,50 +110,129 @@ void rdns_dnscheck(gchar *domain, GList *nservers, GList *ds_rdata, gchar **delc
         free(clean_val);
     }
 
-    for (p = ds_rdata; p; p = p->next) {
+    for (GList *p = ds_rdata; p; p = p->next) {
         rpsl_attr_t *attr = (rpsl_attr_t *)(p->data);
         gchar *clean_val = rpsl_attr_get_clean_value(attr);
 
+        g_string_append(glue, " ds:/");
+        g_string_append(glue, domain);
+        g_string_append(glue, "_DS_");
+        for (gchar *pp = clean_val; *pp; pp++) {
+            if (*pp == ' ') *pp = '_';
+        }
+        g_string_append(glue, clean_val);
+
+        free(clean_val);
     }
+
+    // generate process id
+    snprintf(process_id, 256, "lgc-%d-%d", time(NULL), getpid());
+
+    sql = g_string_new("");
 
     // insert
-    snprintf(buf, sizeof(buf), "INSERT INTO queue (domain, priority, source_id, source_data, fake_parent_glue) VALUES ('%s', 1, 2, 'legacy-%d', '');");
-    LG_log(lu_context, LG_FUNC, "rdns_dnscheck: executing query %s", *delcheck_errors);
+    g_string_printf(sql, "INSERT INTO queue (domain, priority, source_id, source_data, fake_parent_glue) VALUES ('%s', 1, 2, '%s', '%s')", domain, process_id, glue->str);
+    LG_log(lu_context, LG_FUNC, "rdns_dnscheck: executing query %s", sql->str);
 
-    if (SQ_execute_query(conn, buf, &result) == -1) {
-        LG_log(lu_context, LG_FATAL, "lu_whois_lookup: SQL ERROR '%d': '%s' for query '%s'", SQ_errno(conn), SQ_error(conn), buf);
-        die;
+    if (SQ_execute_query(conn, sql->str, (SQ_result_set_t **)NULL) < 0) {
+        *dnscheck_errors = g_sprintf("SQL ERROR '%d': '%s' for query '%s'", SQ_errno(conn), SQ_error(conn), sql->str);
+        goto rdns_dnscheck_bail;
     }
 
-    if ((row = SQ_row_next(result)) != NULL) {
-        char *objtext = SQ_get_column_string_nocopy(result, row, 0);
-        LG_log(lu_context, LG_DEBUG, "lu_whois_lookup: got object from SQL DB: [%s]", objtext);
-        *obj = rpsl_object_init(objtext);
-        if (!*obj) {
-            LG_log(lu_context, LG_ERROR, "lu_whois_query: error parsing object returned by WHOIS");
-            retval = LU_ERROR;
+    // poll table results for 5 minutes
+    g_string_printf(sql, "SELECT id, end, count_critical, count_error FROM tests WHERE source_id=2 and source_data='%s'", process_id);
+    LG_log(lu_context, LG_FUNC, "rdns_dnscheck: executing query %s", sql->str);
+
+    for (; timeleft > 0; timeleft--) {
+        sleep(1);
+
+        if (SQ_execute_query(conn, sql->str, &sql_result) < 0) {
+            *dnscheck_errors = g_sprintf("SQL ERROR '%d': '%s' for query '%s', timeleft: %d", SQ_errno(conn), SQ_error(conn), sql->str, timeleft);
+            goto rdns_dnscheck_bail;
         }
-    } else {
-        *obj = NULL;
+
+        if ((row = SQ_row_next(sql_result)) != NULL) {
+            if (!SQ_get_column_llint(sql_result, row, 0, &id) && !SQ_get_column_llint(sql_result, row, 1, &end)
+                    && !SQ_get_column_int(sql_result, row, 2, &count_critical) && !SQ_get_column_llint(sql_result, row, 3, &count_error)) {
+                if (end > 0) {
+                    LG_log(lu_context, LG_FUNC, "rdns_dnscheck: got id: %lld, end: %lld, count_critical: %ld, count_error: %ld, timeleft: %d", id, end, count_critical, count_error, timeleft);
+                    break;
+                }
+            }
+        }
+
+        if (sql_result) {
+            SQ_free_result(sql_result);
+            sql_result = NULL;
+        }
     }
 
+    if (timeleft <= 0) {
+        *dnscheck_errors = g_sprintf("Timeout. id: %lld, end: %lld, count_critical: %ld, count_error: %ld, timeleft: %d", id, end, count_critical, count_error);
+        goto rdns_dnscheck_bail;
+    }
 
-    g_string_free(sql, TRUE);
-    g_string_free(glue, TRUE);
-    SQ_close_connection(conn);
+    // gather messages
+    if (count_critical > 0 || count_error > 0) {
+        ret = g_string_new("");
+
+        g_string_printf(sql, "SELECT level,formatstring,arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9 FROM (SELECT * FROM results WHERE test_id=%d AND level IN ('ERROR','CRITICAL')) AS tmp LEFT JOIN messages ON tmp.message = messages.tag ORDER BY tmp.id ASC", id);
+        LG_log(lu_context, LG_FUNC, "rdns_dnscheck: executing query %s", sql->str);
+
+        if (SQ_execute_query(conn, sql->str, &sql_result) < 0) {
+            *dnscheck_errors = g_sprintf("SQL ERROR '%d': '%s' for query '%s'", SQ_errno(conn), SQ_error(conn), sql->str, timeleft);
+            goto rdns_dnscheck_bail;
+        }
+
+        while ((row = SQ_row_next(sql_result)) != NULL) {
+            char *level = SQ_get_column_string_nocopy(sql_result, row, 0);
+            char *formatstring = SQ_get_column_string_nocopy(sql_result, row, 1);
+            if (level && formatstring) {
+                g_string_append_printf(ret, "%s: ", level);
+                g_string_append_printf(ret, formatstring, SQ_get_column_string_nocopy(sql_result, row, 2),
+                        SQ_get_column_string_nocopy(sql_result, row, 3),
+                        SQ_get_column_string_nocopy(sql_result, row, 4),
+                        SQ_get_column_string_nocopy(sql_result, row, 5),
+                        SQ_get_column_string_nocopy(sql_result, row, 6),
+                        SQ_get_column_string_nocopy(sql_result, row, 7),
+                        SQ_get_column_string_nocopy(sql_result, row, 8),
+                        SQ_get_column_string_nocopy(sql_result, row, 9));
+                g_string_append_c(ret, '\n');
+            } else {
+                LG_log(lu_context, LG_FUNC, "rdns_dnscheck: invalid entry in results table: column 'level' or 'formatstring' is NULL", sql->str);
+            }
+        }
+
+        if (sql_result) {
+            SQ_free_result(sql_result);
+            sql_result = NULL;
+        }
+    }
+
+rdns_dnscheck_bail:
+    LG_log(lu_context, LG_FUNC, "<rdns_dnscheck: exiting");
+
+    if (sql_result) SQ_free_result(sql_result);
+    if (sql) g_string_free(sql, TRUE);
+    if (glue) g_string_free(glue, TRUE);
+    if (ret) {
+        *dnscheck_result = ret->str;
+        g_string_free(ret, FALSE);
+    }
+    if (conn) SQ_close_connection(conn);
 }
 
 /*
  * Check delegation related problems for the domain
  */
-AU_ret_t ns_domain_dnscheck(au_plugin_callback_info_t * info, gchar * domain, GList *nservers, GList *ds_rdata) {
+AU_ret_t ns_domain_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *nservers, GList *ds_rdata) {
     xmlChar *severity_node = (xmlChar *) "//DELCHECK_REPORT/PROBLEM_ENTITY/PROBLEM/attribute::severity";
     xmlChar *entity_node = (xmlChar *) "//DELCHECK_REPORT/PROBLEM_ENTITY/attribute::name";
 
     gint i; /* generic temporary int */
     xmlChar *keyword; /* string format of each xpath query match */
-    gchar *delcheck_result = NULL; /* output from delchecker */
-    gchar *delcheck_errors = NULL; /* error string from delchecker */
+    gchar *dnscheck_result = NULL; /* output from delchecker */
+    gchar *dnscheck_errors = NULL; /* error string from delchecker */
     AU_ret_t ret_val = AU_AUTHORISED; /* return value of this function */
     gchar *tmp_file_name; /* used while creating tmp files */
     gint f; /* for general file handling */
@@ -177,12 +258,11 @@ AU_ret_t ns_domain_dnscheck(au_plugin_callback_info_t * info, gchar * domain, GL
         LG_log(au_context, LG_DEBUG, "ds-rdata=[%s]", g_strjoinv(",", (gchar **) ds_rdata));
     }
 
-    rdns_dnscheck(domain, nservers, ds_rdata, &delcheck_result, &delcheck_errors);
+    rdns_dnscheck(domain, nservers, ds_rdata, &dnscheck_result, &dnscheck_errors);
 
-    if (delcheck_errors != NULL ) {
-        LG_log(au_context, LG_DEBUG, "error in running dnscheck:");
-        LG_log(au_context, LG_DEBUG, delcheck_errors);
-        g_free(delcheck_errors);
+    if (dnscheck_errors != NULL ) {
+        LG_log(au_context, LG_DEBUG, "error running dnscheck: %s", dnscheck_errors);
+        g_free(dnscheck_errors);
         ret_val = AU_UNAUTHORISED_END;
     } else {
         tmp_file_name = g_strdup_printf("%s/dnscheckxmlXXXXXX", ca_get_tmpdir);
@@ -192,7 +272,7 @@ AU_ret_t ns_domain_dnscheck(au_plugin_callback_info_t * info, gchar * domain, GL
             ret_val = AU_UNAUTHORISED_END;
         } else {
             LG_log(au_context, LG_DEBUG, "opened %s for writing", tmp_file_name);
-            write(f, delcheck_result, strlen(delcheck_result));
+            write(f, dnscheck_result, strlen(dnscheck_result));
             close(f);
 
             /* parsing the result from dnschecker via libxml2 */
