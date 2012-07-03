@@ -91,7 +91,7 @@ void rdns_dnscheck(gchar *domain, GList *nservers, GList *ds_rdata, gchar **dnsc
 
     // get SQL connection
     if (SQ_try_connection(&conn, "dnscheck.ripe.net", 3306, "dnscheck", "whois", "njt53ntu53f8") != SQ_OK) {
-        *dnscheck_errors = g_strdup_printf("Failed to connect to dnscheck backend: %d: %s\n", SQ_errno(conn), SQ_error(conn));
+        *dnscheck_errors = g_strdup_printf("Failed to connect to dnscheck backend: %d: %s", SQ_errno(conn), SQ_error(conn));
         goto rdns_dnscheck_bail;
     }
 
