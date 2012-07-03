@@ -368,70 +368,70 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info) {
     }
 }
 
-    /*
-     Entry point for rdns authorisation - invoke AU by-type support
+/*
+ Entry point for rdns authorisation - invoke AU by-type support
 
-     trans    - PG module transaction
-     info     - AU plugin callback information
+ trans    - PG module transaction
+ info     - AU plugin callback information
 
-     return   - PG_OK means AU_AUTHORISED
-     PG_ERROR_PROCEED means AU_UNAUTHORISED_CONT
-     PG_ERROR_STOP means AU_UNAUTHORISED_END
-     PG_ERROR_PLUGIN_NAME means AU_ERROR
+ return   - PG_OK means AU_AUTHORISED
+ PG_ERROR_PROCEED means AU_UNAUTHORISED_CONT
+ PG_ERROR_STOP means AU_UNAUTHORISED_END
+ PG_ERROR_PLUGIN_NAME means AU_ERROR
 
-     This is merely a dispatcher.
-     */
-    PG_status_t au_rdns_check(PG_transaction_t * trans, gpointer * info) {
-        PG_status_t ret_val;
-        au_plugin_callback_info_t *callback_info;
-        AU_ret_t au_ret_val;
-        const char *object_type;
+ This is merely a dispatcher.
+ */
+PG_status_t au_rdns_check(PG_transaction_t * trans, gpointer * info) {
+    PG_status_t ret_val;
+    au_plugin_callback_info_t *callback_info;
+    AU_ret_t au_ret_val;
+    const char *object_type;
 
-        LG_log(au_context, LG_FUNC, ">au_rdns_check: entering");
+    LG_log(au_context, LG_FUNC, ">au_rdns_check: entering");
 
-        /* check if we really need to apply specific rules */
-        callback_info = PG_global_get(trans);
+    /* check if we really need to apply specific rules */
+    callback_info = PG_global_get(trans);
 
-        /* check object type */
-        object_type = rpsl_object_get_class(callback_info->obj);
+    /* check object type */
+    object_type = rpsl_object_get_class(callback_info->obj);
 
-        if (!ns_is_rdns_suffix(callback_info)) {
-            LG_log(au_context, LG_DEBUG, "au_rdns_check: not rdns");
-            ret_val = AU_AUTHORISED;
-        } else {
-            LG_log(au_context, LG_DEBUG, "au_rdns_check: doing rdns checks");
-            au_ret_val = AU_check_by_type(rdns_plugins, callback_info);
-            switch (au_ret_val) {
-            case AU_AUTHORISED:
-                ret_val = PG_OK;
-                break;
-            case AU_UNAUTHORISED_CONT:
-                ret_val = PG_ERROR_PROCEED;
-                callback_info->ret_val = au_ret_val;
-                break;
-            case AU_FWD:
-                ret_val = PG_ERROR_STOP;
-                callback_info->ret_val = au_ret_val;
-                break;
-            case AU_UNAUTHORISED_END:
-                ret_val = PG_ERROR_STOP;
-                callback_info->ret_val = au_ret_val;
-                break;
-            case AU_ERROR:
-                ret_val = PG_ERROR_PLUGIN_NAME;
-                callback_info->ret_val = au_ret_val;
-                break;
-            default:
-                ret_val = PG_ERROR_PLUGIN_NAME;
-                callback_info->ret_val = AU_ERROR;
-                LG_log(au_context, LG_ERROR, "au_rdns_check: unknown return %d from AU_check_by_type()", au_ret_val);
-            }
+    if (!ns_is_rdns_suffix(callback_info)) {
+        LG_log(au_context, LG_DEBUG, "au_rdns_check: not rdns");
+        ret_val = AU_AUTHORISED;
+    } else {
+        LG_log(au_context, LG_DEBUG, "au_rdns_check: doing rdns checks");
+        au_ret_val = AU_check_by_type(rdns_plugins, callback_info);
+        switch (au_ret_val) {
+        case AU_AUTHORISED:
+            ret_val = PG_OK;
+            break;
+        case AU_UNAUTHORISED_CONT:
+            ret_val = PG_ERROR_PROCEED;
+            callback_info->ret_val = au_ret_val;
+            break;
+        case AU_FWD:
+            ret_val = PG_ERROR_STOP;
+            callback_info->ret_val = au_ret_val;
+            break;
+        case AU_UNAUTHORISED_END:
+            ret_val = PG_ERROR_STOP;
+            callback_info->ret_val = au_ret_val;
+            break;
+        case AU_ERROR:
+            ret_val = PG_ERROR_PLUGIN_NAME;
+            callback_info->ret_val = au_ret_val;
+            break;
+        default:
+            ret_val = PG_ERROR_PLUGIN_NAME;
+            callback_info->ret_val = AU_ERROR;
+            LG_log(au_context, LG_ERROR, "au_rdns_check: unknown return %d from AU_check_by_type()", au_ret_val);
         }
-
-        LG_log(au_context, LG_FUNC, "<au_rdns_check: exiting with value [%d]", ret_val);
-        return ret_val;
     }
 
-    gboolean au_rdns_init() {
-        return TRUE;
-    }
+    LG_log(au_context, LG_FUNC, "<au_rdns_check: exiting with value [%d]", ret_val);
+    return ret_val;
+}
+
+gboolean au_rdns_init() {
+    return TRUE;
+}
