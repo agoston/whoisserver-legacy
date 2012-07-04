@@ -102,8 +102,8 @@ AU_ret_t rdns_deletion(au_plugin_callback_info_t * info) {
  * TODO implement reclaim
  */
 AU_ret_t rdns_modification(au_plugin_callback_info_t * info) {
-    AU_ret_t ret_val = AU_UNAUTHORISED_CONT;
-    AU_ret_t au_check_result;
+    AU_ret_t ret_val;
+    AU_ret_t rdns_ret_val;
     rpsl_object_t *old_object;
     gchar *domain = NULL;
     GList *nservers = NULL;
@@ -128,41 +128,31 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info) {
     }
     if (ret_val == AU_AUTHORISED) {
         /* check if we're the related party */
-        au_check_result = ns_find_rir(info, domain);
-        if (au_check_result == AU_AUTHORISED) {
+        ret_val = ns_find_rir(info, domain);
+        if (ret_val == AU_AUTHORISED) {
             /* find nservers */
             nservers = rpsl_object_get_attr(info->obj, "nserver");
             if (nservers == NULL ) { /* we don't accept domains with no nservers */
                 LG_log(au_context, LG_DEBUG, "object contains no nservers");
                 RT_rdns_nonservers(info->ctx);
-                au_check_result = AU_UNAUTHORISED_CONT;
-                nservers = NULL;
+                ret_val = AU_UNAUTHORISED_CONT;
             } else {
-                /* find ds-rdata records */
-                ds_rdata = rpsl_object_get_attr(info->obj, "ds-rdata");
-
-                if (ds_rdata == NULL ) {
-                    LG_log(au_context, LG_DEBUG, "object contains no ds-rdata");
-                    au_check_result = AU_AUTHORISED;
-                    ds_rdata = NULL;
+                if (ns_ds_accepted(domain) == FALSE) {
+                    LG_log(au_context, LG_DEBUG, "rdns_modification: ds not accepted");
+                    RT_rdns_ds_not_accepted(info->ctx);
+                    ret_val = AU_UNAUTHORISED_CONT;
                 } else {
-                    if (ns_ds_accepted(domain) == FALSE) {
-                        LG_log(au_context, LG_DEBUG, "rdns_modification: ds not accepted");
-                        RT_rdns_ds_not_accepted(info->ctx);
-                        au_check_result = AU_UNAUTHORISED_CONT;
-                    } else {
-                        /* call delcheck */
-                        au_check_result = rdns_dnscheck(info, domain, nservers, ds_rdata);
+                    /* find ds-rdata records */
+                    ds_rdata = rpsl_object_get_attr(info->obj, "ds-rdata");
+
+                    if (ds_rdata == NULL) {
+                        LG_log(au_context, LG_DEBUG, "object contains no ds-rdata");
                     }
 
-                    rpsl_attr_delete_list(ds_rdata);
-
-                    if (au_check_result != AU_AUTHORISED) {
-                        ret_val = au_check_result;
-                    }
+                    /* call delcheck */
+                    ret_val = rdns_dnscheck(info, domain, nservers, ds_rdata);
                 }
             }
-            rpsl_attr_delete_list(nservers);
         } else {
             LG_log(au_context, LG_DEBUG, "rdns_modification: not the right RIR");
             ret_val = AU_UNAUTHORISED_CONT;
@@ -170,14 +160,15 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info) {
     }
 
     /* override */
+    rdns_ret_val = ret_val;
     au_override(&ret_val, &override, info);
-    RT_rdns_auth_result(info->ctx, (ret_val == AU_AUTHORISED), override);
+    RT_rdns_auth_result(info->ctx, (rdns_ret_val == AU_AUTHORISED), override);
 
     LG_log(au_context, LG_FUNC, "<rdns_modification: exiting with value [%s]", AU_ret2str(ret_val));
 
-    if (domain != NULL ) {
-        free(domain);
-    }
+    if (domain) free(domain);
+    if (ds_rdata) rpsl_attr_delete_list(ds_rdata);
+    if (nservers) rpsl_attr_delete_list(nservers);
     return ret_val;
 }
 
@@ -265,13 +256,12 @@ static AU_ret_t ns_hierarchical_creation(au_plugin_callback_info_t * info, gchar
  * Creation of a reverse dns object
  */
 AU_ret_t rdns_creation(au_plugin_callback_info_t * info) {
-    AU_ret_t ret_val = AU_AUTHORISED; /* return value of this function */
-    AU_ret_t rdns_ret_val = AU_AUTHORISED; /* saved rdns return value of this function */
+    AU_ret_t ret_val;
+    AU_ret_t rdns_ret_val;
     gchar *domain = NULL;
     gchar *source = NULL;
     GList *nservers = NULL;
     GList *ds_rdata = NULL;
-    AU_ret_t au_check_result; /* result returned from functions */
     GList *source_attrs; /* used to retrieve source attribute */
     gboolean override;
 
@@ -279,9 +269,6 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info) {
 
     /* Extract the domain name */
     domain = rpsl_object_get_key_value(info->obj);
-
-    /* find the configuration file for delcheck */
-    LG_log(au_context, LG_DEBUG, "rdns_creation: find the delcheck configuration");
 
     /* Extract the source attribute */
     source_attrs = rpsl_object_get_attr(info->obj, "source");
@@ -297,57 +284,41 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info) {
         if (nservers == NULL ) { /* we don't accept domains with no nservers */
             LG_log(au_context, LG_DEBUG, "object contains no nservers");
             RT_rdns_nonservers(info->ctx);
-            au_check_result = AU_UNAUTHORISED_CONT;
+            ret_val = AU_UNAUTHORISED_CONT;
             nservers = NULL;
         } else {
-            /* find ds-rdata records */
-            LG_log(au_context, LG_DEBUG, "rdns_creation: checking DS rdata records");
-            ds_rdata = rpsl_object_get_attr(info->obj, "ds-rdata");
-
-            if (ds_rdata == NULL ) {
-                LG_log(au_context, LG_DEBUG, "object contains no ds-rdata");
-                au_check_result = AU_AUTHORISED;
-                ds_rdata = NULL;
-            } else {
-                /* Check if we're the related party, fail if not */
-                LG_log(au_context, LG_DEBUG, "rdns_creation: checking the RIR");
-                au_check_result = ns_find_rir(info, domain);
-                if (au_check_result != AU_AUTHORISED) {
-                    ret_val = au_check_result;
+            /* Check if we're the related party, fail if not */
+            LG_log(au_context, LG_DEBUG, "rdns_creation: checking the RIR");
+            ret_val = ns_find_rir(info, domain);
+            if (ret_val == AU_AUTHORISED) {
+                if (ns_is_e164_arpa(info)) {
+                    /* Check flat authorization */
+                    LG_log(au_context, LG_DEBUG, "rdns_creation: check the e164 flat authorisation");
+                    ret_val = ns_flat_creation(info, domain, source);
                 } else {
+                    /* Check hierarchical authorization */
+                    LG_log(au_context, LG_DEBUG, "rdns_creation: check hierarchical authorisation");
+                    ret_val = ns_hierarchical_creation(info, domain, source);
+                }
 
-                    if (ns_is_e164_arpa(info)) {
-                        /* Check flat authorization */
-                        LG_log(au_context, LG_DEBUG, "rdns_creation: check the e164 flat authorisation");
-                        au_check_result = ns_flat_creation(info, domain, source);
+                if (ret_val == AU_AUTHORISED) {
+                    if (ns_ds_accepted(domain) == FALSE) {
+                        LG_log(au_context, LG_DEBUG, "rdns_creation: ds not accepted");
+                        RT_rdns_ds_not_accepted(info->ctx);
+                        ret_val = AU_UNAUTHORISED_CONT;
                     } else {
-                        /* Check hierarchical authorization */
-                        LG_log(au_context, LG_DEBUG, "rdns_creation: check hierarchical authorisation");
-                        au_check_result = ns_hierarchical_creation(info, domain, source);
-                    }
-                    if (au_check_result != AU_AUTHORISED) {
-                        ret_val = au_check_result;
+                        /* find ds-rdata records */
+                        ds_rdata = rpsl_object_get_attr(info->obj, "ds-rdata");
 
-                    } else {
-
-                        if (ns_ds_accepted(domain) == FALSE) {
-                            LG_log(au_context, LG_DEBUG, "rdns_creation: ds not accepted");
-                            RT_rdns_ds_not_accepted(info->ctx);
-                            au_check_result = AU_UNAUTHORISED_CONT;
-                        } else {
-                            /* call delcheck */
-                            LG_log(au_context, LG_DEBUG, "rdns_creation: calling dnschecker");
-                            au_check_result = rdns_dnscheck(info, domain, nservers, ds_rdata);
+                        if (ds_rdata == NULL ) {
+                            LG_log(au_context, LG_DEBUG, "object contains no ds-rdata");
                         }
 
-                        if (au_check_result != AU_AUTHORISED) {
-                            ret_val = au_check_result;
-                        }
+                        /* call delcheck */
+                        ret_val = rdns_dnscheck(info, domain, nservers, ds_rdata);
                     }
                 }
-                rpsl_attr_delete_list(ds_rdata);
             }
-            rpsl_attr_delete_list(nservers);
         }
 
         /* override */
@@ -356,16 +327,15 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info) {
         RT_rdns_auth_result(info->ctx, (rdns_ret_val == AU_AUTHORISED), override);
 
         /* cleanup */
-        if (source != NULL ) {
-            free(source);
-        }
-        if (domain != NULL ) {
-            free(domain);
-        }
+        if (source) free(source);
+        if (domain) free(domain);
         rpsl_attr_delete_list(source_attrs);
-        LG_log(au_context, LG_FUNC, "<rdns_creation: exiting with value [%s]", AU_ret2str(ret_val));
-        return ret_val;
+        if (ds_rdata) rpsl_attr_delete_list(ds_rdata);
+        if (nservers) rpsl_attr_delete_list(nservers);
     }
+
+    LG_log(au_context, LG_FUNC, "<rdns_creation: exiting with value [%s]", AU_ret2str(ret_val));
+    return ret_val;
 }
 
 /*

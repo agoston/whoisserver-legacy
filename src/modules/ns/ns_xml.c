@@ -17,8 +17,8 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
     GList *p;
     char process_id[256];
     int timeleft = 300;
-    long long int id, end;
-    long count_critical, count_error;
+    long long int id = -1, end = -1;
+    long count_critical = -1, count_error = -1;
     AU_ret_t retval = AU_AUTHORISED;
 
     LG_log(au_context, LG_FUNC, ">rdns_dnscheck(%s): entered", domain);
@@ -98,6 +98,8 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
         }
 
         if ((row = SQ_row_next(sql_result)) != NULL) {
+            LG_log(au_context, LG_FUNC, "id:[%s] end:[%s] crit:[%s] err:[%s]", SQ_get_column_string_nocopy(sql_result, row, 0), SQ_get_column_string_nocopy(sql_result, row, 1),
+                    SQ_get_column_string_nocopy(sql_result, row, 2), SQ_get_column_string_nocopy(sql_result, row, 3));
             if (!SQ_get_column_llint(sql_result, row, 0, &id) && !SQ_get_column_llint(sql_result, row, 1, &end)
                     && !SQ_get_column_int(sql_result, row, 2, &count_critical) && !SQ_get_column_int(sql_result, row, 3, &count_error)) {
                 if (end > 0) {
@@ -114,7 +116,7 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
     }
 
     if (timeleft <= 0) {
-        LG_log(au_context, LG_FATAL, "Timeout. id: %lld, end: %lld, count_critical: %ld, count_error: %ld", id, end, count_critical, count_error);
+        LG_log(au_context, LG_FATAL, "rdns_dnscheck: timeout; id: %lld, end: %lld, count_critical: %ld, count_error: %ld", id, end, count_critical, count_error);
         retval = AU_UNAUTHORISED_END;
         goto rdns_dnscheck_bail;
     }
@@ -123,7 +125,7 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
     if (count_critical > 0 || count_error > 0) {
         report = g_string_new("");
 
-        g_string_printf(sql, "SELECT level,formatstring,arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9 FROM (SELECT * FROM results WHERE test_id=%lld AND level IN ('ERROR','CRITICAL')) AS tmp LEFT JOIN messages ON tmp.message = messages.tag ORDER BY tmp.id ASC", id);
+        g_string_printf(sql, "SELECT level,formatstring,arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9 FROM (SELECT * FROM results WHERE test_id=%lld AND level IN ('ERROR','CRITICAL', 'WARNING')) AS tmp LEFT JOIN messages ON tmp.message = messages.tag ORDER BY tmp.id ASC", id);
         LG_log(au_context, LG_FUNC, "rdns_dnscheck: executing query %s", sql->str);
 
         if (SQ_execute_query(conn, sql->str, &sql_result) < 0) {
@@ -152,6 +154,9 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
                 RT_rdns_delcheckwarning(info->ctx, warning_str);
                 LG_log(au_context, LG_FUNC, "rdns_dnscheck: got: %s", report->str);
                 LG_log(au_context, LG_FUNC, "rdns_dnscheck: sent to RT: %s", warning_str);
+                if (!strncmp(level, "WARNING", 7)) {
+                    retval = AU_UNAUTHORISED_END;
+                }
             } else {
                 LG_log(au_context, LG_FUNC, "rdns_dnscheck: invalid entry in results table: column 'level' or 'formatstring' is NULL");
             }
