@@ -8,7 +8,7 @@
 #
 # RESULT 11: creation will pass
 
-domain:       0.0.193.in-addr.arpa
+domain:       0.1.193.in-addr.arpa
 descr:        Test
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
