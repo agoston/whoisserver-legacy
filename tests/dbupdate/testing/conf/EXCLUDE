@@ -14,7 +14,7 @@ basic-auth/route-ip/015
 
 # enable only when pushing to master - *VERY* slow because of timeouts
 # (will get rid of the whole RDNS part of whois as DNSProv is to be introduced)
-rdns/
+#rdns/
 
 # disabled because we don't have DNS servers with SOA records so we can't really test delcheck
-rdns/050
+#rdns/050
