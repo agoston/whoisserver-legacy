@@ -8,6 +8,6 @@
 #include "rip.h"
 #include "au_plugins.h"
 
-AU_ret_t ns_domain_dnscheck(au_plugin_callback_info_t * info, gchar * domain, GList *nservers, GList *ds_rdata);
+AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *nservers, GList *ds_rdata);
 
 #endif

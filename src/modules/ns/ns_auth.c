@@ -152,7 +152,7 @@ AU_ret_t rdns_modification(au_plugin_callback_info_t * info) {
                         au_check_result = AU_UNAUTHORISED_CONT;
                     } else {
                         /* call delcheck */
-                        au_check_result = ns_domain_dnscheck(info, domain, nservers, ds_rdata);
+                        au_check_result = rdns_dnscheck(info, domain, nservers, ds_rdata);
                     }
 
                     rpsl_attr_delete_list(ds_rdata);
@@ -336,8 +336,8 @@ AU_ret_t rdns_creation(au_plugin_callback_info_t * info) {
                             au_check_result = AU_UNAUTHORISED_CONT;
                         } else {
                             /* call delcheck */
-                            LG_log(au_context, LG_DEBUG, "rdns_creation: calling delchecker");
-                            au_check_result = ns_domain_dnscheck(info, domain, nservers, ds_rdata);
+                            LG_log(au_context, LG_DEBUG, "rdns_creation: calling dnschecker");
+                            au_check_result = rdns_dnscheck(info, domain, nservers, ds_rdata);
                         }
 
                         if (au_check_result != AU_AUTHORISED) {

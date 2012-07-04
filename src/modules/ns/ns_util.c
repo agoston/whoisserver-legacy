@@ -55,14 +55,13 @@ gchar *ns_par(gchar * str) {
 
     /* remove repeating whitespace */
     p = result;
-    while ((*p != 0) && ((*(p + 1)) != 0) && (p != NULL )
-    && ((p + 1) != NULL)){
-    while ((isspace((int) *p) && (isspace((int) *(p + 1))))) {
-        sprintf(p, p + 1);
-        *p = ' ';
+    while ((*p != 0) && ((*(p + 1)) != 0) && (p != NULL )&& ((p + 1) != NULL)) {
+        while ((isspace((int) *p) && (isspace((int) *(p + 1))))) {
+            sprintf(p, p + 1);
+            *p = ' ';
+        }
+        p++;
     }
-    p++;
-}
 
     /* place linefeeds */
     p = result;
@@ -88,19 +87,19 @@ gchar *ns_par(gchar * str) {
     resultp = g_new0(gchar, strlen(result) + nl_cnt * 20 + 1);
     p = result;
     pp = strchr(result, '\n');
-    while ((pp != NULL )&& (result != NULL) && (*result != 0)){
-    *pp = 0;
-    strcat(resultp, result);
-    strcat(resultp, "\n            "); /* 13 spaces is the indentation */
-    result = pp + 1;
-    pp = strchr(result, '\n');
-}
+
+    while ((pp != NULL )&& (result != NULL) && (*result != 0)) {
+        *pp = 0;
+        strcat(resultp, result);
+        strcat(resultp, "\n            "); /* 13 spaces is the indentation */
+        result = pp + 1;
+        pp = strchr(result, '\n');
+    }
     strcat(resultp, result);
     g_free(p);
 
     return (resultp);
 }
-
 
 /*
  * checks whether the suffix is rdns related
