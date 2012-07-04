@@ -97,7 +97,7 @@
 
 <xsl:template match="RDNSdelcheckwarning">
 
-***RDNS:    <xsl:apply-templates/>
+***RDNS: <xsl:apply-templates/>
 
 </xsl:template>
 

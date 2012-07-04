@@ -91,7 +91,7 @@ gchar *ns_par(gchar * str) {
     while ((pp != NULL )&& (result != NULL) && (*result != 0)) {
         *pp = 0;
         strcat(resultp, result);
-        strcat(resultp, "\n            "); /* 13 spaces is the indentation */
+        strcat(resultp, "\n         "); /* 13 spaces is the indentation */
         result = pp + 1;
         pp = strchr(result, '\n');
     }
