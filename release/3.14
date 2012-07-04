@@ -1,0 +1,14 @@
+20120704 - version 3.14
+
+
+Changes:
+- switched from delcheck to dnscheck
+- lots of minor bugfixes
+
+
+Merged:
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG

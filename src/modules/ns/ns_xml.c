@@ -151,7 +151,7 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
                 warning_str = ns_par(report->str);
                 RT_rdns_delcheckwarning(info->ctx, warning_str);
                 LG_log(au_context, LG_FUNC, "rdns_dnscheck: got: %s", report->str);
-                lg_log(au_context, LG_FUNC, "rdns_dnscheck: sent to RT: %s", warning_str);
+                LG_log(au_context, LG_FUNC, "rdns_dnscheck: sent to RT: %s", warning_str);
             } else {
                 LG_log(au_context, LG_FUNC, "rdns_dnscheck: invalid entry in results table: column 'level' or 'formatstring' is NULL");
             }
