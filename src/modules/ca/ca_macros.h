@@ -488,14 +488,8 @@
 #define ca_get_ns_suffix      ca_get_string(CA_NS_SUFFIX)
 #define ca_set_ns_suffix      ca_set_string(CA_NS_SUFFIX)
 
-#define ca_get_ns_delcheckconf      ca_get_string(CA_NS_DELCHECKCONF)
-#define ca_set_ns_delcheckconf      ca_set_string(CA_NS_DELCHECKCONF)
-
 #define ca_get_ns_delegationsfile	ca_get_dirlist(CA_NS_DELEGATIONSFILE)
 #define ca_set_ns_delegationsfile	ca_set_dirlist(CA_NS_DELEGATIONSFILE)
-
-#define ca_get_ns_severity	ca_get_int(CA_NS_SEVERITY)
-#define ca_set_ns_severity	ca_set_int(CA_NS_SEVERITY)
 
 #define ca_get_command_on_die	ca_get_string(CA_COMMAND_ON_DIE)
 #define ca_set_command_on_die	ca_set_string(CA_COMMAND_ON_DIE)

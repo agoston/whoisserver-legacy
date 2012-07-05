@@ -7,8 +7,8 @@
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 
-/* reformats rdns message: wrap line between text columns 10 and 60,
- * adding 9 spaces at the beginning, and wrapping no later than at 60 chars.
+/* reformats rdns message: wrap line between text columns 10 and 70, inclusive,
+ * adding 9 spaces at the beginning, and wrapping no later than at 70 chars.
  */
 static void format_dnscheck_message(GString *in) {
     int i, last_space = -1, last_linebreak = 0;
@@ -17,10 +17,9 @@ static void format_dnscheck_message(GString *in) {
         if (in->str[i] == ' ') {
             last_space = i;
 
-        } else if (in->str[i] == '\n') {
-            i++;
-            g_string_insert(in, i, "         ");
-            i += 8;
+        } else if (in->str[i] == '\n') {    // indent if newline encountered in input
+            g_string_insert(in, i+1, "         ");
+            i += 9;
             last_linebreak = i;
 
         } else if (i - last_linebreak > 60 && last_space > last_linebreak) {  // time for newline
@@ -107,7 +106,7 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
         goto rdns_dnscheck_bail;
     }
 
-    // poll table results for 5 minutes
+    // poll table results every second for 5 minutes
     g_string_printf(sql, "SELECT id, end, count_critical, count_error FROM tests WHERE source_id=2 and source_data='%s'", process_id);
     LG_log(au_context, LG_FUNC, "rdns_dnscheck: executing query %s", sql->str);
 
