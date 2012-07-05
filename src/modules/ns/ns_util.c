@@ -39,67 +39,6 @@ static gchar *stristr(const gchar * haystack, const gchar * needle) {
     return (result);
 }
 
-/*
- * wraps the text, suitable for formatting
- */
-gchar *ns_par(gchar * str) {
-    gchar *result; /* resulting string */
-    gchar *p, *pp, *resultp; /* temporary iterators */
-    gchar *prevnl; /* pointer to last linefeed */
-    gint nl_cnt; /* count of line feeds */
-
-    result = g_strdup_printf("%s", str);
-
-    /* remove leading/trailing whitespace */
-    g_strstrip(result);
-
-    /* remove repeating whitespace */
-    p = result;
-    while ((*p != 0) && ((*(p + 1)) != 0) && (p != NULL )&& ((p + 1) != NULL)) {
-        while ((isspace((int) *p) && (isspace((int) *(p + 1))))) {
-            sprintf(p, p + 1);
-            *p = ' ';
-        }
-        p++;
-    }
-
-    /* place linefeeds */
-    p = result;
-    prevnl = p;
-    nl_cnt = 0;
-    while ((*p != 0) && (p != NULL )) {
-        if (*p == ' ') {
-            pp = strchr((p + 1), ' ');
-            if (pp == NULL ) {
-                pp = strchr(p + 1, 0);
-            }
-            if ((pp - prevnl) > 60) { /* 60 is the line width,
-             it doesn't need configurability now */
-                *p = '\n';
-                nl_cnt++;
-                prevnl = p + 1;
-            }
-        }
-        p++;
-    }
-
-    /* indent */
-    resultp = g_new0(gchar, strlen(result) + nl_cnt * 20 + 1);
-    p = result;
-    pp = strchr(result, '\n');
-
-    while ((pp != NULL )&& (result != NULL) && (*result != 0)) {
-        *pp = 0;
-        strcat(resultp, result);
-        strcat(resultp, "\n         "); /* 13 spaces is the indentation */
-        result = pp + 1;
-        pp = strchr(result, '\n');
-    }
-    strcat(resultp, result);
-    g_free(p);
-
-    return (resultp);
-}
 
 /*
  * checks whether the suffix is rdns related

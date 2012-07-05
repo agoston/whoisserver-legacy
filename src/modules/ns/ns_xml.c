@@ -7,7 +7,30 @@
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 
-xmlDocPtr xml_doc; /* constructed xml document */
+/* reformats rdns message: wrap line between text columns 10 and 60,
+ * adding 9 spaces at the beginning, and wrapping no later than at 60 chars.
+ */
+static void format_dnscheck_message(GString *in) {
+    int i, last_space = -1, last_linebreak = 0;
+
+    for (i = 0; i < in->len; i++) {
+        if (in->str[i] == ' ') {
+            last_space = i;
+
+        } else if (in->str[i] == '\n') {
+            i++;
+            g_string_insert(in, i, "         ");
+            i += 8;
+            last_linebreak = i;
+
+        } else if (i - last_linebreak > 60 && last_space > last_linebreak) {  // time for newline
+            g_string_insert(in, last_space, "\n        ");
+            i += 9;
+            last_linebreak = i;
+        }
+    }
+}
+
 
 AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *nservers, GList *ds_rdata) {
     SQ_connection_t *conn = NULL;
@@ -144,7 +167,6 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
             char *description = SQ_get_column_string_nocopy(sql_result, row, 2);
 
             if (level && formatstring) {
-                char *warning_str;
                 g_string_printf(report, "(related to %s) %s: ", domain, level);
                 g_string_append_printf(report, formatstring, SQ_get_column_string_nocopy(sql_result, row, 3),
                         SQ_get_column_string_nocopy(sql_result, row, 4),
@@ -158,9 +180,10 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
                     g_string_append_printf(report, "\n\n%s", description);
                 }
 
-                warning_str = ns_par(report->str);
-                RT_rdns_delcheckwarning(info->ctx, warning_str);
-                LG_log(au_context, LG_FUNC, "rdns_dnscheck: got: %s", report->str);
+                LG_log(au_context, LG_FUNC, "rdns_dnscheck: got from DB: %s", report->str);
+                format_dnscheck_message(report);
+                RT_rdns_delcheckwarning(info->ctx, report->str);
+                LG_log(au_context, LG_FUNC, "rdns_dnscheck: sent to RT: %s", report->str);
                 if (strncmp(level, "WARNING", 7)) {
                     retval = AU_UNAUTHORISED_CONT;
                 }
