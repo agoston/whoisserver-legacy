@@ -818,16 +818,10 @@ NS_RIR RIPE NCC
 # Delegations Listing
 NS_DELEGATIONSFILE @confdir@/delegations.txt
 
-# Threshold for errors from delchecker
-NS_SEVERITY 20
-
 # Related NS suffix list
 NS_SUFFIX .in-addr.arpa
 NS_SUFFIX .ip6.arpa
 NS_SUFFIX .e164.arpa
-
-# prefix for delchecker configurations
-NS_DELCHECKCONF @confdir@/delcheck-
 
 
 ###########
