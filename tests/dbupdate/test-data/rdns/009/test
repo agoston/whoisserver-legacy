@@ -1,5 +1,5 @@
 # rdns tests
-# CASE 9: Modification succeeds even though less specific object exists
+# CASE 9: Modification fails on 'ds records not allowed for this zone'
 #
 # modify domain object
 #
