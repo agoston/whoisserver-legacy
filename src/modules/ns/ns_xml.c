@@ -76,7 +76,7 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
         gchar *clean_val = rpsl_attr_get_clean_value(attr);
         gchar *pp;
 
-        LG_log(au_context, LG_FUNC, "rdns_dnscheck: nserver: %s", clean_val);
+        LG_log(au_context, LG_FUNC, "rdns_dnscheck: ds_rdata: %s", clean_val);
 
         g_string_append(glue, " ds:/");
         g_string_append(glue, domain);
@@ -89,7 +89,7 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
         free(clean_val);
     }
 
-    LG_log(au_context, LG_FUNC, "rdns_dnscheck: glue: %s", glue->str);
+    LG_log(au_context, LG_FUNC, "rdns_dnscheck: parent_glue: %s", glue->str);
 
     // generate process id
     snprintf(process_id, 256, "lgc-%ld-%d", time(NULL), getpid());
