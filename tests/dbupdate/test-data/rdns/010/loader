@@ -89,7 +89,7 @@ mnt-domains:  RIPE-NCC-HM-DOM-MNT
 changed:      dbtest@ripe.net 20020101
 source:       DB-TEST
 
-domain:       0.0.193.in-addr.arpa
+domain:       0.1.193.in-addr.arpa
 descr:        Test
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
