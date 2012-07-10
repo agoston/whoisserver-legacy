@@ -125,7 +125,7 @@ source:       DB-TEST
 
 % sample domain object that qualifies for delchecking
 
-domain:       0.0.193.in-addr.arpa
+domain:       0.1.193.in-addr.arpa
 descr:        Test2
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST

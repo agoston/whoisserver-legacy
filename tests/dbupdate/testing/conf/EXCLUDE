@@ -12,9 +12,42 @@ basic-auth/X509/016
 # See FogBugz #788 or test description
 basic-auth/route-ip/015
 
-# enable only when pushing to master - *VERY* slow because of timeouts
-# (will get rid of the whole RDNS part of whois as DNSProv is to be introduced)
-#rdns/
+# disabled because dnscheck accepts nserver: no-such-name.ripe.net
+rdns/010
+rdns/017
 
-# disabled because we don't have DNS servers with SOA records so we can't really test delcheck
-#rdns/050
+# disabled for the lack of resources to keep legacy test suite up-to-date
+# with dnscheck changes
+rdns/038
+rdns/039
+rdns/040
+rdns/041
+rdns/042
+rdns/043
+rdns/044
+rdns/045
+rdns/046
+rdns/047
+rdns/048
+rdns/049
+rdns/050
+rdns/051
+rdns/052
+rdns/053
+rdns/054
+rdns/055
+rdns/056
+rdns/057
+rdns/058
+rdns/059
+rdns/060
+rdns/061
+rdns/062
+rdns/063
+rdns/064
+rdns/065
+rdns/066
+rdns/067
+rdns/068
+rdns/069
+rdns/070

@@ -28856,8 +28856,8 @@ RIPE NCC|64.251.192.in-addr.arpa|1|0
 RIPE NCC|65.251.192.in-addr.arpa|1|0
 AFRINIC|202.251.192.in-addr.arpa|1|0
 RIPE NCC|226.251.192.in-addr.arpa|1|0
-RIPE NCC|0.193.in-addr.arpa|0|0
-RIPE NCC|1.193.in-addr.arpa|0|1
+RIPE NCC|0.193.in-addr.arpa|0|1
+RIPE NCC|1.193.in-addr.arpa|0|0
 RIPE NCC|2.193.in-addr.arpa|0|1
 RIPE NCC|3.193.in-addr.arpa|0|1
 RIPE NCC|4.193.in-addr.arpa|0|1

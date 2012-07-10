@@ -10,7 +10,7 @@
 #
 # RESULT 38: creation will pass
 
-domain:         0.a.2.ip6.arpa
+domain:         a.4.1.0.0.2.ip6.arpa
 descr:          European Regional Registry
 descr:          2a00::/12 block
 admin-c:        TP1-DB-TEST

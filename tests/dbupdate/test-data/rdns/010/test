@@ -7,7 +7,7 @@
 #
 # RESULT 10: modification will fail
 
-domain:       0.1.193.in-addr.arpa
+domain:       0.2.193.in-addr.arpa
 descr:        Test2222
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
