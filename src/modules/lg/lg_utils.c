@@ -92,13 +92,14 @@ void LG_dev_vasprintf(LG_device_t* dev, const char* message, va_list ap) {
 	char *buf;
 	int len;
 	long fd = (long)dev->data;
-	off_t currpos;
+	off_t lockpos;
 
 	len = vasprintf(&buf, message, ap);
-	currpos = lseek(fd, 0, SEEK_END);
+	lockpos = lseek(fd, 0, SEEK_END);
 	lockf(fd, F_LOCK, 0);
+	lseek(fd, 0, SEEK_END); // seek to actual end after we got the lock
 	write(fd, buf, len);
-	lseek(fd, currpos, SEEK_SET);
+	lseek(fd, lockpos, SEEK_SET);
 	lockf(fd, F_ULOCK, 0);
 	free(buf);
 }

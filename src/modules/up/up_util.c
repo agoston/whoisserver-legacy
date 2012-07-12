@@ -249,6 +249,9 @@ void UP_add_to_upd_log(RT_context_t *rt_ctx, LG_context_t *lg_ctx,
   }
   free(updlogfile);
 
+  /* grab lock */
+  lockf(fileno(log_file), F_LOCK, 0);
+
   /* get time */
   cur_time = time(NULL);
   time_str = strdup(ctime(&cur_time));
