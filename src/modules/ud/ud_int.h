@@ -180,8 +180,6 @@ int convert_as(const char *as, unsigned long *asnum);
 int convert_as_range(const char *as_range, unsigned long *begin, unsigned long *end);
 time_t convert_time(const char *asc_time);
 
-int UD_lock_serial(Transaction_t *tr);
-int UD_unlock_serial(Transaction_t *tr);
 long UD_create_serial(Transaction_t *tr);
 int UD_comrol_serial(Transaction_t *tr, int commit);
 

@@ -36,46 +36,6 @@
 /* logging (defined in ud_main.c) */
 extern LG_context_t *ud_context;
 
-/************************************************************
-* int UD_lock/unlock_serial()                               *
-*                                                           *
-* Performs lockind/unlocking of the relevant tables         *
-*                                                           *
-* Returns:                                                  *
-* 0 - success                                               *
-* Non-zero if error occured (XXX dies now)                  *
-*                                                           *
-************************************************************/
-/* FIXME: this is surplus locking, should be removed. With innodb,
- * there is no reason to lock those tables. Not even with myisam:
- * the auto_increment pkey would take care of this.
- * On the other hand, it kills any sort of parallelism, which we aim for.
- * agoston, 2008-02-06 */
-int UD_lock_serial(Transaction_t *tr)
-{
-int sql_err;
-
-/* lock all tables we are going to update and commit */
-/* this also includes transaction_rec table, as we update the status */
-   sql_err=SQ_execute_query(tr->sql_connection, "LOCK TABLES serials WRITE, failed_transaction WRITE, transaction_rec WRITE ", NULL);
-   if (sql_err) {
-	LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), "LOCK TABLES serials WRITE, failed_transaction WRITE, transaction_rec WRITE ");
-        die;
-    }
- return(sql_err);
-}
-
-int UD_unlock_serial(Transaction_t *tr)
-{
-int sql_err;
-
-   sql_err=SQ_execute_query(tr->sql_connection, "UNLOCK TABLES ", NULL);
-   if (sql_err) {
-	LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), "UNLOCK TABLES");
-        die;
-    }
- return(sql_err);
-}
 
 /************************************************************
  * UD_create_serial()                                        *

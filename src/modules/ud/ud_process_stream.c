@@ -537,12 +537,10 @@ static int process_nrtm(UD_stream_t *ud_stream, Transaction_t *tr, int operation
                 tr->sequence_id++;
             }
         }
-        UD_lock_serial(tr);
         UD_create_serial(tr);
         CP_CREATE_S_PASSED(tr->action);
         TR_update_status(tr);
         UD_commit_serial(tr);
-        UD_unlock_serial(tr);
         /* Mark the TR as clean */
         TR_mark_clean(tr);
         TR_delete_record(tr);
@@ -666,12 +664,10 @@ static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int oper
 				tr->action = TA_CREATE;
 				tr->sequence_id++;
 			}
-			UD_lock_serial(tr);
 			UD_create_serial(tr);
 			CP_CREATE_S_PASSED(tr->action);
 			TR_update_status(tr);
 			UD_commit_serial(tr);
-			UD_unlock_serial(tr);
 			/* Mark the TR as clean */
 			TR_mark_clean(tr);
 		}
@@ -815,12 +811,10 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
 						tr->action=TA_DELETE;
 					else
 						tr->action=TA_CREATE;
-					UD_lock_serial(tr);
 					serial_id = UD_create_serial(tr);
 					CP_CREATE_S_PASSED(tr->action);
 					TR_update_status(tr);
 					UD_commit_serial(tr);
-					UD_unlock_serial(tr);
 					/* Mark TR as clean */
 					TR_mark_clean(tr);
 					/* log the transaction */
@@ -859,12 +853,10 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
 						tr->action=TA_DELETE;
 					else
 						tr->action=TA_CREATE;
-					UD_lock_serial(tr);
 					serial_id = UD_create_serial(tr);
 					CP_CREATE_S_PASSED(tr->action);
 					TR_update_status(tr);
 					UD_commit_serial(tr);
-					UD_unlock_serial(tr);
 					/* Mark TR as clean */
 					TR_mark_clean(tr);
 					/* log the transaction */
@@ -902,12 +894,10 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
 						tr->action=TA_DELETE;
 					else
 						tr->action=TA_CREATE;
-					UD_lock_serial(tr);
 					serial_id = UD_create_serial(tr);
 					CP_CREATE_S_PASSED(tr->action);
 					TR_update_status(tr);
 					UD_commit_serial(tr);
-					UD_unlock_serial(tr);
 					/* Mark TR as clean */
 					TR_mark_clean(tr);
 					/* log the transaction */
