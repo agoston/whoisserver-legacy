@@ -84,7 +84,7 @@ gchar *SQ_row_to_string(SQ_result_set_t *result, SQ_row_t *row);
 char *SQ_result_to_string(SQ_result_set_t *result);
 void SQ_free_result(SQ_result_set_t *result);
 void SQ_rollback(SQ_connection_t *sql_connection);
-void SQ_commit(SQ_connection_t *sql_connection);
+int SQ_commit(SQ_connection_t *sql_connection);
 void SQ_close_connection(SQ_connection_t *sql_connection);
 
 /* report number of rows */

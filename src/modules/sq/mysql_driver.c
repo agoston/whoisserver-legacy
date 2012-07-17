@@ -748,14 +748,21 @@ void SQ_free_result(SQ_result_set_t *result) {
   +html+ </UL></DL>
 
   ++++++++++++++++++++++++++++++++++++++*/
-void SQ_commit(SQ_connection_t *sql_connection) {
+int SQ_commit(SQ_connection_t *sql_connection) {
+    int retval;
+
 #ifdef DEBUG_SQL
     fprintf(stderr, "SQL: SQ_commit(%ld)\n", mysql_thread_id(sql_connection));
 #endif
-    if (mysql_commit(sql_connection)) {
+
+    retval = mysql_commit(sql_connection)
+
+    if (retval) {
         LG_log(sq_context, LG_SEVERE, "SQ_commit: %d: %s", SQ_errno(sql_connection), SQ_error(sql_connection));
         fprintf(stderr, "SQ_commit: %d: %s", SQ_errno(sql_connection), SQ_error(sql_connection));
     }
+
+    return retval;
 }
 
 void SQ_rollback(SQ_connection_t *sql_connection) {

@@ -677,9 +677,14 @@ static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int oper
 		}
 	}
 
-	/* Make a report. U stands for update stream. No reason */
+    if (SQ_commit(tr->sql_connection) != SQ_OK) {
+        tr->succeeded = 0;
+        tr->error |= ERROR_U_BUG;
+        reason = "U:COMMIT ERROR";
+    }
+
+    /* Make a report. U stands for update stream. No reason */
 	result = report_transaction(tr, tr->transaction_id, log_ptr, &sotime, reason);
-	SQ_commit(tr->sql_connection);
 
 	/* Free resources */
 	/*    rpsl_object_delete(tr->object); */
