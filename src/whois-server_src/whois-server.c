@@ -109,7 +109,6 @@ static LG_context_t* sv_prepare_context(gchar* file, gchar* module) {
 
 static void sv_init_modules(void) {
     PL_init();
-    SQ_init(sv_prepare_context(ca_get_sqlog, "SQ"));
     AC_init(sv_prepare_context(ca_get_ripaudit, "AC"));
     PC_init(sv_prepare_context(ca_get_ripmirlog, "PC"));
     PM_init(sv_prepare_context(ca_get_ripmirlog, "PM"));
@@ -119,6 +118,7 @@ static void sv_init_modules(void) {
     RP_init(sv_prepare_context(ca_get_allriperr, "RP"));
     RX_init(sv_prepare_context(ca_get_allriperr, "RX"));
     SK_init(sv_prepare_context(ca_get_allriperr, "SK"));
+    SQ_init(sv_prepare_context(ca_get_sqlog, "SQ"));
     SV_init(sv_prepare_context(ca_get_ripsvrlog, "SV"));
     UD_init(sv_prepare_context(ca_get_ripupdlog, "UD"));
 }
