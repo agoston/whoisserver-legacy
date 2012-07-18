@@ -68,3 +68,5 @@ DELETE FROM `transaction_rec`;
 DELETE FROM `upd_to`;
 DELETE FROM `x509`;
 DELETE FROM `zone_c`;
+DELETE FROM `update_lock`;
+

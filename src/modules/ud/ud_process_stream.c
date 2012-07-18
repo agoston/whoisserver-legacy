@@ -742,7 +742,7 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
 	UT_timeget(&sotime);
 
     /* acquire global update lock */
-    if (SQ_execute_query(tr->sql_connection, "SELECT global_lock FROM update_lock WHERE update_lock = 0 FOR UPDATE", (SQ_result_set_t **) NULL)) {
+    if (SQ_execute_query(tr->sql_connection, "SELECT global_lock FROM update_lock WHERE global_lock = 0 FOR UPDATE", (SQ_result_set_t **) NULL)) {
         LG_log(ud_context, LG_ERROR, "ERROR %d: %s\n", SQ_errno(tr->sql_connection), SQ_error(tr->sql_connection));
         tr->succeeded = 0;
         tr->error |= ERROR_U_DBS;
