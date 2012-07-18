@@ -757,7 +757,7 @@ int SQ_commit(SQ_connection_t *sql_connection) {
     fprintf(stderr, "SQL: SQ_commit(%ld)\n", mysql_thread_id(sql_connection));
 #endif
 
-    retval = mysql_commit(sql_connection)
+    retval = mysql_commit(sql_connection);
 
     if (retval) {
         LG_log(sq_context, LG_SEVERE, "SQ_commit: %d: %s", SQ_errno(sql_connection), SQ_error(sql_connection));
