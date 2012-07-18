@@ -713,11 +713,6 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
 	ut_timer_t sotime;
 	long serial_id;
 
-    /* acquire global update lock */
-    if (SQ_execute_query(tr->sql_connection, "SELECT global_lock FROM update_lock WHERE update_lock = 0 FOR UPDATE", (SQ_result_set_t **) NULL)) {
-        LG_log(ud_context, LG_ERROR, "ERROR %d: %s\n", SQ_errno(tr->sql_connection), SQ_error(tr->sql_connection));
-    }
-
 	/* check if the requested transaction has already been processed */
 	/* this may happen in case of crash. If so, just send an ack and return */
 	if (TR_check(ud_stream->db_connection, transaction_id, (ud_stream->condat).sock, src_ctx))
@@ -745,6 +740,16 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
 	tr->x509_commit = 0;
 
 	UT_timeget(&sotime);
+
+    /* acquire global update lock */
+    if (SQ_execute_query(tr->sql_connection, "SELECT global_lock FROM update_lock WHERE update_lock = 0 FOR UPDATE", (SQ_result_set_t **) NULL)) {
+        LG_log(ud_context, LG_ERROR, "ERROR %d: %s\n", SQ_errno(tr->sql_connection), SQ_error(tr->sql_connection));
+        tr->succeeded = 0;
+        tr->error |= ERROR_U_DBS;
+        g_string_sprintfa(tr->error_script, "E[%d]: SQL ERROR: %d: %s\n", ERROR_U_DBS, SQ_errno(tr->sql_connection), SQ_error(tr->sql_connection));
+        UD_ack(tr);
+        return -1;
+    }
 
 	/* check for syntax errors (with whois_rip syntax set) */
 	if ((rpsl_err_list = rpsl_object_errors(submitted_object)) != NULL) {
