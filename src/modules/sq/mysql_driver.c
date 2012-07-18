@@ -99,7 +99,7 @@ int SQ_try_connection(SQ_connection_t **conn, const char *host, unsigned int por
         fprintf(stderr, "mysql_options failed: unknown option MYSQL_READ_DEFAULT_GROUP: %s\n", mysql_error(*conn));
         die;
     }
-    if (mysql_options(*conn, MYSQL_INIT_COMMAND, "SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE; SET autocommit=0;")) {
+    if (mysql_options(*conn, MYSQL_INIT_COMMAND, "SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;")) {
         fprintf(stderr, "mysql_options failed: unknown option MYSQL_INIT_COMMAND: %s\n", mysql_error(*conn));
         die;
     }
@@ -169,6 +169,8 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
 
         /* on success, return our result */
         if (NOERR(res)) {
+            /* disable autocommit */
+            mysql_autocommit(sql_connection, 0);
             return sql_connection;
         } else {
 
