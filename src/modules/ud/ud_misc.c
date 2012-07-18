@@ -95,28 +95,29 @@ transaction_new (SQ_connection_t *sql_connection, C_Type_t class_type, LG_contex
 * 0  - OK
 * -1 - 
 ************************************************************/
-int UD_ack(Transaction_t* tr)
-{
-GString *g_buff;
-int res, error;
- 
- /* if we are not in update/server mode - no ack is needed - just return */
- if(IS_STANDALONE(tr->mode)) return(0);
- if(!IS_UPDATE(tr->mode)) return(0);
- 
- g_buff = g_string_sized_new(STR_L);
+int UD_ack(Transaction_t* tr) {
+    GString *g_buff;
+    int res, error;
 
- if(tr->succeeded==0) { /* update failed */
-   error = tr->error;
- }
- else error = 0;
+    /* if we are not in update/server mode - no ack is needed - just return */
+    if (IS_STANDALONE(tr->mode))
+        return (0);
+    if (!IS_UPDATE(tr->mode))
+        return (0);
 
- g_string_sprintf(g_buff, "%%ERROR %d\n%s\n", error, (tr->error_script)->str);
- res = SK_puts(tr->socket, g_buff->str, NULL);
- g_string_free(g_buff, TRUE);
- /* close the connection */
-/* Let DBupdate close the connection */
-/* close(tr->socket); */
- return(res);		
+    g_buff = g_string_sized_new(STR_L);
+
+    if (tr->succeeded == 0) { /* update failed */
+        error = tr->error;
+    } else
+        error = 0;
+
+    g_string_sprintf(g_buff, "%%ERROR %d\n%s\n", error, (tr->error_script)->str);
+    res = SK_puts(tr->socket, g_buff->str, NULL );
+    g_string_free(g_buff, TRUE);
+    /* close the connection */
+    /* Let DBupdate close the connection */
+    /* close(tr->socket); */
+    return (res);
 }
 
