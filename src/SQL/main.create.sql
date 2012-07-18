@@ -677,8 +677,8 @@ CREATE TABLE `zone_c` (
   KEY `object_type` (`object_type`),
   KEY `object_id` (`object_id`)
 );
+DROP TABLE IF EXISTS `update_lock`;
 CREATE TABLE `update_lock` (
   `global_lock` int(11) NOT NULL,
   PRIMARY KEY (`global_lock`)
 );
-

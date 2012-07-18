@@ -274,7 +274,7 @@ void *UD_do_nrtm(void *arg) {
 
 			/* Check connection to the database and try to reconnect */
 			if (SQ_ping(&ud_stream.db_connection)) {
-				LG_log(src_ctx, LG_DEBUG, "%s connection to SQL server timed out - reistablishing", UD_TAG);
+				LG_log(src_ctx, LG_DEBUG, "%s connection to SQL server timed out - reestablishing", UD_TAG);
 			}
 
 			/* get current serial */

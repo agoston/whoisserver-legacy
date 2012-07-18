@@ -28,4 +28,3 @@ INSERT INTO object_order VALUES (11,120); # role
 INSERT INTO object_order VALUES (10,121); # person
 
 INSERT INTO update_lock VALUES (0);
-

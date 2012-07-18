@@ -46,11 +46,14 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
     LG_log(au_context, LG_FUNC, ">rdns_dnscheck(%s): entered", domain);
 
     // get SQL connection
-    if (SQ_try_connection(&conn, "dnscheck.ripe.net", 3306, "dnscheck", "whois", "njt53ntu53f8") != SQ_OK) {
+    if ((conn = SQ_get_connection("dnscheck.ripe.net", 3306, "dnscheck", "whois", "njt53ntu53f8")) != SQ_OK) {
         LG_log(au_context, LG_FATAL, "Failed to connect to dnscheck backend: %d: %s", SQ_errno(conn), SQ_error(conn));
         retval = AU_UNAUTHORISED_CONT;
         goto rdns_dnscheck_bail;
     }
+
+    // enable autocommit
+    mysql_autocommit(conn, 1);
 
     glue = g_string_new("");
 
