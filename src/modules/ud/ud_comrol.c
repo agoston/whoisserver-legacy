@@ -79,78 +79,6 @@ void _collect_tables(gpointer key, gpointer value, gpointer table_list) {
 }
 
 /************************************************************
- * char *ud_build_lock_query()                               *
- *                                                           *
- * Expects a Transaction_t and assembles a query which locks *
- * the affected tables.  It takes the table names from       *
- * the definition in ud_comrol.h.                            *
- *                                                           *
- * The second argument, common_tables is optional.  If it's  *
- * not null, the tables listed there will also be included   *
- * in the LOCK TABLES statement.                             *
- *                                                           *
- * The query will be build up inside the Transaction_t,      *
- * tr->query.                                                *
- *                                                           *
- * Returns 1 if there was a problem, 0 if successful. Doesn't*
- * do much error checking.                                   *
- *                                                           *
- ************************************************************/
-
-int ud_build_lock_query(Transaction_t *tr, char **common_tables) {
-
-    int i;
-    GSList *lock_tables;
-    GSList *cur_table;
-    GHashTable *tables_unique;
-
-    /* Initialize hash -- this will be used to drop duplicate table names */
-    tables_unique = g_hash_table_new(g_str_hash, g_str_equal);
-
-    /* The base table for this class should always be locked */
-    g_hash_table_insert(tables_unique, DF_get_class_sql_table(tr->class_type), (gpointer) 1);
-
-    /* If we got extra tables to be locked, put them on the list */
-    if (common_tables != NULL) {
-        for (i = 0; common_tables[i] != NULL; i++)
-            g_hash_table_insert(tables_unique, common_tables[i], (gpointer) 1);
-    }
-
-    /* Add tables defined in .../include/UD_comrol.def */
-    for (i = 0; tables[tr->class_type][i] != NULL && i < TAB_START; i++)
-        g_hash_table_insert(tables_unique, tables[tr->class_type][i], (gpointer) 1);
-
-    for (i = TAB_START; tables[tr->class_type][i] != NULL; i++)
-        g_hash_table_insert(tables_unique, tables[tr->class_type][i], (gpointer) 1);
-
-    /* No tables to lock -> nothing to do.
-     * Should this be an error condition?  I'm not sure. */
-    if (!g_hash_table_size(tables_unique))
-        return 1;
-
-    /* Initialize a linked list which we're going to traverse when actually
-     get to build up the query */
-    lock_tables = NULL;
-
-    /* Copy all table names from the hash to this list */
-    g_hash_table_foreach(tables_unique, _collect_tables, &lock_tables);
-
-    /* Start building the query */
-    g_string_sprintf(tr->query, "LOCK TABLES %s WRITE", (char*) (lock_tables->data));
-
-    /* Add all tables on our list to the query */
-    for (cur_table = g_slist_next(lock_tables); cur_table != NULL; cur_table = g_slist_next(cur_table)) {
-        g_string_sprintfa(tr->query, ", %s WRITE", (char *) cur_table->data);
-    }
-
-    /* free the temp list and hash */
-    g_slist_free(lock_tables);
-    g_hash_table_destroy(tables_unique);
-
-    return (0);
-}
-
-/************************************************************
  * int UD_rollback()                                         *
  *                                                           *
  * Rolls back the transaction                                *
@@ -165,29 +93,12 @@ int ud_build_lock_query(Transaction_t *tr, char **common_tables) {
 int UD_rollback(Transaction_t *tr) {
     int i, j;
     int sql_err;
-    int transaction_support;
 
     /* tables we'll have to LOCK regardless of object class */
     char *common_tables[] = { "last", "history", NULL };
 
     if (ACT_DELETE(tr->action))
         return (0);
-
-    /* check if there's transaction support */
-    transaction_support = ud_transaction_support(tr);
-
-    /* if our database's table type supports transactions, then we'll use "BEGIN - COMMIT". If not, we have to
-     lock all relevant tables */
-    if (!transaction_support) {
-        ud_build_lock_query(tr, common_tables);
-        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, NULL);
-        if (sql_err) {
-            LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
-            tr->succeeded = 0;
-            tr->error |= ERROR_U_DBS;
-            die;
-        }
-    }
 
     /* Process AUX and LEAF tables */
     for (i = TAB_START; tables[tr->class_type][i] != NULL; i++) {
@@ -242,20 +153,7 @@ int UD_rollback(Transaction_t *tr) {
     g_string_sprintf(tr->query, "UPDATE last SET thread_id=0 WHERE object_id=%ld AND thread_id=%d", tr->object_id, tr->thread_upd);
     sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
 
-    /* If there is transaction support in database, just "COMMIT". Else, UNLOCK TABLES */
-    if (!transaction_support) {
-        /* Unlock all tables */
-        g_string_sprintf(tr->query, "UNLOCK TABLES ");
-        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
-        if (sql_err) {
-            LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
-            tr->succeeded = 0;
-            tr->error |= ERROR_U_DBS;
-            die;
-        }
-    }
-
-    return (0);
+    return 0;
 } /* rollback() */
 
 /************************************************************
@@ -412,29 +310,11 @@ int UD_commit_II(Transaction_t *tr) {
 int UD_commit(Transaction_t *tr) {
     int err = 0;
     int sql_err;
-    int transaction_support;
 
     char *common_tables[] = { "last", "history", "transaction_rec", NULL };
 
     if (ACT_DELETE(tr->action))
         return (0);
-
-    /* check if there's transaction support */
-    transaction_support = ud_transaction_support(tr);
-
-    /* if our database's table type supports transactions,
-     then we'll use "BEGIN - COMMIT".
-     If not, we have to lock all relevant tables */
-    if (!transaction_support) {
-        ud_build_lock_query(tr, common_tables);
-        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
-        if (sql_err) {
-            LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
-            tr->succeeded = 0;
-            tr->error |= ERROR_U_DBS;
-            die;
-        }
-    }
 
     /* Perform first phase - deletions */
     UD_commit_I(tr);
@@ -447,22 +327,10 @@ int UD_commit(Transaction_t *tr) {
     CP_COMMIT_II_PASSED(tr->action);
     TR_update_status(tr);
 
-    /* If there is transaction support in database, just "COMMIT". Else, UNLOCK TABLES */
-    if (!transaction_support) {
-        g_string_sprintf(tr->query, "UNLOCK TABLES ");
-        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
-        if (sql_err) {
-            LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
-            tr->succeeded = 0;
-            tr->error |= ERROR_U_DBS;
-            die;
-        }
-    }
-
     /* Update radix tree for route, inetnum and inaddr-arpa domain*/
     err = UD_update_rx(tr, RX_OPER_CRE);
 
-    return (err);
+    return err;
 } /* commit() */
 
 /************************************************************
@@ -757,13 +625,9 @@ int UD_delete(Transaction_t *tr) {
     long timestamp;
     int sql_err;
     int ref_set;
-    int transaction_support;
 
     /* tables we'll have to LOCK regardless of object class */
     char *common_tables[] = { "last", "history", NULL };
-
-    /* check if there's transaction support */
-    transaction_support = ud_transaction_support(tr);
 
     /* if we are deleting referenced set, we need to  perform delete a bit differently */
     /* no deletions of aux tables */
@@ -774,20 +638,6 @@ int UD_delete(Transaction_t *tr) {
         ref_set = 1;
     else
         ref_set = 0;
-
-    /* if our database's table type supports transactions, then we'll use "BEGIN - COMMIT". If not, we have to
-     lock all relevant tables */
-
-    if (!transaction_support) {
-        ud_build_lock_query(tr, common_tables);
-        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
-        if (sql_err) {
-            LG_log(ud_context, LG_ERROR, "%s[%s]", SQ_error(tr->sql_connection), tr->query->str);
-            tr->succeeded = 0;
-            tr->error |= ERROR_U_DBS;
-            die;
-        }
-    }
 
     /* Update the history table */
     /* XXX Crash recovery: */
@@ -874,21 +724,7 @@ int UD_delete(Transaction_t *tr) {
         }
     }
 
-    /* If there is transaction support in database, just "COMMIT". Else, UNLOCK TABLES */
-    if (!transaction_support) {
-        /* Unlock all tables */
-        g_string_sprintf(tr->query, "UNLOCK TABLES ");
-        sql_err = SQ_execute_query(tr->sql_connection, tr->query->str, (SQ_result_set_t **) NULL);
-        if (sql_err) {
-            LG_log(ud_context, LG_ERROR, "%s[%s]\n", SQ_error(tr->sql_connection), tr->query->str);
-            tr->succeeded = 0;
-            tr->error |= ERROR_U_DBS;
-            die;
-        }
-    }
-
-    return (err);
-
+    return err;
 } /* delete() */
 
 /* Do more in the forest

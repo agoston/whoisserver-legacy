@@ -182,7 +182,7 @@ static void *RP_sql_load_attr_space(void *arg) {
     TA_setactivity(activity);
 
     con = SQ_get_connection_by_source_hdl(reg_id);
-    if (SQ_execute_query(con, "LOCK TABLES route READ, inetnum READ, inet6num READ, inaddr_arpa READ, domain READ, ip6int READ, route6 READ", NULL)) {
+    if (SQ_execute_query(con, "SELECT global_lock FROM update_lock WHERE global_lock = 0 FOR UPDATE", NULL)) {
         fprintf(stderr, "SQL ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
         die;
     }
