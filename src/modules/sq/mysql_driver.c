@@ -196,6 +196,27 @@ SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const ch
     }
 }
 
+SQ_connection_t *SQ_get_connection_or_NULL(const char *host, unsigned int port, const char *db, const char *user, const char *password) {
+    SQ_connection_t *conn;
+    int i;
+
+    for (i = 1; i <= 3; i++) {
+        int res = SQ_try_connection(&conn, host, port, db, user, password);
+
+        if (NOERR(res)) {
+            /* disable autocommit */
+            mysql_autocommit(conn, 0);
+            return conn;
+        } else {
+            LG_log(sq_context, LG_FATAL, "MySQL error while connecting to DB %s/%s: %d: %s", host, user, SQ_errno(conn), SQ_error(conn));
+        }
+        if (conn) SQ_close_connection(conn);
+        sleep(i);
+    }
+    return NULL;
+}
+
+
 /*Execute the sql query.
 
   SQ_connection_t *sql_connection Connection to database.

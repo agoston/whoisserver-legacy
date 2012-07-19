@@ -64,6 +64,7 @@ int SQ_try_connection(SQ_connection_t **conn, const char *host,
                            unsigned int port, const char *db,
 		           const char *user, const char *password);
 SQ_connection_t *SQ_get_connection(const char *host, unsigned int port, const char *db, const char *user, const char *password);
+SQ_connection_t *SQ_get_connection_or_NULL(const char *host, unsigned int port, const char *db, const char *user, const char *password);
 int SQ_execute_query(SQ_connection_t *sql_connection,
 		     const char *query, SQ_result_set_t **result_ptr);
 int SQ_execute_query_nostore(SQ_connection_t *sql_connection,

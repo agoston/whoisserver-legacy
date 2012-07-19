@@ -46,8 +46,9 @@ AU_ret_t rdns_dnscheck(au_plugin_callback_info_t *info, gchar *domain, GList *ns
     LG_log(au_context, LG_FUNC, ">rdns_dnscheck(%s): entered", domain);
 
     // get SQL connection
-    if ((conn = SQ_get_connection("dnscheck.ripe.net", 3306, "dnscheck", "whois", "njt53ntu53f8")) != SQ_OK) {
-        LG_log(au_context, LG_FATAL, "Failed to connect to dnscheck backend: %d: %s", SQ_errno(conn), SQ_error(conn));
+    conn = SQ_get_connection_or_NULL("dnscheck.ripe.net", 3306, "dnscheck", "whois", "njt53ntu53f8");
+    if (!conn) {
+        // FIXME: there should be an error notifying user other than a lonely "RDNS auth failed" line
         retval = AU_UNAUTHORISED_CONT;
         goto rdns_dnscheck_bail;
     }
