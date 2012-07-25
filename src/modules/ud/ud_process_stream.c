@@ -673,10 +673,14 @@ static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int oper
 		}
 	}
 
-    if (SQ_commit(tr->sql_connection) != SQ_OK) {
-        tr->succeeded = 0;
-        tr->error |= ERROR_U_BUG;
-        reason = "U:COMMIT ERROR";
+    if (tr->succeeded) {
+        if (SQ_commit(tr->sql_connection) != SQ_OK) {
+            tr->succeeded = 0;
+            tr->error |= ERROR_U_BUG;
+            reason = "U:COMMIT ERROR";
+        }
+    } else {
+        SQ_rollback(tr->sql_connection);
     }
 
     /* Make a report. U stands for update stream. No reason */
