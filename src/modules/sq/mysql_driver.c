@@ -99,11 +99,11 @@ int SQ_try_connection(SQ_connection_t **conn, const char *host, unsigned int por
         fprintf(stderr, "mysql_options failed: unknown option MYSQL_READ_DEFAULT_GROUP: %s\n", mysql_error(*conn));
         die;
     }
-//    FIXME: Disabled until we fix transaction isolation and mysql replication
-//    if (mysql_options(*conn, MYSQL_INIT_COMMAND, "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;")) {
-//        fprintf(stderr, "mysql_options failed: unknown option MYSQL_INIT_COMMAND: %s\n", mysql_error(*conn));
-//        die;
-//    }
+
+    if (mysql_options(*conn, MYSQL_INIT_COMMAND, "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;")) {
+        fprintf(stderr, "mysql_options failed: unknown option MYSQL_INIT_COMMAND: %s\n", mysql_error(*conn));
+        die;
+    }
 
     res = mysql_real_connect(*conn, host, user, password, db, port, NULL, 0);
     if (res == NULL) {
@@ -209,7 +209,7 @@ SQ_connection_t *SQ_get_connection_or_NULL(const char *host, unsigned int port, 
             mysql_autocommit(conn, 0);
             return conn;
         } else {
-            LG_log(sq_context, LG_FATAL, "MySQL error while connecting to DB %s/%s: %d: %s", host, user, SQ_errno(conn), SQ_error(conn));
+            LG_log(sq_context, LG_ERROR, "MySQL error while connecting to DB %s/%s: %d: %s", host, user, SQ_errno(conn), SQ_error(conn));
         }
         if (conn) SQ_close_connection(conn);
         sleep(i);
