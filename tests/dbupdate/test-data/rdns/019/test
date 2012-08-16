@@ -21,7 +21,6 @@ nserver:      ns1.surfnet.nl
 nserver:      ns2.surfnet.nl
 nserver:      ns3.surfnet.nl
 mnt-by:       TEST-MB-MNT
-mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 password: host3

@@ -191,7 +191,6 @@ zone-c:       TP1-DB-TEST
 nserver:      pri.authdns.ripe.net
 nserver:      sec1.authdns.ripe.net
 mnt-by:       TEST-DBM-MNT
-mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 

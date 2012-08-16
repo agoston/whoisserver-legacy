@@ -16,7 +16,6 @@ nserver:      pri.authdns.ripe.net
 nserver:      sec1.ripe.net
 nserver:      sec3.ripe.net
 mnt-by:       RIPE-NCC-HM-DOM-MNT
-mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 password: host3

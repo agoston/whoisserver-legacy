@@ -25,7 +25,6 @@ nserver:      ns3.1.ip6.arpa 193.0.0.195
 nserver:      ns3.1.ip6.arpa # I am not a glue
 nserver:      ns3.1.in-addr.arpa # I am not a gue
 mnt-by:       TEST-DBM-MNT
-mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 password: test-dbm

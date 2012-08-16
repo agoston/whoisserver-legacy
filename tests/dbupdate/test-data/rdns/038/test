@@ -23,7 +23,6 @@ nserver:        sec1.apnic.net
 nserver:        sec3.apnic.net
 nserver:        tinnie.arin.net
 mnt-by:       TEST-DBM-MNT
-mnt-lower:    TEST-DBM-MNT
 changed:        katie@ripe.net 20061030
 source:         DB-TEST
 password: hostmaster

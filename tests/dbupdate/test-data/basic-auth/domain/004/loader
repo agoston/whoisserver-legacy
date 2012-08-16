@@ -121,7 +121,6 @@ nserver:      ns1.some.net
 nserver:      ns2.some.net
 notify:       dbtest@ripe.net
 mnt-by:       TEST-DBM-MNT
-mnt-lower:    RIPE-NCC-HM-MNT
 changed:      dbtest@ripe.net 20030101
 source:       DB-TEST
 

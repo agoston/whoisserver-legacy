@@ -18,7 +18,6 @@ zone-c:       TP1-DB-TEST
 nserver:      ns1.test.nowhere
 nserver:      ns2.test.nowhere
 mnt-by:       TEST-MB-MNT
-mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 override:     password

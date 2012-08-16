@@ -24,7 +24,6 @@ nserver:      12221.test.net
 nserver:      12221.test.1n1
 nserver:      12221.test.111
 mnt-by:       TEST-DBM-MNT
-mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20040329
 source:       DB-TEST
 password: test-dbm

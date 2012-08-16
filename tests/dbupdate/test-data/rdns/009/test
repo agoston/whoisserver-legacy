@@ -16,7 +16,6 @@ nserver:      pri.authdns.ripe.net
 nserver:      sec1.apnic.net
 nserver:      sec3.apnic.net
 mnt-by:       TEST-DBM-MNT
-mnt-lower:    TEST-DBM-MNT
 changed:      dbtest@ripe.net 20100329
 source:       DB-TEST
 

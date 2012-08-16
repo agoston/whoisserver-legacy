@@ -120,7 +120,6 @@ zone-c:       TP1-DB-TEST
 nserver:      ns1.some.net
 nserver:      ns2.some.net
 mnt-by:       TEST-MNT
-mnt-lower:    TEST-MNT
 changed:      dbtest@ripe.net 20010101
 source:       DB-TEST
 
