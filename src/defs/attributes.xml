@@ -304,13 +304,6 @@
     <dummify>Dummy description for %s</dummify>
   </ripe_attribute>
 
-  <ripe_attribute name="dom-net" code="di">
-    <description>
-   List of IP networks in a domain.
-    </description>
-    <syntax><ripe-list/>ipv4-address</syntax>
-  </ripe_attribute>
-
   <ripe_attribute name="domain" code="dn">
     <description>
    Domain name.
@@ -1844,42 +1837,6 @@
   'OTHER' for all other organisations.
     </description>
     <syntax>org-type</syntax>
-  </ripe_attribute>
-
-  <ripe_attribute name="sub-dom" code="sd">
-    <description>
-   Specifies list of sub-domains of a domain.  Domain names are
-   relative to the domain represented by the domain object that
-   contains this attribute.
-    </description>
-    <syntax><ripe-list/>subdomain-name</syntax>
-
-    <representation>
-    <sqltable name="sub_dom">
-      <insert qtype="ud_leaf_">
-        INSERT sub_dom
-        SET thread_id=%d, object_id=%ld, domain='%s'
-      </insert>
-      <update qtype="ud_leaf_">
-        UPDATE sub_dom
-        SET thread_id=%d
-        WHERE object_id=%ld
-        AND domain='%s'
-      </update>
-    </sqltable>
-    </representation>
-
-    <keys searchable="inverse">
-
-      <queries>
-        <sqlquery keytype="wk_domain" class="dn">
-          SELECT object_id,0
-          FROM   sub_dom
-          WHERE  domain = '%s'
-          AND    thread_id = 0
-        </sqlquery>
-      </queries>
-    </keys>
   </ripe_attribute>
 
   <ripe_attribute name="tech-c" code="tc">

@@ -20,12 +20,9 @@
       <zone-c      choice="mandatory" number="multiple" />
       <nserver     choice="optional"  number="multiple" />
       <ds-rdata    choice="optional"  number="multiple" />
-      <sub-dom     choice="optional"  number="multiple" />
-      <dom-net     choice="optional"  number="multiple" />
       <remarks     choice="optional"  number="multiple" />
       <notify      choice="optional"  number="multiple" />
       <mnt-by      choice="mandatory" number="multiple" />
-      <mnt-lower   choice="optional"  number="multiple" />
       <refer       choice="optional"  number="single"   />
       <changed     choice="mandatory" number="multiple" />
       <source      choice="mandatory" number="single"   />
@@ -43,10 +40,8 @@
       <table name="tech_c"/>
       <table name="zone_c"/>
       <table name="nserver"/>
-      <table name="sub_dom"/>
       <table name="notify"/>
       <table name="mnt_by"/>
-      <table name="mnt_lower"/>
       <table name="refer"/>
       <table name="inaddr_arpa"/>
       <table name="ip6int"/>
