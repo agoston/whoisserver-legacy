@@ -23,7 +23,6 @@
       <remarks     choice="optional"  number="multiple" />
       <notify      choice="optional"  number="multiple" />
       <mnt-by      choice="mandatory" number="multiple" />
-      <refer       choice="optional"  number="single"   />
       <changed     choice="mandatory" number="multiple" />
       <source      choice="mandatory" number="single"   />
       <delete      choice="optional"  number="single"   pseudo="yes"/>

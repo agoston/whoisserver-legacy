@@ -1694,32 +1694,6 @@
     </keys>
   </ripe_attribute>
 
-  <ripe_attribute name="refer" code="rf">
-    <description>
-   Specifies the referral type, hostname and port that the server
-   should use to redirect the query when using referral mechanism
-   for lookups for domain objects.
-    </description>
-    <syntax>refer</syntax>
-
-    <representation>
-    <sqltable name="refer">
-      <insert qtype="ud_lf_rf">
-        INSERT refer
-        SET thread_id=%d, object_id=%ld, type=%d, host='%s', port=%d
-      </insert>
-      <update qtype="ud_lf_rf">
-        UPDATE refer
-        SET thread_id=%d
-        WHERE object_id=%ld
-        AND type=%d
-        AND host='%s'
-        AND port=%d
-      </update>
-    </sqltable>
-    </representation>
-  </ripe_attribute>
-
   <ripe_attribute name="role" code="ro">
     <description>
    Specifies the full name of a role entity, e.g. RIPE DBM.
