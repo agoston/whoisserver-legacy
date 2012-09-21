@@ -11,7 +11,6 @@
 
 domain:       ch
 descr:        Switzerland
-refer:        CLIENTADDRESS whois.nic.ch
 admin-c:      TP1-DB-TEST
 tech-c:       TP1-DB-TEST
 zone-c:       TP1-DB-TEST
