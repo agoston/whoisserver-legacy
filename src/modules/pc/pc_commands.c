@@ -579,170 +579,36 @@ int set_queries(char *input, GString *output, sk_conn_st *condat)
   ++++++++++++++++++++++++++++++++++++++*/
 int set_initrx(char *input, GString *output, sk_conn_st *condat) {
     ca_dbSource_t *source_hdl;
+    SQ_connection_t *con = NULL;
     int res = 0;
 
     source_hdl = ca_get_SourceHandleByName(input);
-    if (source_hdl == NULL) {
+
+    if (source_hdl == NULL ) {
         g_string_append(output, "Unknown source");
         res = PC_RET_ERR;
-    } else if (RP_init_trees(source_hdl) != RP_OK) {
-        g_string_append(output, "Could not re-initialize radix trees");
-        res = PC_RET_ERR;
-    } else if ((RP_sql_load_reg(source_hdl) != RP_OK) || (RP_sql_load_start() != RP_OK) || (RP_sql_load_wait_until_finished() != RP_OK)) {
-        g_string_append(output, "Could not load radix trees");
-        res = PC_RET_ERR;
     } else {
-        g_string_append(output, "radix trees reloaded successfully\n");
+        // set global update lock
+        con = SQ_get_connection_by_source_hdl(source_hdl);
+        if (SQ_execute_query(con, "SELECT global_lock FROM update_lock WHERE global_lock = 0 FOR UPDATE", NULL )) {
+            fprintf(stderr, "SQL ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
+            die;
+        }
+
+        if (RP_init_trees(source_hdl) != RP_OK) {
+            g_string_append(output, "Could not re-initialize radix trees");
+            res = PC_RET_ERR;
+        } else if ((RP_sql_load_reg(source_hdl) != RP_OK) || (RP_sql_load_start() != RP_OK) || (RP_sql_load_wait_until_finished() != RP_OK)) {
+            g_string_append(output, "Could not load radix trees");
+            res = PC_RET_ERR;
+        } else {
+            g_string_append(output, "radix trees reloaded successfully\n");
+        }
+
+        // release global update lock
+        if (con)
+            SQ_close_connection(con);
+
+        return res;
     }
-    return res;
 }
-/*++++++++++++++++++++++++++++++++++++++
-  
-  Reset the "session time" and "# of tasks" 
-  of a specific thread registered with the TA module.
-
-  ++++++++++++++++++++++++++++++++++++++*/
-#if 0
-
-/*
-XXX:
-I've removed this function because it is supposed to pass a pthread_t 
-to the TA_reset_counters() function.  But pthread_t is an opaque
-type - on FreeBSD it is a pointer to a structure, so you can't simply
-use sscanf() to get one!
-
-Shane
-2001-09-05
-
-int set_counter(char *input, GString *output, sk_conn_st *condat) 
-{
-  unsigned thr_id;
-  
-  if( sscanf(input, "%d", &thr_id) == 1) {
-    TA_reset_counters(thr_id);
-  }
-  return 0;
-}
-*/
-#endif /* 0 */
-
-
-
-/* NO LONGER SUPPORTED AFTER ER to LG transition */
-#if 0
-/*++++++++++++++++++++++++++++++++++++++
-  
-  Execute a command in the ER path processor of the ER module.
-  (first subject to macro expansion of the first word).
-
-  Argument is passed entirely to ER_macro_spec().
-
-  ++++++++++++++++++++++++++++++++++++++*/
-int set_err(char *input, GString *output, sk_conn_st *condat) 
-{
-  char *erret = NULL;
-  int res;
-
-  res = ER_macro_spec(input, &erret);
-  g_string_append(output, erret);
-  UT_free(erret);
-
-  return res;
-}
-
-
-/*++++++++++++++++++++++++++++++++++++++
-  
-  Show the current setup of the ER path system of the ER module.
-  
-  ++++++++++++++++++++++++++++++++++++++*/
-int show_err(char *input, GString *output, sk_conn_st *condat) 
-{
-  char *erret = NULL;
-
-  er_print_paths(&erret);
-  g_string_append(output, erret);
-  UT_free(erret);
-
-  return 0;
-}
-
-
-/*++++++++++++++++++++++++++++++++++++++
-  
-  Show the currently defined macros for the ER path system of the ER module.
-
-  ++++++++++++++++++++++++++++++++++++++*/
-int show_macros(char *input, GString *output, sk_conn_st *condat)
-{
-  ER_macro_list(condat);
-  return 0;
-}
-
-
-
-/*++++++++++++++++++++++++++++++++++++++
-  
-  (re)define a macro for the ER path processor.
-
-  Arguments: The first word is treated as a macro name. 
-  The rest of the line is treated as a macro definition.
-
-  ++++++++++++++++++++++++++++++++++++++*/
-int set_macro(char *input, GString *output, sk_conn_st *condat)
-{
-  char *name, *body;
-  
-  if( strlen(input) > 0 ) {
-    body = input;
-    name = (char *)strsep(&body, " "); 
-    
-    ER_make_macro( name, body );
-  }
-
-  return 0;
-}
-#endif /* 0 */
-
-
-
-
-/*++++++++++++++++++++++++++++++++++++++
-  
-  Trigger running of the socket watchdog actions for a specific thread
-  (typically resulting in shutting down of a query thread). 
-  
-  Arguments are "<socket_id> <thread_id>" as in the output of "show threads".
-
-  Assumes the command is like "stop query 11 17". 
-  This is to limit ambiguities (a new thread on the same socket, for example).
-. 
-  ++++++++++++++++++++++++++++++++++++++*/
-#if 0
-/*
-XXX:
-I've removed this function because it is supposed to pass a pthread_t 
-to the TA_trigger() function.  But pthread_t is an opaque
-type - on FreeBSD it is a pointer to a structure, so you can't simply
-use sscanf() to get one!
-
-Shane
-2001-09-05
-
-int stop_query(char *input, GString *output, sk_conn_st *condat) 
-{
-  int fd;
-  unsigned thr;
-
-  
-  if( sscanf(input, "%d %ud", &fd, &thr) < 2 ) {
-    g_string_append(output,"error!!");
-    return PC_RET_ERR;
-  }
-  else {
-    TA_trigger("whois", fd, thr);
-    return 0;
-  }
-}
-*/
-#endif /* 0 */
