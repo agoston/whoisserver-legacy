@@ -176,8 +176,9 @@ static void radix_load(void) {
 	long *min_serial, *max_serial;
 
     // sanity check - only RIPE DB should exist at this stage of RDP migration
+    dieif(ca_get_SourceHandleByPosition(1));
+
     source_hdl = ca_get_SourceHandleByPosition(0);
-    dieif(strcmp(source_hdl->name, "RIPE"));
 
     // set global update lock
 	con = SQ_get_connection_by_source_hdl(source_hdl);
