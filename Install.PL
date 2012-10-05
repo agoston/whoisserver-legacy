@@ -151,20 +151,6 @@ Examples:
     \n];
 }
 
-### do we have a working net::delcheck?
-{   my $pkg = 'Net::DelCheck';
-
-    eval "require $pkg; 1;";
-
-    ### we couldn't find Net::DelCheck or it didn't load appropriately
-    if( $@ ) {
-        die "We could not find a working '$pkg' for $^X. This is needed for ".
-            "RDNS functionality. You can get it from here:\n".
-            "ftp://ftp.ripe.net/ripe/tools/Net-DelCheck-latest.tar.gz\n\n".
-            "The full error was: $@\n";
-    }
-}
-
 ### option post-processing
 my $DbTempDir;
 {   ### we generate a path name for you if you want to use a tempdir -- only used for
