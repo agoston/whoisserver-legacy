@@ -135,6 +135,10 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
             die;
         }
 
+#ifdef DEBUG_QUERY
+        fprintf(stderr, "Op: %d, type: %d, pkey: %s\n", operation, object_type, pkey);
+#endif
+
         // add new serials to radix trees
         if (RP_asc2pack( &pack, attr_type, pkey)) die;
         pack.key = object_id;
