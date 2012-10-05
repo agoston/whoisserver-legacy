@@ -172,12 +172,30 @@ static void radix_init(void) {
 static void radix_load(void) {
 	int i;
 	ca_dbSource_t *source_hdl;
+	SQ_connection_t *con;
+	long *min_serial, *max_serial;
 
-	for (i=0; (source_hdl = ca_get_SourceHandleByPosition(i)); i++) {
-		RP_sql_load_reg(source_hdl);
+    // sanity check - only RIPE DB should exist at this stage of RDP migration
+    source_hdl = ca_get_SourceHandleByPosition(0);
+    dieif(strcmp(source_hdl->name, "RIPE"));
+
+    // set global update lock
+	con = SQ_get_connection_by_source_hdl(source_hdl);
+	if (SQ_execute_query(con, "SELECT global_lock FROM update_lock WHERE global_lock = 0 FOR UPDATE", NULL)) {
+        fprintf(stderr, "SQL ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
+        die;
 	}
+
+	// load trees in parallel
+    RP_sql_load_reg(source_hdl);
 	RP_sql_load_start();
 	RP_sql_load_wait_until_finished();
+
+	PM_get_minmax_serial(con, &min_serial, &max_serial);
+	UD_rx_refresh_set_current_serial(max_serial);
+
+	// release update lock
+    SQ_close_connection(con);
 
 #ifdef DEBUG_RADIX_LOAD
     rx_tree_t *mytree;

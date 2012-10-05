@@ -182,10 +182,6 @@ static void *RP_sql_load_attr_space(void *arg) {
     TA_setactivity(activity);
 
     con = SQ_get_connection_by_source_hdl(reg_id);
-    if (SQ_execute_query(con, "SELECT global_lock FROM update_lock WHERE global_lock = 0 FOR UPDATE", NULL)) {
-        fprintf(stderr, "SQL ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
-        die;
-    }
 
 #ifdef DEBUG_RADIX_LOAD
     fprintf(stderr, "Executing: %s\n", load_query);

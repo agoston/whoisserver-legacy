@@ -2066,6 +2066,8 @@ int QI_execute(Query_instructions *qis) {
 
     sql_connection = SQ_get_connection_by_source_hdl(qis->source);
 
+    UD_update_radix_trees(sql_connection, qis->source);
+
     sprintf(id_table, "ID_%lu_%u", mysql_thread_id(sql_connection), (unsigned int)pthread_self());
 
     /* see if there was a leftover table from a crashed session

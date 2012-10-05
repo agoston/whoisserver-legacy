@@ -62,3 +62,85 @@ void get_rx_data(void *element_data, void *tr_ptr) {
         break;
     }
 }
+
+
+static long UD_max_serial_id = -1;
+
+void UD_rx_refresh_set_current_serial(long max_serial) {
+#ifdef DEBUG_QUERY
+    fprintf(stderr, " *** max_serial set to %ld\n", max_serial);
+#endif
+    UD_max_serial_id = max_serial;
+}
+
+void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl) {
+    char query[STR_L];
+    SQ_result_set_t *sql_result;
+    SQ_row_t *sql_row;
+    int sql_err;
+    char *pkey;
+    long object_type, object_id, operation, serial_id;
+    rp_upd_pack_t pack;
+    A_Type_t attr_type;
+    rx_oper_mt rx_mode;
+
+    // get new serials
+    sprintf(query, "SELECT last.pkey, last.object_type, last.object_id, serials.operation, serials.serial_id FROM serials "+
+            "LEFT JOIN last ON last.object_id = serials.object_id AND last.sequence_id = serials.sequence_id "+
+            "WHERE last.object_type IN (3, 5, 6, 12, 19) AND serials.serial_id > %ld", UD_max_serial_id);
+
+    if ((sql_err = SQ_execute_query(con, query, &sql_result))) {
+        LG_log(pm_context, LG_SEVERE, "%s[%s]", SQ_error(con), query);
+        die;
+    }
+
+    while ((sql_row = SQ_row_next(sql_result)) != NULL) {
+        pkey = SQ_get_column_string_nocopy(sql_result, sql_row, 0);
+        if (SQ_get_column_int(sql_result, sql_row, 1, object_type) < -1) {
+            LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+            die;
+        }
+        if (SQ_get_column_int(sql_result, sql_row, 2, object_id) < -1) {
+            LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+            die;
+        }
+        if (SQ_get_column_int(sql_result, sql_row, 3, operation) < -1) {
+            LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+            die;
+        }
+        if (SQ_get_column_int(sql_result, sql_row, 4, serial_id) < -1) {
+            LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+            die;
+        }
+
+        // update max serial id
+        if (serial_id > UD_max_serial_id) UD_max_serial_id = serial_id;
+
+        // calculate rx_mode; skip if operation is noop
+        switch (operation) {
+        case OP_DEL: rx_mode = RX_OPER_DEL; break;
+        case OP_ADD:
+        case OP_UPD: rx_mode = RX_OPER_CRE; break;
+        default: continue;
+        }
+
+        // calculate attr_type for radix tree update
+        switch (object_type) {
+        case 3: attr_type = A_DN; break;
+        case 5: attr_type = A_I6; break;
+        case 6: attr_type = A_IN; break;
+        case 12: attr_type = A_RT; break;
+        case 19: attr_type = A_R6; break;
+        default:
+            die;
+        }
+
+        // add new serials to radix trees
+        if (RP_asc2pack( &pack, attr_type, pkey)) die;
+        pack.key = object_id;
+        if (RP_pack_node(rx_mode, &pack, source_hdl) != RX_OK) die;
+    }
+
+    SQ_free_result(sql_result);
+}
+
