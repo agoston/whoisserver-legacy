@@ -1,0 +1,14 @@
+20120904 - version 3.16 (RDP migration)
+
+
+Changes:
+- Only a single source is supported now (as legacy whois-server is phased out)
+- Radix trees are refreshed from serials before executing any queries
+
+
+Merged:
+
+
+Affected stakeholders:
+- NCC Services WG
+- DB WG
