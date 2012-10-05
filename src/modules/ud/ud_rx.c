@@ -90,26 +90,26 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
             "WHERE last.object_type IN (3, 5, 6, 12, 19) AND serials.serial_id > %ld", UD_max_serial_id);
 
     if ((sql_err = SQ_execute_query(con, query, &sql_result))) {
-        LG_log(pm_context, LG_SEVERE, "%s[%s]", SQ_error(con), query);
+        fprintf(stderr, "%s[%s]", SQ_error(con), query);
         die;
     }
 
     while ((sql_row = SQ_row_next(sql_result)) != NULL) {
         pkey = SQ_get_column_string_nocopy(sql_result, sql_row, 0);
         if (SQ_get_column_int(sql_result, sql_row, 1, object_type) < -1) {
-            LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+            fprintf(stderr, "Error during SQ_get_column_int [%s]", query);
             die;
         }
         if (SQ_get_column_int(sql_result, sql_row, 2, object_id) < -1) {
-            LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+            fprintf(stderr, "Error during SQ_get_column_int [%s]", query);
             die;
         }
         if (SQ_get_column_int(sql_result, sql_row, 3, operation) < -1) {
-            LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+            fprintf(stderr, "Error during SQ_get_column_int [%s]", query);
             die;
         }
         if (SQ_get_column_int(sql_result, sql_row, 4, serial_id) < -1) {
-            LG_log(pm_context, LG_SEVERE, "Error during SQ_get_column_int [%s]", query);
+            fprintf(stderr, "Error during SQ_get_column_int [%s]", query);
             die;
         }
 
