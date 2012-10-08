@@ -79,7 +79,7 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
     SQ_row_t *sql_row;
     int sql_err;
     char *pkey;
-    long object_type, object_id, operation, serial_id;
+    long object_type = -1, object_id = -1, operation = -1, serial_id = -1;
     rp_upd_pack_t pack;
     A_Type_t attr_type;
     rx_oper_mt rx_mode;
@@ -96,19 +96,19 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
 
     while ((sql_row = SQ_row_next(sql_result)) != NULL) {
         pkey = SQ_get_column_string_nocopy(sql_result, sql_row, 0);
-        if (SQ_get_column_int(sql_result, sql_row, 1, object_type) < -1) {
+        if (SQ_get_column_int(sql_result, sql_row, 1, &object_type)) {
             fprintf(stderr, "Error during SQ_get_column_int [%s]", query);
             die;
         }
-        if (SQ_get_column_int(sql_result, sql_row, 2, object_id) < -1) {
+        if (SQ_get_column_int(sql_result, sql_row, 2, &object_id)) {
             fprintf(stderr, "Error during SQ_get_column_int [%s]", query);
             die;
         }
-        if (SQ_get_column_int(sql_result, sql_row, 3, operation) < -1) {
+        if (SQ_get_column_int(sql_result, sql_row, 3, &operation)) {
             fprintf(stderr, "Error during SQ_get_column_int [%s]", query);
             die;
         }
-        if (SQ_get_column_int(sql_result, sql_row, 4, serial_id) < -1) {
+        if (SQ_get_column_int(sql_result, sql_row, 4, &serial_id)) {
             fprintf(stderr, "Error during SQ_get_column_int [%s]", query);
             die;
         }
@@ -136,7 +136,7 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
         }
 
 #ifdef DEBUG_QUERY
-        fprintf(stderr, "Op: %d, type: %d, pkey: %s\n", operation, object_type, pkey);
+        fprintf(stderr, "Op: %ld, type: %ld, pkey: %s\n", operation, object_type, pkey);
 #endif
 
         // add new serials to radix trees

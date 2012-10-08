@@ -94,9 +94,6 @@ int UD_rollback(Transaction_t *tr) {
     int i, j;
     int sql_err;
 
-    /* tables we'll have to LOCK regardless of object class */
-    char *common_tables[] = { "last", "history", NULL };
-
     if (ACT_DELETE(tr->action))
         return (0);
 
@@ -309,9 +306,6 @@ int UD_commit_II(Transaction_t *tr) {
 
 int UD_commit(Transaction_t *tr) {
     int err = 0;
-    int sql_err;
-
-    char *common_tables[] = { "last", "history", "transaction_rec", NULL };
 
     if (ACT_DELETE(tr->action))
         return (0);
@@ -625,9 +619,6 @@ int UD_delete(Transaction_t *tr) {
     long timestamp;
     int sql_err;
     int ref_set;
-
-    /* tables we'll have to LOCK regardless of object class */
-    char *common_tables[] = { "last", "history", NULL };
 
     /* if we are deleting referenced set, we need to  perform delete a bit differently */
     /* no deletions of aux tables */
