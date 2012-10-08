@@ -170,7 +170,6 @@ static void radix_init(void) {
 
  ++++++++++++++++++++++++++++++++++++++*/
 static void radix_load(void) {
-	int i;
 	ca_dbSource_t *source_hdl;
 	SQ_connection_t *con;
 	long min_serial = 0, max_serial = 0;
