@@ -581,6 +581,7 @@ int set_initrx(char *input, GString *output, sk_conn_st *condat) {
     ca_dbSource_t *source_hdl;
     SQ_connection_t *con = NULL;
     int res = 0;
+    long min_serial = 0, max_serial = 0;
 
     source_hdl = ca_get_SourceHandleByName(input);
 
@@ -605,10 +606,14 @@ int set_initrx(char *input, GString *output, sk_conn_st *condat) {
             g_string_append(output, "radix trees reloaded successfully\n");
         }
 
+        // reinit min/max serials
+        PM_get_minmax_serial(con, &min_serial, &max_serial);
+        UD_rx_refresh_set_current_serial(max_serial);
+
         // release global update lock
         if (con)
             SQ_close_connection(con);
-
-        return res;
     }
+
+    return res;
 }
