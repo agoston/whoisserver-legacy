@@ -75,6 +75,9 @@ void UD_rx_refresh_set_serial(long max_serial) {
 
 void UD_rx_refresh_increment_serial() {
     UD_max_serial_id++;
+#ifdef DEBUG_QUERY
+    fprintf(stderr, " *** max_serial set to %ld\n", max_serial);
+#endif
 }
 
 void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl) {
