@@ -64,7 +64,7 @@ void get_rx_data(void *element_data, void *tr_ptr) {
 }
 
 
-static long UD_max_serial_id = -1;
+static long volatile UD_max_serial_id = -1;
 static pthread_mutex_t serial_id_lock = PTHREAD_MUTEX_INITIALIZER;
 
 void UD_rx_refresh_set_serial(long max_serial) {

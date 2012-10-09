@@ -666,7 +666,17 @@ static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int oper
 			}
 			UD_create_serial(tr);
 
-            /* update max serials */
+            /* update radix tree */
+            switch (operation) {
+            case OP_ADD:
+                UD_update_rx(tr, RX_OPER_CRE);
+                break;
+            case OP_DEL:
+                UD_update_rx(tr, RX_OPER_DEL);
+                break;
+            }
+
+            /* update last known serial_id */
             UD_rx_refresh_set_serial(tr->serial_id);
 
 			CP_CREATE_S_PASSED(tr->action);

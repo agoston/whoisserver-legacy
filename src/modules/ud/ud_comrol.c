@@ -321,9 +321,6 @@ int UD_commit(Transaction_t *tr) {
     CP_COMMIT_II_PASSED(tr->action);
     TR_update_status(tr);
 
-    /* Update radix tree for route, inetnum and inaddr-arpa domain*/
-    err = UD_update_rx(tr, RX_OPER_CRE);
-
     return err;
 } /* commit() */
 

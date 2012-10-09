@@ -1826,7 +1826,6 @@ int object_process(Transaction_t *tr) {
 
 			/* delete the object and checkpoint it*/
 			UD_delete(tr);
-			UD_update_rx(tr, RX_OPER_DEL);
 
 			/* we need to update sequence_id because it was changed during update */
 			CP_DELETE_PASSED(tr->action);
