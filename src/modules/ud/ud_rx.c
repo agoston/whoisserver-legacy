@@ -73,8 +73,8 @@ void UD_rx_refresh_set_serial(long max_serial) {
     UD_max_serial_id = max_serial;
 }
 
-long UD_rx_refresh_get_serial() {
-    return UD_max_serial_id;
+void UD_rx_refresh_increment_serial() {
+    UD_max_serial_id++;
 }
 
 void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl) {

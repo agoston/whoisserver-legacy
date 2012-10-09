@@ -188,7 +188,7 @@ int UD_comrol_serial(Transaction_t *tr, int commit);
 
 void UD_rx_refresh_set_serial(long max_serial);
 void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl);
-long UD_rx_refresh_get_serial();
+void UD_rx_refresh_increment_serial();
 
 #endif /* _UD_INT_H */
 
