@@ -65,19 +65,15 @@ void get_rx_data(void *element_data, void *tr_ptr) {
 
 
 static long UD_max_serial_id = -1;
+static pthread_mutex_t serial_id_lock = PTHREAD_MUTEX_INITIALIZER;
 
 void UD_rx_refresh_set_serial(long max_serial) {
 #ifdef DEBUG_QUERY
     fprintf(stderr, " *** max_serial set to %ld\n", max_serial);
 #endif
+    pthread_mutex_lock(&serial_id_lock);
     UD_max_serial_id = max_serial;
-}
-
-void UD_rx_refresh_increment_serial() {
-    UD_max_serial_id++;
-#ifdef DEBUG_QUERY
-    fprintf(stderr, " *** max_serial set to %ld\n", UD_max_serial_id);
-#endif
+    pthread_mutex_unlock(&serial_id_lock);
 }
 
 void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl) {
@@ -90,6 +86,8 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
     rp_upd_pack_t pack;
     A_Type_t attr_type;
     rx_oper_mt rx_mode;
+
+    pthread_mutex_lock(&serial_id_lock);
 
     // get new serials
     sprintf(query, "SELECT last.pkey, last.object_type, last.object_id, serials.operation, serials.serial_id FROM serials "
@@ -152,6 +150,7 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
         if (RP_pack_node(rx_mode, &pack, source_hdl) != RX_OK) die;
     }
 
+    pthread_mutex_unlock(&serial_id_lock);
     SQ_free_result(sql_result);
 }
 

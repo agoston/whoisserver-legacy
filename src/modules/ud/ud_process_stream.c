@@ -665,6 +665,10 @@ static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int oper
 				tr->sequence_id++;
 			}
 			UD_create_serial(tr);
+
+            /* update max serials */
+            UD_rx_refresh_set_serial(tr->serial_id);
+
 			CP_CREATE_S_PASSED(tr->action);
 			TR_update_status(tr);
 			UD_commit_serial(tr);

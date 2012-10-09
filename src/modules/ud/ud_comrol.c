@@ -748,9 +748,6 @@ int UD_update_rx(Transaction_t *tr, rx_oper_mt mode) {
                     LG_log(ud_context, LG_SEVERE, "cannot update radix tree\n");
                     die;
                 }
-
-                /* update max serials */
-                UD_rx_refresh_increment_serial(tr->serial_id);
             }
         }
     }
