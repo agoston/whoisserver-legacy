@@ -736,6 +736,12 @@ int UD_update_rx(Transaction_t *tr, rx_oper_mt mode) {
 
             /* Except for regular domains we need to update radix tree */
             if (ACT_UPD_RX(tr->action)) {
+
+                /* update max serials */
+                if (tr->serial_id - 1 > UD_rx_refresh_get_serial()) {
+                    UD_update_radix_trees(tr->sql_connection, tr->source_hdl);
+                }
+
                 packptr->key = tr->object_id;
                 if (RP_pack_node(mode, packptr, tr->source_hdl) == RX_OK) {
                     err = 0;
@@ -744,7 +750,10 @@ int UD_update_rx(Transaction_t *tr, rx_oper_mt mode) {
                     LG_log(ud_context, LG_SEVERE, "cannot update radix tree\n");
                     die;
                 }
-            } /* update radix tree */
+
+                /* update max serials */
+                UD_rx_refresh_set_serial(tr->serial_id);
+            }
         }
     }
     return (err);

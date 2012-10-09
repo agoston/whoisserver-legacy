@@ -608,7 +608,7 @@ int set_initrx(char *input, GString *output, sk_conn_st *condat) {
 
         // reinit min/max serials
         PM_get_minmax_serial(con, &min_serial, &max_serial);
-        UD_rx_refresh_set_current_serial(max_serial);
+        UD_rx_refresh_set_serial(max_serial);
 
         // release global update lock
         if (con)
