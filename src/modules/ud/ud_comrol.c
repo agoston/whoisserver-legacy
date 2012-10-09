@@ -740,6 +740,10 @@ int UD_update_rx(Transaction_t *tr, rx_oper_mt mode) {
                 /* update max serials */
                 if (tr->serial_id - 1 > UD_rx_refresh_get_serial()) {
                     UD_update_radix_trees(tr->sql_connection, tr->source_hdl);
+                } else {
+#ifdef DEBUG_QUERY
+                    fprintf(stderr, " *** serial_id %ld is only 1 bigger than cached, not updating\n");
+#endif
                 }
 
                 packptr->key = tr->object_id;
