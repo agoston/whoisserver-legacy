@@ -36,6 +36,13 @@
 static long volatile UD_max_serial_id = -1;
 static pthread_mutex_t serial_id_lock = PTHREAD_MUTEX_INITIALIZER;
 
+void UD_set_global_update_lock(SQ_connection_t *con) {
+    if (SQ_execute_query(con, "SELECT global_lock FROM update_lock WHERE global_lock = 0 FOR UPDATE", NULL)) {
+        fprintf(stderr, "SQL ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
+        die;
+    }
+}
+
 void UD_rx_refresh_set_serial(SQ_connection_t *con) {
     long min_serial = 0, max_serial = 0;
     PM_get_minmax_serial(con, &min_serial, &max_serial);

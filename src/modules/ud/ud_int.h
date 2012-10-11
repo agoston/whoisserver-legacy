@@ -182,6 +182,7 @@ int UD_comrol_serial(Transaction_t *tr, int commit);
 #define UD_commit_serial(tr) UD_comrol_serial(tr, 1)
 #define UD_rollback_serial(tr) UD_comrol_serial(tr, 0)
 
+void UD_set_global_update_lock(SQ_connection_t *con);
 void UD_rx_refresh_set_serial(SQ_connection_t *con);
 void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl);
 

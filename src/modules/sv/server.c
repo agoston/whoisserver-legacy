@@ -180,10 +180,7 @@ static void radix_load(void) {
 
     // set global update lock
 	con = SQ_get_connection_by_source_hdl(source_hdl);
-	if (SQ_execute_query(con, "SELECT global_lock FROM update_lock WHERE global_lock = 0 FOR UPDATE", NULL)) {
-        fprintf(stderr, "SQL ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
-        die;
-	}
+	UD_set_global_update_lock(con);
 
 	// load trees in parallel
     RP_sql_load_reg(source_hdl);

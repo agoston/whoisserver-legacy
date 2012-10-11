@@ -590,10 +590,7 @@ int set_initrx(char *input, GString *output, sk_conn_st *condat) {
     } else {
         // set global update lock
         con = SQ_get_connection_by_source_hdl(source_hdl);
-        if (SQ_execute_query(con, "SELECT global_lock FROM update_lock WHERE global_lock = 0 FOR UPDATE", NULL )) {
-            fprintf(stderr, "SQL ERROR %d: %s\n", SQ_errno(con), SQ_error(con));
-            die;
-        }
+        UD_set_global_update_lock(con);
 
         if (RP_init_trees(source_hdl) != RP_OK) {
             g_string_append(output, "Could not re-initialize radix trees");
@@ -609,8 +606,7 @@ int set_initrx(char *input, GString *output, sk_conn_st *condat) {
         UD_rx_refresh_set_serial(con);
 
         // release global update lock
-        if (con)
-            SQ_close_connection(con);
+        SQ_close_connection(con);
     }
 
     return res;
