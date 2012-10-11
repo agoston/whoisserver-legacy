@@ -61,7 +61,7 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
     SQ_row_t *sql_row;
     int sql_err;
     char *pkey;
-    long object_type = -1, object_id = -1, operation = -1, serial_id = -1;
+    long object_type = -1, object_id = -1, operation = -1, serial_id = -1, sequence_id = -1;
     rp_upd_pack_t pack;
     A_Type_t attr_type;
     rx_oper_mt rx_mode;
@@ -69,7 +69,7 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
     pthread_mutex_lock(&serial_id_lock);
 
     // get new serials
-    sprintf(query, "SELECT last.pkey, last.object_type, last.object_id, serials.operation, serials.serial_id FROM serials "
+    sprintf(query, "SELECT last.pkey, last.object_type, last.object_id, serials.operation, serials.serial_id, serials.sequence_id FROM serials "
             "LEFT JOIN last ON last.object_id = serials.object_id AND last.sequence_id = serials.sequence_id "
             "WHERE last.object_type IN (3, 5, 6, 12, 19) AND serials.serial_id > %ld", UD_max_serial_id);
 
@@ -96,16 +96,21 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
             fprintf(stderr, "Error during SQ_get_column_int [%s]", query);
             die;
         }
+        if (SQ_get_column_int(sql_result, sql_row, 5, &sequence_id)) {
+            fprintf(stderr, "Error during SQ_get_column_int [%s]", query);
+            die;
+        }
 
         // update max serial id
         if (serial_id > UD_max_serial_id) UD_max_serial_id = serial_id;
 
-        // calculate rx_mode; skip if operation is noop
-        switch (operation) {
-        case OP_DEL: rx_mode = RX_OPER_DEL; break;
-        case OP_ADD: rx_mode = RX_OPER_CRE; break;
-        case OP_UPD:    // primary key never changes, ignore
-        default: continue;
+        // calculate rx_mode
+        if (operation == OP_DEL) {
+            rx_mode = RX_OPER_DEL;
+        } else if (operation == OP_ADD && sequence_id == 1) {   // tricky: ADD+UPD is the same operation
+            rx_mode = RX_OPER_CRE;
+        } else {
+            continue;
         }
 
         // calculate attr_type for radix tree update
