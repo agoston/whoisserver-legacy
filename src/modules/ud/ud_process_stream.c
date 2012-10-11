@@ -665,20 +665,6 @@ static int process_updates(UD_stream_t * ud_stream, Transaction_t * tr, int oper
 				tr->sequence_id++;
 			}
 			UD_create_serial(tr);
-
-            /* update radix tree */
-            switch (operation) {
-            case OP_ADD:
-                UD_update_rx(tr, RX_OPER_CRE);
-                break;
-            case OP_DEL:
-                UD_update_rx(tr, RX_OPER_DEL);
-                break;
-            }
-
-            /* update last known serial_id */
-            UD_rx_refresh_set_serial(tr->serial_id);
-
 			CP_CREATE_S_PASSED(tr->action);
 			TR_update_status(tr);
 			UD_commit_serial(tr);
@@ -768,6 +754,9 @@ static int process_transaction(UD_stream_t *ud_stream, GString *g_obj_buff, int 
         UD_ack(tr);
         return -1;
     }
+
+    // update radix trees from DB before executing update
+    UD_update_radix_trees(tr->sql_connection, tr->source_hdl);
 
 	/* check for syntax errors (with whois_rip syntax set) */
 	if ((rpsl_err_list = rpsl_object_errors(submitted_object)) != NULL) {

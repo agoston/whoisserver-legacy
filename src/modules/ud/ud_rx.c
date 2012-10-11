@@ -33,41 +33,13 @@
 
 #include "rip.h"
 
-/* Function to fill data for radix tree */
-void get_rx_data(void *element_data, void *tr_ptr) {
-    int err;
-    const rpsl_attr_t *attribute = (const rpsl_attr_t *) element_data;
-    Transaction_t *tr = (Transaction_t *) tr_ptr;
-    int attribute_type = rpsl_get_attr_id(rpsl_attr_get_name(attribute));
-
-    const gchar *attribute_value;
-
-    switch (attribute_type) {
-    case A_IN:
-    case A_RT:
-    case A_R6:
-    case A_I6:
-    case A_DN:
-        /* it is already clean as we work with the flattened object */
-        attribute_value = rpsl_attr_get_value(attribute);
-        if (ERR(err = RP_asc2pack( tr->packptr, attribute_type, attribute_value))) {
-            /* we can also forgive bit inconsistencies */
-            /* DN can be forgiven, but radix should not be updated */
-            dieif( attribute_type != A_DN);
-            /* DN can be forgiven, but radix should not be updated */
-        } else
-            tr->action |= TA_UPD_RX; /* Update radix in all other cases */
-        break;
-    default:
-        break;
-    }
-}
-
-
 static long volatile UD_max_serial_id = -1;
 static pthread_mutex_t serial_id_lock = PTHREAD_MUTEX_INITIALIZER;
 
-void UD_rx_refresh_set_serial(long max_serial) {
+void UD_rx_refresh_set_serial(SQ_connection_t *con) {
+    long min_serial = 0, max_serial = 0;
+    PM_get_minmax_serial(con, &min_serial, &max_serial);
+
 #ifdef DEBUG_QUERY
     fprintf(stderr, " *** max_serial set to %ld\n", max_serial);
 #endif

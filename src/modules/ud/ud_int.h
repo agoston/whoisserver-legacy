@@ -151,8 +151,6 @@ int UD_rollback(Transaction_t *tr);
 
 int UD_delete(Transaction_t *tr);
 
-int UD_update_rx(Transaction_t *tr, rx_oper_mt mode);
-
 int UD_ack(Transaction_t* tr);
 int UD_check_ref(Transaction_t *tr);
 
@@ -171,8 +169,6 @@ void transaction_free(Transaction_t *tr);
 
 Transaction_t *transaction_new(SQ_connection_t *sql_connection, C_Type_t class_type, LG_context_t *src_ctx);
 
-void get_rx_data(void *element_data, void *tr_ptr);
-
 void ud_each_primary_key_select(void *element_data, void *result_ptr);
 
 char *convert_rf(const char *avalue, int *type, int *port);
@@ -186,7 +182,7 @@ int UD_comrol_serial(Transaction_t *tr, int commit);
 #define UD_commit_serial(tr) UD_comrol_serial(tr, 1)
 #define UD_rollback_serial(tr) UD_comrol_serial(tr, 0)
 
-void UD_rx_refresh_set_serial(long max_serial);
+void UD_rx_refresh_set_serial(SQ_connection_t *con);
 void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl);
 
 #endif /* _UD_INT_H */
