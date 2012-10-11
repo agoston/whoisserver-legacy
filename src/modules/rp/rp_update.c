@@ -122,6 +122,10 @@ sql_key_t key /*+ the key to the SQL full-text +*/
 
      */
 
+#ifdef DEBUG_RADIX
+    fprintf(stderr, "RP_uni_node: mode: %d, sql_key: %s\n", mode, key)
+#endif
+
     rx_tree_t *mytree;
     ip_space_t space = uni->space;
     int err;
