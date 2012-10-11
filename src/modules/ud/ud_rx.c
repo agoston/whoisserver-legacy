@@ -103,8 +103,8 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
         // calculate rx_mode; skip if operation is noop
         switch (operation) {
         case OP_DEL: rx_mode = RX_OPER_DEL; break;
-        case OP_ADD:
-        case OP_UPD: rx_mode = RX_OPER_CRE; break;
+        case OP_ADD: rx_mode = RX_OPER_CRE; break;
+        case OP_UPD:    // primary key never changes, ignore
         default: continue;
         }
 
