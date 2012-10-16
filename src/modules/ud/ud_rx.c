@@ -70,7 +70,7 @@ void UD_update_radix_trees(SQ_connection_t *con, const ca_dbSource_t *source_hdl
 
     // get new serials
     sprintf(query, "SELECT last.pkey, last.object_type, last.object_id, serials.operation, serials.serial_id, serials.sequence_id FROM serials "
-            "LEFT JOIN last ON last.object_id = serials.object_id AND last.sequence_id = serials.sequence_id "
+            "LEFT JOIN last ON last.object_id = serials.object_id "
             "WHERE last.object_type IN (3, 5, 6, 12, 19) AND serials.serial_id > %ld", UD_max_serial_id);
 
     if ((sql_err = SQ_execute_query(con, query, &sql_result))) {
