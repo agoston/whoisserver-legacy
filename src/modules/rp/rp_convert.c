@@ -93,18 +93,25 @@ int RP_asc2uni(const char *astr, rp_attr_t attr, rp_uni_t *uni) {
 
 /* Function to fill data for radix tree */
 /* returns error if string is not valid, also for reverse domains */
-int RP_asc2pack(rp_upd_pack_t *pack, rp_attr_t type, const char *string) {
+int RP_asc2pack(rp_upd_pack_t *pack, rp_attr_t type, const char *pkey) {
     int err;
 
     pack->type = type;
 
 //    LG_log(rp_context, LG_DEBUG, "RP_asc2pack: converted attr %s: %s to pack at %08x", DF_get_attribute_code(type), string, pack);
 
-    err = RP_asc2uni(string, type, &(pack->uni));
+    err = RP_asc2uni(pkey, type, &(pack->uni));
 
-    if (type == A_DN && err == IP_OK) {
+    switch (type) {
+    case A_DN:
         /* Check if it is an in-addr.arpa domain, set domain ptr only then */
-        pack->d.domain = (char*) string;
+        pack->d.domain = (char*) pkey;
+        break;
+
+    case A_RT:
+    case A_R6:
+        pack->d.origin = strcasestr(pkey, "AS");
+        break;
     }
 
     return err;
