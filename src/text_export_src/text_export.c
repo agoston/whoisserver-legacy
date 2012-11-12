@@ -190,7 +190,7 @@ void output_object(char *object, struct class *c, int num_classes) {
 
     /* we are deliberately not using last.object_type field because we don't trust it */
 	for (i=0; i<num_classes; i++) {
-        if (strcmp(c[i].name, object) == 0) {
+        if (strcasecmp(c[i].name, object) == 0) {
 			*p = ':';
 			dump_fputs(object, c[i].fp);
 			dump_putc('\n', c[i].fp);
