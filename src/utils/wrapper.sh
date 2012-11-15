@@ -41,7 +41,10 @@ cat $ERRFILE 1>&2
 
 # send email on non-zero return code
 if [ $RET -gt 0 ]; then
-	echo "${DBUPDATE} exited with code ${RET} on ${HOSTNAME}
+	echo "To: $ERRORS_TO
+Subject: ${DBUPDATE} execution problem
+
+${DBUPDATE} exited with code ${RET} on ${HOSTNAME}
 Command line: ${DBUPDATE} $*
 
 STDIN: >>>`cat $INFILE`<<<
@@ -49,7 +52,7 @@ STDIN: >>>`cat $INFILE`<<<
 STDOUT: >>>`cat $OUTFILE`<<<
 
 STDERR: >>>`cat $ERRFILE`<<<
-" | mail -s "${DBUPDATE} execution problem" $ERRORS_TO
+" | /usr/sbin/sendmail -funread@ripe.net -t
 fi
 
 rm -f $INFILE $OUTFILE $ERRFILE
